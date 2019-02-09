@@ -1,0 +1,346 @@
+ADC Add With Carry [Flags affected: n,v,z,c]
+ADC (dp,X)	61	DP Indexed Indirect,X	x	x	x	2	61,2,4
+ADC sr,S	63	Stack Relative			x	2	41,4
+ADC dp	65	Direct Page	x	x	x	2	31,2,4
+ADC [dp]	67	DP Indirect Long			x	2	61,2,4
+ADC #const	69	Immediate	x	x	x	217	21,4
+ADC addr	6D	Absolute	x	x	x	3	41,4
+ADC long	6F	Absolute Long			x	4	51,4
+ADC (dp),Y	71	DP Indirect Indexed, Y	x	x	x	2	51,2,3,4
+ADC (dp)	72	DP Indirect		x	x	2	51,2,4
+ADC (sr,S),Y	73	SR Indirect Indexed,Y			x	2	71,4
+ADC dp,X	75	DP Indexed,X	x	x	x	2	41,2,4
+ADC [dp],Y	77	DP Indirect Long Indexed, Y			x	2	61,2,4
+ADC addr,Y	79	Absolute Indexed,Y	x	x	x	3	41,3,4
+ADC addr,X	7D	Absolute Indexed,X	x	x	x	3	41,3,4
+ADC long,X	7F	Absolute Long Indexed,X			x	4	51,4
+AND AND Accumulator With Memory [Flags affected: n,z]
+AND (dp,X)	21	DP Indexed Indirect,X	x	x	x	2	61,2
+AND sr,S	23	Stack Relative			x	2	41
+AND dp	25	Direct Page	x	x	x	2	31,2
+AND [dp]	27	DP Indirect Long			x	2	61,2
+AND #const	29	Immediate	x	x	x	217	21
+AND addr	2D	Absolute	x	x	x	3	41
+AND long	2F	Absolute Long			x	4	51
+AND (dp),Y	31	DP Indirect Indexed, Y	x	x	x	2	51,2,3
+AND (dp)	32	DP Indirect		x	x	2	51,2
+AND (sr,S),Y	33	SR Indirect Indexed,Y			x	2	71
+AND dp,X	35	DP Indexed,X	x	x	x	2	41,2
+AND [dp],Y	37	DP Indirect Long Indexed, Y			x	2	61,2
+AND addr,Y	39	Absolute Indexed,Y	x	x	x	3	41,3
+AND addr,X	3D	Absolute Indexed,X	x	x	x	3	41,3
+AND long,X	3F	Absolute Long Indexed,X			x	4	51
+ASL Accumulator or Memory Shift Left [Flags affected: n,z,c]
+ASL dp	06	Direct Page	x	x	x	2	52,5
+ASL A	0A	Accumulator	x	x	x	1	2
+ASL addr	0E	Absolute	x	x	x	3	65
+ASL dp,X	16	DP Indexed,X	x	x	x	2	62,5
+ASL addr,X	1E	Absolute Indexed,X	x	x	x	3	75,6
+BCC Branch if Carry Clear [Flags affected: none][Alias: BLT]
+BCC nearlabel	90	Program Counter Relative	x	x	x	2	27,8
+BCS Branch if Carry Set [Flags affected: none][Alias: BGE]
+BCS nearlabel	B0	Program Counter Relative	x	x	x	2	27,8
+BEQ Branch if Equal [Flags affected: none]
+BEQ nearlabel	F0	Program Counter Relative	x	x	x	2	27,8
+BIT Test Bits [Flags affected: z (immediate mode) n,v,z (non-immediate modes)]
+BIT dp	24	Direct Page	x	x	x	2	31,2
+BIT addr	2C	Absolute	x	x	x	3	41
+BIT dp,X	34	DP Indexed,X		x	x	2	41,2
+BIT addr,X	3C	Absolute Indexed,X		x	x	3	41,3
+BIT #const	89	Immediate		x	x	217	21
+BMI Branch if Minus [Flags affected: none]
+BMI nearlabel	30	Program Counter Relative	x	x	x	2	27,8
+BNE Branch if Not Equal [Flags affected: none]
+BNE nearlabel	D0	Program Counter Relative	x	x	x	2	27,8
+BPL Branch if Plus [Flags affected: none]
+BPL nearlabel	10	Program Counter Relative	x	x	x	2	27,8
+BRA Branch Always [Flags affected: none]
+BRA nearlabel	80	Program Counter Relative		x	x	2	38
+BRK Break [Flags affected: b,i (6502) b,d,i (65C02/65816 Emulation) d,i (65816 Native)]
+BRK	00	Stack/Interrupt	x	x	x	218	79
+BRL Branch Long Always [Flags affected: none]
+BRL label	82	Program Counter Relative Long			x	3	4
+BVC Branch if Overflow Clear [Flags affected: none]
+BVC nearlabel	50	Program Counter Relative	x	x	x	2	27,8
+BVS Branch if Overflow Set [Flags affected: none]
+BVS nearlabel	70	Program Counter Relative	x	x	x	2	27,8
+CLC Clear Carry [Flags affected: c]
+CLC	18	Implied	x	x	x	1	2
+CLD Clear Decimal Mode Flag [Flags affected: d]
+CLD	D8	Implied	x	x	x	1	2
+CLI Clear Interrupt Disable Flag [Flags affected: i]
+CLI	58	Implied	x	x	x	1	2
+CLV Clear Overflow Flag [Flags affected: v]
+CLV	B8	Implied	x	x	x	1	2
+CMP Compare Accumulator With Memory [Flags affected: n,z,c]
+CMP (dp,X)	C1	DP Indexed Indirect,X	x	x	x	2	61,2
+CMP sr,S	C3	Stack Relative			x	2	41
+CMP dp	C5	Direct Page	x	x	x	2	31,2
+CMP [dp]	C7	DP Indirect Long			x	2	61,2
+CMP #const	C9	Immediate	x	x	x	217	21
+CMP addr	CD	Absolute	x	x	x	3	41
+CMP long	CF	Absolute Long			x	4	51
+CMP (dp),Y	D1	DP Indirect Indexed, Y	x	x	x	2	51,2,3
+CMP (dp)	D2	DP Indirect		x	x	2	51,2
+CMP (sr,S),Y	D3	SR Indirect Indexed,Y			x	2	71
+CMP dp,X	D5	DP Indexed,X	x	x	x	2	41,2
+CMP [dp],Y	D7	DP Indirect Long Indexed, Y			x	2	61,2
+CMP addr,Y	D9	Absolute Indexed,Y	x	x	x	3	41,3
+CMP addr,X	DD	Absolute Indexed,X	x	x	x	3	41,3
+CMP long,X	DF	Absolute Long Indexed,X			x	4	51
+COP Co-Processor Enable [Flags affected: d,i]
+COP const	02	Stack/Interrupt			x	218	79
+CPX Compare Index Register X with Memory [Flags affected: n,z,c]
+CPX #const	E0	Immediate	x	x	x	219	210
+CPX dp	E4	Direct Page	x	x	x	2	32,10
+CPX addr	EC	Absolute	x	x	x	3	410
+CPY Compare Index Register Y with Memory [Flags affected: n,z,c]
+CPY #const	C0	Immediate	x	x	x	219	210
+CPY dp	C4	Direct Page	x	x	x	2	32,10
+CPY addr	CC	Absolute	x	x	x	3	410
+DEC Decrement [Flags affected: n,z]
+DEC A	3A	Accumulator		x	x	1	2
+DEC dp	C6	Direct Page	x	x	x	2	52,5
+DEC addr	CE	Absolute	x	x	x	3	65
+DEC dp,X	D6	DP Indexed,X	x	x	x	2	62,5
+DEC addr,X	DE	Absolute Indexed,X	x	x	x	3	75,6
+DEX Decrement Index Register X [Flags affected: n,z]
+DEX	CA	Implied	x	x	x	1	2
+DEY Decrement Index Register Y [Flags affected: n,z]
+DEY	88	Implied	x	x	x	1	2
+EOR Exclusive-OR Accumulator with Memory [Flags affected: n,z]
+EOR (dp,X)	41	DP Indexed Indirect,X	x	x	x	2	61,2
+EOR sr,S	43	Stack Relative			x	2	41
+EOR dp	45	Direct Page	x	x	x	2	31,2
+EOR [dp]	47	DP Indirect Long			x	2	61,2
+EOR #const	49	Immediate	x	x	x	217	21
+EOR addr	4D	Absolute	x	x	x	3	41
+EOR long	4F	Absolute Long			x	4	51
+EOR (dp),Y	51	DP Indirect Indexed, Y	x	x	x	2	51,2,3
+EOR (dp)	52	DP Indirect		x	x	2	51,2
+EOR (sr,S),Y	53	SR Indirect Indexed,Y			x	2	71
+EOR dp,X	55	DP Indexed,X	x	x	x	2	41,2
+EOR [dp],Y	57	DP Indirect Long Indexed, Y			x	2	61,2
+EOR addr,Y	59	Absolute Indexed,Y	x	x	x	3	41,3
+EOR addr,X	5D	Absolute Indexed,X	x	x	x	3	41,3
+EOR long,X	5F	Absolute Long Indexed,X			x	4	51
+INC Increment [Flags affected: n,z]
+INC A	1A	Accumulator		x	x	1	2
+INC dp	E6	Direct Page	x	x	x	2	52,5
+INC addr	EE	Absolute	x	x	x	3	65
+INC dp,X	F6	DP Indexed,X	x	x	x	2	62,5
+INC addr,X	FE	Absolute Indexed,X	x	x	x	3	75,6
+INX Increment Index Register X [Flags affected: n,z]
+INX	E8	Implied	x	x	x	1	2
+INY Increment Index Register Y [Flags affected: n,z]
+INY	C8	Implied	x	x	x	1	2
+JMP Jump [Flags affected: none][Alias: JML for all Long addressing modes]
+JMP addr	4C	Absolute	x	x	x	3	3
+JMP long	5C	Absolute Long			x	4	4
+JMP (addr)	6C	Absolute Indirect	x	x	x	3	511,12
+JMP (addr,X)	7C	Absolute Indexed Indirect		x	x	3	6
+JMP [addr]	DC	Absolute Indirect Long			x	3	6
+JSR Jump to Subroutine [Flags affected: none][Alias: JSL for Absolute Long]
+JSR addr	20	Absolute	x	x	x	3	6
+JSR long	22	Absolute Long			x	4	8
+JSR (addr,X))	FC	Absolute Indexed Indirect			x	3	8
+LDA Load Accumulator from Memory [Flags affected: n,z]
+LDA (dp,X)	A1	DP Indexed Indirect,X	x	x	x	2	61,2
+LDA sr,S	A3	Stack Relative			x	2	41
+LDA dp	A5	Direct Page	x	x	x	2	31,2
+LDA [dp]	A7	DP Indirect Long			x	2	61,2
+LDA #const	A9	Immediate	x	x	x	217	21
+LDA addr	AD	Absolute	x	x	x	3	41
+LDA long	AF	Absolute Long			x	4	51
+LDA (dp),Y	B1	DP Indirect Indexed, Y	x	x	x	2	51,2,3
+LDA (dp)	B2	DP Indirect		x	x	2	51,2
+LDA (sr,S),Y	B3	SR Indirect Indexed,Y			x	2	71
+LDA dp,X	B5	DP Indexed,X	x	x	x	2	41,2
+LDA [dp],Y	B7	DP Indirect Long Indexed, Y			x	2	61,2
+LDA addr,Y	B9	Absolute Indexed,Y	x	x	x	3	41,3
+LDA addr,X	BD	Absolute Indexed,X	x	x	x	3	41,3
+LDA long,X	BF	Absolute Long Indexed,X			x	4	51
+LDX Load Index Register X from Memory [Flags affected: n,z]
+LDX #const	A2	Immediate	x	x	x	219	210
+LDX dp	A6	Direct Page	x	x	x	2	32,10
+LDX addr	AE	Absolute	x	x	x	3	410
+LDX dp,Y	B6	DP Indexed,Y	x	x	x	2	42,10
+LDX addr,Y	BE	Absolute Indexed,Y	x	x	x	3	43,10
+LDY Load Index Register Y from Memory [Flags affected: n,z]
+LDY #const	A0	Immediate	x	x	x	219	210
+LDY dp	A4	Direct Page	x	x	x	2	32,10
+LDY addr	AC	Absolute	x	x	x	3	410
+LDY dp,X	B4	DP Indexed,X	x	x	x	2	42,10
+LDY addr,X	BC	Absolute Indexed,X	x	x	x	3	43,10
+LSR Logical Shift Memory or Accumulator Right [Flags affected: n,z,c]
+LSR dp	46	Direct Page	x	x	x	2	52,5
+LSR A	4A	Accumulator	x	x	x	1	2
+LSR addr	4E	Absolute	x	x	x	3	65
+LSR dp,X	56	DP Indexed,X	x	x	x	2	62,5
+LSR addr,X	5E	Absolute Indexed,X	x	x	x	3	75,6
+MVN Block Move Negative [Flags affected: none][Registers: X,Y,C]
+MVN srcbk,destbk	54	Block Move			x	3	13
+MVP Block Move Positive [Flags affected: none][Registers: X,Y,C]
+MVN srcbk,destbk	44	Block Move			x	3	13
+NOP No Operation [Flags affected: none]
+NOP	EA	Implied	x	x	x	1	2
+ORA OR Accumulator with Memory [Flags affected: n,z]
+ORA (dp,X)	01	DP Indexed Indirect,X	x	x	x	2	61,2
+ORA sr,S	03	Stack Relative			x	2	41
+ORA dp	05	Direct Page	x	x	x	2	31,2
+ORA [dp]	07	DP Indirect Long			x	2	61,2
+ORA #const	09	Immediate	x	x	x	217	21
+ORA addr	0D	Absolute	x	x	x	3	41
+ORA long	0F	Absolute Long			x	4	51
+ORA (dp),Y	11	DP Indirect Indexed, Y	x	x	x	2	51,2,3
+ORA (dp)	12	DP Indirect		x	x	2	51,2
+ORA (sr,S),Y	13	SR Indirect Indexed,Y			x	2	71
+ORA dp,X	15	DP Indexed,X	x	x	x	2	41,2
+ORA [dp],Y	17	DP Indirect Long Indexed, Y			x	2	61,2
+ORA addr,Y	19	Absolute Indexed,Y	x	x	x	3	41,3
+ORA addr,X	1D	Absolute Indexed,X	x	x	x	3	41,3
+ORA long,X	1F	Absolute Long Indexed,X			x	4	51
+PEA Push Effective Absolute Address [Flags affected: none]
+PEA addr	F4	Stack (Absolute)			x	3	5
+PEI Push Effective Indirect Address [Flags affected: none]
+PEI (dp)	D4	Stack (DP Indirect)			x	2	62
+PER Push Effective PC Relative Indirect Address [Flags affected: none]
+PER label	62	Stack (PC Relative Long)			x	3	6
+PHA Push Accumulator [Flags affected: none]
+PHA	48	Stack (Push)	x	x	x	1	31
+PHB Push Data Bank Register [Flags affected: none]
+PHB	8B	Stack (Push)			x	1	3
+PHD Push Direct Page Register [Flags affected: none]
+PHD	0B	Stack (Push)			x	1	4
+PHK Push Program Bank Register [Flags affected: none]
+PHK	4B	Stack (Push)			x	1	3
+PHP Push Processor Status Register [Flags affected: none]
+PHP	08	Stack (Push)	x	x	x	1	3
+PHX Push Index Register X [Flags affected: none]
+PHX	DA	Stack (Push)		x	x	1	310
+PHY Push Index Register Y [Flags affected: none]
+PHY	5A	Stack (Push)		x	x	1	310
+PLA Pull Accumulator [Flags affected: n,z]
+PLA	68	Stack (Pull)	x	x	x	1	41
+PLB Pull Data Bank Register [Flags affected: n,z]
+PLB	AB	Stack (Pull)			x	1	4
+PLD Pull Direct Page Register [Flags affected: n,z]
+PLD	2B	Stack (Pull)			x	1	5
+PLP Pull Processor Status Register [Flags affected: n,z]
+PLP	28	Stack (Pull)	x	x	x	1	4
+PLX Pull Index Register X [Flags affected: n,z]
+PLX	FA	Stack (Pull)		x	x	1	410
+PLY Pull Index Register Y [Flags affected: n,z]
+PLY	7A	Stack (Pull)		x	x	1	410
+REP Reset Processor Status Bits [Flags affected: all except b per operand]
+REP #const	C2	Immediate			x	2	3
+ROL Rotate Memory or Accumulator Left [Flags affected: n,z,c]
+ROL dp	26	Direct Page	x	x	x	2	52,5
+ROL A	2A	Accumulator	x	x	x	1	2
+ROL addr	2E	Absolute	x	x	x	3	65
+ROL dp,X	36	DP Indexed,X	x	x	x	2	62,5
+ROL addr,X	3E	Absolute Indexed,X	x	x	x	3	75,6
+ROR Rotate Memory or Accumulator Right [Flags affected: n,z,c]
+ROR dp	66	Direct Page	x	x	x	2	52,5
+ROR A	6A	Accumulator	x	x	x	1	2
+ROR addr	6E	Absolute	x	x	x	3	65
+ROR dp,X	76	DP Indexed,X	x	x	x	2	62,5
+ROR addr,X	7E	Absolute Indexed,X	x	x	x	3	75,6
+RTI Return from Interrupt [Flags affected: all except b]
+RTI	40	Stack (RTI)	x	x	x	1	69
+RTL Return from Subroutine Long [Flags affected: none]
+RTL	6B	Stack (RTL)			x	1	6
+RTS Return from Subroutine [Flags affected: none]
+RTS	60	Stack (RTS)	x	x	x	1	6
+SBC Subtract with Borrow from Accumulator [Flags affected: n,v,z,c]
+SBC (dp,X)	E1	DP Indexed Indirect,X	x	x	x	2	61,2,4
+SBC sr,S	E3	Stack Relative			x	2	41,4
+SBC dp	E5	Direct Page	x	x	x	2	31,2,4
+SBC [dp]	E7	DP Indirect Long			x	2	61,2,4
+SBC #const	E9	Immediate	x	x	x	217	21,4
+SBC addr	ED	Absolute	x	x	x	3	41,4
+SBC long	EF	Absolute Long			x	4	51,4
+SBC (dp),Y	F1	DP Indirect Indexed, Y	x	x	x	2	51,2,3,4
+SBC (dp)	F2	DP Indirect		x	x	2	51,2,4
+SBC (sr,S),Y	F3	SR Indirect Indexed,Y			x	2	71,4
+SBC dp,X	F5	DP Indexed,X	x	x	x	2	41,2,4
+SBC [dp],Y	F7	DP Indirect Long Indexed, Y			x	2	61,2,4
+SBC addr,Y	F9	Absolute Indexed,Y	x	x	x	3	41,3,4
+SBC addr,X	FD	Absolute Indexed,X	x	x	x	3	41,3,4
+SBC long,X	FF	Absolute Long Indexed,X			x	4	51,4
+SEC Set Carry Flag [Flags affected: c]
+SEC	38	Implied	x	x	x	1	2
+SED Set Decimal Flag [Flags affected: d]
+SED	F8	Implied	x	x	x	1	2
+SEI Set Interrupt Disable Flag [Flags affected: i]
+SEI	78	Implied	x	x	x	1	2
+SEP Set Processor Status Bits [Flags affected: all except b per operand]
+SEP	E2	Immediate			x	2	3
+STA Store Accumulator to Memory [Flags affected: none]
+STA (dp,X)	81	DP Indexed Indirect,X	x	x	x	2	61,2
+STA sr,S	83	Stack Relative			x	2	41
+STA dp	85	Direct Page	x	x	x	2	31,2
+STA [dp]	87	DP Indirect Long			x	2	61,2
+STA addr	8D	Absolute	x	x	x	3	41
+STA long	8F	Absolute Long			x	4	51
+STA (dp),Y	91	DP Indirect Indexed, Y	x	x	x	2	61,2
+STA (dp)	92	DP Indirect		x	x	2	51,2
+STA (sr,S),Y	93	SR Indirect Indexed,Y			x	2	71
+STA dpX	95	DP Indexed,X	x	x	x	2	41,2
+STA [dp],Y	97	DP Indirect Long Indexed, Y			x	2	61,2
+STA addr,Y	99	Absolute Indexed,Y	x	x	x	3	51
+STA addr,X	9D	Absolute Indexed,X	x	x	x	3	51
+STA long,X	9F	Absolute Long Indexed,X			x	4	51
+STP Stop Processor [Flags affected: none]
+STP	DB	Implied			x	1	314
+STX Store Index Register X to Memory [Flags affected: none]
+STX dp	86	Direct Page	x	x	x	2	32,10
+STX addr	8E	Absolute	x	x	x	3	410
+STX dp,Y	96	DP Indexed,Y	x	x	x	2	42,10
+STY Store Index Register Y to Memory [Flags affected: none]
+STY dp	84	Direct Page	x	x	x	2	32,10
+STY addr	8C	Absolute	x	x	x	3	410
+STY dp,X	94	DP Indexed,X	x	x	x	2	42,10
+STZ Store Zero to Memory [Flags affected: none]
+STZ dp	64	Direct Page		x	x	2	31,2
+STZ dp,X	74	DP Indexed,X		x	x	2	41,2
+STZ addr	9C	Absolute		x	x	3	41
+STZ addr,X	9E	Absolute Indexed,X		x	x	3	51
+TAX Transfer Accumulator to Index Register X [Flags affected: n,z]
+TAX	AA	Implied	x	x	x	1	2
+TAY Transfer Accumulator to Index Register Y [Flags affected: n,z]
+TAY	A8	Implied	x	x	x	1	2
+TCD Transfer 16-bit Accumulator to Direct Page Register [Flags affected: n,z]
+TCD	5B	Implied			x	1	2
+TCS Transfer 16-bit Accumulator to Stack Pointer [Flags affected: none]
+TCS	1B	Implied			x	1	2
+TDC Transfer Direct Page Register to 16-bit Accumulator [Flags affected: n,z]
+TDC	7B	Implied			x	1	2
+TRB Test and Reset Memory Bits Against Accumulator [Flags affected: z]
+TRB dp	14	Direct Page		x	x	2	52,5
+TRB addr	1C	Absolute		x	x	3	63
+TSB Test and Set Memory Bits Against Accumulator [Flags affected: z]
+TSB dp	04	Direct Page		x	x	2	52,5
+TSB addr	0C	Absolute		x	x	3	65
+TSC Transfer Stack Pointer to 16-bit Accumulator [Flags affected: n,z]
+TSC	3B	Implied			x	1	2
+TSX Transfer Stack Pointer to Index Register X [Flags affected: n,z]
+TSX	BA	Implied	x	x	x	1	2
+TXA Transfer Index Register X to Accumulator [Flags affected: n,z]
+TXA	8A	Implied	x	x	x	1	2
+TXS Transfer Index Register X to Stack Pointer [Flags affected: none]
+TXS	9A	Implied	x	x	x	1	2
+TXY Transfer Index Register X to Index Register Y [Flags affected: n,z]
+TXY	9B	Implied			x	1	2
+TYA Transfer Index Register Y to Accumulator [Flags affected: n,z]
+TYA	98	Implied	x	x	x	1	2
+TYX Transfer Index Register Y to Index Register X [Flags affected: n,z]
+TYX	BB	Implied			x	1	2
+WAI Wait for Interrupt [Flags affected: none]
+WAI	CB	Implied			x	1	315
+WDM Reserved for Future Expansion [Flags affected: none (subject to change)]
+WDM	42	n/a			x	216	016
+XBA Exchange B and A 8-bit Accumulators [Flags affected: n,z]
+XBA	EB	Implied			x	1	3
+XCE Exchange Carry and Emulation Flags [Flags affected: m,b/x,c,e]
+XCE	FB	Implied			x	1	2
