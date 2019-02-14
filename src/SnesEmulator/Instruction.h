@@ -78,25 +78,31 @@ public:
 protected:
     virtual int apply(State& state, uint16_t value) const = 0;
 private:
-    uint16_t readValue(State& state) const;
+    uint16_t consumeValue(State& state) const;
 };
 
 template<State::Flag FLAG>
 int InstructionFlagSize<FLAG>::execute(State& state) const
 {
-    int cycles = apply(state, state.readOneByteValue());
-    state.incrementProgramCounter(state.getFlag(FLAG) ? 1 : 2);
-    return cycles;
+    return apply(state, consumeValue(state));
 }
 
 template<State::Flag FLAG>
 std::ostream& InstructionFlagSize<FLAG>::printNextExecution(std::ostream& output, const State& state) const
 {
-    return printInfo(output) << std::hex << (state.getFlag(FLAG) ? state.readOneByteValue() : state.readTwoByteValue()) << std::dec << std::endl;
+    return printInfo(output) << std::hex << (state.getFlag(FLAG) ? state.readOneByteValue() : state.readTwoByteValue()) << std::dec << std::endl << state << std::endl;
 }
 
 template<State::Flag FLAG>
-uint16_t InstructionFlagSize<FLAG>::readValue(State& state) const
+uint16_t InstructionFlagSize<FLAG>::consumeValue(State& state) const
 {
-    return state.getFlag(FLAG) ? state.readOneByteValue() : state.readTwoByteValue();
+    uint16_t value = 0;
+    if (state.getFlag(FLAG)) {
+        state.readOneByteValue();
+        state.incrementProgramCounter(1);
+    } else {
+        state.readTwoByteValue();
+        state.incrementProgramCounter(2);
+    }
+    return value;
 }

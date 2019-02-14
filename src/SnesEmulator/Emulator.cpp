@@ -1,6 +1,7 @@
 #include "Emulator.h"
 
 #include <iostream>
+#include <ctime>
 
 Emulator::Emulator()
 {
@@ -19,6 +20,9 @@ void Emulator::run()
     uint64_t cycleCount = 0;
     uint64_t instructionCount = 0;
     bool running = true;
+    std::time_t startTime = clock();
+
+    std::cout << "startTime=" << startTime << std::endl;
     
     while (running) {
 
@@ -26,17 +30,25 @@ void Emulator::run()
 
         Instruction* instruction = instructions.getInstruction(state.readNextInstruction());
 
-        //instruction->printNextExecution(std::cout, state) << std::endl;
+        instruction->printNextExecution(std::cout, state) << std::endl;
 
         cycleCount += instruction->execute(state);
 
-        //std::cout << "instructionCount=" << instructionCount << ", cycleCount=" << cycleCount << std::endl;
+        std::cout << "instructionCount=" << instructionCount << ", cycleCount=" << cycleCount << std::endl;
 
-        if (cycleCount > 10000000) {
+        if (cycleCount > 1000000) {
             running = false;
         }
 
-        //std::getchar();
+        std::getchar();
     }
+
+    std::time_t endTime = clock();
+    double elapsedSeconds = double(endTime - startTime) / CLOCKS_PER_SEC;
+
+    std::cout << "endTime=" << endTime << std::endl;
+    std::cout << "Time delta=" << elapsedSeconds << std::endl;
+
+    std::cout << "Speed is " << cycleCount / 1000000.0 / elapsedSeconds << " MHz" << std::endl;
 }
 

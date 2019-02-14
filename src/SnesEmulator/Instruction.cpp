@@ -17,41 +17,44 @@ int Instruction1Byte::execute(State& state) const
 
 std::ostream& Instruction1Byte::printNextExecution(std::ostream& output, const State& state) const
 {
-    return printInfo(output);
+    return printInfo(output) << state << std::endl;
 }
 
 int Instruction2Byte::execute(State& state) const
 {
-    int cycles = apply(state, state.readOneByteValue());
+    uint8_t value = state.readOneByteValue();
     state.incrementProgramCounter(2);
+    int cycles = apply(state, value);
     return cycles;
 }
 
 std::ostream& Instruction2Byte::printNextExecution(std::ostream& output, const State& state) const
 {
-    return printInfo(output) << std::hex << state.readOneByteValue() << std::dec << std::endl;
+    return printInfo(output) << std::hex << state.readOneByteValue() << std::dec << std::endl << state << std::endl;
 }
 
 int Instruction3Byte::execute(State& state) const
 {
-    int cycles = apply(state, state.readTwoByteValue());
+    uint16_t value = state.readTwoByteValue();
     state.incrementProgramCounter(3);
+    int cycles = apply(state, value);
     return cycles;
 }
 
 std::ostream& Instruction3Byte::printNextExecution(std::ostream& output, const State& state) const
 {
-    return printInfo(output) << std::hex << state.readTwoByteValue() << std::dec << std::endl;
+    return printInfo(output) << std::hex << state.readTwoByteValue() << std::dec << std::endl << state << std::endl;
 }
 
 int Instruction4Byte::execute(State& state) const
 {
-    int cycles = apply(state, state.readThreeByteValue());
+    uint32_t value = state.readThreeByteValue();
     state.incrementProgramCounter(4);
+    int cycles = apply(state, value);
     return cycles;
 }
 
 std::ostream& Instruction4Byte::printNextExecution(std::ostream& output, const State& state) const
 {
-    return printInfo(output) << std::hex << state.readThreeByteValue() << std::dec << std::endl;
+    return printInfo(output) << std::hex << state.readThreeByteValue() << std::dec << std::endl << state << std::endl;
 }

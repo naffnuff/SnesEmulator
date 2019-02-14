@@ -85,6 +85,8 @@ public:
         programCounter += increment;
     }
 
+    friend std::ostream& operator<<(std::ostream& output, const State& state);
+
 private:
     bool tryReadHeader(int offset, std::vector<char> rom);
 
@@ -96,3 +98,4 @@ private:
     bool emulationMode;
 };
 
+std::ostream& operator<<(std::ostream& output, const State& state);
