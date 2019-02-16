@@ -2,16 +2,20 @@
 #include <sstream>
 #include <iostream>
 #include <vector>
+#include <map>
+#include <set>
 #include <string>
+#include <algorithm>
 
 struct Instruction
 {
     std::string name;
-    std::string shortname;
+    std::string mnemonic;
     std::string comment;
     std::string code;
-    std::string handlername;
+    std::string classname;
     std::string addressMode;
+    std::string addressModeClass;
     std::string size;
     std::string sizeRemark;
     std::string cycles;
@@ -23,11 +27,11 @@ struct Instruction
             throw std::runtime_error("Instruction name is empty");
         }
 
-        if (shortname.empty()) {
+        if (mnemonic.empty()) {
             throw std::runtime_error("Instruction " + name + ": shortname is empty");
         }
 
-        if (handlername.empty()) {
+        if (classname.empty()) {
             throw std::runtime_error("Instruction " + name + ": handlername is empty");
         }
 
@@ -98,112 +102,79 @@ std::string getCycleModification(int remarkIndex)
     }
 }
 
-void generateHeader(const std::vector<Instruction>& instructions)
+void generateImplementations(const std::vector<Instruction>& instructions)
 {
-    std::ofstream output("..\\..\\..\\src\\SnesEmulator\\InstructionImplementations.h");
+    std::ofstream hOutput("..\\..\\..\\src\\SnesEmulator\\InstructionImplementations.h");
+    std::ofstream cppOutput("..\\..\\..\\src\\SnesEmulator\\InstructionImplementations.cpp");
 
-    output << "#pragma once" << std::endl
+    hOutput << "#pragma once" << std::endl
         << std::endl
         << "#include <stdint.h>" << std::endl
         << std::endl
         << "#include \"State.h\"" << std::endl
-        << std::endl
         << "#include \"Instruction.h\"" << std::endl
+        << "#include \"AddressMode.h\"" << std::endl
+        << "#include \"Operator.h\"" << std::endl
+        << std::endl;
+
+    cppOutput << "#include \"InstructionImplementations.h\"" << std::endl
         << std::endl;
 
     for (const Instruction& instruction : instructions) {
         int valueSize = stoi(instruction.size) - 1;
 
         if (!instruction.comment.empty()) {
-            output << "// " << instruction.comment << std::endl << std::endl;
+            hOutput << "// " << instruction.comment << std::endl << std::endl;
+            cppOutput << "// " << instruction.comment << std::endl << std::endl;
         }
 
-        output << "// " << instruction.name << std::endl
+        hOutput << "// " << instruction.name << std::endl
+            << "// " << instruction.addressMode << std::endl;
+        cppOutput << "// " << instruction.name << std::endl
             << "// " << instruction.addressMode << std::endl;
 
-        int nSizeRemark = 0;
+        int sizeRemark = 0;
+
+        std::string addressModeClass = instruction.addressModeClass;
+        addressModeClass += "<Operator::" + instruction.mnemonic;
 
         if (!instruction.sizeRemark.empty()) {
-            nSizeRemark = stoi(instruction.sizeRemark);
-            output << "// " << getRemark(nSizeRemark) << std::endl;
-        }
+            sizeRemark = stoi(instruction.sizeRemark);
+            hOutput << "// " << getRemark(sizeRemark) << std::endl;
+            cppOutput << "// " << getRemark(sizeRemark) << std::endl;
 
-        std::ostringstream baseclass;
-        std::ostringstream valueArg;
-        std::string baseclassInstatiation;
-        if (nSizeRemark == 17) {
-            baseclassInstatiation = "<State::m>";
-        } else if (nSizeRemark == 19) {
-            baseclassInstatiation = "<State::x>";
-        }
-
-        if (nSizeRemark == 17 || nSizeRemark == 19) {
-            baseclass << "InstructionFlagSize";
-            valueArg << ", uint16_t value";
-        } else {
-            baseclass << "Instruction" << instruction.size << "Byte";
-            if (valueSize > 0) {
-                valueArg << ", uint" << (valueSize == 3 ? 32 : valueSize * 8) << "_t value";
+            if (sizeRemark == 17) {
+                addressModeClass += ", State::m";
+                valueSize = 17;
+            } else if (sizeRemark == 19) {
+                addressModeClass += ", State::x";
+                valueSize = 19;
             }
         }
 
-        output << "class " << instruction.handlername << " : public " << baseclass.str() << baseclassInstatiation << " {" << std::endl
-            << "    using " << baseclass.str() << "::" << baseclass.str() << ";" << std::endl
-            << "public:" << std::endl
-            << "    int apply(State& state" << valueArg.str() << ") const override;" << std::endl
+        addressModeClass += ">";
+
+        hOutput << "class " << instruction.classname << " : public AddressMode::" << addressModeClass << std::endl
+            << "{" << std::endl
+            << "    using " << instruction.addressModeClass << "::" << instruction.addressModeClass << ";" << std::endl
+            << "    int calculateCycles(const State& state) const override;" << std::endl
             << "};" << std::endl
             << std::endl;
-    }
-}
 
-void generateHandlers(const std::vector<Instruction>& instructions)
-{
-    std::ofstream output("..\\..\\..\\src\\SnesEmulator\\InstructionImplementations.cpp");
-
-    output << "#include \"InstructionImplementations.h\"" << std::endl
-        << std::endl;
-
-    for (const Instruction& instruction : instructions) {
-
-        if (!instruction.comment.empty()) {
-            output << "// " << instruction.comment << std::endl << std::endl;
-        }
-
-        output << "// " << instruction.name << std::endl
-            << "// " << instruction.addressMode << std::endl;
-
-        int nSizeRemark = 0;
-
-        if (!instruction.sizeRemark.empty()) {
-            nSizeRemark = stoi(instruction.sizeRemark);
-            output << "// " << getRemark(nSizeRemark) << std::endl;
-        }
-
-        int valueSize = stoi(instruction.size) - 1;
-
-        output << "int " << instruction.handlername << "::apply(State& state";
-
-        if (nSizeRemark == 17 || nSizeRemark == 19) {
-            output << ", uint16_t value";
-        } else if (valueSize > 0) {
-            output << ", uint" << (valueSize == 3 ? 32 : valueSize * 8) << "_t value";
-        }
-
-        output << ") const" << std::endl;
-
-        output << "{" << std::endl;
+        cppOutput << "int " << instruction.classname << "::calculateCycles(const State& state) const" << std::endl
+            << "{" << std::endl;
 
         for (int remark : instruction.cyclesRemarks) {
-            output << "    // " << getRemark(remark) << std::endl;
+            cppOutput << "    // " << getRemark(remark) << std::endl;
         }
 
-        output << "    return " << instruction.cycles;
+        cppOutput << "    return " << instruction.cycles;
 
         for (int cycleRemark : instruction.cyclesRemarks) {
-            output << getCycleModification(cycleRemark);
+            cppOutput << getCycleModification(cycleRemark);
         }
 
-        output << ";" << std::endl
+        cppOutput << ";" << std::endl
             << "}" << std::endl
             << std::endl;
     }
@@ -230,13 +201,120 @@ void generateMap(const std::vector<Instruction>& instructions)
     output << "InstructionMap::InstructionMap()" << std::endl
         << "{" << std::endl;
     for (const Instruction& instruction : instructions) {
-        output << "    instructions[0x" << instruction.code << "] = std::make_unique<" << instruction.handlername << ">(\"" << instruction.name << "\", \"" << instruction.addressMode << "\");";
+        output << "    instructions[0x" << instruction.code << "] = std::make_unique<" << instruction.classname << ">(\"" << instruction.name << "\", \"" << instruction.addressMode << "\");";
         if (!instruction.sizeRemark.empty()) {
             output << " // " << getRemark(stoi(instruction.sizeRemark));
         }
         output << std::endl;
     }
     output << "}" << std::endl;
+}
+
+typedef std::map<std::string, int> AddressModeClassMap;
+void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
+{
+    std::ofstream output("..\\..\\..\\src\\SnesEmulator\\AddressMode.h");
+
+    output << "#pragma once" << std::endl
+        << std::endl
+        << "#include <stdint.h>" << std::endl
+        << std::endl
+        << "#include \"State.h\"" << std::endl
+        << "#include \"Instruction.h\"" << std::endl
+        << std::endl
+        << "namespace AddressMode {" << std::endl
+        << std::endl;
+
+    for (const AddressModeClassMap::value_type& kvp : addressModeClassMap) {
+
+        output << "template <typename Operator";
+
+        if (kvp.second == 999) {
+            output << ", State::Flag Flag";
+        }
+
+        output << ">" << std::endl;
+        output << "class " << kvp.first << " : public ";
+        if (kvp.second > 4) {
+            output << "InstructionFlagSize<Flag>";
+        } else {
+            output << "Instruction" << kvp.second << "Byte";
+        }
+        output << std::endl << "{" << std::endl
+            << "    using " << kvp.first << "::" << kvp.first << ";" << std::endl
+            << "    int ";
+
+        std::stringstream ss;
+        ss << "apply(State& state";
+        
+        if (kvp.second == 999) {
+            ss << ", uint16_t value";
+        } else if (kvp.second > 1) {
+            ss << ", uint" << (kvp.second == 4 ? 32 : (kvp.second - 1) * 8) << "_t value";
+        }
+        ss << ") const";
+
+        output << ss.str() << " override;" << std::endl
+            << "};" << std::endl
+            << std::endl;
+
+        output << "template <typename Operator";
+
+        if (kvp.second == 999) {
+            output << ", State::Flag Flag";
+        }
+
+        output << ">" << std::endl;
+
+        output << "int " << kvp.first << "<Operator";
+        if (kvp.second == 999) {
+            output << ", Flag";
+        }
+        output << ">::" << ss.str() << std::endl
+            << "{" << std::endl
+            << "    int data = 0;" << std::endl
+            << "    return Operator::operate(state, &data);" << std::endl
+            << "}" << std::endl
+            << std::endl;
+    }
+
+    output << "}" << std::endl;
+}
+
+void generateOperators(std::set<std::string> mnemonics)
+{
+    std::ofstream hOutput("..\\..\\..\\src\\SnesEmulator\\Operator.h");
+    std::ofstream cppOutput("..\\..\\..\\src\\SnesEmulator\\Operator.cpp");
+
+    hOutput << "#pragma once" << std::endl
+        << std::endl
+        << "#include \"State.h\"" << std::endl
+        << std::endl
+        << "namespace Operator {" << std::endl
+        << std::endl;
+
+    cppOutput << "#include \"Operator.h\"" << std::endl
+        << std::endl
+        << "namespace Operator {" << std::endl
+        << std::endl;
+
+    for (const std::string& mnemonic : mnemonics) {
+        hOutput << "class " << mnemonic << std::endl
+            << "{" << std::endl
+            << "public:" << std::endl
+            << "    static int operate(State& state, int* address);" << std::endl
+            << "};" << std::endl
+            << std::endl;
+
+        cppOutput << "int " << mnemonic << "::operate(State& state, int* address)" << std::endl
+            << "{" << std::endl
+            << "    return 0;" << std::endl
+            << "}" << std::endl
+            << std::endl;
+    }
+
+    hOutput << "}" << std::endl;
+    cppOutput << "}" << std::endl;
 }
 
 int main(int argc, char* argv[])
@@ -269,6 +347,13 @@ int main(int argc, char* argv[])
         std::vector<Instruction> instructions;
         std::string comment;
 
+        typedef std::map<std::string, std::vector<std::string>> AddressModeMap;
+        AddressModeMap addressModeMap;
+
+        AddressModeClassMap addressModeClassMap;
+
+        std::set<std::string> mnemonics;
+
         for (std::vector<std::string> line : lines) {
             if (line.size() == 1) {
                 std::cout << line[0] << std::endl;
@@ -282,14 +367,18 @@ int main(int argc, char* argv[])
 
                 std::string name = line[0];
 
-                std::string shortname = name.substr(0, 3);
+                std::string mnemonic = name.substr(0, 3);
+
+                mnemonics.insert(mnemonic);
+
+                std::string addressModeCode = name.substr(3);
 
                 std::string code = line[1];
                 if (code.size() == 1) {
                     code = "0" + code;
                 }
 
-                std::string handlername = shortname + "_" + code;
+                std::string classname = mnemonic + "_" + code;
 
                 std::string addressMode = line[2];
 
@@ -297,6 +386,22 @@ int main(int argc, char* argv[])
                 std::string size = sizeToken.substr(0, 1);
 
                 std::string sizeRemark = sizeToken.substr(1);
+
+                std::string addressModeClass = addressMode;
+                addressModeClass.erase(std::remove(addressModeClass.begin(), addressModeClass.end(), ' '), addressModeClass.end());
+                addressModeClass.erase(std::remove(addressModeClass.begin(), addressModeClass.end(), ','), addressModeClass.end());
+                addressModeClass.erase(std::remove(addressModeClass.begin(), addressModeClass.end(), '('), addressModeClass.end());
+                addressModeClass.erase(std::remove(addressModeClass.begin(), addressModeClass.end(), ')'), addressModeClass.end());
+                addressModeClass.erase(std::remove(addressModeClass.begin(), addressModeClass.end(), '/'), addressModeClass.end());
+
+                int valueSize = stoi(size);
+
+                if (sizeRemark == "17" || sizeRemark == "19") {
+                    addressModeClass += "FlagSize";
+                    valueSize = 999;
+                }
+
+                addressModeClassMap[addressModeClass] = valueSize;
 
                 std::string cyclesToken = line[7];
                 std::string cycles = cyclesToken.substr(0, 1);
@@ -314,17 +419,32 @@ int main(int argc, char* argv[])
                     }
                 }
 
-                Instruction instruction { name, shortname, comment, code, handlername, addressMode, size, sizeRemark, cycles, cyclesRemarks };
+                Instruction instruction { name, mnemonic, comment, code, classname, addressMode, addressModeClass, size, sizeRemark, cycles, cyclesRemarks };
                 instruction.validate();
                 instructions.push_back(instruction);
 
                 comment.clear();
+
+                // TMP
+                //addressModeMap[addressModeCode].push_back(addressMode + ", " + name + ", code=" + code + ", cycles=" + cycles + ", size=" + size);
+                //addressModeMap[addressMode].push_back(name + ", code=" + code + ", cycles=" + cycles + ", size=" + size + ", sizeRemark=" + sizeRemark);
+                addressModeMap[mnemonic].push_back(code + ": " + name + ", " + addressMode + ", cycles=" + cycles + ", size=" + size);
             }
         }
 
-        generateHeader(instructions);
-        generateHandlers(instructions);
+        generateImplementations(instructions);
         generateMap(instructions);
+        generateAddressModes(addressModeClassMap);
+        generateOperators(mnemonics);
+
+        int i = 0;
+        for (const AddressModeMap::value_type kvp : addressModeMap) {
+            //std::cout << ++i << ": " << kvp.first << std::endl;
+            for (std::string info : kvp.second) {
+                //std::cout << "\t\t" << info << std::endl;
+            }
+            //std::getchar();
+        }
 
     } catch (const std::exception& e) {
 

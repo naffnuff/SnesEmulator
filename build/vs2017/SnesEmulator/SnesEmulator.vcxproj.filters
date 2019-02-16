@@ -33,6 +33,9 @@
     <ClCompile Include="..\..\..\src\SnesEmulator\InstructionImplementations.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\SnesEmulator\Operator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\SnesEmulator\Emulator.h">
@@ -48,6 +51,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\SnesEmulator\State.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\SnesEmulator\AddressMode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\SnesEmulator\Operator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -4,7 +4,8 @@
 
 #include "State.h"
 
-class Instruction {
+class Instruction
+{
 public:
     Instruction(const std::string& debugName, const std::string& debugDescription)
         : debugName(debugName)
@@ -17,12 +18,16 @@ public:
 
     std::ostream& printInfo(std::ostream& ostream) const;
 
+protected:
+    virtual int calculateCycles(const State& state) const = 0;
+
 private:
     const std::string debugName;
     const std::string debugDescription;
 };
 
-class Instruction1Byte : public Instruction {
+class Instruction1Byte : public Instruction
+{
     using Instruction::Instruction;
 
 public:
@@ -33,7 +38,8 @@ protected:
     virtual int apply(State& state) const = 0;
 };
 
-class Instruction2Byte : public Instruction {
+class Instruction2Byte : public Instruction
+{
     using Instruction::Instruction;
 
 public:
@@ -44,7 +50,8 @@ protected:
     virtual int apply(State& state, uint8_t value) const = 0;
 };
 
-class Instruction3Byte : public Instruction {
+class Instruction3Byte : public Instruction
+{
     using Instruction::Instruction;
 
 public:
@@ -55,7 +62,8 @@ protected:
     virtual int apply(State& state, uint16_t value) const = 0;
 };
 
-class Instruction4Byte : public Instruction {
+class Instruction4Byte : public Instruction
+{
     using Instruction::Instruction;
 
 public:
@@ -66,7 +74,7 @@ protected:
     virtual int apply(State& state, uint32_t value) const = 0;
 };
 
-template<State::Flag FLAG>
+template<State::Flag Flag>
 class InstructionFlagSize : public Instruction
 {
     using Instruction::Instruction;
@@ -81,23 +89,23 @@ private:
     uint16_t consumeValue(State& state) const;
 };
 
-template<State::Flag FLAG>
-int InstructionFlagSize<FLAG>::execute(State& state) const
+template<State::Flag Flag>
+int InstructionFlagSize<Flag>::execute(State& state) const
 {
-    return apply(state, consumeValue(state));
+    return calculateCycles(state) + apply(state, consumeValue(state));
 }
 
-template<State::Flag FLAG>
-std::ostream& InstructionFlagSize<FLAG>::printNextExecution(std::ostream& output, const State& state) const
+template<State::Flag Flag>
+std::ostream& InstructionFlagSize<Flag>::printNextExecution(std::ostream& output, const State& state) const
 {
-    return printInfo(output) << std::hex << (state.getFlag(FLAG) ? state.readOneByteValue() : state.readTwoByteValue()) << std::dec << std::endl << state << std::endl;
+    return printInfo(output) << std::hex << (state.getFlag(Flag) ? state.readOneByteValue() : state.readTwoByteValue()) << std::dec << std::endl << state << std::endl;
 }
 
-template<State::Flag FLAG>
-uint16_t InstructionFlagSize<FLAG>::consumeValue(State& state) const
+template<State::Flag Flag>
+uint16_t InstructionFlagSize<Flag>::consumeValue(State& state) const
 {
     uint16_t value = 0;
-    if (state.getFlag(FLAG)) {
+    if (state.getFlag(Flag)) {
         state.readOneByteValue();
         state.incrementProgramCounter(1);
     } else {

@@ -3,8 +3,8 @@
 // ADC Add With Carry [Flags affected: n,v,z,c]
 
 // ADC (dp,X)
-// DP Indexed Indirect,X
-int ADC_61::apply(State& state, uint8_t value) const
+// Direct Page Indexed Indirect,X
+int ADC_61::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -14,7 +14,7 @@ int ADC_61::apply(State& state, uint8_t value) const
 
 // ADC sr,S
 // Stack Relative
-int ADC_63::apply(State& state, uint8_t value) const
+int ADC_63::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 4: Add 1 cycle if 65C02 and d = 1 (65C02 in decimal mode)
@@ -23,7 +23,7 @@ int ADC_63::apply(State& state, uint8_t value) const
 
 // ADC dp
 // Direct Page
-int ADC_65::apply(State& state, uint8_t value) const
+int ADC_65::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -32,8 +32,8 @@ int ADC_65::apply(State& state, uint8_t value) const
 }
 
 // ADC [dp]
-// DP Indirect Long
-int ADC_67::apply(State& state, uint8_t value) const
+// Direct Page Indirect Long
+int ADC_67::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -44,7 +44,7 @@ int ADC_67::apply(State& state, uint8_t value) const
 // ADC #const
 // Immediate
 // 17: Add 1 byte if m = 0 (16 - bit memory / accumulator)
-int ADC_69::apply(State& state, uint16_t value) const
+int ADC_69::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 4: Add 1 cycle if 65C02 and d = 1 (65C02 in decimal mode)
@@ -53,7 +53,7 @@ int ADC_69::apply(State& state, uint16_t value) const
 
 // ADC addr
 // Absolute
-int ADC_6D::apply(State& state, uint16_t value) const
+int ADC_6D::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 4: Add 1 cycle if 65C02 and d = 1 (65C02 in decimal mode)
@@ -62,7 +62,7 @@ int ADC_6D::apply(State& state, uint16_t value) const
 
 // ADC long
 // Absolute Long
-int ADC_6F::apply(State& state, uint32_t value) const
+int ADC_6F::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 4: Add 1 cycle if 65C02 and d = 1 (65C02 in decimal mode)
@@ -70,8 +70,8 @@ int ADC_6F::apply(State& state, uint32_t value) const
 }
 
 // ADC (dp),Y
-// DP Indirect Indexed, Y
-int ADC_71::apply(State& state, uint8_t value) const
+// Direct Page Indirect Indexed, Y
+int ADC_71::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -81,8 +81,8 @@ int ADC_71::apply(State& state, uint8_t value) const
 }
 
 // ADC (dp)
-// DP Indirect
-int ADC_72::apply(State& state, uint8_t value) const
+// Direct Page Indirect
+int ADC_72::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -91,8 +91,8 @@ int ADC_72::apply(State& state, uint8_t value) const
 }
 
 // ADC (sr,S),Y
-// SR Indirect Indexed,Y
-int ADC_73::apply(State& state, uint8_t value) const
+// Stack Relative Indirect Indexed,Y
+int ADC_73::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 4: Add 1 cycle if 65C02 and d = 1 (65C02 in decimal mode)
@@ -100,8 +100,8 @@ int ADC_73::apply(State& state, uint8_t value) const
 }
 
 // ADC dp,X
-// DP Indexed,X
-int ADC_75::apply(State& state, uint8_t value) const
+// Direct Page Indexed,X
+int ADC_75::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -110,8 +110,8 @@ int ADC_75::apply(State& state, uint8_t value) const
 }
 
 // ADC [dp],Y
-// DP Indirect Long Indexed, Y
-int ADC_77::apply(State& state, uint8_t value) const
+// Direct Page Indirect Long Indexed, Y
+int ADC_77::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -121,7 +121,7 @@ int ADC_77::apply(State& state, uint8_t value) const
 
 // ADC addr,Y
 // Absolute Indexed,Y
-int ADC_79::apply(State& state, uint16_t value) const
+int ADC_79::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 3: Add 1 cycle if adding index crosses a page boundary
@@ -131,7 +131,7 @@ int ADC_79::apply(State& state, uint16_t value) const
 
 // ADC addr,X
 // Absolute Indexed,X
-int ADC_7D::apply(State& state, uint16_t value) const
+int ADC_7D::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 3: Add 1 cycle if adding index crosses a page boundary
@@ -141,7 +141,7 @@ int ADC_7D::apply(State& state, uint16_t value) const
 
 // ADC long,X
 // Absolute Long Indexed,X
-int ADC_7F::apply(State& state, uint32_t value) const
+int ADC_7F::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 4: Add 1 cycle if 65C02 and d = 1 (65C02 in decimal mode)
@@ -151,8 +151,8 @@ int ADC_7F::apply(State& state, uint32_t value) const
 // AND AND Accumulator With Memory [Flags affected: n,z]
 
 // AND (dp,X)
-// DP Indexed Indirect,X
-int AND_21::apply(State& state, uint8_t value) const
+// Direct Page Indexed Indirect,X
+int AND_21::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -161,7 +161,7 @@ int AND_21::apply(State& state, uint8_t value) const
 
 // AND sr,S
 // Stack Relative
-int AND_23::apply(State& state, uint8_t value) const
+int AND_23::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
@@ -169,7 +169,7 @@ int AND_23::apply(State& state, uint8_t value) const
 
 // AND dp
 // Direct Page
-int AND_25::apply(State& state, uint8_t value) const
+int AND_25::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -177,8 +177,8 @@ int AND_25::apply(State& state, uint8_t value) const
 }
 
 // AND [dp]
-// DP Indirect Long
-int AND_27::apply(State& state, uint8_t value) const
+// Direct Page Indirect Long
+int AND_27::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -188,7 +188,7 @@ int AND_27::apply(State& state, uint8_t value) const
 // AND #const
 // Immediate
 // 17: Add 1 byte if m = 0 (16 - bit memory / accumulator)
-int AND_29::apply(State& state, uint16_t value) const
+int AND_29::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     return 2 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
@@ -196,7 +196,7 @@ int AND_29::apply(State& state, uint16_t value) const
 
 // AND addr
 // Absolute
-int AND_2D::apply(State& state, uint16_t value) const
+int AND_2D::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
@@ -204,15 +204,15 @@ int AND_2D::apply(State& state, uint16_t value) const
 
 // AND long
 // Absolute Long
-int AND_2F::apply(State& state, uint32_t value) const
+int AND_2F::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
 }
 
 // AND (dp),Y
-// DP Indirect Indexed, Y
-int AND_31::apply(State& state, uint8_t value) const
+// Direct Page Indirect Indexed, Y
+int AND_31::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -221,8 +221,8 @@ int AND_31::apply(State& state, uint8_t value) const
 }
 
 // AND (dp)
-// DP Indirect
-int AND_32::apply(State& state, uint8_t value) const
+// Direct Page Indirect
+int AND_32::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -230,16 +230,16 @@ int AND_32::apply(State& state, uint8_t value) const
 }
 
 // AND (sr,S),Y
-// SR Indirect Indexed,Y
-int AND_33::apply(State& state, uint8_t value) const
+// Stack Relative Indirect Indexed,Y
+int AND_33::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     return 7 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
 }
 
 // AND dp,X
-// DP Indexed,X
-int AND_35::apply(State& state, uint8_t value) const
+// Direct Page Indexed,X
+int AND_35::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -247,8 +247,8 @@ int AND_35::apply(State& state, uint8_t value) const
 }
 
 // AND [dp],Y
-// DP Indirect Long Indexed, Y
-int AND_37::apply(State& state, uint8_t value) const
+// Direct Page Indirect Long Indexed, Y
+int AND_37::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -257,7 +257,7 @@ int AND_37::apply(State& state, uint8_t value) const
 
 // AND addr,Y
 // Absolute Indexed,Y
-int AND_39::apply(State& state, uint16_t value) const
+int AND_39::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 3: Add 1 cycle if adding index crosses a page boundary
@@ -266,7 +266,7 @@ int AND_39::apply(State& state, uint16_t value) const
 
 // AND addr,X
 // Absolute Indexed,X
-int AND_3D::apply(State& state, uint16_t value) const
+int AND_3D::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 3: Add 1 cycle if adding index crosses a page boundary
@@ -275,7 +275,7 @@ int AND_3D::apply(State& state, uint16_t value) const
 
 // AND long,X
 // Absolute Long Indexed,X
-int AND_3F::apply(State& state, uint32_t value) const
+int AND_3F::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
@@ -285,7 +285,7 @@ int AND_3F::apply(State& state, uint32_t value) const
 
 // ASL dp
 // Direct Page
-int ASL_06::apply(State& state, uint8_t value) const
+int ASL_06::calculateCycles(const State& state) const
 {
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
     // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
@@ -294,22 +294,22 @@ int ASL_06::apply(State& state, uint8_t value) const
 
 // ASL A
 // Accumulator
-int ASL_0A::apply(State& state) const
+int ASL_0A::calculateCycles(const State& state) const
 {
     return 2;
 }
 
 // ASL addr
 // Absolute
-int ASL_0E::apply(State& state, uint16_t value) const
+int ASL_0E::calculateCycles(const State& state) const
 {
     // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
     return 6 + (state.getFlag(State::m) ? 0 : 2) /* TODO05 */;
 }
 
 // ASL dp,X
-// DP Indexed,X
-int ASL_16::apply(State& state, uint8_t value) const
+// Direct Page Indexed,X
+int ASL_16::calculateCycles(const State& state) const
 {
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
     // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
@@ -318,7 +318,7 @@ int ASL_16::apply(State& state, uint8_t value) const
 
 // ASL addr,X
 // Absolute Indexed,X
-int ASL_1E::apply(State& state, uint16_t value) const
+int ASL_1E::calculateCycles(const State& state) const
 {
     // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
     // 6: Subtract 1 cycle if 65C02 and no page boundary crossed
@@ -329,7 +329,7 @@ int ASL_1E::apply(State& state, uint16_t value) const
 
 // BCC nearlabel
 // Program Counter Relative
-int BCC_90::apply(State& state, uint8_t value) const
+int BCC_90::calculateCycles(const State& state) const
 {
     // 7: Add 1 cycle if branch is taken
     // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
@@ -340,7 +340,7 @@ int BCC_90::apply(State& state, uint8_t value) const
 
 // BCS nearlabel
 // Program Counter Relative
-int BCS_B0::apply(State& state, uint8_t value) const
+int BCS_B0::calculateCycles(const State& state) const
 {
     // 7: Add 1 cycle if branch is taken
     // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
@@ -351,7 +351,7 @@ int BCS_B0::apply(State& state, uint8_t value) const
 
 // BEQ nearlabel
 // Program Counter Relative
-int BEQ_F0::apply(State& state, uint8_t value) const
+int BEQ_F0::calculateCycles(const State& state) const
 {
     // 7: Add 1 cycle if branch is taken
     // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
@@ -362,7 +362,7 @@ int BEQ_F0::apply(State& state, uint8_t value) const
 
 // BIT dp
 // Direct Page
-int BIT_24::apply(State& state, uint8_t value) const
+int BIT_24::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -371,15 +371,15 @@ int BIT_24::apply(State& state, uint8_t value) const
 
 // BIT addr
 // Absolute
-int BIT_2C::apply(State& state, uint16_t value) const
+int BIT_2C::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
 }
 
 // BIT dp,X
-// DP Indexed,X
-int BIT_34::apply(State& state, uint8_t value) const
+// Direct Page Indexed,X
+int BIT_34::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -388,7 +388,7 @@ int BIT_34::apply(State& state, uint8_t value) const
 
 // BIT addr,X
 // Absolute Indexed,X
-int BIT_3C::apply(State& state, uint16_t value) const
+int BIT_3C::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 3: Add 1 cycle if adding index crosses a page boundary
@@ -398,7 +398,7 @@ int BIT_3C::apply(State& state, uint16_t value) const
 // BIT #const
 // Immediate
 // 17: Add 1 byte if m = 0 (16 - bit memory / accumulator)
-int BIT_89::apply(State& state, uint16_t value) const
+int BIT_89::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     return 2 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
@@ -408,7 +408,7 @@ int BIT_89::apply(State& state, uint16_t value) const
 
 // BMI nearlabel
 // Program Counter Relative
-int BMI_30::apply(State& state, uint8_t value) const
+int BMI_30::calculateCycles(const State& state) const
 {
     // 7: Add 1 cycle if branch is taken
     // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
@@ -419,7 +419,7 @@ int BMI_30::apply(State& state, uint8_t value) const
 
 // BNE nearlabel
 // Program Counter Relative
-int BNE_D0::apply(State& state, uint8_t value) const
+int BNE_D0::calculateCycles(const State& state) const
 {
     // 7: Add 1 cycle if branch is taken
     // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
@@ -430,7 +430,7 @@ int BNE_D0::apply(State& state, uint8_t value) const
 
 // BPL nearlabel
 // Program Counter Relative
-int BPL_10::apply(State& state, uint8_t value) const
+int BPL_10::calculateCycles(const State& state) const
 {
     // 7: Add 1 cycle if branch is taken
     // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
@@ -441,7 +441,7 @@ int BPL_10::apply(State& state, uint8_t value) const
 
 // BRA nearlabel
 // Program Counter Relative
-int BRA_80::apply(State& state, uint8_t value) const
+int BRA_80::calculateCycles(const State& state) const
 {
     // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     return 3 /* TODO08 */;
@@ -452,7 +452,7 @@ int BRA_80::apply(State& state, uint8_t value) const
 // BRK
 // Stack/Interrupt
 // 18: Opcode is 1 byte, but program counter value pushed onto stack is incremented by 2 allowing for optional signature byte
-int BRK_00::apply(State& state, uint8_t value) const
+int BRK_00::calculateCycles(const State& state) const
 {
     // 9: Add 1 cycle for 65816 native mode(e = 0)
     return 7 + (state.getFlag(State::m) ? 0 : 2) /* TODO09 */;
@@ -462,7 +462,7 @@ int BRK_00::apply(State& state, uint8_t value) const
 
 // BRL label
 // Program Counter Relative Long
-int BRL_82::apply(State& state, uint16_t value) const
+int BRL_82::calculateCycles(const State& state) const
 {
     return 4;
 }
@@ -471,7 +471,7 @@ int BRL_82::apply(State& state, uint16_t value) const
 
 // BVC nearlabel
 // Program Counter Relative
-int BVC_50::apply(State& state, uint8_t value) const
+int BVC_50::calculateCycles(const State& state) const
 {
     // 7: Add 1 cycle if branch is taken
     // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
@@ -482,7 +482,7 @@ int BVC_50::apply(State& state, uint8_t value) const
 
 // BVS nearlabel
 // Program Counter Relative
-int BVS_70::apply(State& state, uint8_t value) const
+int BVS_70::calculateCycles(const State& state) const
 {
     // 7: Add 1 cycle if branch is taken
     // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
@@ -493,7 +493,7 @@ int BVS_70::apply(State& state, uint8_t value) const
 
 // CLC
 // Implied
-int CLC_18::apply(State& state) const
+int CLC_18::calculateCycles(const State& state) const
 {
     return 2;
 }
@@ -502,7 +502,7 @@ int CLC_18::apply(State& state) const
 
 // CLD
 // Implied
-int CLD_D8::apply(State& state) const
+int CLD_D8::calculateCycles(const State& state) const
 {
     return 2;
 }
@@ -511,7 +511,7 @@ int CLD_D8::apply(State& state) const
 
 // CLI
 // Implied
-int CLI_58::apply(State& state) const
+int CLI_58::calculateCycles(const State& state) const
 {
     return 2;
 }
@@ -520,7 +520,7 @@ int CLI_58::apply(State& state) const
 
 // CLV
 // Implied
-int CLV_B8::apply(State& state) const
+int CLV_B8::calculateCycles(const State& state) const
 {
     return 2;
 }
@@ -528,8 +528,8 @@ int CLV_B8::apply(State& state) const
 // CMP Compare Accumulator With Memory [Flags affected: n,z,c]
 
 // CMP (dp,X)
-// DP Indexed Indirect,X
-int CMP_C1::apply(State& state, uint8_t value) const
+// Direct Page Indexed Indirect,X
+int CMP_C1::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -538,7 +538,7 @@ int CMP_C1::apply(State& state, uint8_t value) const
 
 // CMP sr,S
 // Stack Relative
-int CMP_C3::apply(State& state, uint8_t value) const
+int CMP_C3::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
@@ -546,7 +546,7 @@ int CMP_C3::apply(State& state, uint8_t value) const
 
 // CMP dp
 // Direct Page
-int CMP_C5::apply(State& state, uint8_t value) const
+int CMP_C5::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -554,8 +554,8 @@ int CMP_C5::apply(State& state, uint8_t value) const
 }
 
 // CMP [dp]
-// DP Indirect Long
-int CMP_C7::apply(State& state, uint8_t value) const
+// Direct Page Indirect Long
+int CMP_C7::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -565,7 +565,7 @@ int CMP_C7::apply(State& state, uint8_t value) const
 // CMP #const
 // Immediate
 // 17: Add 1 byte if m = 0 (16 - bit memory / accumulator)
-int CMP_C9::apply(State& state, uint16_t value) const
+int CMP_C9::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     return 2 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
@@ -573,7 +573,7 @@ int CMP_C9::apply(State& state, uint16_t value) const
 
 // CMP addr
 // Absolute
-int CMP_CD::apply(State& state, uint16_t value) const
+int CMP_CD::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
@@ -581,15 +581,15 @@ int CMP_CD::apply(State& state, uint16_t value) const
 
 // CMP long
 // Absolute Long
-int CMP_CF::apply(State& state, uint32_t value) const
+int CMP_CF::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
 }
 
 // CMP (dp),Y
-// DP Indirect Indexed, Y
-int CMP_D1::apply(State& state, uint8_t value) const
+// Direct Page Indirect Indexed, Y
+int CMP_D1::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -598,8 +598,8 @@ int CMP_D1::apply(State& state, uint8_t value) const
 }
 
 // CMP (dp)
-// DP Indirect
-int CMP_D2::apply(State& state, uint8_t value) const
+// Direct Page Indirect
+int CMP_D2::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -607,16 +607,16 @@ int CMP_D2::apply(State& state, uint8_t value) const
 }
 
 // CMP (sr,S),Y
-// SR Indirect Indexed,Y
-int CMP_D3::apply(State& state, uint8_t value) const
+// Stack Relative Indirect Indexed,Y
+int CMP_D3::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     return 7 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
 }
 
 // CMP dp,X
-// DP Indexed,X
-int CMP_D5::apply(State& state, uint8_t value) const
+// Direct Page Indexed,X
+int CMP_D5::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -624,8 +624,8 @@ int CMP_D5::apply(State& state, uint8_t value) const
 }
 
 // CMP [dp],Y
-// DP Indirect Long Indexed, Y
-int CMP_D7::apply(State& state, uint8_t value) const
+// Direct Page Indirect Long Indexed, Y
+int CMP_D7::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -634,7 +634,7 @@ int CMP_D7::apply(State& state, uint8_t value) const
 
 // CMP addr,Y
 // Absolute Indexed,Y
-int CMP_D9::apply(State& state, uint16_t value) const
+int CMP_D9::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 3: Add 1 cycle if adding index crosses a page boundary
@@ -643,7 +643,7 @@ int CMP_D9::apply(State& state, uint16_t value) const
 
 // CMP addr,X
 // Absolute Indexed,X
-int CMP_DD::apply(State& state, uint16_t value) const
+int CMP_DD::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 3: Add 1 cycle if adding index crosses a page boundary
@@ -652,7 +652,7 @@ int CMP_DD::apply(State& state, uint16_t value) const
 
 // CMP long,X
 // Absolute Long Indexed,X
-int CMP_DF::apply(State& state, uint32_t value) const
+int CMP_DF::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
@@ -663,7 +663,7 @@ int CMP_DF::apply(State& state, uint32_t value) const
 // COP const
 // Stack/Interrupt
 // 18: Opcode is 1 byte, but program counter value pushed onto stack is incremented by 2 allowing for optional signature byte
-int COP_02::apply(State& state, uint8_t value) const
+int COP_02::calculateCycles(const State& state) const
 {
     // 9: Add 1 cycle for 65816 native mode(e = 0)
     return 7 + (state.getFlag(State::m) ? 0 : 2) /* TODO09 */;
@@ -674,7 +674,7 @@ int COP_02::apply(State& state, uint8_t value) const
 // CPX #const
 // Immediate
 // 19: Add 1 byte if x = 0 (16 - bit index registers)
-int CPX_E0::apply(State& state, uint16_t value) const
+int CPX_E0::calculateCycles(const State& state) const
 {
     // 10: Add 1 cycle if x = 0 (16 - bit index registers)
     return 2 + (state.getFlag(State::x) ? 0 : 1) /* TODO10 */;
@@ -682,7 +682,7 @@ int CPX_E0::apply(State& state, uint16_t value) const
 
 // CPX dp
 // Direct Page
-int CPX_E4::apply(State& state, uint8_t value) const
+int CPX_E4::calculateCycles(const State& state) const
 {
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
     // 10: Add 1 cycle if x = 0 (16 - bit index registers)
@@ -691,7 +691,7 @@ int CPX_E4::apply(State& state, uint8_t value) const
 
 // CPX addr
 // Absolute
-int CPX_EC::apply(State& state, uint16_t value) const
+int CPX_EC::calculateCycles(const State& state) const
 {
     // 10: Add 1 cycle if x = 0 (16 - bit index registers)
     return 4 + (state.getFlag(State::x) ? 0 : 1) /* TODO10 */;
@@ -702,7 +702,7 @@ int CPX_EC::apply(State& state, uint16_t value) const
 // CPY #const
 // Immediate
 // 19: Add 1 byte if x = 0 (16 - bit index registers)
-int CPY_C0::apply(State& state, uint16_t value) const
+int CPY_C0::calculateCycles(const State& state) const
 {
     // 10: Add 1 cycle if x = 0 (16 - bit index registers)
     return 2 + (state.getFlag(State::x) ? 0 : 1) /* TODO10 */;
@@ -710,7 +710,7 @@ int CPY_C0::apply(State& state, uint16_t value) const
 
 // CPY dp
 // Direct Page
-int CPY_C4::apply(State& state, uint8_t value) const
+int CPY_C4::calculateCycles(const State& state) const
 {
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
     // 10: Add 1 cycle if x = 0 (16 - bit index registers)
@@ -719,7 +719,7 @@ int CPY_C4::apply(State& state, uint8_t value) const
 
 // CPY addr
 // Absolute
-int CPY_CC::apply(State& state, uint16_t value) const
+int CPY_CC::calculateCycles(const State& state) const
 {
     // 10: Add 1 cycle if x = 0 (16 - bit index registers)
     return 4 + (state.getFlag(State::x) ? 0 : 1) /* TODO10 */;
@@ -729,14 +729,14 @@ int CPY_CC::apply(State& state, uint16_t value) const
 
 // DEC A
 // Accumulator
-int DEC_3A::apply(State& state) const
+int DEC_3A::calculateCycles(const State& state) const
 {
     return 2;
 }
 
 // DEC dp
 // Direct Page
-int DEC_C6::apply(State& state, uint8_t value) const
+int DEC_C6::calculateCycles(const State& state) const
 {
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
     // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
@@ -745,15 +745,15 @@ int DEC_C6::apply(State& state, uint8_t value) const
 
 // DEC addr
 // Absolute
-int DEC_CE::apply(State& state, uint16_t value) const
+int DEC_CE::calculateCycles(const State& state) const
 {
     // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
     return 6 + (state.getFlag(State::m) ? 0 : 2) /* TODO05 */;
 }
 
 // DEC dp,X
-// DP Indexed,X
-int DEC_D6::apply(State& state, uint8_t value) const
+// Direct Page Indexed,X
+int DEC_D6::calculateCycles(const State& state) const
 {
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
     // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
@@ -762,7 +762,7 @@ int DEC_D6::apply(State& state, uint8_t value) const
 
 // DEC addr,X
 // Absolute Indexed,X
-int DEC_DE::apply(State& state, uint16_t value) const
+int DEC_DE::calculateCycles(const State& state) const
 {
     // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
     // 6: Subtract 1 cycle if 65C02 and no page boundary crossed
@@ -773,7 +773,7 @@ int DEC_DE::apply(State& state, uint16_t value) const
 
 // DEX
 // Implied
-int DEX_CA::apply(State& state) const
+int DEX_CA::calculateCycles(const State& state) const
 {
     return 2;
 }
@@ -782,7 +782,7 @@ int DEX_CA::apply(State& state) const
 
 // DEY
 // Implied
-int DEY_88::apply(State& state) const
+int DEY_88::calculateCycles(const State& state) const
 {
     return 2;
 }
@@ -790,8 +790,8 @@ int DEY_88::apply(State& state) const
 // EOR Exclusive-OR Accumulator with Memory [Flags affected: n,z]
 
 // EOR (dp,X)
-// DP Indexed Indirect,X
-int EOR_41::apply(State& state, uint8_t value) const
+// Direct Page Indexed Indirect,X
+int EOR_41::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -800,7 +800,7 @@ int EOR_41::apply(State& state, uint8_t value) const
 
 // EOR sr,S
 // Stack Relative
-int EOR_43::apply(State& state, uint8_t value) const
+int EOR_43::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
@@ -808,7 +808,7 @@ int EOR_43::apply(State& state, uint8_t value) const
 
 // EOR dp
 // Direct Page
-int EOR_45::apply(State& state, uint8_t value) const
+int EOR_45::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -816,8 +816,8 @@ int EOR_45::apply(State& state, uint8_t value) const
 }
 
 // EOR [dp]
-// DP Indirect Long
-int EOR_47::apply(State& state, uint8_t value) const
+// Direct Page Indirect Long
+int EOR_47::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -827,7 +827,7 @@ int EOR_47::apply(State& state, uint8_t value) const
 // EOR #const
 // Immediate
 // 17: Add 1 byte if m = 0 (16 - bit memory / accumulator)
-int EOR_49::apply(State& state, uint16_t value) const
+int EOR_49::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     return 2 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
@@ -835,7 +835,7 @@ int EOR_49::apply(State& state, uint16_t value) const
 
 // EOR addr
 // Absolute
-int EOR_4D::apply(State& state, uint16_t value) const
+int EOR_4D::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
@@ -843,15 +843,15 @@ int EOR_4D::apply(State& state, uint16_t value) const
 
 // EOR long
 // Absolute Long
-int EOR_4F::apply(State& state, uint32_t value) const
+int EOR_4F::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
 }
 
 // EOR (dp),Y
-// DP Indirect Indexed, Y
-int EOR_51::apply(State& state, uint8_t value) const
+// Direct Page Indirect Indexed, Y
+int EOR_51::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -860,8 +860,8 @@ int EOR_51::apply(State& state, uint8_t value) const
 }
 
 // EOR (dp)
-// DP Indirect
-int EOR_52::apply(State& state, uint8_t value) const
+// Direct Page Indirect
+int EOR_52::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -869,16 +869,16 @@ int EOR_52::apply(State& state, uint8_t value) const
 }
 
 // EOR (sr,S),Y
-// SR Indirect Indexed,Y
-int EOR_53::apply(State& state, uint8_t value) const
+// Stack Relative Indirect Indexed,Y
+int EOR_53::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     return 7 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
 }
 
 // EOR dp,X
-// DP Indexed,X
-int EOR_55::apply(State& state, uint8_t value) const
+// Direct Page Indexed,X
+int EOR_55::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -886,8 +886,8 @@ int EOR_55::apply(State& state, uint8_t value) const
 }
 
 // EOR [dp],Y
-// DP Indirect Long Indexed, Y
-int EOR_57::apply(State& state, uint8_t value) const
+// Direct Page Indirect Long Indexed, Y
+int EOR_57::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -896,7 +896,7 @@ int EOR_57::apply(State& state, uint8_t value) const
 
 // EOR addr,Y
 // Absolute Indexed,Y
-int EOR_59::apply(State& state, uint16_t value) const
+int EOR_59::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 3: Add 1 cycle if adding index crosses a page boundary
@@ -905,7 +905,7 @@ int EOR_59::apply(State& state, uint16_t value) const
 
 // EOR addr,X
 // Absolute Indexed,X
-int EOR_5D::apply(State& state, uint16_t value) const
+int EOR_5D::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 3: Add 1 cycle if adding index crosses a page boundary
@@ -914,7 +914,7 @@ int EOR_5D::apply(State& state, uint16_t value) const
 
 // EOR long,X
 // Absolute Long Indexed,X
-int EOR_5F::apply(State& state, uint32_t value) const
+int EOR_5F::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
@@ -924,14 +924,14 @@ int EOR_5F::apply(State& state, uint32_t value) const
 
 // INC A
 // Accumulator
-int INC_1A::apply(State& state) const
+int INC_1A::calculateCycles(const State& state) const
 {
     return 2;
 }
 
 // INC dp
 // Direct Page
-int INC_E6::apply(State& state, uint8_t value) const
+int INC_E6::calculateCycles(const State& state) const
 {
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
     // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
@@ -940,15 +940,15 @@ int INC_E6::apply(State& state, uint8_t value) const
 
 // INC addr
 // Absolute
-int INC_EE::apply(State& state, uint16_t value) const
+int INC_EE::calculateCycles(const State& state) const
 {
     // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
     return 6 + (state.getFlag(State::m) ? 0 : 2) /* TODO05 */;
 }
 
 // INC dp,X
-// DP Indexed,X
-int INC_F6::apply(State& state, uint8_t value) const
+// Direct Page Indexed,X
+int INC_F6::calculateCycles(const State& state) const
 {
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
     // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
@@ -957,7 +957,7 @@ int INC_F6::apply(State& state, uint8_t value) const
 
 // INC addr,X
 // Absolute Indexed,X
-int INC_FE::apply(State& state, uint16_t value) const
+int INC_FE::calculateCycles(const State& state) const
 {
     // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
     // 6: Subtract 1 cycle if 65C02 and no page boundary crossed
@@ -968,7 +968,7 @@ int INC_FE::apply(State& state, uint16_t value) const
 
 // INX
 // Implied
-int INX_E8::apply(State& state) const
+int INX_E8::calculateCycles(const State& state) const
 {
     return 2;
 }
@@ -977,7 +977,7 @@ int INX_E8::apply(State& state) const
 
 // INY
 // Implied
-int INY_C8::apply(State& state) const
+int INY_C8::calculateCycles(const State& state) const
 {
     return 2;
 }
@@ -986,21 +986,21 @@ int INY_C8::apply(State& state) const
 
 // JMP addr
 // Absolute
-int JMP_4C::apply(State& state, uint16_t value) const
+int JMP_4C::calculateCycles(const State& state) const
 {
     return 3;
 }
 
 // JMP long
 // Absolute Long
-int JMP_5C::apply(State& state, uint32_t value) const
+int JMP_5C::calculateCycles(const State& state) const
 {
     return 4;
 }
 
 // JMP (addr)
 // Absolute Indirect
-int JMP_6C::apply(State& state, uint16_t value) const
+int JMP_6C::calculateCycles(const State& state) const
 {
     // 11: Add 1 cycle if 65C02
     // 12: 6502: Yields incorrect results if low byte of operand is $FF(i.e., operand is $xxFF)
@@ -1009,14 +1009,14 @@ int JMP_6C::apply(State& state, uint16_t value) const
 
 // JMP (addr,X)
 // Absolute Indexed Indirect
-int JMP_7C::apply(State& state, uint16_t value) const
+int JMP_7C::calculateCycles(const State& state) const
 {
     return 6;
 }
 
 // JMP [addr]
 // Absolute Indirect Long
-int JMP_DC::apply(State& state, uint16_t value) const
+int JMP_DC::calculateCycles(const State& state) const
 {
     return 6;
 }
@@ -1025,21 +1025,21 @@ int JMP_DC::apply(State& state, uint16_t value) const
 
 // JSR addr
 // Absolute
-int JSR_20::apply(State& state, uint16_t value) const
+int JSR_20::calculateCycles(const State& state) const
 {
     return 6;
 }
 
 // JSR long
 // Absolute Long
-int JSR_22::apply(State& state, uint32_t value) const
+int JSR_22::calculateCycles(const State& state) const
 {
     return 8;
 }
 
-// JSR (addr,X))
+// JSR (addr,X)
 // Absolute Indexed Indirect
-int JSR_FC::apply(State& state, uint16_t value) const
+int JSR_FC::calculateCycles(const State& state) const
 {
     return 8;
 }
@@ -1047,8 +1047,8 @@ int JSR_FC::apply(State& state, uint16_t value) const
 // LDA Load Accumulator from Memory [Flags affected: n,z]
 
 // LDA (dp,X)
-// DP Indexed Indirect,X
-int LDA_A1::apply(State& state, uint8_t value) const
+// Direct Page Indexed Indirect,X
+int LDA_A1::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -1057,7 +1057,7 @@ int LDA_A1::apply(State& state, uint8_t value) const
 
 // LDA sr,S
 // Stack Relative
-int LDA_A3::apply(State& state, uint8_t value) const
+int LDA_A3::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
@@ -1065,7 +1065,7 @@ int LDA_A3::apply(State& state, uint8_t value) const
 
 // LDA dp
 // Direct Page
-int LDA_A5::apply(State& state, uint8_t value) const
+int LDA_A5::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -1073,8 +1073,8 @@ int LDA_A5::apply(State& state, uint8_t value) const
 }
 
 // LDA [dp]
-// DP Indirect Long
-int LDA_A7::apply(State& state, uint8_t value) const
+// Direct Page Indirect Long
+int LDA_A7::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -1084,7 +1084,7 @@ int LDA_A7::apply(State& state, uint8_t value) const
 // LDA #const
 // Immediate
 // 17: Add 1 byte if m = 0 (16 - bit memory / accumulator)
-int LDA_A9::apply(State& state, uint16_t value) const
+int LDA_A9::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     return 2 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
@@ -1092,7 +1092,7 @@ int LDA_A9::apply(State& state, uint16_t value) const
 
 // LDA addr
 // Absolute
-int LDA_AD::apply(State& state, uint16_t value) const
+int LDA_AD::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
@@ -1100,15 +1100,15 @@ int LDA_AD::apply(State& state, uint16_t value) const
 
 // LDA long
 // Absolute Long
-int LDA_AF::apply(State& state, uint32_t value) const
+int LDA_AF::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
 }
 
 // LDA (dp),Y
-// DP Indirect Indexed, Y
-int LDA_B1::apply(State& state, uint8_t value) const
+// Direct Page Indirect Indexed, Y
+int LDA_B1::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -1117,8 +1117,8 @@ int LDA_B1::apply(State& state, uint8_t value) const
 }
 
 // LDA (dp)
-// DP Indirect
-int LDA_B2::apply(State& state, uint8_t value) const
+// Direct Page Indirect
+int LDA_B2::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -1126,16 +1126,16 @@ int LDA_B2::apply(State& state, uint8_t value) const
 }
 
 // LDA (sr,S),Y
-// SR Indirect Indexed,Y
-int LDA_B3::apply(State& state, uint8_t value) const
+// Stack Relative Indirect Indexed,Y
+int LDA_B3::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     return 7 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
 }
 
 // LDA dp,X
-// DP Indexed,X
-int LDA_B5::apply(State& state, uint8_t value) const
+// Direct Page Indexed,X
+int LDA_B5::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -1143,8 +1143,8 @@ int LDA_B5::apply(State& state, uint8_t value) const
 }
 
 // LDA [dp],Y
-// DP Indirect Long Indexed, Y
-int LDA_B7::apply(State& state, uint8_t value) const
+// Direct Page Indirect Long Indexed, Y
+int LDA_B7::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -1153,7 +1153,7 @@ int LDA_B7::apply(State& state, uint8_t value) const
 
 // LDA addr,Y
 // Absolute Indexed,Y
-int LDA_B9::apply(State& state, uint16_t value) const
+int LDA_B9::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 3: Add 1 cycle if adding index crosses a page boundary
@@ -1162,7 +1162,7 @@ int LDA_B9::apply(State& state, uint16_t value) const
 
 // LDA addr,X
 // Absolute Indexed,X
-int LDA_BD::apply(State& state, uint16_t value) const
+int LDA_BD::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 3: Add 1 cycle if adding index crosses a page boundary
@@ -1171,7 +1171,7 @@ int LDA_BD::apply(State& state, uint16_t value) const
 
 // LDA long,X
 // Absolute Long Indexed,X
-int LDA_BF::apply(State& state, uint32_t value) const
+int LDA_BF::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
@@ -1182,7 +1182,7 @@ int LDA_BF::apply(State& state, uint32_t value) const
 // LDX #const
 // Immediate
 // 19: Add 1 byte if x = 0 (16 - bit index registers)
-int LDX_A2::apply(State& state, uint16_t value) const
+int LDX_A2::calculateCycles(const State& state) const
 {
     // 10: Add 1 cycle if x = 0 (16 - bit index registers)
     return 2 + (state.getFlag(State::x) ? 0 : 1) /* TODO10 */;
@@ -1190,7 +1190,7 @@ int LDX_A2::apply(State& state, uint16_t value) const
 
 // LDX dp
 // Direct Page
-int LDX_A6::apply(State& state, uint8_t value) const
+int LDX_A6::calculateCycles(const State& state) const
 {
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
     // 10: Add 1 cycle if x = 0 (16 - bit index registers)
@@ -1199,15 +1199,15 @@ int LDX_A6::apply(State& state, uint8_t value) const
 
 // LDX addr
 // Absolute
-int LDX_AE::apply(State& state, uint16_t value) const
+int LDX_AE::calculateCycles(const State& state) const
 {
     // 10: Add 1 cycle if x = 0 (16 - bit index registers)
     return 4 + (state.getFlag(State::x) ? 0 : 1) /* TODO10 */;
 }
 
 // LDX dp,Y
-// DP Indexed,Y
-int LDX_B6::apply(State& state, uint8_t value) const
+// Direct Page Indexed,Y
+int LDX_B6::calculateCycles(const State& state) const
 {
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
     // 10: Add 1 cycle if x = 0 (16 - bit index registers)
@@ -1216,7 +1216,7 @@ int LDX_B6::apply(State& state, uint8_t value) const
 
 // LDX addr,Y
 // Absolute Indexed,Y
-int LDX_BE::apply(State& state, uint16_t value) const
+int LDX_BE::calculateCycles(const State& state) const
 {
     // 3: Add 1 cycle if adding index crosses a page boundary
     // 10: Add 1 cycle if x = 0 (16 - bit index registers)
@@ -1228,7 +1228,7 @@ int LDX_BE::apply(State& state, uint16_t value) const
 // LDY #const
 // Immediate
 // 19: Add 1 byte if x = 0 (16 - bit index registers)
-int LDY_A0::apply(State& state, uint16_t value) const
+int LDY_A0::calculateCycles(const State& state) const
 {
     // 10: Add 1 cycle if x = 0 (16 - bit index registers)
     return 2 + (state.getFlag(State::x) ? 0 : 1) /* TODO10 */;
@@ -1236,7 +1236,7 @@ int LDY_A0::apply(State& state, uint16_t value) const
 
 // LDY dp
 // Direct Page
-int LDY_A4::apply(State& state, uint8_t value) const
+int LDY_A4::calculateCycles(const State& state) const
 {
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
     // 10: Add 1 cycle if x = 0 (16 - bit index registers)
@@ -1245,15 +1245,15 @@ int LDY_A4::apply(State& state, uint8_t value) const
 
 // LDY addr
 // Absolute
-int LDY_AC::apply(State& state, uint16_t value) const
+int LDY_AC::calculateCycles(const State& state) const
 {
     // 10: Add 1 cycle if x = 0 (16 - bit index registers)
     return 4 + (state.getFlag(State::x) ? 0 : 1) /* TODO10 */;
 }
 
 // LDY dp,X
-// DP Indexed,X
-int LDY_B4::apply(State& state, uint8_t value) const
+// Direct Page Indexed,X
+int LDY_B4::calculateCycles(const State& state) const
 {
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
     // 10: Add 1 cycle if x = 0 (16 - bit index registers)
@@ -1262,7 +1262,7 @@ int LDY_B4::apply(State& state, uint8_t value) const
 
 // LDY addr,X
 // Absolute Indexed,X
-int LDY_BC::apply(State& state, uint16_t value) const
+int LDY_BC::calculateCycles(const State& state) const
 {
     // 3: Add 1 cycle if adding index crosses a page boundary
     // 10: Add 1 cycle if x = 0 (16 - bit index registers)
@@ -1273,7 +1273,7 @@ int LDY_BC::apply(State& state, uint16_t value) const
 
 // LSR dp
 // Direct Page
-int LSR_46::apply(State& state, uint8_t value) const
+int LSR_46::calculateCycles(const State& state) const
 {
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
     // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
@@ -1282,22 +1282,22 @@ int LSR_46::apply(State& state, uint8_t value) const
 
 // LSR A
 // Accumulator
-int LSR_4A::apply(State& state) const
+int LSR_4A::calculateCycles(const State& state) const
 {
     return 2;
 }
 
 // LSR addr
 // Absolute
-int LSR_4E::apply(State& state, uint16_t value) const
+int LSR_4E::calculateCycles(const State& state) const
 {
     // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
     return 6 + (state.getFlag(State::m) ? 0 : 2) /* TODO05 */;
 }
 
 // LSR dp,X
-// DP Indexed,X
-int LSR_56::apply(State& state, uint8_t value) const
+// Direct Page Indexed,X
+int LSR_56::calculateCycles(const State& state) const
 {
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
     // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
@@ -1306,7 +1306,7 @@ int LSR_56::apply(State& state, uint8_t value) const
 
 // LSR addr,X
 // Absolute Indexed,X
-int LSR_5E::apply(State& state, uint16_t value) const
+int LSR_5E::calculateCycles(const State& state) const
 {
     // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
     // 6: Subtract 1 cycle if 65C02 and no page boundary crossed
@@ -1317,7 +1317,7 @@ int LSR_5E::apply(State& state, uint16_t value) const
 
 // MVN srcbk,destbk
 // Block Move
-int MVN_54::apply(State& state, uint16_t value) const
+int MVN_54::calculateCycles(const State& state) const
 {
     // 3: Add 1 cycle if adding index crosses a page boundary
     return 1 /* TODO03 */;
@@ -1327,7 +1327,7 @@ int MVN_54::apply(State& state, uint16_t value) const
 
 // MVN srcbk,destbk
 // Block Move
-int MVN_44::apply(State& state, uint16_t value) const
+int MVN_44::calculateCycles(const State& state) const
 {
     // 3: Add 1 cycle if adding index crosses a page boundary
     return 1 /* TODO03 */;
@@ -1337,7 +1337,7 @@ int MVN_44::apply(State& state, uint16_t value) const
 
 // NOP
 // Implied
-int NOP_EA::apply(State& state) const
+int NOP_EA::calculateCycles(const State& state) const
 {
     return 2;
 }
@@ -1345,8 +1345,8 @@ int NOP_EA::apply(State& state) const
 // ORA OR Accumulator with Memory [Flags affected: n,z]
 
 // ORA (dp,X)
-// DP Indexed Indirect,X
-int ORA_01::apply(State& state, uint8_t value) const
+// Direct Page Indexed Indirect,X
+int ORA_01::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -1355,7 +1355,7 @@ int ORA_01::apply(State& state, uint8_t value) const
 
 // ORA sr,S
 // Stack Relative
-int ORA_03::apply(State& state, uint8_t value) const
+int ORA_03::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
@@ -1363,7 +1363,7 @@ int ORA_03::apply(State& state, uint8_t value) const
 
 // ORA dp
 // Direct Page
-int ORA_05::apply(State& state, uint8_t value) const
+int ORA_05::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -1371,8 +1371,8 @@ int ORA_05::apply(State& state, uint8_t value) const
 }
 
 // ORA [dp]
-// DP Indirect Long
-int ORA_07::apply(State& state, uint8_t value) const
+// Direct Page Indirect Long
+int ORA_07::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -1382,7 +1382,7 @@ int ORA_07::apply(State& state, uint8_t value) const
 // ORA #const
 // Immediate
 // 17: Add 1 byte if m = 0 (16 - bit memory / accumulator)
-int ORA_09::apply(State& state, uint16_t value) const
+int ORA_09::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     return 2 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
@@ -1390,7 +1390,7 @@ int ORA_09::apply(State& state, uint16_t value) const
 
 // ORA addr
 // Absolute
-int ORA_0D::apply(State& state, uint16_t value) const
+int ORA_0D::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
@@ -1398,15 +1398,15 @@ int ORA_0D::apply(State& state, uint16_t value) const
 
 // ORA long
 // Absolute Long
-int ORA_0F::apply(State& state, uint32_t value) const
+int ORA_0F::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
 }
 
 // ORA (dp),Y
-// DP Indirect Indexed, Y
-int ORA_11::apply(State& state, uint8_t value) const
+// Direct Page Indirect Indexed, Y
+int ORA_11::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -1415,8 +1415,8 @@ int ORA_11::apply(State& state, uint8_t value) const
 }
 
 // ORA (dp)
-// DP Indirect
-int ORA_12::apply(State& state, uint8_t value) const
+// Direct Page Indirect
+int ORA_12::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -1424,16 +1424,16 @@ int ORA_12::apply(State& state, uint8_t value) const
 }
 
 // ORA (sr,S),Y
-// SR Indirect Indexed,Y
-int ORA_13::apply(State& state, uint8_t value) const
+// Stack Relative Indirect Indexed,Y
+int ORA_13::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     return 7 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
 }
 
 // ORA dp,X
-// DP Indexed,X
-int ORA_15::apply(State& state, uint8_t value) const
+// Direct Page Indexed,X
+int ORA_15::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -1441,8 +1441,8 @@ int ORA_15::apply(State& state, uint8_t value) const
 }
 
 // ORA [dp],Y
-// DP Indirect Long Indexed, Y
-int ORA_17::apply(State& state, uint8_t value) const
+// Direct Page Indirect Long Indexed, Y
+int ORA_17::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -1451,7 +1451,7 @@ int ORA_17::apply(State& state, uint8_t value) const
 
 // ORA addr,Y
 // Absolute Indexed,Y
-int ORA_19::apply(State& state, uint16_t value) const
+int ORA_19::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 3: Add 1 cycle if adding index crosses a page boundary
@@ -1460,7 +1460,7 @@ int ORA_19::apply(State& state, uint16_t value) const
 
 // ORA addr,X
 // Absolute Indexed,X
-int ORA_1D::apply(State& state, uint16_t value) const
+int ORA_1D::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 3: Add 1 cycle if adding index crosses a page boundary
@@ -1469,7 +1469,7 @@ int ORA_1D::apply(State& state, uint16_t value) const
 
 // ORA long,X
 // Absolute Long Indexed,X
-int ORA_1F::apply(State& state, uint32_t value) const
+int ORA_1F::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
@@ -1479,7 +1479,7 @@ int ORA_1F::apply(State& state, uint32_t value) const
 
 // PEA addr
 // Stack (Absolute)
-int PEA_F4::apply(State& state, uint16_t value) const
+int PEA_F4::calculateCycles(const State& state) const
 {
     return 5;
 }
@@ -1487,18 +1487,18 @@ int PEA_F4::apply(State& state, uint16_t value) const
 // PEI Push Effective Indirect Address [Flags affected: none]
 
 // PEI (dp)
-// Stack (DP Indirect)
-int PEI_D4::apply(State& state, uint8_t value) const
+// Stack (Direct Page Indirect)
+int PEI_D4::calculateCycles(const State& state) const
 {
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
     return 6 /* TODO02 */;
 }
 
-// PER Push Effective PC Relative Indirect Address [Flags affected: none]
+// PER Push Effective Program Counter Relative Indirect Address [Flags affected: none]
 
 // PER label
-// Stack (PC Relative Long)
-int PER_62::apply(State& state, uint16_t value) const
+// Stack (Program Counter Relative Long)
+int PER_62::calculateCycles(const State& state) const
 {
     return 6;
 }
@@ -1507,7 +1507,7 @@ int PER_62::apply(State& state, uint16_t value) const
 
 // PHA
 // Stack (Push)
-int PHA_48::apply(State& state) const
+int PHA_48::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     return 3 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
@@ -1517,7 +1517,7 @@ int PHA_48::apply(State& state) const
 
 // PHB
 // Stack (Push)
-int PHB_8B::apply(State& state) const
+int PHB_8B::calculateCycles(const State& state) const
 {
     return 3;
 }
@@ -1526,7 +1526,7 @@ int PHB_8B::apply(State& state) const
 
 // PHD
 // Stack (Push)
-int PHD_0B::apply(State& state) const
+int PHD_0B::calculateCycles(const State& state) const
 {
     return 4;
 }
@@ -1535,7 +1535,7 @@ int PHD_0B::apply(State& state) const
 
 // PHK
 // Stack (Push)
-int PHK_4B::apply(State& state) const
+int PHK_4B::calculateCycles(const State& state) const
 {
     return 3;
 }
@@ -1544,7 +1544,7 @@ int PHK_4B::apply(State& state) const
 
 // PHP
 // Stack (Push)
-int PHP_08::apply(State& state) const
+int PHP_08::calculateCycles(const State& state) const
 {
     return 3;
 }
@@ -1553,7 +1553,7 @@ int PHP_08::apply(State& state) const
 
 // PHX
 // Stack (Push)
-int PHX_DA::apply(State& state) const
+int PHX_DA::calculateCycles(const State& state) const
 {
     // 10: Add 1 cycle if x = 0 (16 - bit index registers)
     return 3 + (state.getFlag(State::x) ? 0 : 1) /* TODO10 */;
@@ -1563,7 +1563,7 @@ int PHX_DA::apply(State& state) const
 
 // PHY
 // Stack (Push)
-int PHY_5A::apply(State& state) const
+int PHY_5A::calculateCycles(const State& state) const
 {
     // 10: Add 1 cycle if x = 0 (16 - bit index registers)
     return 3 + (state.getFlag(State::x) ? 0 : 1) /* TODO10 */;
@@ -1573,7 +1573,7 @@ int PHY_5A::apply(State& state) const
 
 // PLA
 // Stack (Pull)
-int PLA_68::apply(State& state) const
+int PLA_68::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
@@ -1583,7 +1583,7 @@ int PLA_68::apply(State& state) const
 
 // PLB
 // Stack (Pull)
-int PLB_AB::apply(State& state) const
+int PLB_AB::calculateCycles(const State& state) const
 {
     return 4;
 }
@@ -1592,7 +1592,7 @@ int PLB_AB::apply(State& state) const
 
 // PLD
 // Stack (Pull)
-int PLD_2B::apply(State& state) const
+int PLD_2B::calculateCycles(const State& state) const
 {
     return 5;
 }
@@ -1601,7 +1601,7 @@ int PLD_2B::apply(State& state) const
 
 // PLP
 // Stack (Pull)
-int PLP_28::apply(State& state) const
+int PLP_28::calculateCycles(const State& state) const
 {
     return 4;
 }
@@ -1610,7 +1610,7 @@ int PLP_28::apply(State& state) const
 
 // PLX
 // Stack (Pull)
-int PLX_FA::apply(State& state) const
+int PLX_FA::calculateCycles(const State& state) const
 {
     // 10: Add 1 cycle if x = 0 (16 - bit index registers)
     return 4 + (state.getFlag(State::x) ? 0 : 1) /* TODO10 */;
@@ -1620,7 +1620,7 @@ int PLX_FA::apply(State& state) const
 
 // PLY
 // Stack (Pull)
-int PLY_7A::apply(State& state) const
+int PLY_7A::calculateCycles(const State& state) const
 {
     // 10: Add 1 cycle if x = 0 (16 - bit index registers)
     return 4 + (state.getFlag(State::x) ? 0 : 1) /* TODO10 */;
@@ -1630,7 +1630,7 @@ int PLY_7A::apply(State& state) const
 
 // REP #const
 // Immediate
-int REP_C2::apply(State& state, uint8_t value) const
+int REP_C2::calculateCycles(const State& state) const
 {
     return 3;
 }
@@ -1639,7 +1639,7 @@ int REP_C2::apply(State& state, uint8_t value) const
 
 // ROL dp
 // Direct Page
-int ROL_26::apply(State& state, uint8_t value) const
+int ROL_26::calculateCycles(const State& state) const
 {
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
     // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
@@ -1648,22 +1648,22 @@ int ROL_26::apply(State& state, uint8_t value) const
 
 // ROL A
 // Accumulator
-int ROL_2A::apply(State& state) const
+int ROL_2A::calculateCycles(const State& state) const
 {
     return 2;
 }
 
 // ROL addr
 // Absolute
-int ROL_2E::apply(State& state, uint16_t value) const
+int ROL_2E::calculateCycles(const State& state) const
 {
     // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
     return 6 + (state.getFlag(State::m) ? 0 : 2) /* TODO05 */;
 }
 
 // ROL dp,X
-// DP Indexed,X
-int ROL_36::apply(State& state, uint8_t value) const
+// Direct Page Indexed,X
+int ROL_36::calculateCycles(const State& state) const
 {
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
     // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
@@ -1672,7 +1672,7 @@ int ROL_36::apply(State& state, uint8_t value) const
 
 // ROL addr,X
 // Absolute Indexed,X
-int ROL_3E::apply(State& state, uint16_t value) const
+int ROL_3E::calculateCycles(const State& state) const
 {
     // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
     // 6: Subtract 1 cycle if 65C02 and no page boundary crossed
@@ -1683,7 +1683,7 @@ int ROL_3E::apply(State& state, uint16_t value) const
 
 // ROR dp
 // Direct Page
-int ROR_66::apply(State& state, uint8_t value) const
+int ROR_66::calculateCycles(const State& state) const
 {
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
     // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
@@ -1692,22 +1692,22 @@ int ROR_66::apply(State& state, uint8_t value) const
 
 // ROR A
 // Accumulator
-int ROR_6A::apply(State& state) const
+int ROR_6A::calculateCycles(const State& state) const
 {
     return 2;
 }
 
 // ROR addr
 // Absolute
-int ROR_6E::apply(State& state, uint16_t value) const
+int ROR_6E::calculateCycles(const State& state) const
 {
     // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
     return 6 + (state.getFlag(State::m) ? 0 : 2) /* TODO05 */;
 }
 
 // ROR dp,X
-// DP Indexed,X
-int ROR_76::apply(State& state, uint8_t value) const
+// Direct Page Indexed,X
+int ROR_76::calculateCycles(const State& state) const
 {
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
     // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
@@ -1716,7 +1716,7 @@ int ROR_76::apply(State& state, uint8_t value) const
 
 // ROR addr,X
 // Absolute Indexed,X
-int ROR_7E::apply(State& state, uint16_t value) const
+int ROR_7E::calculateCycles(const State& state) const
 {
     // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
     // 6: Subtract 1 cycle if 65C02 and no page boundary crossed
@@ -1727,7 +1727,7 @@ int ROR_7E::apply(State& state, uint16_t value) const
 
 // RTI
 // Stack (RTI)
-int RTI_40::apply(State& state) const
+int RTI_40::calculateCycles(const State& state) const
 {
     // 9: Add 1 cycle for 65816 native mode(e = 0)
     return 6 + (state.getFlag(State::m) ? 0 : 2) /* TODO09 */;
@@ -1737,7 +1737,7 @@ int RTI_40::apply(State& state) const
 
 // RTL
 // Stack (RTL)
-int RTL_6B::apply(State& state) const
+int RTL_6B::calculateCycles(const State& state) const
 {
     return 6;
 }
@@ -1746,7 +1746,7 @@ int RTL_6B::apply(State& state) const
 
 // RTS
 // Stack (RTS)
-int RTS_60::apply(State& state) const
+int RTS_60::calculateCycles(const State& state) const
 {
     return 6;
 }
@@ -1754,8 +1754,8 @@ int RTS_60::apply(State& state) const
 // SBC Subtract with Borrow from Accumulator [Flags affected: n,v,z,c]
 
 // SBC (dp,X)
-// DP Indexed Indirect,X
-int SBC_E1::apply(State& state, uint8_t value) const
+// Direct Page Indexed Indirect,X
+int SBC_E1::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -1765,7 +1765,7 @@ int SBC_E1::apply(State& state, uint8_t value) const
 
 // SBC sr,S
 // Stack Relative
-int SBC_E3::apply(State& state, uint8_t value) const
+int SBC_E3::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 4: Add 1 cycle if 65C02 and d = 1 (65C02 in decimal mode)
@@ -1774,7 +1774,7 @@ int SBC_E3::apply(State& state, uint8_t value) const
 
 // SBC dp
 // Direct Page
-int SBC_E5::apply(State& state, uint8_t value) const
+int SBC_E5::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -1783,8 +1783,8 @@ int SBC_E5::apply(State& state, uint8_t value) const
 }
 
 // SBC [dp]
-// DP Indirect Long
-int SBC_E7::apply(State& state, uint8_t value) const
+// Direct Page Indirect Long
+int SBC_E7::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -1795,7 +1795,7 @@ int SBC_E7::apply(State& state, uint8_t value) const
 // SBC #const
 // Immediate
 // 17: Add 1 byte if m = 0 (16 - bit memory / accumulator)
-int SBC_E9::apply(State& state, uint16_t value) const
+int SBC_E9::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 4: Add 1 cycle if 65C02 and d = 1 (65C02 in decimal mode)
@@ -1804,7 +1804,7 @@ int SBC_E9::apply(State& state, uint16_t value) const
 
 // SBC addr
 // Absolute
-int SBC_ED::apply(State& state, uint16_t value) const
+int SBC_ED::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 4: Add 1 cycle if 65C02 and d = 1 (65C02 in decimal mode)
@@ -1813,7 +1813,7 @@ int SBC_ED::apply(State& state, uint16_t value) const
 
 // SBC long
 // Absolute Long
-int SBC_EF::apply(State& state, uint32_t value) const
+int SBC_EF::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 4: Add 1 cycle if 65C02 and d = 1 (65C02 in decimal mode)
@@ -1821,8 +1821,8 @@ int SBC_EF::apply(State& state, uint32_t value) const
 }
 
 // SBC (dp),Y
-// DP Indirect Indexed, Y
-int SBC_F1::apply(State& state, uint8_t value) const
+// Direct Page Indirect Indexed, Y
+int SBC_F1::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -1832,8 +1832,8 @@ int SBC_F1::apply(State& state, uint8_t value) const
 }
 
 // SBC (dp)
-// DP Indirect
-int SBC_F2::apply(State& state, uint8_t value) const
+// Direct Page Indirect
+int SBC_F2::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -1842,8 +1842,8 @@ int SBC_F2::apply(State& state, uint8_t value) const
 }
 
 // SBC (sr,S),Y
-// SR Indirect Indexed,Y
-int SBC_F3::apply(State& state, uint8_t value) const
+// Stack Relative Indirect Indexed,Y
+int SBC_F3::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 4: Add 1 cycle if 65C02 and d = 1 (65C02 in decimal mode)
@@ -1851,8 +1851,8 @@ int SBC_F3::apply(State& state, uint8_t value) const
 }
 
 // SBC dp,X
-// DP Indexed,X
-int SBC_F5::apply(State& state, uint8_t value) const
+// Direct Page Indexed,X
+int SBC_F5::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -1861,8 +1861,8 @@ int SBC_F5::apply(State& state, uint8_t value) const
 }
 
 // SBC [dp],Y
-// DP Indirect Long Indexed, Y
-int SBC_F7::apply(State& state, uint8_t value) const
+// Direct Page Indirect Long Indexed, Y
+int SBC_F7::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -1872,7 +1872,7 @@ int SBC_F7::apply(State& state, uint8_t value) const
 
 // SBC addr,Y
 // Absolute Indexed,Y
-int SBC_F9::apply(State& state, uint16_t value) const
+int SBC_F9::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 3: Add 1 cycle if adding index crosses a page boundary
@@ -1882,7 +1882,7 @@ int SBC_F9::apply(State& state, uint16_t value) const
 
 // SBC addr,X
 // Absolute Indexed,X
-int SBC_FD::apply(State& state, uint16_t value) const
+int SBC_FD::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 3: Add 1 cycle if adding index crosses a page boundary
@@ -1892,7 +1892,7 @@ int SBC_FD::apply(State& state, uint16_t value) const
 
 // SBC long,X
 // Absolute Long Indexed,X
-int SBC_FF::apply(State& state, uint32_t value) const
+int SBC_FF::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 4: Add 1 cycle if 65C02 and d = 1 (65C02 in decimal mode)
@@ -1903,7 +1903,7 @@ int SBC_FF::apply(State& state, uint32_t value) const
 
 // SEC
 // Implied
-int SEC_38::apply(State& state) const
+int SEC_38::calculateCycles(const State& state) const
 {
     return 2;
 }
@@ -1912,7 +1912,7 @@ int SEC_38::apply(State& state) const
 
 // SED
 // Implied
-int SED_F8::apply(State& state) const
+int SED_F8::calculateCycles(const State& state) const
 {
     return 2;
 }
@@ -1921,16 +1921,16 @@ int SED_F8::apply(State& state) const
 
 // SEI
 // Implied
-int SEI_78::apply(State& state) const
+int SEI_78::calculateCycles(const State& state) const
 {
     return 2;
 }
 
 // SEP Set Processor Status Bits [Flags affected: all except b per operand]
 
-// SEP
+// SEP #const
 // Immediate
-int SEP_E2::apply(State& state, uint8_t value) const
+int SEP_E2::calculateCycles(const State& state) const
 {
     return 3;
 }
@@ -1938,8 +1938,8 @@ int SEP_E2::apply(State& state, uint8_t value) const
 // STA Store Accumulator to Memory [Flags affected: none]
 
 // STA (dp,X)
-// DP Indexed Indirect,X
-int STA_81::apply(State& state, uint8_t value) const
+// Direct Page Indexed Indirect,X
+int STA_81::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -1948,7 +1948,7 @@ int STA_81::apply(State& state, uint8_t value) const
 
 // STA sr,S
 // Stack Relative
-int STA_83::apply(State& state, uint8_t value) const
+int STA_83::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
@@ -1956,7 +1956,7 @@ int STA_83::apply(State& state, uint8_t value) const
 
 // STA dp
 // Direct Page
-int STA_85::apply(State& state, uint8_t value) const
+int STA_85::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -1964,8 +1964,8 @@ int STA_85::apply(State& state, uint8_t value) const
 }
 
 // STA [dp]
-// DP Indirect Long
-int STA_87::apply(State& state, uint8_t value) const
+// Direct Page Indirect Long
+int STA_87::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -1974,7 +1974,7 @@ int STA_87::apply(State& state, uint8_t value) const
 
 // STA addr
 // Absolute
-int STA_8D::apply(State& state, uint16_t value) const
+int STA_8D::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
@@ -1982,15 +1982,15 @@ int STA_8D::apply(State& state, uint16_t value) const
 
 // STA long
 // Absolute Long
-int STA_8F::apply(State& state, uint32_t value) const
+int STA_8F::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
 }
 
 // STA (dp),Y
-// DP Indirect Indexed, Y
-int STA_91::apply(State& state, uint8_t value) const
+// Direct Page Indirect Indexed, Y
+int STA_91::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -1998,8 +1998,8 @@ int STA_91::apply(State& state, uint8_t value) const
 }
 
 // STA (dp)
-// DP Indirect
-int STA_92::apply(State& state, uint8_t value) const
+// Direct Page Indirect
+int STA_92::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -2007,16 +2007,16 @@ int STA_92::apply(State& state, uint8_t value) const
 }
 
 // STA (sr,S),Y
-// SR Indirect Indexed,Y
-int STA_93::apply(State& state, uint8_t value) const
+// Stack Relative Indirect Indexed,Y
+int STA_93::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     return 7 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
 }
 
-// STA dpX
-// DP Indexed,X
-int STA_95::apply(State& state, uint8_t value) const
+// STA dp,X
+// Direct Page Indexed,X
+int STA_95::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -2024,8 +2024,8 @@ int STA_95::apply(State& state, uint8_t value) const
 }
 
 // STA [dp],Y
-// DP Indirect Long Indexed, Y
-int STA_97::apply(State& state, uint8_t value) const
+// Direct Page Indirect Long Indexed, Y
+int STA_97::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -2034,7 +2034,7 @@ int STA_97::apply(State& state, uint8_t value) const
 
 // STA addr,Y
 // Absolute Indexed,Y
-int STA_99::apply(State& state, uint16_t value) const
+int STA_99::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
@@ -2042,7 +2042,7 @@ int STA_99::apply(State& state, uint16_t value) const
 
 // STA addr,X
 // Absolute Indexed,X
-int STA_9D::apply(State& state, uint16_t value) const
+int STA_9D::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
@@ -2050,7 +2050,7 @@ int STA_9D::apply(State& state, uint16_t value) const
 
 // STA long,X
 // Absolute Long Indexed,X
-int STA_9F::apply(State& state, uint32_t value) const
+int STA_9F::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
@@ -2060,7 +2060,7 @@ int STA_9F::apply(State& state, uint32_t value) const
 
 // STP
 // Implied
-int STP_DB::apply(State& state) const
+int STP_DB::calculateCycles(const State& state) const
 {
     // 14: Uses 3 cycles to shut the processor down : additional cycles are required by reset to restart it
     return 3 /* TODO14 */;
@@ -2070,7 +2070,7 @@ int STP_DB::apply(State& state) const
 
 // STX dp
 // Direct Page
-int STX_86::apply(State& state, uint8_t value) const
+int STX_86::calculateCycles(const State& state) const
 {
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
     // 10: Add 1 cycle if x = 0 (16 - bit index registers)
@@ -2079,15 +2079,15 @@ int STX_86::apply(State& state, uint8_t value) const
 
 // STX addr
 // Absolute
-int STX_8E::apply(State& state, uint16_t value) const
+int STX_8E::calculateCycles(const State& state) const
 {
     // 10: Add 1 cycle if x = 0 (16 - bit index registers)
     return 4 + (state.getFlag(State::x) ? 0 : 1) /* TODO10 */;
 }
 
 // STX dp,Y
-// DP Indexed,Y
-int STX_96::apply(State& state, uint8_t value) const
+// Direct Page Indexed,Y
+int STX_96::calculateCycles(const State& state) const
 {
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
     // 10: Add 1 cycle if x = 0 (16 - bit index registers)
@@ -2098,7 +2098,7 @@ int STX_96::apply(State& state, uint8_t value) const
 
 // STY dp
 // Direct Page
-int STY_84::apply(State& state, uint8_t value) const
+int STY_84::calculateCycles(const State& state) const
 {
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
     // 10: Add 1 cycle if x = 0 (16 - bit index registers)
@@ -2107,15 +2107,15 @@ int STY_84::apply(State& state, uint8_t value) const
 
 // STY addr
 // Absolute
-int STY_8C::apply(State& state, uint16_t value) const
+int STY_8C::calculateCycles(const State& state) const
 {
     // 10: Add 1 cycle if x = 0 (16 - bit index registers)
     return 4 + (state.getFlag(State::x) ? 0 : 1) /* TODO10 */;
 }
 
 // STY dp,X
-// DP Indexed,X
-int STY_94::apply(State& state, uint8_t value) const
+// Direct Page Indexed,X
+int STY_94::calculateCycles(const State& state) const
 {
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
     // 10: Add 1 cycle if x = 0 (16 - bit index registers)
@@ -2126,7 +2126,7 @@ int STY_94::apply(State& state, uint8_t value) const
 
 // STZ dp
 // Direct Page
-int STZ_64::apply(State& state, uint8_t value) const
+int STZ_64::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -2134,8 +2134,8 @@ int STZ_64::apply(State& state, uint8_t value) const
 }
 
 // STZ dp,X
-// DP Indexed,X
-int STZ_74::apply(State& state, uint8_t value) const
+// Direct Page Indexed,X
+int STZ_74::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
@@ -2144,7 +2144,7 @@ int STZ_74::apply(State& state, uint8_t value) const
 
 // STZ addr
 // Absolute
-int STZ_9C::apply(State& state, uint16_t value) const
+int STZ_9C::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
@@ -2152,7 +2152,7 @@ int STZ_9C::apply(State& state, uint16_t value) const
 
 // STZ addr,X
 // Absolute Indexed,X
-int STZ_9E::apply(State& state, uint16_t value) const
+int STZ_9E::calculateCycles(const State& state) const
 {
     // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
     return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
@@ -2162,7 +2162,7 @@ int STZ_9E::apply(State& state, uint16_t value) const
 
 // TAX
 // Implied
-int TAX_AA::apply(State& state) const
+int TAX_AA::calculateCycles(const State& state) const
 {
     return 2;
 }
@@ -2171,7 +2171,7 @@ int TAX_AA::apply(State& state) const
 
 // TAY
 // Implied
-int TAY_A8::apply(State& state) const
+int TAY_A8::calculateCycles(const State& state) const
 {
     return 2;
 }
@@ -2180,7 +2180,7 @@ int TAY_A8::apply(State& state) const
 
 // TCD
 // Implied
-int TCD_5B::apply(State& state) const
+int TCD_5B::calculateCycles(const State& state) const
 {
     return 2;
 }
@@ -2189,7 +2189,7 @@ int TCD_5B::apply(State& state) const
 
 // TCS
 // Implied
-int TCS_1B::apply(State& state) const
+int TCS_1B::calculateCycles(const State& state) const
 {
     return 2;
 }
@@ -2198,7 +2198,7 @@ int TCS_1B::apply(State& state) const
 
 // TDC
 // Implied
-int TDC_7B::apply(State& state) const
+int TDC_7B::calculateCycles(const State& state) const
 {
     return 2;
 }
@@ -2207,7 +2207,7 @@ int TDC_7B::apply(State& state) const
 
 // TRB dp
 // Direct Page
-int TRB_14::apply(State& state, uint8_t value) const
+int TRB_14::calculateCycles(const State& state) const
 {
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
     // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
@@ -2216,7 +2216,7 @@ int TRB_14::apply(State& state, uint8_t value) const
 
 // TRB addr
 // Absolute
-int TRB_1C::apply(State& state, uint16_t value) const
+int TRB_1C::calculateCycles(const State& state) const
 {
     // 3: Add 1 cycle if adding index crosses a page boundary
     return 6 /* TODO03 */;
@@ -2226,7 +2226,7 @@ int TRB_1C::apply(State& state, uint16_t value) const
 
 // TSB dp
 // Direct Page
-int TSB_04::apply(State& state, uint8_t value) const
+int TSB_04::calculateCycles(const State& state) const
 {
     // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
     // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
@@ -2235,7 +2235,7 @@ int TSB_04::apply(State& state, uint8_t value) const
 
 // TSB addr
 // Absolute
-int TSB_0C::apply(State& state, uint16_t value) const
+int TSB_0C::calculateCycles(const State& state) const
 {
     // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
     return 6 + (state.getFlag(State::m) ? 0 : 2) /* TODO05 */;
@@ -2245,7 +2245,7 @@ int TSB_0C::apply(State& state, uint16_t value) const
 
 // TSC
 // Implied
-int TSC_3B::apply(State& state) const
+int TSC_3B::calculateCycles(const State& state) const
 {
     return 2;
 }
@@ -2254,7 +2254,7 @@ int TSC_3B::apply(State& state) const
 
 // TSX
 // Implied
-int TSX_BA::apply(State& state) const
+int TSX_BA::calculateCycles(const State& state) const
 {
     return 2;
 }
@@ -2263,7 +2263,7 @@ int TSX_BA::apply(State& state) const
 
 // TXA
 // Implied
-int TXA_8A::apply(State& state) const
+int TXA_8A::calculateCycles(const State& state) const
 {
     return 2;
 }
@@ -2272,7 +2272,7 @@ int TXA_8A::apply(State& state) const
 
 // TXS
 // Implied
-int TXS_9A::apply(State& state) const
+int TXS_9A::calculateCycles(const State& state) const
 {
     return 2;
 }
@@ -2281,7 +2281,7 @@ int TXS_9A::apply(State& state) const
 
 // TXY
 // Implied
-int TXY_9B::apply(State& state) const
+int TXY_9B::calculateCycles(const State& state) const
 {
     return 2;
 }
@@ -2290,7 +2290,7 @@ int TXY_9B::apply(State& state) const
 
 // TYA
 // Implied
-int TYA_98::apply(State& state) const
+int TYA_98::calculateCycles(const State& state) const
 {
     return 2;
 }
@@ -2299,7 +2299,7 @@ int TYA_98::apply(State& state) const
 
 // TYX
 // Implied
-int TYX_BB::apply(State& state) const
+int TYX_BB::calculateCycles(const State& state) const
 {
     return 2;
 }
@@ -2308,7 +2308,7 @@ int TYX_BB::apply(State& state) const
 
 // WAI
 // Implied
-int WAI_CB::apply(State& state) const
+int WAI_CB::calculateCycles(const State& state) const
 {
     // 15: Uses 3 cycles to shut the processor down : additional cycles are required by interrupt to restart it
     return 3 /* TODO15 */;
@@ -2319,7 +2319,7 @@ int WAI_CB::apply(State& state) const
 // WDM
 // n/a
 // 16: Byte and cycle counts subject to change in future processors which expand WDM into 2 - byte opcode portions of instructions of varying lengths
-int WDM_42::apply(State& state, uint8_t value) const
+int WDM_42::calculateCycles(const State& state) const
 {
     // 16: Byte and cycle counts subject to change in future processors which expand WDM into 2 - byte opcode portions of instructions of varying lengths
     return 0 /* TODO16 */;
@@ -2329,7 +2329,7 @@ int WDM_42::apply(State& state, uint8_t value) const
 
 // XBA
 // Implied
-int XBA_EB::apply(State& state) const
+int XBA_EB::calculateCycles(const State& state) const
 {
     return 3;
 }
@@ -2338,7 +2338,7 @@ int XBA_EB::apply(State& state) const
 
 // XCE
 // Implied
-int XCE_FB::apply(State& state) const
+int XCE_FB::calculateCycles(const State& state) const
 {
     return 2;
 }

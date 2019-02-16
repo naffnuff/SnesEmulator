@@ -10,7 +10,7 @@ std::ostream& Instruction::printInfo(std::ostream& output) const
 
 int Instruction1Byte::execute(State& state) const
 {
-    int cycles = apply(state);
+    int cycles = calculateCycles(state) + apply(state);
     state.incrementProgramCounter(1);
     return cycles;
 }
@@ -24,7 +24,7 @@ int Instruction2Byte::execute(State& state) const
 {
     uint8_t value = state.readOneByteValue();
     state.incrementProgramCounter(2);
-    int cycles = apply(state, value);
+    int cycles = calculateCycles(state) + apply(state, value);
     return cycles;
 }
 
@@ -37,7 +37,7 @@ int Instruction3Byte::execute(State& state) const
 {
     uint16_t value = state.readTwoByteValue();
     state.incrementProgramCounter(3);
-    int cycles = apply(state, value);
+    int cycles = calculateCycles(state) + apply(state, value);
     return cycles;
 }
 
@@ -50,7 +50,7 @@ int Instruction4Byte::execute(State& state) const
 {
     uint32_t value = state.readThreeByteValue();
     state.incrementProgramCounter(4);
-    int cycles = apply(state, value);
+    int cycles = calculateCycles(state) + apply(state, value);
     return cycles;
 }
 
