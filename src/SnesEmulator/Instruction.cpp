@@ -4,9 +4,8 @@
 
 std::ostream& Instruction::printInfo(std::ostream& output) const
 {
-    return output << debugName << std::endl << debugDescription << std::endl;
+    return output << intructionName << std::endl << instructionDescription << std::endl << addressMode << std::endl;
 }
-
 
 int Instruction1Byte::execute(State& state) const
 {
@@ -30,7 +29,7 @@ int Instruction2Byte::execute(State& state) const
 
 std::ostream& Instruction2Byte::printNextExecution(std::ostream& output, const State& state) const
 {
-    return printInfo(output) << std::hex << state.readOneByteValue() << std::dec << std::endl << state << std::endl;
+    return printInfo(output) << std::hex << +state.readOneByteValue() << std::dec << std::endl << state << std::endl;
 }
 
 int Instruction3Byte::execute(State& state) const
@@ -43,7 +42,7 @@ int Instruction3Byte::execute(State& state) const
 
 std::ostream& Instruction3Byte::printNextExecution(std::ostream& output, const State& state) const
 {
-    return printInfo(output) << std::hex << state.readTwoByteValue() << std::dec << std::endl << state << std::endl;
+    return printInfo(output) << std::hex << +state.readTwoByteValue() << std::dec << std::endl << state << std::endl;
 }
 
 int Instruction4Byte::execute(State& state) const
@@ -56,5 +55,5 @@ int Instruction4Byte::execute(State& state) const
 
 std::ostream& Instruction4Byte::printNextExecution(std::ostream& output, const State& state) const
 {
-    return printInfo(output) << std::hex << state.readThreeByteValue() << std::dec << std::endl << state << std::endl;
+    return printInfo(output) << std::hex << +state.readThreeByteValue() << std::dec << std::endl << state << std::endl;
 }

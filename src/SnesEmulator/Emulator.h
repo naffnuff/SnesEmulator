@@ -1,6 +1,6 @@
 #pragma once
 
-#include "InstructionMap.h"
+#include "OpcodeMap.h"
 #include "State.h"
 
 class Emulator
@@ -9,7 +9,7 @@ public:
     Emulator();
     void run();
 private:
-    InstructionMap instructions;
+    OpcodeMap instructions;
     State state;
 };
 

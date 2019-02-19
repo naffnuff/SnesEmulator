@@ -7,9 +7,10 @@
 class Instruction
 {
 public:
-    Instruction(const std::string& debugName, const std::string& debugDescription)
-        : debugName(debugName)
-        , debugDescription(debugDescription)
+    Instruction(const std::string& instructionName, const std::string& instructionDescription, const std::string& addressMode)
+        : intructionName(instructionName)
+        , instructionDescription(instructionDescription)
+        , addressMode(addressMode)
     {
     }
 
@@ -22,8 +23,9 @@ protected:
     virtual int calculateCycles(const State& state) const = 0;
 
 private:
-    const std::string debugName;
-    const std::string debugDescription;
+    const std::string intructionName;
+    const std::string instructionDescription;
+    const std::string addressMode;
 };
 
 class Instruction1Byte : public Instruction
@@ -98,7 +100,7 @@ int InstructionFlagSize<Flag>::execute(State& state) const
 template<State::Flag Flag>
 std::ostream& InstructionFlagSize<Flag>::printNextExecution(std::ostream& output, const State& state) const
 {
-    return printInfo(output) << std::hex << (state.getFlag(Flag) ? state.readOneByteValue() : state.readTwoByteValue()) << std::dec << std::endl << state << std::endl;
+    return printInfo(output) << std::hex << +(state.getFlag(Flag) ? state.readOneByteValue() : state.readTwoByteValue()) << std::dec << std::endl << state << std::endl;
 }
 
 template<State::Flag Flag>

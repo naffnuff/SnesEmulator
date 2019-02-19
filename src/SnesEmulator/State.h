@@ -27,6 +27,10 @@ public:
     {
         memory.resize(1 << 24);
         std::cout << "Memory size=" << memory.size() << std::endl;
+
+        accumulatorA = 0xFB; // A9FB
+        accumulatorB = 0xA9;
+
     }
 
     State(State&) = delete;
@@ -91,11 +95,21 @@ private:
     bool tryReadHeader(int offset, std::vector<char> rom);
 
 private:
-    std::vector<uint8_t> memory;
-    int programCounter;
-    int resetAddress;
+    uint8_t accumulatorA;
+    uint8_t accumulatorB;
+    uint8_t dataBankRegister;
+    uint16_t xIndexRegister;
+    uint16_t yIndexRegister;
+    uint16_t directPagePointer;
+    uint16_t stackPointer;
+    uint8_t programBankRegister;
+    uint16_t programCounter;
+    uint16_t resetAddress;
+
     std::bitset<8> flags;
     bool emulationMode;
+
+    std::vector<uint8_t> memory;
 };
 
 std::ostream& operator<<(std::ostream& output, const State& state);

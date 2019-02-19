@@ -102,10 +102,10 @@ std::string getCycleModification(int remarkIndex)
     }
 }
 
-void generateImplementations(const std::vector<Instruction>& instructions)
+void generateOpcodes(const std::vector<Instruction>& instructions)
 {
-    std::ofstream hOutput("..\\..\\..\\src\\SnesEmulator\\InstructionImplementations.h");
-    std::ofstream cppOutput("..\\..\\..\\src\\SnesEmulator\\InstructionImplementations.cpp");
+    std::ofstream hOutput("..\\..\\..\\src\\SnesEmulator\\Opcode.h");
+    std::ofstream cppOutput("..\\..\\..\\src\\SnesEmulator\\Opcode.cpp");
 
     hOutput << "#pragma once" << std::endl
         << std::endl
@@ -115,17 +115,21 @@ void generateImplementations(const std::vector<Instruction>& instructions)
         << "#include \"Instruction.h\"" << std::endl
         << "#include \"AddressMode.h\"" << std::endl
         << "#include \"Operator.h\"" << std::endl
+        << std::endl
+        << "namespace Opcode {" << std::endl
         << std::endl;
 
-    cppOutput << "#include \"InstructionImplementations.h\"" << std::endl
+    cppOutput << "#include \"Opcode.h\"" << std::endl
+        << std::endl
+        << "namespace Opcode {" << std::endl
         << std::endl;
 
     for (const Instruction& instruction : instructions) {
         int valueSize = stoi(instruction.size) - 1;
 
         if (!instruction.comment.empty()) {
-            hOutput << "// " << instruction.comment << std::endl << std::endl;
-            cppOutput << "// " << instruction.comment << std::endl << std::endl;
+            hOutput << "// " << instruction.comment << std::endl;
+            cppOutput << "// " << instruction.comment << std::endl;
         }
 
         hOutput << "// " << instruction.name << std::endl
@@ -178,39 +182,40 @@ void generateImplementations(const std::vector<Instruction>& instructions)
             << "}" << std::endl
             << std::endl;
     }
+
+    hOutput << "}" << std::endl;
+    cppOutput << "}" << std::endl;
 }
 
-void generateMap(const std::vector<Instruction>& instructions)
+void generateOpcodeMap(const std::vector<Instruction>& instructions)
 {
-    std::ofstream output("..\\..\\..\\src\\SnesEmulator\\InstructionMap.cpp");
+    std::ofstream output("..\\..\\..\\src\\SnesEmulator\\OpcodeMap.cpp");
 
-    output << "#include \"InstructionMap.h\"" << std::endl
+    output << "#include \"OpcodeMap.h\"" << std::endl
         << std::endl
         << "#include <stdint.h>" << std::endl
         << std::endl
-        << "#include \"InstructionImplementations.h\"" << std::endl
+        << "#include \"Opcode.h\"" << std::endl
         << "#include \"State.h\"" << std::endl
         << std::endl;
 
-    output << "Instruction* InstructionMap::getInstruction(uint8_t code) const" << std::endl
+    output << "Instruction* OpcodeMap::getInstruction(uint8_t code) const" << std::endl
         << "{" << std::endl
         << "    return instructions[code].get();" << std::endl
         << "}" << std::endl << std::endl;
 
 
-    output << "InstructionMap::InstructionMap()" << std::endl
+    output << "OpcodeMap::OpcodeMap()" << std::endl
         << "{" << std::endl;
     for (const Instruction& instruction : instructions) {
-        output << "    instructions[0x" << instruction.code << "] = std::make_unique<" << instruction.classname << ">(\"" << instruction.name << "\", \"" << instruction.addressMode << "\");";
-        if (!instruction.sizeRemark.empty()) {
-            output << " // " << getRemark(stoi(instruction.sizeRemark));
-        }
-        output << std::endl;
+        output << "    instructions[0x" << instruction.code << "] = std::make_unique<Opcode::" << instruction.classname << ">(\""
+            << instruction.name << "\", \"" << instruction.comment << "\", \"" << instruction.addressMode << "\");"
+            << std::endl;
     }
     output << "}" << std::endl;
 }
 
-typedef std::map<std::string, int> AddressModeClassMap;
+typedef std::map<std::string, std::pair<int, std::string>> AddressModeClassMap;
 void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
 {
     std::ofstream output("..\\..\\..\\src\\SnesEmulator\\AddressMode.h");
@@ -227,18 +232,18 @@ void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
 
     for (const AddressModeClassMap::value_type& kvp : addressModeClassMap) {
 
-        output << "template <typename Operator";
+        output << "// " << kvp.second.second << std::endl << "template <typename Operator";
 
-        if (kvp.second == 999) {
+        if (kvp.second.first == 999) {
             output << ", State::Flag Flag";
         }
 
         output << ">" << std::endl;
         output << "class " << kvp.first << " : public ";
-        if (kvp.second > 4) {
+        if (kvp.second.first > 4) {
             output << "InstructionFlagSize<Flag>";
         } else {
-            output << "Instruction" << kvp.second << "Byte";
+            output << "Instruction" << kvp.second.first << "Byte";
         }
         output << std::endl << "{" << std::endl
             << "    using " << kvp.first << "::" << kvp.first << ";" << std::endl
@@ -247,10 +252,10 @@ void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
         std::stringstream ss;
         ss << "apply(State& state";
         
-        if (kvp.second == 999) {
+        if (kvp.second.first == 999) {
             ss << ", uint16_t value";
-        } else if (kvp.second > 1) {
-            ss << ", uint" << (kvp.second == 4 ? 32 : (kvp.second - 1) * 8) << "_t value";
+        } else if (kvp.second.first > 1) {
+            ss << ", uint" << (kvp.second.first == 4 ? 32 : (kvp.second.first - 1) * 8) << "_t value";
         }
         ss << ") const";
 
@@ -260,14 +265,14 @@ void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
 
         output << "template <typename Operator";
 
-        if (kvp.second == 999) {
+        if (kvp.second.first == 999) {
             output << ", State::Flag Flag";
         }
 
         output << ">" << std::endl;
 
         output << "int " << kvp.first << "<Operator";
-        if (kvp.second == 999) {
+        if (kvp.second.first == 999) {
             output << ", Flag";
         }
         output << ">::" << ss.str() << std::endl
@@ -281,7 +286,8 @@ void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
     output << "}" << std::endl;
 }
 
-void generateOperators(std::set<std::string> mnemonics)
+typedef std::map<std::string, std::string> MnemonicMap;
+void generateOperators(const MnemonicMap& mnemonicMap)
 {
     std::ofstream hOutput("..\\..\\..\\src\\SnesEmulator\\Operator.h");
     std::ofstream cppOutput("..\\..\\..\\src\\SnesEmulator\\Operator.cpp");
@@ -298,15 +304,19 @@ void generateOperators(std::set<std::string> mnemonics)
         << "namespace Operator {" << std::endl
         << std::endl;
 
-    for (const std::string& mnemonic : mnemonics) {
-        hOutput << "class " << mnemonic << std::endl
+    for (const MnemonicMap::value_type& kvp : mnemonicMap) {
+
+        hOutput << "// " << kvp.second << std::endl;
+        cppOutput << "// " << kvp.second << std::endl;
+
+        hOutput << "class " << kvp.first << std::endl
             << "{" << std::endl
             << "public:" << std::endl
             << "    static int operate(State& state, int* address);" << std::endl
             << "};" << std::endl
             << std::endl;
 
-        cppOutput << "int " << mnemonic << "::operate(State& state, int* address)" << std::endl
+        cppOutput << "int " << kvp.first << "::operate(State& state, int* address)" << std::endl
             << "{" << std::endl
             << "    return 0;" << std::endl
             << "}" << std::endl
@@ -352,14 +362,14 @@ int main(int argc, char* argv[])
 
         AddressModeClassMap addressModeClassMap;
 
-        std::set<std::string> mnemonics;
+        MnemonicMap mnemonicMap;
 
         for (std::vector<std::string> line : lines) {
             if (line.size() == 1) {
                 std::cout << line[0] << std::endl;
                 comment = line[0];
-            } else if (line.size() == 8) {
-                for (int i = 0; i < 8; ++i)
+            } else if (line.size() == 5) {
+                for (int i = 0; i < 5; ++i)
                 {
                     std::cout << line[i] << '\t';
                 }
@@ -369,7 +379,7 @@ int main(int argc, char* argv[])
 
                 std::string mnemonic = name.substr(0, 3);
 
-                mnemonics.insert(mnemonic);
+                mnemonicMap[mnemonic] = comment;
 
                 std::string addressModeCode = name.substr(3);
 
@@ -382,7 +392,7 @@ int main(int argc, char* argv[])
 
                 std::string addressMode = line[2];
 
-                std::string sizeToken = line[6];
+                std::string sizeToken = line[3];
                 std::string size = sizeToken.substr(0, 1);
 
                 std::string sizeRemark = sizeToken.substr(1);
@@ -394,16 +404,19 @@ int main(int argc, char* argv[])
                 addressModeClass.erase(std::remove(addressModeClass.begin(), addressModeClass.end(), ')'), addressModeClass.end());
                 addressModeClass.erase(std::remove(addressModeClass.begin(), addressModeClass.end(), '/'), addressModeClass.end());
 
+                std::string addressModeComment = addressMode;
+
                 int valueSize = stoi(size);
 
                 if (sizeRemark == "17" || sizeRemark == "19") {
                     addressModeClass += "FlagSize";
                     valueSize = 999;
+                    addressModeComment += "\n// " + getRemark(stoi(sizeRemark));
                 }
 
-                addressModeClassMap[addressModeClass] = valueSize;
+                addressModeClassMap[addressModeClass] = std::pair<int, std::string>(valueSize, addressModeComment);
 
-                std::string cyclesToken = line[7];
+                std::string cyclesToken = line[4];
                 std::string cycles = cyclesToken.substr(0, 1);
 
                 std::string cyclesRemark = cyclesToken.substr(1);
@@ -423,8 +436,6 @@ int main(int argc, char* argv[])
                 instruction.validate();
                 instructions.push_back(instruction);
 
-                comment.clear();
-
                 // TMP
                 //addressModeMap[addressModeCode].push_back(addressMode + ", " + name + ", code=" + code + ", cycles=" + cycles + ", size=" + size);
                 //addressModeMap[addressMode].push_back(name + ", code=" + code + ", cycles=" + cycles + ", size=" + size + ", sizeRemark=" + sizeRemark);
@@ -432,10 +443,10 @@ int main(int argc, char* argv[])
             }
         }
 
-        generateImplementations(instructions);
-        generateMap(instructions);
+        generateOpcodes(instructions);
+        generateOpcodeMap(instructions);
         generateAddressModes(addressModeClassMap);
-        generateOperators(mnemonics);
+        generateOperators(mnemonicMap);
 
         int i = 0;
         for (const AddressModeMap::value_type kvp : addressModeMap) {

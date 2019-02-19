@@ -7,6 +7,7 @@
 
 namespace AddressMode {
 
+// Absolute
 template <typename Operator>
 class Absolute : public Instruction3Byte
 {
@@ -21,6 +22,7 @@ int Absolute<Operator>::apply(State& state, uint16_t value) const
     return Operator::operate(state, &data);
 }
 
+// Absolute Indexed Indirect
 template <typename Operator>
 class AbsoluteIndexedIndirect : public Instruction3Byte
 {
@@ -35,6 +37,7 @@ int AbsoluteIndexedIndirect<Operator>::apply(State& state, uint16_t value) const
     return Operator::operate(state, &data);
 }
 
+// Absolute Indexed, X
 template <typename Operator>
 class AbsoluteIndexedX : public Instruction3Byte
 {
@@ -49,6 +52,7 @@ int AbsoluteIndexedX<Operator>::apply(State& state, uint16_t value) const
     return Operator::operate(state, &data);
 }
 
+// Absolute Indexed, Y
 template <typename Operator>
 class AbsoluteIndexedY : public Instruction3Byte
 {
@@ -63,6 +67,7 @@ int AbsoluteIndexedY<Operator>::apply(State& state, uint16_t value) const
     return Operator::operate(state, &data);
 }
 
+// Absolute Indirect
 template <typename Operator>
 class AbsoluteIndirect : public Instruction3Byte
 {
@@ -77,6 +82,7 @@ int AbsoluteIndirect<Operator>::apply(State& state, uint16_t value) const
     return Operator::operate(state, &data);
 }
 
+// Absolute Indirect Long
 template <typename Operator>
 class AbsoluteIndirectLong : public Instruction3Byte
 {
@@ -91,6 +97,7 @@ int AbsoluteIndirectLong<Operator>::apply(State& state, uint16_t value) const
     return Operator::operate(state, &data);
 }
 
+// Absolute Long
 template <typename Operator>
 class AbsoluteLong : public Instruction4Byte
 {
@@ -105,6 +112,7 @@ int AbsoluteLong<Operator>::apply(State& state, uint32_t value) const
     return Operator::operate(state, &data);
 }
 
+// Absolute Long Indexed, X
 template <typename Operator>
 class AbsoluteLongIndexedX : public Instruction4Byte
 {
@@ -119,6 +127,7 @@ int AbsoluteLongIndexedX<Operator>::apply(State& state, uint32_t value) const
     return Operator::operate(state, &data);
 }
 
+// Accumulator
 template <typename Operator>
 class Accumulator : public Instruction1Byte
 {
@@ -133,6 +142,7 @@ int Accumulator<Operator>::apply(State& state) const
     return Operator::operate(state, &data);
 }
 
+// Block Move
 template <typename Operator>
 class BlockMove : public Instruction3Byte
 {
@@ -147,6 +157,7 @@ int BlockMove<Operator>::apply(State& state, uint16_t value) const
     return Operator::operate(state, &data);
 }
 
+// Direct Page
 template <typename Operator>
 class DirectPage : public Instruction2Byte
 {
@@ -161,6 +172,7 @@ int DirectPage<Operator>::apply(State& state, uint8_t value) const
     return Operator::operate(state, &data);
 }
 
+// Direct Page Indexed Indirect, X
 template <typename Operator>
 class DirectPageIndexedIndirectX : public Instruction2Byte
 {
@@ -175,6 +187,7 @@ int DirectPageIndexedIndirectX<Operator>::apply(State& state, uint8_t value) con
     return Operator::operate(state, &data);
 }
 
+// Direct Page Indexed, X
 template <typename Operator>
 class DirectPageIndexedX : public Instruction2Byte
 {
@@ -189,6 +202,7 @@ int DirectPageIndexedX<Operator>::apply(State& state, uint8_t value) const
     return Operator::operate(state, &data);
 }
 
+// Direct Page Indexed, Y
 template <typename Operator>
 class DirectPageIndexedY : public Instruction2Byte
 {
@@ -203,6 +217,7 @@ int DirectPageIndexedY<Operator>::apply(State& state, uint8_t value) const
     return Operator::operate(state, &data);
 }
 
+// Direct Page Indirect
 template <typename Operator>
 class DirectPageIndirect : public Instruction2Byte
 {
@@ -217,6 +232,7 @@ int DirectPageIndirect<Operator>::apply(State& state, uint8_t value) const
     return Operator::operate(state, &data);
 }
 
+// Direct Page Indirect Indexed, Y
 template <typename Operator>
 class DirectPageIndirectIndexedY : public Instruction2Byte
 {
@@ -231,6 +247,7 @@ int DirectPageIndirectIndexedY<Operator>::apply(State& state, uint8_t value) con
     return Operator::operate(state, &data);
 }
 
+// Direct Page Indirect Long
 template <typename Operator>
 class DirectPageIndirectLong : public Instruction2Byte
 {
@@ -245,6 +262,7 @@ int DirectPageIndirectLong<Operator>::apply(State& state, uint8_t value) const
     return Operator::operate(state, &data);
 }
 
+// Direct Page Indirect Long Indexed, Y
 template <typename Operator>
 class DirectPageIndirectLongIndexedY : public Instruction2Byte
 {
@@ -259,6 +277,7 @@ int DirectPageIndirectLongIndexedY<Operator>::apply(State& state, uint8_t value)
     return Operator::operate(state, &data);
 }
 
+// Immediate
 template <typename Operator>
 class Immediate : public Instruction2Byte
 {
@@ -273,6 +292,8 @@ int Immediate<Operator>::apply(State& state, uint8_t value) const
     return Operator::operate(state, &data);
 }
 
+// Immediate
+// 17: Add 1 byte if m = 0 (16 - bit memory / accumulator)
 template <typename Operator, State::Flag Flag>
 class ImmediateFlagSize : public InstructionFlagSize<Flag>
 {
@@ -287,6 +308,7 @@ int ImmediateFlagSize<Operator, Flag>::apply(State& state, uint16_t value) const
     return Operator::operate(state, &data);
 }
 
+// Implied
 template <typename Operator>
 class Implied : public Instruction1Byte
 {
@@ -301,6 +323,7 @@ int Implied<Operator>::apply(State& state) const
     return Operator::operate(state, &data);
 }
 
+// Program Counter Relative
 template <typename Operator>
 class ProgramCounterRelative : public Instruction2Byte
 {
@@ -315,6 +338,7 @@ int ProgramCounterRelative<Operator>::apply(State& state, uint8_t value) const
     return Operator::operate(state, &data);
 }
 
+// Program Counter Relative Long
 template <typename Operator>
 class ProgramCounterRelativeLong : public Instruction3Byte
 {
@@ -329,6 +353,7 @@ int ProgramCounterRelativeLong<Operator>::apply(State& state, uint16_t value) co
     return Operator::operate(state, &data);
 }
 
+// Stack (Absolute)
 template <typename Operator>
 class StackAbsolute : public Instruction3Byte
 {
@@ -343,6 +368,7 @@ int StackAbsolute<Operator>::apply(State& state, uint16_t value) const
     return Operator::operate(state, &data);
 }
 
+// Stack (Direct Page Indirect)
 template <typename Operator>
 class StackDirectPageIndirect : public Instruction2Byte
 {
@@ -357,6 +383,7 @@ int StackDirectPageIndirect<Operator>::apply(State& state, uint8_t value) const
     return Operator::operate(state, &data);
 }
 
+// Stack/Interrupt
 template <typename Operator>
 class StackInterrupt : public Instruction2Byte
 {
@@ -371,6 +398,7 @@ int StackInterrupt<Operator>::apply(State& state, uint8_t value) const
     return Operator::operate(state, &data);
 }
 
+// Stack (Program Counter Relative Long)
 template <typename Operator>
 class StackProgramCounterRelativeLong : public Instruction3Byte
 {
@@ -385,6 +413,7 @@ int StackProgramCounterRelativeLong<Operator>::apply(State& state, uint16_t valu
     return Operator::operate(state, &data);
 }
 
+// Stack (Pull)
 template <typename Operator>
 class StackPull : public Instruction1Byte
 {
@@ -399,6 +428,7 @@ int StackPull<Operator>::apply(State& state) const
     return Operator::operate(state, &data);
 }
 
+// Stack (Push)
 template <typename Operator>
 class StackPush : public Instruction1Byte
 {
@@ -413,6 +443,7 @@ int StackPush<Operator>::apply(State& state) const
     return Operator::operate(state, &data);
 }
 
+// Stack (RTI)
 template <typename Operator>
 class StackRTI : public Instruction1Byte
 {
@@ -427,6 +458,7 @@ int StackRTI<Operator>::apply(State& state) const
     return Operator::operate(state, &data);
 }
 
+// Stack (RTL)
 template <typename Operator>
 class StackRTL : public Instruction1Byte
 {
@@ -441,6 +473,7 @@ int StackRTL<Operator>::apply(State& state) const
     return Operator::operate(state, &data);
 }
 
+// Stack (RTS)
 template <typename Operator>
 class StackRTS : public Instruction1Byte
 {
@@ -455,6 +488,7 @@ int StackRTS<Operator>::apply(State& state) const
     return Operator::operate(state, &data);
 }
 
+// Stack Relative
 template <typename Operator>
 class StackRelative : public Instruction2Byte
 {
@@ -469,6 +503,7 @@ int StackRelative<Operator>::apply(State& state, uint8_t value) const
     return Operator::operate(state, &data);
 }
 
+// Stack Relative Indirect Indexed, Y
 template <typename Operator>
 class StackRelativeIndirectIndexedY : public Instruction2Byte
 {
@@ -483,6 +518,7 @@ int StackRelativeIndirectIndexedY<Operator>::apply(State& state, uint8_t value) 
     return Operator::operate(state, &data);
 }
 
+// n/a
 template <typename Operator>
 class na : public Instruction2Byte
 {
