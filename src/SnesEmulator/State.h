@@ -10,14 +10,15 @@ class State
 public:
     enum Flag
     {
-        c = 0, // Carry
-        z = 1, // Zero
-        i = 2, // IRQ Disable
-        d = 3, // Decimal Mode
-        x = 4, // Index Register Select, 1 = 8-bit, 0 = 16-bit
-        m = 5, // Memory/Accumulator Select, 1 = 8-bit, 0 = 16-bit
-        v = 6, // Overflow
-        n = 7  // Negative
+        c = 1 << 0, // Carry
+        z = 1 << 1, // Zero
+        i = 1 << 2, // IRQ Disable
+        d = 1 << 3, // Decimal Mode
+        x = 1 << 4, // Index Register Select, 1 = 8-bit, 0 = 16-bit
+        b = 1 << 4, // Break (emulation mode only)
+        m = 1 << 5, // Memory/Accumulator Select, 1 = 8-bit, 0 = 16-bit
+        v = 1 << 6, // Overflow
+        n = 1 << 7  // Negative
     };
 
     State()
@@ -27,23 +28,23 @@ public:
     {
         memory.resize(1 << 24);
         std::cout << "Memory size=" << memory.size() << std::endl;
-
-        accumulatorA = 0xFB; // A9FB
-        accumulatorB = 0xA9;
-
     }
 
     State(State&) = delete;
     State& operator=(State&) = delete;
 
-    void setFlag(Flag flag, bool value)
+    void setFlag(int flag, bool value)
     {
-        flags[flag] = value;
+        if (value) {
+            flags |= flag;
+        } else {
+            flags &= ~flag;
+        }
     }
 
     bool getFlag(Flag flag) const
     {
-        return flags[flag];
+        return flags & flag;
     }
 
     bool isEmulationMode() const
@@ -106,7 +107,7 @@ private:
     uint16_t programCounter;
     uint16_t resetAddress;
 
-    std::bitset<8> flags;
+    uint8_t flags;
     bool emulationMode;
 
     std::vector<uint8_t> memory;

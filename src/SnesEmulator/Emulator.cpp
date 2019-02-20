@@ -22,19 +22,26 @@ void Emulator::run()
     bool running = true;
     std::time_t startTime = clock();
 
-    std::cout << "startTime=" << startTime << std::endl;
+    std::ostream& output = std::cout;
     
     while (running) {
 
         instructionCount++;
 
+        output << std::hex << +state.readNextInstruction() << std::dec << ": ";
+
         Instruction* instruction = instructions.getInstruction(state.readNextInstruction());
 
-        instruction->printNextExecution(std::cout, state) << std::endl;
+        output << instruction->opcodeToString() << std::endl;
+        output << instruction->toString(state) << std::endl;
+
+        output << state << " -->" << std::endl;
 
         cycleCount += instruction->execute(state);
 
-        std::cout << "instructionCount=" << instructionCount << ", cycleCount=" << cycleCount << std::endl;
+        output << state << std::endl;
+
+        output << "instructionCount=" << instructionCount << ", cycleCount=" << cycleCount << std::endl;
 
         if (cycleCount > 1000000) {
             running = false;
@@ -46,9 +53,9 @@ void Emulator::run()
     std::time_t endTime = clock();
     double elapsedSeconds = double(endTime - startTime) / CLOCKS_PER_SEC;
 
-    std::cout << "endTime=" << endTime << std::endl;
-    std::cout << "Time delta=" << elapsedSeconds << std::endl;
+    output << "endTime=" << endTime << std::endl;
+    output << "Time delta=" << elapsedSeconds << std::endl;
 
-    std::cout << "Speed is " << cycleCount / 1000000.0 / elapsedSeconds << " MHz" << std::endl;
+    output << "Speed is " << cycleCount / 1000000.0 / elapsedSeconds << " MHz (kind of)" << std::endl;
 }
 

@@ -118,7 +118,7 @@ bool State::tryReadHeader(int offset, std::vector<char> rom)
 std::ostream& operator<<(std::ostream& output, const State& state)
 {
     return output << std::hex << "pc=" << state.programCounter
-        << ", flags=" << state.flags
+        << ", flags=" << std::bitset<8>(state.flags)
         << ", e=" << state.emulationMode
-        << std::dec << std::endl;
+        << std::dec;
 }

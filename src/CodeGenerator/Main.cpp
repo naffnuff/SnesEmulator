@@ -160,7 +160,7 @@ void generateOpcodes(const std::vector<Instruction>& instructions)
 
         hOutput << "class " << instruction.classname << " : public AddressMode::" << addressModeClass << std::endl
             << "{" << std::endl
-            << "    using " << instruction.addressModeClass << "::" << instruction.addressModeClass << ";" << std::endl
+            << "    std::string opcodeToString() const override { return \"" << instruction.name << "\"; }" << std::endl
             << "    int calculateCycles(const State& state) const override;" << std::endl
             << "};" << std::endl
             << std::endl;
@@ -208,9 +208,7 @@ void generateOpcodeMap(const std::vector<Instruction>& instructions)
     output << "OpcodeMap::OpcodeMap()" << std::endl
         << "{" << std::endl;
     for (const Instruction& instruction : instructions) {
-        output << "    instructions[0x" << instruction.code << "] = std::make_unique<Opcode::" << instruction.classname << ">(\""
-            << instruction.name << "\", \"" << instruction.comment << "\", \"" << instruction.addressMode << "\");"
-            << std::endl;
+        output << "    instructions[0x" << instruction.code << "] = std::make_unique<Opcode::" << instruction.classname << ">();" << std::endl;
     }
     output << "}" << std::endl;
 }
@@ -234,48 +232,66 @@ void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
 
         output << "// " << kvp.second.second << std::endl << "template <typename Operator";
 
-        if (kvp.second.first == 999) {
+        if (kvp.second.first == 99) {
             output << ", State::Flag Flag";
         }
 
         output << ">" << std::endl;
         output << "class " << kvp.first << " : public ";
+
+        std::ostringstream superclassStream;
         if (kvp.second.first > 4) {
-            output << "InstructionFlagSize<Flag>";
+            superclassStream << "InstructionFlagSize<Flag>";
         } else {
-            output << "Instruction" << kvp.second.first << "Byte";
+            superclassStream << "Instruction" << kvp.second.first << "Byte";
         }
-        output << std::endl << "{" << std::endl
-            << "    using " << kvp.first << "::" << kvp.first << ";" << std::endl
+
+        output << superclassStream.str() << std::endl << "{" << std::endl
+            << "    std::string toString(const State& state) const override;" << std::endl
             << "    int ";
 
-        std::stringstream ss;
-        ss << "apply(State& state";
+        std::stringstream applySignatureStream;
+        applySignatureStream << "apply(State& state";
         
-        if (kvp.second.first == 999) {
-            ss << ", uint16_t value";
+        if (kvp.second.first == 99) {
+            applySignatureStream << ", uint16_t value";
         } else if (kvp.second.first > 1) {
-            ss << ", uint" << (kvp.second.first == 4 ? 32 : (kvp.second.first - 1) * 8) << "_t value";
+            applySignatureStream << ", uint" << (kvp.second.first == 4 ? 32 : (kvp.second.first - 1) * 8) << "_t value";
         }
-        ss << ") const";
+        applySignatureStream << ") const";
 
-        output << ss.str() << " override;" << std::endl
+        output << applySignatureStream.str() << " override;" << std::endl
             << "};" << std::endl
             << std::endl;
 
-        output << "template <typename Operator";
-
-        if (kvp.second.first == 999) {
-            output << ", State::Flag Flag";
+        std::ostringstream templateStream;
+        templateStream << "template <typename Operator";
+        if (kvp.second.first == 99) {
+            templateStream << ", State::Flag Flag";
         }
+        templateStream << ">" << std::endl;
 
-        output << ">" << std::endl;
-
-        output << "int " << kvp.first << "<Operator";
-        if (kvp.second.first == 999) {
+        output << templateStream.str();
+        output << "std::string " << kvp.first << "<Operator";
+        if (kvp.second.first == 99) {
             output << ", Flag";
         }
-        output << ">::" << ss.str() << std::endl
+        output << ">::toString(const State& state) const" << std::endl
+            << "{" << std::endl
+            << "    return Operator::toString()";
+        if (kvp.second.first > 1) {
+            output << " + \" $\" + " << superclassStream.str() << "::operandToString(state)";
+        }
+        output << " + \" TODO\";" << std::endl
+            << "}" << std::endl
+            << std::endl;
+
+        output << templateStream.str();
+        output << "int " << kvp.first << "<Operator";
+        if (kvp.second.first == 99) {
+            output << ", Flag";
+        }
+        output << ">::" << applySignatureStream.str() << std::endl
             << "{" << std::endl
             << "    int data = 0;" << std::endl
             << "    return Operator::operate(state, &data);" << std::endl
@@ -312,6 +328,7 @@ void generateOperators(const MnemonicMap& mnemonicMap)
         hOutput << "class " << kvp.first << std::endl
             << "{" << std::endl
             << "public:" << std::endl
+            << "    static std::string toString() { return \"" << kvp.first << "\"; }" << std::endl
             << "    static int operate(State& state, int* address);" << std::endl
             << "};" << std::endl
             << std::endl;
@@ -410,7 +427,7 @@ int main(int argc, char* argv[])
 
                 if (sizeRemark == "17" || sizeRemark == "19") {
                     addressModeClass += "FlagSize";
-                    valueSize = 999;
+                    valueSize = 99;
                     addressModeComment += "\n// " + getRemark(stoi(sizeRemark));
                 }
 

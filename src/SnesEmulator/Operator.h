@@ -8,6 +8,7 @@ namespace Operator {
 class ADC
 {
 public:
+    static std::string toString() { return "ADC"; }
     static int operate(State& state, int* address);
 };
 
@@ -15,6 +16,7 @@ public:
 class AND
 {
 public:
+    static std::string toString() { return "AND"; }
     static int operate(State& state, int* address);
 };
 
@@ -22,6 +24,7 @@ public:
 class ASL
 {
 public:
+    static std::string toString() { return "ASL"; }
     static int operate(State& state, int* address);
 };
 
@@ -29,6 +32,7 @@ public:
 class BCC
 {
 public:
+    static std::string toString() { return "BCC"; }
     static int operate(State& state, int* address);
 };
 
@@ -36,6 +40,7 @@ public:
 class BCS
 {
 public:
+    static std::string toString() { return "BCS"; }
     static int operate(State& state, int* address);
 };
 
@@ -43,6 +48,7 @@ public:
 class BEQ
 {
 public:
+    static std::string toString() { return "BEQ"; }
     static int operate(State& state, int* address);
 };
 
@@ -50,6 +56,7 @@ public:
 class BIT
 {
 public:
+    static std::string toString() { return "BIT"; }
     static int operate(State& state, int* address);
 };
 
@@ -57,6 +64,7 @@ public:
 class BMI
 {
 public:
+    static std::string toString() { return "BMI"; }
     static int operate(State& state, int* address);
 };
 
@@ -64,6 +72,7 @@ public:
 class BNE
 {
 public:
+    static std::string toString() { return "BNE"; }
     static int operate(State& state, int* address);
 };
 
@@ -71,6 +80,7 @@ public:
 class BPL
 {
 public:
+    static std::string toString() { return "BPL"; }
     static int operate(State& state, int* address);
 };
 
@@ -78,6 +88,7 @@ public:
 class BRA
 {
 public:
+    static std::string toString() { return "BRA"; }
     static int operate(State& state, int* address);
 };
 
@@ -85,6 +96,7 @@ public:
 class BRK
 {
 public:
+    static std::string toString() { return "BRK"; }
     static int operate(State& state, int* address);
 };
 
@@ -92,6 +104,7 @@ public:
 class BRL
 {
 public:
+    static std::string toString() { return "BRL"; }
     static int operate(State& state, int* address);
 };
 
@@ -99,6 +112,7 @@ public:
 class BVC
 {
 public:
+    static std::string toString() { return "BVC"; }
     static int operate(State& state, int* address);
 };
 
@@ -106,6 +120,7 @@ public:
 class BVS
 {
 public:
+    static std::string toString() { return "BVS"; }
     static int operate(State& state, int* address);
 };
 
@@ -113,6 +128,7 @@ public:
 class CLC
 {
 public:
+    static std::string toString() { return "CLC"; }
     static int operate(State& state, int* address);
 };
 
@@ -120,6 +136,7 @@ public:
 class CLD
 {
 public:
+    static std::string toString() { return "CLD"; }
     static int operate(State& state, int* address);
 };
 
@@ -127,6 +144,7 @@ public:
 class CLI
 {
 public:
+    static std::string toString() { return "CLI"; }
     static int operate(State& state, int* address);
 };
 
@@ -134,6 +152,7 @@ public:
 class CLV
 {
 public:
+    static std::string toString() { return "CLV"; }
     static int operate(State& state, int* address);
 };
 
@@ -141,6 +160,7 @@ public:
 class CMP
 {
 public:
+    static std::string toString() { return "CMP"; }
     static int operate(State& state, int* address);
 };
 
@@ -148,6 +168,7 @@ public:
 class COP
 {
 public:
+    static std::string toString() { return "COP"; }
     static int operate(State& state, int* address);
 };
 
@@ -155,6 +176,7 @@ public:
 class CPX
 {
 public:
+    static std::string toString() { return "CPX"; }
     static int operate(State& state, int* address);
 };
 
@@ -162,6 +184,7 @@ public:
 class CPY
 {
 public:
+    static std::string toString() { return "CPY"; }
     static int operate(State& state, int* address);
 };
 
@@ -169,6 +192,7 @@ public:
 class DEC
 {
 public:
+    static std::string toString() { return "DEC"; }
     static int operate(State& state, int* address);
 };
 
@@ -176,6 +200,7 @@ public:
 class DEX
 {
 public:
+    static std::string toString() { return "DEX"; }
     static int operate(State& state, int* address);
 };
 
@@ -183,6 +208,7 @@ public:
 class DEY
 {
 public:
+    static std::string toString() { return "DEY"; }
     static int operate(State& state, int* address);
 };
 
@@ -190,6 +216,7 @@ public:
 class EOR
 {
 public:
+    static std::string toString() { return "EOR"; }
     static int operate(State& state, int* address);
 };
 
@@ -197,6 +224,7 @@ public:
 class INC
 {
 public:
+    static std::string toString() { return "INC"; }
     static int operate(State& state, int* address);
 };
 
@@ -204,6 +232,7 @@ public:
 class INX
 {
 public:
+    static std::string toString() { return "INX"; }
     static int operate(State& state, int* address);
 };
 
@@ -211,6 +240,7 @@ public:
 class INY
 {
 public:
+    static std::string toString() { return "INY"; }
     static int operate(State& state, int* address);
 };
 
@@ -218,6 +248,7 @@ public:
 class JMP
 {
 public:
+    static std::string toString() { return "JMP"; }
     static int operate(State& state, int* address);
 };
 
@@ -225,6 +256,7 @@ public:
 class JSR
 {
 public:
+    static std::string toString() { return "JSR"; }
     static int operate(State& state, int* address);
 };
 
@@ -232,6 +264,7 @@ public:
 class LDA
 {
 public:
+    static std::string toString() { return "LDA"; }
     static int operate(State& state, int* address);
 };
 
@@ -239,6 +272,7 @@ public:
 class LDX
 {
 public:
+    static std::string toString() { return "LDX"; }
     static int operate(State& state, int* address);
 };
 
@@ -246,6 +280,7 @@ public:
 class LDY
 {
 public:
+    static std::string toString() { return "LDY"; }
     static int operate(State& state, int* address);
 };
 
@@ -253,6 +288,7 @@ public:
 class LSR
 {
 public:
+    static std::string toString() { return "LSR"; }
     static int operate(State& state, int* address);
 };
 
@@ -260,6 +296,7 @@ public:
 class MVN
 {
 public:
+    static std::string toString() { return "MVN"; }
     static int operate(State& state, int* address);
 };
 
@@ -267,6 +304,7 @@ public:
 class NOP
 {
 public:
+    static std::string toString() { return "NOP"; }
     static int operate(State& state, int* address);
 };
 
@@ -274,6 +312,7 @@ public:
 class ORA
 {
 public:
+    static std::string toString() { return "ORA"; }
     static int operate(State& state, int* address);
 };
 
@@ -281,6 +320,7 @@ public:
 class PEA
 {
 public:
+    static std::string toString() { return "PEA"; }
     static int operate(State& state, int* address);
 };
 
@@ -288,6 +328,7 @@ public:
 class PEI
 {
 public:
+    static std::string toString() { return "PEI"; }
     static int operate(State& state, int* address);
 };
 
@@ -295,6 +336,7 @@ public:
 class PER
 {
 public:
+    static std::string toString() { return "PER"; }
     static int operate(State& state, int* address);
 };
 
@@ -302,6 +344,7 @@ public:
 class PHA
 {
 public:
+    static std::string toString() { return "PHA"; }
     static int operate(State& state, int* address);
 };
 
@@ -309,6 +352,7 @@ public:
 class PHB
 {
 public:
+    static std::string toString() { return "PHB"; }
     static int operate(State& state, int* address);
 };
 
@@ -316,6 +360,7 @@ public:
 class PHD
 {
 public:
+    static std::string toString() { return "PHD"; }
     static int operate(State& state, int* address);
 };
 
@@ -323,6 +368,7 @@ public:
 class PHK
 {
 public:
+    static std::string toString() { return "PHK"; }
     static int operate(State& state, int* address);
 };
 
@@ -330,6 +376,7 @@ public:
 class PHP
 {
 public:
+    static std::string toString() { return "PHP"; }
     static int operate(State& state, int* address);
 };
 
@@ -337,6 +384,7 @@ public:
 class PHX
 {
 public:
+    static std::string toString() { return "PHX"; }
     static int operate(State& state, int* address);
 };
 
@@ -344,6 +392,7 @@ public:
 class PHY
 {
 public:
+    static std::string toString() { return "PHY"; }
     static int operate(State& state, int* address);
 };
 
@@ -351,6 +400,7 @@ public:
 class PLA
 {
 public:
+    static std::string toString() { return "PLA"; }
     static int operate(State& state, int* address);
 };
 
@@ -358,6 +408,7 @@ public:
 class PLB
 {
 public:
+    static std::string toString() { return "PLB"; }
     static int operate(State& state, int* address);
 };
 
@@ -365,6 +416,7 @@ public:
 class PLD
 {
 public:
+    static std::string toString() { return "PLD"; }
     static int operate(State& state, int* address);
 };
 
@@ -372,6 +424,7 @@ public:
 class PLP
 {
 public:
+    static std::string toString() { return "PLP"; }
     static int operate(State& state, int* address);
 };
 
@@ -379,6 +432,7 @@ public:
 class PLX
 {
 public:
+    static std::string toString() { return "PLX"; }
     static int operate(State& state, int* address);
 };
 
@@ -386,6 +440,7 @@ public:
 class PLY
 {
 public:
+    static std::string toString() { return "PLY"; }
     static int operate(State& state, int* address);
 };
 
@@ -393,6 +448,7 @@ public:
 class REP
 {
 public:
+    static std::string toString() { return "REP"; }
     static int operate(State& state, int* address);
 };
 
@@ -400,6 +456,7 @@ public:
 class ROL
 {
 public:
+    static std::string toString() { return "ROL"; }
     static int operate(State& state, int* address);
 };
 
@@ -407,6 +464,7 @@ public:
 class ROR
 {
 public:
+    static std::string toString() { return "ROR"; }
     static int operate(State& state, int* address);
 };
 
@@ -414,6 +472,7 @@ public:
 class RTI
 {
 public:
+    static std::string toString() { return "RTI"; }
     static int operate(State& state, int* address);
 };
 
@@ -421,6 +480,7 @@ public:
 class RTL
 {
 public:
+    static std::string toString() { return "RTL"; }
     static int operate(State& state, int* address);
 };
 
@@ -428,6 +488,7 @@ public:
 class RTS
 {
 public:
+    static std::string toString() { return "RTS"; }
     static int operate(State& state, int* address);
 };
 
@@ -435,6 +496,7 @@ public:
 class SBC
 {
 public:
+    static std::string toString() { return "SBC"; }
     static int operate(State& state, int* address);
 };
 
@@ -442,6 +504,7 @@ public:
 class SEC
 {
 public:
+    static std::string toString() { return "SEC"; }
     static int operate(State& state, int* address);
 };
 
@@ -449,6 +512,7 @@ public:
 class SED
 {
 public:
+    static std::string toString() { return "SED"; }
     static int operate(State& state, int* address);
 };
 
@@ -456,6 +520,7 @@ public:
 class SEI
 {
 public:
+    static std::string toString() { return "SEI"; }
     static int operate(State& state, int* address);
 };
 
@@ -463,6 +528,7 @@ public:
 class SEP
 {
 public:
+    static std::string toString() { return "SEP"; }
     static int operate(State& state, int* address);
 };
 
@@ -470,6 +536,7 @@ public:
 class STA
 {
 public:
+    static std::string toString() { return "STA"; }
     static int operate(State& state, int* address);
 };
 
@@ -477,6 +544,7 @@ public:
 class STP
 {
 public:
+    static std::string toString() { return "STP"; }
     static int operate(State& state, int* address);
 };
 
@@ -484,6 +552,7 @@ public:
 class STX
 {
 public:
+    static std::string toString() { return "STX"; }
     static int operate(State& state, int* address);
 };
 
@@ -491,6 +560,7 @@ public:
 class STY
 {
 public:
+    static std::string toString() { return "STY"; }
     static int operate(State& state, int* address);
 };
 
@@ -498,6 +568,7 @@ public:
 class STZ
 {
 public:
+    static std::string toString() { return "STZ"; }
     static int operate(State& state, int* address);
 };
 
@@ -505,6 +576,7 @@ public:
 class TAX
 {
 public:
+    static std::string toString() { return "TAX"; }
     static int operate(State& state, int* address);
 };
 
@@ -512,6 +584,7 @@ public:
 class TAY
 {
 public:
+    static std::string toString() { return "TAY"; }
     static int operate(State& state, int* address);
 };
 
@@ -519,6 +592,7 @@ public:
 class TCD
 {
 public:
+    static std::string toString() { return "TCD"; }
     static int operate(State& state, int* address);
 };
 
@@ -526,6 +600,7 @@ public:
 class TCS
 {
 public:
+    static std::string toString() { return "TCS"; }
     static int operate(State& state, int* address);
 };
 
@@ -533,6 +608,7 @@ public:
 class TDC
 {
 public:
+    static std::string toString() { return "TDC"; }
     static int operate(State& state, int* address);
 };
 
@@ -540,6 +616,7 @@ public:
 class TRB
 {
 public:
+    static std::string toString() { return "TRB"; }
     static int operate(State& state, int* address);
 };
 
@@ -547,6 +624,7 @@ public:
 class TSB
 {
 public:
+    static std::string toString() { return "TSB"; }
     static int operate(State& state, int* address);
 };
 
@@ -554,6 +632,7 @@ public:
 class TSC
 {
 public:
+    static std::string toString() { return "TSC"; }
     static int operate(State& state, int* address);
 };
 
@@ -561,6 +640,7 @@ public:
 class TSX
 {
 public:
+    static std::string toString() { return "TSX"; }
     static int operate(State& state, int* address);
 };
 
@@ -568,6 +648,7 @@ public:
 class TXA
 {
 public:
+    static std::string toString() { return "TXA"; }
     static int operate(State& state, int* address);
 };
 
@@ -575,6 +656,7 @@ public:
 class TXS
 {
 public:
+    static std::string toString() { return "TXS"; }
     static int operate(State& state, int* address);
 };
 
@@ -582,6 +664,7 @@ public:
 class TXY
 {
 public:
+    static std::string toString() { return "TXY"; }
     static int operate(State& state, int* address);
 };
 
@@ -589,6 +672,7 @@ public:
 class TYA
 {
 public:
+    static std::string toString() { return "TYA"; }
     static int operate(State& state, int* address);
 };
 
@@ -596,6 +680,7 @@ public:
 class TYX
 {
 public:
+    static std::string toString() { return "TYX"; }
     static int operate(State& state, int* address);
 };
 
@@ -603,6 +688,7 @@ public:
 class WAI
 {
 public:
+    static std::string toString() { return "WAI"; }
     static int operate(State& state, int* address);
 };
 
@@ -610,6 +696,7 @@ public:
 class WDM
 {
 public:
+    static std::string toString() { return "WDM"; }
     static int operate(State& state, int* address);
 };
 
@@ -617,6 +704,7 @@ public:
 class XBA
 {
 public:
+    static std::string toString() { return "XBA"; }
     static int operate(State& state, int* address);
 };
 
@@ -624,6 +712,7 @@ public:
 class XCE
 {
 public:
+    static std::string toString() { return "XCE"; }
     static int operate(State& state, int* address);
 };
 

@@ -1,11 +1,6 @@
 #include "Instruction.h"
 
-#include <string>
-
-std::ostream& Instruction::printInfo(std::ostream& output) const
-{
-    return output << intructionName << std::endl << instructionDescription << std::endl << addressMode << std::endl;
-}
+#include <sstream>
 
 int Instruction1Byte::execute(State& state) const
 {
@@ -14,9 +9,9 @@ int Instruction1Byte::execute(State& state) const
     return cycles;
 }
 
-std::ostream& Instruction1Byte::printNextExecution(std::ostream& output, const State& state) const
+std::string Instruction1Byte::operandToString(const State& state) const
 {
-    return printInfo(output) << state << std::endl;
+    return "";
 }
 
 int Instruction2Byte::execute(State& state) const
@@ -27,9 +22,11 @@ int Instruction2Byte::execute(State& state) const
     return cycles;
 }
 
-std::ostream& Instruction2Byte::printNextExecution(std::ostream& output, const State& state) const
+std::string Instruction2Byte::operandToString(const State& state) const
 {
-    return printInfo(output) << std::hex << +state.readOneByteValue() << std::dec << std::endl << state << std::endl;
+    std::ostringstream ss;
+    ss << std::hex << +state.readOneByteValue();
+    return ss.str();
 }
 
 int Instruction3Byte::execute(State& state) const
@@ -40,9 +37,11 @@ int Instruction3Byte::execute(State& state) const
     return cycles;
 }
 
-std::ostream& Instruction3Byte::printNextExecution(std::ostream& output, const State& state) const
+std::string Instruction3Byte::operandToString(const State& state) const
 {
-    return printInfo(output) << std::hex << +state.readTwoByteValue() << std::dec << std::endl << state << std::endl;
+    std::ostringstream ss;
+    ss << std::hex << +state.readTwoByteValue();
+    return ss.str();
 }
 
 int Instruction4Byte::execute(State& state) const
@@ -53,7 +52,9 @@ int Instruction4Byte::execute(State& state) const
     return cycles;
 }
 
-std::ostream& Instruction4Byte::printNextExecution(std::ostream& output, const State& state) const
+std::string Instruction4Byte::operandToString(const State& state) const
 {
-    return printInfo(output) << std::hex << +state.readThreeByteValue() << std::dec << std::endl << state << std::endl;
+    std::ostringstream ss;
+    ss << std::hex << +state.readThreeByteValue();
+    return ss.str();
 }
