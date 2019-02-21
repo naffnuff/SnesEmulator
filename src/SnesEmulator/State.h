@@ -4,6 +4,7 @@
 #include <vector>
 #include <bitset>
 #include <stdint.h>
+#include <iomanip>
 
 class State
 {
@@ -23,6 +24,7 @@ public:
 
     State()
         : programCounter(0)
+        , programBank(0)
         , resetAddress(0)
         , emulationMode(true)
     {
@@ -32,6 +34,34 @@ public:
 
     State(State&) = delete;
     State& operator=(State&) = delete;
+
+    std::ostream& printMemoryPage(std::ostream& output, uint32_t startAddress)
+    {
+        output << "          0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f" << std::endl;
+        uint32_t address = startAddress - std::bitset<4>(startAddress).to_ulong();
+        for (int i = 0; i < 16 && address < memory.size(); ++i) {
+            uint8_t bank = address >> 16;
+            uint16_t lowAddress = address;
+            lowAddress = lowAddress >> 4;
+            output << std::setw(2) << std::setfill('0') << +bank << ':' << std::setw(3) << std::setfill('0') << lowAddress << "x  ";
+
+            for (int j = 0; j < 16 && address < memory.size(); ++j) {
+                output << std::setw(2) << std::setfill('0') << +memory[address++] << ' ';
+            }
+
+            output << std::endl;
+        }
+        return output;
+    }
+
+    std::ostream& printRegisters(std::ostream& output)
+    {
+        return output
+            << "pb=" << std::setw(2) << std::setfill('0') << +programBank
+            << ", pc=" << std::setw(4) << std::setfill('0') << programCounter
+            << ", flags=" << std::bitset<8>(flags)
+            << ", e=" << emulationMode;
+    }
 
     void setFlag(int flag, bool value)
     {
@@ -54,27 +84,27 @@ public:
 
     uint8_t readNextInstruction() const
     {
-        return memory[programCounter];
+        return memory[getEffectiveProgramAddress()];
     }
 
     uint8_t readOneByteValue() const
     {
-        uint8_t value = memory[programCounter + 1];
+        uint8_t value = memory[getEffectiveProgramAddress(1)];
         return value;
     }
 
     uint16_t readTwoByteValue() const
     {
-        uint16_t value = memory[programCounter + 1];
-        value += memory[programCounter + 2] << 8;
+        uint16_t value = memory[getEffectiveProgramAddress(1)];
+        value += memory[getEffectiveProgramAddress(2)] << 8;
         return value;
     }
 
     uint32_t readThreeByteValue() const
     {
-        uint32_t value = memory[programCounter + 1];
-        value += memory[programCounter + 2] << 8;
-        value += memory[programCounter + 3] << 16;
+        uint32_t value = memory[getEffectiveProgramAddress(1)];
+        value += memory[getEffectiveProgramAddress(2)] << 8;
+        value += memory[getEffectiveProgramAddress(3)] << 16;
         return value;
     }
 
@@ -90,21 +120,25 @@ public:
         programCounter += increment;
     }
 
-    friend std::ostream& operator<<(std::ostream& output, const State& state);
+    uint32_t getEffectiveProgramAddress(int offset = 0) const
+    {
+        return (programBank << 16) + programCounter + offset;
+    }
 
 private:
     bool tryReadHeader(int offset, std::vector<char> rom);
 
-private:
+public:
     uint8_t accumulatorA;
     uint8_t accumulatorB;
-    uint8_t dataBankRegister;
-    uint16_t xIndexRegister;
-    uint16_t yIndexRegister;
-    uint16_t directPagePointer;
+    uint8_t dataBank;
+    uint16_t xIndex;
+    uint16_t yIndex;
+    uint16_t directPage;
     uint16_t stackPointer;
-    uint8_t programBankRegister;
     uint16_t programCounter;
+    uint8_t programBank;
+
     uint16_t resetAddress;
 
     uint8_t flags;
@@ -112,5 +146,3 @@ private:
 
     std::vector<uint8_t> memory;
 };
-
-std::ostream& operator<<(std::ostream& output, const State& state);

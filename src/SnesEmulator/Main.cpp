@@ -11,8 +11,8 @@ int main(int argc, char* argv[])
 
     } catch (const std::exception& e) {
 
-        std::cout << "Caught std::exception: " << e.what() << std::endl;
-        std::cout << "Failure";
+        std::cerr << "Caught std::exception: " << e.what() << std::endl;
+        std::cerr << "Failure";
         std::getchar();
         return 1;
     }

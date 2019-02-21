@@ -14,7 +14,7 @@ namespace Opcode {
 // Direct Page Indexed Indirect, X
 class ADC_61 : public AddressMode::DirectPageIndexedIndirectX<Operator::ADC>
 {
-    std::string opcodeToString() const override { return "ADC (dp,X)"; }
+    std::string opcodeToString() const override { return "61: ADC (dp,X)"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -23,7 +23,7 @@ class ADC_61 : public AddressMode::DirectPageIndexedIndirectX<Operator::ADC>
 // Stack Relative
 class ADC_63 : public AddressMode::StackRelative<Operator::ADC>
 {
-    std::string opcodeToString() const override { return "ADC sr,S"; }
+    std::string opcodeToString() const override { return "63: ADC sr,S"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -32,7 +32,7 @@ class ADC_63 : public AddressMode::StackRelative<Operator::ADC>
 // Direct Page
 class ADC_65 : public AddressMode::DirectPage<Operator::ADC>
 {
-    std::string opcodeToString() const override { return "ADC dp"; }
+    std::string opcodeToString() const override { return "65: ADC dp"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -41,7 +41,7 @@ class ADC_65 : public AddressMode::DirectPage<Operator::ADC>
 // Direct Page Indirect Long
 class ADC_67 : public AddressMode::DirectPageIndirectLong<Operator::ADC>
 {
-    std::string opcodeToString() const override { return "ADC [dp]"; }
+    std::string opcodeToString() const override { return "67: ADC [dp]"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -51,7 +51,7 @@ class ADC_67 : public AddressMode::DirectPageIndirectLong<Operator::ADC>
 // 17: Add 1 byte if m = 0 (16 - bit memory / accumulator)
 class ADC_69 : public AddressMode::ImmediateFlagSize<Operator::ADC, State::m>
 {
-    std::string opcodeToString() const override { return "ADC #const"; }
+    std::string opcodeToString() const override { return "69: ADC #const"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -60,7 +60,7 @@ class ADC_69 : public AddressMode::ImmediateFlagSize<Operator::ADC, State::m>
 // Absolute
 class ADC_6D : public AddressMode::Absolute<Operator::ADC>
 {
-    std::string opcodeToString() const override { return "ADC addr"; }
+    std::string opcodeToString() const override { return "6D: ADC addr"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -69,7 +69,7 @@ class ADC_6D : public AddressMode::Absolute<Operator::ADC>
 // Absolute Long
 class ADC_6F : public AddressMode::AbsoluteLong<Operator::ADC>
 {
-    std::string opcodeToString() const override { return "ADC long"; }
+    std::string opcodeToString() const override { return "6F: ADC long"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -78,7 +78,7 @@ class ADC_6F : public AddressMode::AbsoluteLong<Operator::ADC>
 // Direct Page Indirect Indexed, Y
 class ADC_71 : public AddressMode::DirectPageIndirectIndexedY<Operator::ADC>
 {
-    std::string opcodeToString() const override { return "ADC (dp),Y"; }
+    std::string opcodeToString() const override { return "71: ADC (dp),Y"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -87,7 +87,7 @@ class ADC_71 : public AddressMode::DirectPageIndirectIndexedY<Operator::ADC>
 // Direct Page Indirect
 class ADC_72 : public AddressMode::DirectPageIndirect<Operator::ADC>
 {
-    std::string opcodeToString() const override { return "ADC (dp)"; }
+    std::string opcodeToString() const override { return "72: ADC (dp)"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -96,7 +96,7 @@ class ADC_72 : public AddressMode::DirectPageIndirect<Operator::ADC>
 // Stack Relative Indirect Indexed, Y
 class ADC_73 : public AddressMode::StackRelativeIndirectIndexedY<Operator::ADC>
 {
-    std::string opcodeToString() const override { return "ADC (sr,S),Y"; }
+    std::string opcodeToString() const override { return "73: ADC (sr,S),Y"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -105,7 +105,7 @@ class ADC_73 : public AddressMode::StackRelativeIndirectIndexedY<Operator::ADC>
 // Direct Page Indexed,X
 class ADC_75 : public AddressMode::DirectPageIndexedX<Operator::ADC>
 {
-    std::string opcodeToString() const override { return "ADC dp,X"; }
+    std::string opcodeToString() const override { return "75: ADC dp,X"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -114,7 +114,7 @@ class ADC_75 : public AddressMode::DirectPageIndexedX<Operator::ADC>
 // Direct Page Indirect Long Indexed, Y
 class ADC_77 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::ADC>
 {
-    std::string opcodeToString() const override { return "ADC [dp],Y"; }
+    std::string opcodeToString() const override { return "77: ADC [dp],Y"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -123,7 +123,7 @@ class ADC_77 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::ADC>
 // Absolute Indexed,Y
 class ADC_79 : public AddressMode::AbsoluteIndexedY<Operator::ADC>
 {
-    std::string opcodeToString() const override { return "ADC addr,Y"; }
+    std::string opcodeToString() const override { return "79: ADC addr,Y"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -132,7 +132,7 @@ class ADC_79 : public AddressMode::AbsoluteIndexedY<Operator::ADC>
 // Absolute Indexed,X
 class ADC_7D : public AddressMode::AbsoluteIndexedX<Operator::ADC>
 {
-    std::string opcodeToString() const override { return "ADC addr,X"; }
+    std::string opcodeToString() const override { return "7D: ADC addr,X"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -141,7 +141,7 @@ class ADC_7D : public AddressMode::AbsoluteIndexedX<Operator::ADC>
 // Absolute Long Indexed, X
 class ADC_7F : public AddressMode::AbsoluteLongIndexedX<Operator::ADC>
 {
-    std::string opcodeToString() const override { return "ADC long,X"; }
+    std::string opcodeToString() const override { return "7F: ADC long,X"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -150,7 +150,7 @@ class ADC_7F : public AddressMode::AbsoluteLongIndexedX<Operator::ADC>
 // Direct Page Indexed Indirect, X
 class AND_21 : public AddressMode::DirectPageIndexedIndirectX<Operator::AND>
 {
-    std::string opcodeToString() const override { return "AND (dp,X)"; }
+    std::string opcodeToString() const override { return "21: AND (dp,X)"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -159,7 +159,7 @@ class AND_21 : public AddressMode::DirectPageIndexedIndirectX<Operator::AND>
 // Stack Relative
 class AND_23 : public AddressMode::StackRelative<Operator::AND>
 {
-    std::string opcodeToString() const override { return "AND sr,S"; }
+    std::string opcodeToString() const override { return "23: AND sr,S"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -168,7 +168,7 @@ class AND_23 : public AddressMode::StackRelative<Operator::AND>
 // Direct Page
 class AND_25 : public AddressMode::DirectPage<Operator::AND>
 {
-    std::string opcodeToString() const override { return "AND dp"; }
+    std::string opcodeToString() const override { return "25: AND dp"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -177,7 +177,7 @@ class AND_25 : public AddressMode::DirectPage<Operator::AND>
 // Direct Page Indirect Long
 class AND_27 : public AddressMode::DirectPageIndirectLong<Operator::AND>
 {
-    std::string opcodeToString() const override { return "AND [dp]"; }
+    std::string opcodeToString() const override { return "27: AND [dp]"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -187,7 +187,7 @@ class AND_27 : public AddressMode::DirectPageIndirectLong<Operator::AND>
 // 17: Add 1 byte if m = 0 (16 - bit memory / accumulator)
 class AND_29 : public AddressMode::ImmediateFlagSize<Operator::AND, State::m>
 {
-    std::string opcodeToString() const override { return "AND #const"; }
+    std::string opcodeToString() const override { return "29: AND #const"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -196,7 +196,7 @@ class AND_29 : public AddressMode::ImmediateFlagSize<Operator::AND, State::m>
 // Absolute
 class AND_2D : public AddressMode::Absolute<Operator::AND>
 {
-    std::string opcodeToString() const override { return "AND addr"; }
+    std::string opcodeToString() const override { return "2D: AND addr"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -205,7 +205,7 @@ class AND_2D : public AddressMode::Absolute<Operator::AND>
 // Absolute Long
 class AND_2F : public AddressMode::AbsoluteLong<Operator::AND>
 {
-    std::string opcodeToString() const override { return "AND long"; }
+    std::string opcodeToString() const override { return "2F: AND long"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -214,7 +214,7 @@ class AND_2F : public AddressMode::AbsoluteLong<Operator::AND>
 // Direct Page Indirect Indexed, Y
 class AND_31 : public AddressMode::DirectPageIndirectIndexedY<Operator::AND>
 {
-    std::string opcodeToString() const override { return "AND (dp),Y"; }
+    std::string opcodeToString() const override { return "31: AND (dp),Y"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -223,7 +223,7 @@ class AND_31 : public AddressMode::DirectPageIndirectIndexedY<Operator::AND>
 // Direct Page Indirect
 class AND_32 : public AddressMode::DirectPageIndirect<Operator::AND>
 {
-    std::string opcodeToString() const override { return "AND (dp)"; }
+    std::string opcodeToString() const override { return "32: AND (dp)"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -232,7 +232,7 @@ class AND_32 : public AddressMode::DirectPageIndirect<Operator::AND>
 // Stack Relative Indirect Indexed, Y
 class AND_33 : public AddressMode::StackRelativeIndirectIndexedY<Operator::AND>
 {
-    std::string opcodeToString() const override { return "AND (sr,S),Y"; }
+    std::string opcodeToString() const override { return "33: AND (sr,S),Y"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -241,7 +241,7 @@ class AND_33 : public AddressMode::StackRelativeIndirectIndexedY<Operator::AND>
 // Direct Page Indexed, X
 class AND_35 : public AddressMode::DirectPageIndexedX<Operator::AND>
 {
-    std::string opcodeToString() const override { return "AND dp,X"; }
+    std::string opcodeToString() const override { return "35: AND dp,X"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -250,7 +250,7 @@ class AND_35 : public AddressMode::DirectPageIndexedX<Operator::AND>
 // Direct Page Indirect Long Indexed, Y
 class AND_37 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::AND>
 {
-    std::string opcodeToString() const override { return "AND [dp],Y"; }
+    std::string opcodeToString() const override { return "37: AND [dp],Y"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -259,7 +259,7 @@ class AND_37 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::AND>
 // Absolute Indexed, Y
 class AND_39 : public AddressMode::AbsoluteIndexedY<Operator::AND>
 {
-    std::string opcodeToString() const override { return "AND addr,Y"; }
+    std::string opcodeToString() const override { return "39: AND addr,Y"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -268,7 +268,7 @@ class AND_39 : public AddressMode::AbsoluteIndexedY<Operator::AND>
 // Absolute Indexed, X
 class AND_3D : public AddressMode::AbsoluteIndexedX<Operator::AND>
 {
-    std::string opcodeToString() const override { return "AND addr,X"; }
+    std::string opcodeToString() const override { return "3D: AND addr,X"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -277,7 +277,7 @@ class AND_3D : public AddressMode::AbsoluteIndexedX<Operator::AND>
 // Absolute Long Indexed, X
 class AND_3F : public AddressMode::AbsoluteLongIndexedX<Operator::AND>
 {
-    std::string opcodeToString() const override { return "AND long,X"; }
+    std::string opcodeToString() const override { return "3F: AND long,X"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -286,7 +286,7 @@ class AND_3F : public AddressMode::AbsoluteLongIndexedX<Operator::AND>
 // Direct Page
 class ASL_06 : public AddressMode::DirectPage<Operator::ASL>
 {
-    std::string opcodeToString() const override { return "ASL dp"; }
+    std::string opcodeToString() const override { return "06: ASL dp"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -295,7 +295,7 @@ class ASL_06 : public AddressMode::DirectPage<Operator::ASL>
 // Accumulator
 class ASL_0A : public AddressMode::Accumulator<Operator::ASL>
 {
-    std::string opcodeToString() const override { return "ASL A"; }
+    std::string opcodeToString() const override { return "0A: ASL A"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -304,7 +304,7 @@ class ASL_0A : public AddressMode::Accumulator<Operator::ASL>
 // Absolute
 class ASL_0E : public AddressMode::Absolute<Operator::ASL>
 {
-    std::string opcodeToString() const override { return "ASL addr"; }
+    std::string opcodeToString() const override { return "0E: ASL addr"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -313,7 +313,7 @@ class ASL_0E : public AddressMode::Absolute<Operator::ASL>
 // Direct Page Indexed, X
 class ASL_16 : public AddressMode::DirectPageIndexedX<Operator::ASL>
 {
-    std::string opcodeToString() const override { return "ASL dp,X"; }
+    std::string opcodeToString() const override { return "16: ASL dp,X"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -322,7 +322,7 @@ class ASL_16 : public AddressMode::DirectPageIndexedX<Operator::ASL>
 // Absolute Indexed, X
 class ASL_1E : public AddressMode::AbsoluteIndexedX<Operator::ASL>
 {
-    std::string opcodeToString() const override { return "ASL addr,X"; }
+    std::string opcodeToString() const override { return "1E: ASL addr,X"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -331,7 +331,7 @@ class ASL_1E : public AddressMode::AbsoluteIndexedX<Operator::ASL>
 // Program Counter Relative
 class BCC_90 : public AddressMode::ProgramCounterRelative<Operator::BCC>
 {
-    std::string opcodeToString() const override { return "BCC nearlabel"; }
+    std::string opcodeToString() const override { return "90: BCC nearlabel"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -340,7 +340,7 @@ class BCC_90 : public AddressMode::ProgramCounterRelative<Operator::BCC>
 // Program Counter Relative
 class BCS_B0 : public AddressMode::ProgramCounterRelative<Operator::BCS>
 {
-    std::string opcodeToString() const override { return "BCS nearlabel"; }
+    std::string opcodeToString() const override { return "B0: BCS nearlabel"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -349,7 +349,7 @@ class BCS_B0 : public AddressMode::ProgramCounterRelative<Operator::BCS>
 // Program Counter Relative
 class BEQ_F0 : public AddressMode::ProgramCounterRelative<Operator::BEQ>
 {
-    std::string opcodeToString() const override { return "BEQ nearlabel"; }
+    std::string opcodeToString() const override { return "F0: BEQ nearlabel"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -358,7 +358,7 @@ class BEQ_F0 : public AddressMode::ProgramCounterRelative<Operator::BEQ>
 // Direct Page
 class BIT_24 : public AddressMode::DirectPage<Operator::BIT>
 {
-    std::string opcodeToString() const override { return "BIT dp"; }
+    std::string opcodeToString() const override { return "24: BIT dp"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -367,7 +367,7 @@ class BIT_24 : public AddressMode::DirectPage<Operator::BIT>
 // Absolute
 class BIT_2C : public AddressMode::Absolute<Operator::BIT>
 {
-    std::string opcodeToString() const override { return "BIT addr"; }
+    std::string opcodeToString() const override { return "2C: BIT addr"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -376,7 +376,7 @@ class BIT_2C : public AddressMode::Absolute<Operator::BIT>
 // Direct Page Indexed, X
 class BIT_34 : public AddressMode::DirectPageIndexedX<Operator::BIT>
 {
-    std::string opcodeToString() const override { return "BIT dp,X"; }
+    std::string opcodeToString() const override { return "34: BIT dp,X"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -385,7 +385,7 @@ class BIT_34 : public AddressMode::DirectPageIndexedX<Operator::BIT>
 // Absolute Indexed, X
 class BIT_3C : public AddressMode::AbsoluteIndexedX<Operator::BIT>
 {
-    std::string opcodeToString() const override { return "BIT addr,X"; }
+    std::string opcodeToString() const override { return "3C: BIT addr,X"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -395,7 +395,7 @@ class BIT_3C : public AddressMode::AbsoluteIndexedX<Operator::BIT>
 // 17: Add 1 byte if m = 0 (16 - bit memory / accumulator)
 class BIT_89 : public AddressMode::ImmediateFlagSize<Operator::BIT, State::m>
 {
-    std::string opcodeToString() const override { return "BIT #const"; }
+    std::string opcodeToString() const override { return "89: BIT #const"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -404,7 +404,7 @@ class BIT_89 : public AddressMode::ImmediateFlagSize<Operator::BIT, State::m>
 // Program Counter Relative
 class BMI_30 : public AddressMode::ProgramCounterRelative<Operator::BMI>
 {
-    std::string opcodeToString() const override { return "BMI nearlabel"; }
+    std::string opcodeToString() const override { return "30: BMI nearlabel"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -413,7 +413,7 @@ class BMI_30 : public AddressMode::ProgramCounterRelative<Operator::BMI>
 // Program Counter Relative
 class BNE_D0 : public AddressMode::ProgramCounterRelative<Operator::BNE>
 {
-    std::string opcodeToString() const override { return "BNE nearlabel"; }
+    std::string opcodeToString() const override { return "D0: BNE nearlabel"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -422,7 +422,7 @@ class BNE_D0 : public AddressMode::ProgramCounterRelative<Operator::BNE>
 // Program Counter Relative
 class BPL_10 : public AddressMode::ProgramCounterRelative<Operator::BPL>
 {
-    std::string opcodeToString() const override { return "BPL nearlabel"; }
+    std::string opcodeToString() const override { return "10: BPL nearlabel"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -431,7 +431,7 @@ class BPL_10 : public AddressMode::ProgramCounterRelative<Operator::BPL>
 // Program Counter Relative
 class BRA_80 : public AddressMode::ProgramCounterRelative<Operator::BRA>
 {
-    std::string opcodeToString() const override { return "BRA nearlabel"; }
+    std::string opcodeToString() const override { return "80: BRA nearlabel"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -441,7 +441,7 @@ class BRA_80 : public AddressMode::ProgramCounterRelative<Operator::BRA>
 // 18: Opcode is 1 byte, but program counter value pushed onto stack is incremented by 2 allowing for optional signature byte
 class BRK_00 : public AddressMode::StackInterrupt<Operator::BRK>
 {
-    std::string opcodeToString() const override { return "BRK"; }
+    std::string opcodeToString() const override { return "00: BRK"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -450,7 +450,7 @@ class BRK_00 : public AddressMode::StackInterrupt<Operator::BRK>
 // Program Counter Relative Long
 class BRL_82 : public AddressMode::ProgramCounterRelativeLong<Operator::BRL>
 {
-    std::string opcodeToString() const override { return "BRL label"; }
+    std::string opcodeToString() const override { return "82: BRL label"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -459,7 +459,7 @@ class BRL_82 : public AddressMode::ProgramCounterRelativeLong<Operator::BRL>
 // Program Counter Relative
 class BVC_50 : public AddressMode::ProgramCounterRelative<Operator::BVC>
 {
-    std::string opcodeToString() const override { return "BVC nearlabel"; }
+    std::string opcodeToString() const override { return "50: BVC nearlabel"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -468,7 +468,7 @@ class BVC_50 : public AddressMode::ProgramCounterRelative<Operator::BVC>
 // Program Counter Relative
 class BVS_70 : public AddressMode::ProgramCounterRelative<Operator::BVS>
 {
-    std::string opcodeToString() const override { return "BVS nearlabel"; }
+    std::string opcodeToString() const override { return "70: BVS nearlabel"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -477,7 +477,7 @@ class BVS_70 : public AddressMode::ProgramCounterRelative<Operator::BVS>
 // Implied
 class CLC_18 : public AddressMode::Implied<Operator::CLC>
 {
-    std::string opcodeToString() const override { return "CLC"; }
+    std::string opcodeToString() const override { return "18: CLC"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -486,7 +486,7 @@ class CLC_18 : public AddressMode::Implied<Operator::CLC>
 // Implied
 class CLD_D8 : public AddressMode::Implied<Operator::CLD>
 {
-    std::string opcodeToString() const override { return "CLD"; }
+    std::string opcodeToString() const override { return "D8: CLD"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -495,7 +495,7 @@ class CLD_D8 : public AddressMode::Implied<Operator::CLD>
 // Implied
 class CLI_58 : public AddressMode::Implied<Operator::CLI>
 {
-    std::string opcodeToString() const override { return "CLI"; }
+    std::string opcodeToString() const override { return "58: CLI"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -504,7 +504,7 @@ class CLI_58 : public AddressMode::Implied<Operator::CLI>
 // Implied
 class CLV_B8 : public AddressMode::Implied<Operator::CLV>
 {
-    std::string opcodeToString() const override { return "CLV"; }
+    std::string opcodeToString() const override { return "B8: CLV"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -513,7 +513,7 @@ class CLV_B8 : public AddressMode::Implied<Operator::CLV>
 // Direct Page Indexed Indirect,X
 class CMP_C1 : public AddressMode::DirectPageIndexedIndirectX<Operator::CMP>
 {
-    std::string opcodeToString() const override { return "CMP (dp,X)"; }
+    std::string opcodeToString() const override { return "C1: CMP (dp,X)"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -522,7 +522,7 @@ class CMP_C1 : public AddressMode::DirectPageIndexedIndirectX<Operator::CMP>
 // Stack Relative
 class CMP_C3 : public AddressMode::StackRelative<Operator::CMP>
 {
-    std::string opcodeToString() const override { return "CMP sr,S"; }
+    std::string opcodeToString() const override { return "C3: CMP sr,S"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -531,7 +531,7 @@ class CMP_C3 : public AddressMode::StackRelative<Operator::CMP>
 // Direct Page
 class CMP_C5 : public AddressMode::DirectPage<Operator::CMP>
 {
-    std::string opcodeToString() const override { return "CMP dp"; }
+    std::string opcodeToString() const override { return "C5: CMP dp"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -540,7 +540,7 @@ class CMP_C5 : public AddressMode::DirectPage<Operator::CMP>
 // Direct Page Indirect Long
 class CMP_C7 : public AddressMode::DirectPageIndirectLong<Operator::CMP>
 {
-    std::string opcodeToString() const override { return "CMP [dp]"; }
+    std::string opcodeToString() const override { return "C7: CMP [dp]"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -550,7 +550,7 @@ class CMP_C7 : public AddressMode::DirectPageIndirectLong<Operator::CMP>
 // 17: Add 1 byte if m = 0 (16 - bit memory / accumulator)
 class CMP_C9 : public AddressMode::ImmediateFlagSize<Operator::CMP, State::m>
 {
-    std::string opcodeToString() const override { return "CMP #const"; }
+    std::string opcodeToString() const override { return "C9: CMP #const"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -559,7 +559,7 @@ class CMP_C9 : public AddressMode::ImmediateFlagSize<Operator::CMP, State::m>
 // Absolute
 class CMP_CD : public AddressMode::Absolute<Operator::CMP>
 {
-    std::string opcodeToString() const override { return "CMP addr"; }
+    std::string opcodeToString() const override { return "CD: CMP addr"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -568,7 +568,7 @@ class CMP_CD : public AddressMode::Absolute<Operator::CMP>
 // Absolute Long
 class CMP_CF : public AddressMode::AbsoluteLong<Operator::CMP>
 {
-    std::string opcodeToString() const override { return "CMP long"; }
+    std::string opcodeToString() const override { return "CF: CMP long"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -577,7 +577,7 @@ class CMP_CF : public AddressMode::AbsoluteLong<Operator::CMP>
 // Direct Page Indirect Indexed, Y
 class CMP_D1 : public AddressMode::DirectPageIndirectIndexedY<Operator::CMP>
 {
-    std::string opcodeToString() const override { return "CMP (dp),Y"; }
+    std::string opcodeToString() const override { return "D1: CMP (dp),Y"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -586,7 +586,7 @@ class CMP_D1 : public AddressMode::DirectPageIndirectIndexedY<Operator::CMP>
 // Direct Page Indirect
 class CMP_D2 : public AddressMode::DirectPageIndirect<Operator::CMP>
 {
-    std::string opcodeToString() const override { return "CMP (dp)"; }
+    std::string opcodeToString() const override { return "D2: CMP (dp)"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -595,7 +595,7 @@ class CMP_D2 : public AddressMode::DirectPageIndirect<Operator::CMP>
 // Stack Relative Indirect Indexed,Y
 class CMP_D3 : public AddressMode::StackRelativeIndirectIndexedY<Operator::CMP>
 {
-    std::string opcodeToString() const override { return "CMP (sr,S),Y"; }
+    std::string opcodeToString() const override { return "D3: CMP (sr,S),Y"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -604,7 +604,7 @@ class CMP_D3 : public AddressMode::StackRelativeIndirectIndexedY<Operator::CMP>
 // Direct Page Indexed, X
 class CMP_D5 : public AddressMode::DirectPageIndexedX<Operator::CMP>
 {
-    std::string opcodeToString() const override { return "CMP dp,X"; }
+    std::string opcodeToString() const override { return "D5: CMP dp,X"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -613,7 +613,7 @@ class CMP_D5 : public AddressMode::DirectPageIndexedX<Operator::CMP>
 // Direct Page Indirect Long Indexed, Y
 class CMP_D7 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::CMP>
 {
-    std::string opcodeToString() const override { return "CMP [dp],Y"; }
+    std::string opcodeToString() const override { return "D7: CMP [dp],Y"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -622,7 +622,7 @@ class CMP_D7 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::CMP>
 // Absolute Indexed, Y
 class CMP_D9 : public AddressMode::AbsoluteIndexedY<Operator::CMP>
 {
-    std::string opcodeToString() const override { return "CMP addr,Y"; }
+    std::string opcodeToString() const override { return "D9: CMP addr,Y"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -631,7 +631,7 @@ class CMP_D9 : public AddressMode::AbsoluteIndexedY<Operator::CMP>
 // Absolute Indexed, X
 class CMP_DD : public AddressMode::AbsoluteIndexedX<Operator::CMP>
 {
-    std::string opcodeToString() const override { return "CMP addr,X"; }
+    std::string opcodeToString() const override { return "DD: CMP addr,X"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -640,7 +640,7 @@ class CMP_DD : public AddressMode::AbsoluteIndexedX<Operator::CMP>
 // Absolute Long Indexed, X
 class CMP_DF : public AddressMode::AbsoluteLongIndexedX<Operator::CMP>
 {
-    std::string opcodeToString() const override { return "CMP long,X"; }
+    std::string opcodeToString() const override { return "DF: CMP long,X"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -650,7 +650,7 @@ class CMP_DF : public AddressMode::AbsoluteLongIndexedX<Operator::CMP>
 // 18: Opcode is 1 byte, but program counter value pushed onto stack is incremented by 2 allowing for optional signature byte
 class COP_02 : public AddressMode::StackInterrupt<Operator::COP>
 {
-    std::string opcodeToString() const override { return "COP const"; }
+    std::string opcodeToString() const override { return "02: COP const"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -660,7 +660,7 @@ class COP_02 : public AddressMode::StackInterrupt<Operator::COP>
 // 19: Add 1 byte if x = 0 (16 - bit index registers)
 class CPX_E0 : public AddressMode::ImmediateFlagSize<Operator::CPX, State::x>
 {
-    std::string opcodeToString() const override { return "CPX #const"; }
+    std::string opcodeToString() const override { return "E0: CPX #const"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -669,7 +669,7 @@ class CPX_E0 : public AddressMode::ImmediateFlagSize<Operator::CPX, State::x>
 // Direct Page
 class CPX_E4 : public AddressMode::DirectPage<Operator::CPX>
 {
-    std::string opcodeToString() const override { return "CPX dp"; }
+    std::string opcodeToString() const override { return "E4: CPX dp"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -678,7 +678,7 @@ class CPX_E4 : public AddressMode::DirectPage<Operator::CPX>
 // Absolute
 class CPX_EC : public AddressMode::Absolute<Operator::CPX>
 {
-    std::string opcodeToString() const override { return "CPX addr"; }
+    std::string opcodeToString() const override { return "EC: CPX addr"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -688,7 +688,7 @@ class CPX_EC : public AddressMode::Absolute<Operator::CPX>
 // 19: Add 1 byte if x = 0 (16 - bit index registers)
 class CPY_C0 : public AddressMode::ImmediateFlagSize<Operator::CPY, State::x>
 {
-    std::string opcodeToString() const override { return "CPY #const"; }
+    std::string opcodeToString() const override { return "C0: CPY #const"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -697,7 +697,7 @@ class CPY_C0 : public AddressMode::ImmediateFlagSize<Operator::CPY, State::x>
 // Direct Page
 class CPY_C4 : public AddressMode::DirectPage<Operator::CPY>
 {
-    std::string opcodeToString() const override { return "CPY dp"; }
+    std::string opcodeToString() const override { return "C4: CPY dp"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -706,7 +706,7 @@ class CPY_C4 : public AddressMode::DirectPage<Operator::CPY>
 // Absolute
 class CPY_CC : public AddressMode::Absolute<Operator::CPY>
 {
-    std::string opcodeToString() const override { return "CPY addr"; }
+    std::string opcodeToString() const override { return "CC: CPY addr"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -715,7 +715,7 @@ class CPY_CC : public AddressMode::Absolute<Operator::CPY>
 // Accumulator
 class DEC_3A : public AddressMode::Accumulator<Operator::DEC>
 {
-    std::string opcodeToString() const override { return "DEC A"; }
+    std::string opcodeToString() const override { return "3A: DEC A"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -724,7 +724,7 @@ class DEC_3A : public AddressMode::Accumulator<Operator::DEC>
 // Direct Page
 class DEC_C6 : public AddressMode::DirectPage<Operator::DEC>
 {
-    std::string opcodeToString() const override { return "DEC dp"; }
+    std::string opcodeToString() const override { return "C6: DEC dp"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -733,7 +733,7 @@ class DEC_C6 : public AddressMode::DirectPage<Operator::DEC>
 // Absolute
 class DEC_CE : public AddressMode::Absolute<Operator::DEC>
 {
-    std::string opcodeToString() const override { return "DEC addr"; }
+    std::string opcodeToString() const override { return "CE: DEC addr"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -742,7 +742,7 @@ class DEC_CE : public AddressMode::Absolute<Operator::DEC>
 // Direct Page Indexed, X
 class DEC_D6 : public AddressMode::DirectPageIndexedX<Operator::DEC>
 {
-    std::string opcodeToString() const override { return "DEC dp,X"; }
+    std::string opcodeToString() const override { return "D6: DEC dp,X"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -751,7 +751,7 @@ class DEC_D6 : public AddressMode::DirectPageIndexedX<Operator::DEC>
 // Absolute Indexed, X
 class DEC_DE : public AddressMode::AbsoluteIndexedX<Operator::DEC>
 {
-    std::string opcodeToString() const override { return "DEC addr,X"; }
+    std::string opcodeToString() const override { return "DE: DEC addr,X"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -760,7 +760,7 @@ class DEC_DE : public AddressMode::AbsoluteIndexedX<Operator::DEC>
 // Implied
 class DEX_CA : public AddressMode::Implied<Operator::DEX>
 {
-    std::string opcodeToString() const override { return "DEX"; }
+    std::string opcodeToString() const override { return "CA: DEX"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -769,7 +769,7 @@ class DEX_CA : public AddressMode::Implied<Operator::DEX>
 // Implied
 class DEY_88 : public AddressMode::Implied<Operator::DEY>
 {
-    std::string opcodeToString() const override { return "DEY"; }
+    std::string opcodeToString() const override { return "88: DEY"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -778,7 +778,7 @@ class DEY_88 : public AddressMode::Implied<Operator::DEY>
 // Direct Page Indexed Indirect,X
 class EOR_41 : public AddressMode::DirectPageIndexedIndirectX<Operator::EOR>
 {
-    std::string opcodeToString() const override { return "EOR (dp,X)"; }
+    std::string opcodeToString() const override { return "41: EOR (dp,X)"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -787,7 +787,7 @@ class EOR_41 : public AddressMode::DirectPageIndexedIndirectX<Operator::EOR>
 // Stack Relative
 class EOR_43 : public AddressMode::StackRelative<Operator::EOR>
 {
-    std::string opcodeToString() const override { return "EOR sr,S"; }
+    std::string opcodeToString() const override { return "43: EOR sr,S"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -796,7 +796,7 @@ class EOR_43 : public AddressMode::StackRelative<Operator::EOR>
 // Direct Page
 class EOR_45 : public AddressMode::DirectPage<Operator::EOR>
 {
-    std::string opcodeToString() const override { return "EOR dp"; }
+    std::string opcodeToString() const override { return "45: EOR dp"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -805,7 +805,7 @@ class EOR_45 : public AddressMode::DirectPage<Operator::EOR>
 // Direct Page Indirect Long
 class EOR_47 : public AddressMode::DirectPageIndirectLong<Operator::EOR>
 {
-    std::string opcodeToString() const override { return "EOR [dp]"; }
+    std::string opcodeToString() const override { return "47: EOR [dp]"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -815,7 +815,7 @@ class EOR_47 : public AddressMode::DirectPageIndirectLong<Operator::EOR>
 // 17: Add 1 byte if m = 0 (16 - bit memory / accumulator)
 class EOR_49 : public AddressMode::ImmediateFlagSize<Operator::EOR, State::m>
 {
-    std::string opcodeToString() const override { return "EOR #const"; }
+    std::string opcodeToString() const override { return "49: EOR #const"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -824,7 +824,7 @@ class EOR_49 : public AddressMode::ImmediateFlagSize<Operator::EOR, State::m>
 // Absolute
 class EOR_4D : public AddressMode::Absolute<Operator::EOR>
 {
-    std::string opcodeToString() const override { return "EOR addr"; }
+    std::string opcodeToString() const override { return "4D: EOR addr"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -833,7 +833,7 @@ class EOR_4D : public AddressMode::Absolute<Operator::EOR>
 // Absolute Long
 class EOR_4F : public AddressMode::AbsoluteLong<Operator::EOR>
 {
-    std::string opcodeToString() const override { return "EOR long"; }
+    std::string opcodeToString() const override { return "4F: EOR long"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -842,7 +842,7 @@ class EOR_4F : public AddressMode::AbsoluteLong<Operator::EOR>
 // Direct Page Indirect Indexed, Y
 class EOR_51 : public AddressMode::DirectPageIndirectIndexedY<Operator::EOR>
 {
-    std::string opcodeToString() const override { return "EOR (dp),Y"; }
+    std::string opcodeToString() const override { return "51: EOR (dp),Y"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -851,7 +851,7 @@ class EOR_51 : public AddressMode::DirectPageIndirectIndexedY<Operator::EOR>
 // Direct Page Indirect
 class EOR_52 : public AddressMode::DirectPageIndirect<Operator::EOR>
 {
-    std::string opcodeToString() const override { return "EOR (dp)"; }
+    std::string opcodeToString() const override { return "52: EOR (dp)"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -860,7 +860,7 @@ class EOR_52 : public AddressMode::DirectPageIndirect<Operator::EOR>
 // Stack Relative Indirect Indexed, Y
 class EOR_53 : public AddressMode::StackRelativeIndirectIndexedY<Operator::EOR>
 {
-    std::string opcodeToString() const override { return "EOR (sr,S),Y"; }
+    std::string opcodeToString() const override { return "53: EOR (sr,S),Y"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -869,7 +869,7 @@ class EOR_53 : public AddressMode::StackRelativeIndirectIndexedY<Operator::EOR>
 // Direct Page Indexed, X
 class EOR_55 : public AddressMode::DirectPageIndexedX<Operator::EOR>
 {
-    std::string opcodeToString() const override { return "EOR dp,X"; }
+    std::string opcodeToString() const override { return "55: EOR dp,X"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -878,7 +878,7 @@ class EOR_55 : public AddressMode::DirectPageIndexedX<Operator::EOR>
 // Direct Page Indirect Long Indexed, Y
 class EOR_57 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::EOR>
 {
-    std::string opcodeToString() const override { return "EOR [dp],Y"; }
+    std::string opcodeToString() const override { return "57: EOR [dp],Y"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -887,7 +887,7 @@ class EOR_57 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::EOR>
 // Absolute Indexed, Y
 class EOR_59 : public AddressMode::AbsoluteIndexedY<Operator::EOR>
 {
-    std::string opcodeToString() const override { return "EOR addr,Y"; }
+    std::string opcodeToString() const override { return "59: EOR addr,Y"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -896,7 +896,7 @@ class EOR_59 : public AddressMode::AbsoluteIndexedY<Operator::EOR>
 // Absolute Indexed, X
 class EOR_5D : public AddressMode::AbsoluteIndexedX<Operator::EOR>
 {
-    std::string opcodeToString() const override { return "EOR addr,X"; }
+    std::string opcodeToString() const override { return "5D: EOR addr,X"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -905,7 +905,7 @@ class EOR_5D : public AddressMode::AbsoluteIndexedX<Operator::EOR>
 // Absolute Long Indexed,X
 class EOR_5F : public AddressMode::AbsoluteLongIndexedX<Operator::EOR>
 {
-    std::string opcodeToString() const override { return "EOR long,X"; }
+    std::string opcodeToString() const override { return "5F: EOR long,X"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -914,7 +914,7 @@ class EOR_5F : public AddressMode::AbsoluteLongIndexedX<Operator::EOR>
 // Accumulator
 class INC_1A : public AddressMode::Accumulator<Operator::INC>
 {
-    std::string opcodeToString() const override { return "INC A"; }
+    std::string opcodeToString() const override { return "1A: INC A"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -923,7 +923,7 @@ class INC_1A : public AddressMode::Accumulator<Operator::INC>
 // Direct Page
 class INC_E6 : public AddressMode::DirectPage<Operator::INC>
 {
-    std::string opcodeToString() const override { return "INC dp"; }
+    std::string opcodeToString() const override { return "E6: INC dp"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -932,7 +932,7 @@ class INC_E6 : public AddressMode::DirectPage<Operator::INC>
 // Absolute
 class INC_EE : public AddressMode::Absolute<Operator::INC>
 {
-    std::string opcodeToString() const override { return "INC addr"; }
+    std::string opcodeToString() const override { return "EE: INC addr"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -941,7 +941,7 @@ class INC_EE : public AddressMode::Absolute<Operator::INC>
 // Direct Page Indexed, X
 class INC_F6 : public AddressMode::DirectPageIndexedX<Operator::INC>
 {
-    std::string opcodeToString() const override { return "INC dp,X"; }
+    std::string opcodeToString() const override { return "F6: INC dp,X"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -950,7 +950,7 @@ class INC_F6 : public AddressMode::DirectPageIndexedX<Operator::INC>
 // Absolute Indexed, X
 class INC_FE : public AddressMode::AbsoluteIndexedX<Operator::INC>
 {
-    std::string opcodeToString() const override { return "INC addr,X"; }
+    std::string opcodeToString() const override { return "FE: INC addr,X"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -959,7 +959,7 @@ class INC_FE : public AddressMode::AbsoluteIndexedX<Operator::INC>
 // Implied
 class INX_E8 : public AddressMode::Implied<Operator::INX>
 {
-    std::string opcodeToString() const override { return "INX"; }
+    std::string opcodeToString() const override { return "E8: INX"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -968,7 +968,7 @@ class INX_E8 : public AddressMode::Implied<Operator::INX>
 // Implied
 class INY_C8 : public AddressMode::Implied<Operator::INY>
 {
-    std::string opcodeToString() const override { return "INY"; }
+    std::string opcodeToString() const override { return "C8: INY"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -977,7 +977,7 @@ class INY_C8 : public AddressMode::Implied<Operator::INY>
 // Absolute
 class JMP_4C : public AddressMode::Absolute<Operator::JMP>
 {
-    std::string opcodeToString() const override { return "JMP addr"; }
+    std::string opcodeToString() const override { return "4C: JMP addr"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -986,7 +986,7 @@ class JMP_4C : public AddressMode::Absolute<Operator::JMP>
 // Absolute Long
 class JMP_5C : public AddressMode::AbsoluteLong<Operator::JMP>
 {
-    std::string opcodeToString() const override { return "JMP long"; }
+    std::string opcodeToString() const override { return "5C: JMP long"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -995,7 +995,7 @@ class JMP_5C : public AddressMode::AbsoluteLong<Operator::JMP>
 // Absolute Indirect
 class JMP_6C : public AddressMode::AbsoluteIndirect<Operator::JMP>
 {
-    std::string opcodeToString() const override { return "JMP (addr)"; }
+    std::string opcodeToString() const override { return "6C: JMP (addr)"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1004,7 +1004,7 @@ class JMP_6C : public AddressMode::AbsoluteIndirect<Operator::JMP>
 // Absolute Indexed Indirect
 class JMP_7C : public AddressMode::AbsoluteIndexedIndirect<Operator::JMP>
 {
-    std::string opcodeToString() const override { return "JMP (addr,X)"; }
+    std::string opcodeToString() const override { return "7C: JMP (addr,X)"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1013,7 +1013,7 @@ class JMP_7C : public AddressMode::AbsoluteIndexedIndirect<Operator::JMP>
 // Absolute Indirect Long
 class JMP_DC : public AddressMode::AbsoluteIndirectLong<Operator::JMP>
 {
-    std::string opcodeToString() const override { return "JMP [addr]"; }
+    std::string opcodeToString() const override { return "DC: JMP [addr]"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1022,7 +1022,7 @@ class JMP_DC : public AddressMode::AbsoluteIndirectLong<Operator::JMP>
 // Absolute
 class JSR_20 : public AddressMode::Absolute<Operator::JSR>
 {
-    std::string opcodeToString() const override { return "JSR addr"; }
+    std::string opcodeToString() const override { return "20: JSR addr"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1031,7 +1031,7 @@ class JSR_20 : public AddressMode::Absolute<Operator::JSR>
 // Absolute Long
 class JSR_22 : public AddressMode::AbsoluteLong<Operator::JSR>
 {
-    std::string opcodeToString() const override { return "JSR long"; }
+    std::string opcodeToString() const override { return "22: JSR long"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1040,7 +1040,7 @@ class JSR_22 : public AddressMode::AbsoluteLong<Operator::JSR>
 // Absolute Indexed Indirect
 class JSR_FC : public AddressMode::AbsoluteIndexedIndirect<Operator::JSR>
 {
-    std::string opcodeToString() const override { return "JSR (addr,X)"; }
+    std::string opcodeToString() const override { return "FC: JSR (addr,X)"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1049,7 +1049,7 @@ class JSR_FC : public AddressMode::AbsoluteIndexedIndirect<Operator::JSR>
 // Direct Page Indexed Indirect, X
 class LDA_A1 : public AddressMode::DirectPageIndexedIndirectX<Operator::LDA>
 {
-    std::string opcodeToString() const override { return "LDA (dp,X)"; }
+    std::string opcodeToString() const override { return "A1: LDA (dp,X)"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1058,7 +1058,7 @@ class LDA_A1 : public AddressMode::DirectPageIndexedIndirectX<Operator::LDA>
 // Stack Relative
 class LDA_A3 : public AddressMode::StackRelative<Operator::LDA>
 {
-    std::string opcodeToString() const override { return "LDA sr,S"; }
+    std::string opcodeToString() const override { return "A3: LDA sr,S"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1067,7 +1067,7 @@ class LDA_A3 : public AddressMode::StackRelative<Operator::LDA>
 // Direct Page
 class LDA_A5 : public AddressMode::DirectPage<Operator::LDA>
 {
-    std::string opcodeToString() const override { return "LDA dp"; }
+    std::string opcodeToString() const override { return "A5: LDA dp"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1076,7 +1076,7 @@ class LDA_A5 : public AddressMode::DirectPage<Operator::LDA>
 // Direct Page Indirect Long
 class LDA_A7 : public AddressMode::DirectPageIndirectLong<Operator::LDA>
 {
-    std::string opcodeToString() const override { return "LDA [dp]"; }
+    std::string opcodeToString() const override { return "A7: LDA [dp]"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1086,7 +1086,7 @@ class LDA_A7 : public AddressMode::DirectPageIndirectLong<Operator::LDA>
 // 17: Add 1 byte if m = 0 (16 - bit memory / accumulator)
 class LDA_A9 : public AddressMode::ImmediateFlagSize<Operator::LDA, State::m>
 {
-    std::string opcodeToString() const override { return "LDA #const"; }
+    std::string opcodeToString() const override { return "A9: LDA #const"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1095,7 +1095,7 @@ class LDA_A9 : public AddressMode::ImmediateFlagSize<Operator::LDA, State::m>
 // Absolute
 class LDA_AD : public AddressMode::Absolute<Operator::LDA>
 {
-    std::string opcodeToString() const override { return "LDA addr"; }
+    std::string opcodeToString() const override { return "AD: LDA addr"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1104,7 +1104,7 @@ class LDA_AD : public AddressMode::Absolute<Operator::LDA>
 // Absolute Long
 class LDA_AF : public AddressMode::AbsoluteLong<Operator::LDA>
 {
-    std::string opcodeToString() const override { return "LDA long"; }
+    std::string opcodeToString() const override { return "AF: LDA long"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1113,7 +1113,7 @@ class LDA_AF : public AddressMode::AbsoluteLong<Operator::LDA>
 // Direct Page Indirect Indexed, Y
 class LDA_B1 : public AddressMode::DirectPageIndirectIndexedY<Operator::LDA>
 {
-    std::string opcodeToString() const override { return "LDA (dp),Y"; }
+    std::string opcodeToString() const override { return "B1: LDA (dp),Y"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1122,7 +1122,7 @@ class LDA_B1 : public AddressMode::DirectPageIndirectIndexedY<Operator::LDA>
 // Direct Page Indirect
 class LDA_B2 : public AddressMode::DirectPageIndirect<Operator::LDA>
 {
-    std::string opcodeToString() const override { return "LDA (dp)"; }
+    std::string opcodeToString() const override { return "B2: LDA (dp)"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1131,7 +1131,7 @@ class LDA_B2 : public AddressMode::DirectPageIndirect<Operator::LDA>
 // Stack Relative Indirect Indexed, Y
 class LDA_B3 : public AddressMode::StackRelativeIndirectIndexedY<Operator::LDA>
 {
-    std::string opcodeToString() const override { return "LDA (sr,S),Y"; }
+    std::string opcodeToString() const override { return "B3: LDA (sr,S),Y"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1140,7 +1140,7 @@ class LDA_B3 : public AddressMode::StackRelativeIndirectIndexedY<Operator::LDA>
 // Direct Page Indexed, X
 class LDA_B5 : public AddressMode::DirectPageIndexedX<Operator::LDA>
 {
-    std::string opcodeToString() const override { return "LDA dp,X"; }
+    std::string opcodeToString() const override { return "B5: LDA dp,X"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1149,7 +1149,7 @@ class LDA_B5 : public AddressMode::DirectPageIndexedX<Operator::LDA>
 // Direct Page Indirect Long Indexed, Y
 class LDA_B7 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::LDA>
 {
-    std::string opcodeToString() const override { return "LDA [dp],Y"; }
+    std::string opcodeToString() const override { return "B7: LDA [dp],Y"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1158,7 +1158,7 @@ class LDA_B7 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::LDA>
 // Absolute Indexed, Y
 class LDA_B9 : public AddressMode::AbsoluteIndexedY<Operator::LDA>
 {
-    std::string opcodeToString() const override { return "LDA addr,Y"; }
+    std::string opcodeToString() const override { return "B9: LDA addr,Y"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1167,7 +1167,7 @@ class LDA_B9 : public AddressMode::AbsoluteIndexedY<Operator::LDA>
 // Absolute Indexed, X
 class LDA_BD : public AddressMode::AbsoluteIndexedX<Operator::LDA>
 {
-    std::string opcodeToString() const override { return "LDA addr,X"; }
+    std::string opcodeToString() const override { return "BD: LDA addr,X"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1176,7 +1176,7 @@ class LDA_BD : public AddressMode::AbsoluteIndexedX<Operator::LDA>
 // Absolute Long Indexed, X
 class LDA_BF : public AddressMode::AbsoluteLongIndexedX<Operator::LDA>
 {
-    std::string opcodeToString() const override { return "LDA long,X"; }
+    std::string opcodeToString() const override { return "BF: LDA long,X"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1186,7 +1186,7 @@ class LDA_BF : public AddressMode::AbsoluteLongIndexedX<Operator::LDA>
 // 19: Add 1 byte if x = 0 (16 - bit index registers)
 class LDX_A2 : public AddressMode::ImmediateFlagSize<Operator::LDX, State::x>
 {
-    std::string opcodeToString() const override { return "LDX #const"; }
+    std::string opcodeToString() const override { return "A2: LDX #const"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1195,7 +1195,7 @@ class LDX_A2 : public AddressMode::ImmediateFlagSize<Operator::LDX, State::x>
 // Direct Page
 class LDX_A6 : public AddressMode::DirectPage<Operator::LDX>
 {
-    std::string opcodeToString() const override { return "LDX dp"; }
+    std::string opcodeToString() const override { return "A6: LDX dp"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1204,7 +1204,7 @@ class LDX_A6 : public AddressMode::DirectPage<Operator::LDX>
 // Absolute
 class LDX_AE : public AddressMode::Absolute<Operator::LDX>
 {
-    std::string opcodeToString() const override { return "LDX addr"; }
+    std::string opcodeToString() const override { return "AE: LDX addr"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1213,7 +1213,7 @@ class LDX_AE : public AddressMode::Absolute<Operator::LDX>
 // Direct Page Indexed, Y
 class LDX_B6 : public AddressMode::DirectPageIndexedY<Operator::LDX>
 {
-    std::string opcodeToString() const override { return "LDX dp,Y"; }
+    std::string opcodeToString() const override { return "B6: LDX dp,Y"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1222,7 +1222,7 @@ class LDX_B6 : public AddressMode::DirectPageIndexedY<Operator::LDX>
 // Absolute Indexed, Y
 class LDX_BE : public AddressMode::AbsoluteIndexedY<Operator::LDX>
 {
-    std::string opcodeToString() const override { return "LDX addr,Y"; }
+    std::string opcodeToString() const override { return "BE: LDX addr,Y"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1232,7 +1232,7 @@ class LDX_BE : public AddressMode::AbsoluteIndexedY<Operator::LDX>
 // 19: Add 1 byte if x = 0 (16 - bit index registers)
 class LDY_A0 : public AddressMode::ImmediateFlagSize<Operator::LDY, State::x>
 {
-    std::string opcodeToString() const override { return "LDY #const"; }
+    std::string opcodeToString() const override { return "A0: LDY #const"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1241,7 +1241,7 @@ class LDY_A0 : public AddressMode::ImmediateFlagSize<Operator::LDY, State::x>
 // Direct Page
 class LDY_A4 : public AddressMode::DirectPage<Operator::LDY>
 {
-    std::string opcodeToString() const override { return "LDY dp"; }
+    std::string opcodeToString() const override { return "A4: LDY dp"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1250,7 +1250,7 @@ class LDY_A4 : public AddressMode::DirectPage<Operator::LDY>
 // Absolute
 class LDY_AC : public AddressMode::Absolute<Operator::LDY>
 {
-    std::string opcodeToString() const override { return "LDY addr"; }
+    std::string opcodeToString() const override { return "AC: LDY addr"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1259,7 +1259,7 @@ class LDY_AC : public AddressMode::Absolute<Operator::LDY>
 // Direct Page Indexed, X
 class LDY_B4 : public AddressMode::DirectPageIndexedX<Operator::LDY>
 {
-    std::string opcodeToString() const override { return "LDY dp,X"; }
+    std::string opcodeToString() const override { return "B4: LDY dp,X"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1268,7 +1268,7 @@ class LDY_B4 : public AddressMode::DirectPageIndexedX<Operator::LDY>
 // Absolute Indexed, X
 class LDY_BC : public AddressMode::AbsoluteIndexedX<Operator::LDY>
 {
-    std::string opcodeToString() const override { return "LDY addr,X"; }
+    std::string opcodeToString() const override { return "BC: LDY addr,X"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1277,7 +1277,7 @@ class LDY_BC : public AddressMode::AbsoluteIndexedX<Operator::LDY>
 // Direct Page
 class LSR_46 : public AddressMode::DirectPage<Operator::LSR>
 {
-    std::string opcodeToString() const override { return "LSR dp"; }
+    std::string opcodeToString() const override { return "46: LSR dp"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1286,7 +1286,7 @@ class LSR_46 : public AddressMode::DirectPage<Operator::LSR>
 // Accumulator
 class LSR_4A : public AddressMode::Accumulator<Operator::LSR>
 {
-    std::string opcodeToString() const override { return "LSR A"; }
+    std::string opcodeToString() const override { return "4A: LSR A"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1295,7 +1295,7 @@ class LSR_4A : public AddressMode::Accumulator<Operator::LSR>
 // Absolute
 class LSR_4E : public AddressMode::Absolute<Operator::LSR>
 {
-    std::string opcodeToString() const override { return "LSR addr"; }
+    std::string opcodeToString() const override { return "4E: LSR addr"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1304,7 +1304,7 @@ class LSR_4E : public AddressMode::Absolute<Operator::LSR>
 // Direct Page Indexed, X
 class LSR_56 : public AddressMode::DirectPageIndexedX<Operator::LSR>
 {
-    std::string opcodeToString() const override { return "LSR dp,X"; }
+    std::string opcodeToString() const override { return "56: LSR dp,X"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1313,7 +1313,7 @@ class LSR_56 : public AddressMode::DirectPageIndexedX<Operator::LSR>
 // Absolute Indexed, X
 class LSR_5E : public AddressMode::AbsoluteIndexedX<Operator::LSR>
 {
-    std::string opcodeToString() const override { return "LSR addr,X"; }
+    std::string opcodeToString() const override { return "5E: LSR addr,X"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1322,7 +1322,7 @@ class LSR_5E : public AddressMode::AbsoluteIndexedX<Operator::LSR>
 // Block Move
 class MVN_54 : public AddressMode::BlockMove<Operator::MVN>
 {
-    std::string opcodeToString() const override { return "MVN srcbk,destbk"; }
+    std::string opcodeToString() const override { return "54: MVN srcbk,destbk"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1331,7 +1331,7 @@ class MVN_54 : public AddressMode::BlockMove<Operator::MVN>
 // Block Move
 class MVN_44 : public AddressMode::BlockMove<Operator::MVN>
 {
-    std::string opcodeToString() const override { return "MVN srcbk,destbk"; }
+    std::string opcodeToString() const override { return "44: MVN srcbk,destbk"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1340,7 +1340,7 @@ class MVN_44 : public AddressMode::BlockMove<Operator::MVN>
 // Implied
 class NOP_EA : public AddressMode::Implied<Operator::NOP>
 {
-    std::string opcodeToString() const override { return "NOP"; }
+    std::string opcodeToString() const override { return "EA: NOP"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1349,7 +1349,7 @@ class NOP_EA : public AddressMode::Implied<Operator::NOP>
 // Direct Page Indexed Indirect, X
 class ORA_01 : public AddressMode::DirectPageIndexedIndirectX<Operator::ORA>
 {
-    std::string opcodeToString() const override { return "ORA (dp,X)"; }
+    std::string opcodeToString() const override { return "01: ORA (dp,X)"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1358,7 +1358,7 @@ class ORA_01 : public AddressMode::DirectPageIndexedIndirectX<Operator::ORA>
 // Stack Relative
 class ORA_03 : public AddressMode::StackRelative<Operator::ORA>
 {
-    std::string opcodeToString() const override { return "ORA sr,S"; }
+    std::string opcodeToString() const override { return "03: ORA sr,S"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1367,7 +1367,7 @@ class ORA_03 : public AddressMode::StackRelative<Operator::ORA>
 // Direct Page
 class ORA_05 : public AddressMode::DirectPage<Operator::ORA>
 {
-    std::string opcodeToString() const override { return "ORA dp"; }
+    std::string opcodeToString() const override { return "05: ORA dp"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1376,7 +1376,7 @@ class ORA_05 : public AddressMode::DirectPage<Operator::ORA>
 // Direct Page Indirect Long
 class ORA_07 : public AddressMode::DirectPageIndirectLong<Operator::ORA>
 {
-    std::string opcodeToString() const override { return "ORA [dp]"; }
+    std::string opcodeToString() const override { return "07: ORA [dp]"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1386,7 +1386,7 @@ class ORA_07 : public AddressMode::DirectPageIndirectLong<Operator::ORA>
 // 17: Add 1 byte if m = 0 (16 - bit memory / accumulator)
 class ORA_09 : public AddressMode::ImmediateFlagSize<Operator::ORA, State::m>
 {
-    std::string opcodeToString() const override { return "ORA #const"; }
+    std::string opcodeToString() const override { return "09: ORA #const"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1395,7 +1395,7 @@ class ORA_09 : public AddressMode::ImmediateFlagSize<Operator::ORA, State::m>
 // Absolute
 class ORA_0D : public AddressMode::Absolute<Operator::ORA>
 {
-    std::string opcodeToString() const override { return "ORA addr"; }
+    std::string opcodeToString() const override { return "0D: ORA addr"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1404,7 +1404,7 @@ class ORA_0D : public AddressMode::Absolute<Operator::ORA>
 // Absolute Long
 class ORA_0F : public AddressMode::AbsoluteLong<Operator::ORA>
 {
-    std::string opcodeToString() const override { return "ORA long"; }
+    std::string opcodeToString() const override { return "0F: ORA long"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1413,7 +1413,7 @@ class ORA_0F : public AddressMode::AbsoluteLong<Operator::ORA>
 // Direct Page Indirect Indexed, Y
 class ORA_11 : public AddressMode::DirectPageIndirectIndexedY<Operator::ORA>
 {
-    std::string opcodeToString() const override { return "ORA (dp),Y"; }
+    std::string opcodeToString() const override { return "11: ORA (dp),Y"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1422,7 +1422,7 @@ class ORA_11 : public AddressMode::DirectPageIndirectIndexedY<Operator::ORA>
 // Direct Page Indirect
 class ORA_12 : public AddressMode::DirectPageIndirect<Operator::ORA>
 {
-    std::string opcodeToString() const override { return "ORA (dp)"; }
+    std::string opcodeToString() const override { return "12: ORA (dp)"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1431,7 +1431,7 @@ class ORA_12 : public AddressMode::DirectPageIndirect<Operator::ORA>
 // Stack Relative Indirect Indexed, Y
 class ORA_13 : public AddressMode::StackRelativeIndirectIndexedY<Operator::ORA>
 {
-    std::string opcodeToString() const override { return "ORA (sr,S),Y"; }
+    std::string opcodeToString() const override { return "13: ORA (sr,S),Y"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1440,7 +1440,7 @@ class ORA_13 : public AddressMode::StackRelativeIndirectIndexedY<Operator::ORA>
 // Direct Page Indexed, X
 class ORA_15 : public AddressMode::DirectPageIndexedX<Operator::ORA>
 {
-    std::string opcodeToString() const override { return "ORA dp,X"; }
+    std::string opcodeToString() const override { return "15: ORA dp,X"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1449,7 +1449,7 @@ class ORA_15 : public AddressMode::DirectPageIndexedX<Operator::ORA>
 // Direct Page Indirect Long Indexed, Y
 class ORA_17 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::ORA>
 {
-    std::string opcodeToString() const override { return "ORA [dp],Y"; }
+    std::string opcodeToString() const override { return "17: ORA [dp],Y"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1458,7 +1458,7 @@ class ORA_17 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::ORA>
 // Absolute Indexed, Y
 class ORA_19 : public AddressMode::AbsoluteIndexedY<Operator::ORA>
 {
-    std::string opcodeToString() const override { return "ORA addr,Y"; }
+    std::string opcodeToString() const override { return "19: ORA addr,Y"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1467,7 +1467,7 @@ class ORA_19 : public AddressMode::AbsoluteIndexedY<Operator::ORA>
 // Absolute Indexed, X
 class ORA_1D : public AddressMode::AbsoluteIndexedX<Operator::ORA>
 {
-    std::string opcodeToString() const override { return "ORA addr,X"; }
+    std::string opcodeToString() const override { return "1D: ORA addr,X"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1476,7 +1476,7 @@ class ORA_1D : public AddressMode::AbsoluteIndexedX<Operator::ORA>
 // Absolute Long Indexed, X
 class ORA_1F : public AddressMode::AbsoluteLongIndexedX<Operator::ORA>
 {
-    std::string opcodeToString() const override { return "ORA long,X"; }
+    std::string opcodeToString() const override { return "1F: ORA long,X"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1485,7 +1485,7 @@ class ORA_1F : public AddressMode::AbsoluteLongIndexedX<Operator::ORA>
 // Stack (Absolute)
 class PEA_F4 : public AddressMode::StackAbsolute<Operator::PEA>
 {
-    std::string opcodeToString() const override { return "PEA addr"; }
+    std::string opcodeToString() const override { return "F4: PEA addr"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1494,7 +1494,7 @@ class PEA_F4 : public AddressMode::StackAbsolute<Operator::PEA>
 // Stack (Direct Page Indirect)
 class PEI_D4 : public AddressMode::StackDirectPageIndirect<Operator::PEI>
 {
-    std::string opcodeToString() const override { return "PEI (dp)"; }
+    std::string opcodeToString() const override { return "D4: PEI (dp)"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1503,7 +1503,7 @@ class PEI_D4 : public AddressMode::StackDirectPageIndirect<Operator::PEI>
 // Stack (Program Counter Relative Long)
 class PER_62 : public AddressMode::StackProgramCounterRelativeLong<Operator::PER>
 {
-    std::string opcodeToString() const override { return "PER label"; }
+    std::string opcodeToString() const override { return "62: PER label"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1512,7 +1512,7 @@ class PER_62 : public AddressMode::StackProgramCounterRelativeLong<Operator::PER
 // Stack (Push)
 class PHA_48 : public AddressMode::StackPush<Operator::PHA>
 {
-    std::string opcodeToString() const override { return "PHA"; }
+    std::string opcodeToString() const override { return "48: PHA"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1521,7 +1521,7 @@ class PHA_48 : public AddressMode::StackPush<Operator::PHA>
 // Stack (Push)
 class PHB_8B : public AddressMode::StackPush<Operator::PHB>
 {
-    std::string opcodeToString() const override { return "PHB"; }
+    std::string opcodeToString() const override { return "8B: PHB"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1530,7 +1530,7 @@ class PHB_8B : public AddressMode::StackPush<Operator::PHB>
 // Stack (Push)
 class PHD_0B : public AddressMode::StackPush<Operator::PHD>
 {
-    std::string opcodeToString() const override { return "PHD"; }
+    std::string opcodeToString() const override { return "0B: PHD"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1539,7 +1539,7 @@ class PHD_0B : public AddressMode::StackPush<Operator::PHD>
 // Stack (Push)
 class PHK_4B : public AddressMode::StackPush<Operator::PHK>
 {
-    std::string opcodeToString() const override { return "PHK"; }
+    std::string opcodeToString() const override { return "4B: PHK"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1548,7 +1548,7 @@ class PHK_4B : public AddressMode::StackPush<Operator::PHK>
 // Stack (Push)
 class PHP_08 : public AddressMode::StackPush<Operator::PHP>
 {
-    std::string opcodeToString() const override { return "PHP"; }
+    std::string opcodeToString() const override { return "08: PHP"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1557,7 +1557,7 @@ class PHP_08 : public AddressMode::StackPush<Operator::PHP>
 // Stack (Push)
 class PHX_DA : public AddressMode::StackPush<Operator::PHX>
 {
-    std::string opcodeToString() const override { return "PHX"; }
+    std::string opcodeToString() const override { return "DA: PHX"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1566,7 +1566,7 @@ class PHX_DA : public AddressMode::StackPush<Operator::PHX>
 // Stack (Push)
 class PHY_5A : public AddressMode::StackPush<Operator::PHY>
 {
-    std::string opcodeToString() const override { return "PHY"; }
+    std::string opcodeToString() const override { return "5A: PHY"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1575,7 +1575,7 @@ class PHY_5A : public AddressMode::StackPush<Operator::PHY>
 // Stack (Pull)
 class PLA_68 : public AddressMode::StackPull<Operator::PLA>
 {
-    std::string opcodeToString() const override { return "PLA"; }
+    std::string opcodeToString() const override { return "68: PLA"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1584,7 +1584,7 @@ class PLA_68 : public AddressMode::StackPull<Operator::PLA>
 // Stack (Pull)
 class PLB_AB : public AddressMode::StackPull<Operator::PLB>
 {
-    std::string opcodeToString() const override { return "PLB"; }
+    std::string opcodeToString() const override { return "AB: PLB"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1593,7 +1593,7 @@ class PLB_AB : public AddressMode::StackPull<Operator::PLB>
 // Stack (Pull)
 class PLD_2B : public AddressMode::StackPull<Operator::PLD>
 {
-    std::string opcodeToString() const override { return "PLD"; }
+    std::string opcodeToString() const override { return "2B: PLD"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1602,7 +1602,7 @@ class PLD_2B : public AddressMode::StackPull<Operator::PLD>
 // Stack (Pull)
 class PLP_28 : public AddressMode::StackPull<Operator::PLP>
 {
-    std::string opcodeToString() const override { return "PLP"; }
+    std::string opcodeToString() const override { return "28: PLP"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1611,7 +1611,7 @@ class PLP_28 : public AddressMode::StackPull<Operator::PLP>
 // Stack (Pull)
 class PLX_FA : public AddressMode::StackPull<Operator::PLX>
 {
-    std::string opcodeToString() const override { return "PLX"; }
+    std::string opcodeToString() const override { return "FA: PLX"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1620,7 +1620,7 @@ class PLX_FA : public AddressMode::StackPull<Operator::PLX>
 // Stack (Pull)
 class PLY_7A : public AddressMode::StackPull<Operator::PLY>
 {
-    std::string opcodeToString() const override { return "PLY"; }
+    std::string opcodeToString() const override { return "7A: PLY"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1629,7 +1629,7 @@ class PLY_7A : public AddressMode::StackPull<Operator::PLY>
 // Immediate
 class REP_C2 : public AddressMode::Immediate<Operator::REP>
 {
-    std::string opcodeToString() const override { return "REP #const"; }
+    std::string opcodeToString() const override { return "C2: REP #const"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1638,7 +1638,7 @@ class REP_C2 : public AddressMode::Immediate<Operator::REP>
 // Direct Page
 class ROL_26 : public AddressMode::DirectPage<Operator::ROL>
 {
-    std::string opcodeToString() const override { return "ROL dp"; }
+    std::string opcodeToString() const override { return "26: ROL dp"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1647,7 +1647,7 @@ class ROL_26 : public AddressMode::DirectPage<Operator::ROL>
 // Accumulator
 class ROL_2A : public AddressMode::Accumulator<Operator::ROL>
 {
-    std::string opcodeToString() const override { return "ROL A"; }
+    std::string opcodeToString() const override { return "2A: ROL A"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1656,7 +1656,7 @@ class ROL_2A : public AddressMode::Accumulator<Operator::ROL>
 // Absolute
 class ROL_2E : public AddressMode::Absolute<Operator::ROL>
 {
-    std::string opcodeToString() const override { return "ROL addr"; }
+    std::string opcodeToString() const override { return "2E: ROL addr"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1665,7 +1665,7 @@ class ROL_2E : public AddressMode::Absolute<Operator::ROL>
 // Direct Page Indexed, X
 class ROL_36 : public AddressMode::DirectPageIndexedX<Operator::ROL>
 {
-    std::string opcodeToString() const override { return "ROL dp,X"; }
+    std::string opcodeToString() const override { return "36: ROL dp,X"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1674,7 +1674,7 @@ class ROL_36 : public AddressMode::DirectPageIndexedX<Operator::ROL>
 // Absolute Indexed, X
 class ROL_3E : public AddressMode::AbsoluteIndexedX<Operator::ROL>
 {
-    std::string opcodeToString() const override { return "ROL addr,X"; }
+    std::string opcodeToString() const override { return "3E: ROL addr,X"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1683,7 +1683,7 @@ class ROL_3E : public AddressMode::AbsoluteIndexedX<Operator::ROL>
 // Direct Page
 class ROR_66 : public AddressMode::DirectPage<Operator::ROR>
 {
-    std::string opcodeToString() const override { return "ROR dp"; }
+    std::string opcodeToString() const override { return "66: ROR dp"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1692,7 +1692,7 @@ class ROR_66 : public AddressMode::DirectPage<Operator::ROR>
 // Accumulator
 class ROR_6A : public AddressMode::Accumulator<Operator::ROR>
 {
-    std::string opcodeToString() const override { return "ROR A"; }
+    std::string opcodeToString() const override { return "6A: ROR A"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1701,7 +1701,7 @@ class ROR_6A : public AddressMode::Accumulator<Operator::ROR>
 // Absolute
 class ROR_6E : public AddressMode::Absolute<Operator::ROR>
 {
-    std::string opcodeToString() const override { return "ROR addr"; }
+    std::string opcodeToString() const override { return "6E: ROR addr"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1710,7 +1710,7 @@ class ROR_6E : public AddressMode::Absolute<Operator::ROR>
 // Direct Page Indexed, X
 class ROR_76 : public AddressMode::DirectPageIndexedX<Operator::ROR>
 {
-    std::string opcodeToString() const override { return "ROR dp,X"; }
+    std::string opcodeToString() const override { return "76: ROR dp,X"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1719,7 +1719,7 @@ class ROR_76 : public AddressMode::DirectPageIndexedX<Operator::ROR>
 // Absolute Indexed, X
 class ROR_7E : public AddressMode::AbsoluteIndexedX<Operator::ROR>
 {
-    std::string opcodeToString() const override { return "ROR addr,X"; }
+    std::string opcodeToString() const override { return "7E: ROR addr,X"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1728,7 +1728,7 @@ class ROR_7E : public AddressMode::AbsoluteIndexedX<Operator::ROR>
 // Stack (RTI)
 class RTI_40 : public AddressMode::StackRTI<Operator::RTI>
 {
-    std::string opcodeToString() const override { return "RTI"; }
+    std::string opcodeToString() const override { return "40: RTI"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1737,7 +1737,7 @@ class RTI_40 : public AddressMode::StackRTI<Operator::RTI>
 // Stack (RTL)
 class RTL_6B : public AddressMode::StackRTL<Operator::RTL>
 {
-    std::string opcodeToString() const override { return "RTL"; }
+    std::string opcodeToString() const override { return "6B: RTL"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1746,7 +1746,7 @@ class RTL_6B : public AddressMode::StackRTL<Operator::RTL>
 // Stack (RTS)
 class RTS_60 : public AddressMode::StackRTS<Operator::RTS>
 {
-    std::string opcodeToString() const override { return "RTS"; }
+    std::string opcodeToString() const override { return "60: RTS"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1755,7 +1755,7 @@ class RTS_60 : public AddressMode::StackRTS<Operator::RTS>
 // Direct Page Indexed Indirect, X
 class SBC_E1 : public AddressMode::DirectPageIndexedIndirectX<Operator::SBC>
 {
-    std::string opcodeToString() const override { return "SBC (dp,X)"; }
+    std::string opcodeToString() const override { return "E1: SBC (dp,X)"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1764,7 +1764,7 @@ class SBC_E1 : public AddressMode::DirectPageIndexedIndirectX<Operator::SBC>
 // Stack Relative
 class SBC_E3 : public AddressMode::StackRelative<Operator::SBC>
 {
-    std::string opcodeToString() const override { return "SBC sr,S"; }
+    std::string opcodeToString() const override { return "E3: SBC sr,S"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1773,7 +1773,7 @@ class SBC_E3 : public AddressMode::StackRelative<Operator::SBC>
 // Direct Page
 class SBC_E5 : public AddressMode::DirectPage<Operator::SBC>
 {
-    std::string opcodeToString() const override { return "SBC dp"; }
+    std::string opcodeToString() const override { return "E5: SBC dp"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1782,7 +1782,7 @@ class SBC_E5 : public AddressMode::DirectPage<Operator::SBC>
 // Direct Page Indirect Long
 class SBC_E7 : public AddressMode::DirectPageIndirectLong<Operator::SBC>
 {
-    std::string opcodeToString() const override { return "SBC [dp]"; }
+    std::string opcodeToString() const override { return "E7: SBC [dp]"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1792,7 +1792,7 @@ class SBC_E7 : public AddressMode::DirectPageIndirectLong<Operator::SBC>
 // 17: Add 1 byte if m = 0 (16 - bit memory / accumulator)
 class SBC_E9 : public AddressMode::ImmediateFlagSize<Operator::SBC, State::m>
 {
-    std::string opcodeToString() const override { return "SBC #const"; }
+    std::string opcodeToString() const override { return "E9: SBC #const"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1801,7 +1801,7 @@ class SBC_E9 : public AddressMode::ImmediateFlagSize<Operator::SBC, State::m>
 // Absolute
 class SBC_ED : public AddressMode::Absolute<Operator::SBC>
 {
-    std::string opcodeToString() const override { return "SBC addr"; }
+    std::string opcodeToString() const override { return "ED: SBC addr"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1810,7 +1810,7 @@ class SBC_ED : public AddressMode::Absolute<Operator::SBC>
 // Absolute Long
 class SBC_EF : public AddressMode::AbsoluteLong<Operator::SBC>
 {
-    std::string opcodeToString() const override { return "SBC long"; }
+    std::string opcodeToString() const override { return "EF: SBC long"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1819,7 +1819,7 @@ class SBC_EF : public AddressMode::AbsoluteLong<Operator::SBC>
 // Direct Page Indirect Indexed, Y
 class SBC_F1 : public AddressMode::DirectPageIndirectIndexedY<Operator::SBC>
 {
-    std::string opcodeToString() const override { return "SBC (dp),Y"; }
+    std::string opcodeToString() const override { return "F1: SBC (dp),Y"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1828,7 +1828,7 @@ class SBC_F1 : public AddressMode::DirectPageIndirectIndexedY<Operator::SBC>
 // Direct Page Indirect
 class SBC_F2 : public AddressMode::DirectPageIndirect<Operator::SBC>
 {
-    std::string opcodeToString() const override { return "SBC (dp)"; }
+    std::string opcodeToString() const override { return "F2: SBC (dp)"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1837,7 +1837,7 @@ class SBC_F2 : public AddressMode::DirectPageIndirect<Operator::SBC>
 // Stack Relative Indirect Indexed, Y
 class SBC_F3 : public AddressMode::StackRelativeIndirectIndexedY<Operator::SBC>
 {
-    std::string opcodeToString() const override { return "SBC (sr,S),Y"; }
+    std::string opcodeToString() const override { return "F3: SBC (sr,S),Y"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1846,7 +1846,7 @@ class SBC_F3 : public AddressMode::StackRelativeIndirectIndexedY<Operator::SBC>
 // Direct Page Indexed, X
 class SBC_F5 : public AddressMode::DirectPageIndexedX<Operator::SBC>
 {
-    std::string opcodeToString() const override { return "SBC dp,X"; }
+    std::string opcodeToString() const override { return "F5: SBC dp,X"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1855,7 +1855,7 @@ class SBC_F5 : public AddressMode::DirectPageIndexedX<Operator::SBC>
 // Direct Page Indirect Long Indexed, Y
 class SBC_F7 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::SBC>
 {
-    std::string opcodeToString() const override { return "SBC [dp],Y"; }
+    std::string opcodeToString() const override { return "F7: SBC [dp],Y"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1864,7 +1864,7 @@ class SBC_F7 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::SBC>
 // Absolute Indexed, Y
 class SBC_F9 : public AddressMode::AbsoluteIndexedY<Operator::SBC>
 {
-    std::string opcodeToString() const override { return "SBC addr,Y"; }
+    std::string opcodeToString() const override { return "F9: SBC addr,Y"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1873,7 +1873,7 @@ class SBC_F9 : public AddressMode::AbsoluteIndexedY<Operator::SBC>
 // Absolute Indexed, X
 class SBC_FD : public AddressMode::AbsoluteIndexedX<Operator::SBC>
 {
-    std::string opcodeToString() const override { return "SBC addr,X"; }
+    std::string opcodeToString() const override { return "FD: SBC addr,X"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1882,7 +1882,7 @@ class SBC_FD : public AddressMode::AbsoluteIndexedX<Operator::SBC>
 // Absolute Long Indexed, X
 class SBC_FF : public AddressMode::AbsoluteLongIndexedX<Operator::SBC>
 {
-    std::string opcodeToString() const override { return "SBC long,X"; }
+    std::string opcodeToString() const override { return "FF: SBC long,X"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1891,7 +1891,7 @@ class SBC_FF : public AddressMode::AbsoluteLongIndexedX<Operator::SBC>
 // Implied
 class SEC_38 : public AddressMode::Implied<Operator::SEC>
 {
-    std::string opcodeToString() const override { return "SEC"; }
+    std::string opcodeToString() const override { return "38: SEC"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1900,7 +1900,7 @@ class SEC_38 : public AddressMode::Implied<Operator::SEC>
 // Implied
 class SED_F8 : public AddressMode::Implied<Operator::SED>
 {
-    std::string opcodeToString() const override { return "SED"; }
+    std::string opcodeToString() const override { return "F8: SED"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1909,7 +1909,7 @@ class SED_F8 : public AddressMode::Implied<Operator::SED>
 // Implied
 class SEI_78 : public AddressMode::Implied<Operator::SEI>
 {
-    std::string opcodeToString() const override { return "SEI"; }
+    std::string opcodeToString() const override { return "78: SEI"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1918,7 +1918,7 @@ class SEI_78 : public AddressMode::Implied<Operator::SEI>
 // Immediate
 class SEP_E2 : public AddressMode::Immediate<Operator::SEP>
 {
-    std::string opcodeToString() const override { return "SEP #const"; }
+    std::string opcodeToString() const override { return "E2: SEP #const"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1927,7 +1927,7 @@ class SEP_E2 : public AddressMode::Immediate<Operator::SEP>
 // Direct Page Indexed Indirect, X
 class STA_81 : public AddressMode::DirectPageIndexedIndirectX<Operator::STA>
 {
-    std::string opcodeToString() const override { return "STA (dp,X)"; }
+    std::string opcodeToString() const override { return "81: STA (dp,X)"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1936,7 +1936,7 @@ class STA_81 : public AddressMode::DirectPageIndexedIndirectX<Operator::STA>
 // Stack Relative
 class STA_83 : public AddressMode::StackRelative<Operator::STA>
 {
-    std::string opcodeToString() const override { return "STA sr,S"; }
+    std::string opcodeToString() const override { return "83: STA sr,S"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1945,7 +1945,7 @@ class STA_83 : public AddressMode::StackRelative<Operator::STA>
 // Direct Page
 class STA_85 : public AddressMode::DirectPage<Operator::STA>
 {
-    std::string opcodeToString() const override { return "STA dp"; }
+    std::string opcodeToString() const override { return "85: STA dp"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1954,7 +1954,7 @@ class STA_85 : public AddressMode::DirectPage<Operator::STA>
 // Direct Page Indirect Long
 class STA_87 : public AddressMode::DirectPageIndirectLong<Operator::STA>
 {
-    std::string opcodeToString() const override { return "STA [dp]"; }
+    std::string opcodeToString() const override { return "87: STA [dp]"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1963,7 +1963,7 @@ class STA_87 : public AddressMode::DirectPageIndirectLong<Operator::STA>
 // Absolute
 class STA_8D : public AddressMode::Absolute<Operator::STA>
 {
-    std::string opcodeToString() const override { return "STA addr"; }
+    std::string opcodeToString() const override { return "8D: STA addr"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1972,7 +1972,7 @@ class STA_8D : public AddressMode::Absolute<Operator::STA>
 // Absolute Long
 class STA_8F : public AddressMode::AbsoluteLong<Operator::STA>
 {
-    std::string opcodeToString() const override { return "STA long"; }
+    std::string opcodeToString() const override { return "8F: STA long"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1981,7 +1981,7 @@ class STA_8F : public AddressMode::AbsoluteLong<Operator::STA>
 // Direct Page Indirect Indexed, Y
 class STA_91 : public AddressMode::DirectPageIndirectIndexedY<Operator::STA>
 {
-    std::string opcodeToString() const override { return "STA (dp),Y"; }
+    std::string opcodeToString() const override { return "91: STA (dp),Y"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1990,7 +1990,7 @@ class STA_91 : public AddressMode::DirectPageIndirectIndexedY<Operator::STA>
 // Direct Page Indirect
 class STA_92 : public AddressMode::DirectPageIndirect<Operator::STA>
 {
-    std::string opcodeToString() const override { return "STA (dp)"; }
+    std::string opcodeToString() const override { return "92: STA (dp)"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -1999,7 +1999,7 @@ class STA_92 : public AddressMode::DirectPageIndirect<Operator::STA>
 // Stack Relative Indirect Indexed, Y
 class STA_93 : public AddressMode::StackRelativeIndirectIndexedY<Operator::STA>
 {
-    std::string opcodeToString() const override { return "STA (sr,S),Y"; }
+    std::string opcodeToString() const override { return "93: STA (sr,S),Y"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -2008,7 +2008,7 @@ class STA_93 : public AddressMode::StackRelativeIndirectIndexedY<Operator::STA>
 // Direct Page Indexed, X
 class STA_95 : public AddressMode::DirectPageIndexedX<Operator::STA>
 {
-    std::string opcodeToString() const override { return "STA dp,X"; }
+    std::string opcodeToString() const override { return "95: STA dp,X"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -2017,7 +2017,7 @@ class STA_95 : public AddressMode::DirectPageIndexedX<Operator::STA>
 // Direct Page Indirect Long Indexed, Y
 class STA_97 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::STA>
 {
-    std::string opcodeToString() const override { return "STA [dp],Y"; }
+    std::string opcodeToString() const override { return "97: STA [dp],Y"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -2026,7 +2026,7 @@ class STA_97 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::STA>
 // Absolute Indexed, Y
 class STA_99 : public AddressMode::AbsoluteIndexedY<Operator::STA>
 {
-    std::string opcodeToString() const override { return "STA addr,Y"; }
+    std::string opcodeToString() const override { return "99: STA addr,Y"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -2035,7 +2035,7 @@ class STA_99 : public AddressMode::AbsoluteIndexedY<Operator::STA>
 // Absolute Indexed, X
 class STA_9D : public AddressMode::AbsoluteIndexedX<Operator::STA>
 {
-    std::string opcodeToString() const override { return "STA addr,X"; }
+    std::string opcodeToString() const override { return "9D: STA addr,X"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -2044,7 +2044,7 @@ class STA_9D : public AddressMode::AbsoluteIndexedX<Operator::STA>
 // Absolute Long Indexed, X
 class STA_9F : public AddressMode::AbsoluteLongIndexedX<Operator::STA>
 {
-    std::string opcodeToString() const override { return "STA long,X"; }
+    std::string opcodeToString() const override { return "9F: STA long,X"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -2053,7 +2053,7 @@ class STA_9F : public AddressMode::AbsoluteLongIndexedX<Operator::STA>
 // Implied
 class STP_DB : public AddressMode::Implied<Operator::STP>
 {
-    std::string opcodeToString() const override { return "STP"; }
+    std::string opcodeToString() const override { return "DB: STP"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -2062,7 +2062,7 @@ class STP_DB : public AddressMode::Implied<Operator::STP>
 // Direct Page
 class STX_86 : public AddressMode::DirectPage<Operator::STX>
 {
-    std::string opcodeToString() const override { return "STX dp"; }
+    std::string opcodeToString() const override { return "86: STX dp"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -2071,7 +2071,7 @@ class STX_86 : public AddressMode::DirectPage<Operator::STX>
 // Absolute
 class STX_8E : public AddressMode::Absolute<Operator::STX>
 {
-    std::string opcodeToString() const override { return "STX addr"; }
+    std::string opcodeToString() const override { return "8E: STX addr"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -2080,7 +2080,7 @@ class STX_8E : public AddressMode::Absolute<Operator::STX>
 // Direct Page Indexed, Y
 class STX_96 : public AddressMode::DirectPageIndexedY<Operator::STX>
 {
-    std::string opcodeToString() const override { return "STX dp,Y"; }
+    std::string opcodeToString() const override { return "96: STX dp,Y"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -2089,7 +2089,7 @@ class STX_96 : public AddressMode::DirectPageIndexedY<Operator::STX>
 // Direct Page
 class STY_84 : public AddressMode::DirectPage<Operator::STY>
 {
-    std::string opcodeToString() const override { return "STY dp"; }
+    std::string opcodeToString() const override { return "84: STY dp"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -2098,7 +2098,7 @@ class STY_84 : public AddressMode::DirectPage<Operator::STY>
 // Absolute
 class STY_8C : public AddressMode::Absolute<Operator::STY>
 {
-    std::string opcodeToString() const override { return "STY addr"; }
+    std::string opcodeToString() const override { return "8C: STY addr"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -2107,7 +2107,7 @@ class STY_8C : public AddressMode::Absolute<Operator::STY>
 // Direct Page Indexed, X
 class STY_94 : public AddressMode::DirectPageIndexedX<Operator::STY>
 {
-    std::string opcodeToString() const override { return "STY dp,X"; }
+    std::string opcodeToString() const override { return "94: STY dp,X"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -2116,7 +2116,7 @@ class STY_94 : public AddressMode::DirectPageIndexedX<Operator::STY>
 // Direct Page
 class STZ_64 : public AddressMode::DirectPage<Operator::STZ>
 {
-    std::string opcodeToString() const override { return "STZ dp"; }
+    std::string opcodeToString() const override { return "64: STZ dp"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -2125,7 +2125,7 @@ class STZ_64 : public AddressMode::DirectPage<Operator::STZ>
 // Direct Page Indexed, X
 class STZ_74 : public AddressMode::DirectPageIndexedX<Operator::STZ>
 {
-    std::string opcodeToString() const override { return "STZ dp,X"; }
+    std::string opcodeToString() const override { return "74: STZ dp,X"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -2134,7 +2134,7 @@ class STZ_74 : public AddressMode::DirectPageIndexedX<Operator::STZ>
 // Absolute
 class STZ_9C : public AddressMode::Absolute<Operator::STZ>
 {
-    std::string opcodeToString() const override { return "STZ addr"; }
+    std::string opcodeToString() const override { return "9C: STZ addr"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -2143,7 +2143,7 @@ class STZ_9C : public AddressMode::Absolute<Operator::STZ>
 // Absolute Indexed, X
 class STZ_9E : public AddressMode::AbsoluteIndexedX<Operator::STZ>
 {
-    std::string opcodeToString() const override { return "STZ addr,X"; }
+    std::string opcodeToString() const override { return "9E: STZ addr,X"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -2152,7 +2152,7 @@ class STZ_9E : public AddressMode::AbsoluteIndexedX<Operator::STZ>
 // Implied
 class TAX_AA : public AddressMode::Implied<Operator::TAX>
 {
-    std::string opcodeToString() const override { return "TAX"; }
+    std::string opcodeToString() const override { return "AA: TAX"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -2161,7 +2161,7 @@ class TAX_AA : public AddressMode::Implied<Operator::TAX>
 // Implied
 class TAY_A8 : public AddressMode::Implied<Operator::TAY>
 {
-    std::string opcodeToString() const override { return "TAY"; }
+    std::string opcodeToString() const override { return "A8: TAY"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -2170,7 +2170,7 @@ class TAY_A8 : public AddressMode::Implied<Operator::TAY>
 // Implied
 class TCD_5B : public AddressMode::Implied<Operator::TCD>
 {
-    std::string opcodeToString() const override { return "TCD"; }
+    std::string opcodeToString() const override { return "5B: TCD"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -2179,7 +2179,7 @@ class TCD_5B : public AddressMode::Implied<Operator::TCD>
 // Implied
 class TCS_1B : public AddressMode::Implied<Operator::TCS>
 {
-    std::string opcodeToString() const override { return "TCS"; }
+    std::string opcodeToString() const override { return "1B: TCS"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -2188,7 +2188,7 @@ class TCS_1B : public AddressMode::Implied<Operator::TCS>
 // Implied
 class TDC_7B : public AddressMode::Implied<Operator::TDC>
 {
-    std::string opcodeToString() const override { return "TDC"; }
+    std::string opcodeToString() const override { return "7B: TDC"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -2197,7 +2197,7 @@ class TDC_7B : public AddressMode::Implied<Operator::TDC>
 // Direct Page
 class TRB_14 : public AddressMode::DirectPage<Operator::TRB>
 {
-    std::string opcodeToString() const override { return "TRB dp"; }
+    std::string opcodeToString() const override { return "14: TRB dp"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -2206,7 +2206,7 @@ class TRB_14 : public AddressMode::DirectPage<Operator::TRB>
 // Absolute
 class TRB_1C : public AddressMode::Absolute<Operator::TRB>
 {
-    std::string opcodeToString() const override { return "TRB addr"; }
+    std::string opcodeToString() const override { return "1C: TRB addr"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -2215,7 +2215,7 @@ class TRB_1C : public AddressMode::Absolute<Operator::TRB>
 // Direct Page
 class TSB_04 : public AddressMode::DirectPage<Operator::TSB>
 {
-    std::string opcodeToString() const override { return "TSB dp"; }
+    std::string opcodeToString() const override { return "04: TSB dp"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -2224,7 +2224,7 @@ class TSB_04 : public AddressMode::DirectPage<Operator::TSB>
 // Absolute
 class TSB_0C : public AddressMode::Absolute<Operator::TSB>
 {
-    std::string opcodeToString() const override { return "TSB addr"; }
+    std::string opcodeToString() const override { return "0C: TSB addr"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -2233,7 +2233,7 @@ class TSB_0C : public AddressMode::Absolute<Operator::TSB>
 // Implied
 class TSC_3B : public AddressMode::Implied<Operator::TSC>
 {
-    std::string opcodeToString() const override { return "TSC"; }
+    std::string opcodeToString() const override { return "3B: TSC"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -2242,7 +2242,7 @@ class TSC_3B : public AddressMode::Implied<Operator::TSC>
 // Implied
 class TSX_BA : public AddressMode::Implied<Operator::TSX>
 {
-    std::string opcodeToString() const override { return "TSX"; }
+    std::string opcodeToString() const override { return "BA: TSX"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -2251,7 +2251,7 @@ class TSX_BA : public AddressMode::Implied<Operator::TSX>
 // Implied
 class TXA_8A : public AddressMode::Implied<Operator::TXA>
 {
-    std::string opcodeToString() const override { return "TXA"; }
+    std::string opcodeToString() const override { return "8A: TXA"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -2260,7 +2260,7 @@ class TXA_8A : public AddressMode::Implied<Operator::TXA>
 // Implied
 class TXS_9A : public AddressMode::Implied<Operator::TXS>
 {
-    std::string opcodeToString() const override { return "TXS"; }
+    std::string opcodeToString() const override { return "9A: TXS"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -2269,7 +2269,7 @@ class TXS_9A : public AddressMode::Implied<Operator::TXS>
 // Implied
 class TXY_9B : public AddressMode::Implied<Operator::TXY>
 {
-    std::string opcodeToString() const override { return "TXY"; }
+    std::string opcodeToString() const override { return "9B: TXY"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -2278,7 +2278,7 @@ class TXY_9B : public AddressMode::Implied<Operator::TXY>
 // Implied
 class TYA_98 : public AddressMode::Implied<Operator::TYA>
 {
-    std::string opcodeToString() const override { return "TYA"; }
+    std::string opcodeToString() const override { return "98: TYA"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -2287,7 +2287,7 @@ class TYA_98 : public AddressMode::Implied<Operator::TYA>
 // Implied
 class TYX_BB : public AddressMode::Implied<Operator::TYX>
 {
-    std::string opcodeToString() const override { return "TYX"; }
+    std::string opcodeToString() const override { return "BB: TYX"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -2296,7 +2296,7 @@ class TYX_BB : public AddressMode::Implied<Operator::TYX>
 // Implied
 class WAI_CB : public AddressMode::Implied<Operator::WAI>
 {
-    std::string opcodeToString() const override { return "WAI"; }
+    std::string opcodeToString() const override { return "CB: WAI"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -2306,7 +2306,7 @@ class WAI_CB : public AddressMode::Implied<Operator::WAI>
 // 16: Byte and cycle counts subject to change in future processors which expand WDM into 2 - byte opcode portions of instructions of varying lengths
 class WDM_42 : public AddressMode::na<Operator::WDM>
 {
-    std::string opcodeToString() const override { return "WDM"; }
+    std::string opcodeToString() const override { return "42: WDM"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -2315,7 +2315,7 @@ class WDM_42 : public AddressMode::na<Operator::WDM>
 // Implied
 class XBA_EB : public AddressMode::Implied<Operator::XBA>
 {
-    std::string opcodeToString() const override { return "XBA"; }
+    std::string opcodeToString() const override { return "EB: XBA"; }
     int calculateCycles(const State& state) const override;
 };
 
@@ -2324,7 +2324,7 @@ class XBA_EB : public AddressMode::Implied<Operator::XBA>
 // Implied
 class XCE_FB : public AddressMode::Implied<Operator::XCE>
 {
-    std::string opcodeToString() const override { return "XCE"; }
+    std::string opcodeToString() const override { return "FB: XCE"; }
     int calculateCycles(const State& state) const override;
 };
 

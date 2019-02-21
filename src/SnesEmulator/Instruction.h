@@ -74,7 +74,12 @@ template<State::Flag Flag>
 std::string InstructionFlagSize<Flag>::operandToString(const State& state) const
 {
     std::ostringstream ss;
-    ss << std::hex << +(state.getFlag(Flag) ? state.readOneByteValue() : state.readTwoByteValue());
+    ss << std::hex;
+    if (state.getFlag(Flag)) {
+        ss << std::setw(2) << std::setfill('0') << state.readOneByteValue();
+    } else {
+        ss << std::setw(4) << std::setfill('0') << state.readTwoByteValue();
+    }
     return ss.str();
 }
 

@@ -160,7 +160,7 @@ void generateOpcodes(const std::vector<Instruction>& instructions)
 
         hOutput << "class " << instruction.classname << " : public AddressMode::" << addressModeClass << std::endl
             << "{" << std::endl
-            << "    std::string opcodeToString() const override { return \"" << instruction.name << "\"; }" << std::endl
+            << "    std::string opcodeToString() const override { return \"" << instruction.code << ": " << instruction.name << "\"; }" << std::endl
             << "    int calculateCycles(const State& state) const override;" << std::endl
             << "};" << std::endl
             << std::endl;

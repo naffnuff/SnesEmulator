@@ -63,7 +63,7 @@ void State::loadRom(const std::string& path)
 
 bool State::tryReadHeader(int offset, std::vector<char> rom)
 {
-    std::cout << "Trying to read header assuming ROM address offset " << std::hex << offset << std::dec << std::endl;
+    std::cout << "Trying to read header assuming ROM address offset " << offset << std::endl;
 
     if ((int)rom.size() < 0x10000 - offset) {
         std::cout << "Rom too small" << std::endl;
@@ -81,7 +81,7 @@ bool State::tryReadHeader(int offset, std::vector<char> rom)
 
     for (int i = 0; i < 7; ++i) {
         if ((uint8_t)rom[0xFFB6 + i - offset] != 0) {
-            std::cout << "Header should have zero at " << std::hex << 0xFFB6 + i << ": " << +(uint8_t)rom[0xFFB6 + i - offset] << std::dec << std::endl;
+            std::cout << "Header should have zero at " << 0xFFB6 + i << ": " << +(uint8_t)rom[0xFFB6 + i - offset] << std::endl;
             //return false;
         }
     }
@@ -108,17 +108,9 @@ bool State::tryReadHeader(int offset, std::vector<char> rom)
         << ", gameTitle=" << gameTitle
         << ", mapMode=" << mapMode
         << ", romSize=" << romSize
-        << ", fixedValue=" << std::hex << fixedValue << std::dec
-        << ", resetAddress=" << std::hex << resetAddress << std::dec
+        << ", fixedValue=" << fixedValue
+        << ", resetAddress=" << resetAddress
         << std::endl;
 
     return true;
-}
-
-std::ostream& operator<<(std::ostream& output, const State& state)
-{
-    return output << std::hex << "pc=" << state.programCounter
-        << ", flags=" << std::bitset<8>(state.flags)
-        << ", e=" << state.emulationMode
-        << std::dec;
 }
