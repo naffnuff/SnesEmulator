@@ -30,6 +30,8 @@ void Emulator::run()
     output << std::hex;
 
     uint32_t inspectedAddress = 0;
+    bool showMemory = true;
+    bool showRegisters = true;
     bool watchMode = false;
     bool stepMode = true;
     std::set<int> breakpoints;
@@ -45,18 +47,23 @@ void Emulator::run()
                 inspectedAddress = state.getProgramAddress();
             }
 
-            output << std::endl << "*" << std::endl;
             output << std::dec << "instructionCount=" << instructionCount << ", cycleCount=" << cycleCount << std::hex << std::endl;
-            output << "Breakpoints:";
-            for (int breakpoint : breakpoints) {
-                output << " " << breakpoint;
+            if (!breakpoints.empty()) {
+                output << "Breakpoints:";
+                for (int breakpoint : breakpoints) {
+                    output << " " << breakpoint;
+                }
+                output << std::endl;
             }
-            output << std::endl;
-            state.printMemoryPage(output, inspectedAddress);
+            if (showMemory) {
+                state.printMemoryPage(output, inspectedAddress);
+            }
+            if (showRegisters) {
+                state.printRegisters(output) << std::endl;
+            }
             output << instruction->opcodeToString() << std::endl;
             output << std::setw(2) << std::setfill('0') << +state.readNextInstruction() << ": ";
             output << instruction->toString(state) << std::endl;
-            state.printRegisters(output) << std::endl;
 
             output << "Command (h for help): ";
 
@@ -68,6 +75,8 @@ void Emulator::run()
                 output << "Step" << std::endl;
             } else if (command == "h") {
                 output << "[return]: execute next instruction" << std::endl
+                    << "s: toggle show register state" << std::endl
+                    << "m: toggle show memory" << std::endl
                     << "n: inspect next memory page" << std::endl
                     << "p: inspect previous memory page" << std::endl
                     << "r: run program" << std::endl
@@ -75,6 +84,10 @@ void Emulator::run()
                     << "w: watch executing program memory" << std::endl
                     << "[hex]: inspect memory page containing address [hex]" << std::endl;
                 std::getchar();
+            } else if (command == "s") {
+                showRegisters = !showRegisters;
+            } else if (command == "m") {
+                showMemory = !showMemory;
             } else if (command == "n") {
                 watchMode = false;
                 inspectedAddress += (1 << 8);

@@ -30,7 +30,7 @@ class Instruction2Byte : public Instruction
 public:
     int execute(State& state) const override;
 protected:
-    virtual int apply(State& state, uint8_t value) const = 0;
+    virtual int apply(State& state, uint8_t operand) const = 0;
     std::string operandToString(const State& state) const override;
 };
 
@@ -39,7 +39,7 @@ class Instruction3Byte : public Instruction
 public:
     int execute(State& state) const override;
 public:
-    virtual int apply(State& state, uint16_t value) const = 0;
+    virtual int apply(State& state, uint16_t operand) const = 0;
     std::string operandToString(const State& state) const override;
 };
 
@@ -48,7 +48,7 @@ class Instruction4Byte : public Instruction
 public:
     int execute(State& state) const override;
 protected:
-    virtual int apply(State& state, uint32_t value) const = 0;
+    virtual int apply(State& state, uint32_t operand) const = 0;
     std::string operandToString(const State& state) const override;
 };
 
@@ -58,16 +58,22 @@ class InstructionFlagSize : public Instruction
 public:
     int execute(State& state) const override;
 protected:
-    virtual int apply(State& state, uint16_t value) const = 0;
+    virtual int apply(State& state, uint16_t operand) const = 0;
     std::string operandToString(const State& state) const override;
-private:
-    uint16_t consumeValue(State& state) const;
 };
 
 template<State::Flag Flag>
 int InstructionFlagSize<Flag>::execute(State& state) const
 {
-    return calculateCycles(state) + apply(state, consumeValue(state));
+    uint16_t operand = 0;
+    if (state.isEmulationMode() || state.getFlag(Flag)) {
+        operand = state.readOneByteValue();
+        state.incrementProgramCounter(2);
+    } else {
+        operand = state.readTwoByteValue();
+        state.incrementProgramCounter(3);
+    }
+    return calculateCycles(state) + apply(state, operand);
 }
 
 template<State::Flag Flag>
@@ -81,18 +87,4 @@ std::string InstructionFlagSize<Flag>::operandToString(const State& state) const
         ss << "Two bytes (variable) " << std::setw(4) << std::setfill('0') << state.readTwoByteValue();
     }
     return ss.str();
-}
-
-template<State::Flag Flag>
-uint16_t InstructionFlagSize<Flag>::consumeValue(State& state) const
-{
-    uint16_t value = 0;
-    if (state.isEmulationMode() || state.getFlag(Flag)) {
-        state.readOneByteValue();
-        state.incrementProgramCounter(2);
-    } else {
-        state.readTwoByteValue();
-        state.incrementProgramCounter(3);
-    }
-    return value;
 }

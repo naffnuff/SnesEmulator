@@ -16,9 +16,9 @@ std::string Instruction1Byte::operandToString(const State& state) const
 
 int Instruction2Byte::execute(State& state) const
 {
-    uint8_t value = state.readOneByteValue();
+    uint8_t operand = state.readOneByteValue();
     state.incrementProgramCounter(2);
-    int cycles = calculateCycles(state) + apply(state, value);
+    int cycles = calculateCycles(state) + apply(state, operand);
     return cycles;
 }
 
@@ -31,9 +31,9 @@ std::string Instruction2Byte::operandToString(const State& state) const
 
 int Instruction3Byte::execute(State& state) const
 {
-    uint16_t value = state.readTwoByteValue();
+    uint16_t operand = state.readTwoByteValue();
     state.incrementProgramCounter(3);
-    int cycles = calculateCycles(state) + apply(state, value);
+    int cycles = calculateCycles(state) + apply(state, operand);
     return cycles;
 }
 
@@ -46,9 +46,9 @@ std::string Instruction3Byte::operandToString(const State& state) const
 
 int Instruction4Byte::execute(State& state) const
 {
-    uint32_t value = state.readThreeByteValue();
+    uint32_t operand = state.readThreeByteValue();
     state.incrementProgramCounter(4);
-    int cycles = calculateCycles(state) + apply(state, value);
+    int cycles = calculateCycles(state) + apply(state, operand);
     return cycles;
 }
 

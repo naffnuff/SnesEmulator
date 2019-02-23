@@ -144,6 +144,11 @@ public:
         return (accumulatorB << 8) + accumulatorA;
     }
 
+    uint16_t getDirectPage() const
+    {
+        return directPage;
+    }
+
 private:
     bool tryReadHeader(int offset, std::vector<char> rom);
 

@@ -12,7 +12,7 @@ template <typename Operator>
 class Absolute : public Instruction3Byte
 {
     std::string toString(const State& state) const override;
-    int apply(State& state, uint16_t value) const override;
+    int apply(State& state, uint16_t operand) const override;
 };
 
 template <typename Operator>
@@ -22,10 +22,11 @@ std::string Absolute<Operator>::toString(const State& state) const
 }
 
 template <typename Operator>
-int Absolute<Operator>::apply(State& state, uint16_t value) const
+int Absolute<Operator>::apply(State& state, uint16_t operand) const
 {
-    int* dataAddress = nullptr;
-    return Operator::operate(state, dataAddress);
+    int cycles = 0;
+    int* data = nullptr;
+    return cycles + Operator::operate(state, data);
 }
 
 // Absolute Indexed Indirect
@@ -33,7 +34,7 @@ template <typename Operator>
 class AbsoluteIndexedIndirect : public Instruction3Byte
 {
     std::string toString(const State& state) const override;
-    int apply(State& state, uint16_t value) const override;
+    int apply(State& state, uint16_t operand) const override;
 };
 
 template <typename Operator>
@@ -43,10 +44,11 @@ std::string AbsoluteIndexedIndirect<Operator>::toString(const State& state) cons
 }
 
 template <typename Operator>
-int AbsoluteIndexedIndirect<Operator>::apply(State& state, uint16_t value) const
+int AbsoluteIndexedIndirect<Operator>::apply(State& state, uint16_t operand) const
 {
-    int* dataAddress = nullptr;
-    return Operator::operate(state, dataAddress);
+    int cycles = 0;
+    int* data = nullptr;
+    return cycles + Operator::operate(state, data);
 }
 
 // Absolute Indexed, X
@@ -54,7 +56,7 @@ template <typename Operator>
 class AbsoluteIndexedX : public Instruction3Byte
 {
     std::string toString(const State& state) const override;
-    int apply(State& state, uint16_t value) const override;
+    int apply(State& state, uint16_t operand) const override;
 };
 
 template <typename Operator>
@@ -64,10 +66,11 @@ std::string AbsoluteIndexedX<Operator>::toString(const State& state) const
 }
 
 template <typename Operator>
-int AbsoluteIndexedX<Operator>::apply(State& state, uint16_t value) const
+int AbsoluteIndexedX<Operator>::apply(State& state, uint16_t operand) const
 {
-    int* dataAddress = nullptr;
-    return Operator::operate(state, dataAddress);
+    int cycles = 0;
+    int* data = nullptr;
+    return cycles + Operator::operate(state, data);
 }
 
 // Absolute Indexed, Y
@@ -75,7 +78,7 @@ template <typename Operator>
 class AbsoluteIndexedY : public Instruction3Byte
 {
     std::string toString(const State& state) const override;
-    int apply(State& state, uint16_t value) const override;
+    int apply(State& state, uint16_t operand) const override;
 };
 
 template <typename Operator>
@@ -85,10 +88,11 @@ std::string AbsoluteIndexedY<Operator>::toString(const State& state) const
 }
 
 template <typename Operator>
-int AbsoluteIndexedY<Operator>::apply(State& state, uint16_t value) const
+int AbsoluteIndexedY<Operator>::apply(State& state, uint16_t operand) const
 {
-    int* dataAddress = nullptr;
-    return Operator::operate(state, dataAddress);
+    int cycles = 0;
+    int* data = nullptr;
+    return cycles + Operator::operate(state, data);
 }
 
 // Absolute Indirect
@@ -96,7 +100,7 @@ template <typename Operator>
 class AbsoluteIndirect : public Instruction3Byte
 {
     std::string toString(const State& state) const override;
-    int apply(State& state, uint16_t value) const override;
+    int apply(State& state, uint16_t operand) const override;
 };
 
 template <typename Operator>
@@ -106,10 +110,13 @@ std::string AbsoluteIndirect<Operator>::toString(const State& state) const
 }
 
 template <typename Operator>
-int AbsoluteIndirect<Operator>::apply(State& state, uint16_t value) const
+int AbsoluteIndirect<Operator>::apply(State& state, uint16_t operand) const
 {
-    int* dataAddress = nullptr;
-    return Operator::operate(state, dataAddress);
+    int cycles = 0;
+    // 11: Add 1 cycle if 65C02
+    // 12: 6502: Yields incorrect results if low byte of operand is $FF (i.e., operand is $xxFF)
+    int* data = nullptr;
+    return cycles + Operator::operate(state, data);
 }
 
 // Absolute Indirect Long
@@ -117,7 +124,7 @@ template <typename Operator>
 class AbsoluteIndirectLong : public Instruction3Byte
 {
     std::string toString(const State& state) const override;
-    int apply(State& state, uint16_t value) const override;
+    int apply(State& state, uint16_t operand) const override;
 };
 
 template <typename Operator>
@@ -127,10 +134,11 @@ std::string AbsoluteIndirectLong<Operator>::toString(const State& state) const
 }
 
 template <typename Operator>
-int AbsoluteIndirectLong<Operator>::apply(State& state, uint16_t value) const
+int AbsoluteIndirectLong<Operator>::apply(State& state, uint16_t operand) const
 {
-    int* dataAddress = nullptr;
-    return Operator::operate(state, dataAddress);
+    int cycles = 0;
+    int* data = nullptr;
+    return cycles + Operator::operate(state, data);
 }
 
 // Absolute Long
@@ -138,7 +146,7 @@ template <typename Operator>
 class AbsoluteLong : public Instruction4Byte
 {
     std::string toString(const State& state) const override;
-    int apply(State& state, uint32_t value) const override;
+    int apply(State& state, uint32_t operand) const override;
 };
 
 template <typename Operator>
@@ -148,10 +156,11 @@ std::string AbsoluteLong<Operator>::toString(const State& state) const
 }
 
 template <typename Operator>
-int AbsoluteLong<Operator>::apply(State& state, uint32_t value) const
+int AbsoluteLong<Operator>::apply(State& state, uint32_t operand) const
 {
-    int* dataAddress = nullptr;
-    return Operator::operate(state, dataAddress);
+    int cycles = 0;
+    int* data = nullptr;
+    return cycles + Operator::operate(state, data);
 }
 
 // Absolute Long Indexed, X
@@ -159,7 +168,7 @@ template <typename Operator>
 class AbsoluteLongIndexedX : public Instruction4Byte
 {
     std::string toString(const State& state) const override;
-    int apply(State& state, uint32_t value) const override;
+    int apply(State& state, uint32_t operand) const override;
 };
 
 template <typename Operator>
@@ -169,10 +178,13 @@ std::string AbsoluteLongIndexedX<Operator>::toString(const State& state) const
 }
 
 template <typename Operator>
-int AbsoluteLongIndexedX<Operator>::apply(State& state, uint32_t value) const
+int AbsoluteLongIndexedX<Operator>::apply(State& state, uint32_t operand) const
 {
-    int* dataAddress = nullptr;
-    return Operator::operate(state, dataAddress);
+    int cycles = 0;
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
+    int* data = nullptr;
+    return cycles + Operator::operate(state, data);
 }
 
 // Accumulator
@@ -192,8 +204,9 @@ std::string Accumulator<Operator>::toString(const State& state) const
 template <typename Operator>
 int Accumulator<Operator>::apply(State& state) const
 {
-    int* dataAddress = nullptr;
-    return Operator::operate(state, dataAddress);
+    int cycles = 0;
+    int* data = nullptr;
+    return cycles + Operator::operate(state, data);
 }
 
 // Block Move
@@ -201,7 +214,7 @@ template <typename Operator>
 class BlockMove : public Instruction3Byte
 {
     std::string toString(const State& state) const override;
-    int apply(State& state, uint16_t value) const override;
+    int apply(State& state, uint16_t operand) const override;
 };
 
 template <typename Operator>
@@ -211,10 +224,13 @@ std::string BlockMove<Operator>::toString(const State& state) const
 }
 
 template <typename Operator>
-int BlockMove<Operator>::apply(State& state, uint16_t value) const
+int BlockMove<Operator>::apply(State& state, uint16_t operand) const
 {
-    int* dataAddress = nullptr;
-    return Operator::operate(state, dataAddress);
+    int cycles = 0;
+    // 3: Add 1 cycle if adding index crosses a page boundary
+    cycles += 0 /* TODO03 */;
+    int* data = nullptr;
+    return cycles + Operator::operate(state, data);
 }
 
 // Direct Page
@@ -222,7 +238,7 @@ template <typename Operator>
 class DirectPage : public Instruction2Byte
 {
     std::string toString(const State& state) const override;
-    int apply(State& state, uint8_t value) const override;
+    int apply(State& state, uint8_t operand) const override;
 };
 
 template <typename Operator>
@@ -232,10 +248,13 @@ std::string DirectPage<Operator>::toString(const State& state) const
 }
 
 template <typename Operator>
-int DirectPage<Operator>::apply(State& state, uint8_t value) const
+int DirectPage<Operator>::apply(State& state, uint8_t operand) const
 {
-    int* dataAddress = nullptr;
-    return Operator::operate(state, dataAddress);
+    int cycles = 0;
+    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
+    cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
+    int* data = nullptr;
+    return cycles + Operator::operate(state, data);
 }
 
 // Direct Page Indexed Indirect, X
@@ -243,7 +262,7 @@ template <typename Operator>
 class DirectPageIndexedIndirectX : public Instruction2Byte
 {
     std::string toString(const State& state) const override;
-    int apply(State& state, uint8_t value) const override;
+    int apply(State& state, uint8_t operand) const override;
 };
 
 template <typename Operator>
@@ -253,10 +272,15 @@ std::string DirectPageIndexedIndirectX<Operator>::toString(const State& state) c
 }
 
 template <typename Operator>
-int DirectPageIndexedIndirectX<Operator>::apply(State& state, uint8_t value) const
+int DirectPageIndexedIndirectX<Operator>::apply(State& state, uint8_t operand) const
 {
-    int* dataAddress = nullptr;
-    return Operator::operate(state, dataAddress);
+    int cycles = 0;
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
+    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
+    cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
+    int* data = nullptr;
+    return cycles + Operator::operate(state, data);
 }
 
 // Direct Page Indexed, X
@@ -264,7 +288,7 @@ template <typename Operator>
 class DirectPageIndexedX : public Instruction2Byte
 {
     std::string toString(const State& state) const override;
-    int apply(State& state, uint8_t value) const override;
+    int apply(State& state, uint8_t operand) const override;
 };
 
 template <typename Operator>
@@ -274,10 +298,13 @@ std::string DirectPageIndexedX<Operator>::toString(const State& state) const
 }
 
 template <typename Operator>
-int DirectPageIndexedX<Operator>::apply(State& state, uint8_t value) const
+int DirectPageIndexedX<Operator>::apply(State& state, uint8_t operand) const
 {
-    int* dataAddress = nullptr;
-    return Operator::operate(state, dataAddress);
+    int cycles = 0;
+    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
+    cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
+    int* data = nullptr;
+    return cycles + Operator::operate(state, data);
 }
 
 // Direct Page Indexed, Y
@@ -285,7 +312,7 @@ template <typename Operator>
 class DirectPageIndexedY : public Instruction2Byte
 {
     std::string toString(const State& state) const override;
-    int apply(State& state, uint8_t value) const override;
+    int apply(State& state, uint8_t operand) const override;
 };
 
 template <typename Operator>
@@ -295,10 +322,15 @@ std::string DirectPageIndexedY<Operator>::toString(const State& state) const
 }
 
 template <typename Operator>
-int DirectPageIndexedY<Operator>::apply(State& state, uint8_t value) const
+int DirectPageIndexedY<Operator>::apply(State& state, uint8_t operand) const
 {
-    int* dataAddress = nullptr;
-    return Operator::operate(state, dataAddress);
+    int cycles = 0;
+    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
+    cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
+    // 10: Add 1 cycle if x=0 (16-bit index registers)
+    cycles += state.getFlag(State::x) ? 0 : 1;
+    int* data = nullptr;
+    return cycles + Operator::operate(state, data);
 }
 
 // Direct Page Indirect
@@ -306,7 +338,7 @@ template <typename Operator>
 class DirectPageIndirect : public Instruction2Byte
 {
     std::string toString(const State& state) const override;
-    int apply(State& state, uint8_t value) const override;
+    int apply(State& state, uint8_t operand) const override;
 };
 
 template <typename Operator>
@@ -316,10 +348,15 @@ std::string DirectPageIndirect<Operator>::toString(const State& state) const
 }
 
 template <typename Operator>
-int DirectPageIndirect<Operator>::apply(State& state, uint8_t value) const
+int DirectPageIndirect<Operator>::apply(State& state, uint8_t operand) const
 {
-    int* dataAddress = nullptr;
-    return Operator::operate(state, dataAddress);
+    int cycles = 0;
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
+    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
+    cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
+    int* data = nullptr;
+    return cycles + Operator::operate(state, data);
 }
 
 // Direct Page Indirect Indexed, Y
@@ -327,7 +364,7 @@ template <typename Operator>
 class DirectPageIndirectIndexedY : public Instruction2Byte
 {
     std::string toString(const State& state) const override;
-    int apply(State& state, uint8_t value) const override;
+    int apply(State& state, uint8_t operand) const override;
 };
 
 template <typename Operator>
@@ -337,10 +374,15 @@ std::string DirectPageIndirectIndexedY<Operator>::toString(const State& state) c
 }
 
 template <typename Operator>
-int DirectPageIndirectIndexedY<Operator>::apply(State& state, uint8_t value) const
+int DirectPageIndirectIndexedY<Operator>::apply(State& state, uint8_t operand) const
 {
-    int* dataAddress = nullptr;
-    return Operator::operate(state, dataAddress);
+    int cycles = 0;
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
+    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
+    cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
+    int* data = nullptr;
+    return cycles + Operator::operate(state, data);
 }
 
 // Direct Page Indirect Long
@@ -348,7 +390,7 @@ template <typename Operator>
 class DirectPageIndirectLong : public Instruction2Byte
 {
     std::string toString(const State& state) const override;
-    int apply(State& state, uint8_t value) const override;
+    int apply(State& state, uint8_t operand) const override;
 };
 
 template <typename Operator>
@@ -358,10 +400,15 @@ std::string DirectPageIndirectLong<Operator>::toString(const State& state) const
 }
 
 template <typename Operator>
-int DirectPageIndirectLong<Operator>::apply(State& state, uint8_t value) const
+int DirectPageIndirectLong<Operator>::apply(State& state, uint8_t operand) const
 {
-    int* dataAddress = nullptr;
-    return Operator::operate(state, dataAddress);
+    int cycles = 0;
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
+    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
+    cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
+    int* data = nullptr;
+    return cycles + Operator::operate(state, data);
 }
 
 // Direct Page Indirect Long Indexed, Y
@@ -369,7 +416,7 @@ template <typename Operator>
 class DirectPageIndirectLongIndexedY : public Instruction2Byte
 {
     std::string toString(const State& state) const override;
-    int apply(State& state, uint8_t value) const override;
+    int apply(State& state, uint8_t operand) const override;
 };
 
 template <typename Operator>
@@ -379,10 +426,15 @@ std::string DirectPageIndirectLongIndexedY<Operator>::toString(const State& stat
 }
 
 template <typename Operator>
-int DirectPageIndirectLongIndexedY<Operator>::apply(State& state, uint8_t value) const
+int DirectPageIndirectLongIndexedY<Operator>::apply(State& state, uint8_t operand) const
 {
-    int* dataAddress = nullptr;
-    return Operator::operate(state, dataAddress);
+    int cycles = 0;
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
+    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
+    cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
+    int* data = nullptr;
+    return cycles + Operator::operate(state, data);
 }
 
 // Immediate
@@ -390,7 +442,7 @@ template <typename Operator>
 class Immediate : public Instruction2Byte
 {
     std::string toString(const State& state) const override;
-    int apply(State& state, uint8_t value) const override;
+    int apply(State& state, uint8_t operand) const override;
 };
 
 template <typename Operator>
@@ -400,19 +452,20 @@ std::string Immediate<Operator>::toString(const State& state) const
 }
 
 template <typename Operator>
-int Immediate<Operator>::apply(State& state, uint8_t value) const
+int Immediate<Operator>::apply(State& state, uint8_t operand) const
 {
-    int* dataAddress = nullptr;
-    return Operator::operate(state, dataAddress);
+    int cycles = 0;
+    int* data = nullptr;
+    return cycles + Operator::operate(state, data);
 }
 
 // Immediate
-// 17: Add 1 byte if m = 0 (16 - bit memory / accumulator)
+// 17: Add 1 byte if m=0 (16-bit memory/accumulator)
 template <typename Operator, State::Flag Flag>
 class ImmediateFlagSize : public InstructionFlagSize<Flag>
 {
     std::string toString(const State& state) const override;
-    int apply(State& state, uint16_t value) const override;
+    int apply(State& state, uint16_t operand) const override;
 };
 
 template <typename Operator, State::Flag Flag>
@@ -422,10 +475,11 @@ std::string ImmediateFlagSize<Operator, Flag>::toString(const State& state) cons
 }
 
 template <typename Operator, State::Flag Flag>
-int ImmediateFlagSize<Operator, Flag>::apply(State& state, uint16_t value) const
+int ImmediateFlagSize<Operator, Flag>::apply(State& state, uint16_t operand) const
 {
-    int* dataAddress = nullptr;
-    return Operator::operate(state, dataAddress);
+    int cycles = 0;
+    int* data = nullptr;
+    return cycles + Operator::operate(state, data);
 }
 
 // Implied
@@ -445,7 +499,8 @@ std::string Implied<Operator>::toString(const State& state) const
 template <typename Operator>
 int Implied<Operator>::apply(State& state) const
 {
-    return Operator::operate(state);
+    int cycles = 0;
+    return cycles + Operator::operate(state);
 }
 
 // Program Counter Relative
@@ -453,7 +508,7 @@ template <typename Operator>
 class ProgramCounterRelative : public Instruction2Byte
 {
     std::string toString(const State& state) const override;
-    int apply(State& state, uint8_t value) const override;
+    int apply(State& state, uint8_t operand) const override;
 };
 
 template <typename Operator>
@@ -463,10 +518,13 @@ std::string ProgramCounterRelative<Operator>::toString(const State& state) const
 }
 
 template <typename Operator>
-int ProgramCounterRelative<Operator>::apply(State& state, uint8_t value) const
+int ProgramCounterRelative<Operator>::apply(State& state, uint8_t operand) const
 {
-    int* dataAddress = nullptr;
-    return Operator::operate(state, dataAddress);
+    int cycles = 0;
+    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
+    cycles += 0 /* TODO08 */;
+    int* data = nullptr;
+    return cycles + Operator::operate(state, data);
 }
 
 // Program Counter Relative Long
@@ -474,7 +532,7 @@ template <typename Operator>
 class ProgramCounterRelativeLong : public Instruction3Byte
 {
     std::string toString(const State& state) const override;
-    int apply(State& state, uint16_t value) const override;
+    int apply(State& state, uint16_t operand) const override;
 };
 
 template <typename Operator>
@@ -484,10 +542,11 @@ std::string ProgramCounterRelativeLong<Operator>::toString(const State& state) c
 }
 
 template <typename Operator>
-int ProgramCounterRelativeLong<Operator>::apply(State& state, uint16_t value) const
+int ProgramCounterRelativeLong<Operator>::apply(State& state, uint16_t operand) const
 {
-    int* dataAddress = nullptr;
-    return Operator::operate(state, dataAddress);
+    int cycles = 0;
+    int* data = nullptr;
+    return cycles + Operator::operate(state, data);
 }
 
 // Stack (Absolute)
@@ -495,7 +554,7 @@ template <typename Operator>
 class StackAbsolute : public Instruction3Byte
 {
     std::string toString(const State& state) const override;
-    int apply(State& state, uint16_t value) const override;
+    int apply(State& state, uint16_t operand) const override;
 };
 
 template <typename Operator>
@@ -505,10 +564,11 @@ std::string StackAbsolute<Operator>::toString(const State& state) const
 }
 
 template <typename Operator>
-int StackAbsolute<Operator>::apply(State& state, uint16_t value) const
+int StackAbsolute<Operator>::apply(State& state, uint16_t operand) const
 {
-    int* dataAddress = nullptr;
-    return Operator::operate(state, dataAddress);
+    int cycles = 0;
+    int* data = nullptr;
+    return cycles + Operator::operate(state, data);
 }
 
 // Stack (Direct Page Indirect)
@@ -516,7 +576,7 @@ template <typename Operator>
 class StackDirectPageIndirect : public Instruction2Byte
 {
     std::string toString(const State& state) const override;
-    int apply(State& state, uint8_t value) const override;
+    int apply(State& state, uint8_t operand) const override;
 };
 
 template <typename Operator>
@@ -526,10 +586,13 @@ std::string StackDirectPageIndirect<Operator>::toString(const State& state) cons
 }
 
 template <typename Operator>
-int StackDirectPageIndirect<Operator>::apply(State& state, uint8_t value) const
+int StackDirectPageIndirect<Operator>::apply(State& state, uint8_t operand) const
 {
-    int* dataAddress = nullptr;
-    return Operator::operate(state, dataAddress);
+    int cycles = 0;
+    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
+    cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
+    int* data = nullptr;
+    return cycles + Operator::operate(state, data);
 }
 
 // Stack/Interrupt
@@ -537,7 +600,7 @@ template <typename Operator>
 class StackInterrupt : public Instruction2Byte
 {
     std::string toString(const State& state) const override;
-    int apply(State& state, uint8_t value) const override;
+    int apply(State& state, uint8_t operand) const override;
 };
 
 template <typename Operator>
@@ -547,10 +610,13 @@ std::string StackInterrupt<Operator>::toString(const State& state) const
 }
 
 template <typename Operator>
-int StackInterrupt<Operator>::apply(State& state, uint8_t value) const
+int StackInterrupt<Operator>::apply(State& state, uint8_t operand) const
 {
-    int* dataAddress = nullptr;
-    return Operator::operate(state, dataAddress);
+    int cycles = 0;
+    // 9: Add 1 cycle for 65816 native mode (e=0)
+    cycles += state.isEmulationMode() ? 0 : 1;
+    int* data = nullptr;
+    return cycles + Operator::operate(state, data);
 }
 
 // Stack (Program Counter Relative Long)
@@ -558,7 +624,7 @@ template <typename Operator>
 class StackProgramCounterRelativeLong : public Instruction3Byte
 {
     std::string toString(const State& state) const override;
-    int apply(State& state, uint16_t value) const override;
+    int apply(State& state, uint16_t operand) const override;
 };
 
 template <typename Operator>
@@ -568,10 +634,11 @@ std::string StackProgramCounterRelativeLong<Operator>::toString(const State& sta
 }
 
 template <typename Operator>
-int StackProgramCounterRelativeLong<Operator>::apply(State& state, uint16_t value) const
+int StackProgramCounterRelativeLong<Operator>::apply(State& state, uint16_t operand) const
 {
-    int* dataAddress = nullptr;
-    return Operator::operate(state, dataAddress);
+    int cycles = 0;
+    int* data = nullptr;
+    return cycles + Operator::operate(state, data);
 }
 
 // Stack (Pull)
@@ -591,8 +658,9 @@ std::string StackPull<Operator>::toString(const State& state) const
 template <typename Operator>
 int StackPull<Operator>::apply(State& state) const
 {
-    int* dataAddress = nullptr;
-    return Operator::operate(state, dataAddress);
+    int cycles = 0;
+    int* data = nullptr;
+    return cycles + Operator::operate(state, data);
 }
 
 // Stack (Push)
@@ -612,8 +680,9 @@ std::string StackPush<Operator>::toString(const State& state) const
 template <typename Operator>
 int StackPush<Operator>::apply(State& state) const
 {
-    int* dataAddress = nullptr;
-    return Operator::operate(state, dataAddress);
+    int cycles = 0;
+    int* data = nullptr;
+    return cycles + Operator::operate(state, data);
 }
 
 // Stack (RTI)
@@ -633,8 +702,11 @@ std::string StackRTI<Operator>::toString(const State& state) const
 template <typename Operator>
 int StackRTI<Operator>::apply(State& state) const
 {
-    int* dataAddress = nullptr;
-    return Operator::operate(state, dataAddress);
+    int cycles = 0;
+    // 9: Add 1 cycle for 65816 native mode (e=0)
+    cycles += state.isEmulationMode() ? 0 : 1;
+    int* data = nullptr;
+    return cycles + Operator::operate(state, data);
 }
 
 // Stack (RTL)
@@ -654,8 +726,9 @@ std::string StackRTL<Operator>::toString(const State& state) const
 template <typename Operator>
 int StackRTL<Operator>::apply(State& state) const
 {
-    int* dataAddress = nullptr;
-    return Operator::operate(state, dataAddress);
+    int cycles = 0;
+    int* data = nullptr;
+    return cycles + Operator::operate(state, data);
 }
 
 // Stack (RTS)
@@ -675,8 +748,9 @@ std::string StackRTS<Operator>::toString(const State& state) const
 template <typename Operator>
 int StackRTS<Operator>::apply(State& state) const
 {
-    int* dataAddress = nullptr;
-    return Operator::operate(state, dataAddress);
+    int cycles = 0;
+    int* data = nullptr;
+    return cycles + Operator::operate(state, data);
 }
 
 // Stack Relative
@@ -684,7 +758,7 @@ template <typename Operator>
 class StackRelative : public Instruction2Byte
 {
     std::string toString(const State& state) const override;
-    int apply(State& state, uint8_t value) const override;
+    int apply(State& state, uint8_t operand) const override;
 };
 
 template <typename Operator>
@@ -694,10 +768,13 @@ std::string StackRelative<Operator>::toString(const State& state) const
 }
 
 template <typename Operator>
-int StackRelative<Operator>::apply(State& state, uint8_t value) const
+int StackRelative<Operator>::apply(State& state, uint8_t operand) const
 {
-    int* dataAddress = nullptr;
-    return Operator::operate(state, dataAddress);
+    int cycles = 0;
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
+    int* data = nullptr;
+    return cycles + Operator::operate(state, data);
 }
 
 // Stack Relative Indirect Indexed, Y
@@ -705,7 +782,7 @@ template <typename Operator>
 class StackRelativeIndirectIndexedY : public Instruction2Byte
 {
     std::string toString(const State& state) const override;
-    int apply(State& state, uint8_t value) const override;
+    int apply(State& state, uint8_t operand) const override;
 };
 
 template <typename Operator>
@@ -715,10 +792,13 @@ std::string StackRelativeIndirectIndexedY<Operator>::toString(const State& state
 }
 
 template <typename Operator>
-int StackRelativeIndirectIndexedY<Operator>::apply(State& state, uint8_t value) const
+int StackRelativeIndirectIndexedY<Operator>::apply(State& state, uint8_t operand) const
 {
-    int* dataAddress = nullptr;
-    return Operator::operate(state, dataAddress);
+    int cycles = 0;
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
+    int* data = nullptr;
+    return cycles + Operator::operate(state, data);
 }
 
 // n/a
@@ -726,7 +806,7 @@ template <typename Operator>
 class na : public Instruction2Byte
 {
     std::string toString(const State& state) const override;
-    int apply(State& state, uint8_t value) const override;
+    int apply(State& state, uint8_t operand) const override;
 };
 
 template <typename Operator>
@@ -736,10 +816,11 @@ std::string na<Operator>::toString(const State& state) const
 }
 
 template <typename Operator>
-int na<Operator>::apply(State& state, uint8_t value) const
+int na<Operator>::apply(State& state, uint8_t operand) const
 {
-    int* dataAddress = nullptr;
-    return Operator::operate(state, dataAddress);
+    int cycles = 0;
+    int* data = nullptr;
+    return cycles + Operator::operate(state, data);
 }
 
 }

@@ -48,7 +48,7 @@ class ADC_67 : public AddressMode::DirectPageIndirectLong<Operator::ADC>
 // ADC Add With Carry [Flags affected: n,v,z,c]
 // ADC #const
 // Immediate
-// 17: Add 1 byte if m = 0 (16 - bit memory / accumulator)
+// 17: Add 1 byte if m=0 (16-bit memory/accumulator)
 class ADC_69 : public AddressMode::ImmediateFlagSize<Operator::ADC, State::m>
 {
     std::string opcodeToString() const override { return "69: ADC #const"; }
@@ -184,7 +184,7 @@ class AND_27 : public AddressMode::DirectPageIndirectLong<Operator::AND>
 // AND AND Accumulator With Memory [Flags affected: n,z]
 // AND #const
 // Immediate
-// 17: Add 1 byte if m = 0 (16 - bit memory / accumulator)
+// 17: Add 1 byte if m=0 (16-bit memory/accumulator)
 class AND_29 : public AddressMode::ImmediateFlagSize<Operator::AND, State::m>
 {
     std::string opcodeToString() const override { return "29: AND #const"; }
@@ -392,7 +392,7 @@ class BIT_3C : public AddressMode::AbsoluteIndexedX<Operator::BIT>
 // BIT Test Bits [Flags affected: z (immediate mode) n,v,z (non-immediate modes)]
 // BIT #const
 // Immediate
-// 17: Add 1 byte if m = 0 (16 - bit memory / accumulator)
+// 17: Add 1 byte if m=0 (16-bit memory/accumulator)
 class BIT_89 : public AddressMode::ImmediateFlagSize<Operator::BIT, State::m>
 {
     std::string opcodeToString() const override { return "89: BIT #const"; }
@@ -547,7 +547,7 @@ class CMP_C7 : public AddressMode::DirectPageIndirectLong<Operator::CMP>
 // CMP Compare Accumulator With Memory [Flags affected: n,z,c]
 // CMP #const
 // Immediate
-// 17: Add 1 byte if m = 0 (16 - bit memory / accumulator)
+// 17: Add 1 byte if m=0 (16-bit memory/accumulator)
 class CMP_C9 : public AddressMode::ImmediateFlagSize<Operator::CMP, State::m>
 {
     std::string opcodeToString() const override { return "C9: CMP #const"; }
@@ -657,7 +657,7 @@ class COP_02 : public AddressMode::StackInterrupt<Operator::COP>
 // CPX Compare Index Register X with Memory [Flags affected: n,z,c]
 // CPX #const
 // Immediate
-// 19: Add 1 byte if x = 0 (16 - bit index registers)
+// 19: Add 1 byte if x=0 (16-bit index registers)
 class CPX_E0 : public AddressMode::ImmediateFlagSize<Operator::CPX, State::x>
 {
     std::string opcodeToString() const override { return "E0: CPX #const"; }
@@ -685,7 +685,7 @@ class CPX_EC : public AddressMode::Absolute<Operator::CPX>
 // CPY Compare Index Register Y with Memory [Flags affected: n,z,c]
 // CPY #const
 // Immediate
-// 19: Add 1 byte if x = 0 (16 - bit index registers)
+// 19: Add 1 byte if x=0 (16-bit index registers)
 class CPY_C0 : public AddressMode::ImmediateFlagSize<Operator::CPY, State::x>
 {
     std::string opcodeToString() const override { return "C0: CPY #const"; }
@@ -812,7 +812,7 @@ class EOR_47 : public AddressMode::DirectPageIndirectLong<Operator::EOR>
 // EOR Exclusive-OR Accumulator with Memory [Flags affected: n,z]
 // EOR #const
 // Immediate
-// 17: Add 1 byte if m = 0 (16 - bit memory / accumulator)
+// 17: Add 1 byte if m=0 (16-bit memory/accumulator)
 class EOR_49 : public AddressMode::ImmediateFlagSize<Operator::EOR, State::m>
 {
     std::string opcodeToString() const override { return "49: EOR #const"; }
@@ -1083,7 +1083,7 @@ class LDA_A7 : public AddressMode::DirectPageIndirectLong<Operator::LDA>
 // LDA Load Accumulator from Memory [Flags affected: n,z]
 // LDA #const
 // Immediate
-// 17: Add 1 byte if m = 0 (16 - bit memory / accumulator)
+// 17: Add 1 byte if m=0 (16-bit memory/accumulator)
 class LDA_A9 : public AddressMode::ImmediateFlagSize<Operator::LDA, State::m>
 {
     std::string opcodeToString() const override { return "A9: LDA #const"; }
@@ -1183,7 +1183,7 @@ class LDA_BF : public AddressMode::AbsoluteLongIndexedX<Operator::LDA>
 // LDX Load Index Register X from Memory [Flags affected: n,z]
 // LDX #const
 // Immediate
-// 19: Add 1 byte if x = 0 (16 - bit index registers)
+// 19: Add 1 byte if x=0 (16-bit index registers)
 class LDX_A2 : public AddressMode::ImmediateFlagSize<Operator::LDX, State::x>
 {
     std::string opcodeToString() const override { return "A2: LDX #const"; }
@@ -1229,7 +1229,7 @@ class LDX_BE : public AddressMode::AbsoluteIndexedY<Operator::LDX>
 // LDY Load Index Register Y from Memory [Flags affected: n,z]
 // LDY #const
 // Immediate
-// 19: Add 1 byte if x = 0 (16 - bit index registers)
+// 19: Add 1 byte if x=0 (16-bit index registers)
 class LDY_A0 : public AddressMode::ImmediateFlagSize<Operator::LDY, State::x>
 {
     std::string opcodeToString() const override { return "A0: LDY #const"; }
@@ -1383,7 +1383,7 @@ class ORA_07 : public AddressMode::DirectPageIndirectLong<Operator::ORA>
 // ORA OR Accumulator with Memory [Flags affected: n,z]
 // ORA #const
 // Immediate
-// 17: Add 1 byte if m = 0 (16 - bit memory / accumulator)
+// 17: Add 1 byte if m=0 (16-bit memory/accumulator)
 class ORA_09 : public AddressMode::ImmediateFlagSize<Operator::ORA, State::m>
 {
     std::string opcodeToString() const override { return "09: ORA #const"; }
@@ -1789,7 +1789,7 @@ class SBC_E7 : public AddressMode::DirectPageIndirectLong<Operator::SBC>
 // SBC Subtract with Borrow from Accumulator [Flags affected: n,v,z,c]
 // SBC #const
 // Immediate
-// 17: Add 1 byte if m = 0 (16 - bit memory / accumulator)
+// 17: Add 1 byte if m=0 (16-bit memory/accumulator)
 class SBC_E9 : public AddressMode::ImmediateFlagSize<Operator::SBC, State::m>
 {
     std::string opcodeToString() const override { return "E9: SBC #const"; }
@@ -2303,7 +2303,7 @@ class WAI_CB : public AddressMode::Implied<Operator::WAI>
 // WDM Reserved for Future Expansion [Flags affected: none (subject to change)]
 // WDM
 // n/a
-// 16: Byte and cycle counts subject to change in future processors which expand WDM into 2 - byte opcode portions of instructions of varying lengths
+// 16: Byte and cycle counts subject to change in future processors which expand WDM into 2-byte opcode portions of instructions of varying lengths
 class WDM_42 : public AddressMode::na<Operator::WDM>
 {
     std::string opcodeToString() const override { return "42: WDM"; }

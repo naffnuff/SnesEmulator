@@ -7,10 +7,8 @@ namespace Opcode {
 // Direct Page Indexed Indirect, X
 int ADC_61::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    // 4: Add 1 cycle if 65C02 and d = 1 (65C02 in decimal mode)
-    return 6 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */ /* TODO04 */;
+    int cycles = 6;
+    return cycles;
 }
 
 // ADC Add With Carry [Flags affected: n,v,z,c]
@@ -18,9 +16,8 @@ int ADC_61::calculateCycles(const State& state) const
 // Stack Relative
 int ADC_63::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 4: Add 1 cycle if 65C02 and d = 1 (65C02 in decimal mode)
-    return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO04 */;
+    int cycles = 4;
+    return cycles;
 }
 
 // ADC Add With Carry [Flags affected: n,v,z,c]
@@ -28,10 +25,8 @@ int ADC_63::calculateCycles(const State& state) const
 // Direct Page
 int ADC_65::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    // 4: Add 1 cycle if 65C02 and d = 1 (65C02 in decimal mode)
-    return 3 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */ /* TODO04 */;
+    int cycles = 3;
+    return cycles;
 }
 
 // ADC Add With Carry [Flags affected: n,v,z,c]
@@ -39,21 +34,18 @@ int ADC_65::calculateCycles(const State& state) const
 // Direct Page Indirect Long
 int ADC_67::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    // 4: Add 1 cycle if 65C02 and d = 1 (65C02 in decimal mode)
-    return 6 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */ /* TODO04 */;
+    int cycles = 6;
+    return cycles;
 }
 
 // ADC Add With Carry [Flags affected: n,v,z,c]
 // ADC #const
 // Immediate
-// 17: Add 1 byte if m = 0 (16 - bit memory / accumulator)
+// 17: Add 1 byte if m=0 (16-bit memory/accumulator)
 int ADC_69::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 4: Add 1 cycle if 65C02 and d = 1 (65C02 in decimal mode)
-    return 2 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO04 */;
+    int cycles = 2;
+    return cycles;
 }
 
 // ADC Add With Carry [Flags affected: n,v,z,c]
@@ -61,9 +53,8 @@ int ADC_69::calculateCycles(const State& state) const
 // Absolute
 int ADC_6D::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 4: Add 1 cycle if 65C02 and d = 1 (65C02 in decimal mode)
-    return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO04 */;
+    int cycles = 4;
+    return cycles;
 }
 
 // ADC Add With Carry [Flags affected: n,v,z,c]
@@ -71,9 +62,8 @@ int ADC_6D::calculateCycles(const State& state) const
 // Absolute Long
 int ADC_6F::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 4: Add 1 cycle if 65C02 and d = 1 (65C02 in decimal mode)
-    return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO04 */;
+    int cycles = 5;
+    return cycles;
 }
 
 // ADC Add With Carry [Flags affected: n,v,z,c]
@@ -81,11 +71,10 @@ int ADC_6F::calculateCycles(const State& state) const
 // Direct Page Indirect Indexed, Y
 int ADC_71::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
+    int cycles = 5;
     // 3: Add 1 cycle if adding index crosses a page boundary
-    // 4: Add 1 cycle if 65C02 and d = 1 (65C02 in decimal mode)
-    return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */ /* TODO03 */ /* TODO04 */;
+    cycles += 0 /* TODO03 */;
+    return cycles;
 }
 
 // ADC Add With Carry [Flags affected: n,v,z,c]
@@ -93,10 +82,8 @@ int ADC_71::calculateCycles(const State& state) const
 // Direct Page Indirect
 int ADC_72::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    // 4: Add 1 cycle if 65C02 and d = 1 (65C02 in decimal mode)
-    return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */ /* TODO04 */;
+    int cycles = 5;
+    return cycles;
 }
 
 // ADC Add With Carry [Flags affected: n,v,z,c]
@@ -104,9 +91,8 @@ int ADC_72::calculateCycles(const State& state) const
 // Stack Relative Indirect Indexed, Y
 int ADC_73::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 4: Add 1 cycle if 65C02 and d = 1 (65C02 in decimal mode)
-    return 7 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO04 */;
+    int cycles = 7;
+    return cycles;
 }
 
 // ADC Add With Carry [Flags affected: n,v,z,c]
@@ -114,10 +100,8 @@ int ADC_73::calculateCycles(const State& state) const
 // Direct Page Indexed,X
 int ADC_75::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    // 4: Add 1 cycle if 65C02 and d = 1 (65C02 in decimal mode)
-    return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */ /* TODO04 */;
+    int cycles = 4;
+    return cycles;
 }
 
 // ADC Add With Carry [Flags affected: n,v,z,c]
@@ -125,10 +109,8 @@ int ADC_75::calculateCycles(const State& state) const
 // Direct Page Indirect Long Indexed, Y
 int ADC_77::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    // 4: Add 1 cycle if 65C02 and d = 1 (65C02 in decimal mode)
-    return 6 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */ /* TODO04 */;
+    int cycles = 6;
+    return cycles;
 }
 
 // ADC Add With Carry [Flags affected: n,v,z,c]
@@ -136,10 +118,10 @@ int ADC_77::calculateCycles(const State& state) const
 // Absolute Indexed,Y
 int ADC_79::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
+    int cycles = 4;
     // 3: Add 1 cycle if adding index crosses a page boundary
-    // 4: Add 1 cycle if 65C02 and d = 1 (65C02 in decimal mode)
-    return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO03 */ /* TODO04 */;
+    cycles += 0 /* TODO03 */;
+    return cycles;
 }
 
 // ADC Add With Carry [Flags affected: n,v,z,c]
@@ -147,10 +129,10 @@ int ADC_79::calculateCycles(const State& state) const
 // Absolute Indexed,X
 int ADC_7D::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
+    int cycles = 4;
     // 3: Add 1 cycle if adding index crosses a page boundary
-    // 4: Add 1 cycle if 65C02 and d = 1 (65C02 in decimal mode)
-    return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO03 */ /* TODO04 */;
+    cycles += 0 /* TODO03 */;
+    return cycles;
 }
 
 // ADC Add With Carry [Flags affected: n,v,z,c]
@@ -158,9 +140,8 @@ int ADC_7D::calculateCycles(const State& state) const
 // Absolute Long Indexed, X
 int ADC_7F::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 4: Add 1 cycle if 65C02 and d = 1 (65C02 in decimal mode)
-    return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO04 */;
+    int cycles = 5;
+    return cycles;
 }
 
 // AND AND Accumulator With Memory [Flags affected: n,z]
@@ -168,9 +149,8 @@ int ADC_7F::calculateCycles(const State& state) const
 // Direct Page Indexed Indirect, X
 int AND_21::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    return 6 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */;
+    int cycles = 6;
+    return cycles;
 }
 
 // AND AND Accumulator With Memory [Flags affected: n,z]
@@ -178,8 +158,8 @@ int AND_21::calculateCycles(const State& state) const
 // Stack Relative
 int AND_23::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
+    int cycles = 4;
+    return cycles;
 }
 
 // AND AND Accumulator With Memory [Flags affected: n,z]
@@ -187,9 +167,8 @@ int AND_23::calculateCycles(const State& state) const
 // Direct Page
 int AND_25::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    return 3 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */;
+    int cycles = 3;
+    return cycles;
 }
 
 // AND AND Accumulator With Memory [Flags affected: n,z]
@@ -197,19 +176,18 @@ int AND_25::calculateCycles(const State& state) const
 // Direct Page Indirect Long
 int AND_27::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    return 6 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */;
+    int cycles = 6;
+    return cycles;
 }
 
 // AND AND Accumulator With Memory [Flags affected: n,z]
 // AND #const
 // Immediate
-// 17: Add 1 byte if m = 0 (16 - bit memory / accumulator)
+// 17: Add 1 byte if m=0 (16-bit memory/accumulator)
 int AND_29::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    return 2 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
+    int cycles = 2;
+    return cycles;
 }
 
 // AND AND Accumulator With Memory [Flags affected: n,z]
@@ -217,8 +195,8 @@ int AND_29::calculateCycles(const State& state) const
 // Absolute
 int AND_2D::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
+    int cycles = 4;
+    return cycles;
 }
 
 // AND AND Accumulator With Memory [Flags affected: n,z]
@@ -226,8 +204,8 @@ int AND_2D::calculateCycles(const State& state) const
 // Absolute Long
 int AND_2F::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
+    int cycles = 5;
+    return cycles;
 }
 
 // AND AND Accumulator With Memory [Flags affected: n,z]
@@ -235,10 +213,10 @@ int AND_2F::calculateCycles(const State& state) const
 // Direct Page Indirect Indexed, Y
 int AND_31::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
+    int cycles = 5;
     // 3: Add 1 cycle if adding index crosses a page boundary
-    return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */ /* TODO03 */;
+    cycles += 0 /* TODO03 */;
+    return cycles;
 }
 
 // AND AND Accumulator With Memory [Flags affected: n,z]
@@ -246,9 +224,8 @@ int AND_31::calculateCycles(const State& state) const
 // Direct Page Indirect
 int AND_32::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */;
+    int cycles = 5;
+    return cycles;
 }
 
 // AND AND Accumulator With Memory [Flags affected: n,z]
@@ -256,8 +233,8 @@ int AND_32::calculateCycles(const State& state) const
 // Stack Relative Indirect Indexed, Y
 int AND_33::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    return 7 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
+    int cycles = 7;
+    return cycles;
 }
 
 // AND AND Accumulator With Memory [Flags affected: n,z]
@@ -265,9 +242,8 @@ int AND_33::calculateCycles(const State& state) const
 // Direct Page Indexed, X
 int AND_35::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */;
+    int cycles = 4;
+    return cycles;
 }
 
 // AND AND Accumulator With Memory [Flags affected: n,z]
@@ -275,9 +251,8 @@ int AND_35::calculateCycles(const State& state) const
 // Direct Page Indirect Long Indexed, Y
 int AND_37::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    return 6 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */;
+    int cycles = 6;
+    return cycles;
 }
 
 // AND AND Accumulator With Memory [Flags affected: n,z]
@@ -285,9 +260,10 @@ int AND_37::calculateCycles(const State& state) const
 // Absolute Indexed, Y
 int AND_39::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
+    int cycles = 4;
     // 3: Add 1 cycle if adding index crosses a page boundary
-    return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO03 */;
+    cycles += 0 /* TODO03 */;
+    return cycles;
 }
 
 // AND AND Accumulator With Memory [Flags affected: n,z]
@@ -295,9 +271,10 @@ int AND_39::calculateCycles(const State& state) const
 // Absolute Indexed, X
 int AND_3D::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
+    int cycles = 4;
     // 3: Add 1 cycle if adding index crosses a page boundary
-    return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO03 */;
+    cycles += 0 /* TODO03 */;
+    return cycles;
 }
 
 // AND AND Accumulator With Memory [Flags affected: n,z]
@@ -305,8 +282,8 @@ int AND_3D::calculateCycles(const State& state) const
 // Absolute Long Indexed, X
 int AND_3F::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
+    int cycles = 5;
+    return cycles;
 }
 
 // ASL Accumulator or Memory Shift Left [Flags affected: n,z,c]
@@ -314,9 +291,10 @@ int AND_3F::calculateCycles(const State& state) const
 // Direct Page
 int ASL_06::calculateCycles(const State& state) const
 {
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
-    return 5 /* TODO02 */ + (state.getFlag(State::m) ? 0 : 2) /* TODO05 */;
+    int cycles = 5;
+    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 2;
+    return cycles;
 }
 
 // ASL Accumulator or Memory Shift Left [Flags affected: n,z,c]
@@ -324,7 +302,8 @@ int ASL_06::calculateCycles(const State& state) const
 // Accumulator
 int ASL_0A::calculateCycles(const State& state) const
 {
-    return 2;
+    int cycles = 2;
+    return cycles;
 }
 
 // ASL Accumulator or Memory Shift Left [Flags affected: n,z,c]
@@ -332,8 +311,10 @@ int ASL_0A::calculateCycles(const State& state) const
 // Absolute
 int ASL_0E::calculateCycles(const State& state) const
 {
-    // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
-    return 6 + (state.getFlag(State::m) ? 0 : 2) /* TODO05 */;
+    int cycles = 6;
+    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 2;
+    return cycles;
 }
 
 // ASL Accumulator or Memory Shift Left [Flags affected: n,z,c]
@@ -341,9 +322,10 @@ int ASL_0E::calculateCycles(const State& state) const
 // Direct Page Indexed, X
 int ASL_16::calculateCycles(const State& state) const
 {
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
-    return 6 /* TODO02 */ + (state.getFlag(State::m) ? 0 : 2) /* TODO05 */;
+    int cycles = 6;
+    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 2;
+    return cycles;
 }
 
 // ASL Accumulator or Memory Shift Left [Flags affected: n,z,c]
@@ -351,9 +333,11 @@ int ASL_16::calculateCycles(const State& state) const
 // Absolute Indexed, X
 int ASL_1E::calculateCycles(const State& state) const
 {
-    // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
+    int cycles = 7;
+    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 2;
     // 6: Subtract 1 cycle if 65C02 and no page boundary crossed
-    return 7 + (state.getFlag(State::m) ? 0 : 2) /* TODO05 */ /* TODO06 */;
+    return cycles;
 }
 
 // BCC Branch if Carry Clear [Flags affected: none][Alias: BLT]
@@ -361,9 +345,8 @@ int ASL_1E::calculateCycles(const State& state) const
 // Program Counter Relative
 int BCC_90::calculateCycles(const State& state) const
 {
-    // 7: Add 1 cycle if branch is taken
-    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
-    return 2 /* TODO07 */ /* TODO08 */;
+    int cycles = 2;
+    return cycles;
 }
 
 // BCS Branch if Carry Set [Flags affected: none][Alias: BGE]
@@ -371,9 +354,8 @@ int BCC_90::calculateCycles(const State& state) const
 // Program Counter Relative
 int BCS_B0::calculateCycles(const State& state) const
 {
-    // 7: Add 1 cycle if branch is taken
-    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
-    return 2 /* TODO07 */ /* TODO08 */;
+    int cycles = 2;
+    return cycles;
 }
 
 // BEQ Branch if Equal [Flags affected: none]
@@ -381,9 +363,8 @@ int BCS_B0::calculateCycles(const State& state) const
 // Program Counter Relative
 int BEQ_F0::calculateCycles(const State& state) const
 {
-    // 7: Add 1 cycle if branch is taken
-    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
-    return 2 /* TODO07 */ /* TODO08 */;
+    int cycles = 2;
+    return cycles;
 }
 
 // BIT Test Bits [Flags affected: z (immediate mode) n,v,z (non-immediate modes)]
@@ -391,9 +372,8 @@ int BEQ_F0::calculateCycles(const State& state) const
 // Direct Page
 int BIT_24::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    return 3 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */;
+    int cycles = 3;
+    return cycles;
 }
 
 // BIT Test Bits [Flags affected: z (immediate mode) n,v,z (non-immediate modes)]
@@ -401,8 +381,8 @@ int BIT_24::calculateCycles(const State& state) const
 // Absolute
 int BIT_2C::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
+    int cycles = 4;
+    return cycles;
 }
 
 // BIT Test Bits [Flags affected: z (immediate mode) n,v,z (non-immediate modes)]
@@ -410,9 +390,8 @@ int BIT_2C::calculateCycles(const State& state) const
 // Direct Page Indexed, X
 int BIT_34::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */;
+    int cycles = 4;
+    return cycles;
 }
 
 // BIT Test Bits [Flags affected: z (immediate mode) n,v,z (non-immediate modes)]
@@ -420,19 +399,20 @@ int BIT_34::calculateCycles(const State& state) const
 // Absolute Indexed, X
 int BIT_3C::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
+    int cycles = 4;
     // 3: Add 1 cycle if adding index crosses a page boundary
-    return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO03 */;
+    cycles += 0 /* TODO03 */;
+    return cycles;
 }
 
 // BIT Test Bits [Flags affected: z (immediate mode) n,v,z (non-immediate modes)]
 // BIT #const
 // Immediate
-// 17: Add 1 byte if m = 0 (16 - bit memory / accumulator)
+// 17: Add 1 byte if m=0 (16-bit memory/accumulator)
 int BIT_89::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    return 2 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
+    int cycles = 2;
+    return cycles;
 }
 
 // BMI Branch if Minus [Flags affected: none]
@@ -440,9 +420,8 @@ int BIT_89::calculateCycles(const State& state) const
 // Program Counter Relative
 int BMI_30::calculateCycles(const State& state) const
 {
-    // 7: Add 1 cycle if branch is taken
-    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
-    return 2 /* TODO07 */ /* TODO08 */;
+    int cycles = 2;
+    return cycles;
 }
 
 // BNE Branch if Not Equal [Flags affected: none]
@@ -450,9 +429,8 @@ int BMI_30::calculateCycles(const State& state) const
 // Program Counter Relative
 int BNE_D0::calculateCycles(const State& state) const
 {
-    // 7: Add 1 cycle if branch is taken
-    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
-    return 2 /* TODO07 */ /* TODO08 */;
+    int cycles = 2;
+    return cycles;
 }
 
 // BPL Branch if Plus [Flags affected: none]
@@ -460,9 +438,8 @@ int BNE_D0::calculateCycles(const State& state) const
 // Program Counter Relative
 int BPL_10::calculateCycles(const State& state) const
 {
-    // 7: Add 1 cycle if branch is taken
-    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
-    return 2 /* TODO07 */ /* TODO08 */;
+    int cycles = 2;
+    return cycles;
 }
 
 // BRA Branch Always [Flags affected: none]
@@ -470,8 +447,8 @@ int BPL_10::calculateCycles(const State& state) const
 // Program Counter Relative
 int BRA_80::calculateCycles(const State& state) const
 {
-    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
-    return 3 /* TODO08 */;
+    int cycles = 3;
+    return cycles;
 }
 
 // BRK Break [Flags affected: b,i (6502) b,d,i (65C02/65816 Emulation) d,i (65816 Native)]
@@ -480,8 +457,8 @@ int BRA_80::calculateCycles(const State& state) const
 // 18: Opcode is 1 byte, but program counter value pushed onto stack is incremented by 2 allowing for optional signature byte
 int BRK_00::calculateCycles(const State& state) const
 {
-    // 9: Add 1 cycle for 65816 native mode(e = 0)
-    return 7 + (state.getFlag(State::m) ? 0 : 2) /* TODO09 */;
+    int cycles = 7;
+    return cycles;
 }
 
 // BRL Branch Long Always [Flags affected: none]
@@ -489,7 +466,8 @@ int BRK_00::calculateCycles(const State& state) const
 // Program Counter Relative Long
 int BRL_82::calculateCycles(const State& state) const
 {
-    return 4;
+    int cycles = 4;
+    return cycles;
 }
 
 // BVC Branch if Overflow Clear [Flags affected: none]
@@ -497,9 +475,8 @@ int BRL_82::calculateCycles(const State& state) const
 // Program Counter Relative
 int BVC_50::calculateCycles(const State& state) const
 {
-    // 7: Add 1 cycle if branch is taken
-    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
-    return 2 /* TODO07 */ /* TODO08 */;
+    int cycles = 2;
+    return cycles;
 }
 
 // BVS Branch if Overflow Set [Flags affected: none]
@@ -507,9 +484,8 @@ int BVC_50::calculateCycles(const State& state) const
 // Program Counter Relative
 int BVS_70::calculateCycles(const State& state) const
 {
-    // 7: Add 1 cycle if branch is taken
-    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
-    return 2 /* TODO07 */ /* TODO08 */;
+    int cycles = 2;
+    return cycles;
 }
 
 // CLC Clear Carry [Flags affected: c]
@@ -517,7 +493,8 @@ int BVS_70::calculateCycles(const State& state) const
 // Implied
 int CLC_18::calculateCycles(const State& state) const
 {
-    return 2;
+    int cycles = 2;
+    return cycles;
 }
 
 // CLD Clear Decimal Mode Flag [Flags affected: d]
@@ -525,7 +502,8 @@ int CLC_18::calculateCycles(const State& state) const
 // Implied
 int CLD_D8::calculateCycles(const State& state) const
 {
-    return 2;
+    int cycles = 2;
+    return cycles;
 }
 
 // CLI Clear Interrupt Disable Flag [Flags affected: i]
@@ -533,7 +511,8 @@ int CLD_D8::calculateCycles(const State& state) const
 // Implied
 int CLI_58::calculateCycles(const State& state) const
 {
-    return 2;
+    int cycles = 2;
+    return cycles;
 }
 
 // CLV Clear Overflow Flag [Flags affected: v]
@@ -541,7 +520,8 @@ int CLI_58::calculateCycles(const State& state) const
 // Implied
 int CLV_B8::calculateCycles(const State& state) const
 {
-    return 2;
+    int cycles = 2;
+    return cycles;
 }
 
 // CMP Compare Accumulator With Memory [Flags affected: n,z,c]
@@ -549,9 +529,8 @@ int CLV_B8::calculateCycles(const State& state) const
 // Direct Page Indexed Indirect,X
 int CMP_C1::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    return 6 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */;
+    int cycles = 6;
+    return cycles;
 }
 
 // CMP Compare Accumulator With Memory [Flags affected: n,z,c]
@@ -559,8 +538,8 @@ int CMP_C1::calculateCycles(const State& state) const
 // Stack Relative
 int CMP_C3::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
+    int cycles = 4;
+    return cycles;
 }
 
 // CMP Compare Accumulator With Memory [Flags affected: n,z,c]
@@ -568,9 +547,8 @@ int CMP_C3::calculateCycles(const State& state) const
 // Direct Page
 int CMP_C5::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    return 3 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */;
+    int cycles = 3;
+    return cycles;
 }
 
 // CMP Compare Accumulator With Memory [Flags affected: n,z,c]
@@ -578,19 +556,18 @@ int CMP_C5::calculateCycles(const State& state) const
 // Direct Page Indirect Long
 int CMP_C7::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    return 6 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */;
+    int cycles = 6;
+    return cycles;
 }
 
 // CMP Compare Accumulator With Memory [Flags affected: n,z,c]
 // CMP #const
 // Immediate
-// 17: Add 1 byte if m = 0 (16 - bit memory / accumulator)
+// 17: Add 1 byte if m=0 (16-bit memory/accumulator)
 int CMP_C9::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    return 2 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
+    int cycles = 2;
+    return cycles;
 }
 
 // CMP Compare Accumulator With Memory [Flags affected: n,z,c]
@@ -598,8 +575,8 @@ int CMP_C9::calculateCycles(const State& state) const
 // Absolute
 int CMP_CD::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
+    int cycles = 4;
+    return cycles;
 }
 
 // CMP Compare Accumulator With Memory [Flags affected: n,z,c]
@@ -607,8 +584,8 @@ int CMP_CD::calculateCycles(const State& state) const
 // Absolute Long
 int CMP_CF::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
+    int cycles = 5;
+    return cycles;
 }
 
 // CMP Compare Accumulator With Memory [Flags affected: n,z,c]
@@ -616,10 +593,10 @@ int CMP_CF::calculateCycles(const State& state) const
 // Direct Page Indirect Indexed, Y
 int CMP_D1::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
+    int cycles = 5;
     // 3: Add 1 cycle if adding index crosses a page boundary
-    return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */ /* TODO03 */;
+    cycles += 0 /* TODO03 */;
+    return cycles;
 }
 
 // CMP Compare Accumulator With Memory [Flags affected: n,z,c]
@@ -627,9 +604,8 @@ int CMP_D1::calculateCycles(const State& state) const
 // Direct Page Indirect
 int CMP_D2::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */;
+    int cycles = 5;
+    return cycles;
 }
 
 // CMP Compare Accumulator With Memory [Flags affected: n,z,c]
@@ -637,8 +613,8 @@ int CMP_D2::calculateCycles(const State& state) const
 // Stack Relative Indirect Indexed,Y
 int CMP_D3::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    return 7 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
+    int cycles = 7;
+    return cycles;
 }
 
 // CMP Compare Accumulator With Memory [Flags affected: n,z,c]
@@ -646,9 +622,8 @@ int CMP_D3::calculateCycles(const State& state) const
 // Direct Page Indexed, X
 int CMP_D5::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */;
+    int cycles = 4;
+    return cycles;
 }
 
 // CMP Compare Accumulator With Memory [Flags affected: n,z,c]
@@ -656,9 +631,8 @@ int CMP_D5::calculateCycles(const State& state) const
 // Direct Page Indirect Long Indexed, Y
 int CMP_D7::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    return 6 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */;
+    int cycles = 6;
+    return cycles;
 }
 
 // CMP Compare Accumulator With Memory [Flags affected: n,z,c]
@@ -666,9 +640,10 @@ int CMP_D7::calculateCycles(const State& state) const
 // Absolute Indexed, Y
 int CMP_D9::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
+    int cycles = 4;
     // 3: Add 1 cycle if adding index crosses a page boundary
-    return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO03 */;
+    cycles += 0 /* TODO03 */;
+    return cycles;
 }
 
 // CMP Compare Accumulator With Memory [Flags affected: n,z,c]
@@ -676,9 +651,10 @@ int CMP_D9::calculateCycles(const State& state) const
 // Absolute Indexed, X
 int CMP_DD::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
+    int cycles = 4;
     // 3: Add 1 cycle if adding index crosses a page boundary
-    return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO03 */;
+    cycles += 0 /* TODO03 */;
+    return cycles;
 }
 
 // CMP Compare Accumulator With Memory [Flags affected: n,z,c]
@@ -686,8 +662,8 @@ int CMP_DD::calculateCycles(const State& state) const
 // Absolute Long Indexed, X
 int CMP_DF::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
+    int cycles = 5;
+    return cycles;
 }
 
 // COP Co-Processor Enable [Flags affected: d,i]
@@ -696,18 +672,18 @@ int CMP_DF::calculateCycles(const State& state) const
 // 18: Opcode is 1 byte, but program counter value pushed onto stack is incremented by 2 allowing for optional signature byte
 int COP_02::calculateCycles(const State& state) const
 {
-    // 9: Add 1 cycle for 65816 native mode(e = 0)
-    return 7 + (state.getFlag(State::m) ? 0 : 2) /* TODO09 */;
+    int cycles = 7;
+    return cycles;
 }
 
 // CPX Compare Index Register X with Memory [Flags affected: n,z,c]
 // CPX #const
 // Immediate
-// 19: Add 1 byte if x = 0 (16 - bit index registers)
+// 19: Add 1 byte if x=0 (16-bit index registers)
 int CPX_E0::calculateCycles(const State& state) const
 {
-    // 10: Add 1 cycle if x = 0 (16 - bit index registers)
-    return 2 + (state.getFlag(State::x) ? 0 : 1) /* TODO10 */;
+    int cycles = 2;
+    return cycles;
 }
 
 // CPX Compare Index Register X with Memory [Flags affected: n,z,c]
@@ -715,9 +691,8 @@ int CPX_E0::calculateCycles(const State& state) const
 // Direct Page
 int CPX_E4::calculateCycles(const State& state) const
 {
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    // 10: Add 1 cycle if x = 0 (16 - bit index registers)
-    return 3 /* TODO02 */ + (state.getFlag(State::x) ? 0 : 1) /* TODO10 */;
+    int cycles = 3;
+    return cycles;
 }
 
 // CPX Compare Index Register X with Memory [Flags affected: n,z,c]
@@ -725,18 +700,18 @@ int CPX_E4::calculateCycles(const State& state) const
 // Absolute
 int CPX_EC::calculateCycles(const State& state) const
 {
-    // 10: Add 1 cycle if x = 0 (16 - bit index registers)
-    return 4 + (state.getFlag(State::x) ? 0 : 1) /* TODO10 */;
+    int cycles = 4;
+    return cycles;
 }
 
 // CPY Compare Index Register Y with Memory [Flags affected: n,z,c]
 // CPY #const
 // Immediate
-// 19: Add 1 byte if x = 0 (16 - bit index registers)
+// 19: Add 1 byte if x=0 (16-bit index registers)
 int CPY_C0::calculateCycles(const State& state) const
 {
-    // 10: Add 1 cycle if x = 0 (16 - bit index registers)
-    return 2 + (state.getFlag(State::x) ? 0 : 1) /* TODO10 */;
+    int cycles = 2;
+    return cycles;
 }
 
 // CPY Compare Index Register Y with Memory [Flags affected: n,z,c]
@@ -744,9 +719,8 @@ int CPY_C0::calculateCycles(const State& state) const
 // Direct Page
 int CPY_C4::calculateCycles(const State& state) const
 {
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    // 10: Add 1 cycle if x = 0 (16 - bit index registers)
-    return 3 /* TODO02 */ + (state.getFlag(State::x) ? 0 : 1) /* TODO10 */;
+    int cycles = 3;
+    return cycles;
 }
 
 // CPY Compare Index Register Y with Memory [Flags affected: n,z,c]
@@ -754,8 +728,8 @@ int CPY_C4::calculateCycles(const State& state) const
 // Absolute
 int CPY_CC::calculateCycles(const State& state) const
 {
-    // 10: Add 1 cycle if x = 0 (16 - bit index registers)
-    return 4 + (state.getFlag(State::x) ? 0 : 1) /* TODO10 */;
+    int cycles = 4;
+    return cycles;
 }
 
 // DEC Decrement [Flags affected: n,z]
@@ -763,7 +737,8 @@ int CPY_CC::calculateCycles(const State& state) const
 // Accumulator
 int DEC_3A::calculateCycles(const State& state) const
 {
-    return 2;
+    int cycles = 2;
+    return cycles;
 }
 
 // DEC Decrement [Flags affected: n,z]
@@ -771,9 +746,10 @@ int DEC_3A::calculateCycles(const State& state) const
 // Direct Page
 int DEC_C6::calculateCycles(const State& state) const
 {
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
-    return 5 /* TODO02 */ + (state.getFlag(State::m) ? 0 : 2) /* TODO05 */;
+    int cycles = 5;
+    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 2;
+    return cycles;
 }
 
 // DEC Decrement [Flags affected: n,z]
@@ -781,8 +757,10 @@ int DEC_C6::calculateCycles(const State& state) const
 // Absolute
 int DEC_CE::calculateCycles(const State& state) const
 {
-    // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
-    return 6 + (state.getFlag(State::m) ? 0 : 2) /* TODO05 */;
+    int cycles = 6;
+    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 2;
+    return cycles;
 }
 
 // DEC Decrement [Flags affected: n,z]
@@ -790,9 +768,10 @@ int DEC_CE::calculateCycles(const State& state) const
 // Direct Page Indexed, X
 int DEC_D6::calculateCycles(const State& state) const
 {
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
-    return 6 /* TODO02 */ + (state.getFlag(State::m) ? 0 : 2) /* TODO05 */;
+    int cycles = 6;
+    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 2;
+    return cycles;
 }
 
 // DEC Decrement [Flags affected: n,z]
@@ -800,9 +779,11 @@ int DEC_D6::calculateCycles(const State& state) const
 // Absolute Indexed, X
 int DEC_DE::calculateCycles(const State& state) const
 {
-    // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
+    int cycles = 7;
+    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 2;
     // 6: Subtract 1 cycle if 65C02 and no page boundary crossed
-    return 7 + (state.getFlag(State::m) ? 0 : 2) /* TODO05 */ /* TODO06 */;
+    return cycles;
 }
 
 // DEX Decrement Index Register X [Flags affected: n,z]
@@ -810,7 +791,8 @@ int DEC_DE::calculateCycles(const State& state) const
 // Implied
 int DEX_CA::calculateCycles(const State& state) const
 {
-    return 2;
+    int cycles = 2;
+    return cycles;
 }
 
 // DEY Decrement Index Register Y [Flags affected: n,z]
@@ -818,7 +800,8 @@ int DEX_CA::calculateCycles(const State& state) const
 // Implied
 int DEY_88::calculateCycles(const State& state) const
 {
-    return 2;
+    int cycles = 2;
+    return cycles;
 }
 
 // EOR Exclusive-OR Accumulator with Memory [Flags affected: n,z]
@@ -826,9 +809,8 @@ int DEY_88::calculateCycles(const State& state) const
 // Direct Page Indexed Indirect,X
 int EOR_41::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    return 6 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */;
+    int cycles = 6;
+    return cycles;
 }
 
 // EOR Exclusive-OR Accumulator with Memory [Flags affected: n,z]
@@ -836,8 +818,8 @@ int EOR_41::calculateCycles(const State& state) const
 // Stack Relative
 int EOR_43::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
+    int cycles = 4;
+    return cycles;
 }
 
 // EOR Exclusive-OR Accumulator with Memory [Flags affected: n,z]
@@ -845,9 +827,8 @@ int EOR_43::calculateCycles(const State& state) const
 // Direct Page
 int EOR_45::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    return 3 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */;
+    int cycles = 3;
+    return cycles;
 }
 
 // EOR Exclusive-OR Accumulator with Memory [Flags affected: n,z]
@@ -855,19 +836,18 @@ int EOR_45::calculateCycles(const State& state) const
 // Direct Page Indirect Long
 int EOR_47::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    return 6 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */;
+    int cycles = 6;
+    return cycles;
 }
 
 // EOR Exclusive-OR Accumulator with Memory [Flags affected: n,z]
 // EOR #const
 // Immediate
-// 17: Add 1 byte if m = 0 (16 - bit memory / accumulator)
+// 17: Add 1 byte if m=0 (16-bit memory/accumulator)
 int EOR_49::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    return 2 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
+    int cycles = 2;
+    return cycles;
 }
 
 // EOR Exclusive-OR Accumulator with Memory [Flags affected: n,z]
@@ -875,8 +855,8 @@ int EOR_49::calculateCycles(const State& state) const
 // Absolute
 int EOR_4D::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
+    int cycles = 4;
+    return cycles;
 }
 
 // EOR Exclusive-OR Accumulator with Memory [Flags affected: n,z]
@@ -884,8 +864,8 @@ int EOR_4D::calculateCycles(const State& state) const
 // Absolute Long
 int EOR_4F::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
+    int cycles = 5;
+    return cycles;
 }
 
 // EOR Exclusive-OR Accumulator with Memory [Flags affected: n,z]
@@ -893,10 +873,10 @@ int EOR_4F::calculateCycles(const State& state) const
 // Direct Page Indirect Indexed, Y
 int EOR_51::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
+    int cycles = 5;
     // 3: Add 1 cycle if adding index crosses a page boundary
-    return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */ /* TODO03 */;
+    cycles += 0 /* TODO03 */;
+    return cycles;
 }
 
 // EOR Exclusive-OR Accumulator with Memory [Flags affected: n,z]
@@ -904,9 +884,8 @@ int EOR_51::calculateCycles(const State& state) const
 // Direct Page Indirect
 int EOR_52::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */;
+    int cycles = 5;
+    return cycles;
 }
 
 // EOR Exclusive-OR Accumulator with Memory [Flags affected: n,z]
@@ -914,8 +893,8 @@ int EOR_52::calculateCycles(const State& state) const
 // Stack Relative Indirect Indexed, Y
 int EOR_53::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    return 7 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
+    int cycles = 7;
+    return cycles;
 }
 
 // EOR Exclusive-OR Accumulator with Memory [Flags affected: n,z]
@@ -923,9 +902,8 @@ int EOR_53::calculateCycles(const State& state) const
 // Direct Page Indexed, X
 int EOR_55::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */;
+    int cycles = 4;
+    return cycles;
 }
 
 // EOR Exclusive-OR Accumulator with Memory [Flags affected: n,z]
@@ -933,9 +911,8 @@ int EOR_55::calculateCycles(const State& state) const
 // Direct Page Indirect Long Indexed, Y
 int EOR_57::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    return 6 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */;
+    int cycles = 6;
+    return cycles;
 }
 
 // EOR Exclusive-OR Accumulator with Memory [Flags affected: n,z]
@@ -943,9 +920,10 @@ int EOR_57::calculateCycles(const State& state) const
 // Absolute Indexed, Y
 int EOR_59::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
+    int cycles = 4;
     // 3: Add 1 cycle if adding index crosses a page boundary
-    return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO03 */;
+    cycles += 0 /* TODO03 */;
+    return cycles;
 }
 
 // EOR Exclusive-OR Accumulator with Memory [Flags affected: n,z]
@@ -953,9 +931,10 @@ int EOR_59::calculateCycles(const State& state) const
 // Absolute Indexed, X
 int EOR_5D::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
+    int cycles = 4;
     // 3: Add 1 cycle if adding index crosses a page boundary
-    return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO03 */;
+    cycles += 0 /* TODO03 */;
+    return cycles;
 }
 
 // EOR Exclusive-OR Accumulator with Memory [Flags affected: n,z]
@@ -963,8 +942,8 @@ int EOR_5D::calculateCycles(const State& state) const
 // Absolute Long Indexed,X
 int EOR_5F::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
+    int cycles = 5;
+    return cycles;
 }
 
 // INC Increment [Flags affected: n,z]
@@ -972,7 +951,8 @@ int EOR_5F::calculateCycles(const State& state) const
 // Accumulator
 int INC_1A::calculateCycles(const State& state) const
 {
-    return 2;
+    int cycles = 2;
+    return cycles;
 }
 
 // INC Increment [Flags affected: n,z]
@@ -980,9 +960,10 @@ int INC_1A::calculateCycles(const State& state) const
 // Direct Page
 int INC_E6::calculateCycles(const State& state) const
 {
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
-    return 5 /* TODO02 */ + (state.getFlag(State::m) ? 0 : 2) /* TODO05 */;
+    int cycles = 5;
+    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 2;
+    return cycles;
 }
 
 // INC Increment [Flags affected: n,z]
@@ -990,8 +971,10 @@ int INC_E6::calculateCycles(const State& state) const
 // Absolute
 int INC_EE::calculateCycles(const State& state) const
 {
-    // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
-    return 6 + (state.getFlag(State::m) ? 0 : 2) /* TODO05 */;
+    int cycles = 6;
+    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 2;
+    return cycles;
 }
 
 // INC Increment [Flags affected: n,z]
@@ -999,9 +982,10 @@ int INC_EE::calculateCycles(const State& state) const
 // Direct Page Indexed, X
 int INC_F6::calculateCycles(const State& state) const
 {
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
-    return 6 /* TODO02 */ + (state.getFlag(State::m) ? 0 : 2) /* TODO05 */;
+    int cycles = 6;
+    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 2;
+    return cycles;
 }
 
 // INC Increment [Flags affected: n,z]
@@ -1009,9 +993,11 @@ int INC_F6::calculateCycles(const State& state) const
 // Absolute Indexed, X
 int INC_FE::calculateCycles(const State& state) const
 {
-    // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
+    int cycles = 7;
+    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 2;
     // 6: Subtract 1 cycle if 65C02 and no page boundary crossed
-    return 7 + (state.getFlag(State::m) ? 0 : 2) /* TODO05 */ /* TODO06 */;
+    return cycles;
 }
 
 // INX Increment Index Register X [Flags affected: n,z]
@@ -1019,7 +1005,8 @@ int INC_FE::calculateCycles(const State& state) const
 // Implied
 int INX_E8::calculateCycles(const State& state) const
 {
-    return 2;
+    int cycles = 2;
+    return cycles;
 }
 
 // INY Increment Index Register Y [Flags affected: n,z]
@@ -1027,7 +1014,8 @@ int INX_E8::calculateCycles(const State& state) const
 // Implied
 int INY_C8::calculateCycles(const State& state) const
 {
-    return 2;
+    int cycles = 2;
+    return cycles;
 }
 
 // JMP Jump [Flags affected: none][Alias: JML for all Long addressing modes]
@@ -1035,7 +1023,8 @@ int INY_C8::calculateCycles(const State& state) const
 // Absolute
 int JMP_4C::calculateCycles(const State& state) const
 {
-    return 3;
+    int cycles = 3;
+    return cycles;
 }
 
 // JMP Jump [Flags affected: none][Alias: JML for all Long addressing modes]
@@ -1043,7 +1032,8 @@ int JMP_4C::calculateCycles(const State& state) const
 // Absolute Long
 int JMP_5C::calculateCycles(const State& state) const
 {
-    return 4;
+    int cycles = 4;
+    return cycles;
 }
 
 // JMP Jump [Flags affected: none][Alias: JML for all Long addressing modes]
@@ -1051,9 +1041,8 @@ int JMP_5C::calculateCycles(const State& state) const
 // Absolute Indirect
 int JMP_6C::calculateCycles(const State& state) const
 {
-    // 11: Add 1 cycle if 65C02
-    // 12: 6502: Yields incorrect results if low byte of operand is $FF(i.e., operand is $xxFF)
-    return 5 /* TODO11 */ /* TODO12 */;
+    int cycles = 5;
+    return cycles;
 }
 
 // JMP Jump [Flags affected: none][Alias: JML for all Long addressing modes]
@@ -1061,7 +1050,8 @@ int JMP_6C::calculateCycles(const State& state) const
 // Absolute Indexed Indirect
 int JMP_7C::calculateCycles(const State& state) const
 {
-    return 6;
+    int cycles = 6;
+    return cycles;
 }
 
 // JMP Jump [Flags affected: none][Alias: JML for all Long addressing modes]
@@ -1069,7 +1059,8 @@ int JMP_7C::calculateCycles(const State& state) const
 // Absolute Indirect Long
 int JMP_DC::calculateCycles(const State& state) const
 {
-    return 6;
+    int cycles = 6;
+    return cycles;
 }
 
 // JSR Jump to Subroutine [Flags affected: none][Alias: JSL for Absolute Long]
@@ -1077,7 +1068,8 @@ int JMP_DC::calculateCycles(const State& state) const
 // Absolute
 int JSR_20::calculateCycles(const State& state) const
 {
-    return 6;
+    int cycles = 6;
+    return cycles;
 }
 
 // JSR Jump to Subroutine [Flags affected: none][Alias: JSL for Absolute Long]
@@ -1085,7 +1077,8 @@ int JSR_20::calculateCycles(const State& state) const
 // Absolute Long
 int JSR_22::calculateCycles(const State& state) const
 {
-    return 8;
+    int cycles = 8;
+    return cycles;
 }
 
 // JSR Jump to Subroutine [Flags affected: none][Alias: JSL for Absolute Long]
@@ -1093,7 +1086,8 @@ int JSR_22::calculateCycles(const State& state) const
 // Absolute Indexed Indirect
 int JSR_FC::calculateCycles(const State& state) const
 {
-    return 8;
+    int cycles = 8;
+    return cycles;
 }
 
 // LDA Load Accumulator from Memory [Flags affected: n,z]
@@ -1101,9 +1095,8 @@ int JSR_FC::calculateCycles(const State& state) const
 // Direct Page Indexed Indirect, X
 int LDA_A1::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    return 6 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */;
+    int cycles = 6;
+    return cycles;
 }
 
 // LDA Load Accumulator from Memory [Flags affected: n,z]
@@ -1111,8 +1104,8 @@ int LDA_A1::calculateCycles(const State& state) const
 // Stack Relative
 int LDA_A3::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
+    int cycles = 4;
+    return cycles;
 }
 
 // LDA Load Accumulator from Memory [Flags affected: n,z]
@@ -1120,9 +1113,8 @@ int LDA_A3::calculateCycles(const State& state) const
 // Direct Page
 int LDA_A5::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    return 3 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */;
+    int cycles = 3;
+    return cycles;
 }
 
 // LDA Load Accumulator from Memory [Flags affected: n,z]
@@ -1130,19 +1122,18 @@ int LDA_A5::calculateCycles(const State& state) const
 // Direct Page Indirect Long
 int LDA_A7::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    return 6 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */;
+    int cycles = 6;
+    return cycles;
 }
 
 // LDA Load Accumulator from Memory [Flags affected: n,z]
 // LDA #const
 // Immediate
-// 17: Add 1 byte if m = 0 (16 - bit memory / accumulator)
+// 17: Add 1 byte if m=0 (16-bit memory/accumulator)
 int LDA_A9::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    return 2 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
+    int cycles = 2;
+    return cycles;
 }
 
 // LDA Load Accumulator from Memory [Flags affected: n,z]
@@ -1150,8 +1141,8 @@ int LDA_A9::calculateCycles(const State& state) const
 // Absolute
 int LDA_AD::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
+    int cycles = 4;
+    return cycles;
 }
 
 // LDA Load Accumulator from Memory [Flags affected: n,z]
@@ -1159,8 +1150,8 @@ int LDA_AD::calculateCycles(const State& state) const
 // Absolute Long
 int LDA_AF::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
+    int cycles = 5;
+    return cycles;
 }
 
 // LDA Load Accumulator from Memory [Flags affected: n,z]
@@ -1168,10 +1159,10 @@ int LDA_AF::calculateCycles(const State& state) const
 // Direct Page Indirect Indexed, Y
 int LDA_B1::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
+    int cycles = 5;
     // 3: Add 1 cycle if adding index crosses a page boundary
-    return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */ /* TODO03 */;
+    cycles += 0 /* TODO03 */;
+    return cycles;
 }
 
 // LDA Load Accumulator from Memory [Flags affected: n,z]
@@ -1179,9 +1170,8 @@ int LDA_B1::calculateCycles(const State& state) const
 // Direct Page Indirect
 int LDA_B2::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */;
+    int cycles = 5;
+    return cycles;
 }
 
 // LDA Load Accumulator from Memory [Flags affected: n,z]
@@ -1189,8 +1179,8 @@ int LDA_B2::calculateCycles(const State& state) const
 // Stack Relative Indirect Indexed, Y
 int LDA_B3::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    return 7 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
+    int cycles = 7;
+    return cycles;
 }
 
 // LDA Load Accumulator from Memory [Flags affected: n,z]
@@ -1198,9 +1188,8 @@ int LDA_B3::calculateCycles(const State& state) const
 // Direct Page Indexed, X
 int LDA_B5::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */;
+    int cycles = 4;
+    return cycles;
 }
 
 // LDA Load Accumulator from Memory [Flags affected: n,z]
@@ -1208,9 +1197,8 @@ int LDA_B5::calculateCycles(const State& state) const
 // Direct Page Indirect Long Indexed, Y
 int LDA_B7::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    return 6 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */;
+    int cycles = 6;
+    return cycles;
 }
 
 // LDA Load Accumulator from Memory [Flags affected: n,z]
@@ -1218,9 +1206,10 @@ int LDA_B7::calculateCycles(const State& state) const
 // Absolute Indexed, Y
 int LDA_B9::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
+    int cycles = 4;
     // 3: Add 1 cycle if adding index crosses a page boundary
-    return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO03 */;
+    cycles += 0 /* TODO03 */;
+    return cycles;
 }
 
 // LDA Load Accumulator from Memory [Flags affected: n,z]
@@ -1228,9 +1217,10 @@ int LDA_B9::calculateCycles(const State& state) const
 // Absolute Indexed, X
 int LDA_BD::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
+    int cycles = 4;
     // 3: Add 1 cycle if adding index crosses a page boundary
-    return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO03 */;
+    cycles += 0 /* TODO03 */;
+    return cycles;
 }
 
 // LDA Load Accumulator from Memory [Flags affected: n,z]
@@ -1238,18 +1228,18 @@ int LDA_BD::calculateCycles(const State& state) const
 // Absolute Long Indexed, X
 int LDA_BF::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
+    int cycles = 5;
+    return cycles;
 }
 
 // LDX Load Index Register X from Memory [Flags affected: n,z]
 // LDX #const
 // Immediate
-// 19: Add 1 byte if x = 0 (16 - bit index registers)
+// 19: Add 1 byte if x=0 (16-bit index registers)
 int LDX_A2::calculateCycles(const State& state) const
 {
-    // 10: Add 1 cycle if x = 0 (16 - bit index registers)
-    return 2 + (state.getFlag(State::x) ? 0 : 1) /* TODO10 */;
+    int cycles = 2;
+    return cycles;
 }
 
 // LDX Load Index Register X from Memory [Flags affected: n,z]
@@ -1257,9 +1247,8 @@ int LDX_A2::calculateCycles(const State& state) const
 // Direct Page
 int LDX_A6::calculateCycles(const State& state) const
 {
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    // 10: Add 1 cycle if x = 0 (16 - bit index registers)
-    return 3 /* TODO02 */ + (state.getFlag(State::x) ? 0 : 1) /* TODO10 */;
+    int cycles = 3;
+    return cycles;
 }
 
 // LDX Load Index Register X from Memory [Flags affected: n,z]
@@ -1267,8 +1256,8 @@ int LDX_A6::calculateCycles(const State& state) const
 // Absolute
 int LDX_AE::calculateCycles(const State& state) const
 {
-    // 10: Add 1 cycle if x = 0 (16 - bit index registers)
-    return 4 + (state.getFlag(State::x) ? 0 : 1) /* TODO10 */;
+    int cycles = 4;
+    return cycles;
 }
 
 // LDX Load Index Register X from Memory [Flags affected: n,z]
@@ -1276,9 +1265,8 @@ int LDX_AE::calculateCycles(const State& state) const
 // Direct Page Indexed, Y
 int LDX_B6::calculateCycles(const State& state) const
 {
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    // 10: Add 1 cycle if x = 0 (16 - bit index registers)
-    return 4 /* TODO02 */ + (state.getFlag(State::x) ? 0 : 1) /* TODO10 */;
+    int cycles = 4;
+    return cycles;
 }
 
 // LDX Load Index Register X from Memory [Flags affected: n,z]
@@ -1286,19 +1274,20 @@ int LDX_B6::calculateCycles(const State& state) const
 // Absolute Indexed, Y
 int LDX_BE::calculateCycles(const State& state) const
 {
+    int cycles = 4;
     // 3: Add 1 cycle if adding index crosses a page boundary
-    // 10: Add 1 cycle if x = 0 (16 - bit index registers)
-    return 4 /* TODO03 */ + (state.getFlag(State::x) ? 0 : 1) /* TODO10 */;
+    cycles += 0 /* TODO03 */;
+    return cycles;
 }
 
 // LDY Load Index Register Y from Memory [Flags affected: n,z]
 // LDY #const
 // Immediate
-// 19: Add 1 byte if x = 0 (16 - bit index registers)
+// 19: Add 1 byte if x=0 (16-bit index registers)
 int LDY_A0::calculateCycles(const State& state) const
 {
-    // 10: Add 1 cycle if x = 0 (16 - bit index registers)
-    return 2 + (state.getFlag(State::x) ? 0 : 1) /* TODO10 */;
+    int cycles = 2;
+    return cycles;
 }
 
 // LDY Load Index Register Y from Memory [Flags affected: n,z]
@@ -1306,9 +1295,8 @@ int LDY_A0::calculateCycles(const State& state) const
 // Direct Page
 int LDY_A4::calculateCycles(const State& state) const
 {
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    // 10: Add 1 cycle if x = 0 (16 - bit index registers)
-    return 3 /* TODO02 */ + (state.getFlag(State::x) ? 0 : 1) /* TODO10 */;
+    int cycles = 3;
+    return cycles;
 }
 
 // LDY Load Index Register Y from Memory [Flags affected: n,z]
@@ -1316,8 +1304,8 @@ int LDY_A4::calculateCycles(const State& state) const
 // Absolute
 int LDY_AC::calculateCycles(const State& state) const
 {
-    // 10: Add 1 cycle if x = 0 (16 - bit index registers)
-    return 4 + (state.getFlag(State::x) ? 0 : 1) /* TODO10 */;
+    int cycles = 4;
+    return cycles;
 }
 
 // LDY Load Index Register Y from Memory [Flags affected: n,z]
@@ -1325,9 +1313,8 @@ int LDY_AC::calculateCycles(const State& state) const
 // Direct Page Indexed, X
 int LDY_B4::calculateCycles(const State& state) const
 {
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    // 10: Add 1 cycle if x = 0 (16 - bit index registers)
-    return 4 /* TODO02 */ + (state.getFlag(State::x) ? 0 : 1) /* TODO10 */;
+    int cycles = 4;
+    return cycles;
 }
 
 // LDY Load Index Register Y from Memory [Flags affected: n,z]
@@ -1335,9 +1322,10 @@ int LDY_B4::calculateCycles(const State& state) const
 // Absolute Indexed, X
 int LDY_BC::calculateCycles(const State& state) const
 {
+    int cycles = 4;
     // 3: Add 1 cycle if adding index crosses a page boundary
-    // 10: Add 1 cycle if x = 0 (16 - bit index registers)
-    return 4 /* TODO03 */ + (state.getFlag(State::x) ? 0 : 1) /* TODO10 */;
+    cycles += 0 /* TODO03 */;
+    return cycles;
 }
 
 // LSR Logical Shift Memory or Accumulator Right [Flags affected: n,z,c]
@@ -1345,9 +1333,10 @@ int LDY_BC::calculateCycles(const State& state) const
 // Direct Page
 int LSR_46::calculateCycles(const State& state) const
 {
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
-    return 5 /* TODO02 */ + (state.getFlag(State::m) ? 0 : 2) /* TODO05 */;
+    int cycles = 5;
+    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 2;
+    return cycles;
 }
 
 // LSR Logical Shift Memory or Accumulator Right [Flags affected: n,z,c]
@@ -1355,7 +1344,8 @@ int LSR_46::calculateCycles(const State& state) const
 // Accumulator
 int LSR_4A::calculateCycles(const State& state) const
 {
-    return 2;
+    int cycles = 2;
+    return cycles;
 }
 
 // LSR Logical Shift Memory or Accumulator Right [Flags affected: n,z,c]
@@ -1363,8 +1353,10 @@ int LSR_4A::calculateCycles(const State& state) const
 // Absolute
 int LSR_4E::calculateCycles(const State& state) const
 {
-    // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
-    return 6 + (state.getFlag(State::m) ? 0 : 2) /* TODO05 */;
+    int cycles = 6;
+    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 2;
+    return cycles;
 }
 
 // LSR Logical Shift Memory or Accumulator Right [Flags affected: n,z,c]
@@ -1372,9 +1364,10 @@ int LSR_4E::calculateCycles(const State& state) const
 // Direct Page Indexed, X
 int LSR_56::calculateCycles(const State& state) const
 {
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
-    return 6 /* TODO02 */ + (state.getFlag(State::m) ? 0 : 2) /* TODO05 */;
+    int cycles = 6;
+    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 2;
+    return cycles;
 }
 
 // LSR Logical Shift Memory or Accumulator Right [Flags affected: n,z,c]
@@ -1382,9 +1375,11 @@ int LSR_56::calculateCycles(const State& state) const
 // Absolute Indexed, X
 int LSR_5E::calculateCycles(const State& state) const
 {
-    // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
+    int cycles = 7;
+    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 2;
     // 6: Subtract 1 cycle if 65C02 and no page boundary crossed
-    return 7 + (state.getFlag(State::m) ? 0 : 2) /* TODO05 */ /* TODO06 */;
+    return cycles;
 }
 
 // MVN Block Move Negative [Flags affected: none][Registers: X,Y,C]
@@ -1392,8 +1387,8 @@ int LSR_5E::calculateCycles(const State& state) const
 // Block Move
 int MVN_54::calculateCycles(const State& state) const
 {
-    // 3: Add 1 cycle if adding index crosses a page boundary
-    return 1 /* TODO03 */;
+    int cycles = 1;
+    return cycles;
 }
 
 // MVP Block Move Positive [Flags affected: none][Registers: X,Y,C]
@@ -1401,8 +1396,8 @@ int MVN_54::calculateCycles(const State& state) const
 // Block Move
 int MVN_44::calculateCycles(const State& state) const
 {
-    // 3: Add 1 cycle if adding index crosses a page boundary
-    return 1 /* TODO03 */;
+    int cycles = 1;
+    return cycles;
 }
 
 // NOP No Operation [Flags affected: none]
@@ -1410,7 +1405,8 @@ int MVN_44::calculateCycles(const State& state) const
 // Implied
 int NOP_EA::calculateCycles(const State& state) const
 {
-    return 2;
+    int cycles = 2;
+    return cycles;
 }
 
 // ORA OR Accumulator with Memory [Flags affected: n,z]
@@ -1418,9 +1414,8 @@ int NOP_EA::calculateCycles(const State& state) const
 // Direct Page Indexed Indirect, X
 int ORA_01::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    return 6 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */;
+    int cycles = 6;
+    return cycles;
 }
 
 // ORA OR Accumulator with Memory [Flags affected: n,z]
@@ -1428,8 +1423,8 @@ int ORA_01::calculateCycles(const State& state) const
 // Stack Relative
 int ORA_03::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
+    int cycles = 4;
+    return cycles;
 }
 
 // ORA OR Accumulator with Memory [Flags affected: n,z]
@@ -1437,9 +1432,8 @@ int ORA_03::calculateCycles(const State& state) const
 // Direct Page
 int ORA_05::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    return 3 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */;
+    int cycles = 3;
+    return cycles;
 }
 
 // ORA OR Accumulator with Memory [Flags affected: n,z]
@@ -1447,19 +1441,18 @@ int ORA_05::calculateCycles(const State& state) const
 // Direct Page Indirect Long
 int ORA_07::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    return 6 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */;
+    int cycles = 6;
+    return cycles;
 }
 
 // ORA OR Accumulator with Memory [Flags affected: n,z]
 // ORA #const
 // Immediate
-// 17: Add 1 byte if m = 0 (16 - bit memory / accumulator)
+// 17: Add 1 byte if m=0 (16-bit memory/accumulator)
 int ORA_09::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    return 2 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
+    int cycles = 2;
+    return cycles;
 }
 
 // ORA OR Accumulator with Memory [Flags affected: n,z]
@@ -1467,8 +1460,8 @@ int ORA_09::calculateCycles(const State& state) const
 // Absolute
 int ORA_0D::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
+    int cycles = 4;
+    return cycles;
 }
 
 // ORA OR Accumulator with Memory [Flags affected: n,z]
@@ -1476,8 +1469,8 @@ int ORA_0D::calculateCycles(const State& state) const
 // Absolute Long
 int ORA_0F::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
+    int cycles = 5;
+    return cycles;
 }
 
 // ORA OR Accumulator with Memory [Flags affected: n,z]
@@ -1485,10 +1478,10 @@ int ORA_0F::calculateCycles(const State& state) const
 // Direct Page Indirect Indexed, Y
 int ORA_11::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
+    int cycles = 5;
     // 3: Add 1 cycle if adding index crosses a page boundary
-    return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */ /* TODO03 */;
+    cycles += 0 /* TODO03 */;
+    return cycles;
 }
 
 // ORA OR Accumulator with Memory [Flags affected: n,z]
@@ -1496,9 +1489,8 @@ int ORA_11::calculateCycles(const State& state) const
 // Direct Page Indirect
 int ORA_12::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */;
+    int cycles = 5;
+    return cycles;
 }
 
 // ORA OR Accumulator with Memory [Flags affected: n,z]
@@ -1506,8 +1498,8 @@ int ORA_12::calculateCycles(const State& state) const
 // Stack Relative Indirect Indexed, Y
 int ORA_13::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    return 7 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
+    int cycles = 7;
+    return cycles;
 }
 
 // ORA OR Accumulator with Memory [Flags affected: n,z]
@@ -1515,9 +1507,8 @@ int ORA_13::calculateCycles(const State& state) const
 // Direct Page Indexed, X
 int ORA_15::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */;
+    int cycles = 4;
+    return cycles;
 }
 
 // ORA OR Accumulator with Memory [Flags affected: n,z]
@@ -1525,9 +1516,8 @@ int ORA_15::calculateCycles(const State& state) const
 // Direct Page Indirect Long Indexed, Y
 int ORA_17::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    return 6 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */;
+    int cycles = 6;
+    return cycles;
 }
 
 // ORA OR Accumulator with Memory [Flags affected: n,z]
@@ -1535,9 +1525,10 @@ int ORA_17::calculateCycles(const State& state) const
 // Absolute Indexed, Y
 int ORA_19::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
+    int cycles = 4;
     // 3: Add 1 cycle if adding index crosses a page boundary
-    return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO03 */;
+    cycles += 0 /* TODO03 */;
+    return cycles;
 }
 
 // ORA OR Accumulator with Memory [Flags affected: n,z]
@@ -1545,9 +1536,10 @@ int ORA_19::calculateCycles(const State& state) const
 // Absolute Indexed, X
 int ORA_1D::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
+    int cycles = 4;
     // 3: Add 1 cycle if adding index crosses a page boundary
-    return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO03 */;
+    cycles += 0 /* TODO03 */;
+    return cycles;
 }
 
 // ORA OR Accumulator with Memory [Flags affected: n,z]
@@ -1555,8 +1547,8 @@ int ORA_1D::calculateCycles(const State& state) const
 // Absolute Long Indexed, X
 int ORA_1F::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
+    int cycles = 5;
+    return cycles;
 }
 
 // PEA Push Effective Absolute Address [Flags affected: none]
@@ -1564,7 +1556,8 @@ int ORA_1F::calculateCycles(const State& state) const
 // Stack (Absolute)
 int PEA_F4::calculateCycles(const State& state) const
 {
-    return 5;
+    int cycles = 5;
+    return cycles;
 }
 
 // PEI Push Effective Indirect Address [Flags affected: none]
@@ -1572,8 +1565,8 @@ int PEA_F4::calculateCycles(const State& state) const
 // Stack (Direct Page Indirect)
 int PEI_D4::calculateCycles(const State& state) const
 {
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    return 6 /* TODO02 */;
+    int cycles = 6;
+    return cycles;
 }
 
 // PER Push Effective Program Counter Relative Indirect Address [Flags affected: none]
@@ -1581,7 +1574,8 @@ int PEI_D4::calculateCycles(const State& state) const
 // Stack (Program Counter Relative Long)
 int PER_62::calculateCycles(const State& state) const
 {
-    return 6;
+    int cycles = 6;
+    return cycles;
 }
 
 // PHA Push Accumulator [Flags affected: none]
@@ -1589,8 +1583,8 @@ int PER_62::calculateCycles(const State& state) const
 // Stack (Push)
 int PHA_48::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    return 3 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
+    int cycles = 3;
+    return cycles;
 }
 
 // PHB Push Data Bank Register [Flags affected: none]
@@ -1598,7 +1592,8 @@ int PHA_48::calculateCycles(const State& state) const
 // Stack (Push)
 int PHB_8B::calculateCycles(const State& state) const
 {
-    return 3;
+    int cycles = 3;
+    return cycles;
 }
 
 // PHD Push Direct Page Register [Flags affected: none]
@@ -1606,7 +1601,8 @@ int PHB_8B::calculateCycles(const State& state) const
 // Stack (Push)
 int PHD_0B::calculateCycles(const State& state) const
 {
-    return 4;
+    int cycles = 4;
+    return cycles;
 }
 
 // PHK Push Program Bank Register [Flags affected: none]
@@ -1614,7 +1610,8 @@ int PHD_0B::calculateCycles(const State& state) const
 // Stack (Push)
 int PHK_4B::calculateCycles(const State& state) const
 {
-    return 3;
+    int cycles = 3;
+    return cycles;
 }
 
 // PHP Push Processor Status Register [Flags affected: none]
@@ -1622,7 +1619,8 @@ int PHK_4B::calculateCycles(const State& state) const
 // Stack (Push)
 int PHP_08::calculateCycles(const State& state) const
 {
-    return 3;
+    int cycles = 3;
+    return cycles;
 }
 
 // PHX Push Index Register X [Flags affected: none]
@@ -1630,8 +1628,8 @@ int PHP_08::calculateCycles(const State& state) const
 // Stack (Push)
 int PHX_DA::calculateCycles(const State& state) const
 {
-    // 10: Add 1 cycle if x = 0 (16 - bit index registers)
-    return 3 + (state.getFlag(State::x) ? 0 : 1) /* TODO10 */;
+    int cycles = 3;
+    return cycles;
 }
 
 // PHY Push Index Register Y [Flags affected: none]
@@ -1639,8 +1637,8 @@ int PHX_DA::calculateCycles(const State& state) const
 // Stack (Push)
 int PHY_5A::calculateCycles(const State& state) const
 {
-    // 10: Add 1 cycle if x = 0 (16 - bit index registers)
-    return 3 + (state.getFlag(State::x) ? 0 : 1) /* TODO10 */;
+    int cycles = 3;
+    return cycles;
 }
 
 // PLA Pull Accumulator [Flags affected: n,z]
@@ -1648,8 +1646,8 @@ int PHY_5A::calculateCycles(const State& state) const
 // Stack (Pull)
 int PLA_68::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
+    int cycles = 4;
+    return cycles;
 }
 
 // PLB Pull Data Bank Register [Flags affected: n,z]
@@ -1657,7 +1655,8 @@ int PLA_68::calculateCycles(const State& state) const
 // Stack (Pull)
 int PLB_AB::calculateCycles(const State& state) const
 {
-    return 4;
+    int cycles = 4;
+    return cycles;
 }
 
 // PLD Pull Direct Page Register [Flags affected: n,z]
@@ -1665,7 +1664,8 @@ int PLB_AB::calculateCycles(const State& state) const
 // Stack (Pull)
 int PLD_2B::calculateCycles(const State& state) const
 {
-    return 5;
+    int cycles = 5;
+    return cycles;
 }
 
 // PLP Pull Processor Status Register [Flags affected: n,z]
@@ -1673,7 +1673,8 @@ int PLD_2B::calculateCycles(const State& state) const
 // Stack (Pull)
 int PLP_28::calculateCycles(const State& state) const
 {
-    return 4;
+    int cycles = 4;
+    return cycles;
 }
 
 // PLX Pull Index Register X [Flags affected: n,z]
@@ -1681,8 +1682,8 @@ int PLP_28::calculateCycles(const State& state) const
 // Stack (Pull)
 int PLX_FA::calculateCycles(const State& state) const
 {
-    // 10: Add 1 cycle if x = 0 (16 - bit index registers)
-    return 4 + (state.getFlag(State::x) ? 0 : 1) /* TODO10 */;
+    int cycles = 4;
+    return cycles;
 }
 
 // PLY Pull Index Register Y [Flags affected: n,z]
@@ -1690,8 +1691,8 @@ int PLX_FA::calculateCycles(const State& state) const
 // Stack (Pull)
 int PLY_7A::calculateCycles(const State& state) const
 {
-    // 10: Add 1 cycle if x = 0 (16 - bit index registers)
-    return 4 + (state.getFlag(State::x) ? 0 : 1) /* TODO10 */;
+    int cycles = 4;
+    return cycles;
 }
 
 // REP Reset Processor Status Bits [Flags affected: all except b per operand]
@@ -1699,7 +1700,8 @@ int PLY_7A::calculateCycles(const State& state) const
 // Immediate
 int REP_C2::calculateCycles(const State& state) const
 {
-    return 3;
+    int cycles = 3;
+    return cycles;
 }
 
 // ROL Rotate Memory or Accumulator Left [Flags affected: n,z,c]
@@ -1707,9 +1709,10 @@ int REP_C2::calculateCycles(const State& state) const
 // Direct Page
 int ROL_26::calculateCycles(const State& state) const
 {
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
-    return 5 /* TODO02 */ + (state.getFlag(State::m) ? 0 : 2) /* TODO05 */;
+    int cycles = 5;
+    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 2;
+    return cycles;
 }
 
 // ROL Rotate Memory or Accumulator Left [Flags affected: n,z,c]
@@ -1717,7 +1720,8 @@ int ROL_26::calculateCycles(const State& state) const
 // Accumulator
 int ROL_2A::calculateCycles(const State& state) const
 {
-    return 2;
+    int cycles = 2;
+    return cycles;
 }
 
 // ROL Rotate Memory or Accumulator Left [Flags affected: n,z,c]
@@ -1725,8 +1729,10 @@ int ROL_2A::calculateCycles(const State& state) const
 // Absolute
 int ROL_2E::calculateCycles(const State& state) const
 {
-    // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
-    return 6 + (state.getFlag(State::m) ? 0 : 2) /* TODO05 */;
+    int cycles = 6;
+    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 2;
+    return cycles;
 }
 
 // ROL Rotate Memory or Accumulator Left [Flags affected: n,z,c]
@@ -1734,9 +1740,10 @@ int ROL_2E::calculateCycles(const State& state) const
 // Direct Page Indexed, X
 int ROL_36::calculateCycles(const State& state) const
 {
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
-    return 6 /* TODO02 */ + (state.getFlag(State::m) ? 0 : 2) /* TODO05 */;
+    int cycles = 6;
+    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 2;
+    return cycles;
 }
 
 // ROL Rotate Memory or Accumulator Left [Flags affected: n,z,c]
@@ -1744,9 +1751,11 @@ int ROL_36::calculateCycles(const State& state) const
 // Absolute Indexed, X
 int ROL_3E::calculateCycles(const State& state) const
 {
-    // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
+    int cycles = 7;
+    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 2;
     // 6: Subtract 1 cycle if 65C02 and no page boundary crossed
-    return 7 + (state.getFlag(State::m) ? 0 : 2) /* TODO05 */ /* TODO06 */;
+    return cycles;
 }
 
 // ROR Rotate Memory or Accumulator Right [Flags affected: n,z,c]
@@ -1754,9 +1763,10 @@ int ROL_3E::calculateCycles(const State& state) const
 // Direct Page
 int ROR_66::calculateCycles(const State& state) const
 {
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
-    return 5 /* TODO02 */ + (state.getFlag(State::m) ? 0 : 2) /* TODO05 */;
+    int cycles = 5;
+    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 2;
+    return cycles;
 }
 
 // ROR Rotate Memory or Accumulator Right [Flags affected: n,z,c]
@@ -1764,7 +1774,8 @@ int ROR_66::calculateCycles(const State& state) const
 // Accumulator
 int ROR_6A::calculateCycles(const State& state) const
 {
-    return 2;
+    int cycles = 2;
+    return cycles;
 }
 
 // ROR Rotate Memory or Accumulator Right [Flags affected: n,z,c]
@@ -1772,8 +1783,10 @@ int ROR_6A::calculateCycles(const State& state) const
 // Absolute
 int ROR_6E::calculateCycles(const State& state) const
 {
-    // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
-    return 6 + (state.getFlag(State::m) ? 0 : 2) /* TODO05 */;
+    int cycles = 6;
+    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 2;
+    return cycles;
 }
 
 // ROR Rotate Memory or Accumulator Right [Flags affected: n,z,c]
@@ -1781,9 +1794,10 @@ int ROR_6E::calculateCycles(const State& state) const
 // Direct Page Indexed, X
 int ROR_76::calculateCycles(const State& state) const
 {
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
-    return 6 /* TODO02 */ + (state.getFlag(State::m) ? 0 : 2) /* TODO05 */;
+    int cycles = 6;
+    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 2;
+    return cycles;
 }
 
 // ROR Rotate Memory or Accumulator Right [Flags affected: n,z,c]
@@ -1791,9 +1805,11 @@ int ROR_76::calculateCycles(const State& state) const
 // Absolute Indexed, X
 int ROR_7E::calculateCycles(const State& state) const
 {
-    // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
+    int cycles = 7;
+    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 2;
     // 6: Subtract 1 cycle if 65C02 and no page boundary crossed
-    return 7 + (state.getFlag(State::m) ? 0 : 2) /* TODO05 */ /* TODO06 */;
+    return cycles;
 }
 
 // RTI Return from Interrupt [Flags affected: all except b]
@@ -1801,8 +1817,8 @@ int ROR_7E::calculateCycles(const State& state) const
 // Stack (RTI)
 int RTI_40::calculateCycles(const State& state) const
 {
-    // 9: Add 1 cycle for 65816 native mode(e = 0)
-    return 6 + (state.getFlag(State::m) ? 0 : 2) /* TODO09 */;
+    int cycles = 6;
+    return cycles;
 }
 
 // RTL Return from Subroutine Long [Flags affected: none]
@@ -1810,7 +1826,8 @@ int RTI_40::calculateCycles(const State& state) const
 // Stack (RTL)
 int RTL_6B::calculateCycles(const State& state) const
 {
-    return 6;
+    int cycles = 6;
+    return cycles;
 }
 
 // RTS Return from Subroutine [Flags affected: none]
@@ -1818,7 +1835,8 @@ int RTL_6B::calculateCycles(const State& state) const
 // Stack (RTS)
 int RTS_60::calculateCycles(const State& state) const
 {
-    return 6;
+    int cycles = 6;
+    return cycles;
 }
 
 // SBC Subtract with Borrow from Accumulator [Flags affected: n,v,z,c]
@@ -1826,10 +1844,8 @@ int RTS_60::calculateCycles(const State& state) const
 // Direct Page Indexed Indirect, X
 int SBC_E1::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    // 4: Add 1 cycle if 65C02 and d = 1 (65C02 in decimal mode)
-    return 6 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */ /* TODO04 */;
+    int cycles = 6;
+    return cycles;
 }
 
 // SBC Subtract with Borrow from Accumulator [Flags affected: n,v,z,c]
@@ -1837,9 +1853,8 @@ int SBC_E1::calculateCycles(const State& state) const
 // Stack Relative
 int SBC_E3::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 4: Add 1 cycle if 65C02 and d = 1 (65C02 in decimal mode)
-    return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO04 */;
+    int cycles = 4;
+    return cycles;
 }
 
 // SBC Subtract with Borrow from Accumulator [Flags affected: n,v,z,c]
@@ -1847,10 +1862,8 @@ int SBC_E3::calculateCycles(const State& state) const
 // Direct Page
 int SBC_E5::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    // 4: Add 1 cycle if 65C02 and d = 1 (65C02 in decimal mode)
-    return 3 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */ /* TODO04 */;
+    int cycles = 3;
+    return cycles;
 }
 
 // SBC Subtract with Borrow from Accumulator [Flags affected: n,v,z,c]
@@ -1858,21 +1871,18 @@ int SBC_E5::calculateCycles(const State& state) const
 // Direct Page Indirect Long
 int SBC_E7::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    // 4: Add 1 cycle if 65C02 and d = 1 (65C02 in decimal mode)
-    return 6 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */ /* TODO04 */;
+    int cycles = 6;
+    return cycles;
 }
 
 // SBC Subtract with Borrow from Accumulator [Flags affected: n,v,z,c]
 // SBC #const
 // Immediate
-// 17: Add 1 byte if m = 0 (16 - bit memory / accumulator)
+// 17: Add 1 byte if m=0 (16-bit memory/accumulator)
 int SBC_E9::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 4: Add 1 cycle if 65C02 and d = 1 (65C02 in decimal mode)
-    return 2 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO04 */;
+    int cycles = 2;
+    return cycles;
 }
 
 // SBC Subtract with Borrow from Accumulator [Flags affected: n,v,z,c]
@@ -1880,9 +1890,8 @@ int SBC_E9::calculateCycles(const State& state) const
 // Absolute
 int SBC_ED::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 4: Add 1 cycle if 65C02 and d = 1 (65C02 in decimal mode)
-    return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO04 */;
+    int cycles = 4;
+    return cycles;
 }
 
 // SBC Subtract with Borrow from Accumulator [Flags affected: n,v,z,c]
@@ -1890,9 +1899,8 @@ int SBC_ED::calculateCycles(const State& state) const
 // Absolute Long
 int SBC_EF::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 4: Add 1 cycle if 65C02 and d = 1 (65C02 in decimal mode)
-    return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO04 */;
+    int cycles = 5;
+    return cycles;
 }
 
 // SBC Subtract with Borrow from Accumulator [Flags affected: n,v,z,c]
@@ -1900,11 +1908,10 @@ int SBC_EF::calculateCycles(const State& state) const
 // Direct Page Indirect Indexed, Y
 int SBC_F1::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
+    int cycles = 5;
     // 3: Add 1 cycle if adding index crosses a page boundary
-    // 4: Add 1 cycle if 65C02 and d = 1 (65C02 in decimal mode)
-    return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */ /* TODO03 */ /* TODO04 */;
+    cycles += 0 /* TODO03 */;
+    return cycles;
 }
 
 // SBC Subtract with Borrow from Accumulator [Flags affected: n,v,z,c]
@@ -1912,10 +1919,8 @@ int SBC_F1::calculateCycles(const State& state) const
 // Direct Page Indirect
 int SBC_F2::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    // 4: Add 1 cycle if 65C02 and d = 1 (65C02 in decimal mode)
-    return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */ /* TODO04 */;
+    int cycles = 5;
+    return cycles;
 }
 
 // SBC Subtract with Borrow from Accumulator [Flags affected: n,v,z,c]
@@ -1923,9 +1928,8 @@ int SBC_F2::calculateCycles(const State& state) const
 // Stack Relative Indirect Indexed, Y
 int SBC_F3::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 4: Add 1 cycle if 65C02 and d = 1 (65C02 in decimal mode)
-    return 7 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO04 */;
+    int cycles = 7;
+    return cycles;
 }
 
 // SBC Subtract with Borrow from Accumulator [Flags affected: n,v,z,c]
@@ -1933,10 +1937,8 @@ int SBC_F3::calculateCycles(const State& state) const
 // Direct Page Indexed, X
 int SBC_F5::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    // 4: Add 1 cycle if 65C02 and d = 1 (65C02 in decimal mode)
-    return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */ /* TODO04 */;
+    int cycles = 4;
+    return cycles;
 }
 
 // SBC Subtract with Borrow from Accumulator [Flags affected: n,v,z,c]
@@ -1944,10 +1946,8 @@ int SBC_F5::calculateCycles(const State& state) const
 // Direct Page Indirect Long Indexed, Y
 int SBC_F7::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    // 4: Add 1 cycle if 65C02 and d = 1 (65C02 in decimal mode)
-    return 6 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */ /* TODO04 */;
+    int cycles = 6;
+    return cycles;
 }
 
 // SBC Subtract with Borrow from Accumulator [Flags affected: n,v,z,c]
@@ -1955,10 +1955,10 @@ int SBC_F7::calculateCycles(const State& state) const
 // Absolute Indexed, Y
 int SBC_F9::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
+    int cycles = 4;
     // 3: Add 1 cycle if adding index crosses a page boundary
-    // 4: Add 1 cycle if 65C02 and d = 1 (65C02 in decimal mode)
-    return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO03 */ /* TODO04 */;
+    cycles += 0 /* TODO03 */;
+    return cycles;
 }
 
 // SBC Subtract with Borrow from Accumulator [Flags affected: n,v,z,c]
@@ -1966,10 +1966,10 @@ int SBC_F9::calculateCycles(const State& state) const
 // Absolute Indexed, X
 int SBC_FD::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
+    int cycles = 4;
     // 3: Add 1 cycle if adding index crosses a page boundary
-    // 4: Add 1 cycle if 65C02 and d = 1 (65C02 in decimal mode)
-    return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO03 */ /* TODO04 */;
+    cycles += 0 /* TODO03 */;
+    return cycles;
 }
 
 // SBC Subtract with Borrow from Accumulator [Flags affected: n,v,z,c]
@@ -1977,9 +1977,8 @@ int SBC_FD::calculateCycles(const State& state) const
 // Absolute Long Indexed, X
 int SBC_FF::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 4: Add 1 cycle if 65C02 and d = 1 (65C02 in decimal mode)
-    return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO04 */;
+    int cycles = 5;
+    return cycles;
 }
 
 // SEC Set Carry Flag [Flags affected: c]
@@ -1987,7 +1986,8 @@ int SBC_FF::calculateCycles(const State& state) const
 // Implied
 int SEC_38::calculateCycles(const State& state) const
 {
-    return 2;
+    int cycles = 2;
+    return cycles;
 }
 
 // SED Set Decimal Flag [Flags affected: d]
@@ -1995,7 +1995,8 @@ int SEC_38::calculateCycles(const State& state) const
 // Implied
 int SED_F8::calculateCycles(const State& state) const
 {
-    return 2;
+    int cycles = 2;
+    return cycles;
 }
 
 // SEI Set Interrupt Disable Flag [Flags affected: i]
@@ -2003,7 +2004,8 @@ int SED_F8::calculateCycles(const State& state) const
 // Implied
 int SEI_78::calculateCycles(const State& state) const
 {
-    return 2;
+    int cycles = 2;
+    return cycles;
 }
 
 // SEP Set Processor Status Bits [Flags affected: all except b per operand]
@@ -2011,7 +2013,8 @@ int SEI_78::calculateCycles(const State& state) const
 // Immediate
 int SEP_E2::calculateCycles(const State& state) const
 {
-    return 3;
+    int cycles = 3;
+    return cycles;
 }
 
 // STA Store Accumulator to Memory [Flags affected: none]
@@ -2019,9 +2022,8 @@ int SEP_E2::calculateCycles(const State& state) const
 // Direct Page Indexed Indirect, X
 int STA_81::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    return 6 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */;
+    int cycles = 6;
+    return cycles;
 }
 
 // STA Store Accumulator to Memory [Flags affected: none]
@@ -2029,8 +2031,8 @@ int STA_81::calculateCycles(const State& state) const
 // Stack Relative
 int STA_83::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
+    int cycles = 4;
+    return cycles;
 }
 
 // STA Store Accumulator to Memory [Flags affected: none]
@@ -2038,9 +2040,8 @@ int STA_83::calculateCycles(const State& state) const
 // Direct Page
 int STA_85::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    return 3 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */;
+    int cycles = 3;
+    return cycles;
 }
 
 // STA Store Accumulator to Memory [Flags affected: none]
@@ -2048,9 +2049,8 @@ int STA_85::calculateCycles(const State& state) const
 // Direct Page Indirect Long
 int STA_87::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    return 6 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */;
+    int cycles = 6;
+    return cycles;
 }
 
 // STA Store Accumulator to Memory [Flags affected: none]
@@ -2058,8 +2058,8 @@ int STA_87::calculateCycles(const State& state) const
 // Absolute
 int STA_8D::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
+    int cycles = 4;
+    return cycles;
 }
 
 // STA Store Accumulator to Memory [Flags affected: none]
@@ -2067,8 +2067,8 @@ int STA_8D::calculateCycles(const State& state) const
 // Absolute Long
 int STA_8F::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
+    int cycles = 5;
+    return cycles;
 }
 
 // STA Store Accumulator to Memory [Flags affected: none]
@@ -2076,9 +2076,8 @@ int STA_8F::calculateCycles(const State& state) const
 // Direct Page Indirect Indexed, Y
 int STA_91::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    return 6 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */;
+    int cycles = 6;
+    return cycles;
 }
 
 // STA Store Accumulator to Memory [Flags affected: none]
@@ -2086,9 +2085,8 @@ int STA_91::calculateCycles(const State& state) const
 // Direct Page Indirect
 int STA_92::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */;
+    int cycles = 5;
+    return cycles;
 }
 
 // STA Store Accumulator to Memory [Flags affected: none]
@@ -2096,8 +2094,8 @@ int STA_92::calculateCycles(const State& state) const
 // Stack Relative Indirect Indexed, Y
 int STA_93::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    return 7 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
+    int cycles = 7;
+    return cycles;
 }
 
 // STA Store Accumulator to Memory [Flags affected: none]
@@ -2105,9 +2103,8 @@ int STA_93::calculateCycles(const State& state) const
 // Direct Page Indexed, X
 int STA_95::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */;
+    int cycles = 4;
+    return cycles;
 }
 
 // STA Store Accumulator to Memory [Flags affected: none]
@@ -2115,9 +2112,8 @@ int STA_95::calculateCycles(const State& state) const
 // Direct Page Indirect Long Indexed, Y
 int STA_97::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    return 6 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */;
+    int cycles = 6;
+    return cycles;
 }
 
 // STA Store Accumulator to Memory [Flags affected: none]
@@ -2125,8 +2121,8 @@ int STA_97::calculateCycles(const State& state) const
 // Absolute Indexed, Y
 int STA_99::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
+    int cycles = 5;
+    return cycles;
 }
 
 // STA Store Accumulator to Memory [Flags affected: none]
@@ -2134,8 +2130,8 @@ int STA_99::calculateCycles(const State& state) const
 // Absolute Indexed, X
 int STA_9D::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
+    int cycles = 5;
+    return cycles;
 }
 
 // STA Store Accumulator to Memory [Flags affected: none]
@@ -2143,8 +2139,8 @@ int STA_9D::calculateCycles(const State& state) const
 // Absolute Long Indexed, X
 int STA_9F::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
+    int cycles = 5;
+    return cycles;
 }
 
 // STP Stop Processor [Flags affected: none]
@@ -2152,8 +2148,8 @@ int STA_9F::calculateCycles(const State& state) const
 // Implied
 int STP_DB::calculateCycles(const State& state) const
 {
-    // 14: Uses 3 cycles to shut the processor down : additional cycles are required by reset to restart it
-    return 3 /* TODO14 */;
+    int cycles = 3;
+    return cycles;
 }
 
 // STX Store Index Register X to Memory [Flags affected: none]
@@ -2161,9 +2157,8 @@ int STP_DB::calculateCycles(const State& state) const
 // Direct Page
 int STX_86::calculateCycles(const State& state) const
 {
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    // 10: Add 1 cycle if x = 0 (16 - bit index registers)
-    return 3 /* TODO02 */ + (state.getFlag(State::x) ? 0 : 1) /* TODO10 */;
+    int cycles = 3;
+    return cycles;
 }
 
 // STX Store Index Register X to Memory [Flags affected: none]
@@ -2171,8 +2166,8 @@ int STX_86::calculateCycles(const State& state) const
 // Absolute
 int STX_8E::calculateCycles(const State& state) const
 {
-    // 10: Add 1 cycle if x = 0 (16 - bit index registers)
-    return 4 + (state.getFlag(State::x) ? 0 : 1) /* TODO10 */;
+    int cycles = 4;
+    return cycles;
 }
 
 // STX Store Index Register X to Memory [Flags affected: none]
@@ -2180,9 +2175,8 @@ int STX_8E::calculateCycles(const State& state) const
 // Direct Page Indexed, Y
 int STX_96::calculateCycles(const State& state) const
 {
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    // 10: Add 1 cycle if x = 0 (16 - bit index registers)
-    return 4 /* TODO02 */ + (state.getFlag(State::x) ? 0 : 1) /* TODO10 */;
+    int cycles = 4;
+    return cycles;
 }
 
 // STY Store Index Register Y to Memory [Flags affected: none]
@@ -2190,9 +2184,8 @@ int STX_96::calculateCycles(const State& state) const
 // Direct Page
 int STY_84::calculateCycles(const State& state) const
 {
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    // 10: Add 1 cycle if x = 0 (16 - bit index registers)
-    return 3 /* TODO02 */ + (state.getFlag(State::x) ? 0 : 1) /* TODO10 */;
+    int cycles = 3;
+    return cycles;
 }
 
 // STY Store Index Register Y to Memory [Flags affected: none]
@@ -2200,8 +2193,8 @@ int STY_84::calculateCycles(const State& state) const
 // Absolute
 int STY_8C::calculateCycles(const State& state) const
 {
-    // 10: Add 1 cycle if x = 0 (16 - bit index registers)
-    return 4 + (state.getFlag(State::x) ? 0 : 1) /* TODO10 */;
+    int cycles = 4;
+    return cycles;
 }
 
 // STY Store Index Register Y to Memory [Flags affected: none]
@@ -2209,9 +2202,8 @@ int STY_8C::calculateCycles(const State& state) const
 // Direct Page Indexed, X
 int STY_94::calculateCycles(const State& state) const
 {
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    // 10: Add 1 cycle if x = 0 (16 - bit index registers)
-    return 4 /* TODO02 */ + (state.getFlag(State::x) ? 0 : 1) /* TODO10 */;
+    int cycles = 4;
+    return cycles;
 }
 
 // STZ Store Zero to Memory [Flags affected: none]
@@ -2219,9 +2211,8 @@ int STY_94::calculateCycles(const State& state) const
 // Direct Page
 int STZ_64::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    return 3 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */;
+    int cycles = 3;
+    return cycles;
 }
 
 // STZ Store Zero to Memory [Flags affected: none]
@@ -2229,9 +2220,8 @@ int STZ_64::calculateCycles(const State& state) const
 // Direct Page Indexed, X
 int STZ_74::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/ /* TODO02 */;
+    int cycles = 4;
+    return cycles;
 }
 
 // STZ Store Zero to Memory [Flags affected: none]
@@ -2239,8 +2229,8 @@ int STZ_74::calculateCycles(const State& state) const
 // Absolute
 int STZ_9C::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    return 4 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
+    int cycles = 4;
+    return cycles;
 }
 
 // STZ Store Zero to Memory [Flags affected: none]
@@ -2248,8 +2238,8 @@ int STZ_9C::calculateCycles(const State& state) const
 // Absolute Indexed, X
 int STZ_9E::calculateCycles(const State& state) const
 {
-    // 1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    return 5 + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/;
+    int cycles = 5;
+    return cycles;
 }
 
 // TAX Transfer Accumulator to Index Register X [Flags affected: n,z]
@@ -2257,7 +2247,8 @@ int STZ_9E::calculateCycles(const State& state) const
 // Implied
 int TAX_AA::calculateCycles(const State& state) const
 {
-    return 2;
+    int cycles = 2;
+    return cycles;
 }
 
 // TAY Transfer Accumulator to Index Register Y [Flags affected: n,z]
@@ -2265,7 +2256,8 @@ int TAX_AA::calculateCycles(const State& state) const
 // Implied
 int TAY_A8::calculateCycles(const State& state) const
 {
-    return 2;
+    int cycles = 2;
+    return cycles;
 }
 
 // TCD Transfer 16-bit Accumulator to Direct Page Register [Flags affected: n,z]
@@ -2273,7 +2265,8 @@ int TAY_A8::calculateCycles(const State& state) const
 // Implied
 int TCD_5B::calculateCycles(const State& state) const
 {
-    return 2;
+    int cycles = 2;
+    return cycles;
 }
 
 // TCS Transfer 16-bit Accumulator to Stack Pointer [Flags affected: none]
@@ -2281,7 +2274,8 @@ int TCD_5B::calculateCycles(const State& state) const
 // Implied
 int TCS_1B::calculateCycles(const State& state) const
 {
-    return 2;
+    int cycles = 2;
+    return cycles;
 }
 
 // TDC Transfer Direct Page Register to 16-bit Accumulator [Flags affected: n,z]
@@ -2289,7 +2283,8 @@ int TCS_1B::calculateCycles(const State& state) const
 // Implied
 int TDC_7B::calculateCycles(const State& state) const
 {
-    return 2;
+    int cycles = 2;
+    return cycles;
 }
 
 // TRB Test and Reset Memory Bits Against Accumulator [Flags affected: z]
@@ -2297,9 +2292,10 @@ int TDC_7B::calculateCycles(const State& state) const
 // Direct Page
 int TRB_14::calculateCycles(const State& state) const
 {
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
-    return 5 /* TODO02 */ + (state.getFlag(State::m) ? 0 : 2) /* TODO05 */;
+    int cycles = 5;
+    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 2;
+    return cycles;
 }
 
 // TRB Test and Reset Memory Bits Against Accumulator [Flags affected: z]
@@ -2307,8 +2303,10 @@ int TRB_14::calculateCycles(const State& state) const
 // Absolute
 int TRB_1C::calculateCycles(const State& state) const
 {
+    int cycles = 6;
     // 3: Add 1 cycle if adding index crosses a page boundary
-    return 6 /* TODO03 */;
+    cycles += 0 /* TODO03 */;
+    return cycles;
 }
 
 // TSB Test and Set Memory Bits Against Accumulator [Flags affected: z]
@@ -2316,9 +2314,8 @@ int TRB_1C::calculateCycles(const State& state) const
 // Direct Page
 int TSB_04::calculateCycles(const State& state) const
 {
-    // 2: Add 1 cycle if low byte of Direct Page Register is non - zero
-    // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
-    return 5 /* TODO02 */ + (state.getFlag(State::m) ? 0 : 2) /* TODO05 */;
+    int cycles = 5;
+    return cycles;
 }
 
 // TSB Test and Set Memory Bits Against Accumulator [Flags affected: z]
@@ -2326,8 +2323,8 @@ int TSB_04::calculateCycles(const State& state) const
 // Absolute
 int TSB_0C::calculateCycles(const State& state) const
 {
-    // 5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)
-    return 6 + (state.getFlag(State::m) ? 0 : 2) /* TODO05 */;
+    int cycles = 6;
+    return cycles;
 }
 
 // TSC Transfer Stack Pointer to 16-bit Accumulator [Flags affected: n,z]
@@ -2335,7 +2332,8 @@ int TSB_0C::calculateCycles(const State& state) const
 // Implied
 int TSC_3B::calculateCycles(const State& state) const
 {
-    return 2;
+    int cycles = 2;
+    return cycles;
 }
 
 // TSX Transfer Stack Pointer to Index Register X [Flags affected: n,z]
@@ -2343,7 +2341,8 @@ int TSC_3B::calculateCycles(const State& state) const
 // Implied
 int TSX_BA::calculateCycles(const State& state) const
 {
-    return 2;
+    int cycles = 2;
+    return cycles;
 }
 
 // TXA Transfer Index Register X to Accumulator [Flags affected: n,z]
@@ -2351,7 +2350,8 @@ int TSX_BA::calculateCycles(const State& state) const
 // Implied
 int TXA_8A::calculateCycles(const State& state) const
 {
-    return 2;
+    int cycles = 2;
+    return cycles;
 }
 
 // TXS Transfer Index Register X to Stack Pointer [Flags affected: none]
@@ -2359,7 +2359,8 @@ int TXA_8A::calculateCycles(const State& state) const
 // Implied
 int TXS_9A::calculateCycles(const State& state) const
 {
-    return 2;
+    int cycles = 2;
+    return cycles;
 }
 
 // TXY Transfer Index Register X to Index Register Y [Flags affected: n,z]
@@ -2367,7 +2368,8 @@ int TXS_9A::calculateCycles(const State& state) const
 // Implied
 int TXY_9B::calculateCycles(const State& state) const
 {
-    return 2;
+    int cycles = 2;
+    return cycles;
 }
 
 // TYA Transfer Index Register Y to Accumulator [Flags affected: n,z]
@@ -2375,7 +2377,8 @@ int TXY_9B::calculateCycles(const State& state) const
 // Implied
 int TYA_98::calculateCycles(const State& state) const
 {
-    return 2;
+    int cycles = 2;
+    return cycles;
 }
 
 // TYX Transfer Index Register Y to Index Register X [Flags affected: n,z]
@@ -2383,7 +2386,8 @@ int TYA_98::calculateCycles(const State& state) const
 // Implied
 int TYX_BB::calculateCycles(const State& state) const
 {
-    return 2;
+    int cycles = 2;
+    return cycles;
 }
 
 // WAI Wait for Interrupt [Flags affected: none]
@@ -2391,18 +2395,19 @@ int TYX_BB::calculateCycles(const State& state) const
 // Implied
 int WAI_CB::calculateCycles(const State& state) const
 {
-    // 15: Uses 3 cycles to shut the processor down : additional cycles are required by interrupt to restart it
-    return 3 /* TODO15 */;
+    int cycles = 3;
+    return cycles;
 }
 
 // WDM Reserved for Future Expansion [Flags affected: none (subject to change)]
 // WDM
 // n/a
-// 16: Byte and cycle counts subject to change in future processors which expand WDM into 2 - byte opcode portions of instructions of varying lengths
+// 16: Byte and cycle counts subject to change in future processors which expand WDM into 2-byte opcode portions of instructions of varying lengths
 int WDM_42::calculateCycles(const State& state) const
 {
-    // 16: Byte and cycle counts subject to change in future processors which expand WDM into 2 - byte opcode portions of instructions of varying lengths
-    return 0 /* TODO16 */;
+    int cycles = 0;
+    // 16: Byte and cycle counts subject to change in future processors which expand WDM into 2-byte opcode portions of instructions of varying lengths
+    return cycles;
 }
 
 // XBA Exchange B and A 8-bit Accumulators [Flags affected: n,z]
@@ -2410,7 +2415,8 @@ int WDM_42::calculateCycles(const State& state) const
 // Implied
 int XBA_EB::calculateCycles(const State& state) const
 {
-    return 3;
+    int cycles = 3;
+    return cycles;
 }
 
 // XCE Exchange Carry and Emulation Flags [Flags affected: m,b/x,c,e]
@@ -2418,7 +2424,8 @@ int XBA_EB::calculateCycles(const State& state) const
 // Implied
 int XCE_FB::calculateCycles(const State& state) const
 {
-    return 2;
+    int cycles = 2;
+    return cycles;
 }
 
 }

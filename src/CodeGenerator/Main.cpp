@@ -19,7 +19,7 @@ struct Instruction
     std::string size;
     std::string sizeRemark;
     std::string cycles;
-    std::vector<int> cyclesRemarks;
+    std::set<int> cyclesRemarks;
 
     void validate()
     {
@@ -56,25 +56,25 @@ struct Instruction
 std::string getRemark(int remarkIndex)
 {
     switch (remarkIndex) {
-    case 1: return "1: Add 1 cycle if m = 0 (16 - bit memory / accumulator)";
-    case 2: return "2: Add 1 cycle if low byte of Direct Page Register is non - zero";
+    case 1: return "1: Add 1 cycle if m=0 (16-bit memory/accumulator)";
+    case 2: return "2: Add 1 cycle if low byte of Direct Page Register is non-zero";
     case 3: return "3: Add 1 cycle if adding index crosses a page boundary";
-    case 4: return "4: Add 1 cycle if 65C02 and d = 1 (65C02 in decimal mode)";
-    case 5: return "5: Add 2 cycles if m = 0 (16 - bit memory / accumulator)";
+    case 4: return "4: Add 1 cycle if 65C02 and d=1 (65C02 in decimal mode)";
+    case 5: return "5: Add 2 cycles if m=0 (16-bit memory/accumulator)";
     case 6: return "6: Subtract 1 cycle if 65C02 and no page boundary crossed";
     case 7: return "7: Add 1 cycle if branch is taken";
     case 8: return "8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) ";
-    case 9: return "9: Add 1 cycle for 65816 native mode(e = 0)";
-    case 10: return "10: Add 1 cycle if x = 0 (16 - bit index registers)";
+    case 9: return "9: Add 1 cycle for 65816 native mode (e=0)";
+    case 10: return "10: Add 1 cycle if x=0 (16-bit index registers)";
     case 11: return "11: Add 1 cycle if 65C02";
-    case 12: return "12: 6502: Yields incorrect results if low byte of operand is $FF(i.e., operand is $xxFF)";
+    case 12: return "12: 6502: Yields incorrect results if low byte of operand is $FF (i.e., operand is $xxFF)";
     case 13: return "13: 7 cycles per byte moved";
-    case 14: return "14: Uses 3 cycles to shut the processor down : additional cycles are required by reset to restart it";
-    case 15: return "15: Uses 3 cycles to shut the processor down : additional cycles are required by interrupt to restart it";
-    case 16: return "16: Byte and cycle counts subject to change in future processors which expand WDM into 2 - byte opcode portions of instructions of varying lengths";
-    case 17: return "17: Add 1 byte if m = 0 (16 - bit memory / accumulator)";
+    case 14: return "14: Uses 3 cycles to shut the processor down; additional cycles are required by reset to restart it";
+    case 15: return "15: Uses 3 cycles to shut the processor down; additional cycles are required by interrupt to restart it";
+    case 16: return "16: Byte and cycle counts subject to change in future processors which expand WDM into 2-byte opcode portions of instructions of varying lengths";
+    case 17: return "17: Add 1 byte if m=0 (16-bit memory/accumulator)";
     case 18: return "18: Opcode is 1 byte, but program counter value pushed onto stack is incremented by 2 allowing for optional signature byte";
-    case 19: return "19: Add 1 byte if x = 0 (16 - bit index registers)";
+    case 19: return "19: Add 1 byte if x=0 (16-bit index registers)";
     default: return "";
     }
 }
@@ -82,23 +82,18 @@ std::string getRemark(int remarkIndex)
 std::string getCycleModification(int remarkIndex)
 {
     switch (remarkIndex) {
-    case 1: return " + (state.getFlag(State::m) ? 0 : 1) /* TODO01*/"; // Add 1 cycle if m = 0 (16 - bit memory / accumulator)
-    case 2: return " /* TODO02 */"; // Add 1 cycle if low byte of Direct Page Register is non - zero
-    case 3: return " /* TODO03 */"; // Add 1 cycle if adding index crosses a page boundary
-    case 4: return " /* TODO04 */"; // Add 1 cycle if 65C02 and d = 1 (65C02 in decimal mode)
-    case 5: return " + (state.getFlag(State::m) ? 0 : 2) /* TODO05 */"; // Add 2 cycles if m = 0 (16 - bit memory / accumulator)";
-    case 6: return " /* TODO06 */"; // Subtract 1 cycle if 65C02 and no page boundary crossed";
-    case 7: return " /* TODO07 */"; // Add 1 cycle if branch is taken";
-    case 8: return " /* TODO08 */"; // Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) ";
-    case 9: return " + (state.getFlag(State::m) ? 0 : 2) /* TODO09 */"; // Add 1 cycle for 65816 native mode(e = 0)";
-    case 10: return " + (state.getFlag(State::x) ? 0 : 1) /* TODO10 */"; // Add 1 cycle if x = 0 (16 - bit index registers)";
-    case 11: return " /* TODO11 */"; // Add 1 cycle if 65C02";
-    case 12: return " /* TODO12 */"; // 6502: Yields incorrect results if low byte of operand is $FF(i.e., operand is $xxFF)";
-    case 13: return " /* TODO13 */"; // 7 cycles per byte moved";
-    case 14: return " /* TODO14 */"; // Uses 3 cycles to shut the processor down : additional cycles are required by reset to restart it";
-    case 15: return " /* TODO15 */"; // Uses 3 cycles to shut the processor down : additional cycles are required by interrupt to restart it";
-    case 16: return " /* TODO16 */"; // Byte and cycle counts subject to change in future processors which expand WDM into 2 - byte opcode portions of instructions of varying lengths";
-    default: return " TODO";
+    case 1: return "state.getFlag(State::m) ? 0 : 1"; // Add 1 cycle if m=0 (16-bit memory / accumulator)
+    case 2: return "(uint8_t)state.getDirectPage() ? 1 : 0"; // Add 1 cycle if low byte of Direct Page Register is non-zero
+    case 3: return "0 /* TODO03 */"; // Add 1 cycle if adding index crosses a page boundary
+    case 5: return "state.getFlag(State::m) ? 0 : 2"; // Add 2 cycles if m=0 (16-bit memory / accumulator)
+    case 7: return "0 /* TODO07 */"; // Add 1 cycle if branch is taken
+    case 8: return "0 /* TODO08 */"; // Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1)
+    case 9: return "state.isEmulationMode() ? 0 : 1"; // Add 1 cycle for 65816 native mode (e=0)
+    case 10: return "state.getFlag(State::x) ? 0 : 1"; // Add 1 cycle if x=0 (16-bit index registers)
+    case 13: return "0 /* TODO13 */"; // 7 cycles per byte moved
+    case 14: return "0 /* TODO14 */"; // Uses 3 cycles to shut the processor down; additional cycles are required by reset to restart it
+    case 15: return "0 /* TODO15 */"; // Uses 3 cycles to shut the processor down; additional cycles are required by interrupt to restart it
+    default: return "";
     }
 }
 
@@ -125,7 +120,7 @@ void generateOpcodes(const std::vector<Instruction>& instructions)
         << std::endl;
 
     for (const Instruction& instruction : instructions) {
-        int valueSize = stoi(instruction.size) - 1;
+        int operandSize = stoi(instruction.size) - 1;
 
         if (!instruction.comment.empty()) {
             hOutput << "// " << instruction.comment << std::endl;
@@ -149,10 +144,10 @@ void generateOpcodes(const std::vector<Instruction>& instructions)
 
             if (sizeRemark == 17) {
                 addressModeClass += ", State::m";
-                valueSize = 17;
+                operandSize = 17;
             } else if (sizeRemark == 19) {
                 addressModeClass += ", State::x";
-                valueSize = 19;
+                operandSize = 19;
             }
         }
 
@@ -166,19 +161,17 @@ void generateOpcodes(const std::vector<Instruction>& instructions)
             << std::endl;
 
         cppOutput << "int " << instruction.classname << "::calculateCycles(const State& state) const" << std::endl
-            << "{" << std::endl;
+            << "{" << std::endl
+            << "    int cycles = " << instruction.cycles << ";" << std::endl;
 
         for (int remark : instruction.cyclesRemarks) {
             cppOutput << "    // " << getRemark(remark) << std::endl;
+            if (!getCycleModification(remark).empty()) {
+                cppOutput << "    cycles += " << getCycleModification(remark) << ";" << std::endl;
+            }
         }
 
-        cppOutput << "    return " << instruction.cycles;
-
-        for (int cycleRemark : instruction.cyclesRemarks) {
-            cppOutput << getCycleModification(cycleRemark);
-        }
-
-        cppOutput << ";" << std::endl
+        cppOutput << "    return cycles;" << std::endl
             << "}" << std::endl
             << std::endl;
     }
@@ -215,7 +208,14 @@ void generateOpcodeMap(const std::vector<Instruction>& instructions)
 
 struct AddressModeClassArgs
 {
-    int size;
+    AddressModeClassArgs()
+    {
+        for (int i = 1; i < 16; ++i) {
+            cycleRemarks.insert(i);
+        }
+    }
+    std::set<int> cycleRemarks;
+    int instructionSize;
     std::string comment;
 };
 typedef std::map<std::string, AddressModeClassArgs> AddressModeClassMap;
@@ -237,7 +237,7 @@ void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
 
         output << "// " << kvp.second.comment << std::endl << "template <typename Operator";
 
-        if (kvp.second.size == -1) {
+        if (kvp.second.instructionSize == -1) {
             output << ", State::Flag Flag";
         }
 
@@ -245,10 +245,10 @@ void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
         output << "class " << kvp.first << " : public ";
 
         std::ostringstream superclassStream;
-        if (kvp.second.size == -1) {
+        if (kvp.second.instructionSize == -1) {
             superclassStream << "InstructionFlagSize<Flag>";
         } else {
-            superclassStream << "Instruction" << kvp.second.size << "Byte";
+            superclassStream << "Instruction" << kvp.second.instructionSize << "Byte";
         }
 
         output << superclassStream.str() << std::endl << "{" << std::endl
@@ -258,10 +258,10 @@ void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
         std::stringstream applySignatureStream;
         applySignatureStream << "apply(State& state";
 
-        if (kvp.second.size == -1) {
-            applySignatureStream << ", uint16_t value";
-        } else if (kvp.second.size > 1) {
-            applySignatureStream << ", uint" << (kvp.second.size == 4 ? 32 : (kvp.second.size - 1) * 8) << "_t value";
+        if (kvp.second.instructionSize == -1) {
+            applySignatureStream << ", uint16_t operand";
+        } else if (kvp.second.instructionSize > 1) {
+            applySignatureStream << ", uint" << (kvp.second.instructionSize == 4 ? 32 : (kvp.second.instructionSize - 1) * 8) << "_t operand";
         }
         applySignatureStream << ") const";
 
@@ -271,20 +271,20 @@ void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
 
         std::ostringstream templateStream;
         templateStream << "template <typename Operator";
-        if (kvp.second.size == -1) {
+        if (kvp.second.instructionSize == -1) {
             templateStream << ", State::Flag Flag";
         }
         templateStream << ">" << std::endl;
 
         output << templateStream.str();
         output << "std::string " << kvp.first << "<Operator";
-        if (kvp.second.size == -1) {
+        if (kvp.second.instructionSize == -1) {
             output << ", Flag";
         }
         output << ">::toString(const State& state) const" << std::endl
             << "{" << std::endl
             << "    return Operator::toString()";
-        if (kvp.second.size == -1 || kvp.second.size > 1) {
+        if (kvp.second.instructionSize == -1 || kvp.second.instructionSize > 1) {
             output << " + \" $\" + " << superclassStream.str() << "::operandToString(state)";
         }
         output << " + \" TODO\";" << std::endl
@@ -293,17 +293,24 @@ void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
 
         output << templateStream.str();
         output << "int " << kvp.first << "<Operator";
-        if (kvp.second.size == -1) {
+        if (kvp.second.instructionSize == -1) {
             output << ", Flag";
         }
         output << ">::" << applySignatureStream.str() << std::endl
-            << "{" << std::endl;
-        if (kvp.first != "Implied") {
-            output << "    int* dataAddress = nullptr;" << std::endl;
+            << "{" << std::endl
+            << "    int cycles = 0;" << std::endl;
+        for (int cycleRemark : kvp.second.cycleRemarks) {
+            output << "    // " << getRemark(cycleRemark) << std::endl;
+            if (!getCycleModification(cycleRemark).empty()) {
+                output << "    cycles += " << getCycleModification(cycleRemark) << ";" << std::endl;
+            }
         }
-        output << "    return Operator::operate(state";
         if (kvp.first != "Implied") {
-            output << ", dataAddress";
+            output << "    int* data = nullptr;" << std::endl;
+        }
+        output << "    return cycles + Operator::operate(state";
+        if (kvp.first != "Implied") {
+            output << ", data";
         }
         output << ");" << std::endl
             << "}" << std::endl
@@ -315,6 +322,13 @@ void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
 
 struct OperatorArgs
 {
+    OperatorArgs()
+    {
+        for (int i = 1; i < 16; ++i) {
+            cycleRemarks.insert(i);
+        }
+    }
+    std::set<int> cycleRemarks;
     bool hasOperand;
     std::string comment;
 };
@@ -347,7 +361,7 @@ void generateOperators(const OperatorMap& operatorMap)
             << "    static std::string toString() { return \"" << kvp.first << "\"; }" << std::endl
             << "    static int operate(State& state";
         if (kvp.second.hasOperand) {
-            hOutput << ", int* address";
+            hOutput << ", int* data";
         }
         hOutput << ");" << std::endl
             << "};" << std::endl
@@ -355,11 +369,18 @@ void generateOperators(const OperatorMap& operatorMap)
 
         cppOutput << "int " << kvp.first << "::operate(State& state";
         if (kvp.second.hasOperand) {
-            cppOutput << ", int* address";
+            cppOutput << ", int* data";
         }
         cppOutput << ")" << std::endl
             << "{" << std::endl
-            << "    return 0;" << std::endl
+            << "    int cycles = 0;" << std::endl;
+        for (int cycleRemark : kvp.second.cycleRemarks) {
+            cppOutput << "    // " << getRemark(cycleRemark) << std::endl;
+            if (!getCycleModification(cycleRemark).empty()) {
+                cppOutput << "    cycles += " << getCycleModification(cycleRemark) << ";" << std::endl;
+            }
+        }
+        cppOutput << "    return cycles;" << std::endl
             << "}" << std::endl
             << std::endl;
     }
@@ -431,12 +452,6 @@ int main(int argc, char* argv[])
 
                 std::string addressMode = line[2];
 
-                bool hasOperand = true;
-                if (addressMode == "Implied") {
-                    hasOperand = false;
-                }
-                operatorMap[mnemonic] = OperatorArgs { hasOperand, comment };
-
                 std::string sizeToken = line[3];
                 std::string size = sizeToken.substr(0, 1);
 
@@ -451,31 +466,52 @@ int main(int argc, char* argv[])
 
                 std::string addressModeComment = addressMode;
 
-                int valueSize = stoi(size);
+                int instructionSize = stoi(size);
 
                 if (sizeRemark == "17" || sizeRemark == "19") {
                     addressModeClass += "FlagSize";
-                    valueSize = -1;
+                    instructionSize = -1;
                     addressModeComment += "\n// " + getRemark(stoi(sizeRemark));
                 }
-
-                addressModeClassMap[addressModeClass] = AddressModeClassArgs { valueSize, addressModeComment };
 
                 std::string cyclesToken = line[4];
                 std::string cycles = cyclesToken.substr(0, 1);
 
                 std::string cyclesRemark = cyclesToken.substr(1);
 
-                std::vector<int> cyclesRemarks;
+                std::set<int> cyclesRemarks;
+                OperatorArgs& operatorArgs = operatorMap[mnemonic];
+                std::set<int> operatorIntersection;
+                AddressModeClassArgs& addressModeClassArgs = addressModeClassMap[addressModeClass];
+                std::set<int> addressModeIntersection;
 
                 if (!cyclesRemark.empty()) {
                     std::istringstream stream(cyclesRemark);
                     std::string token;
                     std::cout << "Parsing cycles remarks: " << cyclesRemark << std::endl;
                     while (std::getline(stream, token, ',')) {
-                        cyclesRemarks.push_back(stoi(token));
+                        int cycleRemark = stoi(token);
+                        cyclesRemarks.insert(cycleRemark);
+                        if (operatorArgs.cycleRemarks.find(cycleRemark) != operatorArgs.cycleRemarks.end()) {
+                            operatorIntersection.insert(cycleRemark);
+                        }
+                        if (addressModeClassArgs.cycleRemarks.find(cycleRemark) != addressModeClassArgs.cycleRemarks.end()) {
+                            addressModeIntersection.insert(cycleRemark);
+                        }
                     }
                 }
+
+                bool hasOperand = true;
+                if (addressMode == "Implied") {
+                    hasOperand = false;
+                }
+                operatorArgs.cycleRemarks = operatorIntersection;
+                operatorArgs.hasOperand = hasOperand;
+                operatorArgs.comment = comment;
+
+                addressModeClassArgs.cycleRemarks = addressModeIntersection;
+                addressModeClassArgs.instructionSize = instructionSize;
+                addressModeClassArgs.comment = addressModeComment;
 
                 Instruction instruction { name, mnemonic, comment, code, classname, addressMode, addressModeClass, size, sizeRemark, cycles, cyclesRemarks };
                 instruction.validate();
@@ -485,6 +521,27 @@ int main(int argc, char* argv[])
                 //addressModeMap[addressModeCode].push_back(addressMode + ", " + name + ", code=" + code + ", cycles=" + cycles + ", size=" + size);
                 //addressModeMap[addressMode].push_back(name + ", code=" + code + ", cycles=" + cycles + ", size=" + size + ", sizeRemark=" + sizeRemark);
                 addressModeMap[mnemonic].push_back(code + ": " + name + ", " + addressMode + ", cycles=" + cycles + ", size=" + size);
+            }
+        }
+
+        for (Instruction& instruction : instructions) {
+            for (const AddressModeClassMap::value_type& kvp : addressModeClassMap) {
+                if (kvp.first == instruction.addressModeClass) {
+                    std::cout << "Found addressMode " << kvp.first << std::endl;
+                    for (int remark : kvp.second.cycleRemarks) {
+                        instruction.cyclesRemarks.erase(remark);
+                        std::cout << "\t" << remark << std::endl;
+                    }
+                }
+            }
+            for (const OperatorMap::value_type& kvp : operatorMap) {
+                if (kvp.first == instruction.mnemonic) {
+                    std::cout << "Found operator " << kvp.first << std::endl;
+                    for (int remark : kvp.second.cycleRemarks) {
+                        instruction.cyclesRemarks.erase(remark);
+                        std::cout << "\t" << remark << std::endl;
+                    }
+                }
             }
         }
 
