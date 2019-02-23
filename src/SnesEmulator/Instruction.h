@@ -75,10 +75,10 @@ std::string InstructionFlagSize<Flag>::operandToString(const State& state) const
 {
     std::ostringstream ss;
     ss << std::hex;
-    if (state.getFlag(Flag)) {
-        ss << std::setw(2) << std::setfill('0') << state.readOneByteValue();
+    if (state.isEmulationMode() || state.getFlag(Flag)) {
+        ss << "One byte (variable) " << std::setw(2) << std::setfill('0') << +state.readOneByteValue();
     } else {
-        ss << std::setw(4) << std::setfill('0') << state.readTwoByteValue();
+        ss << "Two bytes (variable) " << std::setw(4) << std::setfill('0') << state.readTwoByteValue();
     }
     return ss.str();
 }
@@ -87,12 +87,12 @@ template<State::Flag Flag>
 uint16_t InstructionFlagSize<Flag>::consumeValue(State& state) const
 {
     uint16_t value = 0;
-    if (state.getFlag(Flag)) {
+    if (state.isEmulationMode() || state.getFlag(Flag)) {
         state.readOneByteValue();
-        state.incrementProgramCounter(1);
+        state.incrementProgramCounter(2);
     } else {
         state.readTwoByteValue();
-        state.incrementProgramCounter(2);
+        state.incrementProgramCounter(3);
     }
     return value;
 }

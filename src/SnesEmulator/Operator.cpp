@@ -93,25 +93,25 @@ int BVS::operate(State& state, int* address)
 }
 
 // CLC Clear Carry [Flags affected: c]
-int CLC::operate(State& state, int* address)
+int CLC::operate(State& state)
 {
     return 0;
 }
 
 // CLD Clear Decimal Mode Flag [Flags affected: d]
-int CLD::operate(State& state, int* address)
+int CLD::operate(State& state)
 {
     return 0;
 }
 
 // CLI Clear Interrupt Disable Flag [Flags affected: i]
-int CLI::operate(State& state, int* address)
+int CLI::operate(State& state)
 {
     return 0;
 }
 
 // CLV Clear Overflow Flag [Flags affected: v]
-int CLV::operate(State& state, int* address)
+int CLV::operate(State& state)
 {
     return 0;
 }
@@ -147,13 +147,13 @@ int DEC::operate(State& state, int* address)
 }
 
 // DEX Decrement Index Register X [Flags affected: n,z]
-int DEX::operate(State& state, int* address)
+int DEX::operate(State& state)
 {
     return 0;
 }
 
 // DEY Decrement Index Register Y [Flags affected: n,z]
-int DEY::operate(State& state, int* address)
+int DEY::operate(State& state)
 {
     return 0;
 }
@@ -171,13 +171,13 @@ int INC::operate(State& state, int* address)
 }
 
 // INX Increment Index Register X [Flags affected: n,z]
-int INX::operate(State& state, int* address)
+int INX::operate(State& state)
 {
     return 0;
 }
 
 // INY Increment Index Register Y [Flags affected: n,z]
-int INY::operate(State& state, int* address)
+int INY::operate(State& state)
 {
     return 0;
 }
@@ -225,7 +225,7 @@ int MVN::operate(State& state, int* address)
 }
 
 // NOP No Operation [Flags affected: none]
-int NOP::operate(State& state, int* address)
+int NOP::operate(State& state)
 {
     return 0;
 }
@@ -375,19 +375,19 @@ int SBC::operate(State& state, int* address)
 }
 
 // SEC Set Carry Flag [Flags affected: c]
-int SEC::operate(State& state, int* address)
+int SEC::operate(State& state)
 {
     return 0;
 }
 
 // SED Set Decimal Flag [Flags affected: d]
-int SED::operate(State& state, int* address)
+int SED::operate(State& state)
 {
     return 0;
 }
 
 // SEI Set Interrupt Disable Flag [Flags affected: i]
-int SEI::operate(State& state, int* address)
+int SEI::operate(State& state)
 {
     return 0;
 }
@@ -405,7 +405,7 @@ int STA::operate(State& state, int* address)
 }
 
 // STP Stop Processor [Flags affected: none]
-int STP::operate(State& state, int* address)
+int STP::operate(State& state)
 {
     return 0;
 }
@@ -429,31 +429,31 @@ int STZ::operate(State& state, int* address)
 }
 
 // TAX Transfer Accumulator to Index Register X [Flags affected: n,z]
-int TAX::operate(State& state, int* address)
+int TAX::operate(State& state)
 {
     return 0;
 }
 
 // TAY Transfer Accumulator to Index Register Y [Flags affected: n,z]
-int TAY::operate(State& state, int* address)
+int TAY::operate(State& state)
 {
     return 0;
 }
 
 // TCD Transfer 16-bit Accumulator to Direct Page Register [Flags affected: n,z]
-int TCD::operate(State& state, int* address)
+int TCD::operate(State& state)
 {
     return 0;
 }
 
 // TCS Transfer 16-bit Accumulator to Stack Pointer [Flags affected: none]
-int TCS::operate(State& state, int* address)
+int TCS::operate(State& state)
 {
     return 0;
 }
 
 // TDC Transfer Direct Page Register to 16-bit Accumulator [Flags affected: n,z]
-int TDC::operate(State& state, int* address)
+int TDC::operate(State& state)
 {
     return 0;
 }
@@ -471,49 +471,49 @@ int TSB::operate(State& state, int* address)
 }
 
 // TSC Transfer Stack Pointer to 16-bit Accumulator [Flags affected: n,z]
-int TSC::operate(State& state, int* address)
+int TSC::operate(State& state)
 {
     return 0;
 }
 
 // TSX Transfer Stack Pointer to Index Register X [Flags affected: n,z]
-int TSX::operate(State& state, int* address)
+int TSX::operate(State& state)
 {
     return 0;
 }
 
 // TXA Transfer Index Register X to Accumulator [Flags affected: n,z]
-int TXA::operate(State& state, int* address)
+int TXA::operate(State& state)
 {
     return 0;
 }
 
 // TXS Transfer Index Register X to Stack Pointer [Flags affected: none]
-int TXS::operate(State& state, int* address)
+int TXS::operate(State& state)
 {
     return 0;
 }
 
 // TXY Transfer Index Register X to Index Register Y [Flags affected: n,z]
-int TXY::operate(State& state, int* address)
+int TXY::operate(State& state)
 {
     return 0;
 }
 
 // TYA Transfer Index Register Y to Accumulator [Flags affected: n,z]
-int TYA::operate(State& state, int* address)
+int TYA::operate(State& state)
 {
     return 0;
 }
 
 // TYX Transfer Index Register Y to Index Register X [Flags affected: n,z]
-int TYX::operate(State& state, int* address)
+int TYX::operate(State& state)
 {
     return 0;
 }
 
 // WAI Wait for Interrupt [Flags affected: none]
-int WAI::operate(State& state, int* address)
+int WAI::operate(State& state)
 {
     return 0;
 }
@@ -525,13 +525,13 @@ int WDM::operate(State& state, int* address)
 }
 
 // XBA Exchange B and A 8-bit Accumulators [Flags affected: n,z]
-int XBA::operate(State& state, int* address)
+int XBA::operate(State& state)
 {
     return 0;
 }
 
 // XCE Exchange Carry and Emulation Flags [Flags affected: m,b/x,c,e]
-int XCE::operate(State& state, int* address)
+int XCE::operate(State& state)
 {
     return 0;
 }

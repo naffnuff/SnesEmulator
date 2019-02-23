@@ -213,7 +213,12 @@ void generateOpcodeMap(const std::vector<Instruction>& instructions)
     output << "}" << std::endl;
 }
 
-typedef std::map<std::string, std::pair<int, std::string>> AddressModeClassMap;
+struct AddressModeClassArgs
+{
+    int size;
+    std::string comment;
+};
+typedef std::map<std::string, AddressModeClassArgs> AddressModeClassMap;
 void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
 {
     std::ofstream output("..\\..\\..\\src\\SnesEmulator\\AddressMode.h");
@@ -230,9 +235,9 @@ void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
 
     for (const AddressModeClassMap::value_type& kvp : addressModeClassMap) {
 
-        output << "// " << kvp.second.second << std::endl << "template <typename Operator";
+        output << "// " << kvp.second.comment << std::endl << "template <typename Operator";
 
-        if (kvp.second.first == 99) {
+        if (kvp.second.size == -1) {
             output << ", State::Flag Flag";
         }
 
@@ -240,10 +245,10 @@ void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
         output << "class " << kvp.first << " : public ";
 
         std::ostringstream superclassStream;
-        if (kvp.second.first > 4) {
+        if (kvp.second.size == -1) {
             superclassStream << "InstructionFlagSize<Flag>";
         } else {
-            superclassStream << "Instruction" << kvp.second.first << "Byte";
+            superclassStream << "Instruction" << kvp.second.size << "Byte";
         }
 
         output << superclassStream.str() << std::endl << "{" << std::endl
@@ -252,11 +257,11 @@ void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
 
         std::stringstream applySignatureStream;
         applySignatureStream << "apply(State& state";
-        
-        if (kvp.second.first == 99) {
+
+        if (kvp.second.size == -1) {
             applySignatureStream << ", uint16_t value";
-        } else if (kvp.second.first > 1) {
-            applySignatureStream << ", uint" << (kvp.second.first == 4 ? 32 : (kvp.second.first - 1) * 8) << "_t value";
+        } else if (kvp.second.size > 1) {
+            applySignatureStream << ", uint" << (kvp.second.size == 4 ? 32 : (kvp.second.size - 1) * 8) << "_t value";
         }
         applySignatureStream << ") const";
 
@@ -266,20 +271,20 @@ void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
 
         std::ostringstream templateStream;
         templateStream << "template <typename Operator";
-        if (kvp.second.first == 99) {
+        if (kvp.second.size == -1) {
             templateStream << ", State::Flag Flag";
         }
         templateStream << ">" << std::endl;
 
         output << templateStream.str();
         output << "std::string " << kvp.first << "<Operator";
-        if (kvp.second.first == 99) {
+        if (kvp.second.size == -1) {
             output << ", Flag";
         }
         output << ">::toString(const State& state) const" << std::endl
             << "{" << std::endl
             << "    return Operator::toString()";
-        if (kvp.second.first > 1) {
+        if (kvp.second.size == -1 || kvp.second.size > 1) {
             output << " + \" $\" + " << superclassStream.str() << "::operandToString(state)";
         }
         output << " + \" TODO\";" << std::endl
@@ -288,13 +293,19 @@ void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
 
         output << templateStream.str();
         output << "int " << kvp.first << "<Operator";
-        if (kvp.second.first == 99) {
+        if (kvp.second.size == -1) {
             output << ", Flag";
         }
         output << ">::" << applySignatureStream.str() << std::endl
-            << "{" << std::endl
-            << "    int data = 0;" << std::endl
-            << "    return Operator::operate(state, &data);" << std::endl
+            << "{" << std::endl;
+        if (kvp.first != "Implied") {
+            output << "    int* dataAddress = nullptr;" << std::endl;
+        }
+        output << "    return Operator::operate(state";
+        if (kvp.first != "Implied") {
+            output << ", dataAddress";
+        }
+        output << ");" << std::endl
             << "}" << std::endl
             << std::endl;
     }
@@ -302,8 +313,13 @@ void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
     output << "}" << std::endl;
 }
 
-typedef std::map<std::string, std::string> MnemonicMap;
-void generateOperators(const MnemonicMap& mnemonicMap)
+struct OperatorArgs
+{
+    bool hasOperand;
+    std::string comment;
+};
+typedef std::map<std::string, OperatorArgs> OperatorMap;
+void generateOperators(const OperatorMap& operatorMap)
 {
     std::ofstream hOutput("..\\..\\..\\src\\SnesEmulator\\Operator.h");
     std::ofstream cppOutput("..\\..\\..\\src\\SnesEmulator\\Operator.cpp");
@@ -320,20 +336,28 @@ void generateOperators(const MnemonicMap& mnemonicMap)
         << "namespace Operator {" << std::endl
         << std::endl;
 
-    for (const MnemonicMap::value_type& kvp : mnemonicMap) {
+    for (const OperatorMap::value_type& kvp : operatorMap) {
 
-        hOutput << "// " << kvp.second << std::endl;
-        cppOutput << "// " << kvp.second << std::endl;
+        hOutput << "// " << kvp.second.comment << std::endl;
+        cppOutput << "// " << kvp.second.comment << std::endl;
 
         hOutput << "class " << kvp.first << std::endl
             << "{" << std::endl
             << "public:" << std::endl
             << "    static std::string toString() { return \"" << kvp.first << "\"; }" << std::endl
-            << "    static int operate(State& state, int* address);" << std::endl
+            << "    static int operate(State& state";
+        if (kvp.second.hasOperand) {
+            hOutput << ", int* address";
+        }
+        hOutput << ");" << std::endl
             << "};" << std::endl
             << std::endl;
 
-        cppOutput << "int " << kvp.first << "::operate(State& state, int* address)" << std::endl
+        cppOutput << "int " << kvp.first << "::operate(State& state";
+        if (kvp.second.hasOperand) {
+            cppOutput << ", int* address";
+        }
+        cppOutput << ")" << std::endl
             << "{" << std::endl
             << "    return 0;" << std::endl
             << "}" << std::endl
@@ -379,7 +403,7 @@ int main(int argc, char* argv[])
 
         AddressModeClassMap addressModeClassMap;
 
-        MnemonicMap mnemonicMap;
+        OperatorMap operatorMap;
 
         for (std::vector<std::string> line : lines) {
             if (line.size() == 1) {
@@ -396,8 +420,6 @@ int main(int argc, char* argv[])
 
                 std::string mnemonic = name.substr(0, 3);
 
-                mnemonicMap[mnemonic] = comment;
-
                 std::string addressModeCode = name.substr(3);
 
                 std::string code = line[1];
@@ -408,6 +430,12 @@ int main(int argc, char* argv[])
                 std::string classname = mnemonic + "_" + code;
 
                 std::string addressMode = line[2];
+
+                bool hasOperand = true;
+                if (addressMode == "Implied") {
+                    hasOperand = false;
+                }
+                operatorMap[mnemonic] = OperatorArgs { hasOperand, comment };
 
                 std::string sizeToken = line[3];
                 std::string size = sizeToken.substr(0, 1);
@@ -427,11 +455,11 @@ int main(int argc, char* argv[])
 
                 if (sizeRemark == "17" || sizeRemark == "19") {
                     addressModeClass += "FlagSize";
-                    valueSize = 99;
+                    valueSize = -1;
                     addressModeComment += "\n// " + getRemark(stoi(sizeRemark));
                 }
 
-                addressModeClassMap[addressModeClass] = std::pair<int, std::string>(valueSize, addressModeComment);
+                addressModeClassMap[addressModeClass] = AddressModeClassArgs { valueSize, addressModeComment };
 
                 std::string cyclesToken = line[4];
                 std::string cycles = cyclesToken.substr(0, 1);
@@ -463,7 +491,7 @@ int main(int argc, char* argv[])
         generateOpcodes(instructions);
         generateOpcodeMap(instructions);
         generateAddressModes(addressModeClassMap);
-        generateOperators(mnemonicMap);
+        generateOperators(operatorMap);
 
         int i = 0;
         for (const AddressModeMap::value_type kvp : addressModeMap) {

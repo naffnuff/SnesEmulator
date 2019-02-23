@@ -23,9 +23,17 @@ public:
     };
 
     State()
-        : programCounter(0)
+        : accumulatorA(0)
+        , accumulatorB(0)
+        , dataBank(0)
+        , xIndex(0)
+        , yIndex(0)
+        , directPage(0)
+        , stackPointer(0x1ff)
         , programBank(0)
+        , programCounter(0)
         , resetAddress(0)
+        , flags(0)
         , emulationMode(true)
     {
         memory.resize(1 << 24);
@@ -57,8 +65,14 @@ public:
     std::ostream& printRegisters(std::ostream& output)
     {
         return output
-            << "pb=" << std::setw(2) << std::setfill('0') << +programBank
-            << ", pc=" << std::setw(4) << std::setfill('0') << programCounter
+            << "PB=" << std::setw(2) << std::setfill('0') << +programBank
+            << ", PC=" << std::setw(4) << std::setfill('0') << programCounter
+            << ", A=" << std::setw(4) << std::setfill('0') << getAccumulatorC()
+            << ", X=" << std::setw(4) << std::setfill('0') << xIndex
+            << ", Y=" << std::setw(4) << std::setfill('0') << yIndex
+            << ", S=" << std::setw(4) << std::setfill('0') << stackPointer
+            << ", DP=" << std::setw(4) << std::setfill('0') << directPage
+            << ", DB=" << std::setw(2) << std::setfill('0') << +dataBank
             << ", flags=" << std::bitset<8>(flags)
             << ", e=" << emulationMode;
     }
@@ -84,27 +98,27 @@ public:
 
     uint8_t readNextInstruction() const
     {
-        return memory[getEffectiveProgramAddress()];
+        return memory[getProgramAddress()];
     }
 
     uint8_t readOneByteValue() const
     {
-        uint8_t value = memory[getEffectiveProgramAddress(1)];
+        uint8_t value = memory[getProgramAddress(1)];
         return value;
     }
 
     uint16_t readTwoByteValue() const
     {
-        uint16_t value = memory[getEffectiveProgramAddress(1)];
-        value += memory[getEffectiveProgramAddress(2)] << 8;
+        uint16_t value = memory[getProgramAddress(1)];
+        value += memory[getProgramAddress(2)] << 8;
         return value;
     }
 
     uint32_t readThreeByteValue() const
     {
-        uint32_t value = memory[getEffectiveProgramAddress(1)];
-        value += memory[getEffectiveProgramAddress(2)] << 8;
-        value += memory[getEffectiveProgramAddress(3)] << 16;
+        uint32_t value = memory[getProgramAddress(1)];
+        value += memory[getProgramAddress(2)] << 8;
+        value += memory[getProgramAddress(3)] << 16;
         return value;
     }
 
@@ -120,15 +134,20 @@ public:
         programCounter += increment;
     }
 
-    uint32_t getEffectiveProgramAddress(int offset = 0) const
+    uint32_t getProgramAddress(int offset = 0) const
     {
         return (programBank << 16) + programCounter + offset;
+    }
+
+    uint32_t getAccumulatorC() const
+    {
+        return (accumulatorB << 8) + accumulatorA;
     }
 
 private:
     bool tryReadHeader(int offset, std::vector<char> rom);
 
-public:
+private:
     uint8_t accumulatorA;
     uint8_t accumulatorB;
     uint8_t dataBank;
@@ -136,8 +155,8 @@ public:
     uint16_t yIndex;
     uint16_t directPage;
     uint16_t stackPointer;
-    uint16_t programCounter;
     uint8_t programBank;
+    uint16_t programCounter;
 
     uint16_t resetAddress;
 

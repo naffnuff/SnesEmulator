@@ -129,7 +129,7 @@ class CLC
 {
 public:
     static std::string toString() { return "CLC"; }
-    static int operate(State& state, int* address);
+    static int operate(State& state);
 };
 
 // CLD Clear Decimal Mode Flag [Flags affected: d]
@@ -137,7 +137,7 @@ class CLD
 {
 public:
     static std::string toString() { return "CLD"; }
-    static int operate(State& state, int* address);
+    static int operate(State& state);
 };
 
 // CLI Clear Interrupt Disable Flag [Flags affected: i]
@@ -145,7 +145,7 @@ class CLI
 {
 public:
     static std::string toString() { return "CLI"; }
-    static int operate(State& state, int* address);
+    static int operate(State& state);
 };
 
 // CLV Clear Overflow Flag [Flags affected: v]
@@ -153,7 +153,7 @@ class CLV
 {
 public:
     static std::string toString() { return "CLV"; }
-    static int operate(State& state, int* address);
+    static int operate(State& state);
 };
 
 // CMP Compare Accumulator With Memory [Flags affected: n,z,c]
@@ -201,7 +201,7 @@ class DEX
 {
 public:
     static std::string toString() { return "DEX"; }
-    static int operate(State& state, int* address);
+    static int operate(State& state);
 };
 
 // DEY Decrement Index Register Y [Flags affected: n,z]
@@ -209,7 +209,7 @@ class DEY
 {
 public:
     static std::string toString() { return "DEY"; }
-    static int operate(State& state, int* address);
+    static int operate(State& state);
 };
 
 // EOR Exclusive-OR Accumulator with Memory [Flags affected: n,z]
@@ -233,7 +233,7 @@ class INX
 {
 public:
     static std::string toString() { return "INX"; }
-    static int operate(State& state, int* address);
+    static int operate(State& state);
 };
 
 // INY Increment Index Register Y [Flags affected: n,z]
@@ -241,7 +241,7 @@ class INY
 {
 public:
     static std::string toString() { return "INY"; }
-    static int operate(State& state, int* address);
+    static int operate(State& state);
 };
 
 // JMP Jump [Flags affected: none][Alias: JML for all Long addressing modes]
@@ -305,7 +305,7 @@ class NOP
 {
 public:
     static std::string toString() { return "NOP"; }
-    static int operate(State& state, int* address);
+    static int operate(State& state);
 };
 
 // ORA OR Accumulator with Memory [Flags affected: n,z]
@@ -505,7 +505,7 @@ class SEC
 {
 public:
     static std::string toString() { return "SEC"; }
-    static int operate(State& state, int* address);
+    static int operate(State& state);
 };
 
 // SED Set Decimal Flag [Flags affected: d]
@@ -513,7 +513,7 @@ class SED
 {
 public:
     static std::string toString() { return "SED"; }
-    static int operate(State& state, int* address);
+    static int operate(State& state);
 };
 
 // SEI Set Interrupt Disable Flag [Flags affected: i]
@@ -521,7 +521,7 @@ class SEI
 {
 public:
     static std::string toString() { return "SEI"; }
-    static int operate(State& state, int* address);
+    static int operate(State& state);
 };
 
 // SEP Set Processor Status Bits [Flags affected: all except b per operand]
@@ -545,7 +545,7 @@ class STP
 {
 public:
     static std::string toString() { return "STP"; }
-    static int operate(State& state, int* address);
+    static int operate(State& state);
 };
 
 // STX Store Index Register X to Memory [Flags affected: none]
@@ -577,7 +577,7 @@ class TAX
 {
 public:
     static std::string toString() { return "TAX"; }
-    static int operate(State& state, int* address);
+    static int operate(State& state);
 };
 
 // TAY Transfer Accumulator to Index Register Y [Flags affected: n,z]
@@ -585,7 +585,7 @@ class TAY
 {
 public:
     static std::string toString() { return "TAY"; }
-    static int operate(State& state, int* address);
+    static int operate(State& state);
 };
 
 // TCD Transfer 16-bit Accumulator to Direct Page Register [Flags affected: n,z]
@@ -593,7 +593,7 @@ class TCD
 {
 public:
     static std::string toString() { return "TCD"; }
-    static int operate(State& state, int* address);
+    static int operate(State& state);
 };
 
 // TCS Transfer 16-bit Accumulator to Stack Pointer [Flags affected: none]
@@ -601,7 +601,7 @@ class TCS
 {
 public:
     static std::string toString() { return "TCS"; }
-    static int operate(State& state, int* address);
+    static int operate(State& state);
 };
 
 // TDC Transfer Direct Page Register to 16-bit Accumulator [Flags affected: n,z]
@@ -609,7 +609,7 @@ class TDC
 {
 public:
     static std::string toString() { return "TDC"; }
-    static int operate(State& state, int* address);
+    static int operate(State& state);
 };
 
 // TRB Test and Reset Memory Bits Against Accumulator [Flags affected: z]
@@ -633,7 +633,7 @@ class TSC
 {
 public:
     static std::string toString() { return "TSC"; }
-    static int operate(State& state, int* address);
+    static int operate(State& state);
 };
 
 // TSX Transfer Stack Pointer to Index Register X [Flags affected: n,z]
@@ -641,7 +641,7 @@ class TSX
 {
 public:
     static std::string toString() { return "TSX"; }
-    static int operate(State& state, int* address);
+    static int operate(State& state);
 };
 
 // TXA Transfer Index Register X to Accumulator [Flags affected: n,z]
@@ -649,7 +649,7 @@ class TXA
 {
 public:
     static std::string toString() { return "TXA"; }
-    static int operate(State& state, int* address);
+    static int operate(State& state);
 };
 
 // TXS Transfer Index Register X to Stack Pointer [Flags affected: none]
@@ -657,7 +657,7 @@ class TXS
 {
 public:
     static std::string toString() { return "TXS"; }
-    static int operate(State& state, int* address);
+    static int operate(State& state);
 };
 
 // TXY Transfer Index Register X to Index Register Y [Flags affected: n,z]
@@ -665,7 +665,7 @@ class TXY
 {
 public:
     static std::string toString() { return "TXY"; }
-    static int operate(State& state, int* address);
+    static int operate(State& state);
 };
 
 // TYA Transfer Index Register Y to Accumulator [Flags affected: n,z]
@@ -673,7 +673,7 @@ class TYA
 {
 public:
     static std::string toString() { return "TYA"; }
-    static int operate(State& state, int* address);
+    static int operate(State& state);
 };
 
 // TYX Transfer Index Register Y to Index Register X [Flags affected: n,z]
@@ -681,7 +681,7 @@ class TYX
 {
 public:
     static std::string toString() { return "TYX"; }
-    static int operate(State& state, int* address);
+    static int operate(State& state);
 };
 
 // WAI Wait for Interrupt [Flags affected: none]
@@ -689,7 +689,7 @@ class WAI
 {
 public:
     static std::string toString() { return "WAI"; }
-    static int operate(State& state, int* address);
+    static int operate(State& state);
 };
 
 // WDM Reserved for Future Expansion [Flags affected: none (subject to change)]
@@ -705,7 +705,7 @@ class XBA
 {
 public:
     static std::string toString() { return "XBA"; }
-    static int operate(State& state, int* address);
+    static int operate(State& state);
 };
 
 // XCE Exchange Carry and Emulation Flags [Flags affected: m,b/x,c,e]
@@ -713,7 +713,7 @@ class XCE
 {
 public:
     static std::string toString() { return "XCE"; }
-    static int operate(State& state, int* address);
+    static int operate(State& state);
 };
 
 }

@@ -24,12 +24,14 @@ void Emulator::run()
     std::time_t startTime = clock();
 
     std::ostream& output = std::cout;
+    std::istream& input = std::cin;
+    std::ostream& error = std::cerr;
 
     output << std::hex;
 
-    uint32_t watchedAddress = 0;
+    uint32_t inspectedAddress = 0;
     bool watchMode = false;
-    bool stepMode = false;
+    bool stepMode = true;
     std::set<int> breakpoints;
     
     while (running) {
@@ -38,38 +40,61 @@ void Emulator::run()
 
         Instruction* instruction = instructions.getInstruction(state.readNextInstruction());
 
-        if (state.readNextInstruction() == 0xFB) {
-            //stepMode = true;
-            //watchedAddress = state.getEffectiveProgramAddress();
-            //state.printRegisters(output) << std::endl;
-        }
-
         if (stepMode) {
-            state.printMemoryPage(output, watchedAddress);
+            if (watchMode) {
+                inspectedAddress = state.getProgramAddress();
+            }
+
+            output << std::endl << "*" << std::endl;
+            output << std::dec << "instructionCount=" << instructionCount << ", cycleCount=" << cycleCount << std::hex << std::endl;
+            output << "Breakpoints:";
+            for (int breakpoint : breakpoints) {
+                output << " " << breakpoint;
+            }
+            output << std::endl;
+            state.printMemoryPage(output, inspectedAddress);
             output << instruction->opcodeToString() << std::endl;
-            output << +state.readNextInstruction() << ": ";
+            output << std::setw(2) << std::setfill('0') << +state.readNextInstruction() << ": ";
             output << instruction->toString(state) << std::endl;
-            state.printRegisters(output) << " -->";
+            state.printRegisters(output) << std::endl;
+
+            output << "Command (h for help): ";
 
             std::string command;
-            std::getline(std::cin, command);
-            output << "'" << command << "'" << std::endl;
+            std::getline(input, command);
 
             if (command.empty()) {
                 cycleCount += instruction->execute(state);
-                output << "instructionCount=" << instructionCount << ", cycleCount=" << cycleCount << std::endl;
+                output << "Step" << std::endl;
+            } else if (command == "h") {
+                output << "[return]: execute next instruction" << std::endl
+                    << "n: inspect next memory page" << std::endl
+                    << "p: inspect previous memory page" << std::endl
+                    << "r: run program" << std::endl
+                    << "br [hex]: toogle breakpoint at address [hex]" << std::endl
+                    << "w: watch executing program memory" << std::endl
+                    << "[hex]: inspect memory page containing address [hex]" << std::endl;
+                std::getchar();
             } else if (command == "n") {
-                watchedAddress += (1 << 8);
+                watchMode = false;
+                inspectedAddress += (1 << 8);
             } else if (command == "p") {
-                watchedAddress -= (1 << 8);
+                watchMode = false;
+                inspectedAddress -= (1 << 8);
             } else if (command == "r") {
                 stepMode = false;
-                output << "Run mode" << std::endl;
+                output << "Run" << std::endl;
+                startTime = clock();
             } else if (command.substr(0, 3) == "br ") {
                 try {
                     int breakPoint = stoi(command.substr(3), 0, 16);
-                    breakpoints.insert(breakPoint);
-                    output << "Breakpoint " << breakPoint << " inserted" << std::endl;
+                    if (breakpoints.find(breakPoint) == breakpoints.end()) {
+                        breakpoints.insert(breakPoint);
+                        output << "Breakpoint inserted at address " << breakPoint << std::endl;
+                    } else {
+                        breakpoints.erase(breakPoint);
+                        output << "Breakpoint removed at address " << breakPoint << std::endl;
+                    }
                 } catch (std::exception& e) {
                     std::cerr << "Not a valid address: " << e.what() << std::endl;
                 }
@@ -78,28 +103,36 @@ void Emulator::run()
                 output << "Watch mode " << (watchMode ? "on" : "off") << std::endl;
             } else {
                 try {
-                    stoi(command, &watchedAddress, 16);
+                    stoi(command, &inspectedAddress, 16);
                 } catch (std::exception& e) {
                     std::cerr << "Not a valid address: " << e.what() << std::endl;
                 }
             }
-        } else {
-            cycleCount += instruction->execute(state);
         }
 
         if (!stepMode) {
-            uint32_t address = state.getEffectiveProgramAddress();
-            stepMode = breakpoints.find(address) != breakpoints.end()
-                || breakpoints.find(address - 1) != breakpoints.end()
-                || breakpoints.find(address - 2) != breakpoints.end()
-                || breakpoints.find(address - 3) != breakpoints.end();
+            uint32_t previousAddress = state.getProgramAddress();
+
+            cycleCount += instruction->execute(state);
+
+            uint32_t address = state.getProgramAddress();
+
+            for (uint32_t i = address; i > previousAddress; --i) {
+                if (breakpoints.find(i) != breakpoints.end()) {
+                    stepMode = true;
+                    break;
+                }
+            }
+
+            if (stepMode) {
+                std::time_t endTime = clock();
+                double elapsedSeconds = double(endTime - startTime) / CLOCKS_PER_SEC;
+                output << "Time delta=" << elapsedSeconds << std::endl;
+                output << "Speed is " << cycleCount / 1000000.0 / elapsedSeconds << " MHz (kind of)" << std::endl;
+            }
         }
 
-        if (watchMode) {
-            watchedAddress = state.getEffectiveProgramAddress();
-        }
-
-        if (state.programCounter < 0x8000) {
+        /*if (state.programCounter < 0x8000) {
             //output << "End of bank" << std::endl;
             //stepMode = true;
             if (state.programBank == 0xff) {
@@ -109,14 +142,12 @@ void Emulator::run()
                 ++state.programBank;
                 state.programCounter = 0x8000;
             }
-        }
+        }*/
     }
 
     std::time_t endTime = clock();
     double elapsedSeconds = double(endTime - startTime) / CLOCKS_PER_SEC;
-
     output << "Time delta=" << elapsedSeconds << std::endl;
-
     output << "Speed is " << cycleCount / 1000000.0 / elapsedSeconds << " MHz (kind of)" << std::endl;
 }
 
