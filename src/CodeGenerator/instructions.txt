@@ -9,10 +9,10 @@ ADC long	6F	Absolute Long	4	51,4
 ADC (dp),Y	71	Direct Page Indirect Indexed, Y	2	51,2,3,4
 ADC (dp)	72	Direct Page Indirect	2	51,2,4
 ADC (sr,S),Y	73	Stack Relative Indirect Indexed, Y	2	71,4
-ADC dp,X	75	Direct Page Indexed,X	2	41,2,4
+ADC dp,X	75	Direct Page Indexed, X	2	41,2,4
 ADC [dp],Y	77	Direct Page Indirect Long Indexed, Y	2	61,2,4
-ADC addr,Y	79	Absolute Indexed,Y	3	41,3,4
-ADC addr,X	7D	Absolute Indexed,X	3	41,3,4
+ADC addr,Y	79	Absolute Indexed, Y	3	41,3,4
+ADC addr,X	7D	Absolute Indexed, X	3	41,3,4
 ADC long,X	7F	Absolute Long Indexed, X	4	51,4
 AND AND Accumulator With Memory [Flags affected: n,z]
 AND (dp,X)	21	Direct Page Indexed Indirect, X	2	61,2
@@ -82,7 +82,7 @@ CMP addr	CD	Absolute	3	41
 CMP long	CF	Absolute Long	4	51
 CMP (dp),Y	D1	Direct Page Indirect Indexed, Y	2	51,2,3
 CMP (dp)	D2	Direct Page Indirect	2	51,2
-CMP (sr,S),Y	D3	Stack Relative Indirect Indexed,Y	2	71
+CMP (sr,S),Y	D3	Stack Relative Indirect Indexed, Y	2	71
 CMP dp,X	D5	Direct Page Indexed, X	2	41,2
 CMP [dp],Y	D7	Direct Page Indirect Long Indexed, Y	2	61,2
 CMP addr,Y	D9	Absolute Indexed, Y	3	41,3
@@ -123,7 +123,7 @@ EOR dp,X	55	Direct Page Indexed, X	2	41,2
 EOR [dp],Y	57	Direct Page Indirect Long Indexed, Y	2	61,2
 EOR addr,Y	59	Absolute Indexed, Y	3	41,3
 EOR addr,X	5D	Absolute Indexed, X	3	41,3
-EOR long,X	5F	Absolute Long Indexed,X	4	51
+EOR long,X	5F	Absolute Long Indexed, X	4	51
 INC Increment [Flags affected: n,z]
 INC A	1A	Accumulator	1	2
 INC dp	E6	Direct Page	2	52,5
@@ -181,7 +181,7 @@ LSR addr,X	5E	Absolute Indexed, X	3	75,6
 MVN Block Move Negative [Flags affected: none][Registers: X,Y,C]
 MVN srcbk,destbk	54	Block Move	3	13
 MVP Block Move Positive [Flags affected: none][Registers: X,Y,C]
-MVN srcbk,destbk	44	Block Move	3	13
+MVP srcbk,destbk	44	Block Move	3	13
 NOP No Operation [Flags affected: none]
 NOP	EA	Implied	1	2
 ORA OR Accumulator with Memory [Flags affected: n,z]

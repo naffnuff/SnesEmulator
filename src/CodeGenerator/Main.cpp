@@ -59,15 +59,11 @@ std::string getRemark(int remarkIndex)
     case 1: return "1: Add 1 cycle if m=0 (16-bit memory/accumulator)";
     case 2: return "2: Add 1 cycle if low byte of Direct Page Register is non-zero";
     case 3: return "3: Add 1 cycle if adding index crosses a page boundary";
-    case 4: return "4: Add 1 cycle if 65C02 and d=1 (65C02 in decimal mode)";
     case 5: return "5: Add 2 cycles if m=0 (16-bit memory/accumulator)";
-    case 6: return "6: Subtract 1 cycle if 65C02 and no page boundary crossed";
     case 7: return "7: Add 1 cycle if branch is taken";
     case 8: return "8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) ";
     case 9: return "9: Add 1 cycle for 65816 native mode (e=0)";
     case 10: return "10: Add 1 cycle if x=0 (16-bit index registers)";
-    case 11: return "11: Add 1 cycle if 65C02";
-    case 12: return "12: 6502: Yields incorrect results if low byte of operand is $FF (i.e., operand is $xxFF)";
     case 13: return "13: 7 cycles per byte moved";
     case 14: return "14: Uses 3 cycles to shut the processor down; additional cycles are required by reset to restart it";
     case 15: return "15: Uses 3 cycles to shut the processor down; additional cycles are required by interrupt to restart it";
@@ -99,6 +95,19 @@ std::string getCycleModification(int remarkIndex)
 
 void generateOpcodes(const std::vector<Instruction>& instructions)
 {
+    std::ifstream opcodeTableFile("..\\..\\..\\src\\CodeGenerator\\opcodeTable.txt");
+    typedef std::map<std::string, std::string> OpcodeMap;
+    OpcodeMap opcodeMap;
+    std::string line;
+    while (std::getline(opcodeTableFile, line)) {
+        std::istringstream stream(line);
+        std::string opcode;
+        std::getline(stream, opcode, ':');
+        std::string comment;
+        std::getline(stream, comment);
+        opcodeMap[opcode] = comment;
+    }
+
     std::ofstream hOutput("..\\..\\..\\src\\SnesEmulator\\Opcode.h");
     std::ofstream cppOutput("..\\..\\..\\src\\SnesEmulator\\Opcode.cpp");
 
@@ -128,9 +137,11 @@ void generateOpcodes(const std::vector<Instruction>& instructions)
         }
 
         hOutput << "// " << instruction.name << std::endl
-            << "// " << instruction.addressMode << std::endl;
+            << "// " << instruction.addressMode << std::endl
+            << "// " << instruction.size << "<" << instruction.sizeRemark << ">" << std::endl;
         cppOutput << "// " << instruction.name << std::endl
-            << "// " << instruction.addressMode << std::endl;
+            << "// " << instruction.addressMode << std::endl
+            << "// " << instruction.size << "<" << instruction.sizeRemark << ">" << std::endl;
 
         int sizeRemark = 0;
 
@@ -155,14 +166,21 @@ void generateOpcodes(const std::vector<Instruction>& instructions)
 
         hOutput << "class " << instruction.classname << " : public AddressMode::" << addressModeClass << std::endl
             << "{" << std::endl
-            << "    std::string opcodeToString() const override { return \"" << instruction.code << ": " << instruction.name << "\"; }" << std::endl
+            << "    // " << opcodeMap[instruction.code] << std::endl;
+        for (int remark : instruction.cyclesRemarks) {
+            hOutput << "    // " << getRemark(remark) << std::endl;
+        }
+        hOutput << "    std::string opcodeToString() const override { return \"" << instruction.code << ": " << instruction.name << "\"; }" << std::endl
             << "    int calculateCycles(const State& state) const override;" << std::endl
             << "};" << std::endl
             << std::endl;
 
         cppOutput << "int " << instruction.classname << "::calculateCycles(const State& state) const" << std::endl
-            << "{" << std::endl
-            << "    int cycles = " << instruction.cycles << ";" << std::endl;
+            << "{" << std::endl;
+
+        cppOutput << "    // " << opcodeMap[instruction.code] << std::endl;
+
+        cppOutput << "    int cycles = " << instruction.cycles << ";" << std::endl;
 
         for (int remark : instruction.cyclesRemarks) {
             cppOutput << "    // " << getRemark(remark) << std::endl;
@@ -206,13 +224,22 @@ void generateOpcodeMap(const std::vector<Instruction>& instructions)
     output << "}" << std::endl;
 }
 
+struct OperatorArgs
+{
+    OperatorArgs()
+    {
+        //cycleRemarks = { 1, 3, 5, 7, 8, 9, 10, 13, 14, 15 };
+    }
+    std::set<int> cycleRemarks;
+    bool hasOperand;
+    std::string comment;
+};
+
 struct AddressModeClassArgs
 {
     AddressModeClassArgs()
     {
-        for (int i = 1; i < 16; ++i) {
-            cycleRemarks.insert(i);
-        }
+        //cycleRemarks = { 2, 3, 5, 7, 9, 13, 14, 15 };
     }
     std::set<int> cycleRemarks;
     int instructionSize;
@@ -320,18 +347,6 @@ void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
     output << "}" << std::endl;
 }
 
-struct OperatorArgs
-{
-    OperatorArgs()
-    {
-        for (int i = 1; i < 16; ++i) {
-            cycleRemarks.insert(i);
-        }
-    }
-    std::set<int> cycleRemarks;
-    bool hasOperand;
-    std::string comment;
-};
 typedef std::map<std::string, OperatorArgs> OperatorMap;
 void generateOperators(const OperatorMap& operatorMap)
 {
@@ -392,17 +407,16 @@ void generateOperators(const OperatorMap& operatorMap)
 int main(int argc, char* argv[])
 {
     try {
-        std::ifstream infile("..\\..\\..\\src\\CodeGenerator\\instructions.txt");
+        std::ifstream instructionsFile("..\\..\\..\\src\\CodeGenerator\\instructions.txt");
 
-        if (!infile) {
+        if (!instructionsFile) {
             throw std::runtime_error("Cannot find instruction definitions");
         }
 
         std::vector<std::vector<std::string>> lines;
 
         std::string line;
-
-        while (std::getline(infile, line)) {
+        while (std::getline(instructionsFile, line)) {
 
             std::istringstream stream(line);
             std::string token;
@@ -413,8 +427,6 @@ int main(int argc, char* argv[])
 
             lines.push_back(tokens);
         }
-
-        std::vector<std::string> switchCases;
 
         std::vector<Instruction> instructions;
         std::string comment;
@@ -525,21 +537,23 @@ int main(int argc, char* argv[])
         }
 
         for (Instruction& instruction : instructions) {
+            std::set<int> removedRemarks;
             for (const AddressModeClassMap::value_type& kvp : addressModeClassMap) {
                 if (kvp.first == instruction.addressModeClass) {
-                    std::cout << "Found addressMode " << kvp.first << std::endl;
                     for (int remark : kvp.second.cycleRemarks) {
-                        instruction.cyclesRemarks.erase(remark);
-                        std::cout << "\t" << remark << std::endl;
+                        if (instruction.cyclesRemarks.erase(remark)) {
+                            removedRemarks.insert(remark);
+                        }
                     }
                 }
             }
             for (const OperatorMap::value_type& kvp : operatorMap) {
                 if (kvp.first == instruction.mnemonic) {
-                    std::cout << "Found operator " << kvp.first << std::endl;
                     for (int remark : kvp.second.cycleRemarks) {
                         instruction.cyclesRemarks.erase(remark);
-                        std::cout << "\t" << remark << std::endl;
+                        if (removedRemarks.find(remark) != removedRemarks.end()) {
+                            std::cout << "Nope, remark removed twice from " << instruction.classname << ": " << remark << ", " << instruction.mnemonic << ", " << instruction.addressModeClass << std::endl;
+                        }
                     }
                 }
             }

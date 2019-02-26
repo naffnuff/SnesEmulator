@@ -118,7 +118,13 @@
     <ClCompile Include="..\..\..\src\CodeGenerator\Main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="..\..\..\src\CodeGenerator\cycleTable.txt" />
+    <Text Include="..\..\..\src\CodeGenerator\flagTable.txt" />
     <Text Include="..\..\..\src\CodeGenerator\instructions.txt" />
+    <Text Include="..\..\..\src\CodeGenerator\modeTable.txt" />
+    <Text Include="..\..\..\src\CodeGenerator\opcodeTable.txt" />
+    <Text Include="..\..\..\src\CodeGenerator\sizeTable.txt" />
+    <Text Include="..\..\..\src\CodeGenerator\syntaxTable.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

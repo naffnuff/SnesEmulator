@@ -113,8 +113,6 @@ template <typename Operator>
 int AbsoluteIndirect<Operator>::apply(State& state, uint16_t operand) const
 {
     int cycles = 0;
-    // 11: Add 1 cycle if 65C02
-    // 12: 6502: Yields incorrect results if low byte of operand is $FF (i.e., operand is $xxFF)
     int* data = nullptr;
     return cycles + Operator::operate(state, data);
 }
@@ -181,8 +179,6 @@ template <typename Operator>
 int AbsoluteLongIndexedX<Operator>::apply(State& state, uint32_t operand) const
 {
     int cycles = 0;
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 1;
     int* data = nullptr;
     return cycles + Operator::operate(state, data);
 }
@@ -227,8 +223,6 @@ template <typename Operator>
 int BlockMove<Operator>::apply(State& state, uint16_t operand) const
 {
     int cycles = 0;
-    // 3: Add 1 cycle if adding index crosses a page boundary
-    cycles += 0 /* TODO03 */;
     int* data = nullptr;
     return cycles + Operator::operate(state, data);
 }
@@ -251,8 +245,6 @@ template <typename Operator>
 int DirectPage<Operator>::apply(State& state, uint8_t operand) const
 {
     int cycles = 0;
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
     int* data = nullptr;
     return cycles + Operator::operate(state, data);
 }
@@ -275,10 +267,6 @@ template <typename Operator>
 int DirectPageIndexedIndirectX<Operator>::apply(State& state, uint8_t operand) const
 {
     int cycles = 0;
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 1;
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
     int* data = nullptr;
     return cycles + Operator::operate(state, data);
 }
@@ -301,8 +289,6 @@ template <typename Operator>
 int DirectPageIndexedX<Operator>::apply(State& state, uint8_t operand) const
 {
     int cycles = 0;
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
     int* data = nullptr;
     return cycles + Operator::operate(state, data);
 }
@@ -325,10 +311,6 @@ template <typename Operator>
 int DirectPageIndexedY<Operator>::apply(State& state, uint8_t operand) const
 {
     int cycles = 0;
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-    // 10: Add 1 cycle if x=0 (16-bit index registers)
-    cycles += state.getFlag(State::x) ? 0 : 1;
     int* data = nullptr;
     return cycles + Operator::operate(state, data);
 }
@@ -351,10 +333,6 @@ template <typename Operator>
 int DirectPageIndirect<Operator>::apply(State& state, uint8_t operand) const
 {
     int cycles = 0;
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 1;
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
     int* data = nullptr;
     return cycles + Operator::operate(state, data);
 }
@@ -377,10 +355,6 @@ template <typename Operator>
 int DirectPageIndirectIndexedY<Operator>::apply(State& state, uint8_t operand) const
 {
     int cycles = 0;
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 1;
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
     int* data = nullptr;
     return cycles + Operator::operate(state, data);
 }
@@ -403,10 +377,6 @@ template <typename Operator>
 int DirectPageIndirectLong<Operator>::apply(State& state, uint8_t operand) const
 {
     int cycles = 0;
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 1;
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
     int* data = nullptr;
     return cycles + Operator::operate(state, data);
 }
@@ -429,10 +399,6 @@ template <typename Operator>
 int DirectPageIndirectLongIndexedY<Operator>::apply(State& state, uint8_t operand) const
 {
     int cycles = 0;
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 1;
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
     int* data = nullptr;
     return cycles + Operator::operate(state, data);
 }
@@ -521,8 +487,6 @@ template <typename Operator>
 int ProgramCounterRelative<Operator>::apply(State& state, uint8_t operand) const
 {
     int cycles = 0;
-    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
-    cycles += 0 /* TODO08 */;
     int* data = nullptr;
     return cycles + Operator::operate(state, data);
 }
@@ -589,8 +553,6 @@ template <typename Operator>
 int StackDirectPageIndirect<Operator>::apply(State& state, uint8_t operand) const
 {
     int cycles = 0;
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
     int* data = nullptr;
     return cycles + Operator::operate(state, data);
 }
@@ -613,8 +575,6 @@ template <typename Operator>
 int StackInterrupt<Operator>::apply(State& state, uint8_t operand) const
 {
     int cycles = 0;
-    // 9: Add 1 cycle for 65816 native mode (e=0)
-    cycles += state.isEmulationMode() ? 0 : 1;
     int* data = nullptr;
     return cycles + Operator::operate(state, data);
 }
@@ -703,8 +663,6 @@ template <typename Operator>
 int StackRTI<Operator>::apply(State& state) const
 {
     int cycles = 0;
-    // 9: Add 1 cycle for 65816 native mode (e=0)
-    cycles += state.isEmulationMode() ? 0 : 1;
     int* data = nullptr;
     return cycles + Operator::operate(state, data);
 }
@@ -771,8 +729,6 @@ template <typename Operator>
 int StackRelative<Operator>::apply(State& state, uint8_t operand) const
 {
     int cycles = 0;
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 1;
     int* data = nullptr;
     return cycles + Operator::operate(state, data);
 }
@@ -795,8 +751,6 @@ template <typename Operator>
 int StackRelativeIndirectIndexedY<Operator>::apply(State& state, uint8_t operand) const
 {
     int cycles = 0;
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 1;
     int* data = nullptr;
     return cycles + Operator::operate(state, data);
 }

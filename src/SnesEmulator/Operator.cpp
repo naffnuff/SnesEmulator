@@ -6,9 +6,6 @@ namespace Operator {
 int ADC::operate(State& state, int* data)
 {
     int cycles = 0;
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 1;
-    // 4: Add 1 cycle if 65C02 and d=1 (65C02 in decimal mode)
     return cycles;
 }
 
@@ -16,8 +13,6 @@ int ADC::operate(State& state, int* data)
 int AND::operate(State& state, int* data)
 {
     int cycles = 0;
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 1;
     return cycles;
 }
 
@@ -32,10 +27,6 @@ int ASL::operate(State& state, int* data)
 int BCC::operate(State& state, int* data)
 {
     int cycles = 0;
-    // 7: Add 1 cycle if branch is taken
-    cycles += 0 /* TODO07 */;
-    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
-    cycles += 0 /* TODO08 */;
     return cycles;
 }
 
@@ -43,10 +34,6 @@ int BCC::operate(State& state, int* data)
 int BCS::operate(State& state, int* data)
 {
     int cycles = 0;
-    // 7: Add 1 cycle if branch is taken
-    cycles += 0 /* TODO07 */;
-    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
-    cycles += 0 /* TODO08 */;
     return cycles;
 }
 
@@ -54,10 +41,6 @@ int BCS::operate(State& state, int* data)
 int BEQ::operate(State& state, int* data)
 {
     int cycles = 0;
-    // 7: Add 1 cycle if branch is taken
-    cycles += 0 /* TODO07 */;
-    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
-    cycles += 0 /* TODO08 */;
     return cycles;
 }
 
@@ -65,8 +48,6 @@ int BEQ::operate(State& state, int* data)
 int BIT::operate(State& state, int* data)
 {
     int cycles = 0;
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 1;
     return cycles;
 }
 
@@ -74,10 +55,6 @@ int BIT::operate(State& state, int* data)
 int BMI::operate(State& state, int* data)
 {
     int cycles = 0;
-    // 7: Add 1 cycle if branch is taken
-    cycles += 0 /* TODO07 */;
-    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
-    cycles += 0 /* TODO08 */;
     return cycles;
 }
 
@@ -85,10 +62,6 @@ int BMI::operate(State& state, int* data)
 int BNE::operate(State& state, int* data)
 {
     int cycles = 0;
-    // 7: Add 1 cycle if branch is taken
-    cycles += 0 /* TODO07 */;
-    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
-    cycles += 0 /* TODO08 */;
     return cycles;
 }
 
@@ -96,10 +69,6 @@ int BNE::operate(State& state, int* data)
 int BPL::operate(State& state, int* data)
 {
     int cycles = 0;
-    // 7: Add 1 cycle if branch is taken
-    cycles += 0 /* TODO07 */;
-    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
-    cycles += 0 /* TODO08 */;
     return cycles;
 }
 
@@ -107,8 +76,6 @@ int BPL::operate(State& state, int* data)
 int BRA::operate(State& state, int* data)
 {
     int cycles = 0;
-    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
-    cycles += 0 /* TODO08 */;
     return cycles;
 }
 
@@ -116,8 +83,6 @@ int BRA::operate(State& state, int* data)
 int BRK::operate(State& state, int* data)
 {
     int cycles = 0;
-    // 9: Add 1 cycle for 65816 native mode (e=0)
-    cycles += state.isEmulationMode() ? 0 : 1;
     return cycles;
 }
 
@@ -132,10 +97,6 @@ int BRL::operate(State& state, int* data)
 int BVC::operate(State& state, int* data)
 {
     int cycles = 0;
-    // 7: Add 1 cycle if branch is taken
-    cycles += 0 /* TODO07 */;
-    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
-    cycles += 0 /* TODO08 */;
     return cycles;
 }
 
@@ -143,10 +104,6 @@ int BVC::operate(State& state, int* data)
 int BVS::operate(State& state, int* data)
 {
     int cycles = 0;
-    // 7: Add 1 cycle if branch is taken
-    cycles += 0 /* TODO07 */;
-    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
-    cycles += 0 /* TODO08 */;
     return cycles;
 }
 
@@ -182,8 +139,6 @@ int CLV::operate(State& state)
 int CMP::operate(State& state, int* data)
 {
     int cycles = 0;
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 1;
     return cycles;
 }
 
@@ -191,8 +146,6 @@ int CMP::operate(State& state, int* data)
 int COP::operate(State& state, int* data)
 {
     int cycles = 0;
-    // 9: Add 1 cycle for 65816 native mode (e=0)
-    cycles += state.isEmulationMode() ? 0 : 1;
     return cycles;
 }
 
@@ -200,8 +153,6 @@ int COP::operate(State& state, int* data)
 int CPX::operate(State& state, int* data)
 {
     int cycles = 0;
-    // 10: Add 1 cycle if x=0 (16-bit index registers)
-    cycles += state.getFlag(State::x) ? 0 : 1;
     return cycles;
 }
 
@@ -209,8 +160,6 @@ int CPX::operate(State& state, int* data)
 int CPY::operate(State& state, int* data)
 {
     int cycles = 0;
-    // 10: Add 1 cycle if x=0 (16-bit index registers)
-    cycles += state.getFlag(State::x) ? 0 : 1;
     return cycles;
 }
 
@@ -239,8 +188,6 @@ int DEY::operate(State& state)
 int EOR::operate(State& state, int* data)
 {
     int cycles = 0;
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 1;
     return cycles;
 }
 
@@ -283,8 +230,6 @@ int JSR::operate(State& state, int* data)
 int LDA::operate(State& state, int* data)
 {
     int cycles = 0;
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 1;
     return cycles;
 }
 
@@ -292,8 +237,6 @@ int LDA::operate(State& state, int* data)
 int LDX::operate(State& state, int* data)
 {
     int cycles = 0;
-    // 10: Add 1 cycle if x=0 (16-bit index registers)
-    cycles += state.getFlag(State::x) ? 0 : 1;
     return cycles;
 }
 
@@ -301,8 +244,6 @@ int LDX::operate(State& state, int* data)
 int LDY::operate(State& state, int* data)
 {
     int cycles = 0;
-    // 10: Add 1 cycle if x=0 (16-bit index registers)
-    cycles += state.getFlag(State::x) ? 0 : 1;
     return cycles;
 }
 
@@ -313,12 +254,17 @@ int LSR::operate(State& state, int* data)
     return cycles;
 }
 
-// MVP Block Move Positive [Flags affected: none][Registers: X,Y,C]
+// MVN Block Move Negative [Flags affected: none][Registers: X,Y,C]
 int MVN::operate(State& state, int* data)
 {
     int cycles = 0;
-    // 3: Add 1 cycle if adding index crosses a page boundary
-    cycles += 0 /* TODO03 */;
+    return cycles;
+}
+
+// MVP Block Move Positive [Flags affected: none][Registers: X,Y,C]
+int MVP::operate(State& state, int* data)
+{
+    int cycles = 0;
     return cycles;
 }
 
@@ -333,8 +279,6 @@ int NOP::operate(State& state)
 int ORA::operate(State& state, int* data)
 {
     int cycles = 0;
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 1;
     return cycles;
 }
 
@@ -349,8 +293,6 @@ int PEA::operate(State& state, int* data)
 int PEI::operate(State& state, int* data)
 {
     int cycles = 0;
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
     return cycles;
 }
 
@@ -365,8 +307,6 @@ int PER::operate(State& state, int* data)
 int PHA::operate(State& state, int* data)
 {
     int cycles = 0;
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 1;
     return cycles;
 }
 
@@ -402,8 +342,6 @@ int PHP::operate(State& state, int* data)
 int PHX::operate(State& state, int* data)
 {
     int cycles = 0;
-    // 10: Add 1 cycle if x=0 (16-bit index registers)
-    cycles += state.getFlag(State::x) ? 0 : 1;
     return cycles;
 }
 
@@ -411,8 +349,6 @@ int PHX::operate(State& state, int* data)
 int PHY::operate(State& state, int* data)
 {
     int cycles = 0;
-    // 10: Add 1 cycle if x=0 (16-bit index registers)
-    cycles += state.getFlag(State::x) ? 0 : 1;
     return cycles;
 }
 
@@ -420,8 +356,6 @@ int PHY::operate(State& state, int* data)
 int PLA::operate(State& state, int* data)
 {
     int cycles = 0;
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 1;
     return cycles;
 }
 
@@ -450,8 +384,6 @@ int PLP::operate(State& state, int* data)
 int PLX::operate(State& state, int* data)
 {
     int cycles = 0;
-    // 10: Add 1 cycle if x=0 (16-bit index registers)
-    cycles += state.getFlag(State::x) ? 0 : 1;
     return cycles;
 }
 
@@ -459,8 +391,6 @@ int PLX::operate(State& state, int* data)
 int PLY::operate(State& state, int* data)
 {
     int cycles = 0;
-    // 10: Add 1 cycle if x=0 (16-bit index registers)
-    cycles += state.getFlag(State::x) ? 0 : 1;
     return cycles;
 }
 
@@ -489,8 +419,6 @@ int ROR::operate(State& state, int* data)
 int RTI::operate(State& state, int* data)
 {
     int cycles = 0;
-    // 9: Add 1 cycle for 65816 native mode (e=0)
-    cycles += state.isEmulationMode() ? 0 : 1;
     return cycles;
 }
 
@@ -512,9 +440,6 @@ int RTS::operate(State& state, int* data)
 int SBC::operate(State& state, int* data)
 {
     int cycles = 0;
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 1;
-    // 4: Add 1 cycle if 65C02 and d=1 (65C02 in decimal mode)
     return cycles;
 }
 
@@ -550,8 +475,6 @@ int SEP::operate(State& state, int* data)
 int STA::operate(State& state, int* data)
 {
     int cycles = 0;
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 1;
     return cycles;
 }
 
@@ -559,8 +482,6 @@ int STA::operate(State& state, int* data)
 int STP::operate(State& state)
 {
     int cycles = 0;
-    // 14: Uses 3 cycles to shut the processor down; additional cycles are required by reset to restart it
-    cycles += 0 /* TODO14 */;
     return cycles;
 }
 
@@ -568,8 +489,6 @@ int STP::operate(State& state)
 int STX::operate(State& state, int* data)
 {
     int cycles = 0;
-    // 10: Add 1 cycle if x=0 (16-bit index registers)
-    cycles += state.getFlag(State::x) ? 0 : 1;
     return cycles;
 }
 
@@ -577,8 +496,6 @@ int STX::operate(State& state, int* data)
 int STY::operate(State& state, int* data)
 {
     int cycles = 0;
-    // 10: Add 1 cycle if x=0 (16-bit index registers)
-    cycles += state.getFlag(State::x) ? 0 : 1;
     return cycles;
 }
 
@@ -586,8 +503,6 @@ int STY::operate(State& state, int* data)
 int STZ::operate(State& state, int* data)
 {
     int cycles = 0;
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 1;
     return cycles;
 }
 
@@ -637,8 +552,6 @@ int TRB::operate(State& state, int* data)
 int TSB::operate(State& state, int* data)
 {
     int cycles = 0;
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 2;
     return cycles;
 }
 
@@ -695,8 +608,6 @@ int TYX::operate(State& state)
 int WAI::operate(State& state)
 {
     int cycles = 0;
-    // 15: Uses 3 cycles to shut the processor down; additional cycles are required by interrupt to restart it
-    cycles += 0 /* TODO15 */;
     return cycles;
 }
 

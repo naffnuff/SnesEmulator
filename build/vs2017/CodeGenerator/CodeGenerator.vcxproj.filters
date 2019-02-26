@@ -23,5 +23,23 @@
     <Text Include="..\..\..\src\CodeGenerator\instructions.txt">
       <Filter>Resource Files</Filter>
     </Text>
+    <Text Include="..\..\..\src\CodeGenerator\cycleTable.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="..\..\..\src\CodeGenerator\flagTable.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="..\..\..\src\CodeGenerator\modeTable.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="..\..\..\src\CodeGenerator\sizeTable.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="..\..\..\src\CodeGenerator\syntaxTable.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="..\..\..\src\CodeGenerator\opcodeTable.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>

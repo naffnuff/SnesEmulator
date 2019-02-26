@@ -292,11 +292,19 @@ public:
     static int operate(State& state, int* data);
 };
 
-// MVP Block Move Positive [Flags affected: none][Registers: X,Y,C]
+// MVN Block Move Negative [Flags affected: none][Registers: X,Y,C]
 class MVN
 {
 public:
     static std::string toString() { return "MVN"; }
+    static int operate(State& state, int* data);
+};
+
+// MVP Block Move Positive [Flags affected: none][Registers: X,Y,C]
+class MVP
+{
+public:
+    static std::string toString() { return "MVP"; }
     static int operate(State& state, int* data);
 };
 

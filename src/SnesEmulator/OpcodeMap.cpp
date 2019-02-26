@@ -157,7 +157,7 @@ OpcodeMap::OpcodeMap()
     instructions[0x56] = std::make_unique<Opcode::LSR_56>();
     instructions[0x5E] = std::make_unique<Opcode::LSR_5E>();
     instructions[0x54] = std::make_unique<Opcode::MVN_54>();
-    instructions[0x44] = std::make_unique<Opcode::MVN_44>();
+    instructions[0x44] = std::make_unique<Opcode::MVP_44>();
     instructions[0xEA] = std::make_unique<Opcode::NOP_EA>();
     instructions[0x01] = std::make_unique<Opcode::ORA_01>();
     instructions[0x03] = std::make_unique<Opcode::ORA_03>();
