@@ -18,9 +18,6 @@
     <ClCompile Include="..\..\..\src\SnesEmulator\Emulator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\SnesEmulator\Instruction.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\SnesEmulator\Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

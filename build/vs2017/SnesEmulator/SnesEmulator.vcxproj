@@ -116,7 +116,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\SnesEmulator\Emulator.cpp" />
-    <ClCompile Include="..\..\..\src\SnesEmulator\Instruction.cpp" />
     <ClCompile Include="..\..\..\src\SnesEmulator\Opcode.cpp" />
     <ClCompile Include="..\..\..\src\SnesEmulator\OpcodeMap.cpp" />
     <ClCompile Include="..\..\..\src\SnesEmulator\Main.cpp" />

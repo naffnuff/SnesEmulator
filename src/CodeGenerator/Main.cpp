@@ -93,6 +93,28 @@ std::string getCycleModification(int remarkIndex)
     }
 }
 
+struct OperatorArgs
+{
+    OperatorArgs()
+    {
+        //cycleRemarks = { 1, 3, 5, 7, 8, 9, 10, 13, 14, 15 };
+    }
+    std::set<int> cycleRemarks;
+    bool hasOperand;
+    std::string comment;
+};
+
+struct AddressModeClassArgs
+{
+    AddressModeClassArgs()
+    {
+        //cycleRemarks = { 2, 3, 5, 7, 9, 13, 14, 15 };
+    }
+    std::set<int> cycleRemarks;
+    int instructionSize;
+    std::string comment;
+};
+
 void generateOpcodes(const std::vector<Instruction>& instructions)
 {
     std::ifstream opcodeTableFile("..\\..\\..\\src\\CodeGenerator\\opcodeTable.txt");
@@ -224,27 +246,6 @@ void generateOpcodeMap(const std::vector<Instruction>& instructions)
     output << "}" << std::endl;
 }
 
-struct OperatorArgs
-{
-    OperatorArgs()
-    {
-        //cycleRemarks = { 1, 3, 5, 7, 8, 9, 10, 13, 14, 15 };
-    }
-    std::set<int> cycleRemarks;
-    bool hasOperand;
-    std::string comment;
-};
-
-struct AddressModeClassArgs
-{
-    AddressModeClassArgs()
-    {
-        //cycleRemarks = { 2, 3, 5, 7, 9, 13, 14, 15 };
-    }
-    std::set<int> cycleRemarks;
-    int instructionSize;
-    std::string comment;
-};
 typedef std::map<std::string, AddressModeClassArgs> AddressModeClassMap;
 void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
 {

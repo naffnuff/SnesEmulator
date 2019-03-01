@@ -25,6 +25,17 @@ protected:
     std::string operandToString(const State& state) const override;
 };
 
+inline int Instruction1Byte::execute(State& state) const
+{
+    state.incrementProgramCounter(1);
+    return calculateCycles(state) + apply(state);
+}
+
+inline std::string Instruction1Byte::operandToString(const State& state) const
+{
+    return "";
+}
+
 class Instruction2Byte : public Instruction
 {
 public:
@@ -33,6 +44,20 @@ protected:
     virtual int apply(State& state, uint8_t operand) const = 0;
     std::string operandToString(const State& state) const override;
 };
+
+inline int Instruction2Byte::execute(State& state) const
+{
+    uint8_t operand = state.readOneByteValue();
+    state.incrementProgramCounter(2);
+    return calculateCycles(state) + apply(state, operand);
+}
+
+inline std::string Instruction2Byte::operandToString(const State& state) const
+{
+    std::ostringstream ss;
+    ss << std::hex << "One byte: " << std::setw(2) << std::setfill('0') << +state.readOneByteValue();
+    return ss.str();
+}
 
 class Instruction3Byte : public Instruction
 {
@@ -43,6 +68,20 @@ public:
     std::string operandToString(const State& state) const override;
 };
 
+inline int Instruction3Byte::execute(State& state) const
+{
+    uint16_t operand = state.readTwoByteValue();
+    state.incrementProgramCounter(3);
+    return calculateCycles(state) + apply(state, operand);
+}
+
+inline std::string Instruction3Byte::operandToString(const State& state) const
+{
+    std::ostringstream ss;
+    ss << std::hex << "Two bytes: " << std::setw(4) << std::setfill('0') << +state.readTwoByteValue();
+    return ss.str();
+}
+
 class Instruction4Byte : public Instruction
 {
 public:
@@ -51,6 +90,21 @@ protected:
     virtual int apply(State& state, uint32_t operand) const = 0;
     std::string operandToString(const State& state) const override;
 };
+
+inline int Instruction4Byte::execute(State& state) const
+{
+    uint32_t operand = state.readThreeByteValue();
+    state.incrementProgramCounter(4);
+    int cycles = calculateCycles(state) + apply(state, operand);
+    return cycles;
+}
+
+inline std::string Instruction4Byte::operandToString(const State& state) const
+{
+    std::ostringstream ss;
+    ss << std::hex << "Three bytes: " << std::setw(6) << std::setfill('0') << +state.readThreeByteValue();
+    return ss.str();
+}
 
 template<State::Flag Flag>
 class InstructionFlagSize : public Instruction
