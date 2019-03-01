@@ -35,7 +35,7 @@ ASL dp	06	Direct Page	2	52,5
 ASL A	0A	Accumulator	1	2
 ASL addr	0E	Absolute	3	65
 ASL dp,X	16	Direct Page Indexed, X	2	62,5
-ASL addr,X	1E	Absolute Indexed, X	3	75,6
+ASL addr,X	1E	Absolute Indexed, X	3	75,6,3,20
 BCC Branch if Carry Clear [Flags affected: none][Alias: BLT]
 BCC nearlabel	90	Program Counter Relative	2	27,8
 BCS Branch if Carry Set [Flags affected: none][Alias: BGE]
@@ -103,7 +103,7 @@ DEC A	3A	Accumulator	1	2
 DEC dp	C6	Direct Page	2	52,5
 DEC addr	CE	Absolute	3	65
 DEC dp,X	D6	Direct Page Indexed, X	2	62,5
-DEC addr,X	DE	Absolute Indexed, X	3	75,6
+DEC addr,X	DE	Absolute Indexed, X	3	75,6,3,20
 DEX Decrement Index Register X [Flags affected: n,z]
 DEX	CA	Implied	1	2
 DEY Decrement Index Register Y [Flags affected: n,z]
@@ -129,7 +129,7 @@ INC A	1A	Accumulator	1	2
 INC dp	E6	Direct Page	2	52,5
 INC addr	EE	Absolute	3	65
 INC dp,X	F6	Direct Page Indexed, X	2	62,5
-INC addr,X	FE	Absolute Indexed, X	3	75,6
+INC addr,X	FE	Absolute Indexed, X	3	75,6,3,20
 INX Increment Index Register X [Flags affected: n,z]
 INX	E8	Implied	1	2
 INY Increment Index Register Y [Flags affected: n,z]
@@ -177,7 +177,7 @@ LSR dp	46	Direct Page	2	52,5
 LSR A	4A	Accumulator	1	2
 LSR addr	4E	Absolute	3	65
 LSR dp,X	56	Direct Page Indexed, X	2	62,5
-LSR addr,X	5E	Absolute Indexed, X	3	75,6
+LSR addr,X	5E	Absolute Indexed, X	3	75,6,3,20
 MVN Block Move Negative [Flags affected: none][Registers: X,Y,C]
 MVN srcbk,destbk	54	Block Move	3	13
 MVP Block Move Positive [Flags affected: none][Registers: X,Y,C]
@@ -239,13 +239,13 @@ ROL dp	26	Direct Page	2	52,5
 ROL A	2A	Accumulator	1	2
 ROL addr	2E	Absolute	3	65
 ROL dp,X	36	Direct Page Indexed, X	2	62,5
-ROL addr,X	3E	Absolute Indexed, X	3	75,6
+ROL addr,X	3E	Absolute Indexed, X	3	75,6,3,20
 ROR Rotate Memory or Accumulator Right [Flags affected: n,z,c]
 ROR dp	66	Direct Page	2	52,5
 ROR A	6A	Accumulator	1	2
 ROR addr	6E	Absolute	3	65
 ROR dp,X	76	Direct Page Indexed, X	2	62,5
-ROR addr,X	7E	Absolute Indexed, X	3	75,6
+ROR addr,X	7E	Absolute Indexed, X	3	75,6,3,20
 RTI Return from Interrupt [Flags affected: all except b]
 RTI	40	Stack (RTI)	1	69
 RTL Return from Subroutine Long [Flags affected: none]
@@ -283,13 +283,13 @@ STA dp	85	Direct Page	2	31,2
 STA [dp]	87	Direct Page Indirect Long	2	61,2
 STA addr	8D	Absolute	3	41
 STA long	8F	Absolute Long	4	51
-STA (dp),Y	91	Direct Page Indirect Indexed, Y	2	61,2
+STA (dp),Y	91	Direct Page Indirect Indexed, Y	2	61,2,3,20
 STA (dp)	92	Direct Page Indirect	2	51,2
 STA (sr,S),Y	93	Stack Relative Indirect Indexed, Y	2	71
 STA dp,X	95	Direct Page Indexed, X	2	41,2
 STA [dp],Y	97	Direct Page Indirect Long Indexed, Y	2	61,2
-STA addr,Y	99	Absolute Indexed, Y	3	51
-STA addr,X	9D	Absolute Indexed, X	3	51
+STA addr,Y	99	Absolute Indexed, Y	3	51,3,20
+STA addr,X	9D	Absolute Indexed, X	3	51,3,20
 STA long,X	9F	Absolute Long Indexed, X	4	51
 STP Stop Processor [Flags affected: none]
 STP	DB	Implied	1	314
@@ -305,7 +305,7 @@ STZ Store Zero to Memory [Flags affected: none]
 STZ dp	64	Direct Page	2	31,2
 STZ dp,X	74	Direct Page Indexed, X	2	41,2
 STZ addr	9C	Absolute	3	41
-STZ addr,X	9E	Absolute Indexed, X	3	51
+STZ addr,X	9E	Absolute Indexed, X	3	51,3,20
 TAX Transfer Accumulator to Index Register X [Flags affected: n,z]
 TAX	AA	Implied	1	2
 TAY Transfer Accumulator to Index Register Y [Flags affected: n,z]

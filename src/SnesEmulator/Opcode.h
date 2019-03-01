@@ -151,13 +151,11 @@ class ADC_71 : public AddressMode::DirectPageIndirectIndexedY<Operator::ADC>
     // 2   7-m+w-x+x*p (dir),Y   mm....mm . ADC ($10),Y
     // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    // 3: Add 1 cycle if adding index crosses a page boundary
     int calculateCycles(const State& state) const override
     {
         int cycles = 5;
         cycles += state.is16Bit(State::m) ? 1 : 0;
         cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        cycles += 0 /* TODO03 */;
         return cycles;
     }
 
@@ -250,12 +248,10 @@ class ADC_79 : public AddressMode::AbsoluteIndexedY<Operator::ADC>
 {
     // 3   6-m-x+x*p   abs,Y     mm....mm . ADC $9876,Y
     // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 3: Add 1 cycle if adding index crosses a page boundary
     int calculateCycles(const State& state) const override
     {
         int cycles = 4;
         cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += 0 /* TODO03 */;
         return cycles;
     }
 
@@ -270,12 +266,10 @@ class ADC_7D : public AddressMode::AbsoluteIndexedX<Operator::ADC>
 {
     // 3   6-m-x+x*p   abs,X     mm....mm . ADC $9876,X
     // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 3: Add 1 cycle if adding index crosses a page boundary
     int calculateCycles(const State& state) const override
     {
         int cycles = 4;
         cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += 0 /* TODO03 */;
         return cycles;
     }
 
@@ -442,13 +436,11 @@ class AND_31 : public AddressMode::DirectPageIndirectIndexedY<Operator::AND>
     // 2   7-m+w-x+x*p (dir),Y   m.....m. . AND ($10),Y
     // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    // 3: Add 1 cycle if adding index crosses a page boundary
     int calculateCycles(const State& state) const override
     {
         int cycles = 5;
         cycles += state.is16Bit(State::m) ? 1 : 0;
         cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        cycles += 0 /* TODO03 */;
         return cycles;
     }
 
@@ -541,12 +533,10 @@ class AND_39 : public AddressMode::AbsoluteIndexedY<Operator::AND>
 {
     // 3   6-m-x+x*p   abs,Y     m.....m. . AND $9876,Y
     // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 3: Add 1 cycle if adding index crosses a page boundary
     int calculateCycles(const State& state) const override
     {
         int cycles = 4;
         cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += 0 /* TODO03 */;
         return cycles;
     }
 
@@ -561,12 +551,10 @@ class AND_3D : public AddressMode::AbsoluteIndexedX<Operator::AND>
 {
     // 3   6-m-x+x*p   abs,X     m.....m. . AND $9876,X
     // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 3: Add 1 cycle if adding index crosses a page boundary
     int calculateCycles(const State& state) const override
     {
         int cycles = 4;
         cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += 0 /* TODO03 */;
         return cycles;
     }
 
@@ -673,10 +661,12 @@ class ASL_1E : public AddressMode::AbsoluteIndexedX<Operator::ASL>
 {
     // 3   9-2*m       abs,X     m.....mm . ASL $9876,X
     // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    // 20: Needs manual removal of cycle calculation
     int calculateCycles(const State& state) const override
     {
         int cycles = 7;
         cycles += state.is16Bit(State::m) ? 2 : 0;
+        cycles += 0 /* TODO20 */;
         return cycles;
     }
 
@@ -690,13 +680,9 @@ class ASL_1E : public AddressMode::AbsoluteIndexedX<Operator::ASL>
 class BCC_90 : public AddressMode::ProgramCounterRelative<Operator::BCC>
 {
     // 2   2+t+t*e*p   rel8      ........ . BCC LABEL
-    // 7: Add 1 cycle if branch is taken
-    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     int calculateCycles(const State& state) const override
     {
         int cycles = 2;
-        cycles += 0 /* TODO07 */;
-        cycles += 0 /* TODO08 */;
         return cycles;
     }
 
@@ -710,13 +696,9 @@ class BCC_90 : public AddressMode::ProgramCounterRelative<Operator::BCC>
 class BCS_B0 : public AddressMode::ProgramCounterRelative<Operator::BCS>
 {
     // 2   2+t+t*e*p   rel8      ........ . BCS LABEL
-    // 7: Add 1 cycle if branch is taken
-    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     int calculateCycles(const State& state) const override
     {
         int cycles = 2;
-        cycles += 0 /* TODO07 */;
-        cycles += 0 /* TODO08 */;
         return cycles;
     }
 
@@ -730,13 +712,9 @@ class BCS_B0 : public AddressMode::ProgramCounterRelative<Operator::BCS>
 class BEQ_F0 : public AddressMode::ProgramCounterRelative<Operator::BEQ>
 {
     // 2   2+t+t*e*p   rel8      ........ . BEQ LABEL
-    // 7: Add 1 cycle if branch is taken
-    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     int calculateCycles(const State& state) const override
     {
         int cycles = 2;
-        cycles += 0 /* TODO07 */;
-        cycles += 0 /* TODO08 */;
         return cycles;
     }
 
@@ -809,12 +787,10 @@ class BIT_3C : public AddressMode::AbsoluteIndexedX<Operator::BIT>
 {
     // 3   6-m-x+x*p   abs,X     mm....m. . BIT $9876,X
     // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 3: Add 1 cycle if adding index crosses a page boundary
     int calculateCycles(const State& state) const override
     {
         int cycles = 4;
         cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += 0 /* TODO03 */;
         return cycles;
     }
 
@@ -847,13 +823,9 @@ class BIT_89 : public AddressMode::ImmediateFlagSize<Operator::BIT, State::m>
 class BMI_30 : public AddressMode::ProgramCounterRelative<Operator::BMI>
 {
     // 2   2+t+t*e*p   rel8      ........ . BMI LABEL
-    // 7: Add 1 cycle if branch is taken
-    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     int calculateCycles(const State& state) const override
     {
         int cycles = 2;
-        cycles += 0 /* TODO07 */;
-        cycles += 0 /* TODO08 */;
         return cycles;
     }
 
@@ -867,13 +839,9 @@ class BMI_30 : public AddressMode::ProgramCounterRelative<Operator::BMI>
 class BNE_D0 : public AddressMode::ProgramCounterRelative<Operator::BNE>
 {
     // 2   2+t+t*e*p   rel8      ........ . BNE LABEL
-    // 7: Add 1 cycle if branch is taken
-    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     int calculateCycles(const State& state) const override
     {
         int cycles = 2;
-        cycles += 0 /* TODO07 */;
-        cycles += 0 /* TODO08 */;
         return cycles;
     }
 
@@ -887,13 +855,9 @@ class BNE_D0 : public AddressMode::ProgramCounterRelative<Operator::BNE>
 class BPL_10 : public AddressMode::ProgramCounterRelative<Operator::BPL>
 {
     // 2   2+t+t*e*p   rel8      ........ . BPL LABEL
-    // 7: Add 1 cycle if branch is taken
-    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     int calculateCycles(const State& state) const override
     {
         int cycles = 2;
-        cycles += 0 /* TODO07 */;
-        cycles += 0 /* TODO08 */;
         return cycles;
     }
 
@@ -907,11 +871,9 @@ class BPL_10 : public AddressMode::ProgramCounterRelative<Operator::BPL>
 class BRA_80 : public AddressMode::ProgramCounterRelative<Operator::BRA>
 {
     // 2   3+e*p       rel8      ........ . BRA LABEL
-    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     int calculateCycles(const State& state) const override
     {
         int cycles = 3;
-        cycles += 0 /* TODO08 */;
         return cycles;
     }
 
@@ -960,13 +922,9 @@ class BRL_82 : public AddressMode::ProgramCounterRelativeLong<Operator::BRL>
 class BVC_50 : public AddressMode::ProgramCounterRelative<Operator::BVC>
 {
     // 2   2+t+t*e*p   rel8      ........ . BVC LABEL
-    // 7: Add 1 cycle if branch is taken
-    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     int calculateCycles(const State& state) const override
     {
         int cycles = 2;
-        cycles += 0 /* TODO07 */;
-        cycles += 0 /* TODO08 */;
         return cycles;
     }
 
@@ -980,13 +938,9 @@ class BVC_50 : public AddressMode::ProgramCounterRelative<Operator::BVC>
 class BVS_70 : public AddressMode::ProgramCounterRelative<Operator::BVS>
 {
     // 2   2+t+t*e*p   rel8      ........ . BVS LABEL
-    // 7: Add 1 cycle if branch is taken
-    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     int calculateCycles(const State& state) const override
     {
         int cycles = 2;
-        cycles += 0 /* TODO07 */;
-        cycles += 0 /* TODO08 */;
         return cycles;
     }
 
@@ -1199,13 +1153,11 @@ class CMP_D1 : public AddressMode::DirectPageIndirectIndexedY<Operator::CMP>
     // 2   7-m+w-x+x*p (dir),Y   m.....mm . CMP ($10),Y
     // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    // 3: Add 1 cycle if adding index crosses a page boundary
     int calculateCycles(const State& state) const override
     {
         int cycles = 5;
         cycles += state.is16Bit(State::m) ? 1 : 0;
         cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        cycles += 0 /* TODO03 */;
         return cycles;
     }
 
@@ -1298,12 +1250,10 @@ class CMP_D9 : public AddressMode::AbsoluteIndexedY<Operator::CMP>
 {
     // 3   6-m-x+x*p   abs,Y     m.....mm . CMP $9876,Y
     // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 3: Add 1 cycle if adding index crosses a page boundary
     int calculateCycles(const State& state) const override
     {
         int cycles = 4;
         cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += 0 /* TODO03 */;
         return cycles;
     }
 
@@ -1318,12 +1268,10 @@ class CMP_DD : public AddressMode::AbsoluteIndexedX<Operator::CMP>
 {
     // 3   6-m-x+x*p   abs,X     m.....mm . CMP $9876,X
     // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 3: Add 1 cycle if adding index crosses a page boundary
     int calculateCycles(const State& state) const override
     {
         int cycles = 4;
         cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += 0 /* TODO03 */;
         return cycles;
     }
 
@@ -1563,10 +1511,12 @@ class DEC_DE : public AddressMode::AbsoluteIndexedX<Operator::DEC>
 {
     // 3   9-2*m       abs,X     m.....m. . DEC $9876,X
     // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    // 20: Needs manual removal of cycle calculation
     int calculateCycles(const State& state) const override
     {
         int cycles = 7;
         cycles += state.is16Bit(State::m) ? 2 : 0;
+        cycles += 0 /* TODO20 */;
         return cycles;
     }
 
@@ -1747,13 +1697,11 @@ class EOR_51 : public AddressMode::DirectPageIndirectIndexedY<Operator::EOR>
     // 2   7-m+w-x+x*p (dir),Y   m.....m. . EOR ($10),Y
     // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    // 3: Add 1 cycle if adding index crosses a page boundary
     int calculateCycles(const State& state) const override
     {
         int cycles = 5;
         cycles += state.is16Bit(State::m) ? 1 : 0;
         cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        cycles += 0 /* TODO03 */;
         return cycles;
     }
 
@@ -1846,12 +1794,10 @@ class EOR_59 : public AddressMode::AbsoluteIndexedY<Operator::EOR>
 {
     // 3   6-m-x+x*p   abs,Y     m.....m. . EOR $9876,Y
     // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 3: Add 1 cycle if adding index crosses a page boundary
     int calculateCycles(const State& state) const override
     {
         int cycles = 4;
         cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += 0 /* TODO03 */;
         return cycles;
     }
 
@@ -1866,12 +1812,10 @@ class EOR_5D : public AddressMode::AbsoluteIndexedX<Operator::EOR>
 {
     // 3   6-m-x+x*p   abs,X     m.....m. . EOR $9876,X
     // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 3: Add 1 cycle if adding index crosses a page boundary
     int calculateCycles(const State& state) const override
     {
         int cycles = 4;
         cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += 0 /* TODO03 */;
         return cycles;
     }
 
@@ -1978,10 +1922,12 @@ class INC_FE : public AddressMode::AbsoluteIndexedX<Operator::INC>
 {
     // 3   9-2*m       abs,X     m.....m. . INC $9876,X
     // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    // 20: Needs manual removal of cycle calculation
     int calculateCycles(const State& state) const override
     {
         int cycles = 7;
         cycles += state.is16Bit(State::m) ? 2 : 0;
+        cycles += 0 /* TODO20 */;
         return cycles;
     }
 
@@ -2290,13 +2236,11 @@ class LDA_B1 : public AddressMode::DirectPageIndirectIndexedY<Operator::LDA>
     // 2   7-m+w-x+x*p (dir),Y   m.....m. . LDA ($10),Y
     // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    // 3: Add 1 cycle if adding index crosses a page boundary
     int calculateCycles(const State& state) const override
     {
         int cycles = 5;
         cycles += state.is16Bit(State::m) ? 1 : 0;
         cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        cycles += 0 /* TODO03 */;
         return cycles;
     }
 
@@ -2389,12 +2333,10 @@ class LDA_B9 : public AddressMode::AbsoluteIndexedY<Operator::LDA>
 {
     // 3   6-m-x+x*p   abs,Y     m.....m. . LDA $9876,Y
     // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 3: Add 1 cycle if adding index crosses a page boundary
     int calculateCycles(const State& state) const override
     {
         int cycles = 4;
         cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += 0 /* TODO03 */;
         return cycles;
     }
 
@@ -2409,12 +2351,10 @@ class LDA_BD : public AddressMode::AbsoluteIndexedX<Operator::LDA>
 {
     // 3   6-m-x+x*p   abs,X     m.....m. . LDA $9876,X
     // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 3: Add 1 cycle if adding index crosses a page boundary
     int calculateCycles(const State& state) const override
     {
         int cycles = 4;
         cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += 0 /* TODO03 */;
         return cycles;
     }
 
@@ -2523,12 +2463,10 @@ class LDX_B6 : public AddressMode::DirectPageIndexedY<Operator::LDX>
 class LDX_BE : public AddressMode::AbsoluteIndexedY<Operator::LDX>
 {
     // 3   6-2*x+x*p   abs,Y     x.....x. . LDX $9876,Y
-    // 3: Add 1 cycle if adding index crosses a page boundary
     // 10: Add 1 cycle if x=0 (16-bit index registers)
     int calculateCycles(const State& state) const override
     {
         int cycles = 4;
-        cycles += 0 /* TODO03 */;
         cycles += state.is16Bit(State::x) ? 1 : 0;
         return cycles;
     }
@@ -2620,12 +2558,10 @@ class LDY_B4 : public AddressMode::DirectPageIndexedX<Operator::LDY>
 class LDY_BC : public AddressMode::AbsoluteIndexedX<Operator::LDY>
 {
     // 3   6-2*x+x*p   abs,X     x.....x. . LDY $9876,X
-    // 3: Add 1 cycle if adding index crosses a page boundary
     // 10: Add 1 cycle if x=0 (16-bit index registers)
     int calculateCycles(const State& state) const override
     {
         int cycles = 4;
-        cycles += 0 /* TODO03 */;
         cycles += state.is16Bit(State::x) ? 1 : 0;
         return cycles;
     }
@@ -2715,10 +2651,12 @@ class LSR_5E : public AddressMode::AbsoluteIndexedX<Operator::LSR>
 {
     // 3   9-2*m       abs,X     0.....m* . LSR $9876,X
     // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    // 20: Needs manual removal of cycle calculation
     int calculateCycles(const State& state) const override
     {
         int cycles = 7;
         cycles += state.is16Bit(State::m) ? 2 : 0;
+        cycles += 0 /* TODO20 */;
         return cycles;
     }
 
@@ -2732,11 +2670,9 @@ class LSR_5E : public AddressMode::AbsoluteIndexedX<Operator::LSR>
 class MVN_54 : public AddressMode::BlockMove<Operator::MVN>
 {
     // 3   7           src,dest  ........ . MVN #$12,#$34
-    // 3: Add 1 cycle if adding index crosses a page boundary
     int calculateCycles(const State& state) const override
     {
         int cycles = 1;
-        cycles += 0 /* TODO03 */;
         return cycles;
     }
 
@@ -2750,11 +2686,9 @@ class MVN_54 : public AddressMode::BlockMove<Operator::MVN>
 class MVP_44 : public AddressMode::BlockMove<Operator::MVP>
 {
     // 3   7           src,dest  ........ . MVP #$12,#$34
-    // 3: Add 1 cycle if adding index crosses a page boundary
     int calculateCycles(const State& state) const override
     {
         int cycles = 1;
-        cycles += 0 /* TODO03 */;
         return cycles;
     }
 
@@ -2919,13 +2853,11 @@ class ORA_11 : public AddressMode::DirectPageIndirectIndexedY<Operator::ORA>
     // 2   7-m+w-x+x*p (dir),Y   m.....m. . ORA ($10),Y
     // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    // 3: Add 1 cycle if adding index crosses a page boundary
     int calculateCycles(const State& state) const override
     {
         int cycles = 5;
         cycles += state.is16Bit(State::m) ? 1 : 0;
         cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        cycles += 0 /* TODO03 */;
         return cycles;
     }
 
@@ -3018,12 +2950,10 @@ class ORA_19 : public AddressMode::AbsoluteIndexedY<Operator::ORA>
 {
     // 3   6-m-x+x*p   abs,Y     m.....m. . ORA $9876,Y
     // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 3: Add 1 cycle if adding index crosses a page boundary
     int calculateCycles(const State& state) const override
     {
         int cycles = 4;
         cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += 0 /* TODO03 */;
         return cycles;
     }
 
@@ -3038,12 +2968,10 @@ class ORA_1D : public AddressMode::AbsoluteIndexedX<Operator::ORA>
 {
     // 3   6-m-x+x*p   abs,X     m.....m. . ORA $9876,X
     // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 3: Add 1 cycle if adding index crosses a page boundary
     int calculateCycles(const State& state) const override
     {
         int cycles = 4;
         cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += 0 /* TODO03 */;
         return cycles;
     }
 
@@ -3436,10 +3364,12 @@ class ROL_3E : public AddressMode::AbsoluteIndexedX<Operator::ROL>
 {
     // 3   9-2*m       abs,X     m.....mm . ROL $9876,X
     // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    // 20: Needs manual removal of cycle calculation
     int calculateCycles(const State& state) const override
     {
         int cycles = 7;
         cycles += state.is16Bit(State::m) ? 2 : 0;
+        cycles += 0 /* TODO20 */;
         return cycles;
     }
 
@@ -3528,10 +3458,12 @@ class ROR_7E : public AddressMode::AbsoluteIndexedX<Operator::ROR>
 {
     // 3   9-2*m       abs,X     m.....m* . ROR $9876,X
     // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    // 20: Needs manual removal of cycle calculation
     int calculateCycles(const State& state) const override
     {
         int cycles = 7;
         cycles += state.is16Bit(State::m) ? 2 : 0;
+        cycles += 0 /* TODO20 */;
         return cycles;
     }
 
@@ -3730,13 +3662,11 @@ class SBC_F1 : public AddressMode::DirectPageIndirectIndexedY<Operator::SBC>
     // 2   7-m+w-x+x*p (dir),Y   mm....mm . SBC ($10),Y
     // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    // 3: Add 1 cycle if adding index crosses a page boundary
     int calculateCycles(const State& state) const override
     {
         int cycles = 5;
         cycles += state.is16Bit(State::m) ? 1 : 0;
         cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        cycles += 0 /* TODO03 */;
         return cycles;
     }
 
@@ -3829,12 +3759,10 @@ class SBC_F9 : public AddressMode::AbsoluteIndexedY<Operator::SBC>
 {
     // 3   6-m-x+x*p   abs,Y     mm....mm . SBC $9876,Y
     // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 3: Add 1 cycle if adding index crosses a page boundary
     int calculateCycles(const State& state) const override
     {
         int cycles = 4;
         cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += 0 /* TODO03 */;
         return cycles;
     }
 
@@ -3849,12 +3777,10 @@ class SBC_FD : public AddressMode::AbsoluteIndexedX<Operator::SBC>
 {
     // 3   6-m-x+x*p   abs,X     mm....mm . SBC $9876,X
     // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 3: Add 1 cycle if adding index crosses a page boundary
     int calculateCycles(const State& state) const override
     {
         int cycles = 4;
         cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += 0 /* TODO03 */;
         return cycles;
     }
 
@@ -4066,11 +3992,13 @@ class STA_91 : public AddressMode::DirectPageIndirectIndexedY<Operator::STA>
     // 2   7-m+w       (dir),Y   ........ . STA ($10),Y
     // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
+    // 20: Needs manual removal of cycle calculation
     int calculateCycles(const State& state) const override
     {
         int cycles = 6;
         cycles += state.is16Bit(State::m) ? 1 : 0;
         cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
+        cycles += 0 /* TODO20 */;
         return cycles;
     }
 
@@ -4163,10 +4091,12 @@ class STA_99 : public AddressMode::AbsoluteIndexedY<Operator::STA>
 {
     // 3   6-m         abs,Y     ........ . STA $9876,Y
     // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    // 20: Needs manual removal of cycle calculation
     int calculateCycles(const State& state) const override
     {
         int cycles = 5;
         cycles += state.is16Bit(State::m) ? 1 : 0;
+        cycles += 0 /* TODO20 */;
         return cycles;
     }
 
@@ -4181,10 +4111,12 @@ class STA_9D : public AddressMode::AbsoluteIndexedX<Operator::STA>
 {
     // 3   6-m         abs,X     ........ . STA $9876,X
     // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    // 20: Needs manual removal of cycle calculation
     int calculateCycles(const State& state) const override
     {
         int cycles = 5;
         cycles += state.is16Bit(State::m) ? 1 : 0;
+        cycles += 0 /* TODO20 */;
         return cycles;
     }
 
@@ -4220,7 +4152,6 @@ class STP_DB : public AddressMode::Implied<Operator::STP>
     int calculateCycles(const State& state) const override
     {
         int cycles = 3;
-        cycles += 0 /* TODO14 */;
         return cycles;
     }
 
@@ -4409,10 +4340,12 @@ class STZ_9E : public AddressMode::AbsoluteIndexedX<Operator::STZ>
 {
     // 3   6-m         abs,X     ........ . STZ $9876,X
     // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    // 20: Needs manual removal of cycle calculation
     int calculateCycles(const State& state) const override
     {
         int cycles = 5;
         cycles += state.is16Bit(State::m) ? 1 : 0;
+        cycles += 0 /* TODO20 */;
         return cycles;
     }
 
@@ -4698,7 +4631,6 @@ class WAI_CB : public AddressMode::Implied<Operator::WAI>
     int calculateCycles(const State& state) const override
     {
         int cycles = 3;
-        cycles += 0 /* TODO15 */;
         return cycles;
     }
 
@@ -4713,6 +4645,7 @@ class WAI_CB : public AddressMode::Implied<Operator::WAI>
 class WDM_42 : public AddressMode::na<Operator::WDM>
 {
     // 2   2           imm       ........ . WDM
+    // 16: Byte and cycle counts subject to change in future processors which expand WDM into 2-byte opcode portions of instructions of varying lengths
     int calculateCycles(const State& state) const override
     {
         int cycles = 0;

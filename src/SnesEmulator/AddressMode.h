@@ -48,6 +48,8 @@ class AbsoluteIndexedX : public Instruction3Byte
     int apply(State& state, uint16_t operand) const override
     {
         int cycles = 0;
+        // 3: Add 1 cycle if adding index crosses a page boundary
+        cycles += 0 /* TODO03 */;
         int* data = nullptr;
         return cycles + Operator::operate(state, data);
     }
@@ -65,6 +67,8 @@ class AbsoluteIndexedY : public Instruction3Byte
     int apply(State& state, uint16_t operand) const override
     {
         int cycles = 0;
+        // 3: Add 1 cycle if adding index crosses a page boundary
+        cycles += 0 /* TODO03 */;
         int* data = nullptr;
         return cycles + Operator::operate(state, data);
     }
@@ -167,6 +171,8 @@ class BlockMove : public Instruction3Byte
     int apply(State& state, uint16_t operand) const override
     {
         int cycles = 0;
+        // 3: Add 1 cycle if adding index crosses a page boundary
+        cycles += 0 /* TODO03 */;
         int* data = nullptr;
         return cycles + Operator::operate(state, data);
     }
@@ -269,6 +275,8 @@ class DirectPageIndirectIndexedY : public Instruction2Byte
     int apply(State& state, uint8_t operand) const override
     {
         int cycles = 0;
+        // 3: Add 1 cycle if adding index crosses a page boundary
+        cycles += 0 /* TODO03 */;
         int* data = nullptr;
         return cycles + Operator::operate(state, data);
     }

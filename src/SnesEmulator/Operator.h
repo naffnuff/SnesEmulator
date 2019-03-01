@@ -50,6 +50,10 @@ public:
     static int operate(State& state, int* data)
     {
         int cycles = 0;
+        // 7: Add 1 cycle if branch is taken
+        cycles += 0 /* TODO07 */;
+        // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
+        cycles += 0 /* TODO08 */;
         return cycles;
     }
 
@@ -63,6 +67,10 @@ public:
     static int operate(State& state, int* data)
     {
         int cycles = 0;
+        // 7: Add 1 cycle if branch is taken
+        cycles += 0 /* TODO07 */;
+        // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
+        cycles += 0 /* TODO08 */;
         return cycles;
     }
 
@@ -76,6 +84,10 @@ public:
     static int operate(State& state, int* data)
     {
         int cycles = 0;
+        // 7: Add 1 cycle if branch is taken
+        cycles += 0 /* TODO07 */;
+        // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
+        cycles += 0 /* TODO08 */;
         return cycles;
     }
 
@@ -102,6 +114,10 @@ public:
     static int operate(State& state, int* data)
     {
         int cycles = 0;
+        // 7: Add 1 cycle if branch is taken
+        cycles += 0 /* TODO07 */;
+        // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
+        cycles += 0 /* TODO08 */;
         return cycles;
     }
 
@@ -115,6 +131,10 @@ public:
     static int operate(State& state, int* data)
     {
         int cycles = 0;
+        // 7: Add 1 cycle if branch is taken
+        cycles += 0 /* TODO07 */;
+        // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
+        cycles += 0 /* TODO08 */;
         return cycles;
     }
 
@@ -128,6 +148,10 @@ public:
     static int operate(State& state, int* data)
     {
         int cycles = 0;
+        // 7: Add 1 cycle if branch is taken
+        cycles += 0 /* TODO07 */;
+        // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
+        cycles += 0 /* TODO08 */;
         return cycles;
     }
 
@@ -141,6 +165,8 @@ public:
     static int operate(State& state, int* data)
     {
         int cycles = 0;
+        // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
+        cycles += 0 /* TODO08 */;
         return cycles;
     }
 
@@ -180,6 +206,10 @@ public:
     static int operate(State& state, int* data)
     {
         int cycles = 0;
+        // 7: Add 1 cycle if branch is taken
+        cycles += 0 /* TODO07 */;
+        // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
+        cycles += 0 /* TODO08 */;
         return cycles;
     }
 
@@ -193,6 +223,10 @@ public:
     static int operate(State& state, int* data)
     {
         int cycles = 0;
+        // 7: Add 1 cycle if branch is taken
+        cycles += 0 /* TODO07 */;
+        // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
+        cycles += 0 /* TODO08 */;
         return cycles;
     }
 

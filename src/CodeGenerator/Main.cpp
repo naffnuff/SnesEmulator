@@ -71,6 +71,7 @@ std::string getRemark(int remarkIndex)
     case 17: return "17: Add 1 byte if m=0 (16-bit memory/accumulator)";
     case 18: return "18: Opcode is 1 byte, but program counter value pushed onto stack is incremented by 2 allowing for optional signature byte";
     case 19: return "19: Add 1 byte if x=0 (16-bit index registers)";
+    case 20: return "20: Needs manual removal of cycle calculation";
     default: return "";
     }
 }
@@ -87,8 +88,9 @@ std::string getCycleModification(int remarkIndex)
     case 9: return "state.isNativeMode() ? 1 : 0"; // Add 1 cycle for 65816 native mode (e=0)
     case 10: return "state.is16Bit(State::x) ? 1 : 0"; // Add 1 cycle if x=0 (16-bit index registers)
     case 13: return "0 /* TODO13 */"; // 7 cycles per byte moved
-    case 14: return "0 /* TODO14 */"; // Uses 3 cycles to shut the processor down; additional cycles are required by reset to restart it
-    case 15: return "0 /* TODO15 */"; // Uses 3 cycles to shut the processor down; additional cycles are required by interrupt to restart it
+    case 14: return ""; // Uses 3 cycles to shut the processor down; additional cycles are required by reset to restart it
+    case 15: return ""; // Uses 3 cycles to shut the processor down; additional cycles are required by interrupt to restart it
+    case 20: return "0 /* TODO20 */"; // Needs manual removal of cycle calculation
     default: return "";
     }
 }
@@ -97,8 +99,7 @@ struct OperatorArgs
 {
     OperatorArgs()
     {
-        //cycleRemarks = { 1, 3, 5, 7, 8, 9, 10, 13, 14, 15 };
-        //cycleRemarks = { 5 };
+        cycleRemarks = { 7, 8, 13 };
     }
     std::set<int> cycleRemarks;
     bool hasOperand;
@@ -109,8 +110,7 @@ struct AddressModeClassArgs
 {
     AddressModeClassArgs()
     {
-        //cycleRemarks = { 2, 3, 5, 7, 9, 13, 14, 15 };
-        //cycleRemarks = { 1 };
+        cycleRemarks = { 3 };
     }
     std::set<int> cycleRemarks;
     int instructionSize;
@@ -181,7 +181,7 @@ void generateOpcodes(const std::vector<Instruction>& instructions)
             << "{" << std::endl
             << "    // " << opcodeMap[instruction.code] << std::endl;
         for (int remark : instruction.cyclesRemarks) {
-            if (!getCycleModification(remark).empty()) {
+            if (!getRemark(remark).empty()) {
                 hOutput << "    // " << getRemark(remark) << std::endl;
             }
         }
