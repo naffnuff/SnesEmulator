@@ -24,12 +24,6 @@
     <ClCompile Include="..\..\..\src\SnesEmulator\State.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\SnesEmulator\Operator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\SnesEmulator\Opcode.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\SnesEmulator\OpcodeMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

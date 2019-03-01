@@ -59,7 +59,7 @@ std::string getRemark(int remarkIndex)
     case 1: return "1: Add 1 cycle if m=0 (16-bit memory/accumulator)";
     case 2: return "2: Add 1 cycle if low byte of Direct Page Register is non-zero";
     case 3: return "3: Add 1 cycle if adding index crosses a page boundary";
-    case 5: return "5: Add 1 cycle if m=0 (16-bit memory/accumulator)";
+    case 5: return "5: Add 2 cycles if m=0 (16-bit memory/accumulator)";
     case 7: return "7: Add 1 cycle if branch is taken";
     case 8: return "8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) ";
     case 9: return "9: Add 1 cycle for 65816 native mode (e=0)";
@@ -78,14 +78,14 @@ std::string getRemark(int remarkIndex)
 std::string getCycleModification(int remarkIndex)
 {
     switch (remarkIndex) {
-    case 1: return "state.getFlag(State::m) ? 0 : 1"; // Add 1 cycle if m=0 (16-bit memory / accumulator)
+    case 1: return "state.is16Bit(State::m) ? 1 : 0"; // Add 1 cycle if m=0 (16-bit memory / accumulator)
     case 2: return "(uint8_t)state.getDirectPage() ? 1 : 0"; // Add 1 cycle if low byte of Direct Page Register is non-zero
     case 3: return "0 /* TODO03 */"; // Add 1 cycle if adding index crosses a page boundary
-    case 5: return "state.getFlag(State::m) ? 0 : 1"; // Add 1 cycle if m=0 (16-bit memory / accumulator)
+    case 5: return "state.is16Bit(State::m) ? 2 : 0"; // Add 2 cycles if m=0 (16-bit memory / accumulator)
     case 7: return "0 /* TODO07 */"; // Add 1 cycle if branch is taken
     case 8: return "0 /* TODO08 */"; // Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1)
-    case 9: return "state.isEmulationMode() ? 0 : 1"; // Add 1 cycle for 65816 native mode (e=0)
-    case 10: return "state.getFlag(State::x) ? 0 : 1"; // Add 1 cycle if x=0 (16-bit index registers)
+    case 9: return "state.isNativeMode() ? 1 : 0"; // Add 1 cycle for 65816 native mode (e=0)
+    case 10: return "state.is16Bit(State::x) ? 1 : 0"; // Add 1 cycle if x=0 (16-bit index registers)
     case 13: return "0 /* TODO13 */"; // 7 cycles per byte moved
     case 14: return "0 /* TODO14 */"; // Uses 3 cycles to shut the processor down; additional cycles are required by reset to restart it
     case 15: return "0 /* TODO15 */"; // Uses 3 cycles to shut the processor down; additional cycles are required by interrupt to restart it
@@ -133,7 +133,6 @@ void generateOpcodes(const std::vector<Instruction>& instructions)
     }
 
     std::ofstream hOutput("..\\..\\..\\src\\SnesEmulator\\Opcode.h");
-    std::ofstream cppOutput("..\\..\\..\\src\\SnesEmulator\\Opcode.cpp");
 
     hOutput << "#pragma once" << std::endl
         << std::endl
@@ -147,23 +146,14 @@ void generateOpcodes(const std::vector<Instruction>& instructions)
         << "namespace Opcode {" << std::endl
         << std::endl;
 
-    cppOutput << "#include \"Opcode.h\"" << std::endl
-        << std::endl
-        << "namespace Opcode {" << std::endl
-        << std::endl;
-
     for (const Instruction& instruction : instructions) {
         int operandSize = stoi(instruction.size) - 1;
 
         if (!instruction.comment.empty()) {
             hOutput << "// " << instruction.comment << std::endl;
-            cppOutput << "// " << instruction.comment << std::endl;
         }
 
         hOutput << "// " << instruction.name << std::endl
-            << "// " << instruction.addressMode << std::endl
-            << "// " << instruction.size << "<" << instruction.sizeRemark << ">" << std::endl;
-        cppOutput << "// " << instruction.name << std::endl
             << "// " << instruction.addressMode << std::endl
             << "// " << instruction.size << "<" << instruction.sizeRemark << ">" << std::endl;
 
@@ -175,7 +165,6 @@ void generateOpcodes(const std::vector<Instruction>& instructions)
         if (!instruction.sizeRemark.empty()) {
             sizeRemark = stoi(instruction.sizeRemark);
             hOutput << "// " << getRemark(sizeRemark) << std::endl;
-            cppOutput << "// " << getRemark(sizeRemark) << std::endl;
 
             if (sizeRemark == 17) {
                 addressModeClass += ", State::m";
@@ -192,34 +181,27 @@ void generateOpcodes(const std::vector<Instruction>& instructions)
             << "{" << std::endl
             << "    // " << opcodeMap[instruction.code] << std::endl;
         for (int remark : instruction.cyclesRemarks) {
-            hOutput << "    // " << getRemark(remark) << std::endl;
-        }
-        hOutput << "    std::string opcodeToString() const override { return \"" << instruction.code << ": " << instruction.name << "\"; }" << std::endl
-            << "    int calculateCycles(const State& state) const override;" << std::endl
-            << "};" << std::endl
-            << std::endl;
-
-        cppOutput << "int " << instruction.classname << "::calculateCycles(const State& state) const" << std::endl
-            << "{" << std::endl;
-
-        cppOutput << "    // " << opcodeMap[instruction.code] << std::endl;
-
-        cppOutput << "    int cycles = " << instruction.cycles << ";" << std::endl;
-
-        for (int remark : instruction.cyclesRemarks) {
-            cppOutput << "    // " << getRemark(remark) << std::endl;
             if (!getCycleModification(remark).empty()) {
-                cppOutput << "    cycles += " << getCycleModification(remark) << ";" << std::endl;
+                hOutput << "    // " << getRemark(remark) << std::endl;
             }
         }
-
-        cppOutput << "    return cycles;" << std::endl
-            << "}" << std::endl
+        hOutput << "    int calculateCycles(const State& state) const override" << std::endl
+            << "    {" << std::endl;
+        hOutput << "        int cycles = " << instruction.cycles << ";" << std::endl;
+        for (int remark : instruction.cyclesRemarks) {
+            if (!getCycleModification(remark).empty()) {
+                hOutput << "        cycles += " << getCycleModification(remark) << ";" << std::endl;
+            }
+        }
+        hOutput << "        return cycles;" << std::endl
+            << "    }" << std::endl
+            << std::endl
+            << "    std::string opcodeToString() const override { return \"" << instruction.code << ": " << instruction.name << "\"; }" << std::endl
+            << "};" << std::endl
             << std::endl;
     }
 
     hOutput << "}" << std::endl;
-    cppOutput << "}" << std::endl;
 }
 
 void generateOpcodeMap(const std::vector<Instruction>& instructions)
@@ -276,74 +258,48 @@ void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
 
         std::ostringstream superclassStream;
         if (kvp.second.instructionSize == -1) {
-            superclassStream << "InstructionFlagSize<Flag>";
+            superclassStream << "InstructionVariableSize<Flag>";
         } else {
             superclassStream << "Instruction" << kvp.second.instructionSize << "Byte";
         }
 
         output << superclassStream.str() << std::endl << "{" << std::endl
-            << "    std::string toString(const State& state) const override;" << std::endl
             << "    int ";
 
-        std::stringstream applySignatureStream;
-        applySignatureStream << "apply(State& state";
-
+        output << "apply(State& state";
         if (kvp.second.instructionSize == -1) {
-            applySignatureStream << ", uint16_t operand";
+            output << ", uint16_t operand";
         } else if (kvp.second.instructionSize > 1) {
-            applySignatureStream << ", uint" << (kvp.second.instructionSize == 4 ? 32 : (kvp.second.instructionSize - 1) * 8) << "_t operand";
+            output << ", uint" << (kvp.second.instructionSize == 4 ? 32 : (kvp.second.instructionSize - 1) * 8) << "_t operand";
         }
-        applySignatureStream << ") const";
-
-        output << applySignatureStream.str() << " override;" << std::endl
-            << "};" << std::endl
-            << std::endl;
-
-        std::ostringstream templateStream;
-        templateStream << "template <typename Operator";
-        if (kvp.second.instructionSize == -1) {
-            templateStream << ", State::Flag Flag";
-        }
-        templateStream << ">" << std::endl;
-
-        output << templateStream.str();
-        output << "std::string " << kvp.first << "<Operator";
-        if (kvp.second.instructionSize == -1) {
-            output << ", Flag";
-        }
-        output << ">::toString(const State& state) const" << std::endl
-            << "{" << std::endl
-            << "    return Operator::toString()";
-        if (kvp.second.instructionSize == -1 || kvp.second.instructionSize > 1) {
-            output << " + \" $\" + " << superclassStream.str() << "::operandToString(state)";
-        }
-        output << " + \" TODO\";" << std::endl
-            << "}" << std::endl
-            << std::endl;
-
-        output << templateStream.str();
-        output << "int " << kvp.first << "<Operator";
-        if (kvp.second.instructionSize == -1) {
-            output << ", Flag";
-        }
-        output << ">::" << applySignatureStream.str() << std::endl
-            << "{" << std::endl
-            << "    int cycles = 0;" << std::endl;
+        output << ") const" << " override" << std::endl
+            << "    {" << std::endl
+            << "        int cycles = 0;" << std::endl;
         for (int cycleRemark : kvp.second.cycleRemarks) {
-            output << "    // " << getRemark(cycleRemark) << std::endl;
+            output << "        // " << getRemark(cycleRemark) << std::endl;
             if (!getCycleModification(cycleRemark).empty()) {
-                output << "    cycles += " << getCycleModification(cycleRemark) << ";" << std::endl;
+                output << "        cycles += " << getCycleModification(cycleRemark) << ";" << std::endl;
             }
         }
         if (kvp.first != "Implied") {
-            output << "    int* data = nullptr;" << std::endl;
+            output << "        int* data = nullptr;" << std::endl;
         }
-        output << "    return cycles + Operator::operate(state";
+        output << "        return cycles + Operator::operate(state";
         if (kvp.first != "Implied") {
             output << ", data";
         }
         output << ");" << std::endl
-            << "}" << std::endl
+            << "    }" << std::endl
+            << std::endl
+            << "    std::string toString(const State& state) const override" << std::endl
+            << "    {" << std::endl
+            << "        return Operator::toString()";
+        if (kvp.second.instructionSize == -1 || kvp.second.instructionSize > 1) {
+            output << " + \" $\" + " << superclassStream.str() << "::operandToString(state)";
+        }
+        output << " + \" TODO\";" << std::endl
+            << "    }" << std::endl
+            << "};" << std::endl
             << std::endl;
     }
 
@@ -354,7 +310,6 @@ typedef std::map<std::string, OperatorArgs> OperatorMap;
 void generateOperators(const OperatorMap& operatorMap)
 {
     std::ofstream hOutput("..\\..\\..\\src\\SnesEmulator\\Operator.h");
-    std::ofstream cppOutput("..\\..\\..\\src\\SnesEmulator\\Operator.cpp");
 
     hOutput << "#pragma once" << std::endl
         << std::endl
@@ -363,48 +318,34 @@ void generateOperators(const OperatorMap& operatorMap)
         << "namespace Operator {" << std::endl
         << std::endl;
 
-    cppOutput << "#include \"Operator.h\"" << std::endl
-        << std::endl
-        << "namespace Operator {" << std::endl
-        << std::endl;
-
     for (const OperatorMap::value_type& kvp : operatorMap) {
 
         hOutput << "// " << kvp.second.comment << std::endl;
-        cppOutput << "// " << kvp.second.comment << std::endl;
 
         hOutput << "class " << kvp.first << std::endl
             << "{" << std::endl
             << "public:" << std::endl
-            << "    static std::string toString() { return \"" << kvp.first << "\"; }" << std::endl
             << "    static int operate(State& state";
         if (kvp.second.hasOperand) {
             hOutput << ", int* data";
         }
-        hOutput << ");" << std::endl
-            << "};" << std::endl
-            << std::endl;
-
-        cppOutput << "int " << kvp.first << "::operate(State& state";
-        if (kvp.second.hasOperand) {
-            cppOutput << ", int* data";
-        }
-        cppOutput << ")" << std::endl
-            << "{" << std::endl
-            << "    int cycles = 0;" << std::endl;
+        hOutput << ")" << std::endl
+            << "    {" << std::endl
+            << "        int cycles = 0;" << std::endl;
         for (int cycleRemark : kvp.second.cycleRemarks) {
-            cppOutput << "    // " << getRemark(cycleRemark) << std::endl;
+            hOutput << "        // " << getRemark(cycleRemark) << std::endl;
             if (!getCycleModification(cycleRemark).empty()) {
-                cppOutput << "    cycles += " << getCycleModification(cycleRemark) << ";" << std::endl;
+                hOutput << "        cycles += " << getCycleModification(cycleRemark) << ";" << std::endl;
             }
         }
-        cppOutput << "    return cycles;" << std::endl
-            << "}" << std::endl
+        hOutput << "        return cycles;" << std::endl
+            << "    }" << std::endl
+            << std::endl
+            << "    static std::string toString() { return \"" << kvp.first << "\"; }" << std::endl
+            << "};" << std::endl
             << std::endl;
     }
-
     hOutput << "}" << std::endl;
-    cppOutput << "}" << std::endl;
 }
 
 int main(int argc, char* argv[])
@@ -508,7 +449,7 @@ int main(int argc, char* argv[])
                         int cycleRemark = stoi(token);
                         cyclesRemarks.insert(cycleRemark);
                         if (cycleRemark == 5) {
-                            cyclesRemarks.insert(1);
+                            //cyclesRemarks.insert(1);
                         }
                     }
                     for (int cycleRemark : cyclesRemarks) {

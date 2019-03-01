@@ -91,9 +91,18 @@ public:
         return flags & flag;
     }
 
-    bool isEmulationMode() const
+    bool isNativeMode() const
     {
-        return emulationMode;
+        return !emulationMode;
+    }
+
+    bool is16Bit(Flag flag) const
+    {
+        if (emulationMode) {
+            return false;
+        } else {
+            return getFlag(flag);
+        }
     }
 
     uint8_t readNextInstruction() const

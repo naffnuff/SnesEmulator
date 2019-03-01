@@ -318,7 +318,7 @@ TDC Transfer Direct Page Register to 16-bit Accumulator [Flags affected: n,z]
 TDC	7B	Implied	1	2
 TRB Test and Reset Memory Bits Against Accumulator [Flags affected: z]
 TRB dp	14	Direct Page	2	52,5
-TRB addr	1C	Absolute	3	63
+TRB addr	1C	Absolute	3	65
 TSB Test and Set Memory Bits Against Accumulator [Flags affected: z]
 TSB dp	04	Direct Page	2	52,5
 TSB addr	0C	Absolute	3	65
