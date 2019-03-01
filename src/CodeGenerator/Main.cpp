@@ -59,7 +59,7 @@ std::string getRemark(int remarkIndex)
     case 1: return "1: Add 1 cycle if m=0 (16-bit memory/accumulator)";
     case 2: return "2: Add 1 cycle if low byte of Direct Page Register is non-zero";
     case 3: return "3: Add 1 cycle if adding index crosses a page boundary";
-    case 5: return "5: Add 2 cycles if m=0 (16-bit memory/accumulator)";
+    case 5: return "5: Add 1 cycle if m=0 (16-bit memory/accumulator)";
     case 7: return "7: Add 1 cycle if branch is taken";
     case 8: return "8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) ";
     case 9: return "9: Add 1 cycle for 65816 native mode (e=0)";
@@ -81,7 +81,7 @@ std::string getCycleModification(int remarkIndex)
     case 1: return "state.getFlag(State::m) ? 0 : 1"; // Add 1 cycle if m=0 (16-bit memory / accumulator)
     case 2: return "(uint8_t)state.getDirectPage() ? 1 : 0"; // Add 1 cycle if low byte of Direct Page Register is non-zero
     case 3: return "0 /* TODO03 */"; // Add 1 cycle if adding index crosses a page boundary
-    case 5: return "state.getFlag(State::m) ? 0 : 2"; // Add 2 cycles if m=0 (16-bit memory / accumulator)
+    case 5: return "state.getFlag(State::m) ? 0 : 1"; // Add 1 cycle if m=0 (16-bit memory / accumulator)
     case 7: return "0 /* TODO07 */"; // Add 1 cycle if branch is taken
     case 8: return "0 /* TODO08 */"; // Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1)
     case 9: return "state.isEmulationMode() ? 0 : 1"; // Add 1 cycle for 65816 native mode (e=0)
@@ -98,6 +98,7 @@ struct OperatorArgs
     OperatorArgs()
     {
         //cycleRemarks = { 1, 3, 5, 7, 8, 9, 10, 13, 14, 15 };
+        //cycleRemarks = { 5 };
     }
     std::set<int> cycleRemarks;
     bool hasOperand;
@@ -109,6 +110,7 @@ struct AddressModeClassArgs
     AddressModeClassArgs()
     {
         //cycleRemarks = { 2, 3, 5, 7, 9, 13, 14, 15 };
+        //cycleRemarks = { 1 };
     }
     std::set<int> cycleRemarks;
     int instructionSize;
@@ -505,6 +507,11 @@ int main(int argc, char* argv[])
                     while (std::getline(stream, token, ',')) {
                         int cycleRemark = stoi(token);
                         cyclesRemarks.insert(cycleRemark);
+                        if (cycleRemark == 5) {
+                            cyclesRemarks.insert(1);
+                        }
+                    }
+                    for (int cycleRemark : cyclesRemarks) {
                         if (operatorArgs.cycleRemarks.find(cycleRemark) != operatorArgs.cycleRemarks.end()) {
                             operatorIntersection.insert(cycleRemark);
                         }

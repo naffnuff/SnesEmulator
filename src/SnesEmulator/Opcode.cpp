@@ -457,10 +457,12 @@ int ASL_06::calculateCycles(const State& state) const
 {
     // 2   7-2*m+w     dir       m.....mm . ASL $10
     int cycles = 5;
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
     // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 2;
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
     return cycles;
 }
 
@@ -483,8 +485,10 @@ int ASL_0E::calculateCycles(const State& state) const
 {
     // 3   8-2*m       abs       m.....mm . ASL $9876
     int cycles = 6;
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 2;
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
     return cycles;
 }
 
@@ -496,10 +500,12 @@ int ASL_16::calculateCycles(const State& state) const
 {
     // 2   8-2*m+w     dir,X     m.....mm . ASL $10,X
     int cycles = 6;
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
     // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 2;
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
     return cycles;
 }
 
@@ -511,8 +517,10 @@ int ASL_1E::calculateCycles(const State& state) const
 {
     // 3   9-2*m       abs,X     m.....mm . ASL $9876,X
     int cycles = 7;
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 2;
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
     // 
     return cycles;
 }
@@ -1124,10 +1132,12 @@ int DEC_C6::calculateCycles(const State& state) const
 {
     // 2   7-2*m+w     dir       m.....m. . DEC $10
     int cycles = 5;
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
     // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 2;
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
     return cycles;
 }
 
@@ -1139,8 +1149,10 @@ int DEC_CE::calculateCycles(const State& state) const
 {
     // 3   8-2*m       abs       m.....m. . DEC $9876
     int cycles = 6;
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 2;
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
     return cycles;
 }
 
@@ -1152,10 +1164,12 @@ int DEC_D6::calculateCycles(const State& state) const
 {
     // 2   8-2*m+w     dir,X     m.....m. . DEC $10,X
     int cycles = 6;
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
     // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 2;
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
     return cycles;
 }
 
@@ -1167,8 +1181,10 @@ int DEC_DE::calculateCycles(const State& state) const
 {
     // 3   9-2*m       abs,X     m.....m. . DEC $9876,X
     int cycles = 7;
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 2;
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
     // 
     return cycles;
 }
@@ -1430,10 +1446,12 @@ int INC_E6::calculateCycles(const State& state) const
 {
     // 2   7-2*m+w     dir       m.....m. . INC $10
     int cycles = 5;
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
     // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 2;
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
     return cycles;
 }
 
@@ -1445,8 +1463,10 @@ int INC_EE::calculateCycles(const State& state) const
 {
     // 3   8-2*m       abs       m.....m. . INC $9876
     int cycles = 6;
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 2;
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
     return cycles;
 }
 
@@ -1458,10 +1478,12 @@ int INC_F6::calculateCycles(const State& state) const
 {
     // 2   8-2*m+w     dir,X     m.....m. . INC $10,X
     int cycles = 6;
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
     // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 2;
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
     return cycles;
 }
 
@@ -1473,8 +1495,10 @@ int INC_FE::calculateCycles(const State& state) const
 {
     // 3   9-2*m       abs,X     m.....m. . INC $9876,X
     int cycles = 7;
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 2;
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
     // 
     return cycles;
 }
@@ -1959,10 +1983,12 @@ int LSR_46::calculateCycles(const State& state) const
 {
     // 2   7-2*m+w     dir       0.....m* . LSR $10
     int cycles = 5;
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
     // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 2;
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
     return cycles;
 }
 
@@ -1985,8 +2011,10 @@ int LSR_4E::calculateCycles(const State& state) const
 {
     // 3   8-2*m       abs       0.....m* . LSR $9876
     int cycles = 6;
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 2;
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
     return cycles;
 }
 
@@ -1998,10 +2026,12 @@ int LSR_56::calculateCycles(const State& state) const
 {
     // 2   8-2*m+w     dir,X     0.....m* . LSR $10,X
     int cycles = 6;
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
     // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 2;
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
     return cycles;
 }
 
@@ -2013,8 +2043,10 @@ int LSR_5E::calculateCycles(const State& state) const
 {
     // 3   9-2*m       abs,X     0.....m* . LSR $9876,X
     int cycles = 7;
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 2;
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
     // 
     return cycles;
 }
@@ -2481,10 +2513,12 @@ int ROL_26::calculateCycles(const State& state) const
 {
     // 2   7-2*m+w     dir       m.....mm . ROL $10
     int cycles = 5;
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
     // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 2;
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
     return cycles;
 }
 
@@ -2507,8 +2541,10 @@ int ROL_2E::calculateCycles(const State& state) const
 {
     // 3   8-2*m       abs       m.....mm . ROL $9876
     int cycles = 6;
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 2;
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
     return cycles;
 }
 
@@ -2520,10 +2556,12 @@ int ROL_36::calculateCycles(const State& state) const
 {
     // 2   8-2*m+w     dir,X     m.....mm . ROL $10,X
     int cycles = 6;
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
     // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 2;
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
     return cycles;
 }
 
@@ -2535,8 +2573,10 @@ int ROL_3E::calculateCycles(const State& state) const
 {
     // 3   9-2*m       abs,X     m.....mm . ROL $9876,X
     int cycles = 7;
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 2;
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
     // 
     return cycles;
 }
@@ -2549,10 +2589,12 @@ int ROR_66::calculateCycles(const State& state) const
 {
     // 2   7-2*m+w     dir       m.....m* . ROR $10
     int cycles = 5;
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
     // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 2;
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
     return cycles;
 }
 
@@ -2575,8 +2617,10 @@ int ROR_6E::calculateCycles(const State& state) const
 {
     // 3   8-2*m       abs       m.....m* . ROR $9876
     int cycles = 6;
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 2;
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
     return cycles;
 }
 
@@ -2588,10 +2632,12 @@ int ROR_76::calculateCycles(const State& state) const
 {
     // 2   8-2*m+w     dir,X     m.....m* . ROR $10,X
     int cycles = 6;
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
     // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 2;
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
     return cycles;
 }
 
@@ -2603,8 +2649,10 @@ int ROR_7E::calculateCycles(const State& state) const
 {
     // 3   9-2*m       abs,X     m.....m* . ROR $9876,X
     int cycles = 7;
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 2;
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
     // 
     return cycles;
 }
@@ -3333,10 +3381,12 @@ int TRB_14::calculateCycles(const State& state) const
 {
     // 2   7-2*m+w     dir       ......m. . TRB $10
     int cycles = 5;
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
     // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 2;
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
     return cycles;
 }
 
@@ -3361,10 +3411,12 @@ int TSB_04::calculateCycles(const State& state) const
 {
     // 2   7-2*m+w     dir       ......m. . TSB $10
     int cycles = 5;
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
     // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 2;
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
     return cycles;
 }
 
@@ -3376,8 +3428,10 @@ int TSB_0C::calculateCycles(const State& state) const
 {
     // 3   8-2*m       abs       ......m. . TSB $9876
     int cycles = 6;
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    cycles += state.getFlag(State::m) ? 0 : 2;
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    cycles += state.getFlag(State::m) ? 0 : 1;
     return cycles;
 }
 

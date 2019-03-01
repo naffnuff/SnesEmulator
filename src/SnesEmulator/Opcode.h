@@ -413,8 +413,9 @@ class AND_3F : public AddressMode::AbsoluteLongIndexedX<Operator::AND>
 class ASL_06 : public AddressMode::DirectPage<Operator::ASL>
 {
     // 2   7-2*m+w     dir       m.....mm . ASL $10
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
     std::string opcodeToString() const override { return "06: ASL dp"; }
     int calculateCycles(const State& state) const override;
 };
@@ -437,7 +438,8 @@ class ASL_0A : public AddressMode::Accumulator<Operator::ASL>
 class ASL_0E : public AddressMode::Absolute<Operator::ASL>
 {
     // 3   8-2*m       abs       m.....mm . ASL $9876
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
     std::string opcodeToString() const override { return "0E: ASL addr"; }
     int calculateCycles(const State& state) const override;
 };
@@ -449,8 +451,9 @@ class ASL_0E : public AddressMode::Absolute<Operator::ASL>
 class ASL_16 : public AddressMode::DirectPageIndexedX<Operator::ASL>
 {
     // 2   8-2*m+w     dir,X     m.....mm . ASL $10,X
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
     std::string opcodeToString() const override { return "16: ASL dp,X"; }
     int calculateCycles(const State& state) const override;
 };
@@ -462,7 +465,8 @@ class ASL_16 : public AddressMode::DirectPageIndexedX<Operator::ASL>
 class ASL_1E : public AddressMode::AbsoluteIndexedX<Operator::ASL>
 {
     // 3   9-2*m       abs,X     m.....mm . ASL $9876,X
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
     // 
     std::string opcodeToString() const override { return "1E: ASL addr,X"; }
     int calculateCycles(const State& state) const override;
@@ -1014,8 +1018,9 @@ class DEC_3A : public AddressMode::Accumulator<Operator::DEC>
 class DEC_C6 : public AddressMode::DirectPage<Operator::DEC>
 {
     // 2   7-2*m+w     dir       m.....m. . DEC $10
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
     std::string opcodeToString() const override { return "C6: DEC dp"; }
     int calculateCycles(const State& state) const override;
 };
@@ -1027,7 +1032,8 @@ class DEC_C6 : public AddressMode::DirectPage<Operator::DEC>
 class DEC_CE : public AddressMode::Absolute<Operator::DEC>
 {
     // 3   8-2*m       abs       m.....m. . DEC $9876
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
     std::string opcodeToString() const override { return "CE: DEC addr"; }
     int calculateCycles(const State& state) const override;
 };
@@ -1039,8 +1045,9 @@ class DEC_CE : public AddressMode::Absolute<Operator::DEC>
 class DEC_D6 : public AddressMode::DirectPageIndexedX<Operator::DEC>
 {
     // 2   8-2*m+w     dir,X     m.....m. . DEC $10,X
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
     std::string opcodeToString() const override { return "D6: DEC dp,X"; }
     int calculateCycles(const State& state) const override;
 };
@@ -1052,7 +1059,8 @@ class DEC_D6 : public AddressMode::DirectPageIndexedX<Operator::DEC>
 class DEC_DE : public AddressMode::AbsoluteIndexedX<Operator::DEC>
 {
     // 3   9-2*m       abs,X     m.....m. . DEC $9876,X
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
     // 
     std::string opcodeToString() const override { return "DE: DEC addr,X"; }
     int calculateCycles(const State& state) const override;
@@ -1289,8 +1297,9 @@ class INC_1A : public AddressMode::Accumulator<Operator::INC>
 class INC_E6 : public AddressMode::DirectPage<Operator::INC>
 {
     // 2   7-2*m+w     dir       m.....m. . INC $10
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
     std::string opcodeToString() const override { return "E6: INC dp"; }
     int calculateCycles(const State& state) const override;
 };
@@ -1302,7 +1311,8 @@ class INC_E6 : public AddressMode::DirectPage<Operator::INC>
 class INC_EE : public AddressMode::Absolute<Operator::INC>
 {
     // 3   8-2*m       abs       m.....m. . INC $9876
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
     std::string opcodeToString() const override { return "EE: INC addr"; }
     int calculateCycles(const State& state) const override;
 };
@@ -1314,8 +1324,9 @@ class INC_EE : public AddressMode::Absolute<Operator::INC>
 class INC_F6 : public AddressMode::DirectPageIndexedX<Operator::INC>
 {
     // 2   8-2*m+w     dir,X     m.....m. . INC $10,X
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
     std::string opcodeToString() const override { return "F6: INC dp,X"; }
     int calculateCycles(const State& state) const override;
 };
@@ -1327,7 +1338,8 @@ class INC_F6 : public AddressMode::DirectPageIndexedX<Operator::INC>
 class INC_FE : public AddressMode::AbsoluteIndexedX<Operator::INC>
 {
     // 3   9-2*m       abs,X     m.....m. . INC $9876,X
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
     // 
     std::string opcodeToString() const override { return "FE: INC addr,X"; }
     int calculateCycles(const State& state) const override;
@@ -1771,8 +1783,9 @@ class LDY_BC : public AddressMode::AbsoluteIndexedX<Operator::LDY>
 class LSR_46 : public AddressMode::DirectPage<Operator::LSR>
 {
     // 2   7-2*m+w     dir       0.....m* . LSR $10
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
     std::string opcodeToString() const override { return "46: LSR dp"; }
     int calculateCycles(const State& state) const override;
 };
@@ -1795,7 +1808,8 @@ class LSR_4A : public AddressMode::Accumulator<Operator::LSR>
 class LSR_4E : public AddressMode::Absolute<Operator::LSR>
 {
     // 3   8-2*m       abs       0.....m* . LSR $9876
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
     std::string opcodeToString() const override { return "4E: LSR addr"; }
     int calculateCycles(const State& state) const override;
 };
@@ -1807,8 +1821,9 @@ class LSR_4E : public AddressMode::Absolute<Operator::LSR>
 class LSR_56 : public AddressMode::DirectPageIndexedX<Operator::LSR>
 {
     // 2   8-2*m+w     dir,X     0.....m* . LSR $10,X
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
     std::string opcodeToString() const override { return "56: LSR dp,X"; }
     int calculateCycles(const State& state) const override;
 };
@@ -1820,7 +1835,8 @@ class LSR_56 : public AddressMode::DirectPageIndexedX<Operator::LSR>
 class LSR_5E : public AddressMode::AbsoluteIndexedX<Operator::LSR>
 {
     // 3   9-2*m       abs,X     0.....m* . LSR $9876,X
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
     // 
     std::string opcodeToString() const override { return "5E: LSR addr,X"; }
     int calculateCycles(const State& state) const override;
@@ -2253,8 +2269,9 @@ class REP_C2 : public AddressMode::Immediate<Operator::REP>
 class ROL_26 : public AddressMode::DirectPage<Operator::ROL>
 {
     // 2   7-2*m+w     dir       m.....mm . ROL $10
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
     std::string opcodeToString() const override { return "26: ROL dp"; }
     int calculateCycles(const State& state) const override;
 };
@@ -2277,7 +2294,8 @@ class ROL_2A : public AddressMode::Accumulator<Operator::ROL>
 class ROL_2E : public AddressMode::Absolute<Operator::ROL>
 {
     // 3   8-2*m       abs       m.....mm . ROL $9876
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
     std::string opcodeToString() const override { return "2E: ROL addr"; }
     int calculateCycles(const State& state) const override;
 };
@@ -2289,8 +2307,9 @@ class ROL_2E : public AddressMode::Absolute<Operator::ROL>
 class ROL_36 : public AddressMode::DirectPageIndexedX<Operator::ROL>
 {
     // 2   8-2*m+w     dir,X     m.....mm . ROL $10,X
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
     std::string opcodeToString() const override { return "36: ROL dp,X"; }
     int calculateCycles(const State& state) const override;
 };
@@ -2302,7 +2321,8 @@ class ROL_36 : public AddressMode::DirectPageIndexedX<Operator::ROL>
 class ROL_3E : public AddressMode::AbsoluteIndexedX<Operator::ROL>
 {
     // 3   9-2*m       abs,X     m.....mm . ROL $9876,X
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
     // 
     std::string opcodeToString() const override { return "3E: ROL addr,X"; }
     int calculateCycles(const State& state) const override;
@@ -2315,8 +2335,9 @@ class ROL_3E : public AddressMode::AbsoluteIndexedX<Operator::ROL>
 class ROR_66 : public AddressMode::DirectPage<Operator::ROR>
 {
     // 2   7-2*m+w     dir       m.....m* . ROR $10
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
     std::string opcodeToString() const override { return "66: ROR dp"; }
     int calculateCycles(const State& state) const override;
 };
@@ -2339,7 +2360,8 @@ class ROR_6A : public AddressMode::Accumulator<Operator::ROR>
 class ROR_6E : public AddressMode::Absolute<Operator::ROR>
 {
     // 3   8-2*m       abs       m.....m* . ROR $9876
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
     std::string opcodeToString() const override { return "6E: ROR addr"; }
     int calculateCycles(const State& state) const override;
 };
@@ -2351,8 +2373,9 @@ class ROR_6E : public AddressMode::Absolute<Operator::ROR>
 class ROR_76 : public AddressMode::DirectPageIndexedX<Operator::ROR>
 {
     // 2   8-2*m+w     dir,X     m.....m* . ROR $10,X
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
     std::string opcodeToString() const override { return "76: ROR dp,X"; }
     int calculateCycles(const State& state) const override;
 };
@@ -2364,7 +2387,8 @@ class ROR_76 : public AddressMode::DirectPageIndexedX<Operator::ROR>
 class ROR_7E : public AddressMode::AbsoluteIndexedX<Operator::ROR>
 {
     // 3   9-2*m       abs,X     m.....m* . ROR $9876,X
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
     // 
     std::string opcodeToString() const override { return "7E: ROR addr,X"; }
     int calculateCycles(const State& state) const override;
@@ -3029,8 +3053,9 @@ class TDC_7B : public AddressMode::Implied<Operator::TDC>
 class TRB_14 : public AddressMode::DirectPage<Operator::TRB>
 {
     // 2   7-2*m+w     dir       ......m. . TRB $10
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
     std::string opcodeToString() const override { return "14: TRB dp"; }
     int calculateCycles(const State& state) const override;
 };
@@ -3054,8 +3079,9 @@ class TRB_1C : public AddressMode::Absolute<Operator::TRB>
 class TSB_04 : public AddressMode::DirectPage<Operator::TSB>
 {
     // 2   7-2*m+w     dir       ......m. . TSB $10
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
     std::string opcodeToString() const override { return "04: TSB dp"; }
     int calculateCycles(const State& state) const override;
 };
@@ -3067,7 +3093,8 @@ class TSB_04 : public AddressMode::DirectPage<Operator::TSB>
 class TSB_0C : public AddressMode::Absolute<Operator::TSB>
 {
     // 3   8-2*m       abs       ......m. . TSB $9876
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
+    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    // 5: Add 1 cycle if m=0 (16-bit memory/accumulator)
     std::string opcodeToString() const override { return "0C: TSB addr"; }
     int calculateCycles(const State& state) const override;
 };
