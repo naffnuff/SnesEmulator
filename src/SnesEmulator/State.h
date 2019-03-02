@@ -64,6 +64,10 @@ public:
 
     std::ostream& printRegisters(std::ostream& output)
     {
+        std::bitset<8> flagSet(flags);
+        if (emulationMode) {
+            flagSet |= Flag::m;
+        }
         return output
             << "PB=" << std::setw(2) << std::setfill('0') << +programBank
             << ", PC=" << std::setw(4) << std::setfill('0') << programCounter
@@ -73,7 +77,7 @@ public:
             << ", S=" << std::setw(4) << std::setfill('0') << stackPointer
             << ", DP=" << std::setw(4) << std::setfill('0') << directPage
             << ", DB=" << std::setw(2) << std::setfill('0') << +dataBank
-            << ", flags=" << std::bitset<8>(flags)
+            << ", flags=" << flagSet
             << ", e=" << emulationMode;
     }
 
@@ -105,30 +109,9 @@ public:
         }
     }
 
-    uint8_t readNextInstruction() const
+    uint8_t readProgramByte(int offset = 0) const
     {
-        return memory[getProgramAddress()];
-    }
-
-    uint8_t readOneByteValue() const
-    {
-        uint8_t value = memory[getProgramAddress(1)];
-        return value;
-    }
-
-    uint16_t readTwoByteValue() const
-    {
-        uint16_t value = memory[getProgramAddress(1)];
-        value += memory[getProgramAddress(2)] << 8;
-        return value;
-    }
-
-    uint32_t readThreeByteValue() const
-    {
-        uint32_t value = memory[getProgramAddress(1)];
-        value += memory[getProgramAddress(2)] << 8;
-        value += memory[getProgramAddress(3)] << 16;
-        return value;
+        return memory[getProgramAddress(offset)];
     }
 
     void loadRom(const std::string& path);
@@ -145,7 +128,7 @@ public:
 
     uint32_t getProgramAddress(int offset = 0) const
     {
-        return (programBank << 16) + programCounter + offset;
+        return (programBank << 16 | programCounter) + offset;
     }
 
     uint32_t getAccumulatorC() const

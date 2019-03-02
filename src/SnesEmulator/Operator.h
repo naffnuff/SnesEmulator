@@ -8,8 +8,9 @@ namespace Operator {
 class ADC
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -21,8 +22,9 @@ public:
 class AND
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -34,8 +36,9 @@ public:
 class ASL
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -47,8 +50,9 @@ public:
 class BCC
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         // 7: Add 1 cycle if branch is taken
         cycles += 0 /* TODO07 */;
@@ -64,8 +68,9 @@ public:
 class BCS
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         // 7: Add 1 cycle if branch is taken
         cycles += 0 /* TODO07 */;
@@ -81,8 +86,9 @@ public:
 class BEQ
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         // 7: Add 1 cycle if branch is taken
         cycles += 0 /* TODO07 */;
@@ -98,8 +104,9 @@ public:
 class BIT
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -111,8 +118,9 @@ public:
 class BMI
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         // 7: Add 1 cycle if branch is taken
         cycles += 0 /* TODO07 */;
@@ -128,8 +136,9 @@ public:
 class BNE
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         // 7: Add 1 cycle if branch is taken
         cycles += 0 /* TODO07 */;
@@ -145,8 +154,9 @@ public:
 class BPL
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         // 7: Add 1 cycle if branch is taken
         cycles += 0 /* TODO07 */;
@@ -162,8 +172,9 @@ public:
 class BRA
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
         cycles += 0 /* TODO08 */;
@@ -177,8 +188,9 @@ public:
 class BRK
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -190,8 +202,9 @@ public:
 class BRL
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -203,8 +216,9 @@ public:
 class BVC
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         // 7: Add 1 cycle if branch is taken
         cycles += 0 /* TODO07 */;
@@ -220,8 +234,9 @@ public:
 class BVS
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         // 7: Add 1 cycle if branch is taken
         cycles += 0 /* TODO07 */;
@@ -237,8 +252,9 @@ public:
 class CLC
 {
 public:
-    static int operate(State& state)
+    static int invoke(State& state)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -250,8 +266,9 @@ public:
 class CLD
 {
 public:
-    static int operate(State& state)
+    static int invoke(State& state)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -263,8 +280,9 @@ public:
 class CLI
 {
 public:
-    static int operate(State& state)
+    static int invoke(State& state)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -276,8 +294,9 @@ public:
 class CLV
 {
 public:
-    static int operate(State& state)
+    static int invoke(State& state)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -289,8 +308,9 @@ public:
 class CMP
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -302,8 +322,9 @@ public:
 class COP
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -315,8 +336,9 @@ public:
 class CPX
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -328,8 +350,9 @@ public:
 class CPY
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -341,8 +364,9 @@ public:
 class DEC
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -354,8 +378,9 @@ public:
 class DEX
 {
 public:
-    static int operate(State& state)
+    static int invoke(State& state)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -367,8 +392,9 @@ public:
 class DEY
 {
 public:
-    static int operate(State& state)
+    static int invoke(State& state)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -380,8 +406,9 @@ public:
 class EOR
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -393,8 +420,9 @@ public:
 class INC
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -406,8 +434,9 @@ public:
 class INX
 {
 public:
-    static int operate(State& state)
+    static int invoke(State& state)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -419,8 +448,9 @@ public:
 class INY
 {
 public:
-    static int operate(State& state)
+    static int invoke(State& state)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -432,8 +462,9 @@ public:
 class JMP
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -445,8 +476,9 @@ public:
 class JSR
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -458,8 +490,9 @@ public:
 class LDA
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -471,8 +504,9 @@ public:
 class LDX
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -484,8 +518,9 @@ public:
 class LDY
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -497,8 +532,9 @@ public:
 class LSR
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -510,8 +546,9 @@ public:
 class MVN
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -523,8 +560,9 @@ public:
 class MVP
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -536,8 +574,9 @@ public:
 class NOP
 {
 public:
-    static int operate(State& state)
+    static int invoke(State& state)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -549,8 +588,9 @@ public:
 class ORA
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -562,8 +602,9 @@ public:
 class PEA
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -575,8 +616,9 @@ public:
 class PEI
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -588,8 +630,9 @@ public:
 class PER
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -601,8 +644,9 @@ public:
 class PHA
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -614,8 +658,9 @@ public:
 class PHB
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -627,8 +672,9 @@ public:
 class PHD
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -640,8 +686,9 @@ public:
 class PHK
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -653,8 +700,9 @@ public:
 class PHP
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -666,8 +714,9 @@ public:
 class PHX
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -679,8 +728,9 @@ public:
 class PHY
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -692,8 +742,9 @@ public:
 class PLA
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -705,8 +756,9 @@ public:
 class PLB
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -718,8 +770,9 @@ public:
 class PLD
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -731,8 +784,9 @@ public:
 class PLP
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -744,8 +798,9 @@ public:
 class PLX
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -757,8 +812,9 @@ public:
 class PLY
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -770,8 +826,9 @@ public:
 class REP
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -783,8 +840,9 @@ public:
 class ROL
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -796,8 +854,9 @@ public:
 class ROR
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -809,8 +868,9 @@ public:
 class RTI
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -822,8 +882,9 @@ public:
 class RTL
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -835,8 +896,9 @@ public:
 class RTS
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -848,8 +910,9 @@ public:
 class SBC
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -861,8 +924,9 @@ public:
 class SEC
 {
 public:
-    static int operate(State& state)
+    static int invoke(State& state)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -874,8 +938,9 @@ public:
 class SED
 {
 public:
-    static int operate(State& state)
+    static int invoke(State& state)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -887,8 +952,9 @@ public:
 class SEI
 {
 public:
-    static int operate(State& state)
+    static int invoke(State& state)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -900,8 +966,9 @@ public:
 class SEP
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -913,8 +980,9 @@ public:
 class STA
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -926,8 +994,9 @@ public:
 class STP
 {
 public:
-    static int operate(State& state)
+    static int invoke(State& state)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -939,8 +1008,9 @@ public:
 class STX
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -952,8 +1022,9 @@ public:
 class STY
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -965,8 +1036,9 @@ public:
 class STZ
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -978,8 +1050,9 @@ public:
 class TAX
 {
 public:
-    static int operate(State& state)
+    static int invoke(State& state)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -991,8 +1064,9 @@ public:
 class TAY
 {
 public:
-    static int operate(State& state)
+    static int invoke(State& state)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -1004,8 +1078,9 @@ public:
 class TCD
 {
 public:
-    static int operate(State& state)
+    static int invoke(State& state)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -1017,8 +1092,9 @@ public:
 class TCS
 {
 public:
-    static int operate(State& state)
+    static int invoke(State& state)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -1030,8 +1106,9 @@ public:
 class TDC
 {
 public:
-    static int operate(State& state)
+    static int invoke(State& state)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -1043,8 +1120,9 @@ public:
 class TRB
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -1056,8 +1134,9 @@ public:
 class TSB
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -1069,8 +1148,9 @@ public:
 class TSC
 {
 public:
-    static int operate(State& state)
+    static int invoke(State& state)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -1082,8 +1162,9 @@ public:
 class TSX
 {
 public:
-    static int operate(State& state)
+    static int invoke(State& state)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -1095,8 +1176,9 @@ public:
 class TXA
 {
 public:
-    static int operate(State& state)
+    static int invoke(State& state)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -1108,8 +1190,9 @@ public:
 class TXS
 {
 public:
-    static int operate(State& state)
+    static int invoke(State& state)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -1121,8 +1204,9 @@ public:
 class TXY
 {
 public:
-    static int operate(State& state)
+    static int invoke(State& state)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -1134,8 +1218,9 @@ public:
 class TYA
 {
 public:
-    static int operate(State& state)
+    static int invoke(State& state)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -1147,8 +1232,9 @@ public:
 class TYX
 {
 public:
-    static int operate(State& state)
+    static int invoke(State& state)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -1160,8 +1246,9 @@ public:
 class WAI
 {
 public:
-    static int operate(State& state)
+    static int invoke(State& state)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -1173,8 +1260,9 @@ public:
 class WDM
 {
 public:
-    static int operate(State& state, int* data)
+    static int invoke(State& state, uint8_t* data)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -1186,8 +1274,9 @@ public:
 class XBA
 {
 public:
-    static int operate(State& state)
+    static int invoke(State& state)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }
@@ -1199,8 +1288,9 @@ public:
 class XCE
 {
 public:
-    static int operate(State& state)
+    static int invoke(State& state)
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         return cycles;
     }

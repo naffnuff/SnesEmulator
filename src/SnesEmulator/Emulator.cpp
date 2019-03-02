@@ -40,7 +40,7 @@ void Emulator::run()
 
         instructionCount++;
 
-        Instruction* instruction = instructions.getInstruction(state.readNextInstruction());
+        Instruction* instruction = instructions.getInstruction(state.readProgramByte());
 
         if (stepMode) {
             if (watchMode) {
@@ -62,7 +62,7 @@ void Emulator::run()
                 state.printRegisters(output) << std::endl;
             }
             output << instruction->opcodeToString() << std::endl;
-            output << std::setw(2) << std::setfill('0') << +state.readNextInstruction() << ": ";
+            output << std::setw(2) << std::setfill('0') << +state.readProgramByte() << ": ";
             output << instruction->toString(state) << std::endl;
 
             output << "Command (h for help): ";

@@ -11,11 +11,12 @@ namespace AddressMode {
 template <typename Operator>
 class Absolute : public Instruction3Byte
 {
-    int apply(State& state, uint16_t operand) const override
+    int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte) const override
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
-        int* data = nullptr;
-        return cycles + Operator::operate(state, data);
+        uint8_t* data = nullptr;
+        return cycles + Operator::invoke(state, data);
     }
 
     std::string toString(const State& state) const override
@@ -28,11 +29,12 @@ class Absolute : public Instruction3Byte
 template <typename Operator>
 class AbsoluteIndexedIndirect : public Instruction3Byte
 {
-    int apply(State& state, uint16_t operand) const override
+    int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte) const override
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
-        int* data = nullptr;
-        return cycles + Operator::operate(state, data);
+        uint8_t* data = nullptr;
+        return cycles + Operator::invoke(state, data);
     }
 
     std::string toString(const State& state) const override
@@ -45,13 +47,14 @@ class AbsoluteIndexedIndirect : public Instruction3Byte
 template <typename Operator>
 class AbsoluteIndexedX : public Instruction3Byte
 {
-    int apply(State& state, uint16_t operand) const override
+    int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte) const override
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         // 3: Add 1 cycle if adding index crosses a page boundary
         cycles += 0 /* TODO03 */;
-        int* data = nullptr;
-        return cycles + Operator::operate(state, data);
+        uint8_t* data = nullptr;
+        return cycles + Operator::invoke(state, data);
     }
 
     std::string toString(const State& state) const override
@@ -64,13 +67,14 @@ class AbsoluteIndexedX : public Instruction3Byte
 template <typename Operator>
 class AbsoluteIndexedY : public Instruction3Byte
 {
-    int apply(State& state, uint16_t operand) const override
+    int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte) const override
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         // 3: Add 1 cycle if adding index crosses a page boundary
         cycles += 0 /* TODO03 */;
-        int* data = nullptr;
-        return cycles + Operator::operate(state, data);
+        uint8_t* data = nullptr;
+        return cycles + Operator::invoke(state, data);
     }
 
     std::string toString(const State& state) const override
@@ -83,11 +87,12 @@ class AbsoluteIndexedY : public Instruction3Byte
 template <typename Operator>
 class AbsoluteIndirect : public Instruction3Byte
 {
-    int apply(State& state, uint16_t operand) const override
+    int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte) const override
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
-        int* data = nullptr;
-        return cycles + Operator::operate(state, data);
+        uint8_t* data = nullptr;
+        return cycles + Operator::invoke(state, data);
     }
 
     std::string toString(const State& state) const override
@@ -100,11 +105,12 @@ class AbsoluteIndirect : public Instruction3Byte
 template <typename Operator>
 class AbsoluteIndirectLong : public Instruction3Byte
 {
-    int apply(State& state, uint16_t operand) const override
+    int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte) const override
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
-        int* data = nullptr;
-        return cycles + Operator::operate(state, data);
+        uint8_t* data = nullptr;
+        return cycles + Operator::invoke(state, data);
     }
 
     std::string toString(const State& state) const override
@@ -117,11 +123,12 @@ class AbsoluteIndirectLong : public Instruction3Byte
 template <typename Operator>
 class AbsoluteLong : public Instruction4Byte
 {
-    int apply(State& state, uint32_t operand) const override
+    int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte, uint8_t bankByte) const override
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
-        int* data = nullptr;
-        return cycles + Operator::operate(state, data);
+        uint8_t* data = nullptr;
+        return cycles + Operator::invoke(state, data);
     }
 
     std::string toString(const State& state) const override
@@ -134,11 +141,12 @@ class AbsoluteLong : public Instruction4Byte
 template <typename Operator>
 class AbsoluteLongIndexedX : public Instruction4Byte
 {
-    int apply(State& state, uint32_t operand) const override
+    int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte, uint8_t bankByte) const override
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
-        int* data = nullptr;
-        return cycles + Operator::operate(state, data);
+        uint8_t* data = nullptr;
+        return cycles + Operator::invoke(state, data);
     }
 
     std::string toString(const State& state) const override
@@ -151,11 +159,12 @@ class AbsoluteLongIndexedX : public Instruction4Byte
 template <typename Operator>
 class Accumulator : public Instruction1Byte
 {
-    int apply(State& state) const override
+    int invokeOperator(State& state) const override
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
-        int* data = nullptr;
-        return cycles + Operator::operate(state, data);
+        uint8_t* data = nullptr;
+        return cycles + Operator::invoke(state, data);
     }
 
     std::string toString(const State& state) const override
@@ -168,13 +177,14 @@ class Accumulator : public Instruction1Byte
 template <typename Operator>
 class BlockMove : public Instruction3Byte
 {
-    int apply(State& state, uint16_t operand) const override
+    int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte) const override
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         // 3: Add 1 cycle if adding index crosses a page boundary
         cycles += 0 /* TODO03 */;
-        int* data = nullptr;
-        return cycles + Operator::operate(state, data);
+        uint8_t* data = nullptr;
+        return cycles + Operator::invoke(state, data);
     }
 
     std::string toString(const State& state) const override
@@ -187,11 +197,12 @@ class BlockMove : public Instruction3Byte
 template <typename Operator>
 class DirectPage : public Instruction2Byte
 {
-    int apply(State& state, uint8_t operand) const override
+    int invokeOperator(State& state, uint8_t lowByte) const override
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
-        int* data = nullptr;
-        return cycles + Operator::operate(state, data);
+        uint8_t* data = nullptr;
+        return cycles + Operator::invoke(state, data);
     }
 
     std::string toString(const State& state) const override
@@ -204,11 +215,12 @@ class DirectPage : public Instruction2Byte
 template <typename Operator>
 class DirectPageIndexedIndirectX : public Instruction2Byte
 {
-    int apply(State& state, uint8_t operand) const override
+    int invokeOperator(State& state, uint8_t lowByte) const override
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
-        int* data = nullptr;
-        return cycles + Operator::operate(state, data);
+        uint8_t* data = nullptr;
+        return cycles + Operator::invoke(state, data);
     }
 
     std::string toString(const State& state) const override
@@ -221,11 +233,12 @@ class DirectPageIndexedIndirectX : public Instruction2Byte
 template <typename Operator>
 class DirectPageIndexedX : public Instruction2Byte
 {
-    int apply(State& state, uint8_t operand) const override
+    int invokeOperator(State& state, uint8_t lowByte) const override
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
-        int* data = nullptr;
-        return cycles + Operator::operate(state, data);
+        uint8_t* data = nullptr;
+        return cycles + Operator::invoke(state, data);
     }
 
     std::string toString(const State& state) const override
@@ -238,11 +251,12 @@ class DirectPageIndexedX : public Instruction2Byte
 template <typename Operator>
 class DirectPageIndexedY : public Instruction2Byte
 {
-    int apply(State& state, uint8_t operand) const override
+    int invokeOperator(State& state, uint8_t lowByte) const override
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
-        int* data = nullptr;
-        return cycles + Operator::operate(state, data);
+        uint8_t* data = nullptr;
+        return cycles + Operator::invoke(state, data);
     }
 
     std::string toString(const State& state) const override
@@ -255,11 +269,12 @@ class DirectPageIndexedY : public Instruction2Byte
 template <typename Operator>
 class DirectPageIndirect : public Instruction2Byte
 {
-    int apply(State& state, uint8_t operand) const override
+    int invokeOperator(State& state, uint8_t lowByte) const override
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
-        int* data = nullptr;
-        return cycles + Operator::operate(state, data);
+        uint8_t* data = nullptr;
+        return cycles + Operator::invoke(state, data);
     }
 
     std::string toString(const State& state) const override
@@ -272,13 +287,14 @@ class DirectPageIndirect : public Instruction2Byte
 template <typename Operator>
 class DirectPageIndirectIndexedY : public Instruction2Byte
 {
-    int apply(State& state, uint8_t operand) const override
+    int invokeOperator(State& state, uint8_t lowByte) const override
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
         // 3: Add 1 cycle if adding index crosses a page boundary
         cycles += 0 /* TODO03 */;
-        int* data = nullptr;
-        return cycles + Operator::operate(state, data);
+        uint8_t* data = nullptr;
+        return cycles + Operator::invoke(state, data);
     }
 
     std::string toString(const State& state) const override
@@ -291,11 +307,12 @@ class DirectPageIndirectIndexedY : public Instruction2Byte
 template <typename Operator>
 class DirectPageIndirectLong : public Instruction2Byte
 {
-    int apply(State& state, uint8_t operand) const override
+    int invokeOperator(State& state, uint8_t lowByte) const override
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
-        int* data = nullptr;
-        return cycles + Operator::operate(state, data);
+        uint8_t* data = nullptr;
+        return cycles + Operator::invoke(state, data);
     }
 
     std::string toString(const State& state) const override
@@ -308,11 +325,12 @@ class DirectPageIndirectLong : public Instruction2Byte
 template <typename Operator>
 class DirectPageIndirectLongIndexedY : public Instruction2Byte
 {
-    int apply(State& state, uint8_t operand) const override
+    int invokeOperator(State& state, uint8_t lowByte) const override
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
-        int* data = nullptr;
-        return cycles + Operator::operate(state, data);
+        uint8_t* data = nullptr;
+        return cycles + Operator::invoke(state, data);
     }
 
     std::string toString(const State& state) const override
@@ -325,11 +343,12 @@ class DirectPageIndirectLongIndexedY : public Instruction2Byte
 template <typename Operator>
 class Immediate : public Instruction2Byte
 {
-    int apply(State& state, uint8_t operand) const override
+    int invokeOperator(State& state, uint8_t lowByte) const override
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
-        int* data = nullptr;
-        return cycles + Operator::operate(state, data);
+        uint8_t* data = nullptr;
+        return cycles + Operator::invoke(state, data);
     }
 
     std::string toString(const State& state) const override
@@ -341,13 +360,14 @@ class Immediate : public Instruction2Byte
 // Immediate
 // 17: Add 1 byte if m=0 (16-bit memory/accumulator)
 template <typename Operator, State::Flag Flag>
-class ImmediateFlagSize : public InstructionVariableSize<Flag>
+class ImmediateVariableSize : public InstructionVariableSize<Flag>
 {
-    int apply(State& state, uint16_t operand) const override
+    int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte) const override
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
-        int* data = nullptr;
-        return cycles + Operator::operate(state, data);
+        uint8_t* data = nullptr;
+        return cycles + Operator::invoke(state, data);
     }
 
     std::string toString(const State& state) const override
@@ -360,10 +380,11 @@ class ImmediateFlagSize : public InstructionVariableSize<Flag>
 template <typename Operator>
 class Implied : public Instruction1Byte
 {
-    int apply(State& state) const override
+    int invokeOperator(State& state) const override
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
-        return cycles + Operator::operate(state);
+        return cycles + Operator::invoke(state);
     }
 
     std::string toString(const State& state) const override
@@ -376,11 +397,12 @@ class Implied : public Instruction1Byte
 template <typename Operator>
 class ProgramCounterRelative : public Instruction2Byte
 {
-    int apply(State& state, uint8_t operand) const override
+    int invokeOperator(State& state, uint8_t lowByte) const override
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
-        int* data = nullptr;
-        return cycles + Operator::operate(state, data);
+        uint8_t* data = nullptr;
+        return cycles + Operator::invoke(state, data);
     }
 
     std::string toString(const State& state) const override
@@ -393,11 +415,12 @@ class ProgramCounterRelative : public Instruction2Byte
 template <typename Operator>
 class ProgramCounterRelativeLong : public Instruction3Byte
 {
-    int apply(State& state, uint16_t operand) const override
+    int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte) const override
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
-        int* data = nullptr;
-        return cycles + Operator::operate(state, data);
+        uint8_t* data = nullptr;
+        return cycles + Operator::invoke(state, data);
     }
 
     std::string toString(const State& state) const override
@@ -410,11 +433,12 @@ class ProgramCounterRelativeLong : public Instruction3Byte
 template <typename Operator>
 class StackAbsolute : public Instruction3Byte
 {
-    int apply(State& state, uint16_t operand) const override
+    int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte) const override
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
-        int* data = nullptr;
-        return cycles + Operator::operate(state, data);
+        uint8_t* data = nullptr;
+        return cycles + Operator::invoke(state, data);
     }
 
     std::string toString(const State& state) const override
@@ -427,11 +451,12 @@ class StackAbsolute : public Instruction3Byte
 template <typename Operator>
 class StackDirectPageIndirect : public Instruction2Byte
 {
-    int apply(State& state, uint8_t operand) const override
+    int invokeOperator(State& state, uint8_t lowByte) const override
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
-        int* data = nullptr;
-        return cycles + Operator::operate(state, data);
+        uint8_t* data = nullptr;
+        return cycles + Operator::invoke(state, data);
     }
 
     std::string toString(const State& state) const override
@@ -444,11 +469,12 @@ class StackDirectPageIndirect : public Instruction2Byte
 template <typename Operator>
 class StackInterrupt : public Instruction2Byte
 {
-    int apply(State& state, uint8_t operand) const override
+    int invokeOperator(State& state, uint8_t lowByte) const override
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
-        int* data = nullptr;
-        return cycles + Operator::operate(state, data);
+        uint8_t* data = nullptr;
+        return cycles + Operator::invoke(state, data);
     }
 
     std::string toString(const State& state) const override
@@ -461,11 +487,12 @@ class StackInterrupt : public Instruction2Byte
 template <typename Operator>
 class StackProgramCounterRelativeLong : public Instruction3Byte
 {
-    int apply(State& state, uint16_t operand) const override
+    int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte) const override
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
-        int* data = nullptr;
-        return cycles + Operator::operate(state, data);
+        uint8_t* data = nullptr;
+        return cycles + Operator::invoke(state, data);
     }
 
     std::string toString(const State& state) const override
@@ -478,11 +505,12 @@ class StackProgramCounterRelativeLong : public Instruction3Byte
 template <typename Operator>
 class StackPull : public Instruction1Byte
 {
-    int apply(State& state) const override
+    int invokeOperator(State& state) const override
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
-        int* data = nullptr;
-        return cycles + Operator::operate(state, data);
+        uint8_t* data = nullptr;
+        return cycles + Operator::invoke(state, data);
     }
 
     std::string toString(const State& state) const override
@@ -495,11 +523,12 @@ class StackPull : public Instruction1Byte
 template <typename Operator>
 class StackPush : public Instruction1Byte
 {
-    int apply(State& state) const override
+    int invokeOperator(State& state) const override
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
-        int* data = nullptr;
-        return cycles + Operator::operate(state, data);
+        uint8_t* data = nullptr;
+        return cycles + Operator::invoke(state, data);
     }
 
     std::string toString(const State& state) const override
@@ -512,11 +541,12 @@ class StackPush : public Instruction1Byte
 template <typename Operator>
 class StackRTI : public Instruction1Byte
 {
-    int apply(State& state) const override
+    int invokeOperator(State& state) const override
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
-        int* data = nullptr;
-        return cycles + Operator::operate(state, data);
+        uint8_t* data = nullptr;
+        return cycles + Operator::invoke(state, data);
     }
 
     std::string toString(const State& state) const override
@@ -529,11 +559,12 @@ class StackRTI : public Instruction1Byte
 template <typename Operator>
 class StackRTL : public Instruction1Byte
 {
-    int apply(State& state) const override
+    int invokeOperator(State& state) const override
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
-        int* data = nullptr;
-        return cycles + Operator::operate(state, data);
+        uint8_t* data = nullptr;
+        return cycles + Operator::invoke(state, data);
     }
 
     std::string toString(const State& state) const override
@@ -546,11 +577,12 @@ class StackRTL : public Instruction1Byte
 template <typename Operator>
 class StackRTS : public Instruction1Byte
 {
-    int apply(State& state) const override
+    int invokeOperator(State& state) const override
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
-        int* data = nullptr;
-        return cycles + Operator::operate(state, data);
+        uint8_t* data = nullptr;
+        return cycles + Operator::invoke(state, data);
     }
 
     std::string toString(const State& state) const override
@@ -563,11 +595,12 @@ class StackRTS : public Instruction1Byte
 template <typename Operator>
 class StackRelative : public Instruction2Byte
 {
-    int apply(State& state, uint8_t operand) const override
+    int invokeOperator(State& state, uint8_t lowByte) const override
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
-        int* data = nullptr;
-        return cycles + Operator::operate(state, data);
+        uint8_t* data = nullptr;
+        return cycles + Operator::invoke(state, data);
     }
 
     std::string toString(const State& state) const override
@@ -580,11 +613,12 @@ class StackRelative : public Instruction2Byte
 template <typename Operator>
 class StackRelativeIndirectIndexedY : public Instruction2Byte
 {
-    int apply(State& state, uint8_t operand) const override
+    int invokeOperator(State& state, uint8_t lowByte) const override
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
-        int* data = nullptr;
-        return cycles + Operator::operate(state, data);
+        uint8_t* data = nullptr;
+        return cycles + Operator::invoke(state, data);
     }
 
     std::string toString(const State& state) const override
@@ -597,11 +631,12 @@ class StackRelativeIndirectIndexedY : public Instruction2Byte
 template <typename Operator>
 class na : public Instruction2Byte
 {
-    int apply(State& state, uint8_t operand) const override
+    int invokeOperator(State& state, uint8_t lowByte) const override
     {
+        throw std::runtime_error("Not implemented");
         int cycles = 0;
-        int* data = nullptr;
-        return cycles + Operator::operate(state, data);
+        uint8_t* data = nullptr;
+        return cycles + Operator::invoke(state, data);
     }
 
     std::string toString(const State& state) const override

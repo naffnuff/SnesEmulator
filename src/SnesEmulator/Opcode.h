@@ -92,7 +92,7 @@ class ADC_67 : public AddressMode::DirectPageIndirectLong<Operator::ADC>
 // Immediate
 // 2<17>
 // 17: Add 1 byte if m=0 (16-bit memory/accumulator)
-class ADC_69 : public AddressMode::ImmediateFlagSize<Operator::ADC, State::m>
+class ADC_69 : public AddressMode::ImmediateVariableSize<Operator::ADC, State::m>
 {
     // 3-m 3-m         imm       mm....mm . ADC #$54
     // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
@@ -377,7 +377,7 @@ class AND_27 : public AddressMode::DirectPageIndirectLong<Operator::AND>
 // Immediate
 // 2<17>
 // 17: Add 1 byte if m=0 (16-bit memory/accumulator)
-class AND_29 : public AddressMode::ImmediateFlagSize<Operator::AND, State::m>
+class AND_29 : public AddressMode::ImmediateVariableSize<Operator::AND, State::m>
 {
     // 3-m 3-m         imm       m.....m. . AND #$54
     // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
@@ -802,7 +802,7 @@ class BIT_3C : public AddressMode::AbsoluteIndexedX<Operator::BIT>
 // Immediate
 // 2<17>
 // 17: Add 1 byte if m=0 (16-bit memory/accumulator)
-class BIT_89 : public AddressMode::ImmediateFlagSize<Operator::BIT, State::m>
+class BIT_89 : public AddressMode::ImmediateVariableSize<Operator::BIT, State::m>
 {
     // 3-m 3-m         imm       ......m. . BIT #$54
     // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
@@ -1094,7 +1094,7 @@ class CMP_C7 : public AddressMode::DirectPageIndirectLong<Operator::CMP>
 // Immediate
 // 2<17>
 // 17: Add 1 byte if m=0 (16-bit memory/accumulator)
-class CMP_C9 : public AddressMode::ImmediateFlagSize<Operator::CMP, State::m>
+class CMP_C9 : public AddressMode::ImmediateVariableSize<Operator::CMP, State::m>
 {
     // 3-m 3-m         imm       m.....mm . CMP #$54
     // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
@@ -1320,7 +1320,7 @@ class COP_02 : public AddressMode::StackInterrupt<Operator::COP>
 // Immediate
 // 2<19>
 // 19: Add 1 byte if x=0 (16-bit index registers)
-class CPX_E0 : public AddressMode::ImmediateFlagSize<Operator::CPX, State::x>
+class CPX_E0 : public AddressMode::ImmediateVariableSize<Operator::CPX, State::x>
 {
     // 3-x 3-x         imm       x.....xx . CPX #$54
     // 10: Add 1 cycle if x=0 (16-bit index registers)
@@ -1377,7 +1377,7 @@ class CPX_EC : public AddressMode::Absolute<Operator::CPX>
 // Immediate
 // 2<19>
 // 19: Add 1 byte if x=0 (16-bit index registers)
-class CPY_C0 : public AddressMode::ImmediateFlagSize<Operator::CPY, State::x>
+class CPY_C0 : public AddressMode::ImmediateVariableSize<Operator::CPY, State::x>
 {
     // 3-x 3-x         imm       x.....xx . CPY #$54
     // 10: Add 1 cycle if x=0 (16-bit index registers)
@@ -1638,7 +1638,7 @@ class EOR_47 : public AddressMode::DirectPageIndirectLong<Operator::EOR>
 // Immediate
 // 2<17>
 // 17: Add 1 byte if m=0 (16-bit memory/accumulator)
-class EOR_49 : public AddressMode::ImmediateFlagSize<Operator::EOR, State::m>
+class EOR_49 : public AddressMode::ImmediateVariableSize<Operator::EOR, State::m>
 {
     // 3-m 3-m         imm       m.....m. . EOR #$54
     // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
@@ -2177,7 +2177,7 @@ class LDA_A7 : public AddressMode::DirectPageIndirectLong<Operator::LDA>
 // Immediate
 // 2<17>
 // 17: Add 1 byte if m=0 (16-bit memory/accumulator)
-class LDA_A9 : public AddressMode::ImmediateFlagSize<Operator::LDA, State::m>
+class LDA_A9 : public AddressMode::ImmediateVariableSize<Operator::LDA, State::m>
 {
     // 3-m 3-m         imm       m.....m. . LDA #$54
     // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
@@ -2384,7 +2384,7 @@ class LDA_BF : public AddressMode::AbsoluteLongIndexedX<Operator::LDA>
 // Immediate
 // 2<19>
 // 19: Add 1 byte if x=0 (16-bit index registers)
-class LDX_A2 : public AddressMode::ImmediateFlagSize<Operator::LDX, State::x>
+class LDX_A2 : public AddressMode::ImmediateVariableSize<Operator::LDX, State::x>
 {
     // 3-x 3-x         imm       x.....x. . LDX #$54
     // 10: Add 1 cycle if x=0 (16-bit index registers)
@@ -2479,7 +2479,7 @@ class LDX_BE : public AddressMode::AbsoluteIndexedY<Operator::LDX>
 // Immediate
 // 2<19>
 // 19: Add 1 byte if x=0 (16-bit index registers)
-class LDY_A0 : public AddressMode::ImmediateFlagSize<Operator::LDY, State::x>
+class LDY_A0 : public AddressMode::ImmediateVariableSize<Operator::LDY, State::x>
 {
     // 3-x 3-x         imm       x.....x. . LDY #$54
     // 10: Add 1 cycle if x=0 (16-bit index registers)
@@ -2794,7 +2794,7 @@ class ORA_07 : public AddressMode::DirectPageIndirectLong<Operator::ORA>
 // Immediate
 // 2<17>
 // 17: Add 1 byte if m=0 (16-bit memory/accumulator)
-class ORA_09 : public AddressMode::ImmediateFlagSize<Operator::ORA, State::m>
+class ORA_09 : public AddressMode::ImmediateVariableSize<Operator::ORA, State::m>
 {
     // 3-m 3-m         imm       m.....m. . ORA #$54
     // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
@@ -3603,7 +3603,7 @@ class SBC_E7 : public AddressMode::DirectPageIndirectLong<Operator::SBC>
 // Immediate
 // 2<17>
 // 17: Add 1 byte if m=0 (16-bit memory/accumulator)
-class SBC_E9 : public AddressMode::ImmediateFlagSize<Operator::SBC, State::m>
+class SBC_E9 : public AddressMode::ImmediateVariableSize<Operator::SBC, State::m>
 {
     // 3-m 3-m         imm       mm....mm . SBC #$54
     // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)

@@ -266,14 +266,23 @@ void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
         output << superclassStream.str() << std::endl << "{" << std::endl
             << "    int ";
 
-        output << "apply(State& state";
+        output << "invokeOperator(State& state";
         if (kvp.second.instructionSize == -1) {
-            output << ", uint16_t operand";
-        } else if (kvp.second.instructionSize > 1) {
-            output << ", uint" << (kvp.second.instructionSize == 4 ? 32 : (kvp.second.instructionSize - 1) * 8) << "_t operand";
+            output << ", uint8_t lowByte, uint8_t highByte";
+        } else {
+            if (kvp.second.instructionSize >= 2) {
+                output << ", uint8_t lowByte";
+                if (kvp.second.instructionSize >= 3) {
+                    output << ", uint8_t highByte";
+                    if (kvp.second.instructionSize == 4) {
+                        output << ", uint8_t bankByte";
+                    }
+                }
+            }
         }
         output << ") const" << " override" << std::endl
             << "    {" << std::endl
+            << "        throw std::runtime_error(\"Not implemented\");" << std::endl
             << "        int cycles = 0;" << std::endl;
         for (int cycleRemark : kvp.second.cycleRemarks) {
             output << "        // " << getRemark(cycleRemark) << std::endl;
@@ -282,9 +291,9 @@ void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
             }
         }
         if (kvp.first != "Implied") {
-            output << "        int* data = nullptr;" << std::endl;
+            output << "        uint8_t* data = nullptr;" << std::endl;
         }
-        output << "        return cycles + Operator::operate(state";
+        output << "        return cycles + Operator::invoke(state";
         if (kvp.first != "Implied") {
             output << ", data";
         }
@@ -325,12 +334,13 @@ void generateOperators(const OperatorMap& operatorMap)
         hOutput << "class " << kvp.first << std::endl
             << "{" << std::endl
             << "public:" << std::endl
-            << "    static int operate(State& state";
+            << "    static int invoke(State& state";
         if (kvp.second.hasOperand) {
-            hOutput << ", int* data";
+            hOutput << ", uint8_t* data";
         }
         hOutput << ")" << std::endl
             << "    {" << std::endl
+            << "        throw std::runtime_error(\"Not implemented\");" << std::endl
             << "        int cycles = 0;" << std::endl;
         for (int cycleRemark : kvp.second.cycleRemarks) {
             hOutput << "        // " << getRemark(cycleRemark) << std::endl;
@@ -425,7 +435,7 @@ int main(int argc, char* argv[])
                 int instructionSize = stoi(size);
 
                 if (sizeRemark == "17" || sizeRemark == "19") {
-                    addressModeClass += "FlagSize";
+                    addressModeClass += "VariableSize";
                     instructionSize = -1;
                     addressModeComment += "\n// " + getRemark(stoi(sizeRemark));
                 }

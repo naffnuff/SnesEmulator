@@ -22,11 +22,11 @@ public:
     int execute(State& state) const override
     {
         state.incrementProgramCounter(1);
-        return calculateCycles(state) + apply(state);
+        return calculateCycles(state) + invokeOperator(state);
     }
 
 protected:
-    virtual int apply(State& state) const = 0;
+    virtual int invokeOperator(State& state) const = 0;
 
     std::string operandToString(const State& state) const override
     {
@@ -39,18 +39,19 @@ class Instruction2Byte : public Instruction
 public:
     int execute(State& state) const override
     {
-        uint8_t operand = state.readOneByteValue();
+        uint8_t lowByte = state.readProgramByte(1);
         state.incrementProgramCounter(2);
-        return calculateCycles(state) + apply(state, operand);
+        return calculateCycles(state) + invokeOperator(state, lowByte);
     }
 
 protected:
-    virtual int apply(State& state, uint8_t operand) const = 0;
+    virtual int invokeOperator(State& state, uint8_t lowByte) const = 0;
 
     std::string operandToString(const State& state) const override
     {
         std::ostringstream ss;
-        ss << std::hex << "One byte: " << std::setw(2) << std::setfill('0') << +state.readOneByteValue();
+        ss << std::hex << "One byte: "
+            << std::setw(2) << std::setfill('0') << +state.readProgramByte(1);
         return ss.str();
     }
 };
@@ -60,17 +61,21 @@ class Instruction3Byte : public Instruction
 public:
     int execute(State& state) const override
     {
-        uint16_t operand = state.readTwoByteValue();
+        uint8_t lowByte = state.readProgramByte(1);
+        uint8_t highByte = state.readProgramByte(2);
         state.incrementProgramCounter(3);
-        return calculateCycles(state) + apply(state, operand);
+        return calculateCycles(state) + invokeOperator(state, lowByte, highByte);
     }
 
-public:
-    virtual int apply(State& state, uint16_t operand) const = 0;
+protected:
+    virtual int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte) const = 0;
+
     std::string operandToString(const State& state) const override
     {
         std::ostringstream ss;
-        ss << std::hex << "Two bytes: " << std::setw(4) << std::setfill('0') << +state.readTwoByteValue();
+        ss << std::hex << "Two bytes: "
+            << std::setw(2) << std::setfill('0') << +state.readProgramByte(2)
+            << std::setw(2) << std::setfill('0') << +state.readProgramByte(1);
         return ss.str();
     }
 };
@@ -80,19 +85,24 @@ class Instruction4Byte : public Instruction
 public:
     int execute(State& state) const override
     {
-        uint32_t operand = state.readThreeByteValue();
+        uint8_t lowByte = state.readProgramByte(1);
+        uint8_t highByte = state.readProgramByte(2);
+        uint8_t bankByte = state.readProgramByte(3);
         state.incrementProgramCounter(4);
-        int cycles = calculateCycles(state) + apply(state, operand);
+        int cycles = calculateCycles(state) + invokeOperator(state, lowByte, highByte, bankByte);
         return cycles;
     }
 
 protected:
-    virtual int apply(State& state, uint32_t operand) const = 0;
+    virtual int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte, uint8_t bankByte) const = 0;
 
     std::string operandToString(const State& state) const override
     {
         std::ostringstream ss;
-        ss << std::hex << "Three bytes: " << std::setw(6) << std::setfill('0') << +state.readThreeByteValue();
+        ss << std::hex << "Three bytes: "
+            << std::setw(2) << std::setfill('0') << +state.readProgramByte(3)
+            << std::setw(2) << std::setfill('0') << +state.readProgramByte(2)
+            << std::setw(2) << std::setfill('0') << +state.readProgramByte(1);
         return ss.str();
     }
 };
@@ -103,28 +113,31 @@ class InstructionVariableSize : public Instruction
 public:
     int execute(State& state) const override
     {
-        uint16_t operand = 0;
+        uint8_t lowByte = state.readProgramByte(1);
+        uint8_t highByte = 0;
         if (state.is16Bit(Flag)) {
-            operand = state.readTwoByteValue();
+            highByte = state.readProgramByte(2);
             state.incrementProgramCounter(3);
         } else {
-            operand = state.readOneByteValue();
             state.incrementProgramCounter(2);
         }
-        return calculateCycles(state) + apply(state, operand);
+        return calculateCycles(state) + invokeOperator(state, lowByte, highByte);
     }
 
 protected:
-    virtual int apply(State& state, uint16_t operand) const = 0;
+    virtual int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte) const = 0;
 
     std::string operandToString(const State& state) const override
     {
         std::ostringstream ss;
         ss << std::hex;
         if (state.is16Bit(Flag)) {
-            ss << "Two bytes (variable) " << std::setw(4) << std::setfill('0') << state.readTwoByteValue();
+            ss << "Two bytes (variable) "
+                << std::setw(2) << std::setfill('0') << +state.readProgramByte(2)
+                << std::setw(2) << std::setfill('0') << +state.readProgramByte(1);
         } else {
-            ss << "One byte (variable) " << std::setw(2) << std::setfill('0') << +state.readOneByteValue();
+            ss << "One byte (variable) "
+                << std::setw(2) << std::setfill('0') << +state.readProgramByte(1);
         }
         return ss.str();
     }
