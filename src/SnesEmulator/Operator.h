@@ -11,8 +11,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "ADC"; }
@@ -25,8 +24,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "AND"; }
@@ -39,8 +37,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "ASL"; }
@@ -107,8 +104,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "BIT"; }
@@ -191,8 +187,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "BRK"; }
@@ -205,8 +200,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "BRL"; }
@@ -255,8 +249,7 @@ public:
     static int invoke(State& state)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "CLC"; }
@@ -269,8 +262,7 @@ public:
     static int invoke(State& state)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "CLD"; }
@@ -283,8 +275,7 @@ public:
     static int invoke(State& state)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "CLI"; }
@@ -297,8 +288,7 @@ public:
     static int invoke(State& state)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "CLV"; }
@@ -311,8 +301,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "CMP"; }
@@ -325,8 +314,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "COP"; }
@@ -339,8 +327,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "CPX"; }
@@ -353,8 +340,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "CPY"; }
@@ -367,8 +353,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "DEC"; }
@@ -381,8 +366,7 @@ public:
     static int invoke(State& state)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "DEX"; }
@@ -395,8 +379,7 @@ public:
     static int invoke(State& state)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "DEY"; }
@@ -409,8 +392,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "EOR"; }
@@ -423,8 +405,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "INC"; }
@@ -437,8 +418,7 @@ public:
     static int invoke(State& state)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "INX"; }
@@ -451,8 +431,7 @@ public:
     static int invoke(State& state)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "INY"; }
@@ -465,8 +444,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "JMP"; }
@@ -479,8 +457,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "JSR"; }
@@ -493,8 +470,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "LDA"; }
@@ -507,8 +483,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "LDX"; }
@@ -521,8 +496,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "LDY"; }
@@ -535,8 +509,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "LSR"; }
@@ -549,8 +522,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "MVN"; }
@@ -563,8 +535,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "MVP"; }
@@ -577,8 +548,7 @@ public:
     static int invoke(State& state)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "NOP"; }
@@ -591,8 +561,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "ORA"; }
@@ -605,8 +574,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "PEA"; }
@@ -619,8 +587,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "PEI"; }
@@ -633,8 +600,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "PER"; }
@@ -647,8 +613,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "PHA"; }
@@ -661,8 +626,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "PHB"; }
@@ -675,8 +639,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "PHD"; }
@@ -689,8 +652,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "PHK"; }
@@ -703,8 +665,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "PHP"; }
@@ -717,8 +678,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "PHX"; }
@@ -731,8 +691,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "PHY"; }
@@ -745,8 +704,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "PLA"; }
@@ -759,8 +717,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "PLB"; }
@@ -773,8 +730,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "PLD"; }
@@ -787,8 +743,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "PLP"; }
@@ -801,8 +756,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "PLX"; }
@@ -815,8 +769,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "PLY"; }
@@ -829,8 +782,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "REP"; }
@@ -843,8 +795,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "ROL"; }
@@ -857,8 +808,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "ROR"; }
@@ -871,8 +821,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "RTI"; }
@@ -885,8 +834,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "RTL"; }
@@ -899,8 +847,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "RTS"; }
@@ -913,8 +860,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "SBC"; }
@@ -927,8 +873,7 @@ public:
     static int invoke(State& state)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "SEC"; }
@@ -941,8 +886,7 @@ public:
     static int invoke(State& state)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "SED"; }
@@ -955,8 +899,7 @@ public:
     static int invoke(State& state)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "SEI"; }
@@ -969,8 +912,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "SEP"; }
@@ -983,8 +925,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "STA"; }
@@ -997,8 +938,7 @@ public:
     static int invoke(State& state)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "STP"; }
@@ -1011,8 +951,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "STX"; }
@@ -1025,8 +964,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "STY"; }
@@ -1039,8 +977,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "STZ"; }
@@ -1053,8 +990,7 @@ public:
     static int invoke(State& state)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "TAX"; }
@@ -1067,8 +1003,7 @@ public:
     static int invoke(State& state)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "TAY"; }
@@ -1081,8 +1016,7 @@ public:
     static int invoke(State& state)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "TCD"; }
@@ -1095,8 +1029,7 @@ public:
     static int invoke(State& state)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "TCS"; }
@@ -1109,8 +1042,7 @@ public:
     static int invoke(State& state)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "TDC"; }
@@ -1123,8 +1055,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "TRB"; }
@@ -1137,8 +1068,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "TSB"; }
@@ -1151,8 +1081,7 @@ public:
     static int invoke(State& state)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "TSC"; }
@@ -1165,8 +1094,7 @@ public:
     static int invoke(State& state)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "TSX"; }
@@ -1179,8 +1107,7 @@ public:
     static int invoke(State& state)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "TXA"; }
@@ -1193,8 +1120,7 @@ public:
     static int invoke(State& state)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "TXS"; }
@@ -1207,8 +1133,7 @@ public:
     static int invoke(State& state)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "TXY"; }
@@ -1221,8 +1146,7 @@ public:
     static int invoke(State& state)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "TYA"; }
@@ -1235,8 +1159,7 @@ public:
     static int invoke(State& state)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "TYX"; }
@@ -1249,8 +1172,7 @@ public:
     static int invoke(State& state)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "WAI"; }
@@ -1263,8 +1185,7 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "WDM"; }
@@ -1277,8 +1198,7 @@ public:
     static int invoke(State& state)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "XBA"; }
@@ -1291,8 +1211,7 @@ public:
     static int invoke(State& state)
     {
         throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        return cycles;
+        return 0;
     }
 
     static std::string toString() { return "XCE"; }

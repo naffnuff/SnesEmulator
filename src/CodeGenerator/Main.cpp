@@ -282,8 +282,10 @@ void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
         }
         output << ") const" << " override" << std::endl
             << "    {" << std::endl
-            << "        throw std::runtime_error(\"Not implemented\");" << std::endl
-            << "        int cycles = 0;" << std::endl;
+            << "        throw std::runtime_error(\"Not implemented\");" << std::endl;
+        if (!kvp.second.cycleRemarks.empty()) {
+            output << "        int cycles = 0;" << std::endl;
+        }
         for (int cycleRemark : kvp.second.cycleRemarks) {
             output << "        // " << getRemark(cycleRemark) << std::endl;
             if (!getCycleModification(cycleRemark).empty()) {
@@ -293,7 +295,11 @@ void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
         if (kvp.first != "Implied") {
             output << "        uint8_t* data = nullptr;" << std::endl;
         }
-        output << "        return cycles + Operator::invoke(state";
+        output << "        return ";
+        if (!kvp.second.cycleRemarks.empty()) {
+            output << "cycles + ";
+        }
+        output << "Operator::invoke(state";
         if (kvp.first != "Implied") {
             output << ", data";
         }
@@ -340,16 +346,25 @@ void generateOperators(const OperatorMap& operatorMap)
         }
         hOutput << ")" << std::endl
             << "    {" << std::endl
-            << "        throw std::runtime_error(\"Not implemented\");" << std::endl
-            << "        int cycles = 0;" << std::endl;
+            << "        throw std::runtime_error(\"Not implemented\");" << std::endl;
+        if (!kvp.second.cycleRemarks.empty()) {
+            hOutput << "        int cycles = 0;" << std::endl;
+        }
         for (int cycleRemark : kvp.second.cycleRemarks) {
             hOutput << "        // " << getRemark(cycleRemark) << std::endl;
             if (!getCycleModification(cycleRemark).empty()) {
                 hOutput << "        cycles += " << getCycleModification(cycleRemark) << ";" << std::endl;
             }
         }
-        hOutput << "        return cycles;" << std::endl
-            << "    }" << std::endl
+        hOutput << "        return ";
+        if (!kvp.second.cycleRemarks.empty()) {
+            hOutput << "cycles";
+        } else {
+            hOutput << "0";
+        }
+        hOutput << ";" << std::endl;
+
+        hOutput << "    }" << std::endl
             << std::endl
             << "    static std::string toString() { return \"" << kvp.first << "\"; }" << std::endl
             << "};" << std::endl
