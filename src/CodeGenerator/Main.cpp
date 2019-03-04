@@ -71,7 +71,7 @@ std::string getRemark(int remarkIndex)
     case 17: return "17: Add 1 byte if m=0 (16-bit memory/accumulator)";
     case 18: return "18: Opcode is 1 byte, but program counter value pushed onto stack is incremented by 2 allowing for optional signature byte";
     case 19: return "19: Add 1 byte if x=0 (16-bit index registers)";
-    case 20: return "20: Needs manual removal of cycle calculation";
+    case 20: return "20: TODO manually add exception for 3";
     default: return "";
     }
 }
@@ -87,7 +87,7 @@ std::string getCycleModification(int remarkIndex)
     case 8: return "0 /* TODO08 */"; // Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1)
     case 9: return "state.isNativeMode() ? 1 : 0"; // Add 1 cycle for 65816 native mode (e=0)
     case 10: return "state.is16Bit(State::x) ? 1 : 0"; // Add 1 cycle if x=0 (16-bit index registers)
-    case 13: return "0 /* TODO13 */"; // 7 cycles per byte moved
+    case 13: return "0"; // 7 cycles per byte moved
     case 14: return ""; // Uses 3 cycles to shut the processor down; additional cycles are required by reset to restart it
     case 15: return ""; // Uses 3 cycles to shut the processor down; additional cycles are required by interrupt to restart it
     case 20: return "0 /* TODO20 */"; // Needs manual removal of cycle calculation
@@ -99,7 +99,7 @@ struct OperatorArgs
 {
     OperatorArgs()
     {
-        cycleRemarks = { 7, 8, 13 };
+        cycleRemarks = { 7, 8 };
     }
     std::set<int> cycleRemarks;
     bool hasOperand;
@@ -185,16 +185,21 @@ void generateOpcodes(const std::vector<Instruction>& instructions)
                 hOutput << "    // " << getRemark(remark) << std::endl;
             }
         }
-        hOutput << "    int calculateCycles(const State& state) const override" << std::endl
+        hOutput << "    int getCycleCount(const State& state) const override" << std::endl
             << "    {" << std::endl;
-        hOutput << "        int cycles = " << instruction.cycles << ";" << std::endl;
-        for (int remark : instruction.cyclesRemarks) {
-            if (!getCycleModification(remark).empty()) {
-                hOutput << "        cycles += " << getCycleModification(remark) << ";" << std::endl;
+        hOutput << "        throw std::runtime_error(\"" + instruction.classname + " is not implemented\");" << std::endl;
+        if (instruction.cyclesRemarks.empty() || instruction.cyclesRemarks.size() == 1 && *instruction.cyclesRemarks.begin() == 13) {
+            hOutput << "        return " << instruction.cycles << ";" << std::endl;
+        } else {
+            hOutput << "        int cycles = " << instruction.cycles << ";" << std::endl;
+            for (int remark : instruction.cyclesRemarks) {
+                if (!getCycleModification(remark).empty()) {
+                    hOutput << "        cycles += " << getCycleModification(remark) << ";" << std::endl;
+                }
             }
+            hOutput << "        return cycles;" << std::endl;
         }
-        hOutput << "        return cycles;" << std::endl
-            << "    }" << std::endl
+        hOutput << "    }" << std::endl
             << std::endl
             << "    std::string opcodeToString() const override { return \"" << instruction.code << ": " << instruction.name << "\"; }" << std::endl
             << "};" << std::endl
@@ -263,13 +268,42 @@ void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
             superclassStream << "Instruction" << kvp.second.instructionSize << "Byte";
         }
 
-        output << superclassStream.str() << std::endl << "{" << std::endl
-            << "    int ";
+        output << superclassStream.str() << std::endl << "{" << std::endl;
 
-        output << "invokeOperator(State& state";
+        for (int cycleRemark : kvp.second.cycleRemarks) {
+            output << "    // " << getRemark(cycleRemark) << std::endl;
+        }
+
         if (kvp.second.instructionSize == -1) {
-            output << ", uint8_t lowByte, uint8_t highByte";
+            for (std::string arg : { "", ", uint8_t highByte" }) {
+                output << "    int invokeOperator(State& state, uint8_t lowByte" << arg << ") const override"
+                    << "    {" << std::endl
+                    << "        throw std::runtime_error(\"" + kvp.first + " is not implemented\");" << std::endl;
+                if (!kvp.second.cycleRemarks.empty()) {
+                    output << "        int cycles = 0;" << std::endl;
+                }
+                for (int cycleRemark : kvp.second.cycleRemarks) {
+                    if (!getCycleModification(cycleRemark).empty()) {
+                        output << "        cycles += " << getCycleModification(cycleRemark) << ";" << std::endl;
+                    }
+                }
+                if (kvp.first != "Implied") {
+                    output << "        uint8_t* data = nullptr;" << std::endl;
+                }
+                output << "        return ";
+                if (!kvp.second.cycleRemarks.empty()) {
+                    output << "cycles + ";
+                }
+                output << "Operator::invoke(state";
+                if (kvp.first != "Implied") {
+                    output << ", data";
+                }
+                output << ");" << std::endl
+                    << "    }" << std::endl
+                    << std::endl;
+            }
         } else {
+            output << "    int invokeOperator(State& state";
             if (kvp.second.instructionSize >= 2) {
                 output << ", uint8_t lowByte";
                 if (kvp.second.instructionSize >= 3) {
@@ -279,34 +313,34 @@ void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
                     }
                 }
             }
-        }
-        output << ") const" << " override" << std::endl
-            << "    {" << std::endl
-            << "        throw std::runtime_error(\"Not implemented\");" << std::endl;
-        if (!kvp.second.cycleRemarks.empty()) {
-            output << "        int cycles = 0;" << std::endl;
-        }
-        for (int cycleRemark : kvp.second.cycleRemarks) {
-            output << "        // " << getRemark(cycleRemark) << std::endl;
-            if (!getCycleModification(cycleRemark).empty()) {
-                output << "        cycles += " << getCycleModification(cycleRemark) << ";" << std::endl;
+            output << ") const override" << std::endl
+                << "    {" << std::endl
+                << "        throw std::runtime_error(\"" + kvp.first + " is not implemented\");" << std::endl;
+            if (!kvp.second.cycleRemarks.empty()) {
+                output << "        int cycles = 0;" << std::endl;
             }
+            for (int cycleRemark : kvp.second.cycleRemarks) {
+                if (!getCycleModification(cycleRemark).empty()) {
+                    output << "        cycles += " << getCycleModification(cycleRemark) << ";" << std::endl;
+                }
+            }
+            if (kvp.first != "Implied") {
+                output << "        uint8_t* data = nullptr;" << std::endl;
+            }
+            output << "        return ";
+            if (!kvp.second.cycleRemarks.empty()) {
+                output << "cycles + ";
+            }
+            output << "Operator::invoke(state";
+            if (kvp.first != "Implied") {
+                output << ", data";
+            }
+            output << ");" << std::endl
+                << "    }" << std::endl
+                << std::endl;
         }
-        if (kvp.first != "Implied") {
-            output << "        uint8_t* data = nullptr;" << std::endl;
-        }
-        output << "        return ";
-        if (!kvp.second.cycleRemarks.empty()) {
-            output << "cycles + ";
-        }
-        output << "Operator::invoke(state";
-        if (kvp.first != "Implied") {
-            output << ", data";
-        }
-        output << ");" << std::endl
-            << "    }" << std::endl
-            << std::endl
-            << "    std::string toString(const State& state) const override" << std::endl
+
+        output << "    std::string toString(const State& state) const override" << std::endl
             << "    {" << std::endl
             << "        return Operator::toString()";
         if (kvp.second.instructionSize == -1 || kvp.second.instructionSize > 1) {
@@ -339,19 +373,23 @@ void generateOperators(const OperatorMap& operatorMap)
 
         hOutput << "class " << kvp.first << std::endl
             << "{" << std::endl
-            << "public:" << std::endl
-            << "    static int invoke(State& state";
+            << "public:" << std::endl;
+
+        for (int cycleRemark : kvp.second.cycleRemarks) {
+            hOutput << "    // " << getRemark(cycleRemark) << std::endl;
+        }
+
+        hOutput << "    static int invoke(State& state";
         if (kvp.second.hasOperand) {
             hOutput << ", uint8_t* data";
         }
         hOutput << ")" << std::endl
             << "    {" << std::endl
-            << "        throw std::runtime_error(\"Not implemented\");" << std::endl;
+            << "        throw std::runtime_error(\"" + kvp.first + " is not implemented\");" << std::endl;
         if (!kvp.second.cycleRemarks.empty()) {
             hOutput << "        int cycles = 0;" << std::endl;
         }
         for (int cycleRemark : kvp.second.cycleRemarks) {
-            hOutput << "        // " << getRemark(cycleRemark) << std::endl;
             if (!getCycleModification(cycleRemark).empty()) {
                 hOutput << "        cycles += " << getCycleModification(cycleRemark) << ";" << std::endl;
             }

@@ -13,7 +13,7 @@ class Absolute : public Instruction3Byte
 {
     int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte) const override
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("Absolute is not implemented");
         uint8_t* data = nullptr;
         return Operator::invoke(state, data);
     }
@@ -30,7 +30,7 @@ class AbsoluteIndexedIndirect : public Instruction3Byte
 {
     int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte) const override
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("AbsoluteIndexedIndirect is not implemented");
         uint8_t* data = nullptr;
         return Operator::invoke(state, data);
     }
@@ -45,11 +45,11 @@ class AbsoluteIndexedIndirect : public Instruction3Byte
 template <typename Operator>
 class AbsoluteIndexedX : public Instruction3Byte
 {
+    // 3: Add 1 cycle if adding index crosses a page boundary
     int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte) const override
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("AbsoluteIndexedX is not implemented");
         int cycles = 0;
-        // 3: Add 1 cycle if adding index crosses a page boundary
         cycles += 0 /* TODO03 */;
         uint8_t* data = nullptr;
         return cycles + Operator::invoke(state, data);
@@ -65,11 +65,11 @@ class AbsoluteIndexedX : public Instruction3Byte
 template <typename Operator>
 class AbsoluteIndexedY : public Instruction3Byte
 {
+    // 3: Add 1 cycle if adding index crosses a page boundary
     int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte) const override
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("AbsoluteIndexedY is not implemented");
         int cycles = 0;
-        // 3: Add 1 cycle if adding index crosses a page boundary
         cycles += 0 /* TODO03 */;
         uint8_t* data = nullptr;
         return cycles + Operator::invoke(state, data);
@@ -87,7 +87,7 @@ class AbsoluteIndirect : public Instruction3Byte
 {
     int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte) const override
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("AbsoluteIndirect is not implemented");
         uint8_t* data = nullptr;
         return Operator::invoke(state, data);
     }
@@ -104,7 +104,7 @@ class AbsoluteIndirectLong : public Instruction3Byte
 {
     int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte) const override
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("AbsoluteIndirectLong is not implemented");
         uint8_t* data = nullptr;
         return Operator::invoke(state, data);
     }
@@ -121,7 +121,7 @@ class AbsoluteLong : public Instruction4Byte
 {
     int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte, uint8_t bankByte) const override
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("AbsoluteLong is not implemented");
         uint8_t* data = nullptr;
         return Operator::invoke(state, data);
     }
@@ -138,7 +138,7 @@ class AbsoluteLongIndexedX : public Instruction4Byte
 {
     int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte, uint8_t bankByte) const override
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("AbsoluteLongIndexedX is not implemented");
         uint8_t* data = nullptr;
         return Operator::invoke(state, data);
     }
@@ -155,7 +155,7 @@ class Accumulator : public Instruction1Byte
 {
     int invokeOperator(State& state) const override
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("Accumulator is not implemented");
         uint8_t* data = nullptr;
         return Operator::invoke(state, data);
     }
@@ -172,12 +172,9 @@ class BlockMove : public Instruction3Byte
 {
     int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte) const override
     {
-        throw std::runtime_error("Not implemented");
-        int cycles = 0;
-        // 3: Add 1 cycle if adding index crosses a page boundary
-        cycles += 0 /* TODO03 */;
+        throw std::runtime_error("BlockMove is not implemented");
         uint8_t* data = nullptr;
-        return cycles + Operator::invoke(state, data);
+        return Operator::invoke(state, data);
     }
 
     std::string toString(const State& state) const override
@@ -192,7 +189,7 @@ class DirectPage : public Instruction2Byte
 {
     int invokeOperator(State& state, uint8_t lowByte) const override
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("DirectPage is not implemented");
         uint8_t* data = nullptr;
         return Operator::invoke(state, data);
     }
@@ -209,7 +206,7 @@ class DirectPageIndexedIndirectX : public Instruction2Byte
 {
     int invokeOperator(State& state, uint8_t lowByte) const override
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("DirectPageIndexedIndirectX is not implemented");
         uint8_t* data = nullptr;
         return Operator::invoke(state, data);
     }
@@ -226,7 +223,7 @@ class DirectPageIndexedX : public Instruction2Byte
 {
     int invokeOperator(State& state, uint8_t lowByte) const override
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("DirectPageIndexedX is not implemented");
         uint8_t* data = nullptr;
         return Operator::invoke(state, data);
     }
@@ -243,7 +240,7 @@ class DirectPageIndexedY : public Instruction2Byte
 {
     int invokeOperator(State& state, uint8_t lowByte) const override
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("DirectPageIndexedY is not implemented");
         uint8_t* data = nullptr;
         return Operator::invoke(state, data);
     }
@@ -260,7 +257,7 @@ class DirectPageIndirect : public Instruction2Byte
 {
     int invokeOperator(State& state, uint8_t lowByte) const override
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("DirectPageIndirect is not implemented");
         uint8_t* data = nullptr;
         return Operator::invoke(state, data);
     }
@@ -275,11 +272,11 @@ class DirectPageIndirect : public Instruction2Byte
 template <typename Operator>
 class DirectPageIndirectIndexedY : public Instruction2Byte
 {
+    // 3: Add 1 cycle if adding index crosses a page boundary
     int invokeOperator(State& state, uint8_t lowByte) const override
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("DirectPageIndirectIndexedY is not implemented");
         int cycles = 0;
-        // 3: Add 1 cycle if adding index crosses a page boundary
         cycles += 0 /* TODO03 */;
         uint8_t* data = nullptr;
         return cycles + Operator::invoke(state, data);
@@ -297,7 +294,7 @@ class DirectPageIndirectLong : public Instruction2Byte
 {
     int invokeOperator(State& state, uint8_t lowByte) const override
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("DirectPageIndirectLong is not implemented");
         uint8_t* data = nullptr;
         return Operator::invoke(state, data);
     }
@@ -314,7 +311,7 @@ class DirectPageIndirectLongIndexedY : public Instruction2Byte
 {
     int invokeOperator(State& state, uint8_t lowByte) const override
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("DirectPageIndirectLongIndexedY is not implemented");
         uint8_t* data = nullptr;
         return Operator::invoke(state, data);
     }
@@ -331,7 +328,7 @@ class Immediate : public Instruction2Byte
 {
     int invokeOperator(State& state, uint8_t lowByte) const override
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("Immediate is not implemented");
         uint8_t* data = nullptr;
         return Operator::invoke(state, data);
     }
@@ -347,9 +344,14 @@ class Immediate : public Instruction2Byte
 template <typename Operator, State::Flag Flag>
 class ImmediateVariableSize : public InstructionVariableSize<Flag>
 {
-    int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte) const override
-    {
-        throw std::runtime_error("Not implemented");
+    int invokeOperator(State& state, uint8_t lowByte) const override    {
+        throw std::runtime_error("ImmediateVariableSize is not implemented");
+        uint8_t* data = nullptr;
+        return Operator::invoke(state, data);
+    }
+
+    int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte) const override    {
+        throw std::runtime_error("ImmediateVariableSize is not implemented");
         uint8_t* data = nullptr;
         return Operator::invoke(state, data);
     }
@@ -366,7 +368,7 @@ class Implied : public Instruction1Byte
 {
     int invokeOperator(State& state) const override
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("Implied is not implemented");
         return Operator::invoke(state);
     }
 
@@ -382,7 +384,7 @@ class ProgramCounterRelative : public Instruction2Byte
 {
     int invokeOperator(State& state, uint8_t lowByte) const override
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("ProgramCounterRelative is not implemented");
         uint8_t* data = nullptr;
         return Operator::invoke(state, data);
     }
@@ -399,7 +401,7 @@ class ProgramCounterRelativeLong : public Instruction3Byte
 {
     int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte) const override
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("ProgramCounterRelativeLong is not implemented");
         uint8_t* data = nullptr;
         return Operator::invoke(state, data);
     }
@@ -407,159 +409,6 @@ class ProgramCounterRelativeLong : public Instruction3Byte
     std::string toString(const State& state) const override
     {
         return Operator::toString() + " $" + Instruction3Byte::operandToString(state) + " TODO";
-    }
-};
-
-// Stack (Absolute)
-template <typename Operator>
-class StackAbsolute : public Instruction3Byte
-{
-    int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte) const override
-    {
-        throw std::runtime_error("Not implemented");
-        uint8_t* data = nullptr;
-        return Operator::invoke(state, data);
-    }
-
-    std::string toString(const State& state) const override
-    {
-        return Operator::toString() + " $" + Instruction3Byte::operandToString(state) + " TODO";
-    }
-};
-
-// Stack (Direct Page Indirect)
-template <typename Operator>
-class StackDirectPageIndirect : public Instruction2Byte
-{
-    int invokeOperator(State& state, uint8_t lowByte) const override
-    {
-        throw std::runtime_error("Not implemented");
-        uint8_t* data = nullptr;
-        return Operator::invoke(state, data);
-    }
-
-    std::string toString(const State& state) const override
-    {
-        return Operator::toString() + " $" + Instruction2Byte::operandToString(state) + " TODO";
-    }
-};
-
-// Stack/Interrupt
-template <typename Operator>
-class StackInterrupt : public Instruction2Byte
-{
-    int invokeOperator(State& state, uint8_t lowByte) const override
-    {
-        throw std::runtime_error("Not implemented");
-        uint8_t* data = nullptr;
-        return Operator::invoke(state, data);
-    }
-
-    std::string toString(const State& state) const override
-    {
-        return Operator::toString() + " $" + Instruction2Byte::operandToString(state) + " TODO";
-    }
-};
-
-// Stack (Program Counter Relative Long)
-template <typename Operator>
-class StackProgramCounterRelativeLong : public Instruction3Byte
-{
-    int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte) const override
-    {
-        throw std::runtime_error("Not implemented");
-        uint8_t* data = nullptr;
-        return Operator::invoke(state, data);
-    }
-
-    std::string toString(const State& state) const override
-    {
-        return Operator::toString() + " $" + Instruction3Byte::operandToString(state) + " TODO";
-    }
-};
-
-// Stack (Pull)
-template <typename Operator>
-class StackPull : public Instruction1Byte
-{
-    int invokeOperator(State& state) const override
-    {
-        throw std::runtime_error("Not implemented");
-        uint8_t* data = nullptr;
-        return Operator::invoke(state, data);
-    }
-
-    std::string toString(const State& state) const override
-    {
-        return Operator::toString() + " TODO";
-    }
-};
-
-// Stack (Push)
-template <typename Operator>
-class StackPush : public Instruction1Byte
-{
-    int invokeOperator(State& state) const override
-    {
-        throw std::runtime_error("Not implemented");
-        uint8_t* data = nullptr;
-        return Operator::invoke(state, data);
-    }
-
-    std::string toString(const State& state) const override
-    {
-        return Operator::toString() + " TODO";
-    }
-};
-
-// Stack (RTI)
-template <typename Operator>
-class StackRTI : public Instruction1Byte
-{
-    int invokeOperator(State& state) const override
-    {
-        throw std::runtime_error("Not implemented");
-        uint8_t* data = nullptr;
-        return Operator::invoke(state, data);
-    }
-
-    std::string toString(const State& state) const override
-    {
-        return Operator::toString() + " TODO";
-    }
-};
-
-// Stack (RTL)
-template <typename Operator>
-class StackRTL : public Instruction1Byte
-{
-    int invokeOperator(State& state) const override
-    {
-        throw std::runtime_error("Not implemented");
-        uint8_t* data = nullptr;
-        return Operator::invoke(state, data);
-    }
-
-    std::string toString(const State& state) const override
-    {
-        return Operator::toString() + " TODO";
-    }
-};
-
-// Stack (RTS)
-template <typename Operator>
-class StackRTS : public Instruction1Byte
-{
-    int invokeOperator(State& state) const override
-    {
-        throw std::runtime_error("Not implemented");
-        uint8_t* data = nullptr;
-        return Operator::invoke(state, data);
-    }
-
-    std::string toString(const State& state) const override
-    {
-        return Operator::toString() + " TODO";
     }
 };
 
@@ -569,7 +418,7 @@ class StackRelative : public Instruction2Byte
 {
     int invokeOperator(State& state, uint8_t lowByte) const override
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("StackRelative is not implemented");
         uint8_t* data = nullptr;
         return Operator::invoke(state, data);
     }
@@ -586,24 +435,7 @@ class StackRelativeIndirectIndexedY : public Instruction2Byte
 {
     int invokeOperator(State& state, uint8_t lowByte) const override
     {
-        throw std::runtime_error("Not implemented");
-        uint8_t* data = nullptr;
-        return Operator::invoke(state, data);
-    }
-
-    std::string toString(const State& state) const override
-    {
-        return Operator::toString() + " $" + Instruction2Byte::operandToString(state) + " TODO";
-    }
-};
-
-// n/a
-template <typename Operator>
-class na : public Instruction2Byte
-{
-    int invokeOperator(State& state, uint8_t lowByte) const override
-    {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("StackRelativeIndirectIndexedY is not implemented");
         uint8_t* data = nullptr;
         return Operator::invoke(state, data);
     }

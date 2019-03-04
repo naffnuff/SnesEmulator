@@ -10,7 +10,7 @@ class ADC
 public:
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("ADC is not implemented");
         return 0;
     }
 
@@ -23,7 +23,7 @@ class AND
 public:
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("AND is not implemented");
         return 0;
     }
 
@@ -36,7 +36,7 @@ class ASL
 public:
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("ASL is not implemented");
         return 0;
     }
 
@@ -47,13 +47,13 @@ public:
 class BCC
 {
 public:
+    // 7: Add 1 cycle if branch is taken
+    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("BCC is not implemented");
         int cycles = 0;
-        // 7: Add 1 cycle if branch is taken
         cycles += 0 /* TODO07 */;
-        // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
         cycles += 0 /* TODO08 */;
         return cycles;
     }
@@ -65,13 +65,13 @@ public:
 class BCS
 {
 public:
+    // 7: Add 1 cycle if branch is taken
+    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("BCS is not implemented");
         int cycles = 0;
-        // 7: Add 1 cycle if branch is taken
         cycles += 0 /* TODO07 */;
-        // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
         cycles += 0 /* TODO08 */;
         return cycles;
     }
@@ -83,13 +83,13 @@ public:
 class BEQ
 {
 public:
+    // 7: Add 1 cycle if branch is taken
+    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("BEQ is not implemented");
         int cycles = 0;
-        // 7: Add 1 cycle if branch is taken
         cycles += 0 /* TODO07 */;
-        // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
         cycles += 0 /* TODO08 */;
         return cycles;
     }
@@ -103,7 +103,7 @@ class BIT
 public:
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("BIT is not implemented");
         return 0;
     }
 
@@ -114,13 +114,13 @@ public:
 class BMI
 {
 public:
+    // 7: Add 1 cycle if branch is taken
+    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("BMI is not implemented");
         int cycles = 0;
-        // 7: Add 1 cycle if branch is taken
         cycles += 0 /* TODO07 */;
-        // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
         cycles += 0 /* TODO08 */;
         return cycles;
     }
@@ -132,13 +132,13 @@ public:
 class BNE
 {
 public:
+    // 7: Add 1 cycle if branch is taken
+    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("BNE is not implemented");
         int cycles = 0;
-        // 7: Add 1 cycle if branch is taken
         cycles += 0 /* TODO07 */;
-        // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
         cycles += 0 /* TODO08 */;
         return cycles;
     }
@@ -150,13 +150,13 @@ public:
 class BPL
 {
 public:
+    // 7: Add 1 cycle if branch is taken
+    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("BPL is not implemented");
         int cycles = 0;
-        // 7: Add 1 cycle if branch is taken
         cycles += 0 /* TODO07 */;
-        // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
         cycles += 0 /* TODO08 */;
         return cycles;
     }
@@ -168,11 +168,11 @@ public:
 class BRA
 {
 public:
+    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("BRA is not implemented");
         int cycles = 0;
-        // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
         cycles += 0 /* TODO08 */;
         return cycles;
     }
@@ -186,7 +186,7 @@ class BRK
 public:
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("BRK is not implemented");
         return 0;
     }
 
@@ -199,7 +199,7 @@ class BRL
 public:
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("BRL is not implemented");
         return 0;
     }
 
@@ -210,13 +210,13 @@ public:
 class BVC
 {
 public:
+    // 7: Add 1 cycle if branch is taken
+    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("BVC is not implemented");
         int cycles = 0;
-        // 7: Add 1 cycle if branch is taken
         cycles += 0 /* TODO07 */;
-        // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
         cycles += 0 /* TODO08 */;
         return cycles;
     }
@@ -228,13 +228,13 @@ public:
 class BVS
 {
 public:
+    // 7: Add 1 cycle if branch is taken
+    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("BVS is not implemented");
         int cycles = 0;
-        // 7: Add 1 cycle if branch is taken
         cycles += 0 /* TODO07 */;
-        // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
         cycles += 0 /* TODO08 */;
         return cycles;
     }
@@ -248,7 +248,7 @@ class CLC
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("CLC is not implemented");
         return 0;
     }
 
@@ -261,7 +261,7 @@ class CLD
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("CLD is not implemented");
         return 0;
     }
 
@@ -274,7 +274,7 @@ class CLI
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("CLI is not implemented");
         return 0;
     }
 
@@ -287,7 +287,7 @@ class CLV
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("CLV is not implemented");
         return 0;
     }
 
@@ -300,7 +300,7 @@ class CMP
 public:
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("CMP is not implemented");
         return 0;
     }
 
@@ -313,7 +313,7 @@ class COP
 public:
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("COP is not implemented");
         return 0;
     }
 
@@ -326,7 +326,7 @@ class CPX
 public:
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("CPX is not implemented");
         return 0;
     }
 
@@ -339,7 +339,7 @@ class CPY
 public:
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("CPY is not implemented");
         return 0;
     }
 
@@ -352,7 +352,7 @@ class DEC
 public:
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("DEC is not implemented");
         return 0;
     }
 
@@ -365,7 +365,7 @@ class DEX
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("DEX is not implemented");
         return 0;
     }
 
@@ -378,7 +378,7 @@ class DEY
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("DEY is not implemented");
         return 0;
     }
 
@@ -391,7 +391,7 @@ class EOR
 public:
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("EOR is not implemented");
         return 0;
     }
 
@@ -404,7 +404,7 @@ class INC
 public:
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("INC is not implemented");
         return 0;
     }
 
@@ -417,7 +417,7 @@ class INX
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("INX is not implemented");
         return 0;
     }
 
@@ -430,7 +430,7 @@ class INY
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("INY is not implemented");
         return 0;
     }
 
@@ -443,7 +443,7 @@ class JMP
 public:
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("JMP is not implemented");
         return 0;
     }
 
@@ -456,7 +456,7 @@ class JSR
 public:
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("JSR is not implemented");
         return 0;
     }
 
@@ -469,7 +469,7 @@ class LDA
 public:
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("LDA is not implemented");
         return 0;
     }
 
@@ -482,7 +482,7 @@ class LDX
 public:
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("LDX is not implemented");
         return 0;
     }
 
@@ -495,7 +495,7 @@ class LDY
 public:
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("LDY is not implemented");
         return 0;
     }
 
@@ -508,7 +508,7 @@ class LSR
 public:
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("LSR is not implemented");
         return 0;
     }
 
@@ -521,7 +521,7 @@ class MVN
 public:
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("MVN is not implemented");
         return 0;
     }
 
@@ -534,7 +534,7 @@ class MVP
 public:
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("MVP is not implemented");
         return 0;
     }
 
@@ -547,7 +547,7 @@ class NOP
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("NOP is not implemented");
         return 0;
     }
 
@@ -560,7 +560,7 @@ class ORA
 public:
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("ORA is not implemented");
         return 0;
     }
 
@@ -573,7 +573,7 @@ class PEA
 public:
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("PEA is not implemented");
         return 0;
     }
 
@@ -586,7 +586,7 @@ class PEI
 public:
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("PEI is not implemented");
         return 0;
     }
 
@@ -599,7 +599,7 @@ class PER
 public:
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("PER is not implemented");
         return 0;
     }
 
@@ -610,9 +610,9 @@ public:
 class PHA
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("PHA is not implemented");
         return 0;
     }
 
@@ -623,9 +623,9 @@ public:
 class PHB
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("PHB is not implemented");
         return 0;
     }
 
@@ -636,9 +636,9 @@ public:
 class PHD
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("PHD is not implemented");
         return 0;
     }
 
@@ -649,9 +649,9 @@ public:
 class PHK
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("PHK is not implemented");
         return 0;
     }
 
@@ -662,9 +662,9 @@ public:
 class PHP
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("PHP is not implemented");
         return 0;
     }
 
@@ -675,9 +675,9 @@ public:
 class PHX
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("PHX is not implemented");
         return 0;
     }
 
@@ -688,9 +688,9 @@ public:
 class PHY
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("PHY is not implemented");
         return 0;
     }
 
@@ -701,9 +701,9 @@ public:
 class PLA
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("PLA is not implemented");
         return 0;
     }
 
@@ -714,9 +714,9 @@ public:
 class PLB
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("PLB is not implemented");
         return 0;
     }
 
@@ -727,9 +727,9 @@ public:
 class PLD
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("PLD is not implemented");
         return 0;
     }
 
@@ -740,9 +740,9 @@ public:
 class PLP
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("PLP is not implemented");
         return 0;
     }
 
@@ -753,9 +753,9 @@ public:
 class PLX
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("PLX is not implemented");
         return 0;
     }
 
@@ -766,9 +766,9 @@ public:
 class PLY
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("PLY is not implemented");
         return 0;
     }
 
@@ -781,7 +781,7 @@ class REP
 public:
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("REP is not implemented");
         return 0;
     }
 
@@ -794,7 +794,7 @@ class ROL
 public:
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("ROL is not implemented");
         return 0;
     }
 
@@ -807,7 +807,7 @@ class ROR
 public:
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("ROR is not implemented");
         return 0;
     }
 
@@ -818,9 +818,9 @@ public:
 class RTI
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("RTI is not implemented");
         return 0;
     }
 
@@ -831,9 +831,9 @@ public:
 class RTL
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("RTL is not implemented");
         return 0;
     }
 
@@ -844,9 +844,9 @@ public:
 class RTS
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("RTS is not implemented");
         return 0;
     }
 
@@ -859,7 +859,7 @@ class SBC
 public:
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("SBC is not implemented");
         return 0;
     }
 
@@ -872,7 +872,7 @@ class SEC
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("SEC is not implemented");
         return 0;
     }
 
@@ -885,7 +885,7 @@ class SED
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("SED is not implemented");
         return 0;
     }
 
@@ -898,7 +898,7 @@ class SEI
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("SEI is not implemented");
         return 0;
     }
 
@@ -911,7 +911,7 @@ class SEP
 public:
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("SEP is not implemented");
         return 0;
     }
 
@@ -924,7 +924,7 @@ class STA
 public:
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("STA is not implemented");
         return 0;
     }
 
@@ -937,7 +937,7 @@ class STP
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("STP is not implemented");
         return 0;
     }
 
@@ -950,7 +950,7 @@ class STX
 public:
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("STX is not implemented");
         return 0;
     }
 
@@ -963,7 +963,7 @@ class STY
 public:
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("STY is not implemented");
         return 0;
     }
 
@@ -976,7 +976,7 @@ class STZ
 public:
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("STZ is not implemented");
         return 0;
     }
 
@@ -989,7 +989,7 @@ class TAX
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("TAX is not implemented");
         return 0;
     }
 
@@ -1002,7 +1002,7 @@ class TAY
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("TAY is not implemented");
         return 0;
     }
 
@@ -1015,7 +1015,7 @@ class TCD
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("TCD is not implemented");
         return 0;
     }
 
@@ -1028,7 +1028,7 @@ class TCS
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("TCS is not implemented");
         return 0;
     }
 
@@ -1041,7 +1041,7 @@ class TDC
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("TDC is not implemented");
         return 0;
     }
 
@@ -1054,7 +1054,7 @@ class TRB
 public:
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("TRB is not implemented");
         return 0;
     }
 
@@ -1067,7 +1067,7 @@ class TSB
 public:
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("TSB is not implemented");
         return 0;
     }
 
@@ -1080,7 +1080,7 @@ class TSC
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("TSC is not implemented");
         return 0;
     }
 
@@ -1093,7 +1093,7 @@ class TSX
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("TSX is not implemented");
         return 0;
     }
 
@@ -1106,7 +1106,7 @@ class TXA
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("TXA is not implemented");
         return 0;
     }
 
@@ -1119,7 +1119,7 @@ class TXS
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("TXS is not implemented");
         return 0;
     }
 
@@ -1132,7 +1132,7 @@ class TXY
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("TXY is not implemented");
         return 0;
     }
 
@@ -1145,7 +1145,7 @@ class TYA
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("TYA is not implemented");
         return 0;
     }
 
@@ -1158,7 +1158,7 @@ class TYX
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("TYX is not implemented");
         return 0;
     }
 
@@ -1171,7 +1171,7 @@ class WAI
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("WAI is not implemented");
         return 0;
     }
 
@@ -1184,7 +1184,7 @@ class WDM
 public:
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("WDM is not implemented");
         return 0;
     }
 
@@ -1197,7 +1197,7 @@ class XBA
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("XBA is not implemented");
         return 0;
     }
 
@@ -1210,7 +1210,7 @@ class XCE
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("XCE is not implemented");
         return 0;
     }
 

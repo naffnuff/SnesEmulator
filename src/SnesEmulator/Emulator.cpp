@@ -14,6 +14,7 @@ Emulator::Emulator()
     //state.loadRom("..\\..\\SnesInitializationROM.smc");
     //state.loadRom("..\\..\\rom.smc");
     //state.loadRom("H:\\naffnuff\\wla\\rom.smc");
+    //state.loadRom("C:\\cygwin64\\home\\rasmus.knutsson\\wla-dx\\wla\\myrom.smc");
 }
 
 void Emulator::run()
@@ -116,9 +117,10 @@ void Emulator::run()
                 output << "Watch mode " << (watchMode ? "on" : "off") << std::endl;
             } else {
                 try {
-                    stoi(command, &inspectedAddress, 16);
+                    inspectedAddress = stoi(command, 0, 16);
+                    output << "Inspecting address " << std::setw(6) << std::setfill('0') << inspectedAddress << std::endl;
                 } catch (std::exception& e) {
-                    std::cerr << "Not a valid address: " << e.what() << std::endl;
+                    error << "Not a valid address: " << e.what() << std::endl;
                 }
             }
         }

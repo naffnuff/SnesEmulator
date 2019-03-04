@@ -33,7 +33,7 @@ public:
         , programBank(0)
         , programCounter(0)
         , resetAddress(0)
-        , flags(0)
+        , flags(i)
         , emulationMode(true)
     {
         memory.resize(1 << 24);
@@ -131,14 +131,39 @@ public:
         return (programBank << 16 | programCounter) + offset;
     }
 
+    uint8_t getAccumulatorA() const
+    {
+        return accumulatorA;
+    }
+
+    void setAccumulatorA(uint8_t value)
+    {
+        accumulatorA = value;
+    }
+
+    void setAccumulatorB(uint8_t value)
+    {
+        accumulatorB = value;
+    }
+
+    uint8_t getAccumulatorB() const
+    {
+        return accumulatorB;
+    }
+
     uint32_t getAccumulatorC() const
     {
-        return (accumulatorB << 8) + accumulatorA;
+        return accumulatorB << 8 | accumulatorA;
     }
 
     uint16_t getDirectPage() const
     {
         return directPage;
+    }
+
+    uint8_t* getMemoryPointer(uint8_t lowByte, uint8_t highByte)
+    {
+        return &memory[dataBank << 16 | highByte << 8 | lowByte];
     }
 
 private:

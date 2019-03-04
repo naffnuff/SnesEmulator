@@ -34,11 +34,10 @@ void State::loadRom(const std::string& path)
         bool romLoaded = false;
 
         int romIndex = 0;
-        for (int bank = 0; bank < (1 << 8); ++bank) {
+        for (int bank = 0; bank < 1 << 8; ++bank) {
             for (int address = 0x8000; address < (1 << 16); ++address) {
                 uint8_t byte = rom[romIndex++];
-                memory[(bank << 16) + address] = byte;
-                memory[((bank + 0x80) << 16) + address] = byte;
+                memory[bank << 16 | address] = byte;
                 if (romIndex >= (int)rom.size()) {
                     romLoaded = true;
                     break;
@@ -109,7 +108,7 @@ bool State::tryReadHeader(int offset, std::vector<char> rom)
         << ", mapMode=" << mapMode
         << ", romSize=" << romSize
         << ", fixedValue=" << fixedValue
-        << ", resetAddress=" << resetAddress
+        << ", resetAddress=" << std::hex << std::setw(4) << std::setfill('0') << resetAddress
         << std::endl;
 
     return true;

@@ -57,7 +57,7 @@ BPL nearlabel	10	Program Counter Relative	2	27,8
 BRA Branch Always [Flags affected: none]
 BRA nearlabel	80	Program Counter Relative	2	38
 BRK Break [Flags affected: b,i (6502) b,d,i (65C02/65816 Emulation) d,i (65816 Native)]
-BRK	00	Stack/Interrupt	218	79
+BRK	00	Immediate	218	79
 BRL Branch Long Always [Flags affected: none]
 BRL label	82	Program Counter Relative Long	3	4
 BVC Branch if Overflow Clear [Flags affected: none]
@@ -89,7 +89,7 @@ CMP addr,Y	D9	Absolute Indexed, Y	3	41,3
 CMP addr,X	DD	Absolute Indexed, X	3	41,3
 CMP long,X	DF	Absolute Long Indexed, X	4	51
 COP Co-Processor Enable [Flags affected: d,i]
-COP const	02	Stack/Interrupt	218	79
+COP const	02	Immediate	218	79
 CPX Compare Index Register X with Memory [Flags affected: n,z,c]
 CPX #const	E0	Immediate	219	210
 CPX dp	E4	Direct Page	2	32,10
@@ -179,9 +179,9 @@ LSR addr	4E	Absolute	3	65
 LSR dp,X	56	Direct Page Indexed, X	2	62,5
 LSR addr,X	5E	Absolute Indexed, X	3	75,6,3,20
 MVN Block Move Negative [Flags affected: none][Registers: X,Y,C]
-MVN srcbk,destbk	54	Block Move	3	13
+MVN srcbk,destbk	54	Block Move	3	713
 MVP Block Move Positive [Flags affected: none][Registers: X,Y,C]
-MVP srcbk,destbk	44	Block Move	3	13
+MVP srcbk,destbk	44	Block Move	3	713
 NOP No Operation [Flags affected: none]
 NOP	EA	Implied	1	2
 ORA OR Accumulator with Memory [Flags affected: n,z]
@@ -201,37 +201,37 @@ ORA addr,Y	19	Absolute Indexed, Y	3	41,3
 ORA addr,X	1D	Absolute Indexed, X	3	41,3
 ORA long,X	1F	Absolute Long Indexed, X	4	51
 PEA Push Effective Absolute Address [Flags affected: none]
-PEA addr	F4	Stack (Absolute)	3	5
+PEA addr	F4	Absolute	3	5
 PEI Push Effective Indirect Address [Flags affected: none]
-PEI (dp)	D4	Stack (Direct Page Indirect)	2	62
+PEI (dp)	D4	Direct Page Indirect	2	62
 PER Push Effective Program Counter Relative Indirect Address [Flags affected: none]
-PER label	62	Stack (Program Counter Relative Long)	3	6
+PER label	62	Program Counter Relative Long	3	6
 PHA Push Accumulator [Flags affected: none]
-PHA	48	Stack (Push)	1	31
+PHA	48	Implied	1	31
 PHB Push Data Bank Register [Flags affected: none]
-PHB	8B	Stack (Push)	1	3
+PHB	8B	Implied	1	3
 PHD Push Direct Page Register [Flags affected: none]
-PHD	0B	Stack (Push)	1	4
+PHD	0B	Implied	1	4
 PHK Push Program Bank Register [Flags affected: none]
-PHK	4B	Stack (Push)	1	3
+PHK	4B	Implied	1	3
 PHP Push Processor Status Register [Flags affected: none]
-PHP	08	Stack (Push)	1	3
+PHP	08	Implied	1	3
 PHX Push Index Register X [Flags affected: none]
-PHX	DA	Stack (Push)	1	310
+PHX	DA	Implied	1	310
 PHY Push Index Register Y [Flags affected: none]
-PHY	5A	Stack (Push)	1	310
+PHY	5A	Implied	1	310
 PLA Pull Accumulator [Flags affected: n,z]
-PLA	68	Stack (Pull)	1	41
+PLA	68	Implied	1	41
 PLB Pull Data Bank Register [Flags affected: n,z]
-PLB	AB	Stack (Pull)	1	4
+PLB	AB	Implied	1	4
 PLD Pull Direct Page Register [Flags affected: n,z]
-PLD	2B	Stack (Pull)	1	5
+PLD	2B	Implied	1	5
 PLP Pull Processor Status Register [Flags affected: n,z]
-PLP	28	Stack (Pull)	1	4
+PLP	28	Implied	1	4
 PLX Pull Index Register X [Flags affected: n,z]
-PLX	FA	Stack (Pull)	1	410
+PLX	FA	Implied	1	410
 PLY Pull Index Register Y [Flags affected: n,z]
-PLY	7A	Stack (Pull)	1	410
+PLY	7A	Implied	1	410
 REP Reset Processor Status Bits [Flags affected: all except b per operand]
 REP #const	C2	Immediate	2	3
 ROL Rotate Memory or Accumulator Left [Flags affected: n,z,c]
@@ -247,11 +247,11 @@ ROR addr	6E	Absolute	3	65
 ROR dp,X	76	Direct Page Indexed, X	2	62,5
 ROR addr,X	7E	Absolute Indexed, X	3	75,6,3,20
 RTI Return from Interrupt [Flags affected: all except b]
-RTI	40	Stack (RTI)	1	69
+RTI	40	Implied	1	69
 RTL Return from Subroutine Long [Flags affected: none]
-RTL	6B	Stack (RTL)	1	6
+RTL	6B	Implied	1	6
 RTS Return from Subroutine [Flags affected: none]
-RTS	60	Stack (RTS)	1	6
+RTS	60	Implied	1	6
 SBC Subtract with Borrow from Accumulator [Flags affected: n,v,z,c]
 SBC (dp,X)	E1	Direct Page Indexed Indirect, X	2	61,2,4
 SBC sr,S	E3	Stack Relative	2	41,4
@@ -339,7 +339,7 @@ TYX	BB	Implied	1	2
 WAI Wait for Interrupt [Flags affected: none]
 WAI	CB	Implied	1	315
 WDM Reserved for Future Expansion [Flags affected: none (subject to change)]
-WDM	42	n/a	216	016
+WDM	42	Immediate	216	216
 XBA Exchange B and A 8-bit Accumulators [Flags affected: n,z]
 XBA	EB	Implied	1	3
 XCE Exchange Carry and Emulation Flags [Flags affected: m,b/x,c,e]
