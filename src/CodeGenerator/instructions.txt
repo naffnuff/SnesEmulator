@@ -32,7 +32,7 @@ AND addr,X	3D	Absolute Indexed, X	3	41,3
 AND long,X	3F	Absolute Long Indexed, X	4	51
 ASL Accumulator or Memory Shift Left [Flags affected: n,z,c]
 ASL dp	06	Direct Page	2	52,5
-ASL A	0A	Accumulator	1	2
+ASL A	0A	Accumulator	1	25,21
 ASL addr	0E	Absolute	3	65
 ASL dp,X	16	Direct Page Indexed, X	2	62,5
 ASL addr,X	1E	Absolute Indexed, X	3	75,6,3,20
@@ -99,7 +99,7 @@ CPY #const	C0	Immediate	219	210
 CPY dp	C4	Direct Page	2	32,10
 CPY addr	CC	Absolute	3	410
 DEC Decrement [Flags affected: n,z]
-DEC A	3A	Accumulator	1	2
+DEC A	3A	Accumulator	1	25,21
 DEC dp	C6	Direct Page	2	52,5
 DEC addr	CE	Absolute	3	65
 DEC dp,X	D6	Direct Page Indexed, X	2	62,5
@@ -125,7 +125,7 @@ EOR addr,Y	59	Absolute Indexed, Y	3	41,3
 EOR addr,X	5D	Absolute Indexed, X	3	41,3
 EOR long,X	5F	Absolute Long Indexed, X	4	51
 INC Increment [Flags affected: n,z]
-INC A	1A	Accumulator	1	2
+INC A	1A	Accumulator	1	25,21
 INC dp	E6	Direct Page	2	52,5
 INC addr	EE	Absolute	3	65
 INC dp,X	F6	Direct Page Indexed, X	2	62,5
@@ -174,7 +174,7 @@ LDY dp,X	B4	Direct Page Indexed, X	2	42,10
 LDY addr,X	BC	Absolute Indexed, X	3	43,10
 LSR Logical Shift Memory or Accumulator Right [Flags affected: n,z,c]
 LSR dp	46	Direct Page	2	52,5
-LSR A	4A	Accumulator	1	2
+LSR A	4A	Accumulator	1	25,21
 LSR addr	4E	Absolute	3	65
 LSR dp,X	56	Direct Page Indexed, X	2	62,5
 LSR addr,X	5E	Absolute Indexed, X	3	75,6,3,20
@@ -236,13 +236,13 @@ REP Reset Processor Status Bits [Flags affected: all except b per operand]
 REP #const	C2	Immediate	2	3
 ROL Rotate Memory or Accumulator Left [Flags affected: n,z,c]
 ROL dp	26	Direct Page	2	52,5
-ROL A	2A	Accumulator	1	2
+ROL A	2A	Accumulator	1	25,21
 ROL addr	2E	Absolute	3	65
 ROL dp,X	36	Direct Page Indexed, X	2	62,5
 ROL addr,X	3E	Absolute Indexed, X	3	75,6,3,20
 ROR Rotate Memory or Accumulator Right [Flags affected: n,z,c]
 ROR dp	66	Direct Page	2	52,5
-ROR A	6A	Accumulator	1	2
+ROR A	6A	Accumulator	1	25,21
 ROR addr	6E	Absolute	3	65
 ROR dp,X	76	Direct Page Indexed, X	2	62,5
 ROR addr,X	7E	Absolute Indexed, X	3	75,6,3,20
@@ -339,7 +339,7 @@ TYX	BB	Implied	1	2
 WAI Wait for Interrupt [Flags affected: none]
 WAI	CB	Implied	1	315
 WDM Reserved for Future Expansion [Flags affected: none (subject to change)]
-WDM	42	Immediate	216	216
+WDM	42	Immediate	2	216
 XBA Exchange B and A 8-bit Accumulators [Flags affected: n,z]
 XBA	EB	Implied	1	3
 XCE Exchange Carry and Emulation Flags [Flags affected: m,b/x,c,e]

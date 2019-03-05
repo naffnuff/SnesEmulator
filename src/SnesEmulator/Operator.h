@@ -8,10 +8,15 @@ namespace Operator {
 class ADC
 {
 public:
+    // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("ADC is not implemented");
-        return 0;
+        int cycles = 0;
+        if (state.is16Bit(State::m)) {
+            cycles += 1;
+        }
+        return cycles;
     }
 
     static std::string toString() { return "ADC"; }
@@ -21,10 +26,15 @@ public:
 class AND
 {
 public:
+    // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("AND is not implemented");
-        return 0;
+        int cycles = 0;
+        if (state.is16Bit(State::m)) {
+            cycles += 1;
+        }
+        return cycles;
     }
 
     static std::string toString() { return "AND"; }
@@ -34,10 +44,15 @@ public:
 class ASL
 {
 public:
+    // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("ASL is not implemented");
-        return 0;
+        int cycles = 0;
+        if (state.is16Bit(State::m)) {
+            cycles += 2;
+        }
+        return cycles;
     }
 
     static std::string toString() { return "ASL"; }
@@ -47,14 +62,20 @@ public:
 class BCC
 {
 public:
-    // 7: Add 1 cycle if branch is taken
-    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
+    // §7: Add 1 cycle if branch is taken
+    // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("BCC is not implemented");
         int cycles = 0;
-        cycles += 0 /* TODO07 */;
-        cycles += 0 /* TODO08 */;
+        if (true /*branch taken*/) {
+            cycles += 1;
+            throw std::runtime_error("TODO07");
+        }
+        if (true /*branch taken crosses page boundary*/) {
+            cycles += 1;
+            throw std::runtime_error("TODO08");
+        }
         return cycles;
     }
 
@@ -65,14 +86,20 @@ public:
 class BCS
 {
 public:
-    // 7: Add 1 cycle if branch is taken
-    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
+    // §7: Add 1 cycle if branch is taken
+    // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("BCS is not implemented");
         int cycles = 0;
-        cycles += 0 /* TODO07 */;
-        cycles += 0 /* TODO08 */;
+        if (true /*branch taken*/) {
+            cycles += 1;
+            throw std::runtime_error("TODO07");
+        }
+        if (true /*branch taken crosses page boundary*/) {
+            cycles += 1;
+            throw std::runtime_error("TODO08");
+        }
         return cycles;
     }
 
@@ -83,14 +110,20 @@ public:
 class BEQ
 {
 public:
-    // 7: Add 1 cycle if branch is taken
-    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
+    // §7: Add 1 cycle if branch is taken
+    // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("BEQ is not implemented");
         int cycles = 0;
-        cycles += 0 /* TODO07 */;
-        cycles += 0 /* TODO08 */;
+        if (true /*branch taken*/) {
+            cycles += 1;
+            throw std::runtime_error("TODO07");
+        }
+        if (true /*branch taken crosses page boundary*/) {
+            cycles += 1;
+            throw std::runtime_error("TODO08");
+        }
         return cycles;
     }
 
@@ -101,10 +134,15 @@ public:
 class BIT
 {
 public:
+    // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("BIT is not implemented");
-        return 0;
+        int cycles = 0;
+        if (state.is16Bit(State::m)) {
+            cycles += 1;
+        }
+        return cycles;
     }
 
     static std::string toString() { return "BIT"; }
@@ -114,14 +152,20 @@ public:
 class BMI
 {
 public:
-    // 7: Add 1 cycle if branch is taken
-    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
+    // §7: Add 1 cycle if branch is taken
+    // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("BMI is not implemented");
         int cycles = 0;
-        cycles += 0 /* TODO07 */;
-        cycles += 0 /* TODO08 */;
+        if (true /*branch taken*/) {
+            cycles += 1;
+            throw std::runtime_error("TODO07");
+        }
+        if (true /*branch taken crosses page boundary*/) {
+            cycles += 1;
+            throw std::runtime_error("TODO08");
+        }
         return cycles;
     }
 
@@ -132,14 +176,20 @@ public:
 class BNE
 {
 public:
-    // 7: Add 1 cycle if branch is taken
-    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
+    // §7: Add 1 cycle if branch is taken
+    // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("BNE is not implemented");
         int cycles = 0;
-        cycles += 0 /* TODO07 */;
-        cycles += 0 /* TODO08 */;
+        if (true /*branch taken*/) {
+            cycles += 1;
+            throw std::runtime_error("TODO07");
+        }
+        if (true /*branch taken crosses page boundary*/) {
+            cycles += 1;
+            throw std::runtime_error("TODO08");
+        }
         return cycles;
     }
 
@@ -150,14 +200,20 @@ public:
 class BPL
 {
 public:
-    // 7: Add 1 cycle if branch is taken
-    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
+    // §7: Add 1 cycle if branch is taken
+    // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("BPL is not implemented");
         int cycles = 0;
-        cycles += 0 /* TODO07 */;
-        cycles += 0 /* TODO08 */;
+        if (true /*branch taken*/) {
+            cycles += 1;
+            throw std::runtime_error("TODO07");
+        }
+        if (true /*branch taken crosses page boundary*/) {
+            cycles += 1;
+            throw std::runtime_error("TODO08");
+        }
         return cycles;
     }
 
@@ -168,12 +224,15 @@ public:
 class BRA
 {
 public:
-    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
+    // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("BRA is not implemented");
         int cycles = 0;
-        cycles += 0 /* TODO08 */;
+        if (true /*branch taken crosses page boundary*/) {
+            cycles += 1;
+            throw std::runtime_error("TODO08");
+        }
         return cycles;
     }
 
@@ -184,10 +243,15 @@ public:
 class BRK
 {
 public:
+    // §9: Add 1 cycle for 65816 native mode (e=0)
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("BRK is not implemented");
-        return 0;
+        int cycles = 0;
+        if (state.isNativeMode()) {
+            cycles += 1;
+        }
+        return cycles;
     }
 
     static std::string toString() { return "BRK"; }
@@ -210,14 +274,20 @@ public:
 class BVC
 {
 public:
-    // 7: Add 1 cycle if branch is taken
-    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
+    // §7: Add 1 cycle if branch is taken
+    // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("BVC is not implemented");
         int cycles = 0;
-        cycles += 0 /* TODO07 */;
-        cycles += 0 /* TODO08 */;
+        if (true /*branch taken*/) {
+            cycles += 1;
+            throw std::runtime_error("TODO07");
+        }
+        if (true /*branch taken crosses page boundary*/) {
+            cycles += 1;
+            throw std::runtime_error("TODO08");
+        }
         return cycles;
     }
 
@@ -228,14 +298,20 @@ public:
 class BVS
 {
 public:
-    // 7: Add 1 cycle if branch is taken
-    // 8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
+    // §7: Add 1 cycle if branch is taken
+    // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("BVS is not implemented");
         int cycles = 0;
-        cycles += 0 /* TODO07 */;
-        cycles += 0 /* TODO08 */;
+        if (true /*branch taken*/) {
+            cycles += 1;
+            throw std::runtime_error("TODO07");
+        }
+        if (true /*branch taken crosses page boundary*/) {
+            cycles += 1;
+            throw std::runtime_error("TODO08");
+        }
         return cycles;
     }
 
@@ -298,10 +374,15 @@ public:
 class CMP
 {
 public:
+    // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("CMP is not implemented");
-        return 0;
+        int cycles = 0;
+        if (state.is16Bit(State::m)) {
+            cycles += 1;
+        }
+        return cycles;
     }
 
     static std::string toString() { return "CMP"; }
@@ -311,10 +392,15 @@ public:
 class COP
 {
 public:
+    // §9: Add 1 cycle for 65816 native mode (e=0)
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("COP is not implemented");
-        return 0;
+        int cycles = 0;
+        if (state.isNativeMode()) {
+            cycles += 1;
+        }
+        return cycles;
     }
 
     static std::string toString() { return "COP"; }
@@ -324,10 +410,15 @@ public:
 class CPX
 {
 public:
+    // §10: Add 1 cycle if x=0 (16-bit index registers)
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("CPX is not implemented");
-        return 0;
+        int cycles = 0;
+        if (state.is16Bit(State::x)) {
+            cycles += 1;
+        }
+        return cycles;
     }
 
     static std::string toString() { return "CPX"; }
@@ -337,10 +428,15 @@ public:
 class CPY
 {
 public:
+    // §10: Add 1 cycle if x=0 (16-bit index registers)
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("CPY is not implemented");
-        return 0;
+        int cycles = 0;
+        if (state.is16Bit(State::x)) {
+            cycles += 1;
+        }
+        return cycles;
     }
 
     static std::string toString() { return "CPY"; }
@@ -350,10 +446,15 @@ public:
 class DEC
 {
 public:
+    // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("DEC is not implemented");
-        return 0;
+        int cycles = 0;
+        if (state.is16Bit(State::m)) {
+            cycles += 2;
+        }
+        return cycles;
     }
 
     static std::string toString() { return "DEC"; }
@@ -389,10 +490,15 @@ public:
 class EOR
 {
 public:
+    // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("EOR is not implemented");
-        return 0;
+        int cycles = 0;
+        if (state.is16Bit(State::m)) {
+            cycles += 1;
+        }
+        return cycles;
     }
 
     static std::string toString() { return "EOR"; }
@@ -402,10 +508,15 @@ public:
 class INC
 {
 public:
+    // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("INC is not implemented");
-        return 0;
+        int cycles = 0;
+        if (state.is16Bit(State::m)) {
+            cycles += 2;
+        }
+        return cycles;
     }
 
     static std::string toString() { return "INC"; }
@@ -467,10 +578,15 @@ public:
 class LDA
 {
 public:
+    // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("LDA is not implemented");
-        return 0;
+        int cycles = 0;
+        if (state.is16Bit(State::m)) {
+            cycles += 1;
+        }
+        return cycles;
     }
 
     static std::string toString() { return "LDA"; }
@@ -480,10 +596,15 @@ public:
 class LDX
 {
 public:
+    // §10: Add 1 cycle if x=0 (16-bit index registers)
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("LDX is not implemented");
-        return 0;
+        int cycles = 0;
+        if (state.is16Bit(State::x)) {
+            cycles += 1;
+        }
+        return cycles;
     }
 
     static std::string toString() { return "LDX"; }
@@ -493,10 +614,15 @@ public:
 class LDY
 {
 public:
+    // §10: Add 1 cycle if x=0 (16-bit index registers)
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("LDY is not implemented");
-        return 0;
+        int cycles = 0;
+        if (state.is16Bit(State::x)) {
+            cycles += 1;
+        }
+        return cycles;
     }
 
     static std::string toString() { return "LDY"; }
@@ -506,10 +632,15 @@ public:
 class LSR
 {
 public:
+    // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("LSR is not implemented");
-        return 0;
+        int cycles = 0;
+        if (state.is16Bit(State::m)) {
+            cycles += 2;
+        }
+        return cycles;
     }
 
     static std::string toString() { return "LSR"; }
@@ -519,6 +650,7 @@ public:
 class MVN
 {
 public:
+    // §13: 7 cycles per byte moved
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("MVN is not implemented");
@@ -532,6 +664,7 @@ public:
 class MVP
 {
 public:
+    // §13: 7 cycles per byte moved
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("MVP is not implemented");
@@ -558,10 +691,15 @@ public:
 class ORA
 {
 public:
+    // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("ORA is not implemented");
-        return 0;
+        int cycles = 0;
+        if (state.is16Bit(State::m)) {
+            cycles += 1;
+        }
+        return cycles;
     }
 
     static std::string toString() { return "ORA"; }
@@ -610,10 +748,15 @@ public:
 class PHA
 {
 public:
+    // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     static int invoke(State& state)
     {
         throw std::runtime_error("PHA is not implemented");
-        return 0;
+        int cycles = 0;
+        if (state.is16Bit(State::m)) {
+            cycles += 1;
+        }
+        return cycles;
     }
 
     static std::string toString() { return "PHA"; }
@@ -675,10 +818,15 @@ public:
 class PHX
 {
 public:
+    // §10: Add 1 cycle if x=0 (16-bit index registers)
     static int invoke(State& state)
     {
         throw std::runtime_error("PHX is not implemented");
-        return 0;
+        int cycles = 0;
+        if (state.is16Bit(State::x)) {
+            cycles += 1;
+        }
+        return cycles;
     }
 
     static std::string toString() { return "PHX"; }
@@ -688,10 +836,15 @@ public:
 class PHY
 {
 public:
+    // §10: Add 1 cycle if x=0 (16-bit index registers)
     static int invoke(State& state)
     {
         throw std::runtime_error("PHY is not implemented");
-        return 0;
+        int cycles = 0;
+        if (state.is16Bit(State::x)) {
+            cycles += 1;
+        }
+        return cycles;
     }
 
     static std::string toString() { return "PHY"; }
@@ -701,10 +854,15 @@ public:
 class PLA
 {
 public:
+    // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     static int invoke(State& state)
     {
         throw std::runtime_error("PLA is not implemented");
-        return 0;
+        int cycles = 0;
+        if (state.is16Bit(State::m)) {
+            cycles += 1;
+        }
+        return cycles;
     }
 
     static std::string toString() { return "PLA"; }
@@ -753,10 +911,15 @@ public:
 class PLX
 {
 public:
+    // §10: Add 1 cycle if x=0 (16-bit index registers)
     static int invoke(State& state)
     {
         throw std::runtime_error("PLX is not implemented");
-        return 0;
+        int cycles = 0;
+        if (state.is16Bit(State::x)) {
+            cycles += 1;
+        }
+        return cycles;
     }
 
     static std::string toString() { return "PLX"; }
@@ -766,10 +929,15 @@ public:
 class PLY
 {
 public:
+    // §10: Add 1 cycle if x=0 (16-bit index registers)
     static int invoke(State& state)
     {
         throw std::runtime_error("PLY is not implemented");
-        return 0;
+        int cycles = 0;
+        if (state.is16Bit(State::x)) {
+            cycles += 1;
+        }
+        return cycles;
     }
 
     static std::string toString() { return "PLY"; }
@@ -792,10 +960,15 @@ public:
 class ROL
 {
 public:
+    // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("ROL is not implemented");
-        return 0;
+        int cycles = 0;
+        if (state.is16Bit(State::m)) {
+            cycles += 2;
+        }
+        return cycles;
     }
 
     static std::string toString() { return "ROL"; }
@@ -805,10 +978,15 @@ public:
 class ROR
 {
 public:
+    // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("ROR is not implemented");
-        return 0;
+        int cycles = 0;
+        if (state.is16Bit(State::m)) {
+            cycles += 2;
+        }
+        return cycles;
     }
 
     static std::string toString() { return "ROR"; }
@@ -818,10 +996,15 @@ public:
 class RTI
 {
 public:
+    // §9: Add 1 cycle for 65816 native mode (e=0)
     static int invoke(State& state)
     {
         throw std::runtime_error("RTI is not implemented");
-        return 0;
+        int cycles = 0;
+        if (state.isNativeMode()) {
+            cycles += 1;
+        }
+        return cycles;
     }
 
     static std::string toString() { return "RTI"; }
@@ -857,10 +1040,15 @@ public:
 class SBC
 {
 public:
+    // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("SBC is not implemented");
-        return 0;
+        int cycles = 0;
+        if (state.is16Bit(State::m)) {
+            cycles += 1;
+        }
+        return cycles;
     }
 
     static std::string toString() { return "SBC"; }
@@ -922,10 +1110,15 @@ public:
 class STA
 {
 public:
+    // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("STA is not implemented");
-        return 0;
+        int cycles = 0;
+        if (state.is16Bit(State::m)) {
+            cycles += 1;
+        }
+        return cycles;
     }
 
     static std::string toString() { return "STA"; }
@@ -935,6 +1128,7 @@ public:
 class STP
 {
 public:
+    // §14: Uses 3 cycles to shut the processor down; additional cycles are required by reset to restart it
     static int invoke(State& state)
     {
         throw std::runtime_error("STP is not implemented");
@@ -948,10 +1142,15 @@ public:
 class STX
 {
 public:
+    // §10: Add 1 cycle if x=0 (16-bit index registers)
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("STX is not implemented");
-        return 0;
+        int cycles = 0;
+        if (state.is16Bit(State::x)) {
+            cycles += 1;
+        }
+        return cycles;
     }
 
     static std::string toString() { return "STX"; }
@@ -961,10 +1160,15 @@ public:
 class STY
 {
 public:
+    // §10: Add 1 cycle if x=0 (16-bit index registers)
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("STY is not implemented");
-        return 0;
+        int cycles = 0;
+        if (state.is16Bit(State::x)) {
+            cycles += 1;
+        }
+        return cycles;
     }
 
     static std::string toString() { return "STY"; }
@@ -974,10 +1178,15 @@ public:
 class STZ
 {
 public:
+    // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("STZ is not implemented");
-        return 0;
+        int cycles = 0;
+        if (state.is16Bit(State::m)) {
+            cycles += 1;
+        }
+        return cycles;
     }
 
     static std::string toString() { return "STZ"; }
@@ -1052,10 +1261,15 @@ public:
 class TRB
 {
 public:
+    // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("TRB is not implemented");
-        return 0;
+        int cycles = 0;
+        if (state.is16Bit(State::m)) {
+            cycles += 2;
+        }
+        return cycles;
     }
 
     static std::string toString() { return "TRB"; }
@@ -1065,10 +1279,15 @@ public:
 class TSB
 {
 public:
+    // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("TSB is not implemented");
-        return 0;
+        int cycles = 0;
+        if (state.is16Bit(State::m)) {
+            cycles += 2;
+        }
+        return cycles;
     }
 
     static std::string toString() { return "TSB"; }
@@ -1169,6 +1388,7 @@ public:
 class WAI
 {
 public:
+    // §15: Uses 3 cycles to shut the processor down; additional cycles are required by interrupt to restart it
     static int invoke(State& state)
     {
         throw std::runtime_error("WAI is not implemented");
@@ -1182,6 +1402,7 @@ public:
 class WDM
 {
 public:
+    // §16: Byte and cycle counts subject to change in future processors which expand WDM into 2-byte opcode portions of instructions of varying lengths
     static int invoke(State& state, uint8_t* data)
     {
         throw std::runtime_error("WDM is not implemented");

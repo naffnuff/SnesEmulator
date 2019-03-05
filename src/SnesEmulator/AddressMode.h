@@ -45,12 +45,15 @@ class AbsoluteIndexedIndirect : public Instruction3Byte
 template <typename Operator>
 class AbsoluteIndexedX : public Instruction3Byte
 {
-    // 3: Add 1 cycle if adding index crosses a page boundary
+    // §3: Add 1 cycle if adding index crosses a page boundary
     int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte) const override
     {
         throw std::runtime_error("AbsoluteIndexedX is not implemented");
         int cycles = 0;
-        cycles += 0 /* TODO03 */;
+        if (true /*index added crosses page boundary*/) {
+            cycles += 1;
+            throw std::runtime_error("TODO03");
+        }
         uint8_t* data = nullptr;
         return cycles + Operator::invoke(state, data);
     }
@@ -65,12 +68,15 @@ class AbsoluteIndexedX : public Instruction3Byte
 template <typename Operator>
 class AbsoluteIndexedY : public Instruction3Byte
 {
-    // 3: Add 1 cycle if adding index crosses a page boundary
+    // §3: Add 1 cycle if adding index crosses a page boundary
     int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte) const override
     {
         throw std::runtime_error("AbsoluteIndexedY is not implemented");
         int cycles = 0;
-        cycles += 0 /* TODO03 */;
+        if (true /*index added crosses page boundary*/) {
+            cycles += 1;
+            throw std::runtime_error("TODO03");
+        }
         uint8_t* data = nullptr;
         return cycles + Operator::invoke(state, data);
     }
@@ -153,11 +159,16 @@ class AbsoluteLongIndexedX : public Instruction4Byte
 template <typename Operator>
 class Accumulator : public Instruction1Byte
 {
+    // §21: Remove 2 cycles for the special case of Accumulator
     int invokeOperator(State& state) const override
     {
         throw std::runtime_error("Accumulator is not implemented");
+        int cycles = 0;
+        if (state.is16Bit(State::m)) {
+            cycles -= 2;
+        }
         uint8_t* data = nullptr;
-        return Operator::invoke(state, data);
+        return cycles + Operator::invoke(state, data);
     }
 
     std::string toString(const State& state) const override
@@ -187,11 +198,16 @@ class BlockMove : public Instruction3Byte
 template <typename Operator>
 class DirectPage : public Instruction2Byte
 {
+    // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int invokeOperator(State& state, uint8_t lowByte) const override
     {
         throw std::runtime_error("DirectPage is not implemented");
+        int cycles = 0;
+        if ((uint8_t)state.getDirectPage()) {
+            cycles += 1;
+        }
         uint8_t* data = nullptr;
-        return Operator::invoke(state, data);
+        return cycles + Operator::invoke(state, data);
     }
 
     std::string toString(const State& state) const override
@@ -204,11 +220,16 @@ class DirectPage : public Instruction2Byte
 template <typename Operator>
 class DirectPageIndexedIndirectX : public Instruction2Byte
 {
+    // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int invokeOperator(State& state, uint8_t lowByte) const override
     {
         throw std::runtime_error("DirectPageIndexedIndirectX is not implemented");
+        int cycles = 0;
+        if ((uint8_t)state.getDirectPage()) {
+            cycles += 1;
+        }
         uint8_t* data = nullptr;
-        return Operator::invoke(state, data);
+        return cycles + Operator::invoke(state, data);
     }
 
     std::string toString(const State& state) const override
@@ -221,11 +242,16 @@ class DirectPageIndexedIndirectX : public Instruction2Byte
 template <typename Operator>
 class DirectPageIndexedX : public Instruction2Byte
 {
+    // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int invokeOperator(State& state, uint8_t lowByte) const override
     {
         throw std::runtime_error("DirectPageIndexedX is not implemented");
+        int cycles = 0;
+        if ((uint8_t)state.getDirectPage()) {
+            cycles += 1;
+        }
         uint8_t* data = nullptr;
-        return Operator::invoke(state, data);
+        return cycles + Operator::invoke(state, data);
     }
 
     std::string toString(const State& state) const override
@@ -238,11 +264,16 @@ class DirectPageIndexedX : public Instruction2Byte
 template <typename Operator>
 class DirectPageIndexedY : public Instruction2Byte
 {
+    // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int invokeOperator(State& state, uint8_t lowByte) const override
     {
         throw std::runtime_error("DirectPageIndexedY is not implemented");
+        int cycles = 0;
+        if ((uint8_t)state.getDirectPage()) {
+            cycles += 1;
+        }
         uint8_t* data = nullptr;
-        return Operator::invoke(state, data);
+        return cycles + Operator::invoke(state, data);
     }
 
     std::string toString(const State& state) const override
@@ -255,11 +286,16 @@ class DirectPageIndexedY : public Instruction2Byte
 template <typename Operator>
 class DirectPageIndirect : public Instruction2Byte
 {
+    // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int invokeOperator(State& state, uint8_t lowByte) const override
     {
         throw std::runtime_error("DirectPageIndirect is not implemented");
+        int cycles = 0;
+        if ((uint8_t)state.getDirectPage()) {
+            cycles += 1;
+        }
         uint8_t* data = nullptr;
-        return Operator::invoke(state, data);
+        return cycles + Operator::invoke(state, data);
     }
 
     std::string toString(const State& state) const override
@@ -272,12 +308,19 @@ class DirectPageIndirect : public Instruction2Byte
 template <typename Operator>
 class DirectPageIndirectIndexedY : public Instruction2Byte
 {
-    // 3: Add 1 cycle if adding index crosses a page boundary
+    // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
+    // §3: Add 1 cycle if adding index crosses a page boundary
     int invokeOperator(State& state, uint8_t lowByte) const override
     {
         throw std::runtime_error("DirectPageIndirectIndexedY is not implemented");
         int cycles = 0;
-        cycles += 0 /* TODO03 */;
+        if ((uint8_t)state.getDirectPage()) {
+            cycles += 1;
+        }
+        if (true /*index added crosses page boundary*/) {
+            cycles += 1;
+            throw std::runtime_error("TODO03");
+        }
         uint8_t* data = nullptr;
         return cycles + Operator::invoke(state, data);
     }
@@ -292,11 +335,16 @@ class DirectPageIndirectIndexedY : public Instruction2Byte
 template <typename Operator>
 class DirectPageIndirectLong : public Instruction2Byte
 {
+    // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int invokeOperator(State& state, uint8_t lowByte) const override
     {
         throw std::runtime_error("DirectPageIndirectLong is not implemented");
+        int cycles = 0;
+        if ((uint8_t)state.getDirectPage()) {
+            cycles += 1;
+        }
         uint8_t* data = nullptr;
-        return Operator::invoke(state, data);
+        return cycles + Operator::invoke(state, data);
     }
 
     std::string toString(const State& state) const override
@@ -309,11 +357,16 @@ class DirectPageIndirectLong : public Instruction2Byte
 template <typename Operator>
 class DirectPageIndirectLongIndexedY : public Instruction2Byte
 {
+    // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int invokeOperator(State& state, uint8_t lowByte) const override
     {
         throw std::runtime_error("DirectPageIndirectLongIndexedY is not implemented");
+        int cycles = 0;
+        if ((uint8_t)state.getDirectPage()) {
+            cycles += 1;
+        }
         uint8_t* data = nullptr;
-        return Operator::invoke(state, data);
+        return cycles + Operator::invoke(state, data);
     }
 
     std::string toString(const State& state) const override
@@ -340,7 +393,7 @@ class Immediate : public Instruction2Byte
 };
 
 // Immediate
-// 17: Add 1 byte if m=0 (16-bit memory/accumulator)
+// ¤17: Add 1 byte if m=0 (16-bit memory/accumulator)
 template <typename Operator, State::Flag Flag>
 class ImmediateVariableSize : public InstructionVariableSize<Flag>
 {

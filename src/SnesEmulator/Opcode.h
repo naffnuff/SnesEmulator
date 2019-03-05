@@ -16,15 +16,10 @@ namespace Opcode {
 class ADC_61 : public AddressMode::DirectPageIndexedIndirectX<Operator::ADC>
 {
     // 2   7-m+w       (dir,X)   mm....mm . ADC ($10,X)
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("ADC_61 is not implemented");
-        int cycles = 6;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 6 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "61: ADC (dp,X)"; }
@@ -37,13 +32,10 @@ class ADC_61 : public AddressMode::DirectPageIndexedIndirectX<Operator::ADC>
 class ADC_63 : public AddressMode::StackRelative<Operator::ADC>
 {
     // 2   5-m         stk,S     mm....mm . ADC $32,S
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("ADC_63 is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "63: ADC sr,S"; }
@@ -56,15 +48,10 @@ class ADC_63 : public AddressMode::StackRelative<Operator::ADC>
 class ADC_65 : public AddressMode::DirectPage<Operator::ADC>
 {
     // 2   4-m+w       dir       mm....mm . ADC $10
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("ADC_65 is not implemented");
-        int cycles = 3;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 3 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "65: ADC dp"; }
@@ -77,15 +64,10 @@ class ADC_65 : public AddressMode::DirectPage<Operator::ADC>
 class ADC_67 : public AddressMode::DirectPageIndirectLong<Operator::ADC>
 {
     // 2   7-m+w       [dir]     mm....mm . ADC [$10]
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("ADC_67 is not implemented");
-        int cycles = 6;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 6 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "67: ADC [dp]"; }
@@ -95,17 +77,14 @@ class ADC_67 : public AddressMode::DirectPageIndirectLong<Operator::ADC>
 // ADC #const
 // Immediate
 // 2<17>
-// 17: Add 1 byte if m=0 (16-bit memory/accumulator)
+// ¤17: Add 1 byte if m=0 (16-bit memory/accumulator)
 class ADC_69 : public AddressMode::ImmediateVariableSize<Operator::ADC, State::m>
 {
     // 3-m 3-m         imm       mm....mm . ADC #$54
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("ADC_69 is not implemented");
-        int cycles = 2;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 2 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "69: ADC #const"; }
@@ -118,13 +97,10 @@ class ADC_69 : public AddressMode::ImmediateVariableSize<Operator::ADC, State::m
 class ADC_6D : public AddressMode::Absolute<Operator::ADC>
 {
     // 3   5-m         abs       mm....mm . ADC $9876
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("ADC_6D is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "6D: ADC addr"; }
@@ -137,13 +113,10 @@ class ADC_6D : public AddressMode::Absolute<Operator::ADC>
 class ADC_6F : public AddressMode::AbsoluteLong<Operator::ADC>
 {
     // 4   6-m         long      mm....mm . ADC $FEDBCA
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("ADC_6F is not implemented");
-        int cycles = 5;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 5 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "6F: ADC long"; }
@@ -156,15 +129,10 @@ class ADC_6F : public AddressMode::AbsoluteLong<Operator::ADC>
 class ADC_71 : public AddressMode::DirectPageIndirectIndexedY<Operator::ADC>
 {
     // 2   7-m+w-x+x*p (dir),Y   mm....mm . ADC ($10),Y
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("ADC_71 is not implemented");
-        int cycles = 5;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 5 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "71: ADC (dp),Y"; }
@@ -177,15 +145,10 @@ class ADC_71 : public AddressMode::DirectPageIndirectIndexedY<Operator::ADC>
 class ADC_72 : public AddressMode::DirectPageIndirect<Operator::ADC>
 {
     // 2   6-m+w       (dir)     mm....mm . ADC ($10)
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("ADC_72 is not implemented");
-        int cycles = 5;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 5 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "72: ADC (dp)"; }
@@ -198,13 +161,10 @@ class ADC_72 : public AddressMode::DirectPageIndirect<Operator::ADC>
 class ADC_73 : public AddressMode::StackRelativeIndirectIndexedY<Operator::ADC>
 {
     // 2   8-m         (stk,S),Y mm....mm . ADC ($32,S),Y
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("ADC_73 is not implemented");
-        int cycles = 7;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 7 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "73: ADC (sr,S),Y"; }
@@ -217,15 +177,10 @@ class ADC_73 : public AddressMode::StackRelativeIndirectIndexedY<Operator::ADC>
 class ADC_75 : public AddressMode::DirectPageIndexedX<Operator::ADC>
 {
     // 2   5-m+w       dir,X     mm....mm . ADC $10,X
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("ADC_75 is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "75: ADC dp,X"; }
@@ -238,15 +193,10 @@ class ADC_75 : public AddressMode::DirectPageIndexedX<Operator::ADC>
 class ADC_77 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::ADC>
 {
     // 2   7-m+w       [dir],Y   mm....mm . ADC [$10],Y
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("ADC_77 is not implemented");
-        int cycles = 6;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 6 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "77: ADC [dp],Y"; }
@@ -259,13 +209,10 @@ class ADC_77 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::ADC>
 class ADC_79 : public AddressMode::AbsoluteIndexedY<Operator::ADC>
 {
     // 3   6-m-x+x*p   abs,Y     mm....mm . ADC $9876,Y
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("ADC_79 is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "79: ADC addr,Y"; }
@@ -278,13 +225,10 @@ class ADC_79 : public AddressMode::AbsoluteIndexedY<Operator::ADC>
 class ADC_7D : public AddressMode::AbsoluteIndexedX<Operator::ADC>
 {
     // 3   6-m-x+x*p   abs,X     mm....mm . ADC $9876,X
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("ADC_7D is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "7D: ADC addr,X"; }
@@ -297,13 +241,10 @@ class ADC_7D : public AddressMode::AbsoluteIndexedX<Operator::ADC>
 class ADC_7F : public AddressMode::AbsoluteLongIndexedX<Operator::ADC>
 {
     // 4   6-m         long,X    mm....mm . ADC $FEDCBA,X
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("ADC_7F is not implemented");
-        int cycles = 5;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 5 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "7F: ADC long,X"; }
@@ -316,15 +257,10 @@ class ADC_7F : public AddressMode::AbsoluteLongIndexedX<Operator::ADC>
 class AND_21 : public AddressMode::DirectPageIndexedIndirectX<Operator::AND>
 {
     // 2   7-m+w       (dir,X)   m.....m. . AND ($10,X)
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("AND_21 is not implemented");
-        int cycles = 6;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 6 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "21: AND (dp,X)"; }
@@ -337,13 +273,10 @@ class AND_21 : public AddressMode::DirectPageIndexedIndirectX<Operator::AND>
 class AND_23 : public AddressMode::StackRelative<Operator::AND>
 {
     // 2   5-m         stk,S     m.....m. . AND $32,S
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("AND_23 is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "23: AND sr,S"; }
@@ -356,15 +289,10 @@ class AND_23 : public AddressMode::StackRelative<Operator::AND>
 class AND_25 : public AddressMode::DirectPage<Operator::AND>
 {
     // 2   4-m+w       dir       m.....m. . AND $10
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("AND_25 is not implemented");
-        int cycles = 3;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 3 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "25: AND dp"; }
@@ -377,15 +305,10 @@ class AND_25 : public AddressMode::DirectPage<Operator::AND>
 class AND_27 : public AddressMode::DirectPageIndirectLong<Operator::AND>
 {
     // 2   7-m+w       [dir]     m.....m. . AND [$10]
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("AND_27 is not implemented");
-        int cycles = 6;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 6 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "27: AND [dp]"; }
@@ -395,17 +318,14 @@ class AND_27 : public AddressMode::DirectPageIndirectLong<Operator::AND>
 // AND #const
 // Immediate
 // 2<17>
-// 17: Add 1 byte if m=0 (16-bit memory/accumulator)
+// ¤17: Add 1 byte if m=0 (16-bit memory/accumulator)
 class AND_29 : public AddressMode::ImmediateVariableSize<Operator::AND, State::m>
 {
     // 3-m 3-m         imm       m.....m. . AND #$54
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("AND_29 is not implemented");
-        int cycles = 2;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 2 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "29: AND #const"; }
@@ -418,13 +338,10 @@ class AND_29 : public AddressMode::ImmediateVariableSize<Operator::AND, State::m
 class AND_2D : public AddressMode::Absolute<Operator::AND>
 {
     // 3   5-m         abs       m.....m. . AND $9876
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("AND_2D is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "2D: AND addr"; }
@@ -437,13 +354,10 @@ class AND_2D : public AddressMode::Absolute<Operator::AND>
 class AND_2F : public AddressMode::AbsoluteLong<Operator::AND>
 {
     // 4   6-m         long      m.....m. . AND $FEDBCA
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("AND_2F is not implemented");
-        int cycles = 5;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 5 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "2F: AND long"; }
@@ -456,15 +370,10 @@ class AND_2F : public AddressMode::AbsoluteLong<Operator::AND>
 class AND_31 : public AddressMode::DirectPageIndirectIndexedY<Operator::AND>
 {
     // 2   7-m+w-x+x*p (dir),Y   m.....m. . AND ($10),Y
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("AND_31 is not implemented");
-        int cycles = 5;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 5 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "31: AND (dp),Y"; }
@@ -477,15 +386,10 @@ class AND_31 : public AddressMode::DirectPageIndirectIndexedY<Operator::AND>
 class AND_32 : public AddressMode::DirectPageIndirect<Operator::AND>
 {
     // 2   6-m+w       (dir)     m.....m. . AND ($10)
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("AND_32 is not implemented");
-        int cycles = 5;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 5 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "32: AND (dp)"; }
@@ -498,13 +402,10 @@ class AND_32 : public AddressMode::DirectPageIndirect<Operator::AND>
 class AND_33 : public AddressMode::StackRelativeIndirectIndexedY<Operator::AND>
 {
     // 2   8-m         (stk,S),Y m.....m. . AND ($32,S),Y
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("AND_33 is not implemented");
-        int cycles = 7;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 7 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "33: AND (sr,S),Y"; }
@@ -517,15 +418,10 @@ class AND_33 : public AddressMode::StackRelativeIndirectIndexedY<Operator::AND>
 class AND_35 : public AddressMode::DirectPageIndexedX<Operator::AND>
 {
     // 2   5-m+w       dir,X     m.....m. . AND $10,X
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("AND_35 is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "35: AND dp,X"; }
@@ -538,15 +434,10 @@ class AND_35 : public AddressMode::DirectPageIndexedX<Operator::AND>
 class AND_37 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::AND>
 {
     // 2   7-m+w       [dir],Y   m.....m. . AND [$10],Y
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("AND_37 is not implemented");
-        int cycles = 6;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 6 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "37: AND [dp],Y"; }
@@ -559,13 +450,10 @@ class AND_37 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::AND>
 class AND_39 : public AddressMode::AbsoluteIndexedY<Operator::AND>
 {
     // 3   6-m-x+x*p   abs,Y     m.....m. . AND $9876,Y
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("AND_39 is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "39: AND addr,Y"; }
@@ -578,13 +466,10 @@ class AND_39 : public AddressMode::AbsoluteIndexedY<Operator::AND>
 class AND_3D : public AddressMode::AbsoluteIndexedX<Operator::AND>
 {
     // 3   6-m-x+x*p   abs,X     m.....m. . AND $9876,X
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("AND_3D is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "3D: AND addr,X"; }
@@ -597,13 +482,10 @@ class AND_3D : public AddressMode::AbsoluteIndexedX<Operator::AND>
 class AND_3F : public AddressMode::AbsoluteLongIndexedX<Operator::AND>
 {
     // 4   6-m         long,X    m.....m. . AND $FEDCBA,X
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("AND_3F is not implemented");
-        int cycles = 5;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 5 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "3F: AND long,X"; }
@@ -616,15 +498,10 @@ class AND_3F : public AddressMode::AbsoluteLongIndexedX<Operator::AND>
 class ASL_06 : public AddressMode::DirectPage<Operator::ASL>
 {
     // 2   7-2*m+w     dir       m.....mm . ASL $10
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("ASL_06 is not implemented");
-        int cycles = 5;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        cycles += state.is16Bit(State::m) ? 2 : 0;
-        return cycles + applyOperand(state);
+        return 5 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "06: ASL dp"; }
@@ -653,13 +530,10 @@ class ASL_0A : public AddressMode::Accumulator<Operator::ASL>
 class ASL_0E : public AddressMode::Absolute<Operator::ASL>
 {
     // 3   8-2*m       abs       m.....mm . ASL $9876
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("ASL_0E is not implemented");
-        int cycles = 6;
-        cycles += state.is16Bit(State::m) ? 2 : 0;
-        return cycles + applyOperand(state);
+        return 6 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "0E: ASL addr"; }
@@ -672,15 +546,10 @@ class ASL_0E : public AddressMode::Absolute<Operator::ASL>
 class ASL_16 : public AddressMode::DirectPageIndexedX<Operator::ASL>
 {
     // 2   8-2*m+w     dir,X     m.....mm . ASL $10,X
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("ASL_16 is not implemented");
-        int cycles = 6;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        cycles += state.is16Bit(State::m) ? 2 : 0;
-        return cycles + applyOperand(state);
+        return 6 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "16: ASL dp,X"; }
@@ -693,15 +562,12 @@ class ASL_16 : public AddressMode::DirectPageIndexedX<Operator::ASL>
 class ASL_1E : public AddressMode::AbsoluteIndexedX<Operator::ASL>
 {
     // 3   9-2*m       abs,X     m.....mm . ASL $9876,X
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    // 20: TODO manually add exception for 3
+    // §20: TODO manually add exception for 3
     int execute(State& state) const override
     {
         throw std::runtime_error("ASL_1E is not implemented");
-        int cycles = 7;
-        cycles += state.is16Bit(State::m) ? 2 : 0;
-        cycles += 0 /* TODO20 */;
-        return cycles + applyOperand(state);
+        throw std::runtime_error("TODO20");
+        return 7 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "1E: ASL addr,X"; }
@@ -762,15 +628,10 @@ class BEQ_F0 : public AddressMode::ProgramCounterRelative<Operator::BEQ>
 class BIT_24 : public AddressMode::DirectPage<Operator::BIT>
 {
     // 2   4-m+w       dir       mm....m. . BIT $10
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("BIT_24 is not implemented");
-        int cycles = 3;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 3 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "24: BIT dp"; }
@@ -783,13 +644,10 @@ class BIT_24 : public AddressMode::DirectPage<Operator::BIT>
 class BIT_2C : public AddressMode::Absolute<Operator::BIT>
 {
     // 3   5-m         abs       mm....m. . BIT $9876
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("BIT_2C is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "2C: BIT addr"; }
@@ -802,15 +660,10 @@ class BIT_2C : public AddressMode::Absolute<Operator::BIT>
 class BIT_34 : public AddressMode::DirectPageIndexedX<Operator::BIT>
 {
     // 2   5-m+w       dir,X     mm....m. . BIT $10,X
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("BIT_34 is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "34: BIT dp,X"; }
@@ -823,13 +676,10 @@ class BIT_34 : public AddressMode::DirectPageIndexedX<Operator::BIT>
 class BIT_3C : public AddressMode::AbsoluteIndexedX<Operator::BIT>
 {
     // 3   6-m-x+x*p   abs,X     mm....m. . BIT $9876,X
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("BIT_3C is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "3C: BIT addr,X"; }
@@ -839,17 +689,14 @@ class BIT_3C : public AddressMode::AbsoluteIndexedX<Operator::BIT>
 // BIT #const
 // Immediate
 // 2<17>
-// 17: Add 1 byte if m=0 (16-bit memory/accumulator)
+// ¤17: Add 1 byte if m=0 (16-bit memory/accumulator)
 class BIT_89 : public AddressMode::ImmediateVariableSize<Operator::BIT, State::m>
 {
     // 3-m 3-m         imm       ......m. . BIT #$54
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("BIT_89 is not implemented");
-        int cycles = 2;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 2 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "89: BIT #const"; }
@@ -923,17 +770,14 @@ class BRA_80 : public AddressMode::ProgramCounterRelative<Operator::BRA>
 // BRK
 // Immediate
 // 2<18>
-// 18: Opcode is 1 byte, but program counter value pushed onto stack is incremented by 2 allowing for optional signature byte
+// ¤18: Opcode is 1 byte, but program counter value pushed onto stack is incremented by 2 allowing for optional signature byte
 class BRK_00 : public AddressMode::Immediate<Operator::BRK>
 {
     // 1   8-e         imp       ....01.. . BRK
-    // 9: Add 1 cycle for 65816 native mode (e=0)
     int execute(State& state) const override
     {
         throw std::runtime_error("BRK_00 is not implemented");
-        int cycles = 7;
-        cycles += state.isNativeMode() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 7 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "00: BRK"; }
@@ -1058,15 +902,10 @@ class CLV_B8 : public AddressMode::Implied<Operator::CLV>
 class CMP_C1 : public AddressMode::DirectPageIndexedIndirectX<Operator::CMP>
 {
     // 2   7-m+w       (dir,X)   m.....mm . CMP ($10,X)
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("CMP_C1 is not implemented");
-        int cycles = 6;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 6 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "C1: CMP (dp,X)"; }
@@ -1079,13 +918,10 @@ class CMP_C1 : public AddressMode::DirectPageIndexedIndirectX<Operator::CMP>
 class CMP_C3 : public AddressMode::StackRelative<Operator::CMP>
 {
     // 2   5-m         stk,S     m.....mm . CMP $32,S
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("CMP_C3 is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "C3: CMP sr,S"; }
@@ -1098,15 +934,10 @@ class CMP_C3 : public AddressMode::StackRelative<Operator::CMP>
 class CMP_C5 : public AddressMode::DirectPage<Operator::CMP>
 {
     // 2   4-m+w       dir       m.....mm . CMP $10
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("CMP_C5 is not implemented");
-        int cycles = 3;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 3 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "C5: CMP dp"; }
@@ -1119,15 +950,10 @@ class CMP_C5 : public AddressMode::DirectPage<Operator::CMP>
 class CMP_C7 : public AddressMode::DirectPageIndirectLong<Operator::CMP>
 {
     // 2   7-m+w       [dir]     m.....mm . CMP [$10]
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("CMP_C7 is not implemented");
-        int cycles = 6;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 6 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "C7: CMP [dp]"; }
@@ -1137,17 +963,14 @@ class CMP_C7 : public AddressMode::DirectPageIndirectLong<Operator::CMP>
 // CMP #const
 // Immediate
 // 2<17>
-// 17: Add 1 byte if m=0 (16-bit memory/accumulator)
+// ¤17: Add 1 byte if m=0 (16-bit memory/accumulator)
 class CMP_C9 : public AddressMode::ImmediateVariableSize<Operator::CMP, State::m>
 {
     // 3-m 3-m         imm       m.....mm . CMP #$54
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("CMP_C9 is not implemented");
-        int cycles = 2;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 2 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "C9: CMP #const"; }
@@ -1160,13 +983,10 @@ class CMP_C9 : public AddressMode::ImmediateVariableSize<Operator::CMP, State::m
 class CMP_CD : public AddressMode::Absolute<Operator::CMP>
 {
     // 3   5-m         abs       m.....mm . CMP $9876
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("CMP_CD is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "CD: CMP addr"; }
@@ -1179,13 +999,10 @@ class CMP_CD : public AddressMode::Absolute<Operator::CMP>
 class CMP_CF : public AddressMode::AbsoluteLong<Operator::CMP>
 {
     // 4   6-m         long      m.....mm . CMP $FEDBCA
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("CMP_CF is not implemented");
-        int cycles = 5;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 5 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "CF: CMP long"; }
@@ -1198,15 +1015,10 @@ class CMP_CF : public AddressMode::AbsoluteLong<Operator::CMP>
 class CMP_D1 : public AddressMode::DirectPageIndirectIndexedY<Operator::CMP>
 {
     // 2   7-m+w-x+x*p (dir),Y   m.....mm . CMP ($10),Y
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("CMP_D1 is not implemented");
-        int cycles = 5;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 5 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "D1: CMP (dp),Y"; }
@@ -1219,15 +1031,10 @@ class CMP_D1 : public AddressMode::DirectPageIndirectIndexedY<Operator::CMP>
 class CMP_D2 : public AddressMode::DirectPageIndirect<Operator::CMP>
 {
     // 2   6-m+w       (dir)     m.....mm . CMP ($10)
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("CMP_D2 is not implemented");
-        int cycles = 5;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 5 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "D2: CMP (dp)"; }
@@ -1240,13 +1047,10 @@ class CMP_D2 : public AddressMode::DirectPageIndirect<Operator::CMP>
 class CMP_D3 : public AddressMode::StackRelativeIndirectIndexedY<Operator::CMP>
 {
     // 2   8-m         (stk,S),Y m.....mm . CMP ($32,S),Y
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("CMP_D3 is not implemented");
-        int cycles = 7;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 7 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "D3: CMP (sr,S),Y"; }
@@ -1259,15 +1063,10 @@ class CMP_D3 : public AddressMode::StackRelativeIndirectIndexedY<Operator::CMP>
 class CMP_D5 : public AddressMode::DirectPageIndexedX<Operator::CMP>
 {
     // 2   5-m+w       dir,X     m.....mm . CMP $10,X
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("CMP_D5 is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "D5: CMP dp,X"; }
@@ -1280,15 +1079,10 @@ class CMP_D5 : public AddressMode::DirectPageIndexedX<Operator::CMP>
 class CMP_D7 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::CMP>
 {
     // 2   7-m+w       [dir],Y   m.....mm . CMP [$10],Y
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("CMP_D7 is not implemented");
-        int cycles = 6;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 6 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "D7: CMP [dp],Y"; }
@@ -1301,13 +1095,10 @@ class CMP_D7 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::CMP>
 class CMP_D9 : public AddressMode::AbsoluteIndexedY<Operator::CMP>
 {
     // 3   6-m-x+x*p   abs,Y     m.....mm . CMP $9876,Y
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("CMP_D9 is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "D9: CMP addr,Y"; }
@@ -1320,13 +1111,10 @@ class CMP_D9 : public AddressMode::AbsoluteIndexedY<Operator::CMP>
 class CMP_DD : public AddressMode::AbsoluteIndexedX<Operator::CMP>
 {
     // 3   6-m-x+x*p   abs,X     m.....mm . CMP $9876,X
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("CMP_DD is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "DD: CMP addr,X"; }
@@ -1339,13 +1127,10 @@ class CMP_DD : public AddressMode::AbsoluteIndexedX<Operator::CMP>
 class CMP_DF : public AddressMode::AbsoluteLongIndexedX<Operator::CMP>
 {
     // 4   6-m         long,X    m.....mm . CMP $FEDCBA,X
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("CMP_DF is not implemented");
-        int cycles = 5;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 5 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "DF: CMP long,X"; }
@@ -1355,17 +1140,14 @@ class CMP_DF : public AddressMode::AbsoluteLongIndexedX<Operator::CMP>
 // COP const
 // Immediate
 // 2<18>
-// 18: Opcode is 1 byte, but program counter value pushed onto stack is incremented by 2 allowing for optional signature byte
+// ¤18: Opcode is 1 byte, but program counter value pushed onto stack is incremented by 2 allowing for optional signature byte
 class COP_02 : public AddressMode::Immediate<Operator::COP>
 {
     // 2   8-e         imm       ....01.. . COP #$12
-    // 9: Add 1 cycle for 65816 native mode (e=0)
     int execute(State& state) const override
     {
         throw std::runtime_error("COP_02 is not implemented");
-        int cycles = 7;
-        cycles += state.isNativeMode() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 7 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "02: COP const"; }
@@ -1375,17 +1157,14 @@ class COP_02 : public AddressMode::Immediate<Operator::COP>
 // CPX #const
 // Immediate
 // 2<19>
-// 19: Add 1 byte if x=0 (16-bit index registers)
+// ¤19: Add 1 byte if x=0 (16-bit index registers)
 class CPX_E0 : public AddressMode::ImmediateVariableSize<Operator::CPX, State::x>
 {
     // 3-x 3-x         imm       x.....xx . CPX #$54
-    // 10: Add 1 cycle if x=0 (16-bit index registers)
     int execute(State& state) const override
     {
         throw std::runtime_error("CPX_E0 is not implemented");
-        int cycles = 2;
-        cycles += state.is16Bit(State::x) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 2 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "E0: CPX #const"; }
@@ -1398,15 +1177,10 @@ class CPX_E0 : public AddressMode::ImmediateVariableSize<Operator::CPX, State::x
 class CPX_E4 : public AddressMode::DirectPage<Operator::CPX>
 {
     // 2   4-x+w       dir       x.....xx . CPX $10
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    // 10: Add 1 cycle if x=0 (16-bit index registers)
     int execute(State& state) const override
     {
         throw std::runtime_error("CPX_E4 is not implemented");
-        int cycles = 3;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        cycles += state.is16Bit(State::x) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 3 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "E4: CPX dp"; }
@@ -1419,13 +1193,10 @@ class CPX_E4 : public AddressMode::DirectPage<Operator::CPX>
 class CPX_EC : public AddressMode::Absolute<Operator::CPX>
 {
     // 3   5-x         abs       x.....xx . CPX $9876
-    // 10: Add 1 cycle if x=0 (16-bit index registers)
     int execute(State& state) const override
     {
         throw std::runtime_error("CPX_EC is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::x) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "EC: CPX addr"; }
@@ -1435,17 +1206,14 @@ class CPX_EC : public AddressMode::Absolute<Operator::CPX>
 // CPY #const
 // Immediate
 // 2<19>
-// 19: Add 1 byte if x=0 (16-bit index registers)
+// ¤19: Add 1 byte if x=0 (16-bit index registers)
 class CPY_C0 : public AddressMode::ImmediateVariableSize<Operator::CPY, State::x>
 {
     // 3-x 3-x         imm       x.....xx . CPY #$54
-    // 10: Add 1 cycle if x=0 (16-bit index registers)
     int execute(State& state) const override
     {
         throw std::runtime_error("CPY_C0 is not implemented");
-        int cycles = 2;
-        cycles += state.is16Bit(State::x) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 2 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "C0: CPY #const"; }
@@ -1458,15 +1226,10 @@ class CPY_C0 : public AddressMode::ImmediateVariableSize<Operator::CPY, State::x
 class CPY_C4 : public AddressMode::DirectPage<Operator::CPY>
 {
     // 2   4-x+w       dir       x.....xx . CPY $10
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    // 10: Add 1 cycle if x=0 (16-bit index registers)
     int execute(State& state) const override
     {
         throw std::runtime_error("CPY_C4 is not implemented");
-        int cycles = 3;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        cycles += state.is16Bit(State::x) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 3 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "C4: CPY dp"; }
@@ -1479,13 +1242,10 @@ class CPY_C4 : public AddressMode::DirectPage<Operator::CPY>
 class CPY_CC : public AddressMode::Absolute<Operator::CPY>
 {
     // 3   5-x         abs       x.....xx . CPY $9876
-    // 10: Add 1 cycle if x=0 (16-bit index registers)
     int execute(State& state) const override
     {
         throw std::runtime_error("CPY_CC is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::x) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "CC: CPY addr"; }
@@ -1514,15 +1274,10 @@ class DEC_3A : public AddressMode::Accumulator<Operator::DEC>
 class DEC_C6 : public AddressMode::DirectPage<Operator::DEC>
 {
     // 2   7-2*m+w     dir       m.....m. . DEC $10
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("DEC_C6 is not implemented");
-        int cycles = 5;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        cycles += state.is16Bit(State::m) ? 2 : 0;
-        return cycles + applyOperand(state);
+        return 5 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "C6: DEC dp"; }
@@ -1535,13 +1290,10 @@ class DEC_C6 : public AddressMode::DirectPage<Operator::DEC>
 class DEC_CE : public AddressMode::Absolute<Operator::DEC>
 {
     // 3   8-2*m       abs       m.....m. . DEC $9876
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("DEC_CE is not implemented");
-        int cycles = 6;
-        cycles += state.is16Bit(State::m) ? 2 : 0;
-        return cycles + applyOperand(state);
+        return 6 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "CE: DEC addr"; }
@@ -1554,15 +1306,10 @@ class DEC_CE : public AddressMode::Absolute<Operator::DEC>
 class DEC_D6 : public AddressMode::DirectPageIndexedX<Operator::DEC>
 {
     // 2   8-2*m+w     dir,X     m.....m. . DEC $10,X
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("DEC_D6 is not implemented");
-        int cycles = 6;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        cycles += state.is16Bit(State::m) ? 2 : 0;
-        return cycles + applyOperand(state);
+        return 6 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "D6: DEC dp,X"; }
@@ -1575,15 +1322,12 @@ class DEC_D6 : public AddressMode::DirectPageIndexedX<Operator::DEC>
 class DEC_DE : public AddressMode::AbsoluteIndexedX<Operator::DEC>
 {
     // 3   9-2*m       abs,X     m.....m. . DEC $9876,X
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    // 20: TODO manually add exception for 3
+    // §20: TODO manually add exception for 3
     int execute(State& state) const override
     {
         throw std::runtime_error("DEC_DE is not implemented");
-        int cycles = 7;
-        cycles += state.is16Bit(State::m) ? 2 : 0;
-        cycles += 0 /* TODO20 */;
-        return cycles + applyOperand(state);
+        throw std::runtime_error("TODO20");
+        return 7 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "DE: DEC addr,X"; }
@@ -1628,15 +1372,10 @@ class DEY_88 : public AddressMode::Implied<Operator::DEY>
 class EOR_41 : public AddressMode::DirectPageIndexedIndirectX<Operator::EOR>
 {
     // 2   7-m+w       (dir,X)   m.....m. . EOR ($10,X)
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("EOR_41 is not implemented");
-        int cycles = 6;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 6 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "41: EOR (dp,X)"; }
@@ -1649,13 +1388,10 @@ class EOR_41 : public AddressMode::DirectPageIndexedIndirectX<Operator::EOR>
 class EOR_43 : public AddressMode::StackRelative<Operator::EOR>
 {
     // 2   5-m         stk,S     m.....m. . EOR $32,S
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("EOR_43 is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "43: EOR sr,S"; }
@@ -1668,15 +1404,10 @@ class EOR_43 : public AddressMode::StackRelative<Operator::EOR>
 class EOR_45 : public AddressMode::DirectPage<Operator::EOR>
 {
     // 2   4-m+w       dir       m.....m. . EOR $10
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("EOR_45 is not implemented");
-        int cycles = 3;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 3 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "45: EOR dp"; }
@@ -1689,15 +1420,10 @@ class EOR_45 : public AddressMode::DirectPage<Operator::EOR>
 class EOR_47 : public AddressMode::DirectPageIndirectLong<Operator::EOR>
 {
     // 2   7-m+w       [dir]     m.....m. . EOR [$10]
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("EOR_47 is not implemented");
-        int cycles = 6;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 6 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "47: EOR [dp]"; }
@@ -1707,17 +1433,14 @@ class EOR_47 : public AddressMode::DirectPageIndirectLong<Operator::EOR>
 // EOR #const
 // Immediate
 // 2<17>
-// 17: Add 1 byte if m=0 (16-bit memory/accumulator)
+// ¤17: Add 1 byte if m=0 (16-bit memory/accumulator)
 class EOR_49 : public AddressMode::ImmediateVariableSize<Operator::EOR, State::m>
 {
     // 3-m 3-m         imm       m.....m. . EOR #$54
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("EOR_49 is not implemented");
-        int cycles = 2;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 2 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "49: EOR #const"; }
@@ -1730,13 +1453,10 @@ class EOR_49 : public AddressMode::ImmediateVariableSize<Operator::EOR, State::m
 class EOR_4D : public AddressMode::Absolute<Operator::EOR>
 {
     // 3   5-m         abs       m.....m. . EOR $9876
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("EOR_4D is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "4D: EOR addr"; }
@@ -1749,13 +1469,10 @@ class EOR_4D : public AddressMode::Absolute<Operator::EOR>
 class EOR_4F : public AddressMode::AbsoluteLong<Operator::EOR>
 {
     // 4   6-m         long      m.....m. . EOR $FEDBCA
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("EOR_4F is not implemented");
-        int cycles = 5;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 5 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "4F: EOR long"; }
@@ -1768,15 +1485,10 @@ class EOR_4F : public AddressMode::AbsoluteLong<Operator::EOR>
 class EOR_51 : public AddressMode::DirectPageIndirectIndexedY<Operator::EOR>
 {
     // 2   7-m+w-x+x*p (dir),Y   m.....m. . EOR ($10),Y
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("EOR_51 is not implemented");
-        int cycles = 5;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 5 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "51: EOR (dp),Y"; }
@@ -1789,15 +1501,10 @@ class EOR_51 : public AddressMode::DirectPageIndirectIndexedY<Operator::EOR>
 class EOR_52 : public AddressMode::DirectPageIndirect<Operator::EOR>
 {
     // 2   6-m+w       (dir)     m.....m. . EOR ($10)
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("EOR_52 is not implemented");
-        int cycles = 5;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 5 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "52: EOR (dp)"; }
@@ -1810,13 +1517,10 @@ class EOR_52 : public AddressMode::DirectPageIndirect<Operator::EOR>
 class EOR_53 : public AddressMode::StackRelativeIndirectIndexedY<Operator::EOR>
 {
     // 2   8-m         (stk,S),Y m.....m. . EOR ($32,S),Y
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("EOR_53 is not implemented");
-        int cycles = 7;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 7 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "53: EOR (sr,S),Y"; }
@@ -1829,15 +1533,10 @@ class EOR_53 : public AddressMode::StackRelativeIndirectIndexedY<Operator::EOR>
 class EOR_55 : public AddressMode::DirectPageIndexedX<Operator::EOR>
 {
     // 2   5-m+w       dir,X     m.....m. . EOR $10,X
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("EOR_55 is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "55: EOR dp,X"; }
@@ -1850,15 +1549,10 @@ class EOR_55 : public AddressMode::DirectPageIndexedX<Operator::EOR>
 class EOR_57 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::EOR>
 {
     // 2   7-m+w       [dir],Y   m.....m. . EOR [$10],Y
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("EOR_57 is not implemented");
-        int cycles = 6;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 6 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "57: EOR [dp],Y"; }
@@ -1871,13 +1565,10 @@ class EOR_57 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::EOR>
 class EOR_59 : public AddressMode::AbsoluteIndexedY<Operator::EOR>
 {
     // 3   6-m-x+x*p   abs,Y     m.....m. . EOR $9876,Y
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("EOR_59 is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "59: EOR addr,Y"; }
@@ -1890,13 +1581,10 @@ class EOR_59 : public AddressMode::AbsoluteIndexedY<Operator::EOR>
 class EOR_5D : public AddressMode::AbsoluteIndexedX<Operator::EOR>
 {
     // 3   6-m-x+x*p   abs,X     m.....m. . EOR $9876,X
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("EOR_5D is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "5D: EOR addr,X"; }
@@ -1909,13 +1597,10 @@ class EOR_5D : public AddressMode::AbsoluteIndexedX<Operator::EOR>
 class EOR_5F : public AddressMode::AbsoluteLongIndexedX<Operator::EOR>
 {
     // 4   6-m         long,X    m.....m. . EOR $FEDCBA,X
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("EOR_5F is not implemented");
-        int cycles = 5;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 5 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "5F: EOR long,X"; }
@@ -1944,15 +1629,10 @@ class INC_1A : public AddressMode::Accumulator<Operator::INC>
 class INC_E6 : public AddressMode::DirectPage<Operator::INC>
 {
     // 2   7-2*m+w     dir       m.....m. . INC $10
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("INC_E6 is not implemented");
-        int cycles = 5;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        cycles += state.is16Bit(State::m) ? 2 : 0;
-        return cycles + applyOperand(state);
+        return 5 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "E6: INC dp"; }
@@ -1965,13 +1645,10 @@ class INC_E6 : public AddressMode::DirectPage<Operator::INC>
 class INC_EE : public AddressMode::Absolute<Operator::INC>
 {
     // 3   8-2*m       abs       m.....m. . INC $9876
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("INC_EE is not implemented");
-        int cycles = 6;
-        cycles += state.is16Bit(State::m) ? 2 : 0;
-        return cycles + applyOperand(state);
+        return 6 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "EE: INC addr"; }
@@ -1984,15 +1661,10 @@ class INC_EE : public AddressMode::Absolute<Operator::INC>
 class INC_F6 : public AddressMode::DirectPageIndexedX<Operator::INC>
 {
     // 2   8-2*m+w     dir,X     m.....m. . INC $10,X
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("INC_F6 is not implemented");
-        int cycles = 6;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        cycles += state.is16Bit(State::m) ? 2 : 0;
-        return cycles + applyOperand(state);
+        return 6 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "F6: INC dp,X"; }
@@ -2005,15 +1677,12 @@ class INC_F6 : public AddressMode::DirectPageIndexedX<Operator::INC>
 class INC_FE : public AddressMode::AbsoluteIndexedX<Operator::INC>
 {
     // 3   9-2*m       abs,X     m.....m. . INC $9876,X
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    // 20: TODO manually add exception for 3
+    // §20: TODO manually add exception for 3
     int execute(State& state) const override
     {
         throw std::runtime_error("INC_FE is not implemented");
-        int cycles = 7;
-        cycles += state.is16Bit(State::m) ? 2 : 0;
-        cycles += 0 /* TODO20 */;
-        return cycles + applyOperand(state);
+        throw std::runtime_error("TODO20");
+        return 7 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "FE: INC addr,X"; }
@@ -2093,8 +1762,7 @@ class JMP_6C : public AddressMode::AbsoluteIndirect<Operator::JMP>
     int execute(State& state) const override
     {
         throw std::runtime_error("JMP_6C is not implemented");
-        int cycles = 5;
-        return cycles + applyOperand(state);
+        return 5 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "6C: JMP (addr)"; }
@@ -2187,15 +1855,10 @@ class JSR_FC : public AddressMode::AbsoluteIndexedIndirect<Operator::JSR>
 class LDA_A1 : public AddressMode::DirectPageIndexedIndirectX<Operator::LDA>
 {
     // 2   7-m+w       (dir,X)   m.....m. . LDA ($10,X)
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("LDA_A1 is not implemented");
-        int cycles = 6;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 6 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "A1: LDA (dp,X)"; }
@@ -2208,13 +1871,10 @@ class LDA_A1 : public AddressMode::DirectPageIndexedIndirectX<Operator::LDA>
 class LDA_A3 : public AddressMode::StackRelative<Operator::LDA>
 {
     // 2   5-m         stk,S     m.....m. . LDA $32,S
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("LDA_A3 is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "A3: LDA sr,S"; }
@@ -2227,15 +1887,10 @@ class LDA_A3 : public AddressMode::StackRelative<Operator::LDA>
 class LDA_A5 : public AddressMode::DirectPage<Operator::LDA>
 {
     // 2   4-m+w       dir       m.....m. . LDA $10
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("LDA_A5 is not implemented");
-        int cycles = 3;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 3 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "A5: LDA dp"; }
@@ -2248,15 +1903,10 @@ class LDA_A5 : public AddressMode::DirectPage<Operator::LDA>
 class LDA_A7 : public AddressMode::DirectPageIndirectLong<Operator::LDA>
 {
     // 2   7-m+w       [dir]     m.....m. . LDA [$10]
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("LDA_A7 is not implemented");
-        int cycles = 6;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 6 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "A7: LDA [dp]"; }
@@ -2266,17 +1916,14 @@ class LDA_A7 : public AddressMode::DirectPageIndirectLong<Operator::LDA>
 // LDA #const
 // Immediate
 // 2<17>
-// 17: Add 1 byte if m=0 (16-bit memory/accumulator)
+// ¤17: Add 1 byte if m=0 (16-bit memory/accumulator)
 class LDA_A9 : public AddressMode::ImmediateVariableSize<Operator::LDA, State::m>
 {
     // 3-m 3-m         imm       m.....m. . LDA #$54
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("LDA_A9 is not implemented");
-        int cycles = 2;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 2 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "A9: LDA #const"; }
@@ -2289,13 +1936,10 @@ class LDA_A9 : public AddressMode::ImmediateVariableSize<Operator::LDA, State::m
 class LDA_AD : public AddressMode::Absolute<Operator::LDA>
 {
     // 3   5-m         abs       m.....m. . LDA $9876
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("LDA_AD is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "AD: LDA addr"; }
@@ -2308,13 +1952,10 @@ class LDA_AD : public AddressMode::Absolute<Operator::LDA>
 class LDA_AF : public AddressMode::AbsoluteLong<Operator::LDA>
 {
     // 4   6-m         long      m.....m. . LDA $FEDBCA
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("LDA_AF is not implemented");
-        int cycles = 5;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 5 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "AF: LDA long"; }
@@ -2327,15 +1968,10 @@ class LDA_AF : public AddressMode::AbsoluteLong<Operator::LDA>
 class LDA_B1 : public AddressMode::DirectPageIndirectIndexedY<Operator::LDA>
 {
     // 2   7-m+w-x+x*p (dir),Y   m.....m. . LDA ($10),Y
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("LDA_B1 is not implemented");
-        int cycles = 5;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 5 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "B1: LDA (dp),Y"; }
@@ -2348,15 +1984,10 @@ class LDA_B1 : public AddressMode::DirectPageIndirectIndexedY<Operator::LDA>
 class LDA_B2 : public AddressMode::DirectPageIndirect<Operator::LDA>
 {
     // 2   6-m+w       (dir)     m.....m. . LDA ($10)
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("LDA_B2 is not implemented");
-        int cycles = 5;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 5 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "B2: LDA (dp)"; }
@@ -2369,13 +2000,10 @@ class LDA_B2 : public AddressMode::DirectPageIndirect<Operator::LDA>
 class LDA_B3 : public AddressMode::StackRelativeIndirectIndexedY<Operator::LDA>
 {
     // 2   8-m         (stk,S),Y m.....m. . LDA ($32,S),Y
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("LDA_B3 is not implemented");
-        int cycles = 7;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 7 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "B3: LDA (sr,S),Y"; }
@@ -2388,15 +2016,10 @@ class LDA_B3 : public AddressMode::StackRelativeIndirectIndexedY<Operator::LDA>
 class LDA_B5 : public AddressMode::DirectPageIndexedX<Operator::LDA>
 {
     // 2   5-m+w       dir,X     m.....m. . LDA $10,X
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("LDA_B5 is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "B5: LDA dp,X"; }
@@ -2409,15 +2032,10 @@ class LDA_B5 : public AddressMode::DirectPageIndexedX<Operator::LDA>
 class LDA_B7 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::LDA>
 {
     // 2   7-m+w       [dir],Y   m.....m. . LDA [$10],Y
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("LDA_B7 is not implemented");
-        int cycles = 6;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 6 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "B7: LDA [dp],Y"; }
@@ -2430,13 +2048,10 @@ class LDA_B7 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::LDA>
 class LDA_B9 : public AddressMode::AbsoluteIndexedY<Operator::LDA>
 {
     // 3   6-m-x+x*p   abs,Y     m.....m. . LDA $9876,Y
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("LDA_B9 is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "B9: LDA addr,Y"; }
@@ -2449,13 +2064,10 @@ class LDA_B9 : public AddressMode::AbsoluteIndexedY<Operator::LDA>
 class LDA_BD : public AddressMode::AbsoluteIndexedX<Operator::LDA>
 {
     // 3   6-m-x+x*p   abs,X     m.....m. . LDA $9876,X
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("LDA_BD is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "BD: LDA addr,X"; }
@@ -2468,13 +2080,10 @@ class LDA_BD : public AddressMode::AbsoluteIndexedX<Operator::LDA>
 class LDA_BF : public AddressMode::AbsoluteLongIndexedX<Operator::LDA>
 {
     // 4   6-m         long,X    m.....m. . LDA $FEDCBA,X
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("LDA_BF is not implemented");
-        int cycles = 5;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 5 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "BF: LDA long,X"; }
@@ -2484,17 +2093,14 @@ class LDA_BF : public AddressMode::AbsoluteLongIndexedX<Operator::LDA>
 // LDX #const
 // Immediate
 // 2<19>
-// 19: Add 1 byte if x=0 (16-bit index registers)
+// ¤19: Add 1 byte if x=0 (16-bit index registers)
 class LDX_A2 : public AddressMode::ImmediateVariableSize<Operator::LDX, State::x>
 {
     // 3-x 3-x         imm       x.....x. . LDX #$54
-    // 10: Add 1 cycle if x=0 (16-bit index registers)
     int execute(State& state) const override
     {
         throw std::runtime_error("LDX_A2 is not implemented");
-        int cycles = 2;
-        cycles += state.is16Bit(State::x) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 2 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "A2: LDX #const"; }
@@ -2507,15 +2113,10 @@ class LDX_A2 : public AddressMode::ImmediateVariableSize<Operator::LDX, State::x
 class LDX_A6 : public AddressMode::DirectPage<Operator::LDX>
 {
     // 2   4-x+w       dir       x.....x. . LDX $10
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    // 10: Add 1 cycle if x=0 (16-bit index registers)
     int execute(State& state) const override
     {
         throw std::runtime_error("LDX_A6 is not implemented");
-        int cycles = 3;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        cycles += state.is16Bit(State::x) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 3 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "A6: LDX dp"; }
@@ -2528,13 +2129,10 @@ class LDX_A6 : public AddressMode::DirectPage<Operator::LDX>
 class LDX_AE : public AddressMode::Absolute<Operator::LDX>
 {
     // 3   5-x         abs       x.....x. . LDX $9876
-    // 10: Add 1 cycle if x=0 (16-bit index registers)
     int execute(State& state) const override
     {
         throw std::runtime_error("LDX_AE is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::x) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "AE: LDX addr"; }
@@ -2547,15 +2145,10 @@ class LDX_AE : public AddressMode::Absolute<Operator::LDX>
 class LDX_B6 : public AddressMode::DirectPageIndexedY<Operator::LDX>
 {
     // 2   5-x+w       dir,Y     x.....x. . LDX $10,Y
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    // 10: Add 1 cycle if x=0 (16-bit index registers)
     int execute(State& state) const override
     {
         throw std::runtime_error("LDX_B6 is not implemented");
-        int cycles = 4;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        cycles += state.is16Bit(State::x) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "B6: LDX dp,Y"; }
@@ -2568,13 +2161,10 @@ class LDX_B6 : public AddressMode::DirectPageIndexedY<Operator::LDX>
 class LDX_BE : public AddressMode::AbsoluteIndexedY<Operator::LDX>
 {
     // 3   6-2*x+x*p   abs,Y     x.....x. . LDX $9876,Y
-    // 10: Add 1 cycle if x=0 (16-bit index registers)
     int execute(State& state) const override
     {
         throw std::runtime_error("LDX_BE is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::x) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "BE: LDX addr,Y"; }
@@ -2584,17 +2174,14 @@ class LDX_BE : public AddressMode::AbsoluteIndexedY<Operator::LDX>
 // LDY #const
 // Immediate
 // 2<19>
-// 19: Add 1 byte if x=0 (16-bit index registers)
+// ¤19: Add 1 byte if x=0 (16-bit index registers)
 class LDY_A0 : public AddressMode::ImmediateVariableSize<Operator::LDY, State::x>
 {
     // 3-x 3-x         imm       x.....x. . LDY #$54
-    // 10: Add 1 cycle if x=0 (16-bit index registers)
     int execute(State& state) const override
     {
         throw std::runtime_error("LDY_A0 is not implemented");
-        int cycles = 2;
-        cycles += state.is16Bit(State::x) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 2 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "A0: LDY #const"; }
@@ -2607,15 +2194,10 @@ class LDY_A0 : public AddressMode::ImmediateVariableSize<Operator::LDY, State::x
 class LDY_A4 : public AddressMode::DirectPage<Operator::LDY>
 {
     // 2   4-x+w       dir       x.....x. . LDY $10
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    // 10: Add 1 cycle if x=0 (16-bit index registers)
     int execute(State& state) const override
     {
         throw std::runtime_error("LDY_A4 is not implemented");
-        int cycles = 3;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        cycles += state.is16Bit(State::x) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 3 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "A4: LDY dp"; }
@@ -2628,13 +2210,10 @@ class LDY_A4 : public AddressMode::DirectPage<Operator::LDY>
 class LDY_AC : public AddressMode::Absolute<Operator::LDY>
 {
     // 3   5-x         abs       x.....x. . LDY $9876
-    // 10: Add 1 cycle if x=0 (16-bit index registers)
     int execute(State& state) const override
     {
         throw std::runtime_error("LDY_AC is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::x) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "AC: LDY addr"; }
@@ -2647,15 +2226,10 @@ class LDY_AC : public AddressMode::Absolute<Operator::LDY>
 class LDY_B4 : public AddressMode::DirectPageIndexedX<Operator::LDY>
 {
     // 2   5-x+w       dir,X     x.....x. . LDY $10,X
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    // 10: Add 1 cycle if x=0 (16-bit index registers)
     int execute(State& state) const override
     {
         throw std::runtime_error("LDY_B4 is not implemented");
-        int cycles = 4;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        cycles += state.is16Bit(State::x) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "B4: LDY dp,X"; }
@@ -2668,13 +2242,10 @@ class LDY_B4 : public AddressMode::DirectPageIndexedX<Operator::LDY>
 class LDY_BC : public AddressMode::AbsoluteIndexedX<Operator::LDY>
 {
     // 3   6-2*x+x*p   abs,X     x.....x. . LDY $9876,X
-    // 10: Add 1 cycle if x=0 (16-bit index registers)
     int execute(State& state) const override
     {
         throw std::runtime_error("LDY_BC is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::x) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "BC: LDY addr,X"; }
@@ -2687,15 +2258,10 @@ class LDY_BC : public AddressMode::AbsoluteIndexedX<Operator::LDY>
 class LSR_46 : public AddressMode::DirectPage<Operator::LSR>
 {
     // 2   7-2*m+w     dir       0.....m* . LSR $10
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("LSR_46 is not implemented");
-        int cycles = 5;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        cycles += state.is16Bit(State::m) ? 2 : 0;
-        return cycles + applyOperand(state);
+        return 5 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "46: LSR dp"; }
@@ -2724,13 +2290,10 @@ class LSR_4A : public AddressMode::Accumulator<Operator::LSR>
 class LSR_4E : public AddressMode::Absolute<Operator::LSR>
 {
     // 3   8-2*m       abs       0.....m* . LSR $9876
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("LSR_4E is not implemented");
-        int cycles = 6;
-        cycles += state.is16Bit(State::m) ? 2 : 0;
-        return cycles + applyOperand(state);
+        return 6 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "4E: LSR addr"; }
@@ -2743,15 +2306,10 @@ class LSR_4E : public AddressMode::Absolute<Operator::LSR>
 class LSR_56 : public AddressMode::DirectPageIndexedX<Operator::LSR>
 {
     // 2   8-2*m+w     dir,X     0.....m* . LSR $10,X
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("LSR_56 is not implemented");
-        int cycles = 6;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        cycles += state.is16Bit(State::m) ? 2 : 0;
-        return cycles + applyOperand(state);
+        return 6 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "56: LSR dp,X"; }
@@ -2764,15 +2322,12 @@ class LSR_56 : public AddressMode::DirectPageIndexedX<Operator::LSR>
 class LSR_5E : public AddressMode::AbsoluteIndexedX<Operator::LSR>
 {
     // 3   9-2*m       abs,X     0.....m* . LSR $9876,X
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    // 20: TODO manually add exception for 3
+    // §20: TODO manually add exception for 3
     int execute(State& state) const override
     {
         throw std::runtime_error("LSR_5E is not implemented");
-        int cycles = 7;
-        cycles += state.is16Bit(State::m) ? 2 : 0;
-        cycles += 0 /* TODO20 */;
-        return cycles + applyOperand(state);
+        throw std::runtime_error("TODO20");
+        return 7 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "5E: LSR addr,X"; }
@@ -2785,7 +2340,6 @@ class LSR_5E : public AddressMode::AbsoluteIndexedX<Operator::LSR>
 class MVN_54 : public AddressMode::BlockMove<Operator::MVN>
 {
     // 3   7           src,dest  ........ . MVN #$12,#$34
-    // 13: 7 cycles per byte moved
     int execute(State& state) const override
     {
         throw std::runtime_error("MVN_54 is not implemented");
@@ -2802,7 +2356,6 @@ class MVN_54 : public AddressMode::BlockMove<Operator::MVN>
 class MVP_44 : public AddressMode::BlockMove<Operator::MVP>
 {
     // 3   7           src,dest  ........ . MVP #$12,#$34
-    // 13: 7 cycles per byte moved
     int execute(State& state) const override
     {
         throw std::runtime_error("MVP_44 is not implemented");
@@ -2835,15 +2388,10 @@ class NOP_EA : public AddressMode::Implied<Operator::NOP>
 class ORA_01 : public AddressMode::DirectPageIndexedIndirectX<Operator::ORA>
 {
     // 2   7-m+w       (dir,X)   m.....m. . ORA ($10,X)
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("ORA_01 is not implemented");
-        int cycles = 6;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 6 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "01: ORA (dp,X)"; }
@@ -2856,13 +2404,10 @@ class ORA_01 : public AddressMode::DirectPageIndexedIndirectX<Operator::ORA>
 class ORA_03 : public AddressMode::StackRelative<Operator::ORA>
 {
     // 2   5-m         stk,S     m.....m. . ORA $32,S
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("ORA_03 is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "03: ORA sr,S"; }
@@ -2875,15 +2420,10 @@ class ORA_03 : public AddressMode::StackRelative<Operator::ORA>
 class ORA_05 : public AddressMode::DirectPage<Operator::ORA>
 {
     // 2   4-m+w       dir       m.....m. . ORA $10
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("ORA_05 is not implemented");
-        int cycles = 3;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 3 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "05: ORA dp"; }
@@ -2896,15 +2436,10 @@ class ORA_05 : public AddressMode::DirectPage<Operator::ORA>
 class ORA_07 : public AddressMode::DirectPageIndirectLong<Operator::ORA>
 {
     // 2   7-m+w       [dir]     m.....m. . ORA [$10]
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("ORA_07 is not implemented");
-        int cycles = 6;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 6 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "07: ORA [dp]"; }
@@ -2914,17 +2449,14 @@ class ORA_07 : public AddressMode::DirectPageIndirectLong<Operator::ORA>
 // ORA #const
 // Immediate
 // 2<17>
-// 17: Add 1 byte if m=0 (16-bit memory/accumulator)
+// ¤17: Add 1 byte if m=0 (16-bit memory/accumulator)
 class ORA_09 : public AddressMode::ImmediateVariableSize<Operator::ORA, State::m>
 {
     // 3-m 3-m         imm       m.....m. . ORA #$54
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("ORA_09 is not implemented");
-        int cycles = 2;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 2 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "09: ORA #const"; }
@@ -2937,13 +2469,10 @@ class ORA_09 : public AddressMode::ImmediateVariableSize<Operator::ORA, State::m
 class ORA_0D : public AddressMode::Absolute<Operator::ORA>
 {
     // 3   5-m         abs       m.....m. . ORA $9876
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("ORA_0D is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "0D: ORA addr"; }
@@ -2956,13 +2485,10 @@ class ORA_0D : public AddressMode::Absolute<Operator::ORA>
 class ORA_0F : public AddressMode::AbsoluteLong<Operator::ORA>
 {
     // 4   6-m         long      m.....m. . ORA $FEDBCA
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("ORA_0F is not implemented");
-        int cycles = 5;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 5 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "0F: ORA long"; }
@@ -2975,15 +2501,10 @@ class ORA_0F : public AddressMode::AbsoluteLong<Operator::ORA>
 class ORA_11 : public AddressMode::DirectPageIndirectIndexedY<Operator::ORA>
 {
     // 2   7-m+w-x+x*p (dir),Y   m.....m. . ORA ($10),Y
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("ORA_11 is not implemented");
-        int cycles = 5;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 5 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "11: ORA (dp),Y"; }
@@ -2996,15 +2517,10 @@ class ORA_11 : public AddressMode::DirectPageIndirectIndexedY<Operator::ORA>
 class ORA_12 : public AddressMode::DirectPageIndirect<Operator::ORA>
 {
     // 2   6-m+w       (dir)     m.....m. . ORA ($10)
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("ORA_12 is not implemented");
-        int cycles = 5;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 5 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "12: ORA (dp)"; }
@@ -3017,13 +2533,10 @@ class ORA_12 : public AddressMode::DirectPageIndirect<Operator::ORA>
 class ORA_13 : public AddressMode::StackRelativeIndirectIndexedY<Operator::ORA>
 {
     // 2   8-m         (stk,S),Y m.....m. . ORA ($32,S),Y
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("ORA_13 is not implemented");
-        int cycles = 7;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 7 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "13: ORA (sr,S),Y"; }
@@ -3036,15 +2549,10 @@ class ORA_13 : public AddressMode::StackRelativeIndirectIndexedY<Operator::ORA>
 class ORA_15 : public AddressMode::DirectPageIndexedX<Operator::ORA>
 {
     // 2   5-m+w       dir,X     m.....m. . ORA $10,X
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("ORA_15 is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "15: ORA dp,X"; }
@@ -3057,15 +2565,10 @@ class ORA_15 : public AddressMode::DirectPageIndexedX<Operator::ORA>
 class ORA_17 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::ORA>
 {
     // 2   7-m+w       [dir],Y   m.....m. . ORA [$10],Y
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("ORA_17 is not implemented");
-        int cycles = 6;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 6 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "17: ORA [dp],Y"; }
@@ -3078,13 +2581,10 @@ class ORA_17 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::ORA>
 class ORA_19 : public AddressMode::AbsoluteIndexedY<Operator::ORA>
 {
     // 3   6-m-x+x*p   abs,Y     m.....m. . ORA $9876,Y
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("ORA_19 is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "19: ORA addr,Y"; }
@@ -3097,13 +2597,10 @@ class ORA_19 : public AddressMode::AbsoluteIndexedY<Operator::ORA>
 class ORA_1D : public AddressMode::AbsoluteIndexedX<Operator::ORA>
 {
     // 3   6-m-x+x*p   abs,X     m.....m. . ORA $9876,X
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("ORA_1D is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "1D: ORA addr,X"; }
@@ -3116,13 +2613,10 @@ class ORA_1D : public AddressMode::AbsoluteIndexedX<Operator::ORA>
 class ORA_1F : public AddressMode::AbsoluteLongIndexedX<Operator::ORA>
 {
     // 4   6-m         long,X    m.....m. . ORA $FEDCBA,X
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("ORA_1F is not implemented");
-        int cycles = 5;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 5 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "1F: ORA long,X"; }
@@ -3151,13 +2645,10 @@ class PEA_F4 : public AddressMode::Absolute<Operator::PEA>
 class PEI_D4 : public AddressMode::DirectPageIndirect<Operator::PEI>
 {
     // 2   6+w         dir       ........ . PEI $12
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("PEI_D4 is not implemented");
-        int cycles = 6;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 6 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "D4: PEI (dp)"; }
@@ -3186,13 +2677,10 @@ class PER_62 : public AddressMode::ProgramCounterRelativeLong<Operator::PER>
 class PHA_48 : public AddressMode::Implied<Operator::PHA>
 {
     // 1   4-m         imp       ........ . PHA
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("PHA_48 is not implemented");
-        int cycles = 3;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 3 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "48: PHA"; }
@@ -3269,13 +2757,10 @@ class PHP_08 : public AddressMode::Implied<Operator::PHP>
 class PHX_DA : public AddressMode::Implied<Operator::PHX>
 {
     // 1   4-x         imp       ........ . PHX
-    // 10: Add 1 cycle if x=0 (16-bit index registers)
     int execute(State& state) const override
     {
         throw std::runtime_error("PHX_DA is not implemented");
-        int cycles = 3;
-        cycles += state.is16Bit(State::x) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 3 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "DA: PHX"; }
@@ -3288,13 +2773,10 @@ class PHX_DA : public AddressMode::Implied<Operator::PHX>
 class PHY_5A : public AddressMode::Implied<Operator::PHY>
 {
     // 1   4-x         imp       ........ . PHY
-    // 10: Add 1 cycle if x=0 (16-bit index registers)
     int execute(State& state) const override
     {
         throw std::runtime_error("PHY_5A is not implemented");
-        int cycles = 3;
-        cycles += state.is16Bit(State::x) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 3 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "5A: PHY"; }
@@ -3307,13 +2789,10 @@ class PHY_5A : public AddressMode::Implied<Operator::PHY>
 class PLA_68 : public AddressMode::Implied<Operator::PLA>
 {
     // 1   5-m         imp       m.....m. . PLA
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("PLA_68 is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "68: PLA"; }
@@ -3374,13 +2853,10 @@ class PLP_28 : public AddressMode::Implied<Operator::PLP>
 class PLX_FA : public AddressMode::Implied<Operator::PLX>
 {
     // 1   5-x         imp       x.....x. . PLX
-    // 10: Add 1 cycle if x=0 (16-bit index registers)
     int execute(State& state) const override
     {
         throw std::runtime_error("PLX_FA is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::x) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "FA: PLX"; }
@@ -3393,13 +2869,10 @@ class PLX_FA : public AddressMode::Implied<Operator::PLX>
 class PLY_7A : public AddressMode::Implied<Operator::PLY>
 {
     // 1   5-x         imp       x.....x. . PLY
-    // 10: Add 1 cycle if x=0 (16-bit index registers)
     int execute(State& state) const override
     {
         throw std::runtime_error("PLY_7A is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::x) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "7A: PLY"; }
@@ -3428,15 +2901,10 @@ class REP_C2 : public AddressMode::Immediate<Operator::REP>
 class ROL_26 : public AddressMode::DirectPage<Operator::ROL>
 {
     // 2   7-2*m+w     dir       m.....mm . ROL $10
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("ROL_26 is not implemented");
-        int cycles = 5;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        cycles += state.is16Bit(State::m) ? 2 : 0;
-        return cycles + applyOperand(state);
+        return 5 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "26: ROL dp"; }
@@ -3465,13 +2933,10 @@ class ROL_2A : public AddressMode::Accumulator<Operator::ROL>
 class ROL_2E : public AddressMode::Absolute<Operator::ROL>
 {
     // 3   8-2*m       abs       m.....mm . ROL $9876
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("ROL_2E is not implemented");
-        int cycles = 6;
-        cycles += state.is16Bit(State::m) ? 2 : 0;
-        return cycles + applyOperand(state);
+        return 6 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "2E: ROL addr"; }
@@ -3484,15 +2949,10 @@ class ROL_2E : public AddressMode::Absolute<Operator::ROL>
 class ROL_36 : public AddressMode::DirectPageIndexedX<Operator::ROL>
 {
     // 2   8-2*m+w     dir,X     m.....mm . ROL $10,X
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("ROL_36 is not implemented");
-        int cycles = 6;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        cycles += state.is16Bit(State::m) ? 2 : 0;
-        return cycles + applyOperand(state);
+        return 6 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "36: ROL dp,X"; }
@@ -3505,15 +2965,12 @@ class ROL_36 : public AddressMode::DirectPageIndexedX<Operator::ROL>
 class ROL_3E : public AddressMode::AbsoluteIndexedX<Operator::ROL>
 {
     // 3   9-2*m       abs,X     m.....mm . ROL $9876,X
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    // 20: TODO manually add exception for 3
+    // §20: TODO manually add exception for 3
     int execute(State& state) const override
     {
         throw std::runtime_error("ROL_3E is not implemented");
-        int cycles = 7;
-        cycles += state.is16Bit(State::m) ? 2 : 0;
-        cycles += 0 /* TODO20 */;
-        return cycles + applyOperand(state);
+        throw std::runtime_error("TODO20");
+        return 7 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "3E: ROL addr,X"; }
@@ -3526,15 +2983,10 @@ class ROL_3E : public AddressMode::AbsoluteIndexedX<Operator::ROL>
 class ROR_66 : public AddressMode::DirectPage<Operator::ROR>
 {
     // 2   7-2*m+w     dir       m.....m* . ROR $10
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("ROR_66 is not implemented");
-        int cycles = 5;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        cycles += state.is16Bit(State::m) ? 2 : 0;
-        return cycles + applyOperand(state);
+        return 5 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "66: ROR dp"; }
@@ -3563,13 +3015,10 @@ class ROR_6A : public AddressMode::Accumulator<Operator::ROR>
 class ROR_6E : public AddressMode::Absolute<Operator::ROR>
 {
     // 3   8-2*m       abs       m.....m* . ROR $9876
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("ROR_6E is not implemented");
-        int cycles = 6;
-        cycles += state.is16Bit(State::m) ? 2 : 0;
-        return cycles + applyOperand(state);
+        return 6 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "6E: ROR addr"; }
@@ -3582,15 +3031,10 @@ class ROR_6E : public AddressMode::Absolute<Operator::ROR>
 class ROR_76 : public AddressMode::DirectPageIndexedX<Operator::ROR>
 {
     // 2   8-2*m+w     dir,X     m.....m* . ROR $10,X
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("ROR_76 is not implemented");
-        int cycles = 6;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        cycles += state.is16Bit(State::m) ? 2 : 0;
-        return cycles + applyOperand(state);
+        return 6 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "76: ROR dp,X"; }
@@ -3603,15 +3047,12 @@ class ROR_76 : public AddressMode::DirectPageIndexedX<Operator::ROR>
 class ROR_7E : public AddressMode::AbsoluteIndexedX<Operator::ROR>
 {
     // 3   9-2*m       abs,X     m.....m* . ROR $9876,X
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    // 20: TODO manually add exception for 3
+    // §20: TODO manually add exception for 3
     int execute(State& state) const override
     {
         throw std::runtime_error("ROR_7E is not implemented");
-        int cycles = 7;
-        cycles += state.is16Bit(State::m) ? 2 : 0;
-        cycles += 0 /* TODO20 */;
-        return cycles + applyOperand(state);
+        throw std::runtime_error("TODO20");
+        return 7 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "7E: ROR addr,X"; }
@@ -3624,13 +3065,10 @@ class ROR_7E : public AddressMode::AbsoluteIndexedX<Operator::ROR>
 class RTI_40 : public AddressMode::Implied<Operator::RTI>
 {
     // 1   7-e         imp       ******** . RTI
-    // 9: Add 1 cycle for 65816 native mode (e=0)
     int execute(State& state) const override
     {
         throw std::runtime_error("RTI_40 is not implemented");
-        int cycles = 6;
-        cycles += state.isNativeMode() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 6 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "40: RTI"; }
@@ -3675,15 +3113,10 @@ class RTS_60 : public AddressMode::Implied<Operator::RTS>
 class SBC_E1 : public AddressMode::DirectPageIndexedIndirectX<Operator::SBC>
 {
     // 2   7-m+w       (dir,X)   mm....mm . SBC ($10,X)
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("SBC_E1 is not implemented");
-        int cycles = 6;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 6 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "E1: SBC (dp,X)"; }
@@ -3696,13 +3129,10 @@ class SBC_E1 : public AddressMode::DirectPageIndexedIndirectX<Operator::SBC>
 class SBC_E3 : public AddressMode::StackRelative<Operator::SBC>
 {
     // 2   5-m         stk,S     mm....mm . SBC $32,S
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("SBC_E3 is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "E3: SBC sr,S"; }
@@ -3715,15 +3145,10 @@ class SBC_E3 : public AddressMode::StackRelative<Operator::SBC>
 class SBC_E5 : public AddressMode::DirectPage<Operator::SBC>
 {
     // 2   4-m+w       dir       mm....mm . SBC $10
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("SBC_E5 is not implemented");
-        int cycles = 3;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 3 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "E5: SBC dp"; }
@@ -3736,15 +3161,10 @@ class SBC_E5 : public AddressMode::DirectPage<Operator::SBC>
 class SBC_E7 : public AddressMode::DirectPageIndirectLong<Operator::SBC>
 {
     // 2   7-m+w       [dir]     mm....mm . SBC [$10]
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("SBC_E7 is not implemented");
-        int cycles = 6;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 6 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "E7: SBC [dp]"; }
@@ -3754,17 +3174,14 @@ class SBC_E7 : public AddressMode::DirectPageIndirectLong<Operator::SBC>
 // SBC #const
 // Immediate
 // 2<17>
-// 17: Add 1 byte if m=0 (16-bit memory/accumulator)
+// ¤17: Add 1 byte if m=0 (16-bit memory/accumulator)
 class SBC_E9 : public AddressMode::ImmediateVariableSize<Operator::SBC, State::m>
 {
     // 3-m 3-m         imm       mm....mm . SBC #$54
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("SBC_E9 is not implemented");
-        int cycles = 2;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 2 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "E9: SBC #const"; }
@@ -3777,13 +3194,10 @@ class SBC_E9 : public AddressMode::ImmediateVariableSize<Operator::SBC, State::m
 class SBC_ED : public AddressMode::Absolute<Operator::SBC>
 {
     // 3   5-m         abs       mm....mm . SBC $9876
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("SBC_ED is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "ED: SBC addr"; }
@@ -3796,13 +3210,10 @@ class SBC_ED : public AddressMode::Absolute<Operator::SBC>
 class SBC_EF : public AddressMode::AbsoluteLong<Operator::SBC>
 {
     // 4   6-m         long      mm....mm . SBC $FEDBCA
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("SBC_EF is not implemented");
-        int cycles = 5;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 5 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "EF: SBC long"; }
@@ -3815,15 +3226,10 @@ class SBC_EF : public AddressMode::AbsoluteLong<Operator::SBC>
 class SBC_F1 : public AddressMode::DirectPageIndirectIndexedY<Operator::SBC>
 {
     // 2   7-m+w-x+x*p (dir),Y   mm....mm . SBC ($10),Y
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("SBC_F1 is not implemented");
-        int cycles = 5;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 5 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "F1: SBC (dp),Y"; }
@@ -3836,15 +3242,10 @@ class SBC_F1 : public AddressMode::DirectPageIndirectIndexedY<Operator::SBC>
 class SBC_F2 : public AddressMode::DirectPageIndirect<Operator::SBC>
 {
     // 2   6-m+w       (dir)     mm....mm . SBC ($10)
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("SBC_F2 is not implemented");
-        int cycles = 5;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 5 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "F2: SBC (dp)"; }
@@ -3857,13 +3258,10 @@ class SBC_F2 : public AddressMode::DirectPageIndirect<Operator::SBC>
 class SBC_F3 : public AddressMode::StackRelativeIndirectIndexedY<Operator::SBC>
 {
     // 2   8-m         (stk,S),Y mm....mm . SBC ($32,S),Y
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("SBC_F3 is not implemented");
-        int cycles = 7;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 7 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "F3: SBC (sr,S),Y"; }
@@ -3876,15 +3274,10 @@ class SBC_F3 : public AddressMode::StackRelativeIndirectIndexedY<Operator::SBC>
 class SBC_F5 : public AddressMode::DirectPageIndexedX<Operator::SBC>
 {
     // 2   5-m+w       dir,X     mm....mm . SBC $10,X
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("SBC_F5 is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "F5: SBC dp,X"; }
@@ -3897,15 +3290,10 @@ class SBC_F5 : public AddressMode::DirectPageIndexedX<Operator::SBC>
 class SBC_F7 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::SBC>
 {
     // 2   7-m+w       [dir],Y   mm....mm . SBC [$10],Y
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("SBC_F7 is not implemented");
-        int cycles = 6;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 6 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "F7: SBC [dp],Y"; }
@@ -3918,13 +3306,10 @@ class SBC_F7 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::SBC>
 class SBC_F9 : public AddressMode::AbsoluteIndexedY<Operator::SBC>
 {
     // 3   6-m-x+x*p   abs,Y     mm....mm . SBC $9876,Y
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("SBC_F9 is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "F9: SBC addr,Y"; }
@@ -3937,13 +3322,10 @@ class SBC_F9 : public AddressMode::AbsoluteIndexedY<Operator::SBC>
 class SBC_FD : public AddressMode::AbsoluteIndexedX<Operator::SBC>
 {
     // 3   6-m-x+x*p   abs,X     mm....mm . SBC $9876,X
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("SBC_FD is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "FD: SBC addr,X"; }
@@ -3956,13 +3338,10 @@ class SBC_FD : public AddressMode::AbsoluteIndexedX<Operator::SBC>
 class SBC_FF : public AddressMode::AbsoluteLongIndexedX<Operator::SBC>
 {
     // 4   6-m         long,X    mm....mm . SBC $FEDCBA,X
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("SBC_FF is not implemented");
-        int cycles = 5;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 5 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "FF: SBC long,X"; }
@@ -4039,15 +3418,10 @@ class SEP_E2 : public AddressMode::Immediate<Operator::SEP>
 class STA_81 : public AddressMode::DirectPageIndexedIndirectX<Operator::STA>
 {
     // 2   7-m+w       (dir,X)   ........ . STA ($10,X)
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("STA_81 is not implemented");
-        int cycles = 6;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 6 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "81: STA (dp,X)"; }
@@ -4060,13 +3434,10 @@ class STA_81 : public AddressMode::DirectPageIndexedIndirectX<Operator::STA>
 class STA_83 : public AddressMode::StackRelative<Operator::STA>
 {
     // 2   5-m         stk,S     ........ . STA $32,S
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("STA_83 is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "83: STA sr,S"; }
@@ -4079,15 +3450,10 @@ class STA_83 : public AddressMode::StackRelative<Operator::STA>
 class STA_85 : public AddressMode::DirectPage<Operator::STA>
 {
     // 2   4-m+w       dir       ........ . STA $10
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("STA_85 is not implemented");
-        int cycles = 3;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 3 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "85: STA dp"; }
@@ -4100,15 +3466,10 @@ class STA_85 : public AddressMode::DirectPage<Operator::STA>
 class STA_87 : public AddressMode::DirectPageIndirectLong<Operator::STA>
 {
     // 2   7-m+w       [dir]     ........ . STA [$10]
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("STA_87 is not implemented");
-        int cycles = 6;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 6 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "87: STA [dp]"; }
@@ -4121,13 +3482,10 @@ class STA_87 : public AddressMode::DirectPageIndirectLong<Operator::STA>
 class STA_8D : public AddressMode::Absolute<Operator::STA>
 {
     // 3   5-m         abs       ........ . STA $9876
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("STA_8D is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "8D: STA addr"; }
@@ -4140,13 +3498,10 @@ class STA_8D : public AddressMode::Absolute<Operator::STA>
 class STA_8F : public AddressMode::AbsoluteLong<Operator::STA>
 {
     // 4   6-m         long      ........ . STA $FEDBCA
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("STA_8F is not implemented");
-        int cycles = 5;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 5 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "8F: STA long"; }
@@ -4159,17 +3514,12 @@ class STA_8F : public AddressMode::AbsoluteLong<Operator::STA>
 class STA_91 : public AddressMode::DirectPageIndirectIndexedY<Operator::STA>
 {
     // 2   7-m+w       (dir),Y   ........ . STA ($10),Y
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    // 20: TODO manually add exception for 3
+    // §20: TODO manually add exception for 3
     int execute(State& state) const override
     {
         throw std::runtime_error("STA_91 is not implemented");
-        int cycles = 6;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        cycles += 0 /* TODO20 */;
-        return cycles + applyOperand(state);
+        throw std::runtime_error("TODO20");
+        return 6 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "91: STA (dp),Y"; }
@@ -4182,15 +3532,10 @@ class STA_91 : public AddressMode::DirectPageIndirectIndexedY<Operator::STA>
 class STA_92 : public AddressMode::DirectPageIndirect<Operator::STA>
 {
     // 2   6-m+w       (dir)     ........ . STA ($10)
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("STA_92 is not implemented");
-        int cycles = 5;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 5 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "92: STA (dp)"; }
@@ -4203,13 +3548,10 @@ class STA_92 : public AddressMode::DirectPageIndirect<Operator::STA>
 class STA_93 : public AddressMode::StackRelativeIndirectIndexedY<Operator::STA>
 {
     // 2   8-m         (stk,S),Y ........ . STA ($32,S),Y
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("STA_93 is not implemented");
-        int cycles = 7;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 7 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "93: STA (sr,S),Y"; }
@@ -4222,15 +3564,10 @@ class STA_93 : public AddressMode::StackRelativeIndirectIndexedY<Operator::STA>
 class STA_95 : public AddressMode::DirectPageIndexedX<Operator::STA>
 {
     // 2   5-m+w       dir,X     ........ . STA $10,X
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("STA_95 is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "95: STA dp,X"; }
@@ -4243,15 +3580,10 @@ class STA_95 : public AddressMode::DirectPageIndexedX<Operator::STA>
 class STA_97 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::STA>
 {
     // 2   7-m+w       [dir],Y   ........ . STA [$10],Y
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("STA_97 is not implemented");
-        int cycles = 6;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 6 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "97: STA [dp],Y"; }
@@ -4264,15 +3596,12 @@ class STA_97 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::STA>
 class STA_99 : public AddressMode::AbsoluteIndexedY<Operator::STA>
 {
     // 3   6-m         abs,Y     ........ . STA $9876,Y
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 20: TODO manually add exception for 3
+    // §20: TODO manually add exception for 3
     int execute(State& state) const override
     {
         throw std::runtime_error("STA_99 is not implemented");
-        int cycles = 5;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += 0 /* TODO20 */;
-        return cycles + applyOperand(state);
+        throw std::runtime_error("TODO20");
+        return 5 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "99: STA addr,Y"; }
@@ -4285,15 +3614,12 @@ class STA_99 : public AddressMode::AbsoluteIndexedY<Operator::STA>
 class STA_9D : public AddressMode::AbsoluteIndexedX<Operator::STA>
 {
     // 3   6-m         abs,X     ........ . STA $9876,X
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 20: TODO manually add exception for 3
+    // §20: TODO manually add exception for 3
     int execute(State& state) const override
     {
         throw std::runtime_error("STA_9D is not implemented");
-        int cycles = 5;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += 0 /* TODO20 */;
-        return cycles + applyOperand(state);
+        throw std::runtime_error("TODO20");
+        return 5 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "9D: STA addr,X"; }
@@ -4306,13 +3632,10 @@ class STA_9D : public AddressMode::AbsoluteIndexedX<Operator::STA>
 class STA_9F : public AddressMode::AbsoluteLongIndexedX<Operator::STA>
 {
     // 4   6-m         long,X    ........ . STA $FEDCBA,X
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("STA_9F is not implemented");
-        int cycles = 5;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 5 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "9F: STA long,X"; }
@@ -4325,12 +3648,10 @@ class STA_9F : public AddressMode::AbsoluteLongIndexedX<Operator::STA>
 class STP_DB : public AddressMode::Implied<Operator::STP>
 {
     // 1   3           imp       ........ . STP
-    // 14: Uses 3 cycles to shut the processor down; additional cycles are required by reset to restart it
     int execute(State& state) const override
     {
         throw std::runtime_error("STP_DB is not implemented");
-        int cycles = 3;
-        return cycles + applyOperand(state);
+        return 3 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "DB: STP"; }
@@ -4343,15 +3664,10 @@ class STP_DB : public AddressMode::Implied<Operator::STP>
 class STX_86 : public AddressMode::DirectPage<Operator::STX>
 {
     // 2   4-x+w       dir       ........ . STX $10
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    // 10: Add 1 cycle if x=0 (16-bit index registers)
     int execute(State& state) const override
     {
         throw std::runtime_error("STX_86 is not implemented");
-        int cycles = 3;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        cycles += state.is16Bit(State::x) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 3 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "86: STX dp"; }
@@ -4364,13 +3680,10 @@ class STX_86 : public AddressMode::DirectPage<Operator::STX>
 class STX_8E : public AddressMode::Absolute<Operator::STX>
 {
     // 3   5-x         abs       ........ . STX $9876
-    // 10: Add 1 cycle if x=0 (16-bit index registers)
     int execute(State& state) const override
     {
         throw std::runtime_error("STX_8E is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::x) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "8E: STX addr"; }
@@ -4383,15 +3696,10 @@ class STX_8E : public AddressMode::Absolute<Operator::STX>
 class STX_96 : public AddressMode::DirectPageIndexedY<Operator::STX>
 {
     // 2   5-x+w       dir,Y     ........ . STX $10,Y
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    // 10: Add 1 cycle if x=0 (16-bit index registers)
     int execute(State& state) const override
     {
         throw std::runtime_error("STX_96 is not implemented");
-        int cycles = 4;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        cycles += state.is16Bit(State::x) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "96: STX dp,Y"; }
@@ -4404,15 +3712,10 @@ class STX_96 : public AddressMode::DirectPageIndexedY<Operator::STX>
 class STY_84 : public AddressMode::DirectPage<Operator::STY>
 {
     // 2   4-x+w       dir       ........ . STY $10
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    // 10: Add 1 cycle if x=0 (16-bit index registers)
     int execute(State& state) const override
     {
         throw std::runtime_error("STY_84 is not implemented");
-        int cycles = 3;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        cycles += state.is16Bit(State::x) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 3 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "84: STY dp"; }
@@ -4425,13 +3728,10 @@ class STY_84 : public AddressMode::DirectPage<Operator::STY>
 class STY_8C : public AddressMode::Absolute<Operator::STY>
 {
     // 3   5-x         abs       ........ . STY $9876
-    // 10: Add 1 cycle if x=0 (16-bit index registers)
     int execute(State& state) const override
     {
         throw std::runtime_error("STY_8C is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::x) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "8C: STY addr"; }
@@ -4444,15 +3744,10 @@ class STY_8C : public AddressMode::Absolute<Operator::STY>
 class STY_94 : public AddressMode::DirectPageIndexedX<Operator::STY>
 {
     // 2   5-x+w       dir,X     ........ . STY $10,X
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    // 10: Add 1 cycle if x=0 (16-bit index registers)
     int execute(State& state) const override
     {
         throw std::runtime_error("STY_94 is not implemented");
-        int cycles = 4;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        cycles += state.is16Bit(State::x) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "94: STY dp,X"; }
@@ -4465,15 +3760,10 @@ class STY_94 : public AddressMode::DirectPageIndexedX<Operator::STY>
 class STZ_64 : public AddressMode::DirectPage<Operator::STZ>
 {
     // 2   4-m+w       dir       ........ . STZ $10
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("STZ_64 is not implemented");
-        int cycles = 3;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 3 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "64: STZ dp"; }
@@ -4486,15 +3776,10 @@ class STZ_64 : public AddressMode::DirectPage<Operator::STZ>
 class STZ_74 : public AddressMode::DirectPageIndexedX<Operator::STZ>
 {
     // 2   5-m+w       dir,X     ........ . STZ $10,X
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int execute(State& state) const override
     {
         throw std::runtime_error("STZ_74 is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "74: STZ dp,X"; }
@@ -4507,13 +3792,10 @@ class STZ_74 : public AddressMode::DirectPageIndexedX<Operator::STZ>
 class STZ_9C : public AddressMode::Absolute<Operator::STZ>
 {
     // 3   5-m         abs       ........ . STZ $9876
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("STZ_9C is not implemented");
-        int cycles = 4;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        return cycles + applyOperand(state);
+        return 4 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "9C: STZ addr"; }
@@ -4526,15 +3808,12 @@ class STZ_9C : public AddressMode::Absolute<Operator::STZ>
 class STZ_9E : public AddressMode::AbsoluteIndexedX<Operator::STZ>
 {
     // 3   6-m         abs,X     ........ . STZ $9876,X
-    // 1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    // 20: TODO manually add exception for 3
+    // §20: TODO manually add exception for 3
     int execute(State& state) const override
     {
         throw std::runtime_error("STZ_9E is not implemented");
-        int cycles = 5;
-        cycles += state.is16Bit(State::m) ? 1 : 0;
-        cycles += 0 /* TODO20 */;
-        return cycles + applyOperand(state);
+        throw std::runtime_error("TODO20");
+        return 5 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "9E: STZ addr,X"; }
@@ -4627,15 +3906,10 @@ class TDC_7B : public AddressMode::Implied<Operator::TDC>
 class TRB_14 : public AddressMode::DirectPage<Operator::TRB>
 {
     // 2   7-2*m+w     dir       ......m. . TRB $10
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("TRB_14 is not implemented");
-        int cycles = 5;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        cycles += state.is16Bit(State::m) ? 2 : 0;
-        return cycles + applyOperand(state);
+        return 5 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "14: TRB dp"; }
@@ -4648,13 +3922,10 @@ class TRB_14 : public AddressMode::DirectPage<Operator::TRB>
 class TRB_1C : public AddressMode::Absolute<Operator::TRB>
 {
     // 3   8-2*m       abs       ......m. . TRB $9876
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("TRB_1C is not implemented");
-        int cycles = 6;
-        cycles += state.is16Bit(State::m) ? 2 : 0;
-        return cycles + applyOperand(state);
+        return 6 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "1C: TRB addr"; }
@@ -4667,15 +3938,10 @@ class TRB_1C : public AddressMode::Absolute<Operator::TRB>
 class TSB_04 : public AddressMode::DirectPage<Operator::TSB>
 {
     // 2   7-2*m+w     dir       ......m. . TSB $10
-    // 2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("TSB_04 is not implemented");
-        int cycles = 5;
-        cycles += (uint8_t)state.getDirectPage() ? 1 : 0;
-        cycles += state.is16Bit(State::m) ? 2 : 0;
-        return cycles + applyOperand(state);
+        return 5 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "04: TSB dp"; }
@@ -4688,13 +3954,10 @@ class TSB_04 : public AddressMode::DirectPage<Operator::TSB>
 class TSB_0C : public AddressMode::Absolute<Operator::TSB>
 {
     // 3   8-2*m       abs       ......m. . TSB $9876
-    // 5: Add 2 cycles if m=0 (16-bit memory/accumulator)
     int execute(State& state) const override
     {
         throw std::runtime_error("TSB_0C is not implemented");
-        int cycles = 6;
-        cycles += state.is16Bit(State::m) ? 2 : 0;
-        return cycles + applyOperand(state);
+        return 6 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "0C: TSB addr"; }
@@ -4819,12 +4082,10 @@ class TYX_BB : public AddressMode::Implied<Operator::TYX>
 class WAI_CB : public AddressMode::Implied<Operator::WAI>
 {
     // 1   3           imp       ........ . WAI
-    // 15: Uses 3 cycles to shut the processor down; additional cycles are required by interrupt to restart it
     int execute(State& state) const override
     {
         throw std::runtime_error("WAI_CB is not implemented");
-        int cycles = 3;
-        return cycles + applyOperand(state);
+        return 3 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "CB: WAI"; }
@@ -4833,17 +4094,14 @@ class WAI_CB : public AddressMode::Implied<Operator::WAI>
 // WDM Reserved for Future Expansion [Flags affected: none (subject to change)]
 // WDM
 // Immediate
-// 2<16>
-// 16: Byte and cycle counts subject to change in future processors which expand WDM into 2-byte opcode portions of instructions of varying lengths
+// 2<>
 class WDM_42 : public AddressMode::Immediate<Operator::WDM>
 {
     // 2   2           imm       ........ . WDM
-    // 16: Byte and cycle counts subject to change in future processors which expand WDM into 2-byte opcode portions of instructions of varying lengths
     int execute(State& state) const override
     {
         throw std::runtime_error("WDM_42 is not implemented");
-        int cycles = 2;
-        return cycles + applyOperand(state);
+        return 2 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "42: WDM"; }

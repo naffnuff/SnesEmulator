@@ -35,8 +35,8 @@ public:
         , resetAddress(0)
         , flags(i)
         , emulationMode(true)
+        , memory(1 << 24, 0x55)
     {
-        memory.resize(1 << 24);
         std::cout << "Memory size=" << memory.size() << std::endl;
     }
 
@@ -102,11 +102,7 @@ public:
 
     bool is16Bit(Flag flag) const
     {
-        if (emulationMode) {
-            return false;
-        } else {
-            return getFlag(flag);
-        }
+        return isNativeMode() && !getFlag(flag);
     }
 
     uint8_t readProgramByte(int offset = 0) const
