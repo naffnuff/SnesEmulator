@@ -3,8 +3,9 @@
 #include <iostream>
 #include <vector>
 #include <bitset>
-#include <stdint.h>
 #include <iomanip>
+
+#include "Util.h"
 
 class State
 {
@@ -29,15 +30,16 @@ public:
         , xIndex(0)
         , yIndex(0)
         , directPage(0)
-        , stackPointer(0x1ff)
+        , stackPointer(0)
         , programBank(0)
         , programCounter(0)
         , resetAddress(0)
-        , flags(i)
+        , flags(0)
         , emulationMode(true)
         , memory(1 << 24, 0x55)
     {
         std::cout << "Memory size=" << memory.size() << std::endl;
+        forceEmulationRegisters();
     }
 
     State(State&) = delete;
@@ -81,7 +83,7 @@ public:
             << ", e=" << emulationMode;
     }
 
-    void setFlag(int flag, bool value)
+    void setFlags(uint8_t flag, bool value)
     {
         if (value) {
             flags |= flag;
@@ -145,7 +147,13 @@ public:
         return accumulatorB;
     }
 
-    uint32_t getAccumulatorC() const
+    void setAccumulatorC(uint16_t value)
+    {
+        accumulatorA = uint8_t(value);
+        accumulatorB = uint8_t(value >> 8);
+    }
+
+    uint16_t getAccumulatorC() const
     {
         return accumulatorB << 8 | accumulatorA;
     }
@@ -155,9 +163,63 @@ public:
         return directPage;
     }
 
+    uint8_t* getMemoryPointer(uint8_t lowByte, uint8_t highByte, uint8_t bankByte)
+    {
+        return &memory[bankByte << 16 | highByte << 8 | lowByte];
+    }
+
     uint8_t* getMemoryPointer(uint8_t lowByte, uint8_t highByte)
     {
-        return &memory[dataBank << 16 | highByte << 8 | lowByte];
+        return getMemoryPointer(lowByte, highByte, dataBank);
+    }
+
+    void exchangeCarryAndEmulationFlags()
+    {
+        bool emulation = emulationMode;
+        emulationMode = getFlag(c);
+        setFlags(c, emulation);
+
+        if (emulationMode) {
+            setFlags(x | m, true);
+            forceEmulationRegisters();
+        }
+    }
+
+    void forceEmulationRegisters()
+    {
+        if (emulationMode) {
+            ((uint8_t*)(&xIndex))[1] = 0;
+            ((uint8_t*)(&yIndex))[1] = 0;
+            ((uint8_t*)(&stackPointer))[1] = 1;
+        }
+    }
+
+    void setProgramCounter(uint16_t value)
+    {
+        programCounter = value;
+    }
+
+    void setStackPointer(uint16_t value)
+    {
+        stackPointer = value;
+        forceEmulationRegisters();
+    }
+
+    void setXIndexRegister(uint16_t value)
+    {
+        xIndex = value;
+        forceEmulationRegisters();
+    }
+
+    void setYIndexRegister(uint16_t value)
+    {
+        yIndex = value;
+        forceEmulationRegisters();
+    }
+
+    void setDirectPageRegister(uint16_t value)
+    {
+        directPage = value;
     }
 
     void loadRom(const std::string& path, std::ostream& output);

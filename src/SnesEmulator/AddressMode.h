@@ -4,6 +4,7 @@
 
 #include "State.h"
 #include "Instruction.h"
+#include "Operator.h"
 
 namespace AddressMode {
 
@@ -13,16 +14,20 @@ class Absolute : public Instruction3Byte
 {
     int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte) const override
     {
-        throw std::runtime_error("Absolute is not implemented");
-        uint8_t* data = nullptr;
-        return Operator::invoke(state, data);
+        return Operator::invoke(state, state.getMemoryPointer(lowByte, highByte));
     }
 
     std::string toString(const State& state) const override
     {
-        return Operator::toString() + " $" + Instruction3Byte::operandToString(state) + " TODO";
+        return Operator::toString() + " $" + Instruction3Byte::operandToString(state);
     }
 };
+
+int Absolute<Operator::JSR>::invokeOperator(State& state, uint8_t lowByte, uint8_t highByte) const
+{
+    throw std::runtime_error("Push to stack");
+    return Operator::JSR::invoke(state, lowByte | highByte << 8);
+}
 
 // Absolute Indexed Indirect
 template <typename Operator>
@@ -381,14 +386,12 @@ class Immediate : public Instruction2Byte
 {
     int invokeOperator(State& state, uint8_t lowByte) const override
     {
-        throw std::runtime_error("Immediate is not implemented");
-        uint8_t* data = nullptr;
-        return Operator::invoke(state, data);
+        return Operator::invoke(state, &lowByte);
     }
 
     std::string toString(const State& state) const override
     {
-        return Operator::toString() + " $" + Instruction2Byte::operandToString(state) + " TODO";
+        return Operator::toString() + " #$" + Instruction2Byte::operandToString(state);
     }
 };
 
@@ -397,21 +400,20 @@ class Immediate : public Instruction2Byte
 template <typename Operator, State::Flag Flag>
 class ImmediateVariableSize : public InstructionVariableSize<Flag>
 {
-    int invokeOperator(State& state, uint8_t lowByte) const override    {
-        throw std::runtime_error("ImmediateVariableSize is not implemented");
-        uint8_t* data = nullptr;
-        return Operator::invoke(state, data);
+    int invokeOperator(State& state, uint8_t lowByte) const override
+    {
+        return Operator::invoke(state, &lowByte);
     }
 
-    int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte) const override    {
-        throw std::runtime_error("ImmediateVariableSize is not implemented");
-        uint8_t* data = nullptr;
-        return Operator::invoke(state, data);
+    int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte) const override
+    {
+        uint16_t data = lowByte | highByte << 8;
+        return Operator::invoke(state, (uint8_t*)&data);
     }
 
     std::string toString(const State& state) const override
     {
-        return Operator::toString() + " $" + InstructionVariableSize<Flag>::operandToString(state) + " TODO";
+        return Operator::toString() + " #$" + InstructionVariableSize<Flag>::operandToString(state);
     }
 };
 
@@ -421,13 +423,12 @@ class Implied : public Instruction1Byte
 {
     int invokeOperator(State& state) const override
     {
-        throw std::runtime_error("Implied is not implemented");
         return Operator::invoke(state);
     }
 
     std::string toString(const State& state) const override
     {
-        return Operator::toString() + " TODO";
+        return Operator::toString();
     }
 };
 

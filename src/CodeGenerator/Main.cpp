@@ -307,7 +307,7 @@ void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
 
         if (kvp.second.instructionSize == -1) {
             for (std::string arg : { "", ", uint8_t highByte" }) {
-                output << "    int invokeOperator(State& state, uint8_t lowByte" << arg << ") const override"
+                output << "    int invokeOperator(State& state, uint8_t lowByte" << arg << ") const override" << std::endl
                     << "    {" << std::endl
                     << "        throw std::runtime_error(\"" + kvp.first + " is not implemented\");" << std::endl;
                 if (hasCycleModification(kvp.second.cycleRemarks)) {

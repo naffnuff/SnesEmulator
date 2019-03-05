@@ -128,6 +128,7 @@
     <ClInclude Include="..\..\..\src\SnesEmulator\OpcodeMap.h" />
     <ClInclude Include="..\..\..\src\SnesEmulator\Operator.h" />
     <ClInclude Include="..\..\..\src\SnesEmulator\State.h" />
+    <ClInclude Include="..\..\..\src\SnesEmulator\Util.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

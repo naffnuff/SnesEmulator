@@ -324,7 +324,7 @@ class CLC
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("CLC is not implemented");
+        state.setFlags(State::c, false);
         return 0;
     }
 
@@ -571,6 +571,14 @@ public:
         return 0;
     }
 
+    static int invoke(State& state, uint16_t address)
+    {
+        state.setProgramCounter(address);
+        std::cout << address << std::endl;
+        throw std::runtime_error("JSR address is not implemented");
+        return 0;
+    }
+
     static std::string toString() { return "JSR"; }
 };
 
@@ -581,11 +589,23 @@ public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("LDA is not implemented");
         int cycles = 0;
+
+        state.setAccumulatorA(data[0]);
+        uint16_t accumulator = data[0];
+        bool negative = Util::isNegative(data[0]);
+
         if (state.is16Bit(State::m)) {
+            state.setAccumulatorA(data[0]);
+            state.setAccumulatorB(data[1]);
+            accumulator = state.getAccumulatorC();
+            negative = Util::isNegative(accumulator);
             cycles += 1;
         }
+
+        state.setFlags(State::z, accumulator == 0);
+        state.setFlags(State::n, negative);
+
         return cycles;
     }
 
@@ -949,7 +969,7 @@ class REP
 public:
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("REP is not implemented");
+        state.setFlags(*data, false);
         return 0;
     }
 
@@ -1086,7 +1106,7 @@ class SEI
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("SEI is not implemented");
+        state.setFlags(State::i, true);
         return 0;
     }
 
@@ -1099,7 +1119,7 @@ class SEP
 public:
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("SEP is not implemented");
+        state.setFlags(*data, true);
         return 0;
     }
 
@@ -1113,11 +1133,15 @@ public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("STA is not implemented");
         int cycles = 0;
+
+        data[0] = state.getAccumulatorA();
+
         if (state.is16Bit(State::m)) {
+            data[1] = state.getAccumulatorB();
             cycles += 1;
         }
+
         return cycles;
     }
 
@@ -1181,9 +1205,10 @@ public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("STZ is not implemented");
+        data[0] = 0;
         int cycles = 0;
         if (state.is16Bit(State::m)) {
+            data[1] = 0;
             cycles += 1;
         }
         return cycles;
@@ -1224,7 +1249,7 @@ class TCD
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("TCD is not implemented");
+        state.setDirectPageRegister(state.getAccumulatorC());
         return 0;
     }
 
@@ -1237,7 +1262,7 @@ class TCS
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("TCS is not implemented");
+        state.setStackPointer(state.getAccumulatorC());
         return 0;
     }
 
@@ -1431,7 +1456,7 @@ class XCE
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("XCE is not implemented");
+        state.exchangeCarryAndEmulationFlags();
         return 0;
     }
 

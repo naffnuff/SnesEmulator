@@ -840,7 +840,6 @@ class CLC_18 : public AddressMode::Implied<Operator::CLC>
     // 1   2           imp       .......0 . CLC
     int execute(State& state) const override
     {
-        throw std::runtime_error("CLC_18 is not implemented");
         return 2 + applyOperand(state);
     }
 
@@ -1809,7 +1808,6 @@ class JSR_20 : public AddressMode::Absolute<Operator::JSR>
     // 3   6           abs       ........ . JSR $1234
     int execute(State& state) const override
     {
-        throw std::runtime_error("JSR_20 is not implemented");
         return 6 + applyOperand(state);
     }
 
@@ -1922,7 +1920,6 @@ class LDA_A9 : public AddressMode::ImmediateVariableSize<Operator::LDA, State::m
     // 3-m 3-m         imm       m.....m. . LDA #$54
     int execute(State& state) const override
     {
-        throw std::runtime_error("LDA_A9 is not implemented");
         return 2 + applyOperand(state);
     }
 
@@ -2887,7 +2884,6 @@ class REP_C2 : public AddressMode::Immediate<Operator::REP>
     // 2   3           imm       ******** . REP #$12
     int execute(State& state) const override
     {
-        throw std::runtime_error("REP_C2 is not implemented");
         return 3 + applyOperand(state);
     }
 
@@ -3388,7 +3384,6 @@ class SEI_78 : public AddressMode::Implied<Operator::SEI>
     // 1   2           imp       .....1.. . SEI
     int execute(State& state) const override
     {
-        throw std::runtime_error("SEI_78 is not implemented");
         return 2 + applyOperand(state);
     }
 
@@ -3404,7 +3399,6 @@ class SEP_E2 : public AddressMode::Immediate<Operator::SEP>
     // 2   3           imm       ******** . SEP #$12
     int execute(State& state) const override
     {
-        throw std::runtime_error("SEP_E2 is not implemented");
         return 3 + applyOperand(state);
     }
 
@@ -3484,7 +3478,6 @@ class STA_8D : public AddressMode::Absolute<Operator::STA>
     // 3   5-m         abs       ........ . STA $9876
     int execute(State& state) const override
     {
-        throw std::runtime_error("STA_8D is not implemented");
         return 4 + applyOperand(state);
     }
 
@@ -3794,7 +3787,6 @@ class STZ_9C : public AddressMode::Absolute<Operator::STZ>
     // 3   5-m         abs       ........ . STZ $9876
     int execute(State& state) const override
     {
-        throw std::runtime_error("STZ_9C is not implemented");
         return 4 + applyOperand(state);
     }
 
@@ -3860,7 +3852,6 @@ class TCD_5B : public AddressMode::Implied<Operator::TCD>
     // 1   2           imp       *.....*. . TCD
     int execute(State& state) const override
     {
-        throw std::runtime_error("TCD_5B is not implemented");
         return 2 + applyOperand(state);
     }
 
@@ -3876,7 +3867,6 @@ class TCS_1B : public AddressMode::Implied<Operator::TCS>
     // 1   2           imp       ........ . TCS
     int execute(State& state) const override
     {
-        throw std::runtime_error("TCS_1B is not implemented");
         return 2 + applyOperand(state);
     }
 
@@ -4132,7 +4122,6 @@ class XCE_FB : public AddressMode::Implied<Operator::XCE>
     // 1   2           imp       .......* * XCE
     int execute(State& state) const override
     {
-        throw std::runtime_error("XCE_FB is not implemented");
         return 2 + applyOperand(state);
     }
 
