@@ -4,9 +4,9 @@
 #include <ctime>
 #include <set>
 
-Emulator::Emulator()
+void Emulator::run(std::ostream& output, std::istream& input, std::ostream& error)
 {
-    state.loadRom("..\\..\\Legend of Zelda, The - A Link to the Past (U) [!].smc");
+    state.loadRom("..\\..\\Legend of Zelda, The - A Link to the Past (U) [!].smc", output);
     //state.loadRom("..\\..\\Super Mario World (USA).sfc");
     //state.loadRom("..\\..\\Super Metroid (Japan, USA) (En,Ja).sfc");
     //state.loadRom("..\\..\\Super Metroid (JU) [!].smc");
@@ -15,20 +15,11 @@ Emulator::Emulator()
     //state.loadRom("..\\..\\rom.smc");
     //state.loadRom("H:\\naffnuff\\wla\\rom.smc");
     //state.loadRom("C:\\cygwin64\\home\\rasmus.knutsson\\wla-dx\\wla\\myrom.smc");
-}
 
-void Emulator::run()
-{
     uint64_t cycleCount = 0;
     uint64_t instructionCount = 0;
     bool running = true;
     std::time_t startTime = clock();
-
-    std::ostream& output = std::cout;
-    std::istream& input = std::cin;
-    std::ostream& error = std::cerr;
-
-    output << std::hex;
 
     uint32_t inspectedAddress = 0;
     bool showMemory = true;

@@ -6,9 +6,9 @@
 #include <bitset>
 
 
-void State::loadRom(const std::string& path)
+void State::loadRom(const std::string& path, std::ostream& output)
 {
-    std::cout << "Reading " << path << std::endl;
+    output << "Reading " << path << std::endl;
     {
         std::vector<char> rom;
 
@@ -18,18 +18,16 @@ void State::loadRom(const std::string& path)
         }
         std::ifstream::pos_type pos = ifs.tellg();
 
-        std::cout << "Reading " << pos << " bytes" << std::endl;
+        output << "Reading " << pos << " bytes" << std::endl;
 
         rom.resize((size_t)pos);
 
         ifs.seekg(0, std::ios::beg);
         ifs.read(rom.data(), pos);
 
-        if (!tryReadHeader(0x8000, rom) && !tryReadHeader(0, rom)) {
+        if (!tryReadHeader(0x8000, rom, output) && !tryReadHeader(0, rom, output)) {
             throw std::runtime_error("Could not read header");
         }
-
-        //return;
 
         bool romLoaded = false;
 
@@ -55,38 +53,19 @@ void State::loadRom(const std::string& path)
 
     programCounter = resetAddress;
 
-    std::cout << "Success reading header" << std::endl;
+    output << "Success reading header" << std::endl;
 
-    std::cout << std::endl;
+    output << std::endl;
 }
 
-bool State::tryReadHeader(int offset, std::vector<char> rom)
+bool State::tryReadHeader(int offset, std::vector<char> rom, std::ostream& output)
 {
-    std::cout << "Trying to read header assuming ROM address offset " << offset << std::endl;
+    output << "Trying to read header assuming ROM address offset " << offset << std::endl;
 
     if ((int)rom.size() < 0x10000 - offset) {
-        std::cout << "Rom too small" << std::endl;
+        output << "Rom too small" << std::endl;
         return false;
     }
-
-    std::string makerCode;
-    makerCode.push_back((uint8_t)rom[0xFFB0 - offset]);
-    makerCode.push_back((uint8_t)rom[0xFFB1 - offset]);
-
-    std::string gameCode;
-    for (int i = 0; i < 4; ++i) {
-        gameCode.push_back((uint8_t)rom[0xFFB2 + i - offset]);
-    }
-
-    for (int i = 0; i < 7; ++i) {
-        if ((uint8_t)rom[0xFFB6 + i - offset] != 0) {
-            std::cout << "Header should have zero at " << 0xFFB6 + i << ": " << +(uint8_t)rom[0xFFB6 + i - offset] << std::endl;
-            //return false;
-        }
-    }
-
-    // TODO
-
 
     std::string gameTitle;
     for (int i = 0; i < 21; ++i) {
@@ -102,13 +81,11 @@ bool State::tryReadHeader(int offset, std::vector<char> rom)
     resetAddress = (uint8_t)rom[0xFFFC - offset];
     resetAddress += (uint8_t)rom[0xFFFD - offset] << 8;
 
-    std::cout << "makerCode=" << makerCode
-        << ", gameCode=" << gameCode
-        << ", gameTitle=" << gameTitle
-        << ", mapMode=" << mapMode
-        << ", romSize=" << romSize
-        << ", fixedValue=" << fixedValue
-        << ", resetAddress=" << std::hex << std::setw(4) << std::setfill('0') << resetAddress
+    output << "gameTitle=" << gameTitle << std::endl
+        << "mapMode=" << mapMode << std::endl
+        << "romSize=" << romSize << std::endl
+        << "fixedValue=" << fixedValue << std::endl
+        << "resetAddress=" << std::setw(4) << std::setfill('0') << resetAddress
         << std::endl;
 
     return true;

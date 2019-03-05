@@ -185,11 +185,11 @@ void generateOpcodes(const std::vector<Instruction>& instructions)
                 hOutput << "    // " << getRemark(remark) << std::endl;
             }
         }
-        hOutput << "    int getCycleCount(const State& state) const override" << std::endl
+        hOutput << "    int execute(State& state) const override" << std::endl
             << "    {" << std::endl;
         hOutput << "        throw std::runtime_error(\"" + instruction.classname + " is not implemented\");" << std::endl;
         if (instruction.cyclesRemarks.empty() || instruction.cyclesRemarks.size() == 1 && *instruction.cyclesRemarks.begin() == 13) {
-            hOutput << "        return " << instruction.cycles << ";" << std::endl;
+            hOutput << "        return " << instruction.cycles;
         } else {
             hOutput << "        int cycles = " << instruction.cycles << ";" << std::endl;
             for (int remark : instruction.cyclesRemarks) {
@@ -197,9 +197,10 @@ void generateOpcodes(const std::vector<Instruction>& instructions)
                     hOutput << "        cycles += " << getCycleModification(remark) << ";" << std::endl;
                 }
             }
-            hOutput << "        return cycles;" << std::endl;
+            hOutput << "        return cycles";
         }
-        hOutput << "    }" << std::endl
+        hOutput << " + applyOperand(state);" << std::endl
+            << "    }" << std::endl
             << std::endl
             << "    std::string opcodeToString() const override { return \"" << instruction.code << ": " << instruction.name << "\"; }" << std::endl
             << "};" << std::endl

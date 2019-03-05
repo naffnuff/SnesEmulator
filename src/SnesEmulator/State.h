@@ -114,8 +114,6 @@ public:
         return memory[getProgramAddress(offset)];
     }
 
-    void loadRom(const std::string& path);
-
     void reset()
     {
         programCounter = resetAddress;
@@ -166,8 +164,10 @@ public:
         return &memory[dataBank << 16 | highByte << 8 | lowByte];
     }
 
+    void loadRom(const std::string& path, std::ostream& output);
+
 private:
-    bool tryReadHeader(int offset, std::vector<char> rom);
+    bool tryReadHeader(int offset, std::vector<char> rom, std::ostream& output);
 
 private:
     uint8_t accumulatorA;
