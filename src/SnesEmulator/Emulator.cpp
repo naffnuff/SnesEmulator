@@ -24,7 +24,7 @@ void Emulator::run(std::ostream& output, std::istream& input, std::ostream& erro
     uint32_t inspectedAddress = 0;
     bool showMemory = true;
     bool showRegisters = true;
-    bool watchMode = false;
+    bool watchMode = true;
     bool stepMode = true;
     std::set<int> breakpoints;
     

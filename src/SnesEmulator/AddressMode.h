@@ -42,7 +42,7 @@ class AbsoluteIndexedIndirect : public Instruction3Byte
 
     std::string toString(const State& state) const override
     {
-        return Operator::toString() + " $" + Instruction3Byte::operandToString(state) + " TODO";
+        return Operator::toString() + " $" + operandToString(state) + " TODO";
     }
 };
 
@@ -65,7 +65,7 @@ class AbsoluteIndexedX : public Instruction3Byte
 
     std::string toString(const State& state) const override
     {
-        return Operator::toString() + " $" + Instruction3Byte::operandToString(state) + " TODO";
+        return Operator::toString() + " $" + operandToString(state) + " TODO";
     }
 };
 
@@ -88,7 +88,7 @@ class AbsoluteIndexedY : public Instruction3Byte
 
     std::string toString(const State& state) const override
     {
-        return Operator::toString() + " $" + Instruction3Byte::operandToString(state) + " TODO";
+        return Operator::toString() + " $" + operandToString(state) + " TODO";
     }
 };
 
@@ -105,7 +105,7 @@ class AbsoluteIndirect : public Instruction3Byte
 
     std::string toString(const State& state) const override
     {
-        return Operator::toString() + " $" + Instruction3Byte::operandToString(state) + " TODO";
+        return Operator::toString() + " $" + operandToString(state) + " TODO";
     }
 };
 
@@ -122,7 +122,7 @@ class AbsoluteIndirectLong : public Instruction3Byte
 
     std::string toString(const State& state) const override
     {
-        return Operator::toString() + " $" + Instruction3Byte::operandToString(state) + " TODO";
+        return Operator::toString() + " $" + operandToString(state) + " TODO";
     }
 };
 
@@ -139,7 +139,7 @@ class AbsoluteLong : public Instruction4Byte
 
     std::string toString(const State& state) const override
     {
-        return Operator::toString() + " $" + Instruction4Byte::operandToString(state) + " TODO";
+        return Operator::toString() + " $" + operandToString(state) + " TODO";
     }
 };
 
@@ -156,7 +156,7 @@ class AbsoluteLongIndexedX : public Instruction4Byte
 
     std::string toString(const State& state) const override
     {
-        return Operator::toString() + " $" + Instruction4Byte::operandToString(state) + " TODO";
+        return Operator::toString() + " $" + operandToString(state) + " TODO";
     }
 };
 
@@ -195,7 +195,7 @@ class BlockMove : public Instruction3Byte
 
     std::string toString(const State& state) const override
     {
-        return Operator::toString() + " $" + Instruction3Byte::operandToString(state) + " TODO";
+        return Operator::toString() + " $" + operandToString(state) + " TODO";
     }
 };
 
@@ -217,7 +217,7 @@ class DirectPage : public Instruction2Byte
 
     std::string toString(const State& state) const override
     {
-        return Operator::toString() + " $" + Instruction2Byte::operandToString(state) + " TODO";
+        return Operator::toString() + " $" + operandToString(state) + " TODO";
     }
 };
 
@@ -239,7 +239,7 @@ class DirectPageIndexedIndirectX : public Instruction2Byte
 
     std::string toString(const State& state) const override
     {
-        return Operator::toString() + " $" + Instruction2Byte::operandToString(state) + " TODO";
+        return Operator::toString() + " $" + operandToString(state) + " TODO";
     }
 };
 
@@ -261,7 +261,7 @@ class DirectPageIndexedX : public Instruction2Byte
 
     std::string toString(const State& state) const override
     {
-        return Operator::toString() + " $" + Instruction2Byte::operandToString(state) + " TODO";
+        return Operator::toString() + " $" + operandToString(state) + " TODO";
     }
 };
 
@@ -283,7 +283,7 @@ class DirectPageIndexedY : public Instruction2Byte
 
     std::string toString(const State& state) const override
     {
-        return Operator::toString() + " $" + Instruction2Byte::operandToString(state) + " TODO";
+        return Operator::toString() + " $" + operandToString(state) + " TODO";
     }
 };
 
@@ -305,7 +305,7 @@ class DirectPageIndirect : public Instruction2Byte
 
     std::string toString(const State& state) const override
     {
-        return Operator::toString() + " $" + Instruction2Byte::operandToString(state) + " TODO";
+        return Operator::toString() + " $" + operandToString(state) + " TODO";
     }
 };
 
@@ -332,7 +332,7 @@ class DirectPageIndirectIndexedY : public Instruction2Byte
 
     std::string toString(const State& state) const override
     {
-        return Operator::toString() + " $" + Instruction2Byte::operandToString(state) + " TODO";
+        return Operator::toString() + " $" + operandToString(state) + " TODO";
     }
 };
 
@@ -354,7 +354,7 @@ class DirectPageIndirectLong : public Instruction2Byte
 
     std::string toString(const State& state) const override
     {
-        return Operator::toString() + " $" + Instruction2Byte::operandToString(state) + " TODO";
+        return Operator::toString() + " $" + operandToString(state) + " TODO";
     }
 };
 
@@ -376,7 +376,7 @@ class DirectPageIndirectLongIndexedY : public Instruction2Byte
 
     std::string toString(const State& state) const override
     {
-        return Operator::toString() + " $" + Instruction2Byte::operandToString(state) + " TODO";
+        return Operator::toString() + " $" + operandToString(state) + " TODO";
     }
 };
 
@@ -391,29 +391,24 @@ class Immediate : public Instruction2Byte
 
     std::string toString(const State& state) const override
     {
-        return Operator::toString() + " #$" + Instruction2Byte::operandToString(state);
+        return Operator::toString() + " #$" + operandToString(state);
     }
 };
 
 // Immediate
-// ¤17: Add 1 byte if m=0 (16-bit memory/accumulator)
-template <typename Operator, State::Flag Flag>
-class ImmediateVariableSize : public InstructionVariableSize<Flag>
+template <typename Operator>
+class Immediate16Bit : public Instruction3Byte
 {
-    int invokeOperator(State& state, uint8_t lowByte) const override
-    {
-        return Operator::invoke(state, &lowByte);
-    }
-
     int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte) const override
     {
+        throw std::runtime_error("Immediate16Bit is not implemented");
         uint16_t data = lowByte | highByte << 8;
         return Operator::invoke(state, (uint8_t*)&data);
     }
 
     std::string toString(const State& state) const override
     {
-        return Operator::toString() + " #$" + InstructionVariableSize<Flag>::operandToString(state);
+        return Operator::toString() + " #$" + operandToString(state);
     }
 };
 
@@ -445,7 +440,7 @@ class ProgramCounterRelative : public Instruction2Byte
 
     std::string toString(const State& state) const override
     {
-        return Operator::toString() + " $" + Instruction2Byte::operandToString(state) + " TODO";
+        return Operator::toString() + " $" + operandToString(state) + " TODO";
     }
 };
 
@@ -462,7 +457,7 @@ class ProgramCounterRelativeLong : public Instruction3Byte
 
     std::string toString(const State& state) const override
     {
-        return Operator::toString() + " $" + Instruction3Byte::operandToString(state) + " TODO";
+        return Operator::toString() + " $" + operandToString(state) + " TODO";
     }
 };
 
@@ -479,7 +474,7 @@ class StackRelative : public Instruction2Byte
 
     std::string toString(const State& state) const override
     {
-        return Operator::toString() + " $" + Instruction2Byte::operandToString(state) + " TODO";
+        return Operator::toString() + " $" + operandToString(state) + " TODO";
     }
 };
 
@@ -496,7 +491,7 @@ class StackRelativeIndirectIndexedY : public Instruction2Byte
 
     std::string toString(const State& state) const override
     {
-        return Operator::toString() + " $" + Instruction2Byte::operandToString(state) + " TODO";
+        return Operator::toString() + " $" + operandToString(state) + " TODO";
     }
 };
 

@@ -150,6 +150,76 @@ void addCycleModifications(std::ostream& output, const std::set<int>& remarks)
     }
 }
 
+void generateOpcode(std::ostream& output, const Instruction& instruction, const std::string& opcodeComment, bool is16BitVersion, const std::string& flag = "")
+{
+    int operandSize = stoi(instruction.size) - 1;
+
+    if (!instruction.comment.empty()) {
+        output << "// " << instruction.comment << std::endl;
+    }
+
+    output << "// " << instruction.name << std::endl
+        << "// " << instruction.addressMode << " (" << instruction.size << "-Byte";
+    if (!instruction.sizeRemark.empty()) {
+        output << " [" << instruction.sizeRemark << "]";
+    }
+    output << ")" << std::endl;
+
+    int sizeRemark = 0;
+
+    std::string addressModeClass = instruction.addressModeClass;
+    if (is16BitVersion) {
+        addressModeClass += "16Bit";
+    }
+    addressModeClass += "<Operator::" + instruction.mnemonic + ">";
+
+    if (!instruction.sizeRemark.empty()) {
+        sizeRemark = stoi(instruction.sizeRemark);
+        output << "// " << getRemark(sizeRemark) << std::endl;
+    }
+
+    output << "class " << instruction.classname;
+    if (is16BitVersion) {
+        output << "_16Bit";
+    }
+    output << " : public AddressMode::" << addressModeClass;
+    output << std::endl
+        << "{" << std::endl
+        << "    // " << opcodeComment << std::endl;
+    for (int remark : instruction.cyclesRemarks) {
+        if (!getRemark(remark).empty()) {
+            output << "    // " << getRemark(remark) << std::endl;
+        }
+    }
+    output << "    int execute(State& state) const override" << std::endl
+        << "    {" << std::endl;
+    if (!flag.empty()) {
+        output << "        if (state.is16Bit(State::" << flag << ")) {" << std::endl
+            << "            return this16Bit.execute(state);" << std::endl
+            << "        }" << std::endl;
+    }
+    output << "        throw std::runtime_error(\"" + instruction.classname + " is not implemented\");" << std::endl;
+    if (hasCycleModification(instruction.cyclesRemarks)) {
+        output << "        int cycles = " << instruction.cycles << ";" << std::endl;
+        addCycleModifications(output, instruction.cyclesRemarks);
+        output << "        return cycles";
+    } else {
+        addCycleModifications(output, instruction.cyclesRemarks);
+        output << "        return " << instruction.cycles;
+    }
+    output << " + applyOperand(state);" << std::endl
+        << "    }" << std::endl
+        << std::endl
+        << "    std::string opcodeToString() const override { return \"" << instruction.code << ": " << instruction.name << "\"; }" << std::endl;
+    if (!flag.empty()) {
+        output << std::endl << "    " << instruction.classname << "_16Bit this16Bit;" << std::endl;
+    } else if (is16BitVersion) {
+        output << std::endl << "    friend class " << instruction.classname << ";" << std::endl;
+    }
+    output << "};" << std::endl
+        << std::endl;
+}
+
 void generateOpcodes(const std::vector<Instruction>& instructions)
 {
     std::ifstream opcodeTableFile("..\\..\\..\\src\\CodeGenerator\\opcodeTable.txt");
@@ -180,61 +250,12 @@ void generateOpcodes(const std::vector<Instruction>& instructions)
         << std::endl;
 
     for (const Instruction& instruction : instructions) {
-        int operandSize = stoi(instruction.size) - 1;
-
-        if (!instruction.comment.empty()) {
-            output << "// " << instruction.comment << std::endl;
+        std::string flag = "";
+        if (instruction.sizeRemark == "17" || instruction.sizeRemark == "19") {
+            generateOpcode(output, instruction, opcodeMap[instruction.code], true);
+            flag = instruction.sizeRemark == "17" ? "m" : "x";
         }
-
-        output << "// " << instruction.name << std::endl
-            << "// " << instruction.addressMode << std::endl
-            << "// " << instruction.size << "<" << instruction.sizeRemark << ">" << std::endl;
-
-        int sizeRemark = 0;
-
-        std::string addressModeClass = instruction.addressModeClass;
-        addressModeClass += "<Operator::" + instruction.mnemonic;
-
-        if (!instruction.sizeRemark.empty()) {
-            sizeRemark = stoi(instruction.sizeRemark);
-            output << "// " << getRemark(sizeRemark) << std::endl;
-
-            if (sizeRemark == 17) {
-                addressModeClass += ", State::m";
-                operandSize = 17;
-            } else if (sizeRemark == 19) {
-                addressModeClass += ", State::x";
-                operandSize = 19;
-            }
-        }
-
-        addressModeClass += ">";
-
-        output << "class " << instruction.classname << " : public AddressMode::" << addressModeClass << std::endl
-            << "{" << std::endl
-            << "    // " << opcodeMap[instruction.code] << std::endl;
-        for (int remark : instruction.cyclesRemarks) {
-            if (!getRemark(remark).empty()) {
-                output << "    // " << getRemark(remark) << std::endl;
-            }
-        }
-        output << "    int execute(State& state) const override" << std::endl
-            << "    {" << std::endl;
-        output << "        throw std::runtime_error(\"" + instruction.classname + " is not implemented\");" << std::endl;
-        if (hasCycleModification(instruction.cyclesRemarks)) {
-            output << "        int cycles = " << instruction.cycles << ";" << std::endl;
-            addCycleModifications(output, instruction.cyclesRemarks);
-            output << "        return cycles";
-        } else {
-            addCycleModifications(output, instruction.cyclesRemarks);
-            output << "        return " << instruction.cycles;
-        }
-        output << " + applyOperand(state);" << std::endl
-            << "    }" << std::endl
-            << std::endl
-            << "    std::string opcodeToString() const override { return \"" << instruction.code << ": " << instruction.name << "\"; }" << std::endl
-            << "};" << std::endl
-            << std::endl;
+        generateOpcode(output, instruction, opcodeMap[instruction.code], false, flag);
     }
 
     output << "}" << std::endl;
@@ -266,6 +287,70 @@ void generateOpcodeMap(const std::vector<Instruction>& instructions)
     output << "}" << std::endl;
 }
 
+void generateAddressMode(std::ofstream& output, const std::string& name, const AddressModeClassArgs& args, bool is16Bit = false)
+{
+    output << "// " << args.comment << std::endl << "template <typename Operator";
+
+    output << ">" << std::endl;
+
+    output << "class " << name << " : public ";
+
+    int actualSize = args.instructionSize + (is16Bit ? 1 : 0);
+
+    std::ostringstream superclassStream;
+    superclassStream << "Instruction" << actualSize << "Byte";
+
+    output << superclassStream.str() << std::endl << "{" << std::endl;
+
+    for (int cycleRemark : args.cycleRemarks) {
+        output << "    // " << getRemark(cycleRemark) << std::endl;
+    }
+
+    output << "    int invokeOperator(State& state";
+    if (actualSize >= 2) {
+        output << ", uint8_t lowByte";
+        if (actualSize >= 3) {
+            output << ", uint8_t highByte";
+            if (actualSize >= 4) {
+                output << ", uint8_t bankByte";
+            }
+        }
+    }
+    output << ") const override" << std::endl
+        << "    {" << std::endl
+        << "        throw std::runtime_error(\"" + name + " is not implemented\");" << std::endl;
+    if (hasCycleModification(args.cycleRemarks)) {
+        output << "        int cycles = 0;" << std::endl;
+        addCycleModifications(output, args.cycleRemarks);
+    }
+
+    if (name != "Implied") {
+        output << "        uint8_t* data = nullptr;" << std::endl;
+    }
+    output << "        return ";
+    if (hasCycleModification(args.cycleRemarks)) {
+        output << "cycles + ";
+    }
+    output << "Operator::invoke(state";
+    if (name != "Implied") {
+        output << ", data";
+    }
+    output << ");" << std::endl
+        << "    }" << std::endl
+        << std::endl;
+
+    output << "    std::string toString(const State& state) const override" << std::endl
+        << "    {" << std::endl
+        << "        return Operator::toString()";
+    if (actualSize > 1) {
+        output << " + \" $\" + " << "operandToString(state)";
+    }
+    output << " + \" TODO\";" << std::endl
+        << "    }" << std::endl
+        << "};" << std::endl
+        << std::endl;
+}
+
 typedef std::map<std::string, AddressModeClassArgs> AddressModeClassMap;
 void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
 {
@@ -282,99 +367,10 @@ void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
         << std::endl;
 
     for (const AddressModeClassMap::value_type& kvp : addressModeClassMap) {
-
-        output << "// " << kvp.second.comment << std::endl << "template <typename Operator";
-
-        if (kvp.second.instructionSize == -1) {
-            output << ", State::Flag Flag";
+        generateAddressMode(output, kvp.first, kvp.second);
+        if (kvp.first == "Immediate") {
+            generateAddressMode(output, kvp.first + "16Bit", kvp.second, true);
         }
-
-        output << ">" << std::endl;
-        output << "class " << kvp.first << " : public ";
-
-        std::ostringstream superclassStream;
-        if (kvp.second.instructionSize == -1) {
-            superclassStream << "InstructionVariableSize<Flag>";
-        } else {
-            superclassStream << "Instruction" << kvp.second.instructionSize << "Byte";
-        }
-
-        output << superclassStream.str() << std::endl << "{" << std::endl;
-
-        for (int cycleRemark : kvp.second.cycleRemarks) {
-            output << "    // " << getRemark(cycleRemark) << std::endl;
-        }
-
-        if (kvp.second.instructionSize == -1) {
-            for (std::string arg : { "", ", uint8_t highByte" }) {
-                output << "    int invokeOperator(State& state, uint8_t lowByte" << arg << ") const override" << std::endl
-                    << "    {" << std::endl
-                    << "        throw std::runtime_error(\"" + kvp.first + " is not implemented\");" << std::endl;
-                if (hasCycleModification(kvp.second.cycleRemarks)) {
-                    output << "        int cycles = 0;" << std::endl;
-                    addCycleModifications(output, kvp.second.cycleRemarks);
-                }
-
-                if (kvp.first != "Implied") {
-                    output << "        uint8_t* data = nullptr;" << std::endl;
-                }
-                output << "        return ";
-                if (hasCycleModification(kvp.second.cycleRemarks)) {
-                    output << "cycles + ";
-                }
-                output << "Operator::invoke(state";
-                if (kvp.first != "Implied") {
-                    output << ", data";
-                }
-                output << ");" << std::endl
-                    << "    }" << std::endl
-                    << std::endl;
-            }
-        } else {
-            output << "    int invokeOperator(State& state";
-            if (kvp.second.instructionSize >= 2) {
-                output << ", uint8_t lowByte";
-                if (kvp.second.instructionSize >= 3) {
-                    output << ", uint8_t highByte";
-                    if (kvp.second.instructionSize == 4) {
-                        output << ", uint8_t bankByte";
-                    }
-                }
-            }
-            output << ") const override" << std::endl
-                << "    {" << std::endl
-                << "        throw std::runtime_error(\"" + kvp.first + " is not implemented\");" << std::endl;
-            if (hasCycleModification(kvp.second.cycleRemarks)) {
-                output << "        int cycles = 0;" << std::endl;
-                addCycleModifications(output, kvp.second.cycleRemarks);
-            }
-
-            if (kvp.first != "Implied") {
-                output << "        uint8_t* data = nullptr;" << std::endl;
-            }
-            output << "        return ";
-            if (hasCycleModification(kvp.second.cycleRemarks)) {
-                output << "cycles + ";
-            }
-            output << "Operator::invoke(state";
-            if (kvp.first != "Implied") {
-                output << ", data";
-            }
-            output << ");" << std::endl
-                << "    }" << std::endl
-                << std::endl;
-        }
-
-        output << "    std::string toString(const State& state) const override" << std::endl
-            << "    {" << std::endl
-            << "        return Operator::toString()";
-        if (kvp.second.instructionSize == -1 || kvp.second.instructionSize > 1) {
-            output << " + \" $\" + " << superclassStream.str() << "::operandToString(state)";
-        }
-        output << " + \" TODO\";" << std::endl
-            << "    }" << std::endl
-            << "};" << std::endl
-            << std::endl;
     }
 
     output << "}" << std::endl;
@@ -484,12 +480,12 @@ int main(int argc, char* argv[])
 
                 std::string addressModeCode = name.substr(3);
 
-                std::string code = line[1];
-                if (code.size() == 1) {
-                    code = "0" + code;
+                std::string opcode = line[1];
+                if (opcode.size() == 1) {
+                    opcode = "0" + opcode;
                 }
 
-                std::string classname = mnemonic + "_" + code;
+                std::string classname = mnemonic + "_" + opcode;
 
                 std::string addressMode = line[2];
 
@@ -510,8 +506,6 @@ int main(int argc, char* argv[])
                 int instructionSize = stoi(size);
 
                 if (sizeRemark == "17" || sizeRemark == "19") {
-                    addressModeClass += "VariableSize";
-                    instructionSize = -1;
                     addressModeComment += "\n// " + getRemark(stoi(sizeRemark));
                 }
 
@@ -559,14 +553,14 @@ int main(int argc, char* argv[])
                 addressModeClassArgs.instructionSize = instructionSize;
                 addressModeClassArgs.comment = addressModeComment;
 
-                Instruction instruction { name, mnemonic, comment, code, classname, addressMode, addressModeClass, size, sizeRemark, cycles, cyclesRemarks };
+                Instruction instruction { name, mnemonic, comment, opcode, classname, addressMode, addressModeClass, size, sizeRemark, cycles, cyclesRemarks };
                 instruction.validate();
                 instructions.push_back(instruction);
 
                 // TMP
                 //addressModeMap[addressModeCode].push_back(addressMode + ", " + name + ", code=" + code + ", cycles=" + cycles + ", size=" + size);
                 //addressModeMap[addressMode].push_back(name + ", code=" + code + ", cycles=" + cycles + ", size=" + size + ", sizeRemark=" + sizeRemark);
-                addressModeMap[mnemonic].push_back(code + ": " + name + ", " + addressMode + ", cycles=" + cycles + ", size=" + size);
+                addressModeMap[mnemonic].push_back(opcode + ": " + name + ", " + addressMode + ", cycles=" + cycles + ", size=" + size);
             }
         }
 
@@ -595,8 +589,8 @@ int main(int argc, char* argv[])
 
         generateOpcodes(instructions);
         generateOpcodeMap(instructions);
-        generateAddressModes(addressModeClassMap);
-        generateOperators(operatorMap);
+        //generateAddressModes(addressModeClassMap);
+        //generateOperators(operatorMap);
 
         int i = 0;
         for (const AddressModeMap::value_type kvp : addressModeMap) {

@@ -98,38 +98,3 @@ protected:
         return ss.str();
     }
 };
-
-template<State::Flag Flag>
-class InstructionVariableSize : public Instruction
-{
-protected:
-    virtual int invokeOperator(State& state, uint8_t lowByte) const = 0;
-    virtual int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte) const = 0;
-
-    int applyOperand(State& state) const
-    {
-        if (state.is16Bit(Flag)) {
-            uint8_t lowByte = state.readProgramByte(1);
-            uint8_t highByte = state.readProgramByte(2);
-            state.incrementProgramCounter(3);
-            return invokeOperator(state, lowByte, highByte);
-        } else {
-            uint8_t lowByte = state.readProgramByte(1);
-            state.incrementProgramCounter(2);
-            return invokeOperator(state, lowByte);
-        }
-    }
-
-    std::string operandToString(const State& state) const override
-    {
-        std::ostringstream ss;
-        ss << std::hex;
-        if (state.is16Bit(Flag)) {
-            ss << std::setw(2) << std::setfill('0') << +state.readProgramByte(2)
-                << std::setw(2) << std::setfill('0') << +state.readProgramByte(1);
-        } else {
-            ss << std::setw(2) << std::setfill('0') << +state.readProgramByte(1);
-        }
-        return ss.str();
-    }
-};
