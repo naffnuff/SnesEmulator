@@ -2,6 +2,8 @@
 
 #include "State.h"
 
+namespace CPU {
+
 namespace Operator {
 
 // ADC Add With Carry [Flags affected: n,v,z,c]
@@ -1468,5 +1470,7 @@ public:
 
     static std::string toString() { return "XCE"; }
 };
+
+}
 
 }

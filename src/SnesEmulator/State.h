@@ -5,9 +5,12 @@
 #include <bitset>
 #include <iomanip>
 
+#include "IState.h"
 #include "Util.h"
 
-class State
+namespace CPU {
+
+class State : public IState
 {
 public:
     enum Flag
@@ -112,7 +115,7 @@ public:
         return isNativeMode() && !getFlag(flag);
     }
 
-    uint8_t readProgramByte(int offset = 0) const
+    uint8_t readProgramByte(int offset = 0) const override
     {
         return memory[getProgramAddress(offset)];
     }
@@ -315,3 +318,5 @@ private:
 
     std::vector<uint8_t> memory;
 };
+
+}

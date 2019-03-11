@@ -2,19 +2,20 @@
 
 #include <stdint.h>
 #include <sstream>
+#include <iomanip>
 
-#include "State.h"
+#include "IState.h"
 
 class Instruction
 {
 public:
-    virtual std::string toString(const State& state) const = 0;
+    virtual std::string toString(const IState& state) const = 0;
     virtual std::string opcodeToString() const = 0;
-    virtual int execute(State& state) const = 0;
+    virtual int execute() const = 0;
     virtual uint16_t size() const = 0;
 
 protected:
-    virtual std::string operandToString(const State& state) const
+    std::string operandToString(const IState& state) const
     {
         std::ostringstream ss;
         ss << std::hex;
@@ -25,6 +26,7 @@ protected:
     }
 };
 
+template<typename State>
 class Instruction1Byte : public Instruction
 {
 protected:
@@ -42,6 +44,7 @@ protected:
     }
 };
 
+template<typename State>
 class Instruction2Byte : public Instruction
 {
 protected:
@@ -60,6 +63,7 @@ protected:
     }
 };
 
+template<typename State>
 class Instruction3Byte : public Instruction
 {
 protected:
@@ -79,6 +83,7 @@ protected:
     }
 };
 
+template<typename State>
 class Instruction4Byte : public Instruction
 {
 protected:

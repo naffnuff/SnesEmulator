@@ -9,7 +9,6 @@ int main(int, char*)
     std::ostream& error = std::cerr << std::hex;
 
     try {
-
         Emulator emulator;
         emulator.run(output, input, error);
 

@@ -184,13 +184,19 @@ void generateOpcode(std::ostream& output, const Instruction& instruction, const 
     output << " : public AddressMode::" << addressModeClass;
     output << std::endl
         << "{" << std::endl
+        << "public:" << std::endl
+        << "    " << classname << "(State& state) : state(state)" << std::endl
+        << "    {" << std::endl
+        << "    }" << std::endl
+        << std::endl
+        << "private:" << std::endl
         << "    // " << opcodeComment << std::endl;
     for (int remark : instruction.cyclesRemarks) {
         if (!getRemark(remark).empty()) {
             output << "    // " << getRemark(remark) << std::endl;
         }
     }
-    output << "    int execute(State& state) const override" << std::endl
+    output << "    int execute() const override" << std::endl
         << "    {" << std::endl
         << "        throw std::runtime_error(\"" + classname + " is not implemented\");" << std::endl;
     if (hasCycleModification(instruction.cyclesRemarks)) {
@@ -208,8 +214,10 @@ void generateOpcode(std::ostream& output, const Instruction& instruction, const 
     if (is16Bit) {
         output << " (16-bit)";
     }
-    output << "\"; }" << std::endl;
-    output << "};" << std::endl
+    output << "\"; }" << std::endl
+        << std::endl
+        << "    State& state;" << std::endl
+        << "};" << std::endl
         << std::endl;
 }
 
@@ -239,6 +247,8 @@ void generateOpcodes(const std::vector<Instruction>& instructions)
         << "#include \"AddressMode.h\"" << std::endl
         << "#include \"Operator.h\"" << std::endl
         << std::endl
+        << "namespace CPU {" << std::endl
+        << std::endl
         << "namespace Opcode {" << std::endl
         << std::endl;
 
@@ -251,7 +261,9 @@ void generateOpcodes(const std::vector<Instruction>& instructions)
         generateOpcode(output, instruction, opcodeMap[instruction.code], false);
     }
 
-    output << "}" << std::endl;
+    output << "}" << std::endl
+        << std::endl
+        << "}" << std::endl;
 }
 
 void generateOpcodeMap(const std::vector<Instruction>& instructions)
@@ -264,6 +276,8 @@ void generateOpcodeMap(const std::vector<Instruction>& instructions)
         << std::endl
         << "#include \"Opcode.h\"" << std::endl
         << "#include \"State.h\"" << std::endl
+        << std::endl
+        << "namespace CPU {" << std::endl
         << std::endl;
 
     output << "Instruction* OpcodeMap::getNextInstruction(const State& state) const" << std::endl
@@ -279,17 +293,19 @@ void generateOpcodeMap(const std::vector<Instruction>& instructions)
         << "}" << std::endl << std::endl;
 
 
-    output << "OpcodeMap::OpcodeMap()" << std::endl
+    output << "OpcodeMap::OpcodeMap(State& state)" << std::endl
         << "{" << std::endl;
     for (const Instruction& instruction : instructions) {
-        output << "    instructions[0x" << instruction.code << "] = std::make_unique<Opcode::" << instruction.classname << ">();" << std::endl;
+        output << "    instructions[0x" << instruction.code << "] = std::make_unique<Opcode::" << instruction.classname << ">(state);" << std::endl;
         if (instruction.sizeRemark == "17") {
-            output << "    instructions16BitM[0x" << instruction.code << "] = std::make_unique<Opcode::" << instruction.classname << "_16Bit>();" << std::endl;
+            output << "    instructions16BitM[0x" << instruction.code << "] = std::make_unique<Opcode::" << instruction.classname << "_16Bit>(state);" << std::endl;
         } else if (instruction.sizeRemark == "19") {
-            output << "    instructions16BitX[0x" << instruction.code << "] = std::make_unique<Opcode::" << instruction.classname << "_16Bit>();" << std::endl;
+            output << "    instructions16BitX[0x" << instruction.code << "] = std::make_unique<Opcode::" << instruction.classname << "_16Bit>(state);" << std::endl;
         }
     }
-    output << "}" << std::endl;
+    output << "}" << std::endl
+        << std::endl
+        << "}";
 }
 
 void generateAddressMode(std::ofstream& output, const std::string& name, const AddressModeClassArgs& args, bool is16Bit = false)
@@ -303,7 +319,7 @@ void generateAddressMode(std::ofstream& output, const std::string& name, const A
     int actualSize = args.instructionSize + (is16Bit ? 1 : 0);
 
     std::ostringstream superclassStream;
-    superclassStream << "Instruction" << actualSize << "Byte";
+    superclassStream << "Instruction" << actualSize << "Byte<State>";
 
     output << superclassStream.str() << std::endl << "{" << std::endl;
 
@@ -593,7 +609,7 @@ int main(int argc, char* argv[])
         }
 
         generateOpcodes(instructions);
-        //generateOpcodeMap(instructions);
+        generateOpcodeMap(instructions);
         //generateAddressModes(addressModeClassMap);
         //generateOperators(operatorMap);
 

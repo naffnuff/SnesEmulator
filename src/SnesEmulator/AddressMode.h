@@ -6,20 +6,22 @@
 #include "Instruction.h"
 #include "Operator.h"
 
+namespace CPU {
+
 namespace AddressMode {
 
 // Absolute
 template <typename Operator>
-class Absolute : public Instruction3Byte
+class Absolute : public Instruction3Byte<State>
 {
     int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte) const override
     {
         return Operator::invoke(state, state.getMemoryPointer(lowByte, highByte));
     }
 
-    std::string toString(const State& state) const override
+    std::string toString(const IState& state) const override
     {
-        return Operator::toString() + " $" + Instruction3Byte::operandToString(state);
+        return Operator::toString() + " $" + Instruction3Byte<State>::operandToString(state);
     }
 };
 
@@ -30,7 +32,7 @@ int Absolute<Operator::JSR>::invokeOperator(State& state, uint8_t lowByte, uint8
 
 // Absolute Indexed Indirect
 template <typename Operator>
-class AbsoluteIndexedIndirect : public Instruction3Byte
+class AbsoluteIndexedIndirect : public Instruction3Byte<State>
 {
     int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte) const override
     {
@@ -39,7 +41,7 @@ class AbsoluteIndexedIndirect : public Instruction3Byte
         return Operator::invoke(state, data);
     }
 
-    std::string toString(const State& state) const override
+    std::string toString(const IState& state) const override
     {
         return Operator::toString() + " $" + operandToString(state) + " TODO";
     }
@@ -47,7 +49,7 @@ class AbsoluteIndexedIndirect : public Instruction3Byte
 
 // Absolute Indexed, X
 template <typename Operator>
-class AbsoluteIndexedX : public Instruction3Byte
+class AbsoluteIndexedX : public Instruction3Byte<State>
 {
     // §3: Add 1 cycle if adding index crosses a page boundary
     int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte) const override
@@ -62,7 +64,7 @@ class AbsoluteIndexedX : public Instruction3Byte
         return cycles + Operator::invoke(state, data);
     }
 
-    std::string toString(const State& state) const override
+    std::string toString(const IState& state) const override
     {
         return Operator::toString() + " $" + operandToString(state) + " TODO";
     }
@@ -70,7 +72,7 @@ class AbsoluteIndexedX : public Instruction3Byte
 
 // Absolute Indexed, Y
 template <typename Operator>
-class AbsoluteIndexedY : public Instruction3Byte
+class AbsoluteIndexedY : public Instruction3Byte<State>
 {
     // §3: Add 1 cycle if adding index crosses a page boundary
     int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte) const override
@@ -85,7 +87,7 @@ class AbsoluteIndexedY : public Instruction3Byte
         return cycles + Operator::invoke(state, data);
     }
 
-    std::string toString(const State& state) const override
+    std::string toString(const IState& state) const override
     {
         return Operator::toString() + " $" + operandToString(state) + " TODO";
     }
@@ -93,7 +95,7 @@ class AbsoluteIndexedY : public Instruction3Byte
 
 // Absolute Indirect
 template <typename Operator>
-class AbsoluteIndirect : public Instruction3Byte
+class AbsoluteIndirect : public Instruction3Byte<State>
 {
     int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte) const override
     {
@@ -102,7 +104,7 @@ class AbsoluteIndirect : public Instruction3Byte
         return Operator::invoke(state, data);
     }
 
-    std::string toString(const State& state) const override
+    std::string toString(const IState& state) const override
     {
         return Operator::toString() + " $" + operandToString(state) + " TODO";
     }
@@ -110,7 +112,7 @@ class AbsoluteIndirect : public Instruction3Byte
 
 // Absolute Indirect Long
 template <typename Operator>
-class AbsoluteIndirectLong : public Instruction3Byte
+class AbsoluteIndirectLong : public Instruction3Byte<State>
 {
     int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte) const override
     {
@@ -119,7 +121,7 @@ class AbsoluteIndirectLong : public Instruction3Byte
         return Operator::invoke(state, data);
     }
 
-    std::string toString(const State& state) const override
+    std::string toString(const IState& state) const override
     {
         return Operator::toString() + " $" + operandToString(state) + " TODO";
     }
@@ -127,7 +129,7 @@ class AbsoluteIndirectLong : public Instruction3Byte
 
 // Absolute Long
 template <typename Operator>
-class AbsoluteLong : public Instruction4Byte
+class AbsoluteLong : public Instruction4Byte<State>
 {
     int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte, uint8_t bankByte) const override
     {
@@ -136,7 +138,7 @@ class AbsoluteLong : public Instruction4Byte
         return Operator::invoke(state, data);
     }
 
-    std::string toString(const State& state) const override
+    std::string toString(const IState& state) const override
     {
         return Operator::toString() + " $" + operandToString(state) + " TODO";
     }
@@ -144,7 +146,7 @@ class AbsoluteLong : public Instruction4Byte
 
 // Absolute Long Indexed, X
 template <typename Operator>
-class AbsoluteLongIndexedX : public Instruction4Byte
+class AbsoluteLongIndexedX : public Instruction4Byte<State>
 {
     int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte, uint8_t bankByte) const override
     {
@@ -153,7 +155,7 @@ class AbsoluteLongIndexedX : public Instruction4Byte
         return Operator::invoke(state, data);
     }
 
-    std::string toString(const State& state) const override
+    std::string toString(const IState& state) const override
     {
         return Operator::toString() + " $" + operandToString(state) + " TODO";
     }
@@ -161,7 +163,7 @@ class AbsoluteLongIndexedX : public Instruction4Byte
 
 // Accumulator
 template <typename Operator>
-class Accumulator : public Instruction1Byte
+class Accumulator : public Instruction1Byte<State>
 {
     // §21: Remove 2 cycles for the special case of Accumulator
     int invokeOperator(State& state) const override
@@ -175,7 +177,7 @@ class Accumulator : public Instruction1Byte
         return cycles + Operator::invoke(state, data);
     }
 
-    std::string toString(const State& state) const override
+    std::string toString(const IState& state) const override
     {
         return Operator::toString() + " TODO";
     }
@@ -183,7 +185,7 @@ class Accumulator : public Instruction1Byte
 
 // Block Move
 template <typename Operator>
-class BlockMove : public Instruction3Byte
+class BlockMove : public Instruction3Byte<State>
 {
     int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte) const override
     {
@@ -192,7 +194,7 @@ class BlockMove : public Instruction3Byte
         return Operator::invoke(state, data);
     }
 
-    std::string toString(const State& state) const override
+    std::string toString(const IState& state) const override
     {
         return Operator::toString() + " $" + operandToString(state) + " TODO";
     }
@@ -200,7 +202,7 @@ class BlockMove : public Instruction3Byte
 
 // Direct Page
 template <typename Operator>
-class DirectPage : public Instruction2Byte
+class DirectPage : public Instruction2Byte<State>
 {
     // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int invokeOperator(State& state, uint8_t lowByte) const override
@@ -213,7 +215,7 @@ class DirectPage : public Instruction2Byte
         return cycles + Operator::invoke(state, data);
     }
 
-    std::string toString(const State& state) const override
+    std::string toString(const IState& state) const override
     {
         return Operator::toString() + " $" + operandToString(state);
     }
@@ -221,7 +223,7 @@ class DirectPage : public Instruction2Byte
 
 // Direct Page Indexed Indirect, X
 template <typename Operator>
-class DirectPageIndexedIndirectX : public Instruction2Byte
+class DirectPageIndexedIndirectX : public Instruction2Byte<State>
 {
     // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int invokeOperator(State& state, uint8_t lowByte) const override
@@ -235,7 +237,7 @@ class DirectPageIndexedIndirectX : public Instruction2Byte
         return cycles + Operator::invoke(state, data);
     }
 
-    std::string toString(const State& state) const override
+    std::string toString(const IState& state) const override
     {
         return Operator::toString() + " $" + operandToString(state) + " TODO";
     }
@@ -243,7 +245,7 @@ class DirectPageIndexedIndirectX : public Instruction2Byte
 
 // Direct Page Indexed, X
 template <typename Operator>
-class DirectPageIndexedX : public Instruction2Byte
+class DirectPageIndexedX : public Instruction2Byte<State>
 {
     // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int invokeOperator(State& state, uint8_t lowByte) const override
@@ -257,7 +259,7 @@ class DirectPageIndexedX : public Instruction2Byte
         return cycles + Operator::invoke(state, data);
     }
 
-    std::string toString(const State& state) const override
+    std::string toString(const IState& state) const override
     {
         return Operator::toString() + " $" + operandToString(state) + " TODO";
     }
@@ -265,7 +267,7 @@ class DirectPageIndexedX : public Instruction2Byte
 
 // Direct Page Indexed, Y
 template <typename Operator>
-class DirectPageIndexedY : public Instruction2Byte
+class DirectPageIndexedY : public Instruction2Byte<State>
 {
     // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int invokeOperator(State& state, uint8_t lowByte) const override
@@ -279,7 +281,7 @@ class DirectPageIndexedY : public Instruction2Byte
         return cycles + Operator::invoke(state, data);
     }
 
-    std::string toString(const State& state) const override
+    std::string toString(const IState& state) const override
     {
         return Operator::toString() + " $" + operandToString(state) + " TODO";
     }
@@ -287,7 +289,7 @@ class DirectPageIndexedY : public Instruction2Byte
 
 // Direct Page Indirect
 template <typename Operator>
-class DirectPageIndirect : public Instruction2Byte
+class DirectPageIndirect : public Instruction2Byte<State>
 {
     // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int invokeOperator(State& state, uint8_t lowByte) const override
@@ -301,7 +303,7 @@ class DirectPageIndirect : public Instruction2Byte
         return cycles + Operator::invoke(state, data);
     }
 
-    std::string toString(const State& state) const override
+    std::string toString(const IState& state) const override
     {
         return Operator::toString() + " $" + operandToString(state) + " TODO";
     }
@@ -309,7 +311,7 @@ class DirectPageIndirect : public Instruction2Byte
 
 // Direct Page Indirect Indexed, Y
 template <typename Operator>
-class DirectPageIndirectIndexedY : public Instruction2Byte
+class DirectPageIndirectIndexedY : public Instruction2Byte<State>
 {
     // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
     // §3: Add 1 cycle if adding index crosses a page boundary
@@ -328,7 +330,7 @@ class DirectPageIndirectIndexedY : public Instruction2Byte
         return cycles + Operator::invoke(state, data);
     }
 
-    std::string toString(const State& state) const override
+    std::string toString(const IState& state) const override
     {
         return Operator::toString() + " $" + operandToString(state) + " TODO";
     }
@@ -336,7 +338,7 @@ class DirectPageIndirectIndexedY : public Instruction2Byte
 
 // Direct Page Indirect Long
 template <typename Operator>
-class DirectPageIndirectLong : public Instruction2Byte
+class DirectPageIndirectLong : public Instruction2Byte<State>
 {
     // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int invokeOperator(State& state, uint8_t lowByte) const override
@@ -350,7 +352,7 @@ class DirectPageIndirectLong : public Instruction2Byte
         return cycles + Operator::invoke(state, data);
     }
 
-    std::string toString(const State& state) const override
+    std::string toString(const IState& state) const override
     {
         return Operator::toString() + " $" + operandToString(state) + " TODO";
     }
@@ -358,7 +360,7 @@ class DirectPageIndirectLong : public Instruction2Byte
 
 // Direct Page Indirect Long Indexed, Y
 template <typename Operator>
-class DirectPageIndirectLongIndexedY : public Instruction2Byte
+class DirectPageIndirectLongIndexedY : public Instruction2Byte<State>
 {
     // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int invokeOperator(State& state, uint8_t lowByte) const override
@@ -372,7 +374,7 @@ class DirectPageIndirectLongIndexedY : public Instruction2Byte
         return cycles + Operator::invoke(state, data);
     }
 
-    std::string toString(const State& state) const override
+    std::string toString(const IState& state) const override
     {
         return Operator::toString() + " $" + operandToString(state) + " TODO";
     }
@@ -380,14 +382,14 @@ class DirectPageIndirectLongIndexedY : public Instruction2Byte
 
 // Immediate
 template <typename Operator>
-class Immediate : public Instruction2Byte
+class Immediate : public Instruction2Byte<State>
 {
     int invokeOperator(State& state, uint8_t lowByte) const override
     {
         return Operator::invoke(state, &lowByte);
     }
 
-    std::string toString(const State& state) const override
+    std::string toString(const IState& state) const override
     {
         return Operator::toString() + " #$" + operandToString(state);
     }
@@ -395,7 +397,7 @@ class Immediate : public Instruction2Byte
 
 // Immediate
 template <typename Operator>
-class Immediate16Bit : public Instruction3Byte
+class Immediate16Bit : public Instruction3Byte<State>
 {
     int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte) const override
     {
@@ -403,7 +405,7 @@ class Immediate16Bit : public Instruction3Byte
         return Operator::invoke(state, (uint8_t*)&data);
     }
 
-    std::string toString(const State& state) const override
+    std::string toString(const IState& state) const override
     {
         return Operator::toString() + " #$" + operandToString(state);
     }
@@ -411,14 +413,14 @@ class Immediate16Bit : public Instruction3Byte
 
 // Implied
 template <typename Operator>
-class Implied : public Instruction1Byte
+class Implied : public Instruction1Byte<State>
 {
     int invokeOperator(State& state) const override
     {
         return Operator::invoke(state);
     }
 
-    std::string toString(const State& state) const override
+    std::string toString(const IState& state) const override
     {
         return Operator::toString();
     }
@@ -426,14 +428,14 @@ class Implied : public Instruction1Byte
 
 // Program Counter Relative
 template <typename Operator>
-class ProgramCounterRelative : public Instruction2Byte
+class ProgramCounterRelative : public Instruction2Byte<State>
 {
     int invokeOperator(State& state, uint8_t lowByte) const override
     {
         return Operator::invoke(state, (int8_t)lowByte);
     }
 
-    std::string toString(const State& state) const override
+    std::string toString(const IState& state) const override
     {
         std::ostringstream ss;
         ss << std::hex;
@@ -446,7 +448,7 @@ class ProgramCounterRelative : public Instruction2Byte
 
 // Program Counter Relative Long
 template <typename Operator>
-class ProgramCounterRelativeLong : public Instruction3Byte
+class ProgramCounterRelativeLong : public Instruction3Byte<State>
 {
     int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte) const override
     {
@@ -455,7 +457,7 @@ class ProgramCounterRelativeLong : public Instruction3Byte
         return Operator::invoke(state, data);
     }
 
-    std::string toString(const State& state) const override
+    std::string toString(const IState& state) const override
     {
         return Operator::toString() + " $" + operandToString(state) + " TODO";
     }
@@ -463,7 +465,7 @@ class ProgramCounterRelativeLong : public Instruction3Byte
 
 // Stack Relative
 template <typename Operator>
-class StackRelative : public Instruction2Byte
+class StackRelative : public Instruction2Byte<State>
 {
     int invokeOperator(State& state, uint8_t lowByte) const override
     {
@@ -472,7 +474,7 @@ class StackRelative : public Instruction2Byte
         return Operator::invoke(state, data);
     }
 
-    std::string toString(const State& state) const override
+    std::string toString(const IState& state) const override
     {
         return Operator::toString() + " $" + operandToString(state) + " TODO";
     }
@@ -480,7 +482,7 @@ class StackRelative : public Instruction2Byte
 
 // Stack Relative Indirect Indexed, Y
 template <typename Operator>
-class StackRelativeIndirectIndexedY : public Instruction2Byte
+class StackRelativeIndirectIndexedY : public Instruction2Byte<State>
 {
     int invokeOperator(State& state, uint8_t lowByte) const override
     {
@@ -489,10 +491,12 @@ class StackRelativeIndirectIndexedY : public Instruction2Byte
         return Operator::invoke(state, data);
     }
 
-    std::string toString(const State& state) const override
+    std::string toString(const IState& state) const override
     {
         return Operator::toString() + " $" + operandToString(state) + " TODO";
     }
 };
+
+}
 
 }

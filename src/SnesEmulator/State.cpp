@@ -5,6 +5,7 @@
 #include <functional>
 #include <bitset>
 
+namespace CPU {
 
 void State::loadRom(const std::string& path, std::ostream& output)
 {
@@ -89,4 +90,6 @@ bool State::tryReadHeader(int offset, std::vector<char> rom, std::ostream& outpu
         << std::endl;
 
     return true;
+}
+
 }

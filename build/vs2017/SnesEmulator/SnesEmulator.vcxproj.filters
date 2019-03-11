@@ -53,10 +53,8 @@
     <ClInclude Include="..\..\..\src\SnesEmulator\Util.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="address.txt">
-      <Filter>Resource Files</Filter>
-    </Text>
+    <ClInclude Include="..\..\..\src\SnesEmulator\IState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -128,14 +128,12 @@
     <ClInclude Include="..\..\..\src\SnesEmulator\AddressMode.h" />
     <ClInclude Include="..\..\..\src\SnesEmulator\Emulator.h" />
     <ClInclude Include="..\..\..\src\SnesEmulator\Instruction.h" />
+    <ClInclude Include="..\..\..\src\SnesEmulator\IState.h" />
     <ClInclude Include="..\..\..\src\SnesEmulator\Opcode.h" />
     <ClInclude Include="..\..\..\src\SnesEmulator\OpcodeMap.h" />
     <ClInclude Include="..\..\..\src\SnesEmulator\Operator.h" />
     <ClInclude Include="..\..\..\src\SnesEmulator\State.h" />
     <ClInclude Include="..\..\..\src\SnesEmulator\Util.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="address.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
