@@ -119,20 +119,26 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\src\SnesEmulator\CPU\CpuOpcodeMap.cpp" />
+    <ClCompile Include="..\..\..\src\SnesEmulator\CPU\CpuState.cpp" />
     <ClCompile Include="..\..\..\src\SnesEmulator\Emulator.cpp" />
-    <ClCompile Include="..\..\..\src\SnesEmulator\OpcodeMap.cpp" />
     <ClCompile Include="..\..\..\src\SnesEmulator\Main.cpp" />
-    <ClCompile Include="..\..\..\src\SnesEmulator\State.cpp" />
+    <ClCompile Include="..\..\..\src\SnesEmulator\SPC\SpcOpcodeMap.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\src\SnesEmulator\AddressMode.h" />
+    <ClInclude Include="..\..\..\src\SnesEmulator\CPU\CpuAddressMode.h" />
+    <ClInclude Include="..\..\..\src\SnesEmulator\CPU\CpuOpcode.h" />
+    <ClInclude Include="..\..\..\src\SnesEmulator\CPU\CpuOpcodeMap.h" />
+    <ClInclude Include="..\..\..\src\SnesEmulator\CPU\CpuOperator.h" />
+    <ClInclude Include="..\..\..\src\SnesEmulator\CPU\CpuState.h" />
     <ClInclude Include="..\..\..\src\SnesEmulator\Emulator.h" />
     <ClInclude Include="..\..\..\src\SnesEmulator\Instruction.h" />
     <ClInclude Include="..\..\..\src\SnesEmulator\IState.h" />
-    <ClInclude Include="..\..\..\src\SnesEmulator\Opcode.h" />
-    <ClInclude Include="..\..\..\src\SnesEmulator\OpcodeMap.h" />
-    <ClInclude Include="..\..\..\src\SnesEmulator\Operator.h" />
-    <ClInclude Include="..\..\..\src\SnesEmulator\State.h" />
+    <ClInclude Include="..\..\..\src\SnesEmulator\SPC\SpcAddressMode.h" />
+    <ClInclude Include="..\..\..\src\SnesEmulator\SPC\SpcOpcode.h" />
+    <ClInclude Include="..\..\..\src\SnesEmulator\SPC\SpcOpcodeMap.h" />
+    <ClInclude Include="..\..\..\src\SnesEmulator\SPC\SpcOperator.h" />
+    <ClInclude Include="..\..\..\src\SnesEmulator\SPC\SpcState.h" />
     <ClInclude Include="..\..\..\src\SnesEmulator\Util.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

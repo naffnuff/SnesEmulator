@@ -1,9 +1,9 @@
-#include "OpcodeMap.h"
+#include "CpuOpcodeMap.h"
 
 #include <stdint.h>
 
-#include "Opcode.h"
-#include "State.h"
+#include "CpuOpcode.h"
+#include "CpuState.h"
 
 namespace CPU {
 

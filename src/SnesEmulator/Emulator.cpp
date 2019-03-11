@@ -3,9 +3,17 @@
 #include <fstream>
 #include <iostream>
 
-void Emulator::run(std::ostream& output, std::istream& input, std::ostream& error)
+#include "CPU/CpuState.h"
+#include "SPC/SpcState.h"
+
+#include "CPU/CpuOpcodeMap.h"
+#include "SPC/SpcOpcodeMap.h"
+
+void Emulator::run()
 {
-    state.loadRom("..\\..\\Legend of Zelda, The - A Link to the Past (U) [!].smc", output);
+    CPU::State cpuState;
+
+    cpuState.loadRom("..\\..\\Legend of Zelda, The - A Link to the Past (U) [!].smc", output);
     //state.loadRom("..\\..\\Super Mario World (USA).sfc");
     //state.loadRom("..\\..\\Super Metroid (Japan, USA) (En,Ja).sfc");
     //state.loadRom("..\\..\\Super Metroid (JU) [!].smc");
@@ -14,6 +22,8 @@ void Emulator::run(std::ostream& output, std::istream& input, std::ostream& erro
     //state.loadRom("..\\..\\rom.smc");
     //state.loadRom("H:\\naffnuff\\wla\\rom.smc");
     //state.loadRom("C:\\cygwin64\\home\\rasmus.knutsson\\wla-dx\\wla\\myrom.smc");
+    
+    SPC::State spcState;
 
     const bool resumeLast = false;
 
@@ -25,49 +35,29 @@ void Emulator::run(std::ostream& output, std::istream& input, std::ostream& erro
         breakpoints.insert(programAddress);
     }
 
-    CPU::OpcodeMap opcodeMap(state);
+    CPU::OpcodeMap cpuOpcodeMap(cpuState);
+    SPC::OpcodeMap spcOpcodeMap(spcState);
 
     uint64_t cycleCount = 0;
     uint64_t nextCpu = 0;
+    uint64_t nextSpc = 0;
     bool running = true;
     startTime = clock();
     
     while (running) {
-        output << std::dec << "cycleCount=" << cycleCount << ", nextCpu=" << nextCpu << std::hex << std::endl;
-
+        output << std::dec << "cycleCount=" << cycleCount << ", nextCpu=" << nextCpu << ", nextSpc=" << nextSpc << std::hex << std::endl;
+        
         if (cycleCount == nextCpu) {
+            Instruction* instruction = cpuOpcodeMap.getNextInstruction(cpuState);
+            if (!executeNext(instruction, cpuState, nextCpu, cycleCount)) {
+                continue;
+            }
+        }
 
-            Instruction* instruction = opcodeMap.getNextInstruction(state);
-
-            if (stepMode) {
-                if (resumeLast) {
-                    std::ofstream pcFile("address.txt");
-                    pcFile << std::hex << state.getProgramAddress();
-                }
-
-                printState(output, input, error, instruction);
-
-                if (awaitCommand(output, input, error)) {
-                    nextCpu += instruction->execute();
-                }
-
-            } else {
-
-                for (uint32_t i = state.getProgramAddress(); i < state.getProgramAddress() + instruction->size(); ++i) {
-                    if (breakpoints.find(i) != breakpoints.end()) {
-                        stepMode = true;
-                        break;
-                    }
-                }
-
-                if (stepMode) {
-                    std::time_t endTime = clock();
-                    double elapsedSeconds = double(endTime - startTime) / CLOCKS_PER_SEC;
-                    output << "Time delta=" << elapsedSeconds << std::endl;
-                    output << "Speed is " << cycleCount / 1000000.0 / elapsedSeconds << " MHz (kind of)" << std::endl;
-                } else {
-                    nextCpu += instruction->execute();
-                }
+        if (cycleCount == nextSpc) {
+            Instruction* instruction = spcOpcodeMap.getNextInstruction(spcState);
+            if (!executeNext(instruction, spcState, nextSpc, cycleCount)) {
+                continue;
             }
         }
 
@@ -80,7 +70,44 @@ void Emulator::run(std::ostream& output, std::istream& input, std::ostream& erro
     output << "Speed is " << cycleCount / 1000000.0 / elapsedSeconds << " MHz (kind of)" << std::endl;
 }
 
-void Emulator::printState(std::ostream& output, std::istream& input, std::ostream& error, const Instruction* instruction)
+bool Emulator::executeNext(Instruction* instruction, const IState& state, uint64_t& nextExecution, uint64_t cycleCount)
+{
+    if (stepMode) {
+        /*if (resumeLast) {
+            std::ofstream pcFile("address.txt");
+            pcFile << std::hex << state.getProgramAddress();
+        }*/
+
+        printState(instruction, state);
+
+        if (awaitCommand()) {
+            nextExecution += instruction->execute();
+            return true;
+        }
+
+    } else {
+
+        for (uint32_t i = state.getProgramAddress(); i < state.getProgramAddress() + instruction->size(); ++i) {
+            if (breakpoints.find(i) != breakpoints.end()) {
+                stepMode = true;
+                break;
+            }
+        }
+
+        if (stepMode) {
+            std::time_t endTime = clock();
+            double elapsedSeconds = double(endTime - startTime) / CLOCKS_PER_SEC;
+            output << "Time delta=" << elapsedSeconds << std::endl;
+            output << "Speed is " << cycleCount / 1000000.0 / elapsedSeconds << " MHz (kind of)" << std::endl;
+        } else {
+            nextExecution += instruction->execute();
+            return true;
+        }
+    }
+    return false;
+}
+
+void Emulator::printState(const Instruction* instruction, const IState& state)
 {
     if (watchMode) {
         inspectedAddress = state.getProgramAddress();
@@ -92,18 +119,14 @@ void Emulator::printState(std::ostream& output, std::istream& input, std::ostrea
         }
         output << std::endl;
     }
-    if (showMemory) {
-        state.printMemoryPage(output, inspectedAddress);
-    }
-    if (showRegisters) {
-        state.printRegisters(output) << std::endl;
-    }
+    state.printMemoryPage(output, inspectedAddress);
+    state.printRegisters(output) << std::endl;
     output << instruction->opcodeToString() << std::endl;
     output << std::setw(2) << std::setfill('0') << +state.readProgramByte() << ": ";
     output << instruction->toString(state) << std::endl;
 }
 
-bool Emulator::awaitCommand(std::ostream& output, std::istream& input, std::ostream& error)
+bool Emulator::awaitCommand()
 {
     output << "Command (h for help): ";
 
@@ -115,8 +138,6 @@ bool Emulator::awaitCommand(std::ostream& output, std::istream& input, std::ostr
         return true;
     } else if (command == "h") {
         output << "[return]: step into next instruction" << std::endl
-            << "s: toggle show register state" << std::endl
-            << "m: toggle show memory" << std::endl
             << "n: inspect next memory page" << std::endl
             << "p: inspect previous memory page" << std::endl
             << "r: run program" << std::endl
@@ -126,10 +147,6 @@ bool Emulator::awaitCommand(std::ostream& output, std::istream& input, std::ostr
             << "[p|s|a|x|y|d|f]=[hex]: set register to [hex]" << std::endl
             << "[a]=[hex]: set address [a] to [hex]" << std::endl;
         std::getchar();
-    } else if (command == "s") {
-        showRegisters = !showRegisters;
-    } else if (command == "m") {
-        showMemory = !showMemory;
     } else if (command == "n") {
         watchMode = false;
         inspectedAddress += (1 << 8);
@@ -161,7 +178,7 @@ bool Emulator::awaitCommand(std::ostream& output, std::istream& input, std::ostr
         try {
             uint16_t value = (uint16_t)stoi(command.substr(2), 0, 16);
             output << "Setting register " << command[0] << "=" << std::setw(6) << std::setfill('0') << value << std::endl;
-            switch (command[0]) {
+            /*switch (command[0]) {
             case 'p':
                 state.setProgramCounter(value);
                 break;
@@ -186,7 +203,7 @@ bool Emulator::awaitCommand(std::ostream& output, std::istream& input, std::ostr
             default:
                 error << "Unknown register " << command[0] << std::endl;
                 break;
-            }
+            }*/
         } catch (std::exception& e) {
             error << "Not a valid address: " << e.what() << std::endl;
         }
@@ -198,7 +215,7 @@ bool Emulator::awaitCommand(std::ostream& output, std::istream& input, std::ostr
             uint8_t value = (uint8_t)stoi(command.substr(pos + 1), 0, 16);
             output << "Setting address " << std::setw(6) << std::setfill('0') << address <<
                 "=" << std::setw(2) << std::setfill('0') << +value << std::endl;
-            *state.getMemoryPointer(address) = value;
+            //*state.getMemoryPointer(address) = value;
         } catch (std::exception& e) {
             error << "Not valid: " << command.substr(0, pos) << " or " << command.substr(pos + 1) << ": " << e.what() << std::endl;
         }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "State.h"
+#include "CpuState.h"
 
 namespace CPU {
 
@@ -584,7 +584,7 @@ public:
 
     static int invoke(State& state, uint16_t address)
     {
-        uint16_t programCounter = uint16_t(state.getProgramAddress() - 1);
+        uint16_t programCounter = uint16_t(state.getProgramAddress(-1));
         state.pushToStack(programCounter);
         state.setProgramCounter(address);
         return 0;

@@ -9,8 +9,8 @@ int main(int, char*)
     std::ostream& error = std::cerr << std::hex;
 
     try {
-        Emulator emulator;
-        emulator.run(output, input, error);
+        Emulator emulator(output, input, error);
+        emulator.run();
 
     } catch (const std::exception& e) {
 

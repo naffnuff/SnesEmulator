@@ -13,6 +13,18 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\CPU">
+      <UniqueIdentifier>{e2ff5cf0-baa1-4a33-8af4-d567979d89b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\CPU">
+      <UniqueIdentifier>{e08f16b5-2432-48fe-948c-e00d9f3bf533}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\SPC">
+      <UniqueIdentifier>{f1f993ae-9bf8-49f4-9ea4-5c8215681938}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\SPC">
+      <UniqueIdentifier>{8a9623ab-9227-421d-be5e-d6a21df34994}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\SnesEmulator\Emulator.cpp">
@@ -21,11 +33,14 @@
     <ClCompile Include="..\..\..\src\SnesEmulator\Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\SnesEmulator\State.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\..\..\src\SnesEmulator\CPU\CpuOpcodeMap.cpp">
+      <Filter>Source Files\CPU</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\SnesEmulator\OpcodeMap.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\..\..\src\SnesEmulator\CPU\CpuState.cpp">
+      <Filter>Source Files\CPU</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\SnesEmulator\SPC\SpcOpcodeMap.cpp">
+      <Filter>Source Files\SPC</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -35,26 +50,41 @@
     <ClInclude Include="..\..\..\src\SnesEmulator\Instruction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\SnesEmulator\State.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\SnesEmulator\AddressMode.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\SnesEmulator\Operator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\SnesEmulator\Opcode.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\SnesEmulator\OpcodeMap.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\SnesEmulator\Util.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\SnesEmulator\IState.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\SnesEmulator\CPU\CpuAddressMode.h">
+      <Filter>Header Files\CPU</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\SnesEmulator\CPU\CpuOpcode.h">
+      <Filter>Header Files\CPU</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\SnesEmulator\CPU\CpuOpcodeMap.h">
+      <Filter>Header Files\CPU</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\SnesEmulator\CPU\CpuOperator.h">
+      <Filter>Header Files\CPU</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\SnesEmulator\CPU\CpuState.h">
+      <Filter>Header Files\CPU</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\SnesEmulator\SPC\SpcAddressMode.h">
+      <Filter>Header Files\SPC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\SnesEmulator\SPC\SpcOperator.h">
+      <Filter>Header Files\SPC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\SnesEmulator\SPC\SpcOpcode.h">
+      <Filter>Header Files\SPC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\SnesEmulator\SPC\SpcState.h">
+      <Filter>Header Files\SPC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\SnesEmulator\SPC\SpcOpcodeMap.h">
+      <Filter>Header Files\SPC</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

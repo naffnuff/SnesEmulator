@@ -2,9 +2,9 @@
 
 #include <stdint.h>
 
-#include "State.h"
-#include "Instruction.h"
-#include "Operator.h"
+#include "../Instruction.h"
+#include "CpuOperator.h"
+#include "CpuState.h"
 
 namespace CPU {
 

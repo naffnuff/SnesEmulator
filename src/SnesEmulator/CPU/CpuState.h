@@ -5,8 +5,8 @@
 #include <bitset>
 #include <iomanip>
 
-#include "IState.h"
-#include "Util.h"
+#include "../IState.h"
+#include "../Util.h"
 
 namespace CPU {
 
@@ -48,7 +48,7 @@ public:
     State(State&) = delete;
     State& operator=(State&) = delete;
 
-    std::ostream& printMemoryPage(std::ostream& output, uint32_t startAddress)
+    std::ostream& printMemoryPage(std::ostream& output, uint32_t startAddress) const override
     {
         output << "          0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f" << std::endl;
         uint32_t address = startAddress - std::bitset<4>(startAddress).to_ulong();
@@ -67,7 +67,7 @@ public:
         return output;
     }
 
-    std::ostream& printRegisters(std::ostream& output)
+    std::ostream& printRegisters(std::ostream& output) const
     {
         std::bitset<8> flagSet(flags);
         if (emulationMode) {
@@ -130,7 +130,7 @@ public:
         programCounter += increment;
     }
 
-    uint32_t getProgramAddress(int offset = 0) const
+    uint32_t getProgramAddress(int offset = 0) const override
     {
         return (programBank << 16 | programCounter) + offset;
     }

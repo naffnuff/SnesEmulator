@@ -2,10 +2,10 @@
 
 #include <stdint.h>
 
-#include "State.h"
-#include "Instruction.h"
-#include "AddressMode.h"
-#include "Operator.h"
+#include "../Instruction.h"
+#include "CpuAddressMode.h"
+#include "CpuOperator.h"
+#include "CpuState.h"
 
 namespace CPU {
 
@@ -5146,7 +5146,6 @@ private:
     // 1   2           imp       .....1.. . SEI
     int execute() const override
     {
-        throw std::runtime_error("SEI_78 is not implemented");
         return 2 + applyOperand(state);
     }
 
