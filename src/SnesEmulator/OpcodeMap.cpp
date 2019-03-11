@@ -5,9 +5,16 @@
 #include "Opcode.h"
 #include "State.h"
 
-Instruction* OpcodeMap::getInstruction(uint8_t code) const
+Instruction* OpcodeMap::getNextInstruction(const State& state) const
 {
-    return instructions[code].get();
+    uint8_t opcode = state.readProgramByte();
+    if (state.is16Bit(State::m) && instructions16BitM[opcode]) {
+        return instructions16BitM[opcode].get();
+    } else if (state.is16Bit(State::x) && instructions16BitX[opcode]) {
+        return instructions16BitX[opcode].get();
+    } else {
+        return instructions[opcode].get();
+    }
 }
 
 OpcodeMap::OpcodeMap()
@@ -17,6 +24,7 @@ OpcodeMap::OpcodeMap()
     instructions[0x65] = std::make_unique<Opcode::ADC_65>();
     instructions[0x67] = std::make_unique<Opcode::ADC_67>();
     instructions[0x69] = std::make_unique<Opcode::ADC_69>();
+    instructions16BitM[0x69] = std::make_unique<Opcode::ADC_69_16Bit>();
     instructions[0x6D] = std::make_unique<Opcode::ADC_6D>();
     instructions[0x6F] = std::make_unique<Opcode::ADC_6F>();
     instructions[0x71] = std::make_unique<Opcode::ADC_71>();
@@ -32,6 +40,7 @@ OpcodeMap::OpcodeMap()
     instructions[0x25] = std::make_unique<Opcode::AND_25>();
     instructions[0x27] = std::make_unique<Opcode::AND_27>();
     instructions[0x29] = std::make_unique<Opcode::AND_29>();
+    instructions16BitM[0x29] = std::make_unique<Opcode::AND_29_16Bit>();
     instructions[0x2D] = std::make_unique<Opcode::AND_2D>();
     instructions[0x2F] = std::make_unique<Opcode::AND_2F>();
     instructions[0x31] = std::make_unique<Opcode::AND_31>();
@@ -55,6 +64,7 @@ OpcodeMap::OpcodeMap()
     instructions[0x34] = std::make_unique<Opcode::BIT_34>();
     instructions[0x3C] = std::make_unique<Opcode::BIT_3C>();
     instructions[0x89] = std::make_unique<Opcode::BIT_89>();
+    instructions16BitM[0x89] = std::make_unique<Opcode::BIT_89_16Bit>();
     instructions[0x30] = std::make_unique<Opcode::BMI_30>();
     instructions[0xD0] = std::make_unique<Opcode::BNE_D0>();
     instructions[0x10] = std::make_unique<Opcode::BPL_10>();
@@ -72,6 +82,7 @@ OpcodeMap::OpcodeMap()
     instructions[0xC5] = std::make_unique<Opcode::CMP_C5>();
     instructions[0xC7] = std::make_unique<Opcode::CMP_C7>();
     instructions[0xC9] = std::make_unique<Opcode::CMP_C9>();
+    instructions16BitM[0xC9] = std::make_unique<Opcode::CMP_C9_16Bit>();
     instructions[0xCD] = std::make_unique<Opcode::CMP_CD>();
     instructions[0xCF] = std::make_unique<Opcode::CMP_CF>();
     instructions[0xD1] = std::make_unique<Opcode::CMP_D1>();
@@ -84,9 +95,11 @@ OpcodeMap::OpcodeMap()
     instructions[0xDF] = std::make_unique<Opcode::CMP_DF>();
     instructions[0x02] = std::make_unique<Opcode::COP_02>();
     instructions[0xE0] = std::make_unique<Opcode::CPX_E0>();
+    instructions16BitX[0xE0] = std::make_unique<Opcode::CPX_E0_16Bit>();
     instructions[0xE4] = std::make_unique<Opcode::CPX_E4>();
     instructions[0xEC] = std::make_unique<Opcode::CPX_EC>();
     instructions[0xC0] = std::make_unique<Opcode::CPY_C0>();
+    instructions16BitX[0xC0] = std::make_unique<Opcode::CPY_C0_16Bit>();
     instructions[0xC4] = std::make_unique<Opcode::CPY_C4>();
     instructions[0xCC] = std::make_unique<Opcode::CPY_CC>();
     instructions[0x3A] = std::make_unique<Opcode::DEC_3A>();
@@ -101,6 +114,7 @@ OpcodeMap::OpcodeMap()
     instructions[0x45] = std::make_unique<Opcode::EOR_45>();
     instructions[0x47] = std::make_unique<Opcode::EOR_47>();
     instructions[0x49] = std::make_unique<Opcode::EOR_49>();
+    instructions16BitM[0x49] = std::make_unique<Opcode::EOR_49_16Bit>();
     instructions[0x4D] = std::make_unique<Opcode::EOR_4D>();
     instructions[0x4F] = std::make_unique<Opcode::EOR_4F>();
     instructions[0x51] = std::make_unique<Opcode::EOR_51>();
@@ -131,6 +145,7 @@ OpcodeMap::OpcodeMap()
     instructions[0xA5] = std::make_unique<Opcode::LDA_A5>();
     instructions[0xA7] = std::make_unique<Opcode::LDA_A7>();
     instructions[0xA9] = std::make_unique<Opcode::LDA_A9>();
+    instructions16BitM[0xA9] = std::make_unique<Opcode::LDA_A9_16Bit>();
     instructions[0xAD] = std::make_unique<Opcode::LDA_AD>();
     instructions[0xAF] = std::make_unique<Opcode::LDA_AF>();
     instructions[0xB1] = std::make_unique<Opcode::LDA_B1>();
@@ -142,11 +157,13 @@ OpcodeMap::OpcodeMap()
     instructions[0xBD] = std::make_unique<Opcode::LDA_BD>();
     instructions[0xBF] = std::make_unique<Opcode::LDA_BF>();
     instructions[0xA2] = std::make_unique<Opcode::LDX_A2>();
+    instructions16BitX[0xA2] = std::make_unique<Opcode::LDX_A2_16Bit>();
     instructions[0xA6] = std::make_unique<Opcode::LDX_A6>();
     instructions[0xAE] = std::make_unique<Opcode::LDX_AE>();
     instructions[0xB6] = std::make_unique<Opcode::LDX_B6>();
     instructions[0xBE] = std::make_unique<Opcode::LDX_BE>();
     instructions[0xA0] = std::make_unique<Opcode::LDY_A0>();
+    instructions16BitX[0xA0] = std::make_unique<Opcode::LDY_A0_16Bit>();
     instructions[0xA4] = std::make_unique<Opcode::LDY_A4>();
     instructions[0xAC] = std::make_unique<Opcode::LDY_AC>();
     instructions[0xB4] = std::make_unique<Opcode::LDY_B4>();
@@ -164,6 +181,7 @@ OpcodeMap::OpcodeMap()
     instructions[0x05] = std::make_unique<Opcode::ORA_05>();
     instructions[0x07] = std::make_unique<Opcode::ORA_07>();
     instructions[0x09] = std::make_unique<Opcode::ORA_09>();
+    instructions16BitM[0x09] = std::make_unique<Opcode::ORA_09_16Bit>();
     instructions[0x0D] = std::make_unique<Opcode::ORA_0D>();
     instructions[0x0F] = std::make_unique<Opcode::ORA_0F>();
     instructions[0x11] = std::make_unique<Opcode::ORA_11>();
@@ -209,6 +227,7 @@ OpcodeMap::OpcodeMap()
     instructions[0xE5] = std::make_unique<Opcode::SBC_E5>();
     instructions[0xE7] = std::make_unique<Opcode::SBC_E7>();
     instructions[0xE9] = std::make_unique<Opcode::SBC_E9>();
+    instructions16BitM[0xE9] = std::make_unique<Opcode::SBC_E9_16Bit>();
     instructions[0xED] = std::make_unique<Opcode::SBC_ED>();
     instructions[0xEF] = std::make_unique<Opcode::SBC_EF>();
     instructions[0xF1] = std::make_unique<Opcode::SBC_F1>();

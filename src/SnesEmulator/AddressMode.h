@@ -25,7 +25,6 @@ class Absolute : public Instruction3Byte
 
 int Absolute<Operator::JSR>::invokeOperator(State& state, uint8_t lowByte, uint8_t highByte) const
 {
-    throw std::runtime_error("Push to stack");
     return Operator::JSR::invoke(state, lowByte | highByte << 8);
 }
 
@@ -206,18 +205,17 @@ class DirectPage : public Instruction2Byte
     // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int invokeOperator(State& state, uint8_t lowByte) const override
     {
-        throw std::runtime_error("DirectPage is not implemented");
         int cycles = 0;
         if ((uint8_t)state.getDirectPage()) {
             cycles += 1;
         }
-        uint8_t* data = nullptr;
+        uint8_t* data = state.getMemoryPointer(lowByte);
         return cycles + Operator::invoke(state, data);
     }
 
     std::string toString(const State& state) const override
     {
-        return Operator::toString() + " $" + operandToString(state) + " TODO";
+        return Operator::toString() + " $" + operandToString(state);
     }
 };
 
@@ -401,7 +399,6 @@ class Immediate16Bit : public Instruction3Byte
 {
     int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte) const override
     {
-        throw std::runtime_error("Immediate16Bit is not implemented");
         uint16_t data = lowByte | highByte << 8;
         return Operator::invoke(state, (uint8_t*)&data);
     }
@@ -433,14 +430,17 @@ class ProgramCounterRelative : public Instruction2Byte
 {
     int invokeOperator(State& state, uint8_t lowByte) const override
     {
-        throw std::runtime_error("ProgramCounterRelative is not implemented");
-        uint8_t* data = nullptr;
-        return Operator::invoke(state, data);
+        return Operator::invoke(state, (int8_t)lowByte);
     }
 
     std::string toString(const State& state) const override
     {
-        return Operator::toString() + " $" + operandToString(state) + " TODO";
+        std::ostringstream ss;
+        ss << std::hex;
+        ss << Operator::toString() + " $";
+        uint16_t address = state.getProgramCounter(int((int8_t)size() + (int8_t)state.readProgramByte(1)));
+        ss << std::setw(4) << std::setfill('0') << address;
+        return ss.str();
     }
 };
 

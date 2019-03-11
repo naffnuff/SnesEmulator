@@ -1,5 +1,6 @@
 #include "Emulator.h"
 
+#include <fstream>
 #include <iostream>
 #include <ctime>
 #include <set>
@@ -26,15 +27,28 @@ void Emulator::run(std::ostream& output, std::istream& input, std::ostream& erro
     bool showRegisters = true;
     bool watchMode = true;
     bool stepMode = true;
-    std::set<int> breakpoints;
+    std::set<uint32_t> breakpoints;
+
+    {
+        std::ifstream pcFile("address.txt");
+        int programAddress = -1;
+        pcFile >> std::hex >> programAddress;
+        output << "Read breakpoint: " << programAddress << std::endl;
+        breakpoints.insert(programAddress);
+    }
     
     while (running) {
 
         instructionCount++;
 
-        Instruction* instruction = instructions.getInstruction(state.readProgramByte());
+        Instruction* instruction = opcodeMap.getNextInstruction(state);
 
         if (stepMode) {
+            {
+                std::ofstream pcFile("address.txt");
+                pcFile << std::hex << state.getProgramAddress();
+            }
+
             if (watchMode) {
                 inspectedAddress = state.getProgramAddress();
             }
@@ -75,7 +89,7 @@ void Emulator::run(std::ostream& output, std::istream& input, std::ostream& erro
                     << "br [hex]: toogle breakpoint at address [hex]" << std::endl
                     << "w: watch executing program memory" << std::endl
                     << "[hex]: inspect memory page containing address [hex]" << std::endl
-                    << "[p|s|a|x|y|d]=[hex]: set register to [hex]" << std::endl
+                    << "[p|s|a|x|y|d|f]=[hex]: set register to [hex]" << std::endl
                     << "[a]=[hex]: set address [a] to [hex]" << std::endl;
                 std::getchar();
             } else if (command == "s") {
@@ -94,13 +108,13 @@ void Emulator::run(std::ostream& output, std::istream& input, std::ostream& erro
                 startTime = clock();
             } else if (command.substr(0, 3) == "br ") {
                 try {
-                    int breakPoint = stoi(command.substr(3), 0, 16);
-                    if (breakpoints.find(breakPoint) == breakpoints.end()) {
-                        breakpoints.insert(breakPoint);
-                        output << "Breakpoint inserted at address " << breakPoint << std::endl;
+                    int breakpoint = stoi(command.substr(3), 0, 16);
+                    if (breakpoints.find(breakpoint) == breakpoints.end()) {
+                        breakpoints.insert(breakpoint);
+                        output << "Breakpoint inserted at address " << breakpoint << std::endl;
                     } else {
-                        breakpoints.erase(breakPoint);
-                        output << "Breakpoint removed at address " << breakPoint << std::endl;
+                        breakpoints.erase(breakpoint);
+                        output << "Breakpoint removed at address " << breakpoint << std::endl;
                     }
                 } catch (std::exception& e) {
                     std::cerr << "Not a valid value: " << e.what() << std::endl;
@@ -110,7 +124,7 @@ void Emulator::run(std::ostream& output, std::istream& input, std::ostream& erro
                 output << "Watch mode " << (watchMode ? "on" : "off") << std::endl;
             } else if (command.size() > 1 && command[1] == '=') {
                 try {
-                    uint16_t value = stoi(command.substr(2), 0, 16);
+                    uint16_t value = (uint16_t)stoi(command.substr(2), 0, 16);
                     output << "Setting register " << command[0] << "=" << std::setw(6) << std::setfill('0') << value << std::endl;
                     switch (command[0]) {
                     case 'p':
@@ -131,6 +145,9 @@ void Emulator::run(std::ostream& output, std::istream& input, std::ostream& erro
                     case 'd':
                         state.setDirectPageRegister(value);
                         break;
+                    case 'f':
+                        state.setFlags((uint8_t)value);
+                        break;
                     default:
                         error << "Unknown register " << command[0] << std::endl;
                         break;
@@ -143,10 +160,10 @@ void Emulator::run(std::ostream& output, std::istream& input, std::ostream& erro
                 try {
                     output << "Address: " << command.substr(0, pos) << ", value: " << command.substr(pos + 1) << std::endl;
                     uint32_t address = stoi(command.substr(0, pos), 0, 16);
-                    uint8_t value = stoi(command.substr(pos + 1), 0, 16);
+                    uint8_t value = (uint8_t)stoi(command.substr(pos + 1), 0, 16);
                     output << "Setting address " << std::setw(6) << std::setfill('0') << address <<
                         "=" << std::setw(2) << std::setfill('0') << +value << std::endl;
-                    *state.getMemoryPointer(address, address >> 8, address >> 16) = value;
+                    *state.getMemoryPointer(address) = value;
                 } catch (std::exception& e) {
                     error << "Not valid: " << command.substr(0, pos) << " or " << command.substr(pos + 1) << ": " << e.what() << std::endl;
                 }
@@ -162,13 +179,7 @@ void Emulator::run(std::ostream& output, std::istream& input, std::ostream& erro
         }
 
         if (!stepMode) {
-            uint32_t previousAddress = state.getProgramAddress();
-
-            cycleCount += instruction->execute(state);
-
-            uint32_t address = state.getProgramAddress();
-
-            for (uint32_t i = address; i > previousAddress; --i) {
+            for (uint32_t i = state.getProgramAddress(); i < state.getProgramAddress() + instruction->size(); ++i) {
                 if (breakpoints.find(i) != breakpoints.end()) {
                     stepMode = true;
                     break;
@@ -180,6 +191,8 @@ void Emulator::run(std::ostream& output, std::istream& input, std::ostream& erro
                 double elapsedSeconds = double(endTime - startTime) / CLOCKS_PER_SEC;
                 output << "Time delta=" << elapsedSeconds << std::endl;
                 output << "Speed is " << cycleCount / 1000000.0 / elapsedSeconds << " MHz (kind of)" << std::endl;
+            } else {
+                cycleCount += instruction->execute(state);
             }
         }
 

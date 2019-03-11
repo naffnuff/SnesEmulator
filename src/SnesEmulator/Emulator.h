@@ -8,7 +8,7 @@ class Emulator
 public:
     void run(std::ostream& output, std::istream& input, std::ostream& error);
 private:
-    OpcodeMap instructions;
+    OpcodeMap opcodeMap;
     State state;
 };
 

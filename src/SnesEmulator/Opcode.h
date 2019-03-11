@@ -78,13 +78,11 @@ class ADC_69_16Bit : public AddressMode::Immediate16Bit<Operator::ADC>
     // 3-m 3-m         imm       mm....mm . ADC #$54
     int execute(State& state) const override
     {
-        throw std::runtime_error("ADC_69 is not implemented");
+        throw std::runtime_error("ADC_69_16Bit is not implemented");
         return 2 + applyOperand(state);
     }
 
-    std::string opcodeToString() const override { return "69: ADC #const"; }
-
-    friend class ADC_69;
+    std::string opcodeToString() const override { return "69: ADC #const (16-bit)"; }
 };
 
 // ADC Add With Carry [Flags affected: n,v,z,c]
@@ -96,16 +94,11 @@ class ADC_69 : public AddressMode::Immediate<Operator::ADC>
     // 3-m 3-m         imm       mm....mm . ADC #$54
     int execute(State& state) const override
     {
-        if (state.is16Bit(State::m)) {
-            return this16Bit.execute(state);
-        }
         throw std::runtime_error("ADC_69 is not implemented");
         return 2 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "69: ADC #const"; }
-
-    ADC_69_16Bit this16Bit;
 };
 
 // ADC Add With Carry [Flags affected: n,v,z,c]
@@ -327,13 +320,11 @@ class AND_29_16Bit : public AddressMode::Immediate16Bit<Operator::AND>
     // 3-m 3-m         imm       m.....m. . AND #$54
     int execute(State& state) const override
     {
-        throw std::runtime_error("AND_29 is not implemented");
+        throw std::runtime_error("AND_29_16Bit is not implemented");
         return 2 + applyOperand(state);
     }
 
-    std::string opcodeToString() const override { return "29: AND #const"; }
-
-    friend class AND_29;
+    std::string opcodeToString() const override { return "29: AND #const (16-bit)"; }
 };
 
 // AND AND Accumulator With Memory [Flags affected: n,z]
@@ -345,16 +336,11 @@ class AND_29 : public AddressMode::Immediate<Operator::AND>
     // 3-m 3-m         imm       m.....m. . AND #$54
     int execute(State& state) const override
     {
-        if (state.is16Bit(State::m)) {
-            return this16Bit.execute(state);
-        }
         throw std::runtime_error("AND_29 is not implemented");
         return 2 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "29: AND #const"; }
-
-    AND_29_16Bit this16Bit;
 };
 
 // AND AND Accumulator With Memory [Flags affected: n,z]
@@ -698,13 +684,11 @@ class BIT_89_16Bit : public AddressMode::Immediate16Bit<Operator::BIT>
     // 3-m 3-m         imm       ......m. . BIT #$54
     int execute(State& state) const override
     {
-        throw std::runtime_error("BIT_89 is not implemented");
+        throw std::runtime_error("BIT_89_16Bit is not implemented");
         return 2 + applyOperand(state);
     }
 
-    std::string opcodeToString() const override { return "89: BIT #const"; }
-
-    friend class BIT_89;
+    std::string opcodeToString() const override { return "89: BIT #const (16-bit)"; }
 };
 
 // BIT Test Bits [Flags affected: z (immediate mode) n,v,z (non-immediate modes)]
@@ -716,16 +700,11 @@ class BIT_89 : public AddressMode::Immediate<Operator::BIT>
     // 3-m 3-m         imm       ......m. . BIT #$54
     int execute(State& state) const override
     {
-        if (state.is16Bit(State::m)) {
-            return this16Bit.execute(state);
-        }
         throw std::runtime_error("BIT_89 is not implemented");
         return 2 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "89: BIT #const"; }
-
-    BIT_89_16Bit this16Bit;
 };
 
 // BMI Branch if Minus [Flags affected: none]
@@ -751,7 +730,6 @@ class BNE_D0 : public AddressMode::ProgramCounterRelative<Operator::BNE>
     // 2   2+t+t*e*p   rel8      ........ . BNE LABEL
     int execute(State& state) const override
     {
-        throw std::runtime_error("BNE_D0 is not implemented");
         return 2 + applyOperand(state);
     }
 
@@ -781,8 +759,7 @@ class BRA_80 : public AddressMode::ProgramCounterRelative<Operator::BRA>
     // 2   3+e*p       rel8      ........ . BRA LABEL
     int execute(State& state) const override
     {
-        throw std::runtime_error("BRA_80 is not implemented");
-        return 3 + applyOperand(state);
+        return 2 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "80: BRA nearlabel"; }
@@ -857,7 +834,6 @@ class CLC_18 : public AddressMode::Implied<Operator::CLC>
     // 1   2           imp       .......0 . CLC
     int execute(State& state) const override
     {
-        throw std::runtime_error("CLC_18 is not implemented");
         return 2 + applyOperand(state);
     }
 
@@ -978,13 +954,11 @@ class CMP_C9_16Bit : public AddressMode::Immediate16Bit<Operator::CMP>
     // 3-m 3-m         imm       m.....mm . CMP #$54
     int execute(State& state) const override
     {
-        throw std::runtime_error("CMP_C9 is not implemented");
+        throw std::runtime_error("CMP_C9_16Bit is not implemented");
         return 2 + applyOperand(state);
     }
 
-    std::string opcodeToString() const override { return "C9: CMP #const"; }
-
-    friend class CMP_C9;
+    std::string opcodeToString() const override { return "C9: CMP #const (16-bit)"; }
 };
 
 // CMP Compare Accumulator With Memory [Flags affected: n,z,c]
@@ -996,16 +970,11 @@ class CMP_C9 : public AddressMode::Immediate<Operator::CMP>
     // 3-m 3-m         imm       m.....mm . CMP #$54
     int execute(State& state) const override
     {
-        if (state.is16Bit(State::m)) {
-            return this16Bit.execute(state);
-        }
         throw std::runtime_error("CMP_C9 is not implemented");
         return 2 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "C9: CMP #const"; }
-
-    CMP_C9_16Bit this16Bit;
 };
 
 // CMP Compare Accumulator With Memory [Flags affected: n,z,c]
@@ -1016,7 +985,6 @@ class CMP_CD : public AddressMode::Absolute<Operator::CMP>
     // 3   5-m         abs       m.....mm . CMP $9876
     int execute(State& state) const override
     {
-        throw std::runtime_error("CMP_CD is not implemented");
         return 4 + applyOperand(state);
     }
 
@@ -1183,13 +1151,11 @@ class CPX_E0_16Bit : public AddressMode::Immediate16Bit<Operator::CPX>
     // 3-x 3-x         imm       x.....xx . CPX #$54
     int execute(State& state) const override
     {
-        throw std::runtime_error("CPX_E0 is not implemented");
+        throw std::runtime_error("CPX_E0_16Bit is not implemented");
         return 2 + applyOperand(state);
     }
 
-    std::string opcodeToString() const override { return "E0: CPX #const"; }
-
-    friend class CPX_E0;
+    std::string opcodeToString() const override { return "E0: CPX #const (16-bit)"; }
 };
 
 // CPX Compare Index Register X with Memory [Flags affected: n,z,c]
@@ -1201,16 +1167,11 @@ class CPX_E0 : public AddressMode::Immediate<Operator::CPX>
     // 3-x 3-x         imm       x.....xx . CPX #$54
     int execute(State& state) const override
     {
-        if (state.is16Bit(State::x)) {
-            return this16Bit.execute(state);
-        }
         throw std::runtime_error("CPX_E0 is not implemented");
         return 2 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "E0: CPX #const"; }
-
-    CPX_E0_16Bit this16Bit;
 };
 
 // CPX Compare Index Register X with Memory [Flags affected: n,z,c]
@@ -1252,13 +1213,11 @@ class CPY_C0_16Bit : public AddressMode::Immediate16Bit<Operator::CPY>
     // 3-x 3-x         imm       x.....xx . CPY #$54
     int execute(State& state) const override
     {
-        throw std::runtime_error("CPY_C0 is not implemented");
+        throw std::runtime_error("CPY_C0_16Bit is not implemented");
         return 2 + applyOperand(state);
     }
 
-    std::string opcodeToString() const override { return "C0: CPY #const"; }
-
-    friend class CPY_C0;
+    std::string opcodeToString() const override { return "C0: CPY #const (16-bit)"; }
 };
 
 // CPY Compare Index Register Y with Memory [Flags affected: n,z,c]
@@ -1270,16 +1229,11 @@ class CPY_C0 : public AddressMode::Immediate<Operator::CPY>
     // 3-x 3-x         imm       x.....xx . CPY #$54
     int execute(State& state) const override
     {
-        if (state.is16Bit(State::x)) {
-            return this16Bit.execute(state);
-        }
         throw std::runtime_error("CPY_C0 is not implemented");
         return 2 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "C0: CPY #const"; }
-
-    CPY_C0_16Bit this16Bit;
 };
 
 // CPY Compare Index Register Y with Memory [Flags affected: n,z,c]
@@ -1488,13 +1442,11 @@ class EOR_49_16Bit : public AddressMode::Immediate16Bit<Operator::EOR>
     // 3-m 3-m         imm       m.....m. . EOR #$54
     int execute(State& state) const override
     {
-        throw std::runtime_error("EOR_49 is not implemented");
+        throw std::runtime_error("EOR_49_16Bit is not implemented");
         return 2 + applyOperand(state);
     }
 
-    std::string opcodeToString() const override { return "49: EOR #const"; }
-
-    friend class EOR_49;
+    std::string opcodeToString() const override { return "49: EOR #const (16-bit)"; }
 };
 
 // EOR Exclusive-OR Accumulator with Memory [Flags affected: n,z]
@@ -1506,16 +1458,11 @@ class EOR_49 : public AddressMode::Immediate<Operator::EOR>
     // 3-m 3-m         imm       m.....m. . EOR #$54
     int execute(State& state) const override
     {
-        if (state.is16Bit(State::m)) {
-            return this16Bit.execute(state);
-        }
         throw std::runtime_error("EOR_49 is not implemented");
         return 2 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "49: EOR #const"; }
-
-    EOR_49_16Bit this16Bit;
 };
 
 // EOR Exclusive-OR Accumulator with Memory [Flags affected: n,z]
@@ -1858,7 +1805,6 @@ class JSR_20 : public AddressMode::Absolute<Operator::JSR>
     // 3   6           abs       ........ . JSR $1234
     int execute(State& state) const override
     {
-        throw std::runtime_error("JSR_20 is not implemented");
         return 6 + applyOperand(state);
     }
 
@@ -1964,13 +1910,10 @@ class LDA_A9_16Bit : public AddressMode::Immediate16Bit<Operator::LDA>
     // 3-m 3-m         imm       m.....m. . LDA #$54
     int execute(State& state) const override
     {
-        throw std::runtime_error("LDA_A9 is not implemented");
         return 2 + applyOperand(state);
     }
 
-    std::string opcodeToString() const override { return "A9: LDA #const"; }
-
-    friend class LDA_A9;
+    std::string opcodeToString() const override { return "A9: LDA #const (16-bit)"; }
 };
 
 // LDA Load Accumulator from Memory [Flags affected: n,z]
@@ -1982,16 +1925,10 @@ class LDA_A9 : public AddressMode::Immediate<Operator::LDA>
     // 3-m 3-m         imm       m.....m. . LDA #$54
     int execute(State& state) const override
     {
-        if (state.is16Bit(State::m)) {
-            return this16Bit.execute(state);
-        }
-        throw std::runtime_error("LDA_A9 is not implemented");
         return 2 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "A9: LDA #const"; }
-
-    LDA_A9_16Bit this16Bit;
 };
 
 // LDA Load Accumulator from Memory [Flags affected: n,z]
@@ -2153,13 +2090,11 @@ class LDX_A2_16Bit : public AddressMode::Immediate16Bit<Operator::LDX>
     // 3-x 3-x         imm       x.....x. . LDX #$54
     int execute(State& state) const override
     {
-        throw std::runtime_error("LDX_A2 is not implemented");
+        throw std::runtime_error("LDX_A2_16Bit is not implemented");
         return 2 + applyOperand(state);
     }
 
-    std::string opcodeToString() const override { return "A2: LDX #const"; }
-
-    friend class LDX_A2;
+    std::string opcodeToString() const override { return "A2: LDX #const (16-bit)"; }
 };
 
 // LDX Load Index Register X from Memory [Flags affected: n,z]
@@ -2171,16 +2106,11 @@ class LDX_A2 : public AddressMode::Immediate<Operator::LDX>
     // 3-x 3-x         imm       x.....x. . LDX #$54
     int execute(State& state) const override
     {
-        if (state.is16Bit(State::x)) {
-            return this16Bit.execute(state);
-        }
         throw std::runtime_error("LDX_A2 is not implemented");
         return 2 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "A2: LDX #const"; }
-
-    LDX_A2_16Bit this16Bit;
 };
 
 // LDX Load Index Register X from Memory [Flags affected: n,z]
@@ -2252,13 +2182,10 @@ class LDY_A0_16Bit : public AddressMode::Immediate16Bit<Operator::LDY>
     // 3-x 3-x         imm       x.....x. . LDY #$54
     int execute(State& state) const override
     {
-        throw std::runtime_error("LDY_A0 is not implemented");
         return 2 + applyOperand(state);
     }
 
-    std::string opcodeToString() const override { return "A0: LDY #const"; }
-
-    friend class LDY_A0;
+    std::string opcodeToString() const override { return "A0: LDY #const (16-bit)"; }
 };
 
 // LDY Load Index Register Y from Memory [Flags affected: n,z]
@@ -2270,16 +2197,11 @@ class LDY_A0 : public AddressMode::Immediate<Operator::LDY>
     // 3-x 3-x         imm       x.....x. . LDY #$54
     int execute(State& state) const override
     {
-        if (state.is16Bit(State::x)) {
-            return this16Bit.execute(state);
-        }
         throw std::runtime_error("LDY_A0 is not implemented");
         return 2 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "A0: LDY #const"; }
-
-    LDY_A0_16Bit this16Bit;
 };
 
 // LDY Load Index Register Y from Memory [Flags affected: n,z]
@@ -2533,13 +2455,11 @@ class ORA_09_16Bit : public AddressMode::Immediate16Bit<Operator::ORA>
     // 3-m 3-m         imm       m.....m. . ORA #$54
     int execute(State& state) const override
     {
-        throw std::runtime_error("ORA_09 is not implemented");
+        throw std::runtime_error("ORA_09_16Bit is not implemented");
         return 2 + applyOperand(state);
     }
 
-    std::string opcodeToString() const override { return "09: ORA #const"; }
-
-    friend class ORA_09;
+    std::string opcodeToString() const override { return "09: ORA #const (16-bit)"; }
 };
 
 // ORA OR Accumulator with Memory [Flags affected: n,z]
@@ -2551,16 +2471,11 @@ class ORA_09 : public AddressMode::Immediate<Operator::ORA>
     // 3-m 3-m         imm       m.....m. . ORA #$54
     int execute(State& state) const override
     {
-        if (state.is16Bit(State::m)) {
-            return this16Bit.execute(state);
-        }
         throw std::runtime_error("ORA_09 is not implemented");
         return 2 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "09: ORA #const"; }
-
-    ORA_09_16Bit this16Bit;
 };
 
 // ORA OR Accumulator with Memory [Flags affected: n,z]
@@ -2766,7 +2681,6 @@ class PHA_48 : public AddressMode::Implied<Operator::PHA>
     // 1   4-m         imp       ........ . PHA
     int execute(State& state) const override
     {
-        throw std::runtime_error("PHA_48 is not implemented");
         return 3 + applyOperand(state);
     }
 
@@ -2826,7 +2740,6 @@ class PHP_08 : public AddressMode::Implied<Operator::PHP>
     // 1   3           imp       ........ . PHP
     int execute(State& state) const override
     {
-        throw std::runtime_error("PHP_08 is not implemented");
         return 3 + applyOperand(state);
     }
 
@@ -2961,7 +2874,6 @@ class REP_C2 : public AddressMode::Immediate<Operator::REP>
     // 2   3           imm       ******** . REP #$12
     int execute(State& state) const override
     {
-        throw std::runtime_error("REP_C2 is not implemented");
         return 3 + applyOperand(state);
     }
 
@@ -3236,13 +3148,11 @@ class SBC_E9_16Bit : public AddressMode::Immediate16Bit<Operator::SBC>
     // 3-m 3-m         imm       mm....mm . SBC #$54
     int execute(State& state) const override
     {
-        throw std::runtime_error("SBC_E9 is not implemented");
+        throw std::runtime_error("SBC_E9_16Bit is not implemented");
         return 2 + applyOperand(state);
     }
 
-    std::string opcodeToString() const override { return "E9: SBC #const"; }
-
-    friend class SBC_E9;
+    std::string opcodeToString() const override { return "E9: SBC #const (16-bit)"; }
 };
 
 // SBC Subtract with Borrow from Accumulator [Flags affected: n,v,z,c]
@@ -3254,16 +3164,11 @@ class SBC_E9 : public AddressMode::Immediate<Operator::SBC>
     // 3-m 3-m         imm       mm....mm . SBC #$54
     int execute(State& state) const override
     {
-        if (state.is16Bit(State::m)) {
-            return this16Bit.execute(state);
-        }
         throw std::runtime_error("SBC_E9 is not implemented");
         return 2 + applyOperand(state);
     }
 
     std::string opcodeToString() const override { return "E9: SBC #const"; }
-
-    SBC_E9_16Bit this16Bit;
 };
 
 // SBC Subtract with Borrow from Accumulator [Flags affected: n,v,z,c]
@@ -3454,7 +3359,6 @@ class SEI_78 : public AddressMode::Implied<Operator::SEI>
     // 1   2           imp       .....1.. . SEI
     int execute(State& state) const override
     {
-        throw std::runtime_error("SEI_78 is not implemented");
         return 2 + applyOperand(state);
     }
 
@@ -3469,7 +3373,6 @@ class SEP_E2 : public AddressMode::Immediate<Operator::SEP>
     // 2   3           imm       ******** . SEP #$12
     int execute(State& state) const override
     {
-        throw std::runtime_error("SEP_E2 is not implemented");
         return 3 + applyOperand(state);
     }
 
@@ -3514,7 +3417,6 @@ class STA_85 : public AddressMode::DirectPage<Operator::STA>
     // 2   4-m+w       dir       ........ . STA $10
     int execute(State& state) const override
     {
-        throw std::runtime_error("STA_85 is not implemented");
         return 3 + applyOperand(state);
     }
 
@@ -3544,7 +3446,6 @@ class STA_8D : public AddressMode::Absolute<Operator::STA>
     // 3   5-m         abs       ........ . STA $9876
     int execute(State& state) const override
     {
-        throw std::runtime_error("STA_8D is not implemented");
         return 4 + applyOperand(state);
     }
 
@@ -3835,7 +3736,6 @@ class STZ_9C : public AddressMode::Absolute<Operator::STZ>
     // 3   5-m         abs       ........ . STZ $9876
     int execute(State& state) const override
     {
-        throw std::runtime_error("STZ_9C is not implemented");
         return 4 + applyOperand(state);
     }
 
@@ -3897,7 +3797,6 @@ class TCD_5B : public AddressMode::Implied<Operator::TCD>
     // 1   2           imp       *.....*. . TCD
     int execute(State& state) const override
     {
-        throw std::runtime_error("TCD_5B is not implemented");
         return 2 + applyOperand(state);
     }
 
@@ -3912,7 +3811,6 @@ class TCS_1B : public AddressMode::Implied<Operator::TCS>
     // 1   2           imp       ........ . TCS
     int execute(State& state) const override
     {
-        throw std::runtime_error("TCS_1B is not implemented");
         return 2 + applyOperand(state);
     }
 
@@ -4152,7 +4050,6 @@ class XCE_FB : public AddressMode::Implied<Operator::XCE>
     // 1   2           imp       .......* * XCE
     int execute(State& state) const override
     {
-        throw std::runtime_error("XCE_FB is not implemented");
         return 2 + applyOperand(state);
     }
 

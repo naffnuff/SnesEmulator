@@ -150,7 +150,7 @@ void addCycleModifications(std::ostream& output, const std::set<int>& remarks)
     }
 }
 
-void generateOpcode(std::ostream& output, const Instruction& instruction, const std::string& opcodeComment, bool is16BitVersion, const std::string& flag = "")
+void generateOpcode(std::ostream& output, const Instruction& instruction, const std::string& opcodeComment, bool is16Bit)
 {
     int operandSize = stoi(instruction.size) - 1;
 
@@ -168,7 +168,7 @@ void generateOpcode(std::ostream& output, const Instruction& instruction, const 
     int sizeRemark = 0;
 
     std::string addressModeClass = instruction.addressModeClass;
-    if (is16BitVersion) {
+    if (is16Bit) {
         addressModeClass += "16Bit";
     }
     addressModeClass += "<Operator::" + instruction.mnemonic + ">";
@@ -178,10 +178,9 @@ void generateOpcode(std::ostream& output, const Instruction& instruction, const 
         output << "// " << getRemark(sizeRemark) << std::endl;
     }
 
-    output << "class " << instruction.classname;
-    if (is16BitVersion) {
-        output << "_16Bit";
-    }
+    std::string classname = instruction.classname + (is16Bit ? "_16Bit" : "");
+
+    output << "class " << classname;
     output << " : public AddressMode::" << addressModeClass;
     output << std::endl
         << "{" << std::endl
@@ -192,13 +191,8 @@ void generateOpcode(std::ostream& output, const Instruction& instruction, const 
         }
     }
     output << "    int execute(State& state) const override" << std::endl
-        << "    {" << std::endl;
-    if (!flag.empty()) {
-        output << "        if (state.is16Bit(State::" << flag << ")) {" << std::endl
-            << "            return this16Bit.execute(state);" << std::endl
-            << "        }" << std::endl;
-    }
-    output << "        throw std::runtime_error(\"" + instruction.classname + " is not implemented\");" << std::endl;
+        << "    {" << std::endl
+        << "        throw std::runtime_error(\"" + classname + " is not implemented\");" << std::endl;
     if (hasCycleModification(instruction.cyclesRemarks)) {
         output << "        int cycles = " << instruction.cycles << ";" << std::endl;
         addCycleModifications(output, instruction.cyclesRemarks);
@@ -210,12 +204,11 @@ void generateOpcode(std::ostream& output, const Instruction& instruction, const 
     output << " + applyOperand(state);" << std::endl
         << "    }" << std::endl
         << std::endl
-        << "    std::string opcodeToString() const override { return \"" << instruction.code << ": " << instruction.name << "\"; }" << std::endl;
-    if (!flag.empty()) {
-        output << std::endl << "    " << instruction.classname << "_16Bit this16Bit;" << std::endl;
-    } else if (is16BitVersion) {
-        output << std::endl << "    friend class " << instruction.classname << ";" << std::endl;
+        << "    std::string opcodeToString() const override { return \"" << instruction.code << ": " << instruction.name;
+    if (is16Bit) {
+        output << " (16-bit)";
     }
+    output << "\"; }" << std::endl;
     output << "};" << std::endl
         << std::endl;
 }
@@ -255,7 +248,7 @@ void generateOpcodes(const std::vector<Instruction>& instructions)
             generateOpcode(output, instruction, opcodeMap[instruction.code], true);
             flag = instruction.sizeRemark == "17" ? "m" : "x";
         }
-        generateOpcode(output, instruction, opcodeMap[instruction.code], false, flag);
+        generateOpcode(output, instruction, opcodeMap[instruction.code], false);
     }
 
     output << "}" << std::endl;
@@ -273,9 +266,16 @@ void generateOpcodeMap(const std::vector<Instruction>& instructions)
         << "#include \"State.h\"" << std::endl
         << std::endl;
 
-    output << "Instruction* OpcodeMap::getInstruction(uint8_t code) const" << std::endl
+    output << "Instruction* OpcodeMap::getNextInstruction(const State& state) const" << std::endl
         << "{" << std::endl
-        << "    return instructions[code].get();" << std::endl
+        << "    uint8_t opcode = state.readProgramByte();" << std::endl
+        << "    if (state.is16Bit(State::m) && instructions16BitM[opcode]) {" << std::endl
+        << "        return instructions16BitM[opcode].get();" << std::endl
+        << "    } else if (state.is16Bit(State::x) && instructions16BitX[opcode]) {" << std::endl
+        << "        return instructions16BitX[opcode].get();" << std::endl
+        << "    } else {" << std::endl
+        << "        return instructions[opcode].get();" << std::endl
+        << "    }" << std::endl
         << "}" << std::endl << std::endl;
 
 
@@ -283,6 +283,11 @@ void generateOpcodeMap(const std::vector<Instruction>& instructions)
         << "{" << std::endl;
     for (const Instruction& instruction : instructions) {
         output << "    instructions[0x" << instruction.code << "] = std::make_unique<Opcode::" << instruction.classname << ">();" << std::endl;
+        if (instruction.sizeRemark == "17") {
+            output << "    instructions16BitM[0x" << instruction.code << "] = std::make_unique<Opcode::" << instruction.classname << "_16Bit>();" << std::endl;
+        } else if (instruction.sizeRemark == "19") {
+            output << "    instructions16BitX[0x" << instruction.code << "] = std::make_unique<Opcode::" << instruction.classname << "_16Bit>();" << std::endl;
+        }
     }
     output << "}" << std::endl;
 }
@@ -588,7 +593,7 @@ int main(int argc, char* argv[])
         }
 
         generateOpcodes(instructions);
-        generateOpcodeMap(instructions);
+        //generateOpcodeMap(instructions);
         //generateAddressModes(addressModeClassMap);
         //generateOperators(operatorMap);
 

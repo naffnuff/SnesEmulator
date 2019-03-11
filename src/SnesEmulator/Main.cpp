@@ -2,7 +2,7 @@
 
 #include "Emulator.h"
 
-int main(int argc, char* argv[])
+int main(int, char*)
 {
     std::ostream& output = std::cout << std::hex;
     std::istream& input = std::cin;

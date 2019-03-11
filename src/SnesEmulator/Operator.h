@@ -58,13 +58,31 @@ public:
     static std::string toString() { return "ASL"; }
 };
 
+static int branchIf(bool condition, State& state, int8_t offset)
+{
+    int cycles = 0;
+    if (condition) {
+        uint16_t address = state.getProgramCounter(offset);
+        cycles += 1;
+        if (!state.isNativeMode()) {
+            uint8_t programPage = uint8_t(state.getProgramCounter() >> 8);
+            uint8_t addressPage = uint8_t(address >> 8);
+            if (programPage != addressPage) {
+                cycles += 1;
+            }
+        }
+        state.setProgramCounter(address);
+    }
+    return cycles;
+}
+
 // BCC Branch if Carry Clear [Flags affected: none][Alias: BLT]
 class BCC
 {
 public:
     // §7: Add 1 cycle if branch is taken
     // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, int8_t offset)
     {
         throw std::runtime_error("BCC is not implemented");
         int cycles = 0;
@@ -88,7 +106,7 @@ class BCS
 public:
     // §7: Add 1 cycle if branch is taken
     // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, int8_t offset)
     {
         throw std::runtime_error("BCS is not implemented");
         int cycles = 0;
@@ -112,7 +130,7 @@ class BEQ
 public:
     // §7: Add 1 cycle if branch is taken
     // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, int8_t offset)
     {
         throw std::runtime_error("BEQ is not implemented");
         int cycles = 0;
@@ -154,7 +172,7 @@ class BMI
 public:
     // §7: Add 1 cycle if branch is taken
     // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, int8_t offset)
     {
         throw std::runtime_error("BMI is not implemented");
         int cycles = 0;
@@ -178,19 +196,9 @@ class BNE
 public:
     // §7: Add 1 cycle if branch is taken
     // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, int8_t offset)
     {
-        throw std::runtime_error("BNE is not implemented");
-        int cycles = 0;
-        if (true /*branch taken*/) {
-            cycles += 1;
-            throw std::runtime_error("TODO07");
-        }
-        if (true /*branch taken crosses page boundary*/) {
-            cycles += 1;
-            throw std::runtime_error("TODO08");
-        }
-        return cycles;
+        return branchIf(!state.getFlag(State::z), state, offset);
     }
 
     static std::string toString() { return "BNE"; }
@@ -202,7 +210,7 @@ class BPL
 public:
     // §7: Add 1 cycle if branch is taken
     // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, int8_t offset)
     {
         throw std::runtime_error("BPL is not implemented");
         int cycles = 0;
@@ -225,15 +233,9 @@ class BRA
 {
 public:
     // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, int8_t offset)
     {
-        throw std::runtime_error("BRA is not implemented");
-        int cycles = 0;
-        if (true /*branch taken crosses page boundary*/) {
-            cycles += 1;
-            throw std::runtime_error("TODO08");
-        }
-        return cycles;
+        return branchIf(true, state, offset);
     }
 
     static std::string toString() { return "BRA"; }
@@ -276,7 +278,7 @@ class BVC
 public:
     // §7: Add 1 cycle if branch is taken
     // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, int8_t offset)
     {
         throw std::runtime_error("BVC is not implemented");
         int cycles = 0;
@@ -300,7 +302,7 @@ class BVS
 public:
     // §7: Add 1 cycle if branch is taken
     // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, int8_t offset)
     {
         throw std::runtime_error("BVS is not implemented");
         int cycles = 0;
@@ -324,7 +326,7 @@ class CLC
 public:
     static int invoke(State& state)
     {
-        state.setFlags(State::c, false);
+        state.setFlag(State::c, false);
         return 0;
     }
 
@@ -377,10 +379,17 @@ public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("CMP is not implemented");
         int cycles = 0;
         if (state.is16Bit(State::m)) {
             cycles += 1;
+            uint16_t accumulator = state.getAccumulatorC();
+            uint16_t data16Bit = data[0] | data[1] << 8;
+            state.setFlag(State::c, accumulator >= data16Bit);
+            state.updateSignFlags(uint16_t(accumulator - data16Bit));
+        } else {
+            uint8_t accumulator = state.getAccumulatorA();
+            state.setFlag(State::c, accumulator >= data[0]);
+            state.updateSignFlags(uint8_t(accumulator - data[0]));
         }
         return cycles;
     }
@@ -573,9 +582,9 @@ public:
 
     static int invoke(State& state, uint16_t address)
     {
+        uint16_t programCounter = uint16_t(state.getProgramAddress() - 1);
+        state.pushToStack(programCounter);
         state.setProgramCounter(address);
-        std::cout << address << std::endl;
-        throw std::runtime_error("JSR address is not implemented");
         return 0;
     }
 
@@ -590,22 +599,12 @@ public:
     static int invoke(State& state, uint8_t* data)
     {
         int cycles = 0;
-
-        state.setAccumulatorA(data[0]);
-        uint16_t accumulator = data[0];
-        bool negative = Util::isNegative(data[0]);
-
         if (state.is16Bit(State::m)) {
-            state.setAccumulatorA(data[0]);
-            state.setAccumulatorB(data[1]);
-            accumulator = state.getAccumulatorC();
-            negative = Util::isNegative(accumulator);
+            state.setAccumulatorC(uint16_t(data[0] | data[1] << 8));
             cycles += 1;
+        } else {
+            state.setAccumulatorA(data[0]);
         }
-
-        state.setFlags(State::z, accumulator == 0);
-        state.setFlags(State::n, negative);
-
         return cycles;
     }
 
@@ -619,10 +618,12 @@ public:
     // §10: Add 1 cycle if x=0 (16-bit index registers)
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("LDX is not implemented");
         int cycles = 0;
         if (state.is16Bit(State::x)) {
+            state.setXIndexRegister(uint16_t(data[0] | data[1] << 8));
             cycles += 1;
+        } else {
+            state.setXIndexRegister(data[0]);
         }
         return cycles;
     }
@@ -637,10 +638,12 @@ public:
     // §10: Add 1 cycle if x=0 (16-bit index registers)
     static int invoke(State& state, uint8_t* data)
     {
-        throw std::runtime_error("LDY is not implemented");
         int cycles = 0;
         if (state.is16Bit(State::x)) {
+            state.setYIndexRegister(uint16_t(data[0] | data[1] << 8));
             cycles += 1;
+        } else {
+            state.setYIndexRegister(data[0]);
         }
         return cycles;
     }
@@ -771,11 +774,14 @@ public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     static int invoke(State& state)
     {
-        throw std::runtime_error("PHA is not implemented");
         int cycles = 0;
         if (state.is16Bit(State::m)) {
             cycles += 1;
+            uint8_t highByte = state.getAccumulatorB();
+            state.pushToStack(highByte);
         }
+        uint8_t lowByte = state.getAccumulatorA();
+        state.pushToStack(lowByte);
         return cycles;
     }
 
@@ -827,7 +833,7 @@ class PHP
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("PHP is not implemented");
+        state.pushFlagsToStack();
         return 0;
     }
 
@@ -969,7 +975,7 @@ class REP
 public:
     static int invoke(State& state, uint8_t* data)
     {
-        state.setFlags(*data, false);
+        state.setFlag(*data, false);
         return 0;
     }
 
@@ -1106,7 +1112,7 @@ class SEI
 public:
     static int invoke(State& state)
     {
-        state.setFlags(State::i, true);
+        state.setFlag(State::i, true);
         return 0;
     }
 
@@ -1119,7 +1125,7 @@ class SEP
 public:
     static int invoke(State& state, uint8_t* data)
     {
-        state.setFlags(*data, true);
+        state.setFlag(*data, true);
         return 0;
     }
 

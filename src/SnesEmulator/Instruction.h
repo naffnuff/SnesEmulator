@@ -11,9 +11,18 @@ public:
     virtual std::string toString(const State& state) const = 0;
     virtual std::string opcodeToString() const = 0;
     virtual int execute(State& state) const = 0;
+    virtual uint16_t size() const = 0;
 
 protected:
-    virtual std::string operandToString(const State& state) const = 0;
+    virtual std::string operandToString(const State& state) const
+    {
+        std::ostringstream ss;
+        ss << std::hex;
+        for (int i = size() - 1; i > 0; --i) {
+            ss << std::setw(2) << std::setfill('0') << +state.readProgramByte(i);
+        }
+        return ss.str();
+    }
 };
 
 class Instruction1Byte : public Instruction
@@ -23,13 +32,13 @@ protected:
 
     int applyOperand(State& state) const
     {
-        state.incrementProgramCounter(1);
+        state.incrementProgramCounter(size());
         return invokeOperator(state);
     }
 
-    std::string operandToString(const State& state) const override
+    uint16_t size() const override
     {
-        return "";
+        return 1;
     }
 };
 
@@ -41,15 +50,13 @@ protected:
     int applyOperand(State& state) const
     {
         uint8_t lowByte = state.readProgramByte(1);
-        state.incrementProgramCounter(2);
+        state.incrementProgramCounter(size());
         return invokeOperator(state, lowByte);
     }
 
-    std::string operandToString(const State& state) const override
+    uint16_t size() const override
     {
-        std::ostringstream ss;
-        ss << std::hex << std::setw(2) << std::setfill('0') << +state.readProgramByte(1);
-        return ss.str();
+        return 2;
     }
 };
 
@@ -62,16 +69,13 @@ protected:
     {
         uint8_t lowByte = state.readProgramByte(1);
         uint8_t highByte = state.readProgramByte(2);
-        state.incrementProgramCounter(3);
+        state.incrementProgramCounter(size());
         return invokeOperator(state, lowByte, highByte);
     }
 
-    std::string operandToString(const State& state) const override
+    uint16_t size() const override
     {
-        std::ostringstream ss;
-        ss << std::hex << std::setw(2) << std::setfill('0') << +state.readProgramByte(2)
-            << std::setw(2) << std::setfill('0') << +state.readProgramByte(1);
-        return ss.str();
+        return 3;
     }
 };
 
@@ -85,16 +89,12 @@ protected:
         uint8_t lowByte = state.readProgramByte(1);
         uint8_t highByte = state.readProgramByte(2);
         uint8_t bankByte = state.readProgramByte(3);
-        state.incrementProgramCounter(4);
+        state.incrementProgramCounter(size());
         return invokeOperator(state, lowByte, highByte, bankByte);
     }
 
-    std::string operandToString(const State& state) const override
+    uint16_t size() const override
     {
-        std::ostringstream ss;
-        ss << std::hex << std::setw(2) << std::setfill('0') << +state.readProgramByte(3)
-            << std::setw(2) << std::setfill('0') << +state.readProgramByte(2)
-            << std::setw(2) << std::setfill('0') << +state.readProgramByte(1);
-        return ss.str();
+        return 4;
     }
 };
