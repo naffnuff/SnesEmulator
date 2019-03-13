@@ -18,12 +18,21 @@
     <ClCompile Include="..\..\..\src\CodeGenerator\Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\CodeGenerator\CpuGeneration.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\CodeGenerator\SpcGeneration.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="..\..\..\src\CodeGenerator\instructions.txt">
+    <Text Include="..\..\..\src\CodeGenerator\cpuOpcodeTable.txt">
       <Filter>Resource Files</Filter>
     </Text>
-    <Text Include="..\..\..\src\CodeGenerator\opcodeTable.txt">
+    <Text Include="..\..\..\src\CodeGenerator\cpuInstructions.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="..\..\..\src\CodeGenerator\spcInstructions.txt">
       <Filter>Resource Files</Filter>
     </Text>
   </ItemGroup>
