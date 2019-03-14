@@ -2,8 +2,8 @@
 
 #include <stdint.h>
 
-#include "SpcOpcode.h"
 #include "SpcState.h"
+#include "SpcOpcode.h"
 
 namespace SPC {
 

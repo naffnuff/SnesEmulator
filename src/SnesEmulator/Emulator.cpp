@@ -123,7 +123,7 @@ void Emulator::printState(const Instruction* instruction, const IState& state)
     state.printRegisters(output) << std::endl;
     output << instruction->opcodeToString() << std::endl;
     output << std::setw(2) << std::setfill('0') << +state.readProgramByte() << ": ";
-    output << instruction->toString(state) << std::endl;
+    output << instruction->toString() << std::endl;
 }
 
 bool Emulator::awaitCommand()

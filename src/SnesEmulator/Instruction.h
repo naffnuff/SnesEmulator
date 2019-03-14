@@ -9,13 +9,23 @@
 class Instruction
 {
 public:
-    virtual std::string toString(const IState& state) const = 0;
+    virtual std::string toString() const = 0;
     virtual std::string opcodeToString() const = 0;
-    virtual int execute() const = 0;
+    virtual int execute() = 0;
     virtual uint16_t size() const = 0;
+};
+
+template<typename State>
+class InstructionBase : public Instruction
+{
+public:
+    InstructionBase(State& state)
+        : state(state)
+    {
+    }
 
 protected:
-    std::string operandToString(const IState& state) const
+    std::string operandToString() const
     {
         std::ostringstream ss;
         ss << std::hex;
@@ -24,18 +34,22 @@ protected:
         }
         return ss.str();
     }
+
+    State& state;
 };
 
 template<typename State>
-class Instruction1Byte : public Instruction
+class Instruction1Byte : public InstructionBase<State>
 {
-protected:
-    virtual int invokeOperator(State& state) const = 0;
+    using InstructionBase<State>::InstructionBase;
 
-    int applyOperand(State& state) const
+protected:
+    virtual int invokeOperator() = 0;
+
+    int applyOperand()
     {
-        state.incrementProgramCounter(size());
-        return invokeOperator(state);
+        InstructionBase<State>::state.incrementProgramCounter(size());
+        return invokeOperator();
     }
 
     uint16_t size() const override
@@ -45,16 +59,18 @@ protected:
 };
 
 template<typename State>
-class Instruction2Byte : public Instruction
+class Instruction2Byte : public InstructionBase<State>
 {
-protected:
-    virtual int invokeOperator(State& state, uint8_t lowByte) const = 0;
+    using InstructionBase<State>::InstructionBase;
 
-    int applyOperand(State& state) const
+protected:
+    virtual int invokeOperator(uint8_t lowByte) = 0;
+
+    int applyOperand()
     {
-        uint8_t lowByte = state.readProgramByte(1);
-        state.incrementProgramCounter(size());
-        return invokeOperator(state, lowByte);
+        uint8_t lowByte = InstructionBase<State>::state.readProgramByte(1);
+        InstructionBase<State>::state.incrementProgramCounter(size());
+        return invokeOperator(lowByte);
     }
 
     uint16_t size() const override
@@ -64,17 +80,19 @@ protected:
 };
 
 template<typename State>
-class Instruction3Byte : public Instruction
+class Instruction3Byte : public InstructionBase<State>
 {
-protected:
-    virtual int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte) const = 0;
+    using InstructionBase<State>::InstructionBase;
 
-    int applyOperand(State& state) const
+protected:
+    virtual int invokeOperator(uint8_t lowByte, uint8_t highByte) = 0;
+
+    int applyOperand()
     {
-        uint8_t lowByte = state.readProgramByte(1);
-        uint8_t highByte = state.readProgramByte(2);
-        state.incrementProgramCounter(size());
-        return invokeOperator(state, lowByte, highByte);
+        uint8_t lowByte = InstructionBase<State>::state.readProgramByte(1);
+        uint8_t highByte = InstructionBase<State>::state.readProgramByte(2);
+        InstructionBase<State>::state.incrementProgramCounter(size());
+        return invokeOperator(lowByte, highByte);
     }
 
     uint16_t size() const override
@@ -84,18 +102,20 @@ protected:
 };
 
 template<typename State>
-class Instruction4Byte : public Instruction
+class Instruction4Byte : public InstructionBase<State>
 {
-protected:
-    virtual int invokeOperator(State& state, uint8_t lowByte, uint8_t highByte, uint8_t bankByte) const = 0;
+    using InstructionBase<State>::InstructionBase;
 
-    int applyOperand(State& state) const
+protected:
+    virtual int invokeOperator(uint8_t lowByte, uint8_t highByte, uint8_t bankByte) = 0;
+
+    int applyOperand()
     {
-        uint8_t lowByte = state.readProgramByte(1);
-        uint8_t highByte = state.readProgramByte(2);
-        uint8_t bankByte = state.readProgramByte(3);
-        state.incrementProgramCounter(size());
-        return invokeOperator(state, lowByte, highByte, bankByte);
+        uint8_t lowByte = InstructionBase<State>::state.readProgramByte(1);
+        uint8_t highByte = InstructionBase<State>::state.readProgramByte(2);
+        uint8_t bankByte = InstructionBase<State>::state.readProgramByte(3);
+        InstructionBase<State>::state.incrementProgramCounter(size());
+        return invokeOperator(lowByte, highByte, bankByte);
     }
 
     uint16_t size() const override

@@ -3,7 +3,6 @@
 #include <stdint.h>
 
 #include "CpuOpcode.h"
-#include "CpuState.h"
 
 namespace CPU {
 

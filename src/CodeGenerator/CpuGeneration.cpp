@@ -173,7 +173,6 @@ void generateOpcode(std::ostream& output, const Instruction& instruction, const 
     if (is16Bit) {
         addressModeClass += "16Bit";
     }
-    addressModeClass += "<Operator::" + instruction.mnemonic + ">";
 
     if (!instruction.sizeRemark.empty()) {
         sizeRemark = stoi(instruction.sizeRemark);
@@ -183,22 +182,17 @@ void generateOpcode(std::ostream& output, const Instruction& instruction, const 
     std::string classname = instruction.classname + (is16Bit ? "_16Bit" : "");
 
     output << "class " << classname;
-    output << " : public AddressMode::" << addressModeClass;
+    output << " : public AddressMode::" << addressModeClass << "<Operator::" + instruction.mnemonic + ">";
     output << std::endl
         << "{" << std::endl
-        << "public:" << std::endl
-        << "    " << classname << "(State& state) : state(state)" << std::endl
-        << "    {" << std::endl
-        << "    }" << std::endl
-        << std::endl
-        << "private:" << std::endl
+        << "    using " << addressModeClass << "::" << addressModeClass << ";" << std::endl << std::endl
         << "    // " << opcodeComment << std::endl;
     for (int remark : instruction.cyclesRemarks) {
         if (!getRemark(remark).empty()) {
             output << "    // " << getRemark(remark) << std::endl;
         }
     }
-    output << "    int execute() const override" << std::endl
+    output << "    int execute() override" << std::endl
         << "    {" << std::endl
         << "        throw std::runtime_error(\"" + classname + " is not implemented\");" << std::endl;
     if (hasCycleModification(instruction.cyclesRemarks)) {
@@ -209,7 +203,7 @@ void generateOpcode(std::ostream& output, const Instruction& instruction, const 
         addCycleModifications(output, instruction.cyclesRemarks);
         output << "        return " << instruction.cycles;
     }
-    output << " + applyOperand(state);" << std::endl
+    output << " + applyOperand();" << std::endl
         << "    }" << std::endl
         << std::endl
         << "    std::string opcodeToString() const override { return \"" << instruction.code << ": " << instruction.name;
@@ -217,15 +211,17 @@ void generateOpcode(std::ostream& output, const Instruction& instruction, const 
         output << " (16-bit)";
     }
     output << "\"; }" << std::endl
-        << std::endl
-        << "    State& state;" << std::endl
         << "};" << std::endl
         << std::endl;
 }
 
 void generateOpcodes(const std::vector<Instruction>& instructions)
 {
-    std::ifstream opcodeTableFile("..\\..\\..\\src\\CodeGenerator\\opcodeTable.txt");
+    std::ifstream opcodeTableFile("..\\..\\..\\src\\CodeGenerator\\cpuOpcodeTable.txt");
+    if (!opcodeTableFile) {
+        throw std::runtime_error("Cannot find opcode table file");
+    }
+
     typedef std::map<std::string, std::string> OpcodeMap;
     OpcodeMap opcodeMap;
     std::string line;
@@ -238,16 +234,16 @@ void generateOpcodes(const std::vector<Instruction>& instructions)
         opcodeMap[opcode] = comment;
     }
 
-    std::ofstream output("..\\..\\..\\src\\SnesEmulator\\Opcode.h");
+    std::ofstream output("..\\..\\..\\src\\SnesEmulator\\CPU\\CpuOpcode.h");
 
     output << "#pragma once" << std::endl
         << std::endl
         << "#include <stdint.h>" << std::endl
         << std::endl
-        << "#include \"State.h\"" << std::endl
-        << "#include \"Instruction.h\"" << std::endl
-        << "#include \"AddressMode.h\"" << std::endl
-        << "#include \"Operator.h\"" << std::endl
+        << "#include \"..\\Instruction.h\"" << std::endl
+        << "#include \"CpuState.h\"" << std::endl
+        << "#include \"CpuAddressMode.h\"" << std::endl
+        << "#include \"CpuOperator.h\"" << std::endl
         << std::endl
         << "namespace CPU {" << std::endl
         << std::endl
@@ -270,14 +266,13 @@ void generateOpcodes(const std::vector<Instruction>& instructions)
 
 void generateOpcodeMap(const std::vector<Instruction>& instructions)
 {
-    std::ofstream output("..\\..\\..\\src\\SnesEmulator\\OpcodeMap.cpp");
+    std::ofstream output("..\\..\\..\\src\\SnesEmulator\\CPU\\CpuOpcodeMap.cpp");
 
-    output << "#include \"OpcodeMap.h\"" << std::endl
+    output << "#include \"CpuOpcodeMap.h\"" << std::endl
         << std::endl
         << "#include <stdint.h>" << std::endl
         << std::endl
-        << "#include \"Opcode.h\"" << std::endl
-        << "#include \"State.h\"" << std::endl
+        << "#include \"CpuOpcode.h\"" << std::endl
         << std::endl
         << "namespace CPU {" << std::endl
         << std::endl;
@@ -321,9 +316,11 @@ void generateAddressMode(std::ofstream& output, const std::string& name, const A
     int actualSize = args.instructionSize + (is16Bit ? 1 : 0);
 
     std::ostringstream superclassStream;
-    superclassStream << "Instruction" << actualSize << "Byte<State>";
+    superclassStream << "Instruction" << actualSize << "Byte";
 
-    output << superclassStream.str() << std::endl << "{" << std::endl;
+    output << superclassStream.str() << "<State>" << std::endl << "{" << std::endl;
+
+    output << "    " << superclassStream.str() << "::" << superclassStream.str() << std::endl;
 
     for (int cycleRemark : args.cycleRemarks) {
         output << "    // " << getRemark(cycleRemark) << std::endl;
@@ -339,7 +336,7 @@ void generateAddressMode(std::ofstream& output, const std::string& name, const A
             }
         }
     }
-    output << ") const override" << std::endl
+    output << ") override" << std::endl
         << "    {" << std::endl
         << "        throw std::runtime_error(\"" + name + " is not implemented\");" << std::endl;
     if (hasCycleModification(args.cycleRemarks)) {
@@ -377,14 +374,14 @@ void generateAddressMode(std::ofstream& output, const std::string& name, const A
 typedef std::map<std::string, AddressModeClassArgs> AddressModeClassMap;
 void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
 {
-    std::ofstream output("..\\..\\..\\src\\SnesEmulator\\AddressMode.h");
+    std::ofstream output("..\\..\\..\\src\\SnesEmulator\\CPU\\CpuAddressMode.h");
 
     output << "#pragma once" << std::endl
         << std::endl
         << "#include <stdint.h>" << std::endl
         << std::endl
-        << "#include \"State.h\"" << std::endl
-        << "#include \"Instruction.h\"" << std::endl
+        << "#include \"CpuState.h\"" << std::endl
+        << "#include \"..\\Instruction.h\"" << std::endl
         << std::endl
         << "namespace AddressMode {" << std::endl
         << std::endl;
@@ -402,7 +399,7 @@ void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
 typedef std::map<std::string, OperatorArgs> OperatorMap;
 void generateOperators(const OperatorMap& operatorMap)
 {
-    std::ofstream output("..\\..\\..\\src\\SnesEmulator\\Operator.h");
+    std::ofstream output("..\\..\\..\\src\\SnesEmulator\\CPU\\CpuOperator.h");
 
     output << "#pragma once" << std::endl
         << std::endl
@@ -456,7 +453,7 @@ void generateOperators(const OperatorMap& operatorMap)
 
 void generateCpu()
 {
-    std::ifstream instructionsFile("..\\..\\..\\src\\CodeGenerator\\instructions.txt");
+    std::ifstream instructionsFile("..\\..\\..\\src\\CodeGenerator\\cpuInstructions.txt");
 
     if (!instructionsFile) {
         throw std::runtime_error("Cannot find instruction definitions");
