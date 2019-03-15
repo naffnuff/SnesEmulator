@@ -125,9 +125,14 @@ public:
         programCounter = resetAddress;
     }
 
-    void incrementProgramCounter(uint16_t increment)
+    uint8_t nextProgramByte()
     {
-        programCounter += increment;
+        return memory[programCounter++];
+    }
+
+    void incrementProgramCounter()
+    {
+        programCounter++;
     }
 
     uint32_t getProgramAddress(int offset = 0) const override

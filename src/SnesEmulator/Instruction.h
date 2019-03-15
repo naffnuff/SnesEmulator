@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <sstream>
 #include <iomanip>
+#include <tuple>
+#include <utility>
 
 #include "IState.h"
 
@@ -48,7 +50,7 @@ protected:
 
     int applyOperand()
     {
-        InstructionBase<State>::state.incrementProgramCounter(size());
+        InstructionBase<State>::state.incrementProgramCounter();
         return invokeOperator();
     }
 
@@ -69,7 +71,8 @@ protected:
     int applyOperand()
     {
         uint8_t lowByte = InstructionBase<State>::state.readProgramByte(1);
-        InstructionBase<State>::state.incrementProgramCounter(size());
+        InstructionBase<State>::state.incrementProgramCounter();
+        InstructionBase<State>::state.incrementProgramCounter();
         return invokeOperator(lowByte);
     }
 
@@ -91,7 +94,9 @@ protected:
     {
         uint8_t lowByte = InstructionBase<State>::state.readProgramByte(1);
         uint8_t highByte = InstructionBase<State>::state.readProgramByte(2);
-        InstructionBase<State>::state.incrementProgramCounter(size());
+        InstructionBase<State>::state.incrementProgramCounter();
+        InstructionBase<State>::state.incrementProgramCounter();
+        InstructionBase<State>::state.incrementProgramCounter();
         return invokeOperator(lowByte, highByte);
     }
 
@@ -114,12 +119,66 @@ protected:
         uint8_t lowByte = InstructionBase<State>::state.readProgramByte(1);
         uint8_t highByte = InstructionBase<State>::state.readProgramByte(2);
         uint8_t bankByte = InstructionBase<State>::state.readProgramByte(3);
-        InstructionBase<State>::state.incrementProgramCounter(size());
+        InstructionBase<State>::state.incrementProgramCounter();
+        InstructionBase<State>::state.incrementProgramCounter();
+        InstructionBase<State>::state.incrementProgramCounter();
+        InstructionBase<State>::state.incrementProgramCounter();
         return invokeOperator(lowByte, highByte, bankByte);
     }
 
     uint16_t size() const override
     {
         return 4;
+    }
+};
+
+template<typename State, typename... Bytes>
+class FiniteInstruction : InstructionBase<State>
+{
+    using InstructionBase<State>::InstructionBase;
+
+protected:
+    virtual int invokeOperator(Bytes...) = 0;
+
+    template <typename T> int read(State& state)
+    {
+        return state.nextProgramByte();
+    }
+
+    int applyOperand()
+    {
+        InstructionBase<State>::state.incrementProgramCounter();
+        std::tuple<Bytes...> tuple = std::make_tuple(read<Bytes>(InstructionBase<State>::state)...);
+        return std::apply([this](Bytes... bytes) { return this->invokeOperator(bytes...); }, tuple);
+    }
+};
+
+template<typename State>
+class ThreeBytes : FiniteInstruction<State, uint8_t, uint8_t, uint8_t>
+{
+    using FiniteInstruction<State, uint8_t, uint8_t, uint8_t>::FiniteInstruction;
+
+    int invokeOperator(uint8_t lowByte, uint8_t highByte, uint8_t bankByte) override
+    {
+        std::cout << +lowByte << ", " << +highByte << ", " << +bankByte << std::endl;
+        return 0;
+    }
+
+    std::string toString() const
+    {
+        return "";
+    }
+    std::string opcodeToString() const
+    {
+        return "";
+    }
+public:
+    int execute()
+    {
+        return FiniteInstruction<State, uint8_t, uint8_t, uint8_t>::applyOperand();
+    }
+    uint16_t size() const
+    {
+        return 0;
     }
 };
