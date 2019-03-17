@@ -43,9 +43,6 @@ void Emulator::run()
     uint64_t nextSpc = 0;
     bool running = true;
     startTime = clock();
-
-    ThreeBytes<CPU::State> banana(cpuState);
-    banana.execute();
     
     while (running) {
         output << std::dec << "cycleCount=" << cycleCount << ", nextCpu=" << nextCpu << ", nextSpc=" << nextSpc << std::hex << std::endl;

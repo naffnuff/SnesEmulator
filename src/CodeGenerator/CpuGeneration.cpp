@@ -318,9 +318,9 @@ void generateAddressMode(std::ofstream& output, const std::string& name, const A
     std::ostringstream superclassStream;
     superclassStream << "Instruction" << actualSize << "Byte";
 
-    output << superclassStream.str() << "<State>" << std::endl << "{" << std::endl;
+    output << superclassStream.str() << std::endl << "{" << std::endl;
 
-    output << "    " << superclassStream.str() << "::" << superclassStream.str() << std::endl;
+    output << "    using " << superclassStream.str() << "::" << superclassStream.str() << std::endl;
 
     for (int cycleRemark : args.cycleRemarks) {
         output << "    // " << getRemark(cycleRemark) << std::endl;
@@ -382,6 +382,14 @@ void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
         << std::endl
         << "#include \"CpuState.h\"" << std::endl
         << "#include \"..\\Instruction.h\"" << std::endl
+        << std::endl
+        << "namespace CPU {" << std::endl
+        << std::endl
+        << "typedef InstructionBase<State> Instruction1Byte;" << std::endl
+        << "typedef InstructionBase<State, uint8_t> Instruction2Byte;" << std::endl
+        << "typedef InstructionBase<State, uint8_t, uint8_t> Instruction3Byte;" << std::endl
+        << "typedef InstructionBase<State, uint8_t, uint8_t, uint8_t> Instruction4Byte;" << std::endl
+        << std::endl
         << std::endl
         << "namespace AddressMode {" << std::endl
         << std::endl;

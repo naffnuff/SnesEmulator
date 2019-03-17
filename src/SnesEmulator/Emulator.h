@@ -4,6 +4,7 @@
 #include <set>
 
 #include "Instruction.h"
+#include "IState.h"
 
 class Emulator
 {
@@ -16,6 +17,7 @@ public:
     }
 
     void run();
+
     bool executeNext(Instruction* instruction, const IState& state, uint64_t& nextExecution, uint64_t cycleCount);
     bool awaitCommand();
     void printState(const Instruction* instruction, const IState& state);

@@ -72,15 +72,10 @@ public:
     {
         return memory[getProgramAddress(offset)];
     }
-
-    uint8_t nextProgramByte()
-    {
-        return memory[programCounter++];
-    }
     
-    void incrementProgramCounter()
+    void incrementProgramCounter(uint16_t increment)
     {
-        programCounter++;
+        programCounter += increment;
     }
 
 private:

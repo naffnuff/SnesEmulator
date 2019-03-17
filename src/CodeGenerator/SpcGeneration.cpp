@@ -439,9 +439,9 @@ void generateAddressMode(std::ofstream& output, const std::string& name, const A
     std::ostringstream superclassStream;
     superclassStream << "Instruction" << actualSize << "Byte";
 
-    output << superclassStream.str() << "<State>" << std::endl << "{" << std::endl;
+    output << superclassStream.str() << std::endl << "{" << std::endl;
 
-    output << "    " << superclassStream.str() << "::" << superclassStream.str() << ";" << std::endl << std::endl;
+    output << "    using " << superclassStream.str() << "::" << superclassStream.str() << ";" << std::endl << std::endl;
 
     for (int cycleRemark : args.cycleRemarks) {
         output << "    // " << getRemark(cycleRemark) << std::endl;
@@ -505,6 +505,10 @@ void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
         << "#include \"SpcState.h\"" << std::endl
         << std::endl
         << "namespace SPC {" << std::endl
+        << std::endl
+        << "typedef InstructionBase<State> Instruction1Byte;" << std::endl
+        << "typedef InstructionBase<State, uint8_t> Instruction2Byte;" << std::endl
+        << "typedef InstructionBase<State, uint8_t, uint8_t> Instruction3Byte;" << std::endl
         << std::endl
         << "namespace AddressMode {" << std::endl
         << std::endl;

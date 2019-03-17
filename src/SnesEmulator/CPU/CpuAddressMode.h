@@ -8,11 +8,16 @@
 
 namespace CPU {
 
+typedef InstructionBase<State> Instruction1Byte;
+typedef InstructionBase<State, uint8_t> Instruction2Byte;
+typedef InstructionBase<State, uint8_t, uint8_t> Instruction3Byte;
+typedef InstructionBase<State, uint8_t, uint8_t, uint8_t> Instruction4Byte;
+
 namespace AddressMode {
 
 // Absolute
 template <typename Operator>
-class Absolute : public Instruction3Byte<State>
+class Absolute : public Instruction3Byte
 {
     using Instruction3Byte::Instruction3Byte;
 
@@ -23,7 +28,7 @@ class Absolute : public Instruction3Byte<State>
 
     std::string toString() const override
     {
-        return Operator::toString() + " $" + Instruction3Byte<State>::operandToString();
+        return Operator::toString() + " $" + Instruction3Byte::operandToString();
     }
 };
 
@@ -34,7 +39,7 @@ int Absolute<Operator::JSR>::invokeOperator(uint8_t lowByte, uint8_t highByte)
 
 // Absolute Indexed Indirect
 template <typename Operator>
-class AbsoluteIndexedIndirect : public Instruction3Byte<State>
+class AbsoluteIndexedIndirect : public Instruction3Byte
 {
     using Instruction3Byte::Instruction3Byte;
 
@@ -53,7 +58,7 @@ class AbsoluteIndexedIndirect : public Instruction3Byte<State>
 
 // Absolute Indexed, X
 template <typename Operator>
-class AbsoluteIndexedX : public Instruction3Byte<State>
+class AbsoluteIndexedX : public Instruction3Byte
 {
     using Instruction3Byte::Instruction3Byte;
 
@@ -78,7 +83,7 @@ class AbsoluteIndexedX : public Instruction3Byte<State>
 
 // Absolute Indexed, Y
 template <typename Operator>
-class AbsoluteIndexedY : public Instruction3Byte<State>
+class AbsoluteIndexedY : public Instruction3Byte
 {
     using Instruction3Byte::Instruction3Byte;
 
@@ -103,7 +108,7 @@ class AbsoluteIndexedY : public Instruction3Byte<State>
 
 // Absolute Indirect
 template <typename Operator>
-class AbsoluteIndirect : public Instruction3Byte<State>
+class AbsoluteIndirect : public Instruction3Byte
 {
     using Instruction3Byte::Instruction3Byte;
 
@@ -122,7 +127,7 @@ class AbsoluteIndirect : public Instruction3Byte<State>
 
 // Absolute Indirect Long
 template <typename Operator>
-class AbsoluteIndirectLong : public Instruction3Byte<State>
+class AbsoluteIndirectLong : public Instruction3Byte
 {
     using Instruction3Byte::Instruction3Byte;
 
@@ -141,7 +146,7 @@ class AbsoluteIndirectLong : public Instruction3Byte<State>
 
 // Absolute Long
 template <typename Operator>
-class AbsoluteLong : public Instruction4Byte<State>
+class AbsoluteLong : public Instruction4Byte
 {
     using Instruction4Byte::Instruction4Byte;
 
@@ -160,7 +165,7 @@ class AbsoluteLong : public Instruction4Byte<State>
 
 // Absolute Long Indexed, X
 template <typename Operator>
-class AbsoluteLongIndexedX : public Instruction4Byte<State>
+class AbsoluteLongIndexedX : public Instruction4Byte
 {
     using Instruction4Byte::Instruction4Byte;
 
@@ -179,7 +184,7 @@ class AbsoluteLongIndexedX : public Instruction4Byte<State>
 
 // Accumulator
 template <typename Operator>
-class Accumulator : public Instruction1Byte<State>
+class Accumulator : public Instruction1Byte
 {
     using Instruction1Byte::Instruction1Byte;
 
@@ -203,7 +208,7 @@ class Accumulator : public Instruction1Byte<State>
 
 // Block Move
 template <typename Operator>
-class BlockMove : public Instruction3Byte<State>
+class BlockMove : public Instruction3Byte
 {
     using Instruction3Byte::Instruction3Byte;
 
@@ -222,7 +227,7 @@ class BlockMove : public Instruction3Byte<State>
 
 // Direct Page
 template <typename Operator>
-class DirectPage : public Instruction2Byte<State>
+class DirectPage : public Instruction2Byte
 {
     using Instruction2Byte::Instruction2Byte;
 
@@ -245,7 +250,7 @@ class DirectPage : public Instruction2Byte<State>
 
 // Direct Page Indexed Indirect, X
 template <typename Operator>
-class DirectPageIndexedIndirectX : public Instruction2Byte<State>
+class DirectPageIndexedIndirectX : public Instruction2Byte
 {
     using Instruction2Byte::Instruction2Byte;
 
@@ -269,7 +274,7 @@ class DirectPageIndexedIndirectX : public Instruction2Byte<State>
 
 // Direct Page Indexed, X
 template <typename Operator>
-class DirectPageIndexedX : public Instruction2Byte<State>
+class DirectPageIndexedX : public Instruction2Byte
 {
     using Instruction2Byte::Instruction2Byte;
 
@@ -293,7 +298,7 @@ class DirectPageIndexedX : public Instruction2Byte<State>
 
 // Direct Page Indexed, Y
 template <typename Operator>
-class DirectPageIndexedY : public Instruction2Byte<State>
+class DirectPageIndexedY : public Instruction2Byte
 {
     using Instruction2Byte::Instruction2Byte;
 
@@ -317,7 +322,7 @@ class DirectPageIndexedY : public Instruction2Byte<State>
 
 // Direct Page Indirect
 template <typename Operator>
-class DirectPageIndirect : public Instruction2Byte<State>
+class DirectPageIndirect : public Instruction2Byte
 {
     using Instruction2Byte::Instruction2Byte;
 
@@ -341,7 +346,7 @@ class DirectPageIndirect : public Instruction2Byte<State>
 
 // Direct Page Indirect Indexed, Y
 template <typename Operator>
-class DirectPageIndirectIndexedY : public Instruction2Byte<State>
+class DirectPageIndirectIndexedY : public Instruction2Byte
 {
     using Instruction2Byte::Instruction2Byte;
 
@@ -370,7 +375,7 @@ class DirectPageIndirectIndexedY : public Instruction2Byte<State>
 
 // Direct Page Indirect Long
 template <typename Operator>
-class DirectPageIndirectLong : public Instruction2Byte<State>
+class DirectPageIndirectLong : public Instruction2Byte
 {
     using Instruction2Byte::Instruction2Byte;
 
@@ -394,7 +399,7 @@ class DirectPageIndirectLong : public Instruction2Byte<State>
 
 // Direct Page Indirect Long Indexed, Y
 template <typename Operator>
-class DirectPageIndirectLongIndexedY : public Instruction2Byte<State>
+class DirectPageIndirectLongIndexedY : public Instruction2Byte
 {
     using Instruction2Byte::Instruction2Byte;
 
@@ -418,7 +423,7 @@ class DirectPageIndirectLongIndexedY : public Instruction2Byte<State>
 
 // Immediate
 template <typename Operator>
-class Immediate : public Instruction2Byte<State>
+class Immediate : public Instruction2Byte
 {
     using Instruction2Byte::Instruction2Byte;
 
@@ -435,7 +440,7 @@ class Immediate : public Instruction2Byte<State>
 
 // Immediate
 template <typename Operator>
-class Immediate16Bit : public Instruction3Byte<State>
+class Immediate16Bit : public Instruction3Byte
 {
     using Instruction3Byte::Instruction3Byte;
 
@@ -453,7 +458,7 @@ class Immediate16Bit : public Instruction3Byte<State>
 
 // Implied
 template <typename Operator>
-class Implied : public Instruction1Byte<State>
+class Implied : public Instruction1Byte
 {
     using Instruction1Byte::Instruction1Byte;
 
@@ -470,7 +475,7 @@ class Implied : public Instruction1Byte<State>
 
 // Program Counter Relative
 template <typename Operator>
-class ProgramCounterRelative : public Instruction2Byte<State>
+class ProgramCounterRelative : public Instruction2Byte
 {
     using Instruction2Byte::Instruction2Byte;
 
@@ -492,7 +497,7 @@ class ProgramCounterRelative : public Instruction2Byte<State>
 
 // Program Counter Relative Long
 template <typename Operator>
-class ProgramCounterRelativeLong : public Instruction3Byte<State>
+class ProgramCounterRelativeLong : public Instruction3Byte
 {
     using Instruction3Byte::Instruction3Byte;
 
@@ -511,7 +516,7 @@ class ProgramCounterRelativeLong : public Instruction3Byte<State>
 
 // Stack Relative
 template <typename Operator>
-class StackRelative : public Instruction2Byte<State>
+class StackRelative : public Instruction2Byte
 {
     using Instruction2Byte::Instruction2Byte;
 
@@ -530,7 +535,7 @@ class StackRelative : public Instruction2Byte<State>
 
 // Stack Relative Indirect Indexed, Y
 template <typename Operator>
-class StackRelativeIndirectIndexedY : public Instruction2Byte<State>
+class StackRelativeIndirectIndexedY : public Instruction2Byte
 {
     using Instruction2Byte::Instruction2Byte;
 

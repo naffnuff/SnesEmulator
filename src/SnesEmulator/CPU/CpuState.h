@@ -130,9 +130,9 @@ public:
         return memory[programCounter++];
     }
 
-    void incrementProgramCounter()
+    void incrementProgramCounter(uint16_t increment)
     {
-        programCounter++;
+        programCounter += increment;
     }
 
     uint32_t getProgramAddress(int offset = 0) const override

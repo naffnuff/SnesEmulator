@@ -7,14 +7,18 @@
 
 namespace SPC {
 
+typedef InstructionBase<State> Instruction1Byte;
+typedef InstructionBase<State, uint8_t> Instruction2Byte;
+typedef InstructionBase<State, uint8_t, uint8_t> Instruction3Byte;
+
 namespace AddressMode {
 
 // Absolute
 // !a
 template <typename Operator>
-class Absolute : public Instruction3Byte<State>
+class Absolute : public Instruction3Byte
 {
-    Instruction3Byte::Instruction3Byte;
+    using Instruction3Byte::Instruction3Byte;
 
     int invokeOperator(uint8_t lowByte, uint8_t highByte) override
     {
@@ -32,9 +36,9 @@ class Absolute : public Instruction3Byte<State>
 // Absolute Accumulator
 // !a, A
 template <typename Operator>
-class AbsoluteAccumulator : public Instruction3Byte<State>
+class AbsoluteAccumulator : public Instruction3Byte
 {
-    Instruction3Byte::Instruction3Byte;
+    using Instruction3Byte::Instruction3Byte;
 
     int invokeOperator(uint8_t lowByte, uint8_t highByte) override
     {
@@ -52,9 +56,9 @@ class AbsoluteAccumulator : public Instruction3Byte<State>
 // Absolute Index X
 // !a, X
 template <typename Operator>
-class AbsoluteIndexX : public Instruction3Byte<State>
+class AbsoluteIndexX : public Instruction3Byte
 {
-    Instruction3Byte::Instruction3Byte;
+    using Instruction3Byte::Instruction3Byte;
 
     int invokeOperator(uint8_t lowByte, uint8_t highByte) override
     {
@@ -72,9 +76,9 @@ class AbsoluteIndexX : public Instruction3Byte<State>
 // Absolute Index Y
 // !a, Y
 template <typename Operator>
-class AbsoluteIndexY : public Instruction3Byte<State>
+class AbsoluteIndexY : public Instruction3Byte
 {
-    Instruction3Byte::Instruction3Byte;
+    using Instruction3Byte::Instruction3Byte;
 
     int invokeOperator(uint8_t lowByte, uint8_t highByte) override
     {
@@ -92,9 +96,9 @@ class AbsoluteIndexY : public Instruction3Byte<State>
 // Absolute Indexed, X Accumulator
 // !a+X, A
 template <typename Operator>
-class AbsoluteIndexedXAccumulator : public Instruction3Byte<State>
+class AbsoluteIndexedXAccumulator : public Instruction3Byte
 {
-    Instruction3Byte::Instruction3Byte;
+    using Instruction3Byte::Instruction3Byte;
 
     int invokeOperator(uint8_t lowByte, uint8_t highByte) override
     {
@@ -112,9 +116,9 @@ class AbsoluteIndexedXAccumulator : public Instruction3Byte<State>
 // Absolute Indexed, X Indirect
 // [!a+X]
 template <typename Operator>
-class AbsoluteIndexedXIndirect : public Instruction3Byte<State>
+class AbsoluteIndexedXIndirect : public Instruction3Byte
 {
-    Instruction3Byte::Instruction3Byte;
+    using Instruction3Byte::Instruction3Byte;
 
     int invokeOperator(uint8_t lowByte, uint8_t highByte) override
     {
@@ -132,9 +136,9 @@ class AbsoluteIndexedXIndirect : public Instruction3Byte<State>
 // Absolute Indexed, Y Accumulator
 // !a+Y, A
 template <typename Operator>
-class AbsoluteIndexedYAccumulator : public Instruction3Byte<State>
+class AbsoluteIndexedYAccumulator : public Instruction3Byte
 {
-    Instruction3Byte::Instruction3Byte;
+    using Instruction3Byte::Instruction3Byte;
 
     int invokeOperator(uint8_t lowByte, uint8_t highByte) override
     {
@@ -152,9 +156,9 @@ class AbsoluteIndexedYAccumulator : public Instruction3Byte<State>
 // Accumulator
 // A
 template <typename Operator>
-class Accumulator : public Instruction1Byte<State>
+class Accumulator : public Instruction1Byte
 {
-    Instruction1Byte::Instruction1Byte;
+    using Instruction1Byte::Instruction1Byte;
 
     int invokeOperator() override
     {
@@ -172,9 +176,9 @@ class Accumulator : public Instruction1Byte<State>
 // Accumulator Absolute
 // A, !a
 template <typename Operator>
-class AccumulatorAbsolute : public Instruction3Byte<State>
+class AccumulatorAbsolute : public Instruction3Byte
 {
-    Instruction3Byte::Instruction3Byte;
+    using Instruction3Byte::Instruction3Byte;
 
     int invokeOperator(uint8_t lowByte, uint8_t highByte) override
     {
@@ -192,9 +196,9 @@ class AccumulatorAbsolute : public Instruction3Byte<State>
 // Accumulator Absolute Indexed, X
 // A, !a+X
 template <typename Operator>
-class AccumulatorAbsoluteIndexedX : public Instruction3Byte<State>
+class AccumulatorAbsoluteIndexedX : public Instruction3Byte
 {
-    Instruction3Byte::Instruction3Byte;
+    using Instruction3Byte::Instruction3Byte;
 
     int invokeOperator(uint8_t lowByte, uint8_t highByte) override
     {
@@ -212,9 +216,9 @@ class AccumulatorAbsoluteIndexedX : public Instruction3Byte<State>
 // Accumulator Absolute Indexed, Y
 // A, !a+Y
 template <typename Operator>
-class AccumulatorAbsoluteIndexedY : public Instruction3Byte<State>
+class AccumulatorAbsoluteIndexedY : public Instruction3Byte
 {
-    Instruction3Byte::Instruction3Byte;
+    using Instruction3Byte::Instruction3Byte;
 
     int invokeOperator(uint8_t lowByte, uint8_t highByte) override
     {
@@ -232,9 +236,9 @@ class AccumulatorAbsoluteIndexedY : public Instruction3Byte<State>
 // Accumulator Direct
 // A, d
 template <typename Operator>
-class AccumulatorDirect : public Instruction2Byte<State>
+class AccumulatorDirect : public Instruction2Byte
 {
-    Instruction2Byte::Instruction2Byte;
+    using Instruction2Byte::Instruction2Byte;
 
     int invokeOperator(uint8_t lowByte) override
     {
@@ -252,9 +256,9 @@ class AccumulatorDirect : public Instruction2Byte<State>
 // Accumulator Direct Indexed, X
 // A, d+X
 template <typename Operator>
-class AccumulatorDirectIndexedX : public Instruction2Byte<State>
+class AccumulatorDirectIndexedX : public Instruction2Byte
 {
-    Instruction2Byte::Instruction2Byte;
+    using Instruction2Byte::Instruction2Byte;
 
     int invokeOperator(uint8_t lowByte) override
     {
@@ -272,9 +276,9 @@ class AccumulatorDirectIndexedX : public Instruction2Byte<State>
 // Accumulator Direct Indexed, X Indirect
 // A, [d+X]
 template <typename Operator>
-class AccumulatorDirectIndexedXIndirect : public Instruction2Byte<State>
+class AccumulatorDirectIndexedXIndirect : public Instruction2Byte
 {
-    Instruction2Byte::Instruction2Byte;
+    using Instruction2Byte::Instruction2Byte;
 
     int invokeOperator(uint8_t lowByte) override
     {
@@ -292,9 +296,9 @@ class AccumulatorDirectIndexedXIndirect : public Instruction2Byte<State>
 // Accumulator Direct Indirect Indexed, Y
 // A, [d]+Y
 template <typename Operator>
-class AccumulatorDirectIndirectIndexedY : public Instruction2Byte<State>
+class AccumulatorDirectIndirectIndexedY : public Instruction2Byte
 {
-    Instruction2Byte::Instruction2Byte;
+    using Instruction2Byte::Instruction2Byte;
 
     int invokeOperator(uint8_t lowByte) override
     {
@@ -312,9 +316,9 @@ class AccumulatorDirectIndirectIndexedY : public Instruction2Byte<State>
 // Accumulator Immediate
 // A, #i
 template <typename Operator>
-class AccumulatorImmediate : public Instruction2Byte<State>
+class AccumulatorImmediate : public Instruction2Byte
 {
-    Instruction2Byte::Instruction2Byte;
+    using Instruction2Byte::Instruction2Byte;
 
     int invokeOperator(uint8_t lowByte) override
     {
@@ -332,9 +336,9 @@ class AccumulatorImmediate : public Instruction2Byte<State>
 // Accumulator Index X
 // A, X
 template <typename Operator>
-class AccumulatorIndexX : public Instruction1Byte<State>
+class AccumulatorIndexX : public Instruction1Byte
 {
-    Instruction1Byte::Instruction1Byte;
+    using Instruction1Byte::Instruction1Byte;
 
     int invokeOperator() override
     {
@@ -352,9 +356,9 @@ class AccumulatorIndexX : public Instruction1Byte<State>
 // Accumulator Index Y
 // A, Y
 template <typename Operator>
-class AccumulatorIndexY : public Instruction1Byte<State>
+class AccumulatorIndexY : public Instruction1Byte
 {
-    Instruction1Byte::Instruction1Byte;
+    using Instruction1Byte::Instruction1Byte;
 
     int invokeOperator() override
     {
@@ -372,9 +376,9 @@ class AccumulatorIndexY : public Instruction1Byte<State>
 // Accumulator X Indirect
 // A, (X)
 template <typename Operator>
-class AccumulatorXIndirect : public Instruction1Byte<State>
+class AccumulatorXIndirect : public Instruction1Byte
 {
-    Instruction1Byte::Instruction1Byte;
+    using Instruction1Byte::Instruction1Byte;
 
     int invokeOperator() override
     {
@@ -392,9 +396,9 @@ class AccumulatorXIndirect : public Instruction1Byte<State>
 // Accumulator X Indirect Plus
 // A, (X)+
 template <typename Operator>
-class AccumulatorXIndirectPlus : public Instruction1Byte<State>
+class AccumulatorXIndirectPlus : public Instruction1Byte
 {
-    Instruction1Byte::Instruction1Byte;
+    using Instruction1Byte::Instruction1Byte;
 
     int invokeOperator() override
     {
@@ -412,9 +416,9 @@ class AccumulatorXIndirectPlus : public Instruction1Byte<State>
 // Carry Memory Bit
 // C, m.b
 template <typename Operator>
-class CarryMemoryBit : public Instruction3Byte<State>
+class CarryMemoryBit : public Instruction3Byte
 {
-    Instruction3Byte::Instruction3Byte;
+    using Instruction3Byte::Instruction3Byte;
 
     int invokeOperator(uint8_t lowByte, uint8_t highByte) override
     {
@@ -432,9 +436,9 @@ class CarryMemoryBit : public Instruction3Byte<State>
 // Carry Not Memory Bit
 // C, /m.b
 template <typename Operator>
-class CarryNotMemoryBit : public Instruction3Byte<State>
+class CarryNotMemoryBit : public Instruction3Byte
 {
-    Instruction3Byte::Instruction3Byte;
+    using Instruction3Byte::Instruction3Byte;
 
     int invokeOperator(uint8_t lowByte, uint8_t highByte) override
     {
@@ -452,9 +456,9 @@ class CarryNotMemoryBit : public Instruction3Byte<State>
 // Direct
 // d
 template <typename Operator>
-class Direct : public Instruction2Byte<State>
+class Direct : public Instruction2Byte
 {
-    Instruction2Byte::Instruction2Byte;
+    using Instruction2Byte::Instruction2Byte;
 
     int invokeOperator(uint8_t lowByte) override
     {
@@ -472,9 +476,9 @@ class Direct : public Instruction2Byte<State>
 // Direct Accumulator
 // d, A
 template <typename Operator>
-class DirectAccumulator : public Instruction2Byte<State>
+class DirectAccumulator : public Instruction2Byte
 {
-    Instruction2Byte::Instruction2Byte;
+    using Instruction2Byte::Instruction2Byte;
 
     int invokeOperator(uint8_t lowByte) override
     {
@@ -492,9 +496,9 @@ class DirectAccumulator : public Instruction2Byte<State>
 // Direct Bit
 // d.7
 template <typename Operator, uint8_t bitMask>
-class DirectBit : public Instruction2Byte<State>
+class DirectBit : public Instruction2Byte
 {
-    Instruction2Byte::Instruction2Byte;
+    using Instruction2Byte::Instruction2Byte;
 
     int invokeOperator(uint8_t lowByte) override
     {
@@ -512,9 +516,9 @@ class DirectBit : public Instruction2Byte<State>
 // Direct Bit Program Counter Relative
 // d.7, r
 template <typename Operator, uint8_t bitMask>
-class DirectBitProgramCounterRelative : public Instruction3Byte<State>
+class DirectBitProgramCounterRelative : public Instruction3Byte
 {
-    Instruction3Byte::Instruction3Byte;
+    using Instruction3Byte::Instruction3Byte;
 
     int invokeOperator(uint8_t lowByte, uint8_t highByte) override
     {
@@ -532,9 +536,9 @@ class DirectBitProgramCounterRelative : public Instruction3Byte<State>
 // Direct Direct
 // dd, ds
 template <typename Operator>
-class DirectDirect : public Instruction3Byte<State>
+class DirectDirect : public Instruction3Byte
 {
-    Instruction3Byte::Instruction3Byte;
+    using Instruction3Byte::Instruction3Byte;
 
     int invokeOperator(uint8_t lowByte, uint8_t highByte) override
     {
@@ -552,9 +556,9 @@ class DirectDirect : public Instruction3Byte<State>
 // Direct Immediate
 // d, #i
 template <typename Operator>
-class DirectImmediate : public Instruction3Byte<State>
+class DirectImmediate : public Instruction3Byte
 {
-    Instruction3Byte::Instruction3Byte;
+    using Instruction3Byte::Instruction3Byte;
 
     int invokeOperator(uint8_t lowByte, uint8_t highByte) override
     {
@@ -572,9 +576,9 @@ class DirectImmediate : public Instruction3Byte<State>
 // Direct Index X
 // d, X
 template <typename Operator>
-class DirectIndexX : public Instruction2Byte<State>
+class DirectIndexX : public Instruction2Byte
 {
-    Instruction2Byte::Instruction2Byte;
+    using Instruction2Byte::Instruction2Byte;
 
     int invokeOperator(uint8_t lowByte) override
     {
@@ -592,9 +596,9 @@ class DirectIndexX : public Instruction2Byte<State>
 // Direct Index Y
 // d, Y
 template <typename Operator>
-class DirectIndexY : public Instruction2Byte<State>
+class DirectIndexY : public Instruction2Byte
 {
-    Instruction2Byte::Instruction2Byte;
+    using Instruction2Byte::Instruction2Byte;
 
     int invokeOperator(uint8_t lowByte) override
     {
@@ -612,9 +616,9 @@ class DirectIndexY : public Instruction2Byte<State>
 // Direct Indexed, X
 // d+X
 template <typename Operator>
-class DirectIndexedX : public Instruction2Byte<State>
+class DirectIndexedX : public Instruction2Byte
 {
-    Instruction2Byte::Instruction2Byte;
+    using Instruction2Byte::Instruction2Byte;
 
     int invokeOperator(uint8_t lowByte) override
     {
@@ -632,9 +636,9 @@ class DirectIndexedX : public Instruction2Byte<State>
 // Direct Indexed, X Accumulator
 // d+X, A
 template <typename Operator>
-class DirectIndexedXAccumulator : public Instruction2Byte<State>
+class DirectIndexedXAccumulator : public Instruction2Byte
 {
-    Instruction2Byte::Instruction2Byte;
+    using Instruction2Byte::Instruction2Byte;
 
     int invokeOperator(uint8_t lowByte) override
     {
@@ -652,9 +656,9 @@ class DirectIndexedXAccumulator : public Instruction2Byte<State>
 // Direct Indexed, X Index Y
 // d+X, Y
 template <typename Operator>
-class DirectIndexedXIndexY : public Instruction2Byte<State>
+class DirectIndexedXIndexY : public Instruction2Byte
 {
-    Instruction2Byte::Instruction2Byte;
+    using Instruction2Byte::Instruction2Byte;
 
     int invokeOperator(uint8_t lowByte) override
     {
@@ -672,9 +676,9 @@ class DirectIndexedXIndexY : public Instruction2Byte<State>
 // Direct Indexed, X Indirect Accumulator
 // [d+X], A
 template <typename Operator>
-class DirectIndexedXIndirectAccumulator : public Instruction2Byte<State>
+class DirectIndexedXIndirectAccumulator : public Instruction2Byte
 {
-    Instruction2Byte::Instruction2Byte;
+    using Instruction2Byte::Instruction2Byte;
 
     int invokeOperator(uint8_t lowByte) override
     {
@@ -692,9 +696,9 @@ class DirectIndexedXIndirectAccumulator : public Instruction2Byte<State>
 // Direct Indexed, X Program Counter Relative
 // d+X, r
 template <typename Operator>
-class DirectIndexedXProgramCounterRelative : public Instruction3Byte<State>
+class DirectIndexedXProgramCounterRelative : public Instruction3Byte
 {
-    Instruction3Byte::Instruction3Byte;
+    using Instruction3Byte::Instruction3Byte;
 
     int invokeOperator(uint8_t lowByte, uint8_t highByte) override
     {
@@ -712,9 +716,9 @@ class DirectIndexedXProgramCounterRelative : public Instruction3Byte<State>
 // Direct Indexed, Y Index X
 // d+Y, X
 template <typename Operator>
-class DirectIndexedYIndexX : public Instruction2Byte<State>
+class DirectIndexedYIndexX : public Instruction2Byte
 {
-    Instruction2Byte::Instruction2Byte;
+    using Instruction2Byte::Instruction2Byte;
 
     int invokeOperator(uint8_t lowByte) override
     {
@@ -732,9 +736,9 @@ class DirectIndexedYIndexX : public Instruction2Byte<State>
 // Direct Indirect Indexed, Y Accumulator
 // [d]+Y, A
 template <typename Operator>
-class DirectIndirectIndexedYAccumulator : public Instruction2Byte<State>
+class DirectIndirectIndexedYAccumulator : public Instruction2Byte
 {
-    Instruction2Byte::Instruction2Byte;
+    using Instruction2Byte::Instruction2Byte;
 
     int invokeOperator(uint8_t lowByte) override
     {
@@ -752,9 +756,9 @@ class DirectIndirectIndexedYAccumulator : public Instruction2Byte<State>
 // Direct Program Counter Relative
 // d, r
 template <typename Operator>
-class DirectProgramCounterRelative : public Instruction3Byte<State>
+class DirectProgramCounterRelative : public Instruction3Byte
 {
-    Instruction3Byte::Instruction3Byte;
+    using Instruction3Byte::Instruction3Byte;
 
     int invokeOperator(uint8_t lowByte, uint8_t highByte) override
     {
@@ -772,9 +776,9 @@ class DirectProgramCounterRelative : public Instruction3Byte<State>
 // Direct Y Accumulator
 // d, YA
 template <typename Operator>
-class DirectYAccumulator : public Instruction2Byte<State>
+class DirectYAccumulator : public Instruction2Byte
 {
-    Instruction2Byte::Instruction2Byte;
+    using Instruction2Byte::Instruction2Byte;
 
     int invokeOperator(uint8_t lowByte) override
     {
@@ -792,9 +796,9 @@ class DirectYAccumulator : public Instruction2Byte<State>
 // Implied
 // 
 template <typename Operator>
-class Implied : public Instruction1Byte<State>
+class Implied : public Instruction1Byte
 {
-    Instruction1Byte::Instruction1Byte;
+    using Instruction1Byte::Instruction1Byte;
 
     int invokeOperator() override
     {
@@ -811,9 +815,9 @@ class Implied : public Instruction1Byte<State>
 // Index X
 // X
 template <typename Operator>
-class IndexX : public Instruction1Byte<State>
+class IndexX : public Instruction1Byte
 {
-    Instruction1Byte::Instruction1Byte;
+    using Instruction1Byte::Instruction1Byte;
 
     int invokeOperator() override
     {
@@ -831,9 +835,9 @@ class IndexX : public Instruction1Byte<State>
 // Index X Absolute
 // X, !a
 template <typename Operator>
-class IndexXAbsolute : public Instruction3Byte<State>
+class IndexXAbsolute : public Instruction3Byte
 {
-    Instruction3Byte::Instruction3Byte;
+    using Instruction3Byte::Instruction3Byte;
 
     int invokeOperator(uint8_t lowByte, uint8_t highByte) override
     {
@@ -851,9 +855,9 @@ class IndexXAbsolute : public Instruction3Byte<State>
 // Index X Accumulator
 // X, A
 template <typename Operator>
-class IndexXAccumulator : public Instruction1Byte<State>
+class IndexXAccumulator : public Instruction1Byte
 {
-    Instruction1Byte::Instruction1Byte;
+    using Instruction1Byte::Instruction1Byte;
 
     int invokeOperator() override
     {
@@ -871,9 +875,9 @@ class IndexXAccumulator : public Instruction1Byte<State>
 // Index X Direct
 // X, d
 template <typename Operator>
-class IndexXDirect : public Instruction2Byte<State>
+class IndexXDirect : public Instruction2Byte
 {
-    Instruction2Byte::Instruction2Byte;
+    using Instruction2Byte::Instruction2Byte;
 
     int invokeOperator(uint8_t lowByte) override
     {
@@ -891,9 +895,9 @@ class IndexXDirect : public Instruction2Byte<State>
 // Index X Direct Indexed, Y
 // X, d+Y
 template <typename Operator>
-class IndexXDirectIndexedY : public Instruction2Byte<State>
+class IndexXDirectIndexedY : public Instruction2Byte
 {
-    Instruction2Byte::Instruction2Byte;
+    using Instruction2Byte::Instruction2Byte;
 
     int invokeOperator(uint8_t lowByte) override
     {
@@ -911,9 +915,9 @@ class IndexXDirectIndexedY : public Instruction2Byte<State>
 // Index X Immediate
 // X, #i
 template <typename Operator>
-class IndexXImmediate : public Instruction2Byte<State>
+class IndexXImmediate : public Instruction2Byte
 {
-    Instruction2Byte::Instruction2Byte;
+    using Instruction2Byte::Instruction2Byte;
 
     int invokeOperator(uint8_t lowByte) override
     {
@@ -931,9 +935,9 @@ class IndexXImmediate : public Instruction2Byte<State>
 // Index X Stack Pointer
 // X, SP
 template <typename Operator>
-class IndexXStackPointer : public Instruction1Byte<State>
+class IndexXStackPointer : public Instruction1Byte
 {
-    Instruction1Byte::Instruction1Byte;
+    using Instruction1Byte::Instruction1Byte;
 
     int invokeOperator() override
     {
@@ -951,9 +955,9 @@ class IndexXStackPointer : public Instruction1Byte<State>
 // Index Y
 // Y
 template <typename Operator>
-class IndexY : public Instruction1Byte<State>
+class IndexY : public Instruction1Byte
 {
-    Instruction1Byte::Instruction1Byte;
+    using Instruction1Byte::Instruction1Byte;
 
     int invokeOperator() override
     {
@@ -971,9 +975,9 @@ class IndexY : public Instruction1Byte<State>
 // Index Y Absolute
 // Y, !a
 template <typename Operator>
-class IndexYAbsolute : public Instruction3Byte<State>
+class IndexYAbsolute : public Instruction3Byte
 {
-    Instruction3Byte::Instruction3Byte;
+    using Instruction3Byte::Instruction3Byte;
 
     int invokeOperator(uint8_t lowByte, uint8_t highByte) override
     {
@@ -991,9 +995,9 @@ class IndexYAbsolute : public Instruction3Byte<State>
 // Index Y Accumulator
 // YA
 template <typename Operator>
-class IndexYAccumulator : public Instruction1Byte<State>
+class IndexYAccumulator : public Instruction1Byte
 {
-    Instruction1Byte::Instruction1Byte;
+    using Instruction1Byte::Instruction1Byte;
 
     int invokeOperator() override
     {
@@ -1011,9 +1015,9 @@ class IndexYAccumulator : public Instruction1Byte<State>
 // Index Y Direct
 // Y, d
 template <typename Operator>
-class IndexYDirect : public Instruction2Byte<State>
+class IndexYDirect : public Instruction2Byte
 {
-    Instruction2Byte::Instruction2Byte;
+    using Instruction2Byte::Instruction2Byte;
 
     int invokeOperator(uint8_t lowByte) override
     {
@@ -1031,9 +1035,9 @@ class IndexYDirect : public Instruction2Byte<State>
 // Index Y Direct Indexed, X
 // Y, d+X
 template <typename Operator>
-class IndexYDirectIndexedX : public Instruction2Byte<State>
+class IndexYDirectIndexedX : public Instruction2Byte
 {
-    Instruction2Byte::Instruction2Byte;
+    using Instruction2Byte::Instruction2Byte;
 
     int invokeOperator(uint8_t lowByte) override
     {
@@ -1051,9 +1055,9 @@ class IndexYDirectIndexedX : public Instruction2Byte<State>
 // Index Y Immediate
 // Y, #i
 template <typename Operator>
-class IndexYImmediate : public Instruction2Byte<State>
+class IndexYImmediate : public Instruction2Byte
 {
-    Instruction2Byte::Instruction2Byte;
+    using Instruction2Byte::Instruction2Byte;
 
     int invokeOperator(uint8_t lowByte) override
     {
@@ -1071,9 +1075,9 @@ class IndexYImmediate : public Instruction2Byte<State>
 // Index Y Program Counter Relative
 // Y, r
 template <typename Operator>
-class IndexYProgramCounterRelative : public Instruction2Byte<State>
+class IndexYProgramCounterRelative : public Instruction2Byte
 {
-    Instruction2Byte::Instruction2Byte;
+    using Instruction2Byte::Instruction2Byte;
 
     int invokeOperator(uint8_t lowByte) override
     {
@@ -1091,9 +1095,9 @@ class IndexYProgramCounterRelative : public Instruction2Byte<State>
 // Memory Bit
 // m.b
 template <typename Operator>
-class MemoryBit : public Instruction3Byte<State>
+class MemoryBit : public Instruction3Byte
 {
-    Instruction3Byte::Instruction3Byte;
+    using Instruction3Byte::Instruction3Byte;
 
     int invokeOperator(uint8_t lowByte, uint8_t highByte) override
     {
@@ -1111,9 +1115,9 @@ class MemoryBit : public Instruction3Byte<State>
 // Memory Bit Carry
 // m.b, C
 template <typename Operator>
-class MemoryBitCarry : public Instruction3Byte<State>
+class MemoryBitCarry : public Instruction3Byte
 {
-    Instruction3Byte::Instruction3Byte;
+    using Instruction3Byte::Instruction3Byte;
 
     int invokeOperator(uint8_t lowByte, uint8_t highByte) override
     {
@@ -1131,9 +1135,9 @@ class MemoryBitCarry : public Instruction3Byte<State>
 // Program Counter Relative
 // r
 template <typename Operator>
-class ProgramCounterRelative : public Instruction2Byte<State>
+class ProgramCounterRelative : public Instruction2Byte
 {
-    Instruction2Byte::Instruction2Byte;
+    using Instruction2Byte::Instruction2Byte;
 
     int invokeOperator(uint8_t lowByte) override
     {
@@ -1151,9 +1155,9 @@ class ProgramCounterRelative : public Instruction2Byte<State>
 // Stack Pointer Index X
 // SP, X
 template <typename Operator>
-class StackPointerIndexX : public Instruction1Byte<State>
+class StackPointerIndexX : public Instruction1Byte
 {
-    Instruction1Byte::Instruction1Byte;
+    using Instruction1Byte::Instruction1Byte;
 
     int invokeOperator() override
     {
@@ -1171,9 +1175,9 @@ class StackPointerIndexX : public Instruction1Byte<State>
 // State Flags
 // PSW
 template <typename Operator>
-class StateFlags : public Instruction1Byte<State>
+class StateFlags : public Instruction1Byte
 {
-    Instruction1Byte::Instruction1Byte;
+    using Instruction1Byte::Instruction1Byte;
 
     int invokeOperator() override
     {
@@ -1191,9 +1195,9 @@ class StateFlags : public Instruction1Byte<State>
 // Table
 // 15
 template <typename Operator, uint8_t index>
-class Table : public Instruction1Byte<State>
+class Table : public Instruction1Byte
 {
-    Instruction1Byte::Instruction1Byte;
+    using Instruction1Byte::Instruction1Byte;
 
     int invokeOperator() override
     {
@@ -1211,9 +1215,9 @@ class Table : public Instruction1Byte<State>
 // U Page
 // u
 template <typename Operator>
-class UPage : public Instruction2Byte<State>
+class UPage : public Instruction2Byte
 {
-    Instruction2Byte::Instruction2Byte;
+    using Instruction2Byte::Instruction2Byte;
 
     int invokeOperator(uint8_t lowByte) override
     {
@@ -1231,9 +1235,9 @@ class UPage : public Instruction2Byte<State>
 // X Indirect Accumulator
 // (X), A
 template <typename Operator>
-class XIndirectAccumulator : public Instruction1Byte<State>
+class XIndirectAccumulator : public Instruction1Byte
 {
-    Instruction1Byte::Instruction1Byte;
+    using Instruction1Byte::Instruction1Byte;
 
     int invokeOperator() override
     {
@@ -1251,9 +1255,9 @@ class XIndirectAccumulator : public Instruction1Byte<State>
 // X Indirect Plus Accumulator
 // (X)+, A
 template <typename Operator>
-class XIndirectPlusAccumulator : public Instruction1Byte<State>
+class XIndirectPlusAccumulator : public Instruction1Byte
 {
-    Instruction1Byte::Instruction1Byte;
+    using Instruction1Byte::Instruction1Byte;
 
     int invokeOperator() override
     {
@@ -1271,9 +1275,9 @@ class XIndirectPlusAccumulator : public Instruction1Byte<State>
 // X Indirect Y Indirect
 // (X), (Y)
 template <typename Operator>
-class XIndirectYIndirect : public Instruction1Byte<State>
+class XIndirectYIndirect : public Instruction1Byte
 {
-    Instruction1Byte::Instruction1Byte;
+    using Instruction1Byte::Instruction1Byte;
 
     int invokeOperator() override
     {
@@ -1291,9 +1295,9 @@ class XIndirectYIndirect : public Instruction1Byte<State>
 // Y Accumulator Direct
 // YA, d
 template <typename Operator>
-class YAccumulatorDirect : public Instruction2Byte<State>
+class YAccumulatorDirect : public Instruction2Byte
 {
-    Instruction2Byte::Instruction2Byte;
+    using Instruction2Byte::Instruction2Byte;
 
     int invokeOperator(uint8_t lowByte) override
     {
@@ -1311,9 +1315,9 @@ class YAccumulatorDirect : public Instruction2Byte<State>
 // Y Accumulator Index X
 // YA, X
 template <typename Operator>
-class YAccumulatorIndexX : public Instruction1Byte<State>
+class YAccumulatorIndexX : public Instruction1Byte
 {
-    Instruction1Byte::Instruction1Byte;
+    using Instruction1Byte::Instruction1Byte;
 
     int invokeOperator() override
     {
