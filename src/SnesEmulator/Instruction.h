@@ -29,7 +29,7 @@ protected:
 
     int applyOperand()
     {
-        state.incrementProgramCounter(this->size());
+        state.incrementProgramCounter(size());
         int offset = -1;
         return invokeOperator(readByte<Bytes>(offset)...);
     }

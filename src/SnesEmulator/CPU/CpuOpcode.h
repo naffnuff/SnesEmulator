@@ -1281,7 +1281,7 @@ class CMP_DF : public AddressMode::AbsoluteLongIndexedX<Operator::CMP>
 };
 
 // COP Co-Processor Enable [Flags affected: d,i]
-// COP const
+// COP #const
 // Immediate (2-Byte [18])
 // ¤18: Opcode is 1 byte, but program counter value pushed onto stack is incremented by 2 allowing for optional signature byte
 class COP_02 : public AddressMode::Immediate<Operator::COP>

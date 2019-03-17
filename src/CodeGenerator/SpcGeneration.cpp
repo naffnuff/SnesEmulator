@@ -57,8 +57,6 @@ struct AddressMode
     std::string templateArg;
 };
 
-static int miau = 0;
-
 AddressMode getAddressMode(const std::string& code)
 {
     AddressMode mode;
@@ -197,8 +195,6 @@ AddressMode getAddressMode(const std::string& code)
         mode.name = "U Page";
     } else if (code == "PSW") {
         mode.name = "State Flags";
-    } else if (code == "miau") {
-        mode.name = "suge";
     } else {
         mode.name = "Table";
         mode.templateArg = code;

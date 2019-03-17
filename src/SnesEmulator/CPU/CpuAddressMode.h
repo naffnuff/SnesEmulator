@@ -16,6 +16,7 @@ typedef InstructionBase<State, uint8_t, uint8_t, uint8_t> Instruction4Byte;
 namespace AddressMode {
 
 // Absolute
+// addr
 template <typename Operator>
 class Absolute : public Instruction3Byte
 {
@@ -38,6 +39,7 @@ int Absolute<Operator::JSR>::invokeOperator(uint8_t lowByte, uint8_t highByte)
 }
 
 // Absolute Indexed Indirect
+// (addr,X)
 template <typename Operator>
 class AbsoluteIndexedIndirect : public Instruction3Byte
 {
@@ -57,6 +59,7 @@ class AbsoluteIndexedIndirect : public Instruction3Byte
 };
 
 // Absolute Indexed, X
+// addr,X
 template <typename Operator>
 class AbsoluteIndexedX : public Instruction3Byte
 {
@@ -82,6 +85,7 @@ class AbsoluteIndexedX : public Instruction3Byte
 };
 
 // Absolute Indexed, Y
+// addr,Y
 template <typename Operator>
 class AbsoluteIndexedY : public Instruction3Byte
 {
@@ -107,6 +111,7 @@ class AbsoluteIndexedY : public Instruction3Byte
 };
 
 // Absolute Indirect
+// (addr)
 template <typename Operator>
 class AbsoluteIndirect : public Instruction3Byte
 {
@@ -126,6 +131,7 @@ class AbsoluteIndirect : public Instruction3Byte
 };
 
 // Absolute Indirect Long
+// [addr]
 template <typename Operator>
 class AbsoluteIndirectLong : public Instruction3Byte
 {
@@ -145,6 +151,7 @@ class AbsoluteIndirectLong : public Instruction3Byte
 };
 
 // Absolute Long
+// long
 template <typename Operator>
 class AbsoluteLong : public Instruction4Byte
 {
@@ -164,6 +171,7 @@ class AbsoluteLong : public Instruction4Byte
 };
 
 // Absolute Long Indexed, X
+// long,X
 template <typename Operator>
 class AbsoluteLongIndexedX : public Instruction4Byte
 {
@@ -183,6 +191,7 @@ class AbsoluteLongIndexedX : public Instruction4Byte
 };
 
 // Accumulator
+// A
 template <typename Operator>
 class Accumulator : public Instruction1Byte
 {
@@ -207,6 +216,7 @@ class Accumulator : public Instruction1Byte
 };
 
 // Block Move
+// srcbk,destbk
 template <typename Operator>
 class BlockMove : public Instruction3Byte
 {
@@ -226,6 +236,7 @@ class BlockMove : public Instruction3Byte
 };
 
 // Direct Page
+// dp
 template <typename Operator>
 class DirectPage : public Instruction2Byte
 {
@@ -249,6 +260,7 @@ class DirectPage : public Instruction2Byte
 };
 
 // Direct Page Indexed Indirect, X
+// (dp,X)
 template <typename Operator>
 class DirectPageIndexedIndirectX : public Instruction2Byte
 {
@@ -273,6 +285,7 @@ class DirectPageIndexedIndirectX : public Instruction2Byte
 };
 
 // Direct Page Indexed, X
+// dp,X
 template <typename Operator>
 class DirectPageIndexedX : public Instruction2Byte
 {
@@ -297,6 +310,7 @@ class DirectPageIndexedX : public Instruction2Byte
 };
 
 // Direct Page Indexed, Y
+// dp,Y
 template <typename Operator>
 class DirectPageIndexedY : public Instruction2Byte
 {
@@ -321,6 +335,7 @@ class DirectPageIndexedY : public Instruction2Byte
 };
 
 // Direct Page Indirect
+// (dp)
 template <typename Operator>
 class DirectPageIndirect : public Instruction2Byte
 {
@@ -345,6 +360,7 @@ class DirectPageIndirect : public Instruction2Byte
 };
 
 // Direct Page Indirect Indexed, Y
+// (dp),Y
 template <typename Operator>
 class DirectPageIndirectIndexedY : public Instruction2Byte
 {
@@ -374,6 +390,7 @@ class DirectPageIndirectIndexedY : public Instruction2Byte
 };
 
 // Direct Page Indirect Long
+// [dp]
 template <typename Operator>
 class DirectPageIndirectLong : public Instruction2Byte
 {
@@ -398,6 +415,7 @@ class DirectPageIndirectLong : public Instruction2Byte
 };
 
 // Direct Page Indirect Long Indexed, Y
+// [dp],Y
 template <typename Operator>
 class DirectPageIndirectLongIndexedY : public Instruction2Byte
 {
@@ -422,6 +440,7 @@ class DirectPageIndirectLongIndexedY : public Instruction2Byte
 };
 
 // Immediate
+// #const
 template <typename Operator>
 class Immediate : public Instruction2Byte
 {
@@ -439,6 +458,7 @@ class Immediate : public Instruction2Byte
 };
 
 // Immediate
+// #const
 template <typename Operator>
 class Immediate16Bit : public Instruction3Byte
 {
@@ -474,6 +494,7 @@ class Implied : public Instruction1Byte
 };
 
 // Program Counter Relative
+// nearlabel
 template <typename Operator>
 class ProgramCounterRelative : public Instruction2Byte
 {
@@ -496,6 +517,7 @@ class ProgramCounterRelative : public Instruction2Byte
 };
 
 // Program Counter Relative Long
+// label
 template <typename Operator>
 class ProgramCounterRelativeLong : public Instruction3Byte
 {
@@ -515,6 +537,7 @@ class ProgramCounterRelativeLong : public Instruction3Byte
 };
 
 // Stack Relative
+// sr,S
 template <typename Operator>
 class StackRelative : public Instruction2Byte
 {
@@ -534,6 +557,7 @@ class StackRelative : public Instruction2Byte
 };
 
 // Stack Relative Indirect Indexed, Y
+// (sr,S),Y
 template <typename Operator>
 class StackRelativeIndirectIndexedY : public Instruction2Byte
 {

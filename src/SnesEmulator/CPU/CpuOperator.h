@@ -64,16 +64,16 @@ static int branchIf(bool condition, State& state, int8_t offset)
 {
     int cycles = 0;
     if (condition) {
-        uint16_t address = state.getProgramCounter(offset);
+        uint16_t newAddress = state.getProgramCounter(offset);
         cycles += 1;
         if (!state.isNativeMode()) {
             uint8_t programPage = uint8_t(state.getProgramCounter() >> 8);
-            uint8_t addressPage = uint8_t(address >> 8);
-            if (programPage != addressPage) {
+            uint8_t newAddressPage = uint8_t(newAddress >> 8);
+            if (programPage != newAddressPage) {
                 cycles += 1;
             }
         }
-        state.setProgramCounter(address);
+        state.setProgramCounter(newAddress);
     }
     return cycles;
 }
