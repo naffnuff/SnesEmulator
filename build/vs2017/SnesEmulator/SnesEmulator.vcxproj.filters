@@ -53,9 +53,6 @@
     <ClInclude Include="..\..\..\src\SnesEmulator\Util.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\SnesEmulator\IState.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\SnesEmulator\CPU\CpuAddressMode.h">
       <Filter>Header Files\CPU</Filter>
     </ClInclude>
@@ -65,16 +62,10 @@
     <ClInclude Include="..\..\..\src\SnesEmulator\CPU\CpuOpcodeMap.h">
       <Filter>Header Files\CPU</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\SnesEmulator\CPU\CpuOperator.h">
-      <Filter>Header Files\CPU</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\SnesEmulator\CPU\CpuState.h">
       <Filter>Header Files\CPU</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\SnesEmulator\SPC\SpcAddressMode.h">
-      <Filter>Header Files\SPC</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\SnesEmulator\SPC\SpcOperator.h">
       <Filter>Header Files\SPC</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\SnesEmulator\SPC\SpcOpcode.h">
@@ -84,6 +75,12 @@
       <Filter>Header Files\SPC</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\SnesEmulator\SPC\SpcOpcodeMap.h">
+      <Filter>Header Files\SPC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\SnesEmulator\CPU\CpuOperator.h">
+      <Filter>Header Files\CPU</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\SnesEmulator\SPC\SpcOperator.h">
       <Filter>Header Files\SPC</Filter>
     </ClInclude>
   </ItemGroup>

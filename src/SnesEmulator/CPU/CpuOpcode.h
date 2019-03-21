@@ -203,9 +203,9 @@ class ADC_73 : public AddressMode::StackRelativeIndirectIndexedY<Operator::ADC>
 // ADC Add With Carry [Flags affected: n,v,z,c]
 // ADC dp,X
 // Direct Page Indexed, X (2-Byte)
-class ADC_75 : public AddressMode::DirectPageIndexedX<Operator::ADC>
+class ADC_75 : public AddressMode::DirectPageIndexed<Operator::ADC, State::X>
 {
-    using DirectPageIndexedX::DirectPageIndexedX;
+    using DirectPageIndexed::DirectPageIndexed;
 
     // 2   5-m+w       dir,X     mm....mm . ADC $10,X
     int execute() override
@@ -237,9 +237,9 @@ class ADC_77 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::ADC>
 // ADC Add With Carry [Flags affected: n,v,z,c]
 // ADC addr,Y
 // Absolute Indexed, Y (3-Byte)
-class ADC_79 : public AddressMode::AbsoluteIndexedY<Operator::ADC>
+class ADC_79 : public AddressMode::AbsoluteIndexed<Operator::ADC, State::Y>
 {
-    using AbsoluteIndexedY::AbsoluteIndexedY;
+    using AbsoluteIndexed::AbsoluteIndexed;
 
     // 3   6-m-x+x*p   abs,Y     mm....mm . ADC $9876,Y
     int execute() override
@@ -254,9 +254,9 @@ class ADC_79 : public AddressMode::AbsoluteIndexedY<Operator::ADC>
 // ADC Add With Carry [Flags affected: n,v,z,c]
 // ADC addr,X
 // Absolute Indexed, X (3-Byte)
-class ADC_7D : public AddressMode::AbsoluteIndexedX<Operator::ADC>
+class ADC_7D : public AddressMode::AbsoluteIndexed<Operator::ADC, State::X>
 {
-    using AbsoluteIndexedX::AbsoluteIndexedX;
+    using AbsoluteIndexed::AbsoluteIndexed;
 
     // 3   6-m-x+x*p   abs,X     mm....mm . ADC $9876,X
     int execute() override
@@ -477,9 +477,9 @@ class AND_33 : public AddressMode::StackRelativeIndirectIndexedY<Operator::AND>
 // AND AND Accumulator With Memory [Flags affected: n,z]
 // AND dp,X
 // Direct Page Indexed, X (2-Byte)
-class AND_35 : public AddressMode::DirectPageIndexedX<Operator::AND>
+class AND_35 : public AddressMode::DirectPageIndexed<Operator::AND, State::X>
 {
-    using DirectPageIndexedX::DirectPageIndexedX;
+    using DirectPageIndexed::DirectPageIndexed;
 
     // 2   5-m+w       dir,X     m.....m. . AND $10,X
     int execute() override
@@ -511,9 +511,9 @@ class AND_37 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::AND>
 // AND AND Accumulator With Memory [Flags affected: n,z]
 // AND addr,Y
 // Absolute Indexed, Y (3-Byte)
-class AND_39 : public AddressMode::AbsoluteIndexedY<Operator::AND>
+class AND_39 : public AddressMode::AbsoluteIndexed<Operator::AND, State::Y>
 {
-    using AbsoluteIndexedY::AbsoluteIndexedY;
+    using AbsoluteIndexed::AbsoluteIndexed;
 
     // 3   6-m-x+x*p   abs,Y     m.....m. . AND $9876,Y
     int execute() override
@@ -528,9 +528,9 @@ class AND_39 : public AddressMode::AbsoluteIndexedY<Operator::AND>
 // AND AND Accumulator With Memory [Flags affected: n,z]
 // AND addr,X
 // Absolute Indexed, X (3-Byte)
-class AND_3D : public AddressMode::AbsoluteIndexedX<Operator::AND>
+class AND_3D : public AddressMode::AbsoluteIndexed<Operator::AND, State::X>
 {
-    using AbsoluteIndexedX::AbsoluteIndexedX;
+    using AbsoluteIndexed::AbsoluteIndexed;
 
     // 3   6-m-x+x*p   abs,X     m.....m. . AND $9876,X
     int execute() override
@@ -613,9 +613,9 @@ class ASL_0E : public AddressMode::Absolute<Operator::ASL>
 // ASL Accumulator or Memory Shift Left [Flags affected: n,z,c]
 // ASL dp,X
 // Direct Page Indexed, X (2-Byte)
-class ASL_16 : public AddressMode::DirectPageIndexedX<Operator::ASL>
+class ASL_16 : public AddressMode::DirectPageIndexed<Operator::ASL, State::X>
 {
-    using DirectPageIndexedX::DirectPageIndexedX;
+    using DirectPageIndexed::DirectPageIndexed;
 
     // 2   8-2*m+w     dir,X     m.....mm . ASL $10,X
     int execute() override
@@ -630,9 +630,9 @@ class ASL_16 : public AddressMode::DirectPageIndexedX<Operator::ASL>
 // ASL Accumulator or Memory Shift Left [Flags affected: n,z,c]
 // ASL addr,X
 // Absolute Indexed, X (3-Byte)
-class ASL_1E : public AddressMode::AbsoluteIndexedX<Operator::ASL>
+class ASL_1E : public AddressMode::AbsoluteIndexed<Operator::ASL, State::X>
 {
-    using AbsoluteIndexedX::AbsoluteIndexedX;
+    using AbsoluteIndexed::AbsoluteIndexed;
 
     // 3   9-2*m       abs,X     m.....mm . ASL $9876,X
     // §20: TODO manually add exception for 3
@@ -734,9 +734,9 @@ class BIT_2C : public AddressMode::Absolute<Operator::BIT>
 // BIT Test Bits [Flags affected: z (immediate mode) n,v,z (non-immediate modes)]
 // BIT dp,X
 // Direct Page Indexed, X (2-Byte)
-class BIT_34 : public AddressMode::DirectPageIndexedX<Operator::BIT>
+class BIT_34 : public AddressMode::DirectPageIndexed<Operator::BIT, State::X>
 {
-    using DirectPageIndexedX::DirectPageIndexedX;
+    using DirectPageIndexed::DirectPageIndexed;
 
     // 2   5-m+w       dir,X     mm....m. . BIT $10,X
     int execute() override
@@ -751,9 +751,9 @@ class BIT_34 : public AddressMode::DirectPageIndexedX<Operator::BIT>
 // BIT Test Bits [Flags affected: z (immediate mode) n,v,z (non-immediate modes)]
 // BIT addr,X
 // Absolute Indexed, X (3-Byte)
-class BIT_3C : public AddressMode::AbsoluteIndexedX<Operator::BIT>
+class BIT_3C : public AddressMode::AbsoluteIndexed<Operator::BIT, State::X>
 {
-    using AbsoluteIndexedX::AbsoluteIndexedX;
+    using AbsoluteIndexed::AbsoluteIndexed;
 
     // 3   6-m-x+x*p   abs,X     mm....m. . BIT $9876,X
     int execute() override
@@ -1198,9 +1198,9 @@ class CMP_D3 : public AddressMode::StackRelativeIndirectIndexedY<Operator::CMP>
 // CMP Compare Accumulator With Memory [Flags affected: n,z,c]
 // CMP dp,X
 // Direct Page Indexed, X (2-Byte)
-class CMP_D5 : public AddressMode::DirectPageIndexedX<Operator::CMP>
+class CMP_D5 : public AddressMode::DirectPageIndexed<Operator::CMP, State::X>
 {
-    using DirectPageIndexedX::DirectPageIndexedX;
+    using DirectPageIndexed::DirectPageIndexed;
 
     // 2   5-m+w       dir,X     m.....mm . CMP $10,X
     int execute() override
@@ -1232,9 +1232,9 @@ class CMP_D7 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::CMP>
 // CMP Compare Accumulator With Memory [Flags affected: n,z,c]
 // CMP addr,Y
 // Absolute Indexed, Y (3-Byte)
-class CMP_D9 : public AddressMode::AbsoluteIndexedY<Operator::CMP>
+class CMP_D9 : public AddressMode::AbsoluteIndexed<Operator::CMP, State::Y>
 {
-    using AbsoluteIndexedY::AbsoluteIndexedY;
+    using AbsoluteIndexed::AbsoluteIndexed;
 
     // 3   6-m-x+x*p   abs,Y     m.....mm . CMP $9876,Y
     int execute() override
@@ -1249,9 +1249,9 @@ class CMP_D9 : public AddressMode::AbsoluteIndexedY<Operator::CMP>
 // CMP Compare Accumulator With Memory [Flags affected: n,z,c]
 // CMP addr,X
 // Absolute Indexed, X (3-Byte)
-class CMP_DD : public AddressMode::AbsoluteIndexedX<Operator::CMP>
+class CMP_DD : public AddressMode::AbsoluteIndexed<Operator::CMP, State::X>
 {
-    using AbsoluteIndexedX::AbsoluteIndexedX;
+    using AbsoluteIndexed::AbsoluteIndexed;
 
     // 3   6-m-x+x*p   abs,X     m.....mm . CMP $9876,X
     int execute() override
@@ -1281,7 +1281,7 @@ class CMP_DF : public AddressMode::AbsoluteLongIndexedX<Operator::CMP>
 };
 
 // COP Co-Processor Enable [Flags affected: d,i]
-// COP #const
+// COP const
 // Immediate (2-Byte [18])
 // ¤18: Opcode is 1 byte, but program counter value pushed onto stack is incremented by 2 allowing for optional signature byte
 class COP_02 : public AddressMode::Immediate<Operator::COP>
@@ -1492,9 +1492,9 @@ class DEC_CE : public AddressMode::Absolute<Operator::DEC>
 // DEC Decrement [Flags affected: n,z]
 // DEC dp,X
 // Direct Page Indexed, X (2-Byte)
-class DEC_D6 : public AddressMode::DirectPageIndexedX<Operator::DEC>
+class DEC_D6 : public AddressMode::DirectPageIndexed<Operator::DEC, State::X>
 {
-    using DirectPageIndexedX::DirectPageIndexedX;
+    using DirectPageIndexed::DirectPageIndexed;
 
     // 2   8-2*m+w     dir,X     m.....m. . DEC $10,X
     int execute() override
@@ -1509,9 +1509,9 @@ class DEC_D6 : public AddressMode::DirectPageIndexedX<Operator::DEC>
 // DEC Decrement [Flags affected: n,z]
 // DEC addr,X
 // Absolute Indexed, X (3-Byte)
-class DEC_DE : public AddressMode::AbsoluteIndexedX<Operator::DEC>
+class DEC_DE : public AddressMode::AbsoluteIndexed<Operator::DEC, State::X>
 {
-    using AbsoluteIndexedX::AbsoluteIndexedX;
+    using AbsoluteIndexed::AbsoluteIndexed;
 
     // 3   9-2*m       abs,X     m.....m. . DEC $9876,X
     // §20: TODO manually add exception for 3
@@ -1751,9 +1751,9 @@ class EOR_53 : public AddressMode::StackRelativeIndirectIndexedY<Operator::EOR>
 // EOR Exclusive-OR Accumulator with Memory [Flags affected: n,z]
 // EOR dp,X
 // Direct Page Indexed, X (2-Byte)
-class EOR_55 : public AddressMode::DirectPageIndexedX<Operator::EOR>
+class EOR_55 : public AddressMode::DirectPageIndexed<Operator::EOR, State::X>
 {
-    using DirectPageIndexedX::DirectPageIndexedX;
+    using DirectPageIndexed::DirectPageIndexed;
 
     // 2   5-m+w       dir,X     m.....m. . EOR $10,X
     int execute() override
@@ -1785,9 +1785,9 @@ class EOR_57 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::EOR>
 // EOR Exclusive-OR Accumulator with Memory [Flags affected: n,z]
 // EOR addr,Y
 // Absolute Indexed, Y (3-Byte)
-class EOR_59 : public AddressMode::AbsoluteIndexedY<Operator::EOR>
+class EOR_59 : public AddressMode::AbsoluteIndexed<Operator::EOR, State::Y>
 {
-    using AbsoluteIndexedY::AbsoluteIndexedY;
+    using AbsoluteIndexed::AbsoluteIndexed;
 
     // 3   6-m-x+x*p   abs,Y     m.....m. . EOR $9876,Y
     int execute() override
@@ -1802,9 +1802,9 @@ class EOR_59 : public AddressMode::AbsoluteIndexedY<Operator::EOR>
 // EOR Exclusive-OR Accumulator with Memory [Flags affected: n,z]
 // EOR addr,X
 // Absolute Indexed, X (3-Byte)
-class EOR_5D : public AddressMode::AbsoluteIndexedX<Operator::EOR>
+class EOR_5D : public AddressMode::AbsoluteIndexed<Operator::EOR, State::X>
 {
-    using AbsoluteIndexedX::AbsoluteIndexedX;
+    using AbsoluteIndexed::AbsoluteIndexed;
 
     // 3   6-m-x+x*p   abs,X     m.....m. . EOR $9876,X
     int execute() override
@@ -1887,9 +1887,9 @@ class INC_EE : public AddressMode::Absolute<Operator::INC>
 // INC Increment [Flags affected: n,z]
 // INC dp,X
 // Direct Page Indexed, X (2-Byte)
-class INC_F6 : public AddressMode::DirectPageIndexedX<Operator::INC>
+class INC_F6 : public AddressMode::DirectPageIndexed<Operator::INC, State::X>
 {
-    using DirectPageIndexedX::DirectPageIndexedX;
+    using DirectPageIndexed::DirectPageIndexed;
 
     // 2   8-2*m+w     dir,X     m.....m. . INC $10,X
     int execute() override
@@ -1904,9 +1904,9 @@ class INC_F6 : public AddressMode::DirectPageIndexedX<Operator::INC>
 // INC Increment [Flags affected: n,z]
 // INC addr,X
 // Absolute Indexed, X (3-Byte)
-class INC_FE : public AddressMode::AbsoluteIndexedX<Operator::INC>
+class INC_FE : public AddressMode::AbsoluteIndexed<Operator::INC, State::X>
 {
-    using AbsoluteIndexedX::AbsoluteIndexedX;
+    using AbsoluteIndexed::AbsoluteIndexed;
 
     // 3   9-2*m       abs,X     m.....m. . INC $9876,X
     // §20: TODO manually add exception for 3
@@ -2282,9 +2282,9 @@ class LDA_B3 : public AddressMode::StackRelativeIndirectIndexedY<Operator::LDA>
 // LDA Load Accumulator from Memory [Flags affected: n,z]
 // LDA dp,X
 // Direct Page Indexed, X (2-Byte)
-class LDA_B5 : public AddressMode::DirectPageIndexedX<Operator::LDA>
+class LDA_B5 : public AddressMode::DirectPageIndexed<Operator::LDA, State::X>
 {
-    using DirectPageIndexedX::DirectPageIndexedX;
+    using DirectPageIndexed::DirectPageIndexed;
 
     // 2   5-m+w       dir,X     m.....m. . LDA $10,X
     int execute() override
@@ -2316,9 +2316,9 @@ class LDA_B7 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::LDA>
 // LDA Load Accumulator from Memory [Flags affected: n,z]
 // LDA addr,Y
 // Absolute Indexed, Y (3-Byte)
-class LDA_B9 : public AddressMode::AbsoluteIndexedY<Operator::LDA>
+class LDA_B9 : public AddressMode::AbsoluteIndexed<Operator::LDA, State::Y>
 {
-    using AbsoluteIndexedY::AbsoluteIndexedY;
+    using AbsoluteIndexed::AbsoluteIndexed;
 
     // 3   6-m-x+x*p   abs,Y     m.....m. . LDA $9876,Y
     int execute() override
@@ -2333,9 +2333,9 @@ class LDA_B9 : public AddressMode::AbsoluteIndexedY<Operator::LDA>
 // LDA Load Accumulator from Memory [Flags affected: n,z]
 // LDA addr,X
 // Absolute Indexed, X (3-Byte)
-class LDA_BD : public AddressMode::AbsoluteIndexedX<Operator::LDA>
+class LDA_BD : public AddressMode::AbsoluteIndexed<Operator::LDA, State::X>
 {
-    using AbsoluteIndexedX::AbsoluteIndexedX;
+    using AbsoluteIndexed::AbsoluteIndexed;
 
     // 3   6-m-x+x*p   abs,X     m.....m. . LDA $9876,X
     int execute() override
@@ -2437,9 +2437,9 @@ class LDX_AE : public AddressMode::Absolute<Operator::LDX>
 // LDX Load Index Register X from Memory [Flags affected: n,z]
 // LDX dp,Y
 // Direct Page Indexed, Y (2-Byte)
-class LDX_B6 : public AddressMode::DirectPageIndexedY<Operator::LDX>
+class LDX_B6 : public AddressMode::DirectPageIndexed<Operator::LDX, State::Y>
 {
-    using DirectPageIndexedY::DirectPageIndexedY;
+    using DirectPageIndexed::DirectPageIndexed;
 
     // 2   5-x+w       dir,Y     x.....x. . LDX $10,Y
     int execute() override
@@ -2454,9 +2454,9 @@ class LDX_B6 : public AddressMode::DirectPageIndexedY<Operator::LDX>
 // LDX Load Index Register X from Memory [Flags affected: n,z]
 // LDX addr,Y
 // Absolute Indexed, Y (3-Byte)
-class LDX_BE : public AddressMode::AbsoluteIndexedY<Operator::LDX>
+class LDX_BE : public AddressMode::AbsoluteIndexed<Operator::LDX, State::Y>
 {
-    using AbsoluteIndexedY::AbsoluteIndexedY;
+    using AbsoluteIndexed::AbsoluteIndexed;
 
     // 3   6-2*x+x*p   abs,Y     x.....x. . LDX $9876,Y
     int execute() override
@@ -2541,9 +2541,9 @@ class LDY_AC : public AddressMode::Absolute<Operator::LDY>
 // LDY Load Index Register Y from Memory [Flags affected: n,z]
 // LDY dp,X
 // Direct Page Indexed, X (2-Byte)
-class LDY_B4 : public AddressMode::DirectPageIndexedX<Operator::LDY>
+class LDY_B4 : public AddressMode::DirectPageIndexed<Operator::LDY, State::X>
 {
-    using DirectPageIndexedX::DirectPageIndexedX;
+    using DirectPageIndexed::DirectPageIndexed;
 
     // 2   5-x+w       dir,X     x.....x. . LDY $10,X
     int execute() override
@@ -2558,9 +2558,9 @@ class LDY_B4 : public AddressMode::DirectPageIndexedX<Operator::LDY>
 // LDY Load Index Register Y from Memory [Flags affected: n,z]
 // LDY addr,X
 // Absolute Indexed, X (3-Byte)
-class LDY_BC : public AddressMode::AbsoluteIndexedX<Operator::LDY>
+class LDY_BC : public AddressMode::AbsoluteIndexed<Operator::LDY, State::X>
 {
-    using AbsoluteIndexedX::AbsoluteIndexedX;
+    using AbsoluteIndexed::AbsoluteIndexed;
 
     // 3   6-2*x+x*p   abs,X     x.....x. . LDY $9876,X
     int execute() override
@@ -2626,9 +2626,9 @@ class LSR_4E : public AddressMode::Absolute<Operator::LSR>
 // LSR Logical Shift Memory or Accumulator Right [Flags affected: n,z,c]
 // LSR dp,X
 // Direct Page Indexed, X (2-Byte)
-class LSR_56 : public AddressMode::DirectPageIndexedX<Operator::LSR>
+class LSR_56 : public AddressMode::DirectPageIndexed<Operator::LSR, State::X>
 {
-    using DirectPageIndexedX::DirectPageIndexedX;
+    using DirectPageIndexed::DirectPageIndexed;
 
     // 2   8-2*m+w     dir,X     0.....m* . LSR $10,X
     int execute() override
@@ -2643,9 +2643,9 @@ class LSR_56 : public AddressMode::DirectPageIndexedX<Operator::LSR>
 // LSR Logical Shift Memory or Accumulator Right [Flags affected: n,z,c]
 // LSR addr,X
 // Absolute Indexed, X (3-Byte)
-class LSR_5E : public AddressMode::AbsoluteIndexedX<Operator::LSR>
+class LSR_5E : public AddressMode::AbsoluteIndexed<Operator::LSR, State::X>
 {
-    using AbsoluteIndexedX::AbsoluteIndexedX;
+    using AbsoluteIndexed::AbsoluteIndexed;
 
     // 3   9-2*m       abs,X     0.....m* . LSR $9876,X
     // §20: TODO manually add exception for 3
@@ -2902,9 +2902,9 @@ class ORA_13 : public AddressMode::StackRelativeIndirectIndexedY<Operator::ORA>
 // ORA OR Accumulator with Memory [Flags affected: n,z]
 // ORA dp,X
 // Direct Page Indexed, X (2-Byte)
-class ORA_15 : public AddressMode::DirectPageIndexedX<Operator::ORA>
+class ORA_15 : public AddressMode::DirectPageIndexed<Operator::ORA, State::X>
 {
-    using DirectPageIndexedX::DirectPageIndexedX;
+    using DirectPageIndexed::DirectPageIndexed;
 
     // 2   5-m+w       dir,X     m.....m. . ORA $10,X
     int execute() override
@@ -2936,9 +2936,9 @@ class ORA_17 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::ORA>
 // ORA OR Accumulator with Memory [Flags affected: n,z]
 // ORA addr,Y
 // Absolute Indexed, Y (3-Byte)
-class ORA_19 : public AddressMode::AbsoluteIndexedY<Operator::ORA>
+class ORA_19 : public AddressMode::AbsoluteIndexed<Operator::ORA, State::Y>
 {
-    using AbsoluteIndexedY::AbsoluteIndexedY;
+    using AbsoluteIndexed::AbsoluteIndexed;
 
     // 3   6-m-x+x*p   abs,Y     m.....m. . ORA $9876,Y
     int execute() override
@@ -2953,9 +2953,9 @@ class ORA_19 : public AddressMode::AbsoluteIndexedY<Operator::ORA>
 // ORA OR Accumulator with Memory [Flags affected: n,z]
 // ORA addr,X
 // Absolute Indexed, X (3-Byte)
-class ORA_1D : public AddressMode::AbsoluteIndexedX<Operator::ORA>
+class ORA_1D : public AddressMode::AbsoluteIndexed<Operator::ORA, State::X>
 {
-    using AbsoluteIndexedX::AbsoluteIndexedX;
+    using AbsoluteIndexed::AbsoluteIndexed;
 
     // 3   6-m-x+x*p   abs,X     m.....m. . ORA $9876,X
     int execute() override
@@ -3327,9 +3327,9 @@ class ROL_2E : public AddressMode::Absolute<Operator::ROL>
 // ROL Rotate Memory or Accumulator Left [Flags affected: n,z,c]
 // ROL dp,X
 // Direct Page Indexed, X (2-Byte)
-class ROL_36 : public AddressMode::DirectPageIndexedX<Operator::ROL>
+class ROL_36 : public AddressMode::DirectPageIndexed<Operator::ROL, State::X>
 {
-    using DirectPageIndexedX::DirectPageIndexedX;
+    using DirectPageIndexed::DirectPageIndexed;
 
     // 2   8-2*m+w     dir,X     m.....mm . ROL $10,X
     int execute() override
@@ -3344,9 +3344,9 @@ class ROL_36 : public AddressMode::DirectPageIndexedX<Operator::ROL>
 // ROL Rotate Memory or Accumulator Left [Flags affected: n,z,c]
 // ROL addr,X
 // Absolute Indexed, X (3-Byte)
-class ROL_3E : public AddressMode::AbsoluteIndexedX<Operator::ROL>
+class ROL_3E : public AddressMode::AbsoluteIndexed<Operator::ROL, State::X>
 {
-    using AbsoluteIndexedX::AbsoluteIndexedX;
+    using AbsoluteIndexed::AbsoluteIndexed;
 
     // 3   9-2*m       abs,X     m.....mm . ROL $9876,X
     // §20: TODO manually add exception for 3
@@ -3414,9 +3414,9 @@ class ROR_6E : public AddressMode::Absolute<Operator::ROR>
 // ROR Rotate Memory or Accumulator Right [Flags affected: n,z,c]
 // ROR dp,X
 // Direct Page Indexed, X (2-Byte)
-class ROR_76 : public AddressMode::DirectPageIndexedX<Operator::ROR>
+class ROR_76 : public AddressMode::DirectPageIndexed<Operator::ROR, State::X>
 {
-    using DirectPageIndexedX::DirectPageIndexedX;
+    using DirectPageIndexed::DirectPageIndexed;
 
     // 2   8-2*m+w     dir,X     m.....m* . ROR $10,X
     int execute() override
@@ -3431,9 +3431,9 @@ class ROR_76 : public AddressMode::DirectPageIndexedX<Operator::ROR>
 // ROR Rotate Memory or Accumulator Right [Flags affected: n,z,c]
 // ROR addr,X
 // Absolute Indexed, X (3-Byte)
-class ROR_7E : public AddressMode::AbsoluteIndexedX<Operator::ROR>
+class ROR_7E : public AddressMode::AbsoluteIndexed<Operator::ROR, State::X>
 {
-    using AbsoluteIndexedX::AbsoluteIndexedX;
+    using AbsoluteIndexed::AbsoluteIndexed;
 
     // 3   9-2*m       abs,X     m.....m* . ROR $9876,X
     // §20: TODO manually add exception for 3
@@ -3690,9 +3690,9 @@ class SBC_F3 : public AddressMode::StackRelativeIndirectIndexedY<Operator::SBC>
 // SBC Subtract with Borrow from Accumulator [Flags affected: n,v,z,c]
 // SBC dp,X
 // Direct Page Indexed, X (2-Byte)
-class SBC_F5 : public AddressMode::DirectPageIndexedX<Operator::SBC>
+class SBC_F5 : public AddressMode::DirectPageIndexed<Operator::SBC, State::X>
 {
-    using DirectPageIndexedX::DirectPageIndexedX;
+    using DirectPageIndexed::DirectPageIndexed;
 
     // 2   5-m+w       dir,X     mm....mm . SBC $10,X
     int execute() override
@@ -3724,9 +3724,9 @@ class SBC_F7 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::SBC>
 // SBC Subtract with Borrow from Accumulator [Flags affected: n,v,z,c]
 // SBC addr,Y
 // Absolute Indexed, Y (3-Byte)
-class SBC_F9 : public AddressMode::AbsoluteIndexedY<Operator::SBC>
+class SBC_F9 : public AddressMode::AbsoluteIndexed<Operator::SBC, State::Y>
 {
-    using AbsoluteIndexedY::AbsoluteIndexedY;
+    using AbsoluteIndexed::AbsoluteIndexed;
 
     // 3   6-m-x+x*p   abs,Y     mm....mm . SBC $9876,Y
     int execute() override
@@ -3741,9 +3741,9 @@ class SBC_F9 : public AddressMode::AbsoluteIndexedY<Operator::SBC>
 // SBC Subtract with Borrow from Accumulator [Flags affected: n,v,z,c]
 // SBC addr,X
 // Absolute Indexed, X (3-Byte)
-class SBC_FD : public AddressMode::AbsoluteIndexedX<Operator::SBC>
+class SBC_FD : public AddressMode::AbsoluteIndexed<Operator::SBC, State::X>
 {
-    using AbsoluteIndexedX::AbsoluteIndexedX;
+    using AbsoluteIndexed::AbsoluteIndexed;
 
     // 3   6-m-x+x*p   abs,X     mm....mm . SBC $9876,X
     int execute() override
@@ -3998,9 +3998,9 @@ class STA_93 : public AddressMode::StackRelativeIndirectIndexedY<Operator::STA>
 // STA Store Accumulator to Memory [Flags affected: none]
 // STA dp,X
 // Direct Page Indexed, X (2-Byte)
-class STA_95 : public AddressMode::DirectPageIndexedX<Operator::STA>
+class STA_95 : public AddressMode::DirectPageIndexed<Operator::STA, State::X>
 {
-    using DirectPageIndexedX::DirectPageIndexedX;
+    using DirectPageIndexed::DirectPageIndexed;
 
     // 2   5-m+w       dir,X     ........ . STA $10,X
     int execute() override
@@ -4032,9 +4032,9 @@ class STA_97 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::STA>
 // STA Store Accumulator to Memory [Flags affected: none]
 // STA addr,Y
 // Absolute Indexed, Y (3-Byte)
-class STA_99 : public AddressMode::AbsoluteIndexedY<Operator::STA>
+class STA_99 : public AddressMode::AbsoluteIndexed<Operator::STA, State::Y>
 {
-    using AbsoluteIndexedY::AbsoluteIndexedY;
+    using AbsoluteIndexed::AbsoluteIndexed;
 
     // 3   6-m         abs,Y     ........ . STA $9876,Y
     // §20: TODO manually add exception for 3
@@ -4051,9 +4051,9 @@ class STA_99 : public AddressMode::AbsoluteIndexedY<Operator::STA>
 // STA Store Accumulator to Memory [Flags affected: none]
 // STA addr,X
 // Absolute Indexed, X (3-Byte)
-class STA_9D : public AddressMode::AbsoluteIndexedX<Operator::STA>
+class STA_9D : public AddressMode::AbsoluteIndexed<Operator::STA, State::X>
 {
-    using AbsoluteIndexedX::AbsoluteIndexedX;
+    using AbsoluteIndexed::AbsoluteIndexed;
 
     // 3   6-m         abs,X     ........ . STA $9876,X
     // §20: TODO manually add exception for 3
@@ -4138,9 +4138,9 @@ class STX_8E : public AddressMode::Absolute<Operator::STX>
 // STX Store Index Register X to Memory [Flags affected: none]
 // STX dp,Y
 // Direct Page Indexed, Y (2-Byte)
-class STX_96 : public AddressMode::DirectPageIndexedY<Operator::STX>
+class STX_96 : public AddressMode::DirectPageIndexed<Operator::STX, State::Y>
 {
-    using DirectPageIndexedY::DirectPageIndexedY;
+    using DirectPageIndexed::DirectPageIndexed;
 
     // 2   5-x+w       dir,Y     ........ . STX $10,Y
     int execute() override
@@ -4189,9 +4189,9 @@ class STY_8C : public AddressMode::Absolute<Operator::STY>
 // STY Store Index Register Y to Memory [Flags affected: none]
 // STY dp,X
 // Direct Page Indexed, X (2-Byte)
-class STY_94 : public AddressMode::DirectPageIndexedX<Operator::STY>
+class STY_94 : public AddressMode::DirectPageIndexed<Operator::STY, State::X>
 {
-    using DirectPageIndexedX::DirectPageIndexedX;
+    using DirectPageIndexed::DirectPageIndexed;
 
     // 2   5-x+w       dir,X     ........ . STY $10,X
     int execute() override
@@ -4223,9 +4223,9 @@ class STZ_64 : public AddressMode::DirectPage<Operator::STZ>
 // STZ Store Zero to Memory [Flags affected: none]
 // STZ dp,X
 // Direct Page Indexed, X (2-Byte)
-class STZ_74 : public AddressMode::DirectPageIndexedX<Operator::STZ>
+class STZ_74 : public AddressMode::DirectPageIndexed<Operator::STZ, State::X>
 {
-    using DirectPageIndexedX::DirectPageIndexedX;
+    using DirectPageIndexed::DirectPageIndexed;
 
     // 2   5-m+w       dir,X     ........ . STZ $10,X
     int execute() override
@@ -4257,9 +4257,9 @@ class STZ_9C : public AddressMode::Absolute<Operator::STZ>
 // STZ Store Zero to Memory [Flags affected: none]
 // STZ addr,X
 // Absolute Indexed, X (3-Byte)
-class STZ_9E : public AddressMode::AbsoluteIndexedX<Operator::STZ>
+class STZ_9E : public AddressMode::AbsoluteIndexed<Operator::STZ, State::X>
 {
-    using AbsoluteIndexedX::AbsoluteIndexedX;
+    using AbsoluteIndexed::AbsoluteIndexed;
 
     // 3   6-m         abs,X     ........ . STZ $9876,X
     // §20: TODO manually add exception for 3

@@ -45,159 +45,367 @@ struct Instruction
             throw std::runtime_error("Instruction " + name + ": size out of range: " + size);
         }
 
-        if (cycles != "0" && cycles != "1" && cycles != "2" && cycles != "3" && cycles != "4" && cycles != "5" && cycles != "6" && cycles != "7" && cycles != "8") {
-            throw std::runtime_error("Instruction " + name + ": cycles out of range: " + cycles);
-        }
+        //if (cycles != "0" && cycles != "1" && cycles != "2" && cycles != "3" && cycles != "4" && cycles != "5" && cycles != "6" && cycles != "7" && cycles != "8") {
+        //    throw std::runtime_error("Instruction " + name + ": cycles out of range: " + cycles);
+        //}
     }
+};
+
+struct OperatorArgs
+{
+    OperatorArgs()
+        : hasOperand(false)
+    {
+        cycleRemarks = { 1 };
+    }
+    std::set<int> cycleRemarks;
+    bool hasOperand;
+    std::string comment;
+};
+
+struct TemplateConfig
+{
+    TemplateConfig()
+        : bitMask(false)
+        , index(false)
+        , oneRegister(false)
+        , twoRegister(false)
+    { }
+    bool bitMask;
+    bool index;
+    bool oneRegister;
+    bool twoRegister;
+};
+
+struct AddressModeClassArgs
+{
+    AddressModeClassArgs()
+        : instructionSize(0)
+    {
+        cycleRemarks = {};
+    }
+    std::set<int> cycleRemarks;
+    int instructionSize;
+    std::string comment;
+    TemplateConfig config;
 };
 
 struct AddressMode
 {
+    AddressMode()
+    {
+    }
     std::string name;
     std::string templateArg;
+    TemplateConfig config;
 };
 
 AddressMode getAddressMode(const std::string& code)
 {
     AddressMode mode;
-    if (code == "(X), (Y)") {
-        mode.name = "X Indirect Y Indirect";
-    } else if (code == "A, #i") {
-        mode.name = "Accumulator Immediate";
-    } else if (code == "A, (X)") {
-        mode.name = "Accumulator X Indirect";
-    } else if (code == "A, [d]+Y") {
-        mode.name = "Accumulator Direct Indirect Indexed, Y";
-    } else if (code == "A, [d+X]") {
-        mode.name = "Accumulator Direct Indexed, X Indirect";
-    } else if (code == "A, d") {
-        mode.name = "Accumulator Direct";
-    } else if (code == "A, d+X") {
-        mode.name = "Accumulator Direct Indexed, X";
-    } else if (code == "A, !a") {
-        mode.name = "Accumulator Absolute";
-    } else if (code == "A, !a+X") {
-        mode.name = "Accumulator Absolute Indexed, X";
-    } else if (code == "A, !a+Y") {
-        mode.name = "Accumulator Absolute Indexed, Y";
-    } else if (code == "dd, ds") {
-        mode.name = "Direct Direct";
-    } else if (code == "d, #i") {
-        mode.name = "Direct Immediate";
-    } else if (code == "YA, d") {
-        mode.name = "Y Accumulator Direct";
-    } else if (code == "C, /m.b") {
-        mode.name = "Carry Not Memory Bit";
-    } else if (code == "C, m.b") {
-        mode.name = "Carry Memory Bit";
-    } else if (code == "A") {
-        mode.name = "Accumulator";
-    } else if (code == "d") {
-        mode.name = "Direct";
-    } else if (code == "d+X") {
-        mode.name = "Direct Indexed, X";
-    } else if (code == "!a") {
-        mode.name = "Absolute";
-    } else if (code.substr(0, 2) == "d.") {
+
+    if (code == "A, #i") {
+        mode.name = "Register Immediate";
+        mode.config.oneRegister = true;
+        mode.templateArg = "State::A";
+    }
+    else if (code == "X, #i") {
+        mode.name = "Register Immediate";
+        mode.config.oneRegister = true;
+        mode.templateArg = "State::X";
+    }
+    else if (code == "Y, #i") {
+        mode.name = "Register Immediate";
+        mode.config.oneRegister = true;
+        mode.templateArg = "State::Y";
+    }
+    else if (code == "A, d") {
+        mode.name = "Register Direct";
+        mode.config.oneRegister = true;
+        mode.templateArg = "State::A";
+    }
+    else if (code == "X, d") {
+        mode.name = "Register Direct";
+        mode.config.oneRegister = true;
+        mode.templateArg = "State::X";
+    }
+    else if (code == "Y, d") {
+        mode.name = "Register Direct";
+        mode.config.oneRegister = true;
+        mode.templateArg = "State::Y";
+    }
+    else if (code == "A, !a") {
+        mode.name = "Register Absolute";
+        mode.config.oneRegister = true;
+        mode.templateArg = "State::A";
+    }
+    else if (code == "X, !a") {
+        mode.name = "Register Absolute";
+        mode.config.oneRegister = true;
+        mode.templateArg = "State::X";
+    }
+    else if (code == "Y, !a") {
+        mode.name = "Register Absolute";
+        mode.config.oneRegister = true;
+        mode.templateArg = "State::Y";
+    }
+    else if (code == "A") {
+        mode.name = "Register";
+        mode.config.oneRegister = true;
+        mode.templateArg = "State::A";
+    }
+    else if (code == "X") {
+        mode.name = "Register";
+        mode.config.oneRegister = true;
+        mode.templateArg = "State::X";
+    }
+    else if (code == "Y") {
+        mode.name = "Register";
+        mode.config.oneRegister = true;
+        mode.templateArg = "State::Y";
+    }
+    else if (code == "PSW") {
+        mode.name = "Register";
+        mode.config.oneRegister = true;
+        mode.templateArg = "State::PSW";
+    }
+    else if (code == "d, A") {
+        mode.name = "Direct Register";
+        mode.config.oneRegister = true;
+        mode.templateArg = "State::A";
+    }
+    else if (code == "d, X") {
+        mode.name = "Direct Register";
+        mode.config.oneRegister = true;
+        mode.templateArg = "State::X";
+    }
+    else if (code == "d, Y") {
+        mode.name = "Direct Register";
+        mode.config.oneRegister = true;
+        mode.templateArg = "State::Y";
+    }
+    else if (code == "!a, A") {
+        mode.name = "Absolute Register";
+        mode.config.oneRegister = true;
+        mode.templateArg = "State::A";
+    }
+    else if (code == "!a, X") {
+        mode.name = "Absolute Register";
+        mode.config.oneRegister = true;
+        mode.templateArg = "State::X";
+    }
+    else if (code == "!a, Y") {
+        mode.name = "Absolute Register";
+        mode.config.oneRegister = true;
+        mode.templateArg = "State::Y";
+    }
+    else if (code == "d+X") {
+        mode.name = "Direct Indexed";
+        mode.config.oneRegister = true;
+        mode.templateArg = "State::X";
+    }
+    else if (code == "d+X, r") {
+        mode.name = "Direct Indexed Program Counter Relative";
+        mode.config.oneRegister = true;
+        mode.templateArg = "State::X";
+    }
+    else if (code == "Y, r") {
+        mode.name = "Register Program Counter Relative";
+        mode.config.oneRegister = true;
+        mode.templateArg = "State::Y";
+    }
+    else if (code == "YA, X") {
+        mode.name = "Y Accumulator Index";
+        mode.config.oneRegister = true;
+        mode.templateArg = "State::X";
+    }
+    else if (code == "[!a+X]") {
+        mode.name = "Absolute Indexed Indirect";
+        mode.config.oneRegister = true;
+        mode.templateArg = "State::X";
+    }
+    else if (code == "A, [d]+Y") {
+        mode.name = "Register Direct Indirect Indexed";
+        mode.config.twoRegister = true;
+        mode.templateArg = "State::A, State::Y";
+    }
+    else if (code == "A, [d+X]") {
+        mode.name = "Register Direct Indexed Indirect";
+        mode.config.twoRegister = true;
+        mode.templateArg = "State::A, State::X";
+    }
+    else if (code == "A, d+X") {
+        mode.name = "Register Direct Indexed";
+        mode.config.twoRegister = true;
+        mode.templateArg = "State::A, State::X";
+    }
+    else if (code == "X, d+Y") {
+        mode.name = "Register Direct Indexed";
+        mode.config.twoRegister = true;
+        mode.templateArg = "State::X, State::Y";
+    }
+    else if (code == "Y, d+X") {
+        mode.name = "Register Direct Indexed";
+        mode.config.twoRegister = true;
+        mode.templateArg = "State::Y, State::X";
+    }
+    else if (code == "A, X") {
+        mode.name = "Register Register";
+        mode.config.twoRegister = true;
+        mode.templateArg = "State::A, State::X";
+    }
+    else if (code == "A, Y") {
+        mode.name = "Register Register";
+        mode.config.twoRegister = true;
+        mode.templateArg = "State::A, State::Y";
+    }
+    else if (code == "SP, X") {
+        mode.name = "Register Register";
+        mode.config.twoRegister = true;
+        mode.templateArg = "State::SP, State::X";
+    }
+    else if (code == "X, A") {
+        mode.name = "Register Register";
+        mode.config.twoRegister = true;
+        mode.templateArg = "State::X, State::A";
+    }
+    else if (code == "X, SP") {
+        mode.name = "Register Register";
+        mode.config.twoRegister = true;
+        mode.templateArg = "State::X, State::SP";
+    }
+    else if (code == "Y, A") {
+        mode.name = "Register Register";
+        mode.config.twoRegister = true;
+        mode.templateArg = "State::Y, State::A";
+    }
+    else if (code == "d+X, A") {
+        mode.name = "Direct Indexed Register";
+        mode.config.twoRegister = true;
+        mode.templateArg = "State::X, State::A";
+    }
+    else if (code == "d+X, Y") {
+        mode.name = "Direct Indexed Register";
+        mode.config.twoRegister = true;
+        mode.templateArg = "State::X, State::Y";
+    }
+    else if (code == "d+Y, X") {
+        mode.name = "Direct Indexed Register";
+        mode.config.twoRegister = true;
+        mode.templateArg = "State::Y, State::X";
+    }
+    else if (code == "A, !a+X") {
+        mode.name = "Register Absolute Indexed";
+        mode.config.twoRegister = true;
+        mode.templateArg = "State::A, State::X";
+    }
+    else if (code == "A, !a+Y") {
+        mode.name = "Register Absolute Indexed";
+        mode.config.twoRegister = true;
+        mode.templateArg = "State::A, State::Y";
+    }
+    else if (code == "!a+X, A") {
+        mode.name = "Absolute Indexed Register";
+        mode.config.twoRegister = true;
+        mode.templateArg = "State::X, State::A";
+    }
+    else if (code == "!a+Y, A") {
+        mode.name = "Absolute Indexed Register";
+        mode.config.twoRegister = true;
+        mode.templateArg = "State::Y, State::A";
+    }
+    else if (code == "A, (X)") {
+        mode.name = "Register Register Indirect";
+        mode.config.twoRegister = true;
+        mode.templateArg = "State::A, State::X";
+    }
+    else if (code == "(X)+, A") {
+        mode.name = "Register Indirect Increment Register";
+        mode.config.twoRegister = true;
+        mode.templateArg = "State::X, State::A";
+    }
+    else if (code == "(X), A") {
+        mode.name = "Register Indirect Register";
+        mode.config.twoRegister = true;
+        mode.templateArg = "State::X, State::A";
+    }
+    else if (code == "[d]+Y, A") {
+        mode.name = "Direct Indirect Indexed Register";
+        mode.config.twoRegister = true;
+        mode.templateArg = "State::Y, State::A";
+    }
+    else if (code == "[d+X], A") {
+        mode.name = "Direct Indexed Indirect Register";
+        mode.config.twoRegister = true;
+        mode.templateArg = "State::X, State::A";
+    }
+    else if (code == "A, (X)+") {
+        mode.name = "Register Register Indirect Increment";
+        mode.config.twoRegister = true;
+        mode.templateArg = "State::A, State::X";
+    }
+    else if (code.substr(0, 2) == "d.") {
+        mode.config.bitMask = true;
         mode.templateArg = "1 << " + code.substr(2, 1);
         if (code.size() == 3) {
             mode.name = "Direct Bit";
-        } else {
+        }
+        else {
             mode.name = "Direct Bit Program Counter Relative";
         }
-    } else if (code == "r") {
+    }
+    else if (code == "(X), (Y)") {
+        mode.name = "Indirect Indirect";
+    }
+    else if (code == "dd, ds") {
+        mode.name = "Direct Direct";
+    }
+    else if (code == "d, #i") {
+        mode.name = "Direct Immediate";
+    }
+    else if (code == "YA, d") {
+        mode.name = "Y Accumulator Direct";
+    }
+    else if (code == "C, /m.b") {
+        mode.name = "Carry Negated Memory Bit";
+    }
+    else if (code == "C, m.b") {
+        mode.name = "Carry Memory Bit";
+    }
+    else if (code == "d") {
+        mode.name = "Direct";
+    }
+    else if (code == "!a") {
+        mode.name = "Absolute";
+    }
+    else if (code == "r") {
         mode.name = "Program Counter Relative";
-    } else if (code == "") {
+    }
+    else if (code == "") {
         mode.name = "Implied";
-    } else if (code == "d+X, r") {
-        mode.name = "Direct Indexed, X Program Counter Relative";
-    } else if (code == "d, r") {
+    }
+    else if (code == "d, r") {
         mode.name = "Direct Program Counter Relative";
-    } else if (code == "X, #i") {
-        mode.name = "Index X Immediate";
-    } else if (code == "X, d") {
-        mode.name = "Index X Direct";
-    } else if (code == "X, !a") {
-        mode.name = "Index X Absolute";
-    } else if (code == "Y, #i") {
-        mode.name = "Index Y Immediate";
-    } else if (code == "Y, d") {
-        mode.name = "Index Y Direct";
-    } else if (code == "Y, !a") {
-        mode.name = "Index Y Absolute";
-    } else if (code == "Y, r") {
-        mode.name = "Index Y Program Counter Relative";
-    } else if (code == "X") {
-        mode.name = "Index X";
-    } else if (code == "Y") {
-        mode.name = "Index Y";
-    } else if (code == "YA, X") {
-        mode.name = "Y Accumulator Index X";
-    } else if (code == "[!a+X]") {
-        mode.name = "Absolute Indexed, X Indirect";
-    } else if (code == "(X)+, A") {
-        mode.name = "X Indirect Plus Accumulator";
-    } else if (code == "(X), A") {
-        mode.name = "X Indirect Accumulator";
-    } else if (code == "[d]+Y, A") {
-        mode.name = "Direct Indirect Indexed, Y Accumulator";
-    } else if (code == "[d+X], A") {
-        mode.name = "Direct Indexed, X Indirect Accumulator";
-    } else if (code == "A, (X)+") {
-        mode.name = "Accumulator X Indirect Plus";
-    } else if (code == "A, X") {
-        mode.name = "Accumulator Index X";
-    } else if (code == "A, Y") {
-        mode.name = "Accumulator Index Y";
-    } else if (code == "SP, X") {
-        mode.name = "Stack Pointer Index X";
-    } else if (code == "X, A") {
-        mode.name = "Index X Accumulator";
-    } else if (code == "X, SP") {
-        mode.name = "Index X Stack Pointer";
-    } else if (code == "X, d+Y") {
-        mode.name = "Index X Direct Indexed, Y";
-    } else if (code == "Y, A") {
-        mode.name = "Index Y Accumulator";
-    } else if (code == "Y, d+X") {
-        mode.name = "Index Y Direct Indexed, X";
-    } else if (code == "d+X, A") {
-        mode.name = "Direct Indexed, X Accumulator";
-    } else if (code == "d+X, Y") {
-        mode.name = "Direct Indexed, X Index Y";
-    } else if (code == "d+Y, X") {
-        mode.name = "Direct Indexed, Y Index X";
-    } else if (code == "d, A") {
-        mode.name = "Direct Accumulator";
-    } else if (code == "d, X") {
-        mode.name = "Direct Index X";
-    } else if (code == "d, Y") {
-        mode.name = "Direct Index Y";
-    } else if (code == "!a+X, A") {
-        mode.name = "Absolute Indexed, X Accumulator";
-    } else if (code == "!a+Y, A") {
-        mode.name = "Absolute Indexed, Y Accumulator";
-    } else if (code == "!a, A") {
-        mode.name = "Absolute Accumulator";
-    } else if (code == "!a, X") {
-        mode.name = "Absolute Index X";
-    } else if (code == "!a, Y") {
-        mode.name = "Absolute Index Y";
-    } else if (code == "m.b, C") {
+    }
+    else if (code == "m.b, C") {
         mode.name = "Memory Bit Carry";
-    } else if (code == "d, YA") {
+    }
+    else if (code == "d, YA") {
         mode.name = "Direct Y Accumulator";
-    } else if (code == "YA") {
-        mode.name = "Index Y Accumulator";
-    } else if (code == "m.b") {
+    }
+    else if (code == "YA") {
+        mode.name = "Y Accumulator";
+    }
+    else if (code == "m.b") {
         mode.name = "Memory Bit";
-    } else if (code == "u") {
+    }
+    else if (code == "u") {
         mode.name = "U Page";
-    } else if (code == "PSW") {
-        mode.name = "State Flags";
-    } else {
+    }
+    else {
         mode.name = "Table";
         mode.templateArg = code;
+        mode.config.index = true;
     }
     return mode;
 }
@@ -205,23 +413,7 @@ AddressMode getAddressMode(const std::string& code)
 std::string getRemark(int remarkIndex)
 {
     switch (remarkIndex) {
-    case 1: return "§1: Add 1 cycle if m=0 (16-bit memory/accumulator)";
-    case 2: return "§2: Add 1 cycle if low byte of Direct Page Register is non-zero";
-    case 3: return "§3: Add 1 cycle if adding index crosses a page boundary";
-    case 5: return "§5: Add 2 cycles if m=0 (16-bit memory/accumulator)";
-    case 7: return "§7: Add 1 cycle if branch is taken";
-    case 8: return "§8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) ";
-    case 9: return "§9: Add 1 cycle for 65816 native mode (e=0)";
-    case 10: return "§10: Add 1 cycle if x=0 (16-bit index registers)";
-    case 13: return "§13: 7 cycles per byte moved";
-    case 14: return "§14: Uses 3 cycles to shut the processor down; additional cycles are required by reset to restart it";
-    case 15: return "§15: Uses 3 cycles to shut the processor down; additional cycles are required by interrupt to restart it";
-    case 16: return "§16: Byte and cycle counts subject to change in future processors which expand WDM into 2-byte opcode portions of instructions of varying lengths";
-    case 17: return "¤17: Add 1 byte if m=0 (16-bit memory/accumulator)";
-    case 18: return "¤18: Opcode is 1 byte, but program counter value pushed onto stack is incremented by 2 allowing for optional signature byte";
-    case 19: return "¤19: Add 1 byte if x=0 (16-bit index registers)";
-    case 20: return "§20: TODO manually add exception for 3";
-    case 21: return "§21: Remove 2 cycles for the special case of Accumulator";
+    case 1: return "§1: Add 1 cycle if branch is taken";
     default: return "";
     }
 }
@@ -235,47 +427,10 @@ struct CycleModification
 CycleModification getCycleModification(int remarkIndex)
 {
     switch (remarkIndex) {
-    case 1: return { "state.is16Bit(State::m)", "cycles += 1" }; // Add 1 cycle if m=0 (16-bit memory / accumulator)
-    case 2: return { "(uint8_t)state.getDirectPage()", "cycles += 1" }; // Add 1 cycle if low byte of Direct Page Register is non-zero
-    case 3: return { "true /*index added crosses page boundary*/", "cycles += 1;\n            throw std::runtime_error(\"TODO03\")" }; // Add 1 cycle if adding index crosses a page boundary
-    case 5: return { "state.is16Bit(State::m)", "cycles += 2" }; // Add 2 cycles if m=0 (16-bit memory / accumulator)
-    case 7: return { "true /*branch taken*/", "cycles += 1;\n            throw std::runtime_error(\"TODO07\")" }; // Add 1 cycle if branch is taken
-    case 8: return { "true /*branch taken crosses page boundary*/", "cycles += 1;\n            throw std::runtime_error(\"TODO08\")" }; // Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1)
-    case 9: return { "state.isNativeMode()", "cycles += 1" }; // Add 1 cycle for 65816 native mode (e=0)
-    case 10: return { "state.is16Bit(State::x)", "cycles += 1" }; // Add 1 cycle if x=0 (16-bit index registers)
-    case 20: return { "", "throw std::runtime_error(\"TODO20\")" }; // Needs specialization in address mode
-    case 21: return { "state.is16Bit(State::m)", "cycles -= 2" }; // Removed 2 cycles for the special case of Accumulator
+    case 1: return { "true /*branch taken*/", "cycles += 2;\n            throw std::runtime_error(\"TODO01\")" }; // Add 1 cycle if branch is taken
     default: return {};
     }
 }
-
-struct OperatorArgs
-{
-    OperatorArgs()
-        : hasOperand(0)
-    {
-        cycleRemarks = { 1, 5, 7, 8, 9, 10, 13, 14, 15, 16 };
-    }
-    std::set<int> cycleRemarks;
-    bool hasOperand;
-    std::string comment;
-};
-
-struct AddressModeClassArgs
-{
-    AddressModeClassArgs()
-        : instructionSize(0)
-        , bitMaskTemplate(false)
-        , indexTemplate(false)
-    {
-        cycleRemarks = { 2, 3, 21 };
-    }
-    std::set<int> cycleRemarks;
-    int instructionSize;
-    std::string comment;
-    bool bitMaskTemplate;
-    bool indexTemplate;
-};
 
 bool hasCycleModification(const std::set<int>& remarks)
 {
@@ -323,9 +478,9 @@ void generateOpcode(std::ostream& output, const Instruction& instruction, bool i
         addressModeClass += "16Bit";
     }
 
-    output << "class " << classname;
-    output << " : public AddressMode::" << addressModeClass;
-    output << "<Operator::" << instruction.mnemonic;
+    output << "class " << classname
+        << " : public AddressMode::" << addressModeClass
+        << "<Operator::" << instruction.mnemonic;
     if (!instruction.addressModeClassArg.empty()) {
         output << ", " << instruction.addressModeClassArg;
     }
@@ -421,10 +576,19 @@ void generateOpcodeMap(const std::vector<Instruction>& instructions)
 void generateAddressMode(std::ofstream& output, const std::string& name, const AddressModeClassArgs& args, bool is16Bit = false)
 {
     output << "// " << args.comment << std::endl << "template <typename Operator";
-    if (args.bitMaskTemplate) {
-        output << ", uint8_t bitMask";
-    } else if (args.indexTemplate) {
-        output << ", uint8_t index";
+    if (args.config.bitMask) {
+        output << ", uint8_t BitMask";
+    }
+    else if (args.config.index)
+    {
+        output << ", uint8_t Index";
+    }
+    else if (args.config.oneRegister)
+    {
+        output << ", State::Register RegisterIndex";
+    }
+    else if (args.config.twoRegister) {
+        output << ", State::Register FirstRegister, State::Register SecondRegister";
     }
     output << ">" << std::endl;
 
@@ -470,7 +634,7 @@ void generateAddressMode(std::ofstream& output, const std::string& name, const A
     }
     output << "Operator::invoke(state";
     if (name != "Implied") {
-        output << ", data";
+        output << ", *data, 0";
     }
     output << ");" << std::endl
         << "    }" << std::endl
@@ -550,7 +714,7 @@ void generateOperators(const OperatorMap& operatorMap)
 
         output << "    static int invoke(State& state";
         if (kvp.second.hasOperand) {
-            output << ", uint8_t* data";
+            output << ", uint8_t& leftOperand, const uint8_t& rightOperand";
         }
         output << ")" << std::endl
             << "    {" << std::endl
@@ -638,7 +802,7 @@ void generateSpc()
 
             AddressMode addressMode = getAddressMode(addressModeCode);
 
-            comment = line[5];
+            comment = line[5] + "    \t[" + line[6] + "]";
 
             std::string size = line[3];
 
@@ -649,19 +813,31 @@ void generateSpc()
             addressModeClass.erase(std::remove(addressModeClass.begin(), addressModeClass.end(), ')'), addressModeClass.end());
             addressModeClass.erase(std::remove(addressModeClass.begin(), addressModeClass.end(), '/'), addressModeClass.end());
 
-            std::string addressModeComment = addressMode.name;
-            addressModeComment += "\n// " + addressModeCode;
-
             int instructionSize = stoi(size);
 
-            std::string cycles = "0";
+            std::string cycles;
+            std::string cyclesRemark;
 
-            std::string cyclesRemark = "";
+            size_t pos = line[4].find('/');
+            if (pos != std::string::npos) {
+                cycles = line[4].substr(0, pos);
+                cyclesRemark = "1";
+            }
+            else {
+                cycles = line[4];
+            }
 
             std::set<int> cyclesRemarks;
             OperatorArgs& operatorArgs = operatorMap[mnemonic];
             std::set<int> operatorIntersection;
             AddressModeClassArgs& addressModeClassArgs = addressModeClassMap[addressModeClass];
+
+            std::string addressModeComment = addressModeClassArgs.comment;
+            if (addressModeComment.empty()) {
+                addressModeComment = addressMode.name;
+            }
+            addressModeComment += "\n// " + mnemonic + " " + addressModeCode + ":     \t" + comment;
+
             std::set<int> addressModeIntersection;
 
             if (!cyclesRemark.empty()) {
@@ -702,13 +878,7 @@ void generateSpc()
             addressModeClassArgs.cycleRemarks = addressModeIntersection;
             addressModeClassArgs.instructionSize = instructionSize;
             addressModeClassArgs.comment = addressModeComment;
-            if (!addressMode.templateArg.empty()) {
-                if (addressMode.name == "Table") {
-                    addressModeClassArgs.indexTemplate = true;
-                } else {
-                    addressModeClassArgs.bitMaskTemplate = true;
-                }
-            }
+            addressModeClassArgs.config = addressMode.config;
 
             Instruction instruction { name, mnemonic, comment, opcode, classname, addressMode.name, addressModeClass, size, cycles, cyclesRemarks, addressMode.templateArg };
             instruction.validate();

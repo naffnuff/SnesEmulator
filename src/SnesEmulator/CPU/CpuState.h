@@ -26,6 +26,12 @@ public:
         n = 1 << 7  // Negative
     };
 
+    enum Register
+    {
+        X = 0,
+        Y = 1
+    };
+
     State()
         : accumulatorA(0)
         , accumulatorB(0)

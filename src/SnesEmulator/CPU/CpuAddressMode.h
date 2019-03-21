@@ -58,43 +58,17 @@ class AbsoluteIndexedIndirect : public Instruction3Byte
     }
 };
 
-// Absolute Indexed, X
-// addr,X
-template <typename Operator>
-class AbsoluteIndexedX : public Instruction3Byte
+// Absolute Indexed, X/Y
+// addr,X/Y
+template <typename Operator, State::Register Register>
+class AbsoluteIndexed : public Instruction3Byte
 {
     using Instruction3Byte::Instruction3Byte;
 
     // §3: Add 1 cycle if adding index crosses a page boundary
     int invokeOperator(uint8_t lowByte, uint8_t highByte) override
     {
-        throw std::runtime_error("AbsoluteIndexedX is not implemented");
-        int cycles = 0;
-        if (true /*index added crosses page boundary*/) {
-            cycles += 1;
-            throw std::runtime_error("TODO03");
-        }
-        uint8_t* data = nullptr;
-        return cycles + Operator::invoke(state, data);
-    }
-
-    std::string toString() const override
-    {
-        return Operator::toString() + " $" + operandToString() + " TODO";
-    }
-};
-
-// Absolute Indexed, Y
-// addr,Y
-template <typename Operator>
-class AbsoluteIndexedY : public Instruction3Byte
-{
-    using Instruction3Byte::Instruction3Byte;
-
-    // §3: Add 1 cycle if adding index crosses a page boundary
-    int invokeOperator(uint8_t lowByte, uint8_t highByte) override
-    {
-        throw std::runtime_error("AbsoluteIndexedY is not implemented");
+        throw std::runtime_error("AbsoluteIndexed is not implemented");
         int cycles = 0;
         if (true /*index added crosses page boundary*/) {
             cycles += 1;
@@ -284,42 +258,17 @@ class DirectPageIndexedIndirectX : public Instruction2Byte
     }
 };
 
-// Direct Page Indexed, X
-// dp,X
-template <typename Operator>
-class DirectPageIndexedX : public Instruction2Byte
+// Direct Page Indexed, X/Y
+// dp,X/Y
+template <typename Operator, State::Register Register>
+class DirectPageIndexed : public Instruction2Byte
 {
     using Instruction2Byte::Instruction2Byte;
 
     // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int invokeOperator(uint8_t lowByte) override
     {
-        throw std::runtime_error("DirectPageIndexedX is not implemented");
-        int cycles = 0;
-        if ((uint8_t)state.getDirectPage()) {
-            cycles += 1;
-        }
-        uint8_t* data = nullptr;
-        return cycles + Operator::invoke(state, data);
-    }
-
-    std::string toString() const override
-    {
-        return Operator::toString() + " $" + operandToString() + " TODO";
-    }
-};
-
-// Direct Page Indexed, Y
-// dp,Y
-template <typename Operator>
-class DirectPageIndexedY : public Instruction2Byte
-{
-    using Instruction2Byte::Instruction2Byte;
-
-    // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    int invokeOperator(uint8_t lowByte) override
-    {
-        throw std::runtime_error("DirectPageIndexedY is not implemented");
+        throw std::runtime_error("DirectPageIndexed is not implemented");
         int cycles = 0;
         if ((uint8_t)state.getDirectPage()) {
             cycles += 1;

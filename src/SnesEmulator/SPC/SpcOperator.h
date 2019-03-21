@@ -7,22 +7,22 @@ namespace SPC {
 namespace Operator {
 
 // ADC
-// (X), (Y): (X) = (X)+(Y)+C
-// A, #i: A = A+i+C
-// A, (X): A = A+(X)+C
-// A, [d]+Y: A = A+([d]+Y)+C
-// A, [d+X]: A = A+([d+X])+C
-// A, d: A = A+(d)+C
-// A, d+X: A = A+(d+X)+C
-// A, !a: A = A+(a)+C
-// A, !a+X: A = A+(a+X)+C
-// A, !a+Y: A = A+(a+Y)+C
-// dd, ds: (dd) = (dd)+(d)+C
-// d, #i: (d) = (d)+i+C
+// (X), (Y): (X) = (X)+(Y)+C    	[NV..H.ZC]
+// A, #i: A = A+i+C    	[NV..H.ZC]
+// A, (X): A = A+(X)+C    	[NV..H.ZC]
+// A, [d]+Y: A = A+([d]+Y)+C    	[NV..H.ZC]
+// A, [d+X]: A = A+([d+X])+C    	[NV..H.ZC]
+// A, d: A = A+(d)+C    	[NV..H.ZC]
+// A, d+X: A = A+(d+X)+C    	[NV..H.ZC]
+// A, !a: A = A+(a)+C    	[NV..H.ZC]
+// A, !a+X: A = A+(a+X)+C    	[NV..H.ZC]
+// A, !a+Y: A = A+(a+Y)+C    	[NV..H.ZC]
+// dd, ds: (dd) = (dd)+(d)+C    	[NV..H.ZC]
+// d, #i: (d) = (d)+i+C    	[NV..H.ZC]
 class ADC
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("ADC is not implemented");
         return 0;
@@ -32,11 +32,11 @@ public:
 };
 
 // ADDW
-// YA, d: YA  = YA + (d), H on high byte
+// YA, d: YA  = YA + (d), H on high byte    	[NV..H.ZC]
 class ADDW
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("ADDW is not implemented");
         return 0;
@@ -46,22 +46,22 @@ public:
 };
 
 // AND
-// (X), (Y): (X) = (X) & (Y)
-// A, #i: A = A & i
-// A, (X): A = A & (X)
-// A, [d]+Y: A = A & ([d]+Y)
-// A, [d+X]: A = A & ([d+X])
-// A, d: A = A & (d)
-// A, d+X: A = A & (d+X)
-// A, !a: A = A & (a)
-// A, !a+X: A = A & (a+X)
-// A, !a+Y: A = A & (a+Y)
-// dd, ds: (dd) = (dd) & (ds)
-// d, #i: (d) = (d) & i
+// (X), (Y): (X) = (X) & (Y)    	[N.....Z.]
+// A, #i: A = A & i    	[N.....Z.]
+// A, (X): A = A & (X)    	[N.....Z.]
+// A, [d]+Y: A = A & ([d]+Y)    	[N.....Z.]
+// A, [d+X]: A = A & ([d+X])    	[N.....Z.]
+// A, d: A = A & (d)    	[N.....Z.]
+// A, d+X: A = A & (d+X)    	[N.....Z.]
+// A, !a: A = A & (a)    	[N.....Z.]
+// A, !a+X: A = A & (a+X)    	[N.....Z.]
+// A, !a+Y: A = A & (a+Y)    	[N.....Z.]
+// dd, ds: (dd) = (dd) & (ds)    	[N.....Z.]
+// d, #i: (d) = (d) & i    	[N.....Z.]
 class AND
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("AND is not implemented");
         return 0;
@@ -71,12 +71,12 @@ public:
 };
 
 // AND1
-// C, /m.b: C = C & ~(m.b)
-// C, m.b: C = C & (m.b)
+// C, /m.b: C = C & ~(m.b)    	[.......C]
+// C, m.b: C = C & (m.b)    	[.......C]
 class AND1
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("AND1 is not implemented");
         return 0;
@@ -86,14 +86,14 @@ public:
 };
 
 // ASL
-// A: Left shift A: high->C, 0->low
-// d: Left shift (d) as above
-// d+X: Left shift (d+X) as above
-// !a: Left shift (a) as above
+// A: Left shift A: high->C, 0->low    	[N.....ZC]
+// d: Left shift (d) as above    	[N.....ZC]
+// d+X: Left shift (d+X) as above    	[N.....ZC]
+// !a: Left shift (a) as above    	[N.....ZC]
 class ASL
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("ASL is not implemented");
         return 0;
@@ -103,147 +103,201 @@ public:
 };
 
 // BBC
-// d.0, r: PC+=r  if d.0 == 0
-// d.1, r: PC+=r  if d.1 == 0
-// d.2, r: PC+=r  if d.2 == 0
-// d.3, r: PC+=r  if d.3 == 0
-// d.4, r: PC+=r  if d.4 == 0
-// d.5, r: PC+=r  if d.5 == 0
-// d.6, r: PC+=r  if d.6 == 0
-// d.7, r: PC+=r  if d.7 == 0
+// d.0, r: PC+=r  if d.0 == 0    	[........]
+// d.1, r: PC+=r  if d.1 == 0    	[........]
+// d.2, r: PC+=r  if d.2 == 0    	[........]
+// d.3, r: PC+=r  if d.3 == 0    	[........]
+// d.4, r: PC+=r  if d.4 == 0    	[........]
+// d.5, r: PC+=r  if d.5 == 0    	[........]
+// d.6, r: PC+=r  if d.6 == 0    	[........]
+// d.7, r: PC+=r  if d.7 == 0    	[........]
 class BBC
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    // §1: Add 1 cycle if branch is taken
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("BBC is not implemented");
-        return 0;
+        int cycles = 0;
+        if (true /*branch taken*/) {
+            cycles += 2;
+            throw std::runtime_error("TODO01");
+        }
+        return cycles;
     }
 
     static std::string toString() { return "BBC"; }
 };
 
 // BBS
-// d.0, r: PC+=r  if d.0 == 1
-// d.1, r: PC+=r  if d.1 == 1
-// d.2, r: PC+=r  if d.2 == 1
-// d.3, r: PC+=r  if d.3 == 1
-// d.4, r: PC+=r  if d.4 == 1
-// d.5, r: PC+=r  if d.5 == 1
-// d.6, r: PC+=r  if d.6 == 1
-// d.7, r: PC+=r  if d.7 == 1
+// d.0, r: PC+=r  if d.0 == 1    	[........]
+// d.1, r: PC+=r  if d.1 == 1    	[........]
+// d.2, r: PC+=r  if d.2 == 1    	[........]
+// d.3, r: PC+=r  if d.3 == 1    	[........]
+// d.4, r: PC+=r  if d.4 == 1    	[........]
+// d.5, r: PC+=r  if d.5 == 1    	[........]
+// d.6, r: PC+=r  if d.6 == 1    	[........]
+// d.7, r: PC+=r  if d.7 == 1    	[........]
 class BBS
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    // §1: Add 1 cycle if branch is taken
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("BBS is not implemented");
-        return 0;
+        int cycles = 0;
+        if (true /*branch taken*/) {
+            cycles += 2;
+            throw std::runtime_error("TODO01");
+        }
+        return cycles;
     }
 
     static std::string toString() { return "BBS"; }
 };
 
 // BCC
-// r: PC+=r  if C == 0
+// r: PC+=r  if C == 0    	[........]
 class BCC
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    // §1: Add 1 cycle if branch is taken
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("BCC is not implemented");
-        return 0;
+        int cycles = 0;
+        if (true /*branch taken*/) {
+            cycles += 2;
+            throw std::runtime_error("TODO01");
+        }
+        return cycles;
     }
 
     static std::string toString() { return "BCC"; }
 };
 
 // BCS
-// r: PC+=r  if C == 1
+// r: PC+=r  if C == 1    	[........]
 class BCS
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    // §1: Add 1 cycle if branch is taken
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("BCS is not implemented");
-        return 0;
+        int cycles = 0;
+        if (true /*branch taken*/) {
+            cycles += 2;
+            throw std::runtime_error("TODO01");
+        }
+        return cycles;
     }
 
     static std::string toString() { return "BCS"; }
 };
 
 // BEQ
-// r: PC+=r  if Z == 1
+// r: PC+=r  if Z == 1    	[........]
 class BEQ
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    // §1: Add 1 cycle if branch is taken
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("BEQ is not implemented");
-        return 0;
+        int cycles = 0;
+        if (true /*branch taken*/) {
+            cycles += 2;
+            throw std::runtime_error("TODO01");
+        }
+        return cycles;
     }
 
     static std::string toString() { return "BEQ"; }
 };
 
 // BMI
-// r: PC+=r  if N == 1
+// r: PC+=r  if N == 1    	[........]
 class BMI
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    // §1: Add 1 cycle if branch is taken
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("BMI is not implemented");
-        return 0;
+        int cycles = 0;
+        if (true /*branch taken*/) {
+            cycles += 2;
+            throw std::runtime_error("TODO01");
+        }
+        return cycles;
     }
 
     static std::string toString() { return "BMI"; }
 };
 
 // BNE
-// r: PC+=r  if Z == 0
+// r: PC+=r  if Z == 0    	[........]
 class BNE
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    // §1: Add 1 cycle if branch is taken
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("BNE is not implemented");
-        return 0;
+        int cycles = 0;
+        if (true /*branch taken*/) {
+            cycles += 2;
+            throw std::runtime_error("TODO01");
+        }
+        return cycles;
     }
 
     static std::string toString() { return "BNE"; }
 };
 
 // BPL
-// r: PC+=r  if N == 0
+// r: PC+=r  if N == 0    	[........]
 class BPL
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    // §1: Add 1 cycle if branch is taken
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("BPL is not implemented");
-        return 0;
+        int cycles = 0;
+        if (true /*branch taken*/) {
+            cycles += 2;
+            throw std::runtime_error("TODO01");
+        }
+        return cycles;
     }
 
     static std::string toString() { return "BPL"; }
 };
 
 // BRA
-// r: PC+=r
+// r: PC+=r    	[........]
 class BRA
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    // §1: Add 1 cycle if branch is taken
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("BRA is not implemented");
-        return 0;
+        int cycles = 0;
+        if (true /*branch taken*/) {
+            cycles += 2;
+            throw std::runtime_error("TODO01");
+        }
+        return cycles;
     }
 
     static std::string toString() { return "BRA"; }
 };
 
 // BRK
-// : Push PC and Flags, PC = [$FFDE]
+// : Push PC and Flags, PC = [$FFDE]    	[...1.0..]
 class BRK
 {
 public:
@@ -257,39 +311,51 @@ public:
 };
 
 // BVC
-// r: PC+=r  if V == 0
+// r: PC+=r  if V == 0    	[........]
 class BVC
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    // §1: Add 1 cycle if branch is taken
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("BVC is not implemented");
-        return 0;
+        int cycles = 0;
+        if (true /*branch taken*/) {
+            cycles += 2;
+            throw std::runtime_error("TODO01");
+        }
+        return cycles;
     }
 
     static std::string toString() { return "BVC"; }
 };
 
 // BVS
-// r: PC+=r  if V == 1
+// r: PC+=r  if V == 1    	[........]
 class BVS
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    // §1: Add 1 cycle if branch is taken
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("BVS is not implemented");
-        return 0;
+        int cycles = 0;
+        if (true /*branch taken*/) {
+            cycles += 2;
+            throw std::runtime_error("TODO01");
+        }
+        return cycles;
     }
 
     static std::string toString() { return "BVS"; }
 };
 
 // CALL
-// !a: (SP--)=PCh, (SP--)=PCl, PC=a
+// !a: (SP--)=PCh, (SP--)=PCl, PC=a    	[........]
 class CALL
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("CALL is not implemented");
         return 0;
@@ -299,33 +365,39 @@ public:
 };
 
 // CBNE
-// d+X, r: CMP A, (d+X) then BNE
-// d, r: CMP A, (d) then BNE
+// d+X, r: CMP A, (d+X) then BNE    	[........]
+// d, r: CMP A, (d) then BNE    	[........]
 class CBNE
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    // §1: Add 1 cycle if branch is taken
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("CBNE is not implemented");
-        return 0;
+        int cycles = 0;
+        if (true /*branch taken*/) {
+            cycles += 2;
+            throw std::runtime_error("TODO01");
+        }
+        return cycles;
     }
 
     static std::string toString() { return "CBNE"; }
 };
 
 // CLR1
-// d.0: d.0 = 0
-// d.1: d.1 = 0
-// d.2: d.2 = 0
-// d.3: d.3 = 0
-// d.4: d.4 = 0
-// d.5: d.5 = 0
-// d.6: d.6 = 0
-// d.7: d.7 = 0
+// d.0: d.0 = 0    	[........]
+// d.1: d.1 = 0    	[........]
+// d.2: d.2 = 0    	[........]
+// d.3: d.3 = 0    	[........]
+// d.4: d.4 = 0    	[........]
+// d.5: d.5 = 0    	[........]
+// d.6: d.6 = 0    	[........]
+// d.7: d.7 = 0    	[........]
 class CLR1
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("CLR1 is not implemented");
         return 0;
@@ -335,7 +407,7 @@ public:
 };
 
 // CLRC
-// : C = 0
+// : C = 0    	[.......0]
 class CLRC
 {
 public:
@@ -349,7 +421,7 @@ public:
 };
 
 // CLRP
-// : P = 0
+// : P = 0    	[..0.....]
 class CLRP
 {
 public:
@@ -363,7 +435,7 @@ public:
 };
 
 // CLRV
-// : V = 0, H = 0
+// : V = 0, H = 0    	[.0..0...]
 class CLRV
 {
 public:
@@ -377,28 +449,28 @@ public:
 };
 
 // CMP
-// (X), (Y): (X) - (Y)
-// A, #i: A - i
-// A, (X): A - (X)
-// A, [d]+Y: A - ([d]+Y)
-// A, [d+X]: A - ([d+X])
-// A, d: A - (d)
-// A, d+X: A - (d+X)
-// A, !a: A - (a)
-// A, !a+X: A - (a+X)
-// A, !a+Y: A - (a+Y)
-// X, #i: X - i
-// X, d: X - (d)
-// X, !a: X - (a)
-// Y, #i: Y - i
-// Y, d: Y - (d)
-// Y, !a: Y - (a)
-// dd, ds: (dd) - (ds)
-// d, #i: (d) - i
+// (X), (Y): (X) - (Y)    	[N.....ZC]
+// A, #i: A - i    	[N.....ZC]
+// A, (X): A - (X)    	[N.....ZC]
+// A, [d]+Y: A - ([d]+Y)    	[N.....ZC]
+// A, [d+X]: A - ([d+X])    	[N.....ZC]
+// A, d: A - (d)    	[N.....ZC]
+// A, d+X: A - (d+X)    	[N.....ZC]
+// A, !a: A - (a)    	[N.....ZC]
+// A, !a+X: A - (a+X)    	[N.....ZC]
+// A, !a+Y: A - (a+Y)    	[N.....ZC]
+// X, #i: X - i    	[N.....ZC]
+// X, d: X - (d)    	[N.....ZC]
+// X, !a: X - (a)    	[N.....ZC]
+// Y, #i: Y - i    	[N.....ZC]
+// Y, d: Y - (d)    	[N.....ZC]
+// Y, !a: Y - (a)    	[N.....ZC]
+// dd, ds: (dd) - (ds)    	[N.....ZC]
+// d, #i: (d) - i    	[N.....ZC]
 class CMP
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("CMP is not implemented");
         return 0;
@@ -408,11 +480,11 @@ public:
 };
 
 // CMPW
-// YA, d: YA - (d)
+// YA, d: YA - (d)    	[N.....ZC]
 class CMPW
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("CMPW is not implemented");
         return 0;
@@ -422,11 +494,11 @@ public:
 };
 
 // DAA
-// A: decimal adjust for addition
+// A: decimal adjust for addition    	[N.....ZC]
 class DAA
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("DAA is not implemented");
         return 0;
@@ -436,11 +508,11 @@ public:
 };
 
 // DAS
-// A: decimal adjust for subtraction
+// A: decimal adjust for subtraction    	[N.....ZC]
 class DAS
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("DAS is not implemented");
         return 0;
@@ -450,31 +522,37 @@ public:
 };
 
 // DBNZ
-// Y, r: Y-- then JNZ
-// d, r: (d)-- then JNZ
+// Y, r: Y-- then JNZ    	[........]
+// d, r: (d)-- then JNZ    	[........]
 class DBNZ
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    // §1: Add 1 cycle if branch is taken
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("DBNZ is not implemented");
-        return 0;
+        int cycles = 0;
+        if (true /*branch taken*/) {
+            cycles += 2;
+            throw std::runtime_error("TODO01");
+        }
+        return cycles;
     }
 
     static std::string toString() { return "DBNZ"; }
 };
 
 // DEC
-// A: A--
-// X: X--
-// Y: Y--
-// d: (d)--
-// d+X: (d+X)--
-// !a: (a)--
+// A: A--    	[N.....Z.]
+// X: X--    	[N.....Z.]
+// Y: Y--    	[N.....Z.]
+// d: (d)--    	[N.....Z.]
+// d+X: (d+X)--    	[N.....Z.]
+// !a: (a)--    	[N.....Z.]
 class DEC
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("DEC is not implemented");
         return 0;
@@ -484,11 +562,11 @@ public:
 };
 
 // DECW
-// d: Word (d)--
+// d: Word (d)--    	[N.....Z.]
 class DECW
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("DECW is not implemented");
         return 0;
@@ -498,7 +576,7 @@ public:
 };
 
 // DI
-// : I = 0
+// : I = 0    	[.....0..]
 class DI
 {
 public:
@@ -512,11 +590,11 @@ public:
 };
 
 // DIV
-// YA, X: A=YA/X, Y=mod(YA,X)
+// YA, X: A=YA/X, Y=mod(YA,X)    	[NV..H.Z.]
 class DIV
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("DIV is not implemented");
         return 0;
@@ -526,7 +604,7 @@ public:
 };
 
 // EI
-// : I = 1
+// : I = 1    	[.....1..]
 class EI
 {
 public:
@@ -540,22 +618,22 @@ public:
 };
 
 // EOR
-// (X), (Y): (X) = (X) EOR (Y)
-// A, #i: A = A EOR i
-// A, (X): A = A EOR (X)
-// A, [d]+Y: A = A EOR ([d]+Y)
-// A, [d+X]: A = A EOR ([d+X])
-// A, d: A = A EOR (d)
-// A, d+X: A = A EOR (d+X)
-// A, !a: A = A EOR (a)
-// A, !a+X: A = A EOR (a+X)
-// A, !a+Y: A = A EOR (a+Y)
-// dd, ds: (dd) = (dd) EOR (ds)
-// d, #i: (d) = (d) EOR i
+// (X), (Y): (X) = (X) EOR (Y)    	[N.....Z.]
+// A, #i: A = A EOR i    	[N.....Z.]
+// A, (X): A = A EOR (X)    	[N.....Z.]
+// A, [d]+Y: A = A EOR ([d]+Y)    	[N.....Z.]
+// A, [d+X]: A = A EOR ([d+X])    	[N.....Z.]
+// A, d: A = A EOR (d)    	[N.....Z.]
+// A, d+X: A = A EOR (d+X)    	[N.....Z.]
+// A, !a: A = A EOR (a)    	[N.....Z.]
+// A, !a+X: A = A EOR (a+X)    	[N.....Z.]
+// A, !a+Y: A = A EOR (a+Y)    	[N.....Z.]
+// dd, ds: (dd) = (dd) EOR (ds)    	[N.....Z.]
+// d, #i: (d) = (d) EOR i    	[N.....Z.]
 class EOR
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("EOR is not implemented");
         return 0;
@@ -565,11 +643,11 @@ public:
 };
 
 // EOR1
-// C, m.b: C = C EOR (m.b)
+// C, m.b: C = C EOR (m.b)    	[.......C]
 class EOR1
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("EOR1 is not implemented");
         return 0;
@@ -579,16 +657,16 @@ public:
 };
 
 // INC
-// A: A++
-// X: X++
-// Y: Y++
-// d: (d)++
-// d+X: (d+X)++
-// !a: (a)++
+// A: A++    	[N.....Z.]
+// X: X++    	[N.....Z.]
+// Y: Y++    	[N.....Z.]
+// d: (d)++    	[N.....Z.]
+// d+X: (d+X)++    	[N.....Z.]
+// !a: (a)++    	[N.....Z.]
 class INC
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("INC is not implemented");
         return 0;
@@ -598,11 +676,11 @@ public:
 };
 
 // INCW
-// d: Word (d)++
+// d: Word (d)++    	[N.....Z.]
 class INCW
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("INCW is not implemented");
         return 0;
@@ -612,12 +690,12 @@ public:
 };
 
 // JMP
-// [!a+X]: PC = [a+X]
-// !a: PC = a
+// [!a+X]: PC = [a+X]    	[........]
+// !a: PC = a    	[........]
 class JMP
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("JMP is not implemented");
         return 0;
@@ -627,14 +705,14 @@ public:
 };
 
 // LSR
-// A: Right shift A: 0->high, low->C
-// d: Right shift (d) as above
-// d+X: Right shift (d+X) as above
-// !a: Right shift (a) as above
+// A: Right shift A: 0->high, low->C    	[N.....ZC]
+// d: Right shift (d) as above    	[N.....ZC]
+// d+X: Right shift (d+X) as above    	[N.....ZC]
+// !a: Right shift (a) as above    	[N.....ZC]
 class LSR
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("LSR is not implemented");
         return 0;
@@ -644,51 +722,51 @@ public:
 };
 
 // MOV
-// (X)+, A: (X++) = A      (no read)
-// (X), A: (X) = A        (read)
-// [d]+Y, A: ([d]+Y) = A    (read)
-// [d+X], A: ([d+X]) = A    (read)
-// A, #i: A = i
-// A, (X): A = (X)
-// A, (X)+: A = (X++)
-// A, [d]+Y: A = ([d]+Y)
-// A, [d+X]: A = ([d+X])
-// A, X: A = X
-// A, Y: A = Y
-// A, d: A = (d)
-// A, d+X: A = (d+X)
-// A, !a: A = (a)
-// A, !a+X: A = (a+X)
-// A, !a+Y: A = (a+Y)
-// SP, X: SP = X
-// X, #i: X = i
-// X, A: X = A
-// X, SP: X = SP
-// X, d: X = (d)
-// X, d+Y: X = (d+Y)
-// X, !a: X = (a)
-// Y, #i: Y = i
-// Y, A: Y = A
-// Y, d: Y = (d)
-// Y, d+X: Y = (d+X)
-// Y, !a: Y = (a)
-// dd, ds: (dd) = (ds)    (no read)
-// d+X, A: (d+X) = A      (read)
-// d+X, Y: (d+X) = Y      (read)
-// d+Y, X: (d+Y) = X      (read)
-// d, #i: (d) = i        (read)
-// d, A: (d) = A        (read)
-// d, X: (d) = X        (read)
-// d, Y: (d) = Y        (read)
-// !a+X, A: (a+X) = A      (read)
-// !a+Y, A: (a+Y) = A      (read)
-// !a, A: (a) = A        (read)
-// !a, X: (a) = X        (read)
-// !a, Y: (a) = Y        (read)
+// (X)+, A: (X++) = A      (no read)    	[........]
+// (X), A: (X) = A        (read)    	[........]
+// [d]+Y, A: ([d]+Y) = A    (read)    	[........]
+// [d+X], A: ([d+X]) = A    (read)    	[........]
+// A, #i: A = i    	[N.....Z.]
+// A, (X): A = (X)    	[N.....Z.]
+// A, (X)+: A = (X++)    	[N.....Z.]
+// A, [d]+Y: A = ([d]+Y)    	[N.....Z.]
+// A, [d+X]: A = ([d+X])    	[N.....Z.]
+// A, X: A = X    	[N.....Z.]
+// A, Y: A = Y    	[N.....Z.]
+// A, d: A = (d)    	[N.....Z.]
+// A, d+X: A = (d+X)    	[N.....Z.]
+// A, !a: A = (a)    	[N.....Z.]
+// A, !a+X: A = (a+X)    	[N.....Z.]
+// A, !a+Y: A = (a+Y)    	[N.....Z.]
+// SP, X: SP = X    	[........]
+// X, #i: X = i    	[N.....Z.]
+// X, A: X = A    	[N.....Z.]
+// X, SP: X = SP    	[N.....Z.]
+// X, d: X = (d)    	[N.....Z.]
+// X, d+Y: X = (d+Y)    	[N.....Z.]
+// X, !a: X = (a)    	[N.....Z.]
+// Y, #i: Y = i    	[N.....Z.]
+// Y, A: Y = A    	[N.....Z.]
+// Y, d: Y = (d)    	[N.....Z.]
+// Y, d+X: Y = (d+X)    	[N.....Z.]
+// Y, !a: Y = (a)    	[N.....Z.]
+// dd, ds: (dd) = (ds)    (no read)    	[........]
+// d+X, A: (d+X) = A      (read)    	[........]
+// d+X, Y: (d+X) = Y      (read)    	[........]
+// d+Y, X: (d+Y) = X      (read)    	[........]
+// d, #i: (d) = i        (read)    	[........]
+// d, A: (d) = A        (read)    	[........]
+// d, X: (d) = X        (read)    	[........]
+// d, Y: (d) = Y        (read)    	[........]
+// !a+X, A: (a+X) = A      (read)    	[........]
+// !a+Y, A: (a+Y) = A      (read)    	[........]
+// !a, A: (a) = A        (read)    	[........]
+// !a, X: (a) = X        (read)    	[........]
+// !a, Y: (a) = Y        (read)    	[........]
 class MOV
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("MOV is not implemented");
         return 0;
@@ -698,12 +776,12 @@ public:
 };
 
 // MOV1
-// C, m.b: C = (m.b)
-// m.b, C: (m.b) = C
+// C, m.b: C = (m.b)    	[.......C]
+// m.b, C: (m.b) = C    	[........]
 class MOV1
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("MOV1 is not implemented");
         return 0;
@@ -713,12 +791,12 @@ public:
 };
 
 // MOVW
-// YA, d: YA = word (d)
-// d, YA: word (d) = YA  (read low only)
+// YA, d: YA = word (d)    	[N.....Z.]
+// d, YA: word (d) = YA  (read low only)    	[........]
 class MOVW
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("MOVW is not implemented");
         return 0;
@@ -728,11 +806,11 @@ public:
 };
 
 // MUL
-// YA: YA = Y * A, NZ on Y only
+// YA: YA = Y * A, NZ on Y only    	[N.....Z.]
 class MUL
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("MUL is not implemented");
         return 0;
@@ -742,7 +820,7 @@ public:
 };
 
 // NOP
-// : do nothing
+// : do nothing    	[........]
 class NOP
 {
 public:
@@ -756,11 +834,11 @@ public:
 };
 
 // NOT1
-// m.b: m.b = ~m.b
+// m.b: m.b = ~m.b    	[........]
 class NOT1
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("NOT1 is not implemented");
         return 0;
@@ -770,7 +848,7 @@ public:
 };
 
 // NOTC
-// : C = !C
+// : C = !C    	[.......C]
 class NOTC
 {
 public:
@@ -784,22 +862,22 @@ public:
 };
 
 // OR
-// (X), (Y): (X) = (X) | (Y)
-// A, #i: A = A | i
-// A, (X): A = A | (X)
-// A, [d]+Y: A = A | ([d]+Y)
-// A, [d+X]: A = A | ([d+X])
-// A, d: A = A | (d)
-// A, d+X: A = A | (d+X)
-// A, !a: A = A | (a)
-// A, !a+X: A = A | (a+X)
-// A, !a+Y: A = A | (a+Y)
-// dd, ds: (dd) = (dd) | (ds)
-// d, #i: (d) = (d) | i
+// (X), (Y): (X) = (X) | (Y)    	[N.....Z.]
+// A, #i: A = A | i    	[N.....Z.]
+// A, (X): A = A | (X)    	[N.....Z.]
+// A, [d]+Y: A = A | ([d]+Y)    	[N.....Z.]
+// A, [d+X]: A = A | ([d+X])    	[N.....Z.]
+// A, d: A = A | (d)    	[N.....Z.]
+// A, d+X: A = A | (d+X)    	[N.....Z.]
+// A, !a: A = A | (a)    	[N.....Z.]
+// A, !a+X: A = A | (a+X)    	[N.....Z.]
+// A, !a+Y: A = A | (a+Y)    	[N.....Z.]
+// dd, ds: (dd) = (dd) | (ds)    	[N.....Z.]
+// d, #i: (d) = (d) | i    	[N.....Z.]
 class OR
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("OR is not implemented");
         return 0;
@@ -809,12 +887,12 @@ public:
 };
 
 // OR1
-// C, /m.b: C = C | ~(m.b)
-// C, m.b: C = C | (m.b)
+// C, /m.b: C = C | ~(m.b)    	[.......C]
+// C, m.b: C = C | (m.b)    	[.......C]
 class OR1
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("OR1 is not implemented");
         return 0;
@@ -824,11 +902,11 @@ public:
 };
 
 // PCALL
-// u: CALL $FF00+u
+// u: CALL $FF00+u    	[........]
 class PCALL
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("PCALL is not implemented");
         return 0;
@@ -838,14 +916,14 @@ public:
 };
 
 // POP
-// A: A = (++SP)
-// PSW: Flags = (++SP)
-// X: X = (++SP)
-// Y: Y = (++SP)
+// A: A = (++SP)    	[........]
+// PSW: Flags = (++SP)    	[NVPBHIZC]
+// X: X = (++SP)    	[........]
+// Y: Y = (++SP)    	[........]
 class POP
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("POP is not implemented");
         return 0;
@@ -855,14 +933,14 @@ public:
 };
 
 // PUSH
-// A: (SP--) = A
-// PSW: (SP--) = Flags
-// X: (SP--) = X
-// Y: (SP--) = Y
+// A: (SP--) = A    	[........]
+// PSW: (SP--) = Flags    	[........]
+// X: (SP--) = X    	[........]
+// Y: (SP--) = Y    	[........]
 class PUSH
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("PUSH is not implemented");
         return 0;
@@ -872,7 +950,7 @@ public:
 };
 
 // RET
-// : Pop PC
+// : Pop PC    	[........]
 class RET
 {
 public:
@@ -886,7 +964,7 @@ public:
 };
 
 // RET1
-// : Pop Flags, PC
+// : Pop Flags, PC    	[NVPBHIZC]
 class RET1
 {
 public:
@@ -900,14 +978,14 @@ public:
 };
 
 // ROL
-// A: Left shift A: low=C, C=high
-// d: Left shift (d) as above
-// d+X: Left shift (d+X) as above
-// !a: Left shift (a) as above
+// A: Left shift A: low=C, C=high    	[N.....ZC]
+// d: Left shift (d) as above    	[N.....ZC]
+// d+X: Left shift (d+X) as above    	[N.....ZC]
+// !a: Left shift (a) as above    	[N.....ZC]
 class ROL
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("ROL is not implemented");
         return 0;
@@ -917,14 +995,14 @@ public:
 };
 
 // ROR
-// A: Right shift A: high=C, C=low
-// d: Right shift (d) as above
-// d+X: Right shift (d+X) as above
-// !a: Right shift (a) as above
+// A: Right shift A: high=C, C=low    	[N.....ZC]
+// d: Right shift (d) as above    	[N.....ZC]
+// d+X: Right shift (d+X) as above    	[N.....ZC]
+// !a: Right shift (a) as above    	[N.....ZC]
 class ROR
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("ROR is not implemented");
         return 0;
@@ -934,22 +1012,22 @@ public:
 };
 
 // SBC
-// (X), (Y): (X) = (X)-(Y)-!C
-// A, #i: A = A-i-!C
-// A, (X): A = A-(X)-!C
-// A, [d]+Y: A = A-([d]+Y)-!C
-// A, [d+X]: A = A-([d+X])-!C
-// A, d: A = A-(d)-!C
-// A, d+X: A = A-(d+X)-!C
-// A, !a: A = A-(a)-!C
-// A, !a+X: A = A-(a+X)-!C
-// A, !a+Y: A = A-(a+Y)-!C
-// dd, ds: (dd) = (dd)-(ds)-!C
-// d, #i: (d) = (d)-i-!C
+// (X), (Y): (X) = (X)-(Y)-!C    	[NV..H.ZC]
+// A, #i: A = A-i-!C    	[NV..H.ZC]
+// A, (X): A = A-(X)-!C    	[NV..H.ZC]
+// A, [d]+Y: A = A-([d]+Y)-!C    	[NV..H.ZC]
+// A, [d+X]: A = A-([d+X])-!C    	[NV..H.ZC]
+// A, d: A = A-(d)-!C    	[NV..H.ZC]
+// A, d+X: A = A-(d+X)-!C    	[NV..H.ZC]
+// A, !a: A = A-(a)-!C    	[NV..H.ZC]
+// A, !a+X: A = A-(a+X)-!C    	[NV..H.ZC]
+// A, !a+Y: A = A-(a+Y)-!C    	[NV..H.ZC]
+// dd, ds: (dd) = (dd)-(ds)-!C    	[NV..H.ZC]
+// d, #i: (d) = (d)-i-!C    	[NV..H.ZC]
 class SBC
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("SBC is not implemented");
         return 0;
@@ -959,18 +1037,18 @@ public:
 };
 
 // SET1
-// d.0: d.0 = 1
-// d.1: d.1 = 1
-// d.2: d.2 = 1
-// d.3: d.3 = 1
-// d.4: d.4 = 1
-// d.5: d.5 = 1
-// d.6: d.6 = 1
-// d.7: d.7 = 1
+// d.0: d.0 = 1    	[........]
+// d.1: d.1 = 1    	[........]
+// d.2: d.2 = 1    	[........]
+// d.3: d.3 = 1    	[........]
+// d.4: d.4 = 1    	[........]
+// d.5: d.5 = 1    	[........]
+// d.6: d.6 = 1    	[........]
+// d.7: d.7 = 1    	[........]
 class SET1
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("SET1 is not implemented");
         return 0;
@@ -980,7 +1058,7 @@ public:
 };
 
 // SETC
-// : C = 1
+// : C = 1    	[.......1]
 class SETC
 {
 public:
@@ -994,7 +1072,7 @@ public:
 };
 
 // SETP
-// : P = 1
+// : P = 1    	[..1.....]
 class SETP
 {
 public:
@@ -1008,7 +1086,7 @@ public:
 };
 
 // SLEEP
-// : Halts the processor
+// : Halts the processor    	[........]
 class SLEEP
 {
 public:
@@ -1022,7 +1100,7 @@ public:
 };
 
 // STOP
-// : Halts the processor
+// : Halts the processor    	[........]
 class STOP
 {
 public:
@@ -1036,11 +1114,11 @@ public:
 };
 
 // SUBW
-// YA, d: YA  = YA - (d), H on high byte
+// YA, d: YA  = YA - (d), H on high byte    	[NV..H.ZC]
 class SUBW
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("SUBW is not implemented");
         return 0;
@@ -1050,26 +1128,26 @@ public:
 };
 
 // TCALL
-// 0: CALL [$FFDE]
-// 1: CALL [$FFDC]
-// 2: CALL [$FFDA]
-// 3: CALL [$FFD8]
-// 4: CALL [$FFD6]
-// 5: CALL [$FFD4]
-// 6: CALL [$FFD2]
-// 7: CALL [$FFD0]
-// 8: CALL [$FFCE]
-// 9: CALL [$FFCC]
-// 10: CALL [$FFCA]
-// 11: CALL [$FFC8]
-// 12: CALL [$FFC6]
-// 13: CALL [$FFC4]
-// 14: CALL [$FFC2]
-// 15: CALL [$FFC0]
+// 0: CALL [$FFDE]    	[........]
+// 1: CALL [$FFDC]    	[........]
+// 2: CALL [$FFDA]    	[........]
+// 3: CALL [$FFD8]    	[........]
+// 4: CALL [$FFD6]    	[........]
+// 5: CALL [$FFD4]    	[........]
+// 6: CALL [$FFD2]    	[........]
+// 7: CALL [$FFD0]    	[........]
+// 8: CALL [$FFCE]    	[........]
+// 9: CALL [$FFCC]    	[........]
+// 10: CALL [$FFCA]    	[........]
+// 11: CALL [$FFC8]    	[........]
+// 12: CALL [$FFC6]    	[........]
+// 13: CALL [$FFC4]    	[........]
+// 14: CALL [$FFC2]    	[........]
+// 15: CALL [$FFC0]    	[........]
 class TCALL
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("TCALL is not implemented");
         return 0;
@@ -1079,11 +1157,11 @@ public:
 };
 
 // TCLR1
-// !a: (a) = (a)&~A, ZN as for A-(a)
+// !a: (a) = (a)&~A, ZN as for A-(a)    	[N.....Z.]
 class TCLR1
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("TCLR1 is not implemented");
         return 0;
@@ -1093,11 +1171,11 @@ public:
 };
 
 // TSET1
-// !a: (a) = (a)|A, ZN as for A-(a)
+// !a: (a) = (a)|A, ZN as for A-(a)    	[N.....Z.]
 class TSET1
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("TSET1 is not implemented");
         return 0;
@@ -1107,11 +1185,11 @@ public:
 };
 
 // XCN
-// A: A = (A>>4) | (A<<4)
+// A: A = (A>>4) | (A<<4)    	[N.....Z.]
 class XCN
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, uint8_t& leftOperand, const uint8_t& rightOperand)
     {
         throw std::runtime_error("XCN is not implemented");
         return 0;

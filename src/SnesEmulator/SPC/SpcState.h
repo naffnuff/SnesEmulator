@@ -15,6 +15,16 @@ namespace SPC {
 class State : public IState
 {
 public:
+    enum Register
+    {
+        A,
+        X,
+        Y,
+        SP,
+        PSW,
+        RegisterCount
+    };
+
     State()
         : programCounter(0xFFC0)
         , memory(1 << 16, 0x55)
@@ -55,6 +65,7 @@ public:
 
     std::ostream& printRegisters(std::ostream& output) const override
     {
+
         return output;
     }
 
@@ -78,10 +89,17 @@ public:
         programCounter += increment;
     }
 
+    template<Register RegisterIndex>
+    uint8_t& getRegister()
+    {
+        return registers[RegisterIndex];
+    }
+
 private:
     uint16_t programCounter;
 
     std::vector<uint8_t> memory;
+    std::array<uint8_t, RegisterCount> registers;
 };
 
 }

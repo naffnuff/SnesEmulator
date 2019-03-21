@@ -22,6 +22,7 @@ struct Instruction
     std::string sizeRemark;
     std::string cycles;
     std::set<int> cyclesRemarks;
+    std::string addressModeClassArg;
 
     void validate()
     {
@@ -105,6 +106,7 @@ CycleModification getCycleModification(int remarkIndex)
 struct OperatorArgs
 {
     OperatorArgs()
+        : hasOperand(false)
     {
         cycleRemarks = { 1, 5, 7, 8, 9, 10, 13, 14, 15, 16 };
     }
@@ -116,12 +118,16 @@ struct OperatorArgs
 struct AddressModeClassArgs
 {
     AddressModeClassArgs()
+        : instructionSize(0)
+        , registerTemplate(false)
+        
     {
         cycleRemarks = { 2, 3, 21 };
     }
     std::set<int> cycleRemarks;
     int instructionSize;
     std::string comment;
+    bool registerTemplate;
 };
 
 bool hasCycleModification(const std::set<int>& remarks)
@@ -181,9 +187,12 @@ void generateOpcode(std::ostream& output, const Instruction& instruction, const 
 
     std::string classname = instruction.classname + (is16Bit ? "_16Bit" : "");
 
-    output << "class " << classname;
-    output << " : public AddressMode::" << addressModeClass << "<Operator::" + instruction.mnemonic + ">";
-    output << std::endl
+    output << "class " << classname
+        << " : public AddressMode::" << addressModeClass << "<Operator::" << instruction.mnemonic;
+    if (!instruction.addressModeClassArg.empty()) {
+        output << ", " << instruction.addressModeClassArg;
+    }
+    output << ">" << std::endl
         << "{" << std::endl
         << "    using " << addressModeClass << "::" << addressModeClass << ";" << std::endl << std::endl
         << "    // " << opcodeComment << std::endl;
@@ -308,7 +317,9 @@ void generateOpcodeMap(const std::vector<Instruction>& instructions)
 void generateAddressMode(std::ofstream& output, const std::string& name, const AddressModeClassArgs& args, bool is16Bit = false)
 {
     output << "// " << args.comment << std::endl << "template <typename Operator";
-
+    if (args.registerTemplate) {
+        output << ", typename Register";
+    }
     output << ">" << std::endl;
 
     output << "class " << name << " : public ";
@@ -545,6 +556,15 @@ void generateCpu()
             std::set<int> cyclesRemarks;
             OperatorArgs& operatorArgs = operatorMap[mnemonic];
             std::set<int> operatorIntersection;
+
+            std::string addressModeClassSubstr = addressModeClass.substr(0, addressModeClass.size() - 1);
+            std::string addressModeClassArg;
+            bool registerTemplate = false;
+            if (addressModeClassSubstr == "AbsoluteIndexed" || addressModeClassSubstr == "DirectPageIndexed") {
+                addressModeClassArg = "State::" + addressModeClass.substr(addressModeClass.size() - 1, 1);
+                registerTemplate = true;
+                addressModeClass = addressModeClassSubstr;
+            }
             AddressModeClassArgs& addressModeClassArgs = addressModeClassMap[addressModeClass];
             std::set<int> addressModeIntersection;
 
@@ -580,8 +600,9 @@ void generateCpu()
             addressModeClassArgs.cycleRemarks = addressModeIntersection;
             addressModeClassArgs.instructionSize = instructionSize;
             addressModeClassArgs.comment = addressModeComment;
+            addressModeClassArgs.registerTemplate = registerTemplate;
 
-            Instruction instruction { name, mnemonic, comment, opcode, classname, addressMode, addressModeClass, size, sizeRemark, cycles, cyclesRemarks };
+            Instruction instruction { name, mnemonic, comment, opcode, classname, addressMode, addressModeClass, size, sizeRemark, cycles, cyclesRemarks, addressModeClassArg };
             instruction.validate();
             instructions.push_back(instruction);
 
