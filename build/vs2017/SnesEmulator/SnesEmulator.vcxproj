@@ -142,6 +142,7 @@
     <ClInclude Include="..\..\..\src\SnesEmulator\SPC\SpcOpcodeMap.h" />
     <ClInclude Include="..\..\..\src\SnesEmulator\SPC\SpcOperator.h" />
     <ClInclude Include="..\..\..\src\SnesEmulator\SPC\SpcState.h" />
+    <ClInclude Include="..\..\..\src\SnesEmulator\Types.h" />
     <ClInclude Include="..\..\..\src\SnesEmulator\Util.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -83,5 +83,8 @@
     <ClInclude Include="..\..\..\src\SnesEmulator\SPC\SpcOperator.h">
       <Filter>Header Files\SPC</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\SnesEmulator\Types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

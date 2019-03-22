@@ -5,12 +5,11 @@
 #include <bitset>
 #include <iomanip>
 
-#include "../IState.h"
 #include "../Util.h"
 
 namespace CPU {
 
-class State : public IState
+class State
 {
 public:
     enum Flag
@@ -54,7 +53,7 @@ public:
     State(State&) = delete;
     State& operator=(State&) = delete;
 
-    std::ostream& printMemoryPage(std::ostream& output, uint32_t startAddress) const override
+    std::ostream& printMemoryPage(std::ostream& output, uint32_t startAddress) const
     {
         output << "          0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f" << std::endl;
         uint32_t address = startAddress - std::bitset<4>(startAddress).to_ulong();
@@ -75,10 +74,21 @@ public:
 
     std::ostream& printRegisters(std::ostream& output) const
     {
-        std::bitset<8> flagSet(flags);
+        std::string flagsString;
         if (emulationMode) {
-            flagSet |= Flag::m;
+            flagsString = "nv1bdizc";
         }
+        else {
+            flagsString = "nvmxdizc";
+        }
+        for (size_t i = 0; i < flagsString.size(); ++i) {
+            if (flags & 1 << i) {
+                flagsString[flagsString.size() - i - 1] = toupper(flagsString[flagsString.size() - i - 1]);
+            }
+        }
+
+        std::bitset<8> flagSet(flags);
+        
         return output
             << "PB=" << std::setw(2) << std::setfill('0') << +programBank
             << ", PC=" << std::setw(4) << std::setfill('0') << programCounter
@@ -88,7 +98,7 @@ public:
             << ", S=" << std::setw(4) << std::setfill('0') << stackPointer
             << ", DP=" << std::setw(4) << std::setfill('0') << directPage
             << ", DB=" << std::setw(2) << std::setfill('0') << +dataBank
-            << ", flags=" << flagSet
+            << ", flags=" << flagSet << " (" << flagsString << ", $" << std::setw(2) << std::setfill('0') << +flags << ")"
             << ", e=" << emulationMode;
     }
 
@@ -121,7 +131,7 @@ public:
         return isNativeMode() && !getFlag(flag);
     }
 
-    uint8_t readProgramByte(int offset = 0) const override
+    uint8_t readProgramByte(int offset = 0) const
     {
         return memory[getProgramAddress(offset)];
     }
@@ -141,7 +151,7 @@ public:
         programCounter += increment;
     }
 
-    uint32_t getProgramAddress(int offset = 0) const override
+    uint32_t getProgramAddress(int offset = 0) const
     {
         return (programBank << 16 | programCounter) + offset;
     }
@@ -206,6 +216,8 @@ public:
 
     void exchangeCarryAndEmulationFlags()
     {
+        forceEmulationRegisters();
+
         bool emulation = emulationMode;
         emulationMode = getFlag(c);
         setFlag(c, emulation);

@@ -3816,7 +3816,6 @@ class SEI_78 : public AddressMode::Implied<Operator::SEI>
     // 1   2           imp       .....1.. . SEI
     int execute() override
     {
-        throw std::runtime_error("SEI_78 is not implemented");
         return 2 + applyOperand();
     }
 

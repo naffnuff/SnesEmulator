@@ -7,19 +7,31 @@
 #include <bitset>
 #include <iomanip>
 
-#include "../IState.h"
+#include "../Types.h"
 #include "../Util.h"
 
 namespace SPC {
 
-class State : public IState
+class State
 {
 public:
+    enum Flag
+    {
+        c = 1 << 0, // Carry
+        z = 1 << 1, // Zero
+        i = 1 << 2, // IRQ Disable
+        h = 1 << 3, // 
+        b = 1 << 4, // Break
+        p = 1 << 5, // 
+        v = 1 << 6, // Overflow
+        n = 1 << 7  // Negative
+    };
+
     enum Register
     {
         A,
-        X,
         Y,
+        X,
         SP,
         PSW,
         RegisterCount
@@ -44,7 +56,7 @@ public:
     State(State&) = delete;
     State& operator=(State&) = delete;
 
-    std::ostream& printMemoryPage(std::ostream& output, uint32_t startAddress) const override
+    std::ostream& printMemoryPage(std::ostream& output, uint32_t startAddress) const
     {
         output << "          0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f" << std::endl;
         uint32_t address = startAddress - std::bitset<4>(startAddress).to_ulong();
@@ -63,23 +75,39 @@ public:
         return output;
     }
 
-    std::ostream& printRegisters(std::ostream& output) const override
+    std::ostream& printRegisters(std::ostream& output) const
     {
+        std::string flagsString = "nvpbhizc";
 
-        return output;
+        for (size_t i = 0; i < flagsString.size(); ++i) {
+            if (getRegister<PSW>() & 1 << i) {
+                flagsString[flagsString.size() - i - 1] = toupper(flagsString[flagsString.size() - i - 1]);
+            }
+        }
+
+        std::bitset<8> flagSet(getRegister<PSW>());
+
+        return output
+            << "PC=" << std::setw(4) << std::setfill('0') << programCounter
+            << ", A=" << std::setw(2) << std::setfill('0') << +getRegister<A>()
+            << ", X=" << std::setw(2) << std::setfill('0') << +getRegister<X>()
+            << ", Y=" << std::setw(2) << std::setfill('0') << +getRegister<Y>()
+            << ", S=" << std::setw(4) << std::setfill('0') << getStackPointer()
+            << ", YA=" << std::setw(4) << std::setfill('0') << getYAccumulator()
+            << ", flags=" << flagSet << " (" << flagsString << ", $" << std::setw(2) << std::setfill('0') << +getRegister<PSW>() << ")";
     }
 
-    uint32_t getProgramAddress(int offset = 0) const override
+    uint32_t getProgramAddress(int offset = 0) const
     {
         return programCounter + offset;
     }
 
-    uint16_t getProgramCounter(int offset = 0) const override
+    uint16_t getProgramCounter(int offset = 0) const
     {
         return programCounter + offset;
     }
 
-    uint8_t readProgramByte(int offset = 0) const override
+    uint8_t readProgramByte(int offset = 0) const
     {
         return memory[getProgramAddress(offset)];
     }
@@ -89,8 +117,29 @@ public:
         programCounter += increment;
     }
 
+    uint16_t getStackPointer() const
+    {
+        return 0x0100 | getRegister<SP>();
+    }
+
+    uint16_t& getYAccumulator()
+    {
+        return (uint16_t&)registers[A];
+    }
+
+    uint16_t getYAccumulator() const
+    {
+        return (uint16_t&)registers[A];
+    }
+
     template<Register RegisterIndex>
     uint8_t& getRegister()
+    {
+        return registers[RegisterIndex];
+    }
+
+    template<Register RegisterIndex>
+    uint8_t getRegister() const
     {
         return registers[RegisterIndex];
     }
