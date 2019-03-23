@@ -4,9 +4,9 @@
 
 int main(int, char*)
 {
-    std::ostream& output = std::cout << std::hex;
+    std::ostream& output = std::cout;
     std::istream& input = std::cin;
-    std::ostream& error = std::cerr << std::hex;
+    std::ostream& error = std::cerr;
 
     try {
         Emulator emulator(output, input, error);

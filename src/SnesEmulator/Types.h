@@ -90,9 +90,44 @@ public:
     {
     }
 
+    Word(Byte lowByte, Byte highByte)
+        : value(lowByte | highByte << 8)
+    {
+    }
+
     operator uint16_t() const
     {
         return value;
+    }
+
+    Word& operator=(Byte operand)
+    {
+        value = operand;
+        return *this;
+    }
+
+    Word& operator+=(Word operand)
+    {
+        value += operand.value;
+        return *this;
+    }
+
+    Word& operator++()
+    {
+        ++value;
+        return *this;
+    }
+
+    Word operator--(int)
+    {
+        Word copy(value);
+        --value;
+        return copy;
+    }
+
+    bool isNegative() const
+    {
+        return value & 1 << 15;
     }
 
 private:
@@ -114,9 +149,39 @@ public:
     {
     }
 
+    Long(Byte lowByte, Byte highByte, Byte bankByte)
+        : value(lowByte | highByte << 8 | bankByte << 16)
+    {
+    }
+
     operator uint32_t() const
     {
         return value;
+    }
+
+    Long& operator+=(Long operand)
+    {
+        value += operand.value;
+        return *this;
+    }
+
+    Long& operator-=(Long operand)
+    {
+        value -= operand.value;
+        return *this;
+    }
+
+    Long& operator++()
+    {
+        ++value;
+        return *this;
+    }
+
+    Long operator++(int)
+    {
+        Long copy(value);
+        ++value;
+        return copy;
     }
 
 private:
@@ -132,10 +197,10 @@ inline std::ostream& operator<<(std::ostream& output, Byte byte)
 
 inline std::ostream& operator<<(std::ostream& output, Word word)
 {
-    return output << std::hex << std::setw(4) << std::setfill('0') << +word.value << std::dec;
+    return output << std::hex << std::setw(4) << std::setfill('0') << word.value << std::dec;
 }
 
 inline std::ostream& operator<<(std::ostream& output, Long long_)
 {
-    return output << std::hex << std::setw(6) << std::setfill('0') << +long_.value << std::dec;
+    return output << std::hex << std::setw(6) << std::setfill('0') << long_.value << std::dec;
 }

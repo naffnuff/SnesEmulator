@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <vector>
+#include <array>
 #include <bitset>
 #include <iomanip>
 
@@ -26,20 +27,15 @@ public:
         n = 1 << 7  // Negative
     };
 
-    enum Register
+    enum IndexRegister
     {
         X = 0,
-        Y = 1
+        Y = 1,
+        IndexRegisterCount
     };
 
     State()
-        : xIndex(0)
-        , yIndex(0)
-        , directPage(0)
-        , stackPointer(0)
-        , programCounter(0)
-        , resetAddress(0)
-        , emulationMode(true)
+        : emulationMode(true)
         , memory(1 << 24, 0x55)
     {
         std::cout << "Memory size=" << memory.size() << std::endl;
@@ -73,12 +69,12 @@ public:
         
         return output
             << "PB=" << programBank
-            << ", PC=" << std::hex << std::setw(4) << std::setfill('0') << programCounter
-            << ", A=" << std::hex << std::setw(4) << std::setfill('0') << getAccumulatorC()
-            << ", X=" << std::hex << std::setw(4) << std::setfill('0') << xIndex
-            << ", Y=" << std::hex << std::setw(4) << std::setfill('0') << yIndex
-            << ", S=" << std::hex << std::setw(4) << std::setfill('0') << stackPointer
-            << ", DP=" << std::hex << std::setw(4) << std::setfill('0') << directPage
+            << ", PC=" << programCounter
+            << ", A=" << getAccumulatorC()
+            << ", X=" << getIndexRegister<X>()
+            << ", Y=" << getIndexRegister<Y>()
+            << ", S=" << stackPointer
+            << ", DP=" << directPage
             << ", DB=" << dataBank
             << ", flags=" << flagSet << " (" << flagsString << ", $" << flags << ")"
             << ", e=" << emulationMode;
@@ -123,22 +119,17 @@ public:
         programCounter = resetAddress;
     }
 
-    Byte nextProgramByte()
-    {
-        return memory[programCounter++];
-    }
-
-    void incrementProgramCounter(uint16_t increment)
+    void incrementProgramCounter(Word increment)
     {
         programCounter += increment;
     }
 
-    uint32_t getProgramAddress(int offset = 0) const
+    Long getProgramAddress(int offset = 0) const
     {
         return (programBank << 16 | programCounter) + offset;
     }
 
-    uint16_t getProgramCounter(int offset = 0) const
+    Word getProgramCounter(int offset = 0) const
     {
         return programCounter + offset;
     }
@@ -159,36 +150,36 @@ public:
         return accumulatorB;
     }
 
-    void setAccumulatorC(uint16_t value)
+    void setAccumulatorC(Word value)
     {
         accumulatorA = Byte(value);
         accumulatorB = Byte(value >> 8);
         updateSignFlags(value);
     }
 
-    uint16_t getAccumulatorC() const
+    Word getAccumulatorC() const
     {
         return accumulatorB << 8 | accumulatorA;
     }
 
-    uint16_t getDirectPage() const
+    Word getDirectPage() const
     {
         return directPage;
     }
 
-    Byte getMemory(uint32_t address) const
+    Byte getMemory(Long address) const
     {
         return memory[address];
     }
 
-    Byte* getMemoryPointer(uint32_t address)
+    Byte* getMemoryPointer(Long address)
     {
         return &memory[address];
     }
 
-    Byte* getMemoryPointer(Byte lowByte, Byte highByte, Byte bankByte, uint16_t offset = 0)
+    Byte* getMemoryPointer(Byte lowByte, Byte highByte, Byte bankByte, Word offset = 0)
     {
-        return getMemoryPointer(uint32_t(bankByte << 16 | highByte << 8 | lowByte) + offset);
+        return getMemoryPointer(Long((bankByte << 16 | highByte << 8 | lowByte) + offset));
     }
 
     Byte* getMemoryPointer(Byte lowByte, Byte highByte)
@@ -198,7 +189,7 @@ public:
 
     Byte* getMemoryPointer(Byte lowByte)
     {
-        return getMemoryPointer(uint32_t(directPage + lowByte));
+        return getMemoryPointer(Long(directPage + lowByte));
     }
 
     void exchangeCarryAndEmulationFlags()
@@ -216,22 +207,17 @@ public:
     {
         if (emulationMode) {
             setFlag(x | m, true);
-            ((Byte*)(&xIndex))[1] = 0;
-            ((Byte*)(&yIndex))[1] = 0;
+            ((Byte*)(&getIndexRegister<X>()))[1] = 0;
+            ((Byte*)(&getIndexRegister<Y>()))[1] = 0;
             ((Byte*)(&stackPointer))[1] = 1;
         }
     }
 
-    void updateSignFlags(Byte value)
+    template<typename T>
+    void updateSignFlags(T value)
     {
         setFlag(State::z, value == 0);
         setFlag(State::n, value.isNegative());
-    }
-
-    void updateSignFlags(uint16_t value)
-    {
-        setFlag(State::z, value == 0);
-        setFlag(State::n, value & 1 << 15);
     }
 
     void pushToStack(Byte byte)
@@ -240,7 +226,7 @@ public:
         forceEmulationRegisters();
     }
 
-    void pushToStack(uint16_t byte)
+    void pushToStack(Word byte)
     {
         pushToStack(Byte(byte >> 8));
         pushToStack(Byte(byte));
@@ -251,60 +237,63 @@ public:
         pushToStack(flags);
     }
 
-    void setProgramCounter(uint16_t pc, Byte pbr)
+    void setProgramCounter(Word pc, Byte pbr)
     {
         programCounter = pc;
         programBank = pbr;
     }
 
-    void setProgramCounter(uint16_t value)
+    void setProgramCounter(Word value)
     {
         setProgramCounter(value, programBank);
     }
 
-    void setProgramCounter(uint32_t value)
+    void setProgramCounter(Long value)
     {
-        setProgramCounter(uint16_t(value), Byte(value >> 16));
+        setProgramCounter(Word(value), Byte(value >> 16));
     }
 
-    void setStackPointer(uint16_t value)
+    void setStackPointer(Word value)
     {
         stackPointer = value;
         forceEmulationRegisters();
     }
 
-    void setXIndexRegister(uint16_t value)
+    template<IndexRegister Register>
+    void setIndexRegister(Word value)
     {
-        xIndex = value;
+        getIndexRegister<Register>() = value;
         forceEmulationRegisters();
         updateSignFlags(value);
     }
 
-    void setXIndexRegister(Byte value)
+    template<IndexRegister Register>
+    void setIndexRegister(Byte value)
     {
-        xIndex = value;
+        getIndexRegister<Register>() = value;
         updateSignFlags(value);
     }
 
-    void setYIndexRegister(uint16_t value)
+    template<IndexRegister Register>
+    Word& getIndexRegister()
     {
-        yIndex = value;
-        forceEmulationRegisters();
-        updateSignFlags(value);
+        return indexRegisters[Register];
     }
 
-    void setYIndexRegister(Byte value)
+    template<IndexRegister Register>
+    Word getIndexRegister() const
     {
-        yIndex = value;
-        updateSignFlags(value);
+        return indexRegisters[Register];
     }
 
-    uint16_t& getYIndexRegister()
+    template<IndexRegister Register>
+    static std::string getRegisterName()
     {
-        return yIndex;
+        std::string names[] = { "X", "Y" };
+        return names[Register];
     }
 
-    void setDirectPageRegister(uint16_t value)
+    void setDirectPageRegister(Word value)
     {
         directPage = value;
         updateSignFlags(value);
@@ -319,19 +308,18 @@ private:
     Byte accumulatorA;
     Byte accumulatorB;
     Byte dataBank;
-    uint16_t xIndex;
-    uint16_t yIndex;
-    uint16_t directPage;
-    uint16_t stackPointer;
+    Word directPage;
+    Word stackPointer;
     Byte programBank;
-    uint16_t programCounter;
+    Word programCounter;
 
-    uint16_t resetAddress;
+    Word resetAddress;
 
     Byte flags;
     bool emulationMode;
 
     std::vector<Byte> memory;
+    std::array<Word, IndexRegisterCount> indexRegisters;
 };
 
 }

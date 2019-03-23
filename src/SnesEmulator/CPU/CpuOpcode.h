@@ -1298,14 +1298,13 @@ class COP_02 : public AddressMode::Immediate<Operator::COP>
 // CPX #const
 // Immediate (2-Byte [19])
 // ¤19: Add 1 byte if x=0 (16-bit index registers)
-class CPX_E0_16Bit : public AddressMode::Immediate16Bit<Operator::CPX>
+class CPX_E0_16Bit : public AddressMode::Immediate16Bit<Operator::CP<State::X>>
 {
     using Immediate16Bit::Immediate16Bit;
 
     // 3-x 3-x         imm       x.....xx . CPX #$54
     int execute() override
     {
-        throw std::runtime_error("CPX_E0_16Bit is not implemented");
         return 2 + applyOperand();
     }
 
@@ -1316,7 +1315,7 @@ class CPX_E0_16Bit : public AddressMode::Immediate16Bit<Operator::CPX>
 // CPX #const
 // Immediate (2-Byte [19])
 // ¤19: Add 1 byte if x=0 (16-bit index registers)
-class CPX_E0 : public AddressMode::Immediate<Operator::CPX>
+class CPX_E0 : public AddressMode::Immediate<Operator::CP<State::X>>
 {
     using Immediate::Immediate;
 
@@ -1333,7 +1332,7 @@ class CPX_E0 : public AddressMode::Immediate<Operator::CPX>
 // CPX Compare Index Register X with Memory [Flags affected: n,z,c]
 // CPX dp
 // Direct Page (2-Byte)
-class CPX_E4 : public AddressMode::DirectPage<Operator::CPX>
+class CPX_E4 : public AddressMode::DirectPage<Operator::CP<State::X>>
 {
     using DirectPage::DirectPage;
 
@@ -1350,7 +1349,7 @@ class CPX_E4 : public AddressMode::DirectPage<Operator::CPX>
 // CPX Compare Index Register X with Memory [Flags affected: n,z,c]
 // CPX addr
 // Absolute (3-Byte)
-class CPX_EC : public AddressMode::Absolute<Operator::CPX>
+class CPX_EC : public AddressMode::Absolute<Operator::CP<State::X>>
 {
     using Absolute::Absolute;
 
@@ -1368,7 +1367,7 @@ class CPX_EC : public AddressMode::Absolute<Operator::CPX>
 // CPY #const
 // Immediate (2-Byte [19])
 // ¤19: Add 1 byte if x=0 (16-bit index registers)
-class CPY_C0_16Bit : public AddressMode::Immediate16Bit<Operator::CPY>
+class CPY_C0_16Bit : public AddressMode::Immediate16Bit<Operator::CP<State::Y>>
 {
     using Immediate16Bit::Immediate16Bit;
 
@@ -1386,7 +1385,7 @@ class CPY_C0_16Bit : public AddressMode::Immediate16Bit<Operator::CPY>
 // CPY #const
 // Immediate (2-Byte [19])
 // ¤19: Add 1 byte if x=0 (16-bit index registers)
-class CPY_C0 : public AddressMode::Immediate<Operator::CPY>
+class CPY_C0 : public AddressMode::Immediate<Operator::CP<State::Y>>
 {
     using Immediate::Immediate;
 
@@ -1403,7 +1402,7 @@ class CPY_C0 : public AddressMode::Immediate<Operator::CPY>
 // CPY Compare Index Register Y with Memory [Flags affected: n,z,c]
 // CPY dp
 // Direct Page (2-Byte)
-class CPY_C4 : public AddressMode::DirectPage<Operator::CPY>
+class CPY_C4 : public AddressMode::DirectPage<Operator::CP<State::Y>>
 {
     using DirectPage::DirectPage;
 
@@ -1420,7 +1419,7 @@ class CPY_C4 : public AddressMode::DirectPage<Operator::CPY>
 // CPY Compare Index Register Y with Memory [Flags affected: n,z,c]
 // CPY addr
 // Absolute (3-Byte)
-class CPY_CC : public AddressMode::Absolute<Operator::CPY>
+class CPY_CC : public AddressMode::Absolute<Operator::CP<State::Y>>
 {
     using Absolute::Absolute;
 
@@ -1919,7 +1918,7 @@ class INC_FE : public AddressMode::AbsoluteIndexed<Operator::INC, State::X>
 // INX Increment Index Register X [Flags affected: n,z]
 // INX
 // Implied (1-Byte)
-class INX_E8 : public AddressMode::Implied<Operator::INX>
+class INX_E8 : public AddressMode::Implied<Operator::IN<State::X>>
 {
     using Implied::Implied;
 
@@ -1936,7 +1935,7 @@ class INX_E8 : public AddressMode::Implied<Operator::INX>
 // INY Increment Index Register Y [Flags affected: n,z]
 // INY
 // Implied (1-Byte)
-class INY_C8 : public AddressMode::Implied<Operator::INY>
+class INY_C8 : public AddressMode::Implied<Operator::IN<State::Y>>
 {
     using Implied::Implied;
 
@@ -2359,7 +2358,7 @@ class LDA_BF : public AddressMode::AbsoluteLongIndexedX<Operator::LDA>
 // LDX #const
 // Immediate (2-Byte [19])
 // ¤19: Add 1 byte if x=0 (16-bit index registers)
-class LDX_A2_16Bit : public AddressMode::Immediate16Bit<Operator::LDX>
+class LDX_A2_16Bit : public AddressMode::Immediate16Bit<Operator::LD<State::X>>
 {
     using Immediate16Bit::Immediate16Bit;
 
@@ -2377,7 +2376,7 @@ class LDX_A2_16Bit : public AddressMode::Immediate16Bit<Operator::LDX>
 // LDX #const
 // Immediate (2-Byte [19])
 // ¤19: Add 1 byte if x=0 (16-bit index registers)
-class LDX_A2 : public AddressMode::Immediate<Operator::LDX>
+class LDX_A2 : public AddressMode::Immediate<Operator::LD<State::X>>
 {
     using Immediate::Immediate;
 
@@ -2394,7 +2393,7 @@ class LDX_A2 : public AddressMode::Immediate<Operator::LDX>
 // LDX Load Index Register X from Memory [Flags affected: n,z]
 // LDX dp
 // Direct Page (2-Byte)
-class LDX_A6 : public AddressMode::DirectPage<Operator::LDX>
+class LDX_A6 : public AddressMode::DirectPage<Operator::LD<State::X>>
 {
     using DirectPage::DirectPage;
 
@@ -2411,7 +2410,7 @@ class LDX_A6 : public AddressMode::DirectPage<Operator::LDX>
 // LDX Load Index Register X from Memory [Flags affected: n,z]
 // LDX addr
 // Absolute (3-Byte)
-class LDX_AE : public AddressMode::Absolute<Operator::LDX>
+class LDX_AE : public AddressMode::Absolute<Operator::LD<State::X>>
 {
     using Absolute::Absolute;
 
@@ -2428,7 +2427,7 @@ class LDX_AE : public AddressMode::Absolute<Operator::LDX>
 // LDX Load Index Register X from Memory [Flags affected: n,z]
 // LDX dp,Y
 // Direct Page Indexed, Y (2-Byte)
-class LDX_B6 : public AddressMode::DirectPageIndexed<Operator::LDX, State::Y>
+class LDX_B6 : public AddressMode::DirectPageIndexed<Operator::LD<State::X>, State::Y>
 {
     using DirectPageIndexed::DirectPageIndexed;
 
@@ -2445,7 +2444,7 @@ class LDX_B6 : public AddressMode::DirectPageIndexed<Operator::LDX, State::Y>
 // LDX Load Index Register X from Memory [Flags affected: n,z]
 // LDX addr,Y
 // Absolute Indexed, Y (3-Byte)
-class LDX_BE : public AddressMode::AbsoluteIndexed<Operator::LDX, State::Y>
+class LDX_BE : public AddressMode::AbsoluteIndexed<Operator::LD<State::X>, State::Y>
 {
     using AbsoluteIndexed::AbsoluteIndexed;
 
@@ -2463,7 +2462,7 @@ class LDX_BE : public AddressMode::AbsoluteIndexed<Operator::LDX, State::Y>
 // LDY #const
 // Immediate (2-Byte [19])
 // ¤19: Add 1 byte if x=0 (16-bit index registers)
-class LDY_A0_16Bit : public AddressMode::Immediate16Bit<Operator::LDY>
+class LDY_A0_16Bit : public AddressMode::Immediate16Bit<Operator::LD<State::Y>>
 {
     using Immediate16Bit::Immediate16Bit;
 
@@ -2480,7 +2479,7 @@ class LDY_A0_16Bit : public AddressMode::Immediate16Bit<Operator::LDY>
 // LDY #const
 // Immediate (2-Byte [19])
 // ¤19: Add 1 byte if x=0 (16-bit index registers)
-class LDY_A0 : public AddressMode::Immediate<Operator::LDY>
+class LDY_A0 : public AddressMode::Immediate<Operator::LD<State::Y>>
 {
     using Immediate::Immediate;
 
@@ -2497,7 +2496,7 @@ class LDY_A0 : public AddressMode::Immediate<Operator::LDY>
 // LDY Load Index Register Y from Memory [Flags affected: n,z]
 // LDY dp
 // Direct Page (2-Byte)
-class LDY_A4 : public AddressMode::DirectPage<Operator::LDY>
+class LDY_A4 : public AddressMode::DirectPage<Operator::LD<State::Y>>
 {
     using DirectPage::DirectPage;
 
@@ -2514,7 +2513,7 @@ class LDY_A4 : public AddressMode::DirectPage<Operator::LDY>
 // LDY Load Index Register Y from Memory [Flags affected: n,z]
 // LDY addr
 // Absolute (3-Byte)
-class LDY_AC : public AddressMode::Absolute<Operator::LDY>
+class LDY_AC : public AddressMode::Absolute<Operator::LD<State::Y>>
 {
     using Absolute::Absolute;
 
@@ -2531,7 +2530,7 @@ class LDY_AC : public AddressMode::Absolute<Operator::LDY>
 // LDY Load Index Register Y from Memory [Flags affected: n,z]
 // LDY dp,X
 // Direct Page Indexed, X (2-Byte)
-class LDY_B4 : public AddressMode::DirectPageIndexed<Operator::LDY, State::X>
+class LDY_B4 : public AddressMode::DirectPageIndexed<Operator::LD<State::Y>, State::X>
 {
     using DirectPageIndexed::DirectPageIndexed;
 
@@ -2548,7 +2547,7 @@ class LDY_B4 : public AddressMode::DirectPageIndexed<Operator::LDY, State::X>
 // LDY Load Index Register Y from Memory [Flags affected: n,z]
 // LDY addr,X
 // Absolute Indexed, X (3-Byte)
-class LDY_BC : public AddressMode::AbsoluteIndexed<Operator::LDY, State::X>
+class LDY_BC : public AddressMode::AbsoluteIndexed<Operator::LD<State::Y>, State::X>
 {
     using AbsoluteIndexed::AbsoluteIndexed;
 
@@ -4258,7 +4257,7 @@ class STZ_9E : public AddressMode::AbsoluteIndexed<Operator::STZ, State::X>
 // TAX Transfer Accumulator to Index Register X [Flags affected: n,z]
 // TAX
 // Implied (1-Byte)
-class TAX_AA : public AddressMode::Implied<Operator::TAX>
+class TAX_AA : public AddressMode::Implied<Operator::TA<State::X>>
 {
     using Implied::Implied;
 
@@ -4274,7 +4273,7 @@ class TAX_AA : public AddressMode::Implied<Operator::TAX>
 // TAY Transfer Accumulator to Index Register Y [Flags affected: n,z]
 // TAY
 // Implied (1-Byte)
-class TAY_A8 : public AddressMode::Implied<Operator::TAY>
+class TAY_A8 : public AddressMode::Implied<Operator::TA<State::Y>>
 {
     using Implied::Implied;
 

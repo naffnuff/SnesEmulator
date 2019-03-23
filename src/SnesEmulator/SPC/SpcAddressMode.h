@@ -587,10 +587,8 @@ class ProgramCounterRelative : public Instruction2Byte
     std::string toString() const override
     {
         std::ostringstream ss;
-        ss << std::hex;
         ss << Operator::toString() + " $";
-        uint16_t address = state.getProgramCounter(int((int8_t)size() + (int8_t)state.readProgramByte(1)));
-        ss << std::setw(4) << std::setfill('0') << address;
+        ss << state.getProgramCounter(int((int8_t)size() + (int8_t)state.readProgramByte(1)));
         return ss.str();
     }
 };
@@ -629,7 +627,7 @@ class Register : public Instruction1Byte
 
     std::string toString() const override
     {
-        return Operator::toString() + " " + state.getRegisterName<RegisterIndex>();
+        return Operator::toString() + " " + State::getRegisterName<RegisterIndex>();
     }
 };
 
@@ -830,7 +828,7 @@ class RegisterImmediate : public Instruction2Byte
 
     std::string toString() const override
     {
-        return Operator::toString() + " " + state.getRegisterName<RegisterIndex>() + ", #$" + operandToString();
+        return Operator::toString() + " " + State::getRegisterName<RegisterIndex>() + ", #$" + operandToString();
     }
 };
 
@@ -868,7 +866,7 @@ class RegisterIndirectRegister : public Instruction1Byte
 
     std::string toString() const override
     {
-        return Operator::toString() + " (" + state.getRegisterName<FirstRegister>() + "), " + state.getRegisterName<SecondRegister>();
+        return Operator::toString() + " (" + State::getRegisterName<FirstRegister>() + "), " + State::getRegisterName<SecondRegister>();
     }
 };
 
@@ -911,7 +909,7 @@ class RegisterRegister : public Instruction1Byte
 
     std::string toString() const override
     {
-        return Operator::toString() + " " + state.getRegisterName<FirstRegister>() + ", " + state.getRegisterName<SecondRegister>();
+        return Operator::toString() + " " + State::getRegisterName<FirstRegister>() + ", " + State::getRegisterName<SecondRegister>();
     }
 };
 

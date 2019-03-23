@@ -33,7 +33,7 @@ class Absolute : public Instruction3Byte
 
 int Absolute<Operator::JSR>::invokeOperator(Byte lowByte, Byte highByte)
 {
-    return Operator::JSR::invoke(state, lowByte | highByte << 8);
+    return Operator::JSR::invoke(state, Word(lowByte, highByte));
 }
 
 // Absolute Indexed Indirect
@@ -58,7 +58,7 @@ class AbsoluteIndexedIndirect : public Instruction3Byte
 
 // Absolute Indexed, X/Y
 // addr,X/Y
-template <typename Operator, State::Register Register>
+template <typename Operator, State::IndexRegister Register>
 class AbsoluteIndexed : public Instruction3Byte
 {
     using Instruction3Byte::Instruction3Byte;
@@ -258,7 +258,7 @@ class DirectPageIndexedIndirectX : public Instruction2Byte
 
 // Direct Page Indexed, X/Y
 // dp,X/Y
-template <typename Operator, State::Register Register>
+template <typename Operator, State::IndexRegister Register>
 class DirectPageIndexed : public Instruction2Byte
 {
     using Instruction2Byte::Instruction2Byte;
@@ -375,8 +375,8 @@ class DirectPageIndirectLongIndexedY : public Instruction2Byte
         if ((Byte)state.getDirectPage()) {
             cycles += 1;
         }
-        Byte* address = state.getMemoryPointer(state.getDirectPage() + lowByte);
-        Byte* data = state.getMemoryPointer(address[0], address[1], address[2], state.getYIndexRegister());
+        Byte* address = state.getMemoryPointer(lowByte);
+        Byte* data = state.getMemoryPointer(address[0], address[1], address[2], state.getIndexRegister<State::Y>());
         return cycles + Operator::invoke(state, data);
     }
 
@@ -413,7 +413,7 @@ class Immediate16Bit : public Instruction3Byte
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
-        uint16_t data = lowByte | highByte << 8;
+        Word data = lowByte | highByte << 8;
         return Operator::invoke(state, (Byte*)&data);
     }
 
@@ -455,10 +455,8 @@ class ProgramCounterRelative : public Instruction2Byte
     std::string toString() const override
     {
         std::ostringstream ss;
-        ss << std::hex;
         ss << Operator::toString() + " $";
-        uint16_t address = state.getProgramCounter(int((int8_t)size() + (int8_t)state.readProgramByte(1)));
-        ss << std::setw(4) << std::setfill('0') << address;
+        ss << state.getProgramCounter(int((int8_t)size() + (int8_t)state.readProgramByte(1)));
         return ss.str();
     }
 };

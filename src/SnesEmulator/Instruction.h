@@ -11,7 +11,7 @@ public:
     virtual std::string toString() const = 0;
     virtual std::string opcodeToString() const = 0;
     virtual int execute() = 0;
-    virtual uint16_t size() const = 0;
+    virtual int size() const = 0;
 };
 
 template<typename State, typename... Bytes>
@@ -37,11 +37,11 @@ protected:
     {
         std::ostringstream ss;
         int offset = size() - 1;
-        ((ss << std::hex << readByte<Bytes>(offset)), ...);
+        ((ss << readByte<Bytes>(offset)), ...);
         return ss.str();
     }
 
-    uint16_t size() const
+    int size() const
     {
         return sizeof...(Bytes) + 1;
     }

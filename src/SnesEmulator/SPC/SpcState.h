@@ -56,12 +56,12 @@ public:
     State(State&) = delete;
     State& operator=(State&) = delete;
 
-    /*std::ostream& printMemoryPage(std::ostream& output, uint32_t startAddress) const
+    /*std::ostream& printMemoryPage(std::ostream& output, Long startAddress) const
     {
         output << "       0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f" << std::endl;
-        uint32_t address = startAddress - std::bitset<4>(startAddress).to_ulong();
+        Long address = startAddress - std::bitset<4>(startAddress).to_ulong();
         for (int i = 0; i < 16 && address < memory.size(); ++i) {
-            uint16_t lowAddress = uint16_t(address);
+            Word lowAddress = Word(address);
             lowAddress = lowAddress >> 4;
             output << std::setw(3) << std::setfill('0') << lowAddress << "x  ";
 
@@ -92,26 +92,26 @@ public:
         std::bitset<8> flagSet(getRegister<PSW>());
 
         return output
-            << "PC=" << std::hex << std::setw(4) << std::setfill('0') << programCounter
+            << "PC=" << programCounter
             << ", A=" << getRegister<A>()
             << ", X=" << getRegister<X>()
             << ", Y=" << getRegister<Y>()
-            << ", S=" << std::hex << std::setw(4) << std::setfill('0') << getStackPointer()
-            << ", YA=" << std::hex << std::setw(4) << std::setfill('0') << getYAccumulator()
+            << ", S=" << getStackPointer()
+            << ", YA=" << getYAccumulator()
             << ", flags=" << flagSet << " (" << flagsString << ", $" << getRegister<PSW>() << ")";
     }
 
-    uint32_t getProgramAddress(int offset = 0) const
+    Long getProgramAddress(int offset = 0) const
     {
         return programCounter + offset;
     }
 
-    uint16_t getProgramCounter(int offset = 0) const
+    Word getProgramCounter(int offset = 0) const
     {
         return programCounter + offset;
     }
 
-    void setProgramCounter(uint16_t value)
+    void setProgramCounter(Word value)
     {
         programCounter = value;
     }
@@ -121,34 +121,44 @@ public:
         return memory[getProgramAddress(offset)];
     }
     
-    void incrementProgramCounter(uint16_t increment)
+    void incrementProgramCounter(Word increment)
     {
         programCounter += increment;
     }
 
-    uint16_t getStackPointer() const
+    Word getStackPointer() const
     {
         return 0x0100 | getRegister<SP>();
     }
 
-    uint16_t& getYAccumulator()
+    Word& getYAccumulator()
     {
-        return (uint16_t&)registers[A];
+        return (Word&)registers[A];
     }
 
-    uint16_t getYAccumulator() const
+    Word getYAccumulator() const
     {
-        return (uint16_t&)registers[A];
+        return (Word&)registers[A];
     }
 
-    Byte& getMemory(uint16_t address)
+    Byte& getMemory(Word address)
     {
         return memory[address];
     }
 
-    Byte getMemory(uint16_t address) const
+    Byte getMemory(Word address) const
     {
         return memory[address];
+    }
+
+    Byte& getMemory(Byte address)
+    {
+        return getMemory(Word(address));
+    }
+
+    Byte getMemory(Byte address) const
+    {
+        return getMemory(Word(address));
     }
 
     template<Register RegisterIndex>
@@ -164,7 +174,7 @@ public:
     }
 
     template<Register RegisterIndex>
-    std::string getRegisterName() const
+    static std::string getRegisterName()
     {
         std::string names[] = { "A", "Y", "X", "SP", "PSW" };
         return names[RegisterIndex];
@@ -197,7 +207,7 @@ public:
     }
 
 private:
-    uint16_t programCounter;
+    Word programCounter;
 
     std::vector<Byte> memory;
     std::array<Byte, RegisterCount> registers;

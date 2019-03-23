@@ -264,3 +264,4 @@ __pycache__/
 *.sfc
 *.smc
 *.srm
+/build/vs2017/SnesEmulator/address.txt

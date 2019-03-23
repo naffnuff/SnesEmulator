@@ -77,16 +77,13 @@ bool State::tryReadHeader(int offset, std::vector<char> rom, std::ostream& outpu
 
     int romSize = 1024 * (int)std::pow(2, (int)rom[0xFFD7 - offset]);
 
-    int fixedValue = (Byte)rom[0xFFDA - offset];
-
     resetAddress = (Byte)rom[0xFFFC - offset];
     resetAddress += (Byte)rom[0xFFFD - offset] << 8;
 
     output << "gameTitle=" << gameTitle << std::endl
         << "mapMode=" << mapMode << std::endl
         << "romSize=" << romSize << std::endl
-        << "fixedValue=" << fixedValue << std::endl
-        << "resetAddress=" << std::setw(4) << std::setfill('0') << resetAddress
+        << "resetAddress=" << resetAddress
         << std::endl;
 
     return true;

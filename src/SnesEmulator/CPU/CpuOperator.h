@@ -64,7 +64,7 @@ static int branchIf(bool condition, State& state, int8_t offset)
 {
     int cycles = 0;
     if (condition) {
-        uint16_t newAddress = state.getProgramCounter(offset);
+        Word newAddress = state.getProgramCounter(offset);
         cycles += 1;
         if (!state.isNativeMode()) {
             Byte programPage = Byte(state.getProgramCounter() >> 8);
@@ -384,10 +384,10 @@ public:
         int cycles = 0;
         if (state.is16Bit(State::m)) {
             cycles += 1;
-            uint16_t accumulator = state.getAccumulatorC();
-            uint16_t data16Bit = data[0] | data[1] << 8;
+            Word accumulator = state.getAccumulatorC();
+            Word data16Bit = data[0] | data[1] << 8;
             state.setFlag(State::c, accumulator >= data16Bit);
-            state.updateSignFlags(uint16_t(accumulator - data16Bit));
+            state.updateSignFlags(Word(accumulator - data16Bit));
         } else {
             Byte accumulator = state.getAccumulatorA();
             state.setFlag(State::c, accumulator >= data[0]);
@@ -417,40 +417,31 @@ public:
     static std::string toString() { return "COP"; }
 };
 
-// CPX Compare Index Register X with Memory [Flags affected: n,z,c]
-class CPX
+// CPX/Y Compare Index Register X/Y with Memory [Flags affected: n,z,c]
+template<State::IndexRegister Register>
+class CP
 {
 public:
     // §10: Add 1 cycle if x=0 (16-bit index registers)
     static int invoke(State& state, Byte* data)
     {
-        throw std::runtime_error("CPX is not implemented");
         int cycles = 0;
         if (state.is16Bit(State::x)) {
             cycles += 1;
+            Word indexRegister = state.getIndexRegister<Register>();
+            Word data16Bit = data[0] | data[1] << 8;
+            state.setFlag(State::c, indexRegister >= data16Bit);
+            state.updateSignFlags(Word(indexRegister - data16Bit));
+        }
+        else {
+            Byte indexRegister(state.getIndexRegister<Register>());
+            state.setFlag(State::c, indexRegister >= data[0]);
+            state.updateSignFlags(Byte(indexRegister - data[0]));
         }
         return cycles;
     }
 
-    static std::string toString() { return "CPX"; }
-};
-
-// CPY Compare Index Register Y with Memory [Flags affected: n,z,c]
-class CPY
-{
-public:
-    // §10: Add 1 cycle if x=0 (16-bit index registers)
-    static int invoke(State& state, Byte* data)
-    {
-        throw std::runtime_error("CPY is not implemented");
-        int cycles = 0;
-        if (state.is16Bit(State::x)) {
-            cycles += 1;
-        }
-        return cycles;
-    }
-
-    static std::string toString() { return "CPY"; }
+    static std::string toString() { return "CP" + State::getRegisterName<Register>(); }
 };
 
 // DEC Decrement [Flags affected: n,z]
@@ -533,30 +524,18 @@ public:
     static std::string toString() { return "INC"; }
 };
 
-// INX Increment Index Register X [Flags affected: n,z]
-class INX
+// INX/Y Increment Index Register X/Y [Flags affected: n,z]
+template<State::IndexRegister Register>
+class IN
 {
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("INX is not implemented");
+        state.updateSignFlags(++state.getIndexRegister<Register>());
         return 0;
     }
 
-    static std::string toString() { return "INX"; }
-};
-
-// INY Increment Index Register Y [Flags affected: n,z]
-class INY
-{
-public:
-    static int invoke(State& state)
-    {
-        state.updateSignFlags(++state.getYIndexRegister());
-        return 0;
-    }
-
-    static std::string toString() { return "INY"; }
+    static std::string toString() { return "IN" + State::getRegisterName<Register>(); }
 };
 
 // JMP Jump [Flags affected: none][Alias: JML for all Long addressing modes]
@@ -582,9 +561,9 @@ public:
         return 0;
     }
 
-    static int invoke(State& state, uint16_t address)
+    static int invoke(State& state, Word address)
     {
-        uint16_t programCounter = uint16_t(state.getProgramAddress(-1));
+        Word programCounter = Word(state.getProgramAddress(-1));
         state.pushToStack(programCounter);
         state.setProgramCounter(address);
         return 0;
@@ -602,7 +581,7 @@ public:
     {
         int cycles = 0;
         if (state.is16Bit(State::m)) {
-            state.setAccumulatorC(uint16_t(data[0] | data[1] << 8));
+            state.setAccumulatorC(Word(data[0] | data[1] << 8));
             cycles += 1;
         } else {
             state.setAccumulatorA(data[0]);
@@ -613,8 +592,9 @@ public:
     static std::string toString() { return "LDA"; }
 };
 
-// LDX Load Index Register X from Memory [Flags affected: n,z]
-class LDX
+// LDX/Y Load Index Register X/Y from Memory [Flags affected: n,z]
+template<State::IndexRegister Register>
+class LD
 {
 public:
     // §10: Add 1 cycle if x=0 (16-bit index registers)
@@ -622,35 +602,15 @@ public:
     {
         int cycles = 0;
         if (state.is16Bit(State::x)) {
-            state.setXIndexRegister(uint16_t(data[0] | data[1] << 8));
+            state.setIndexRegister<Register>(Word(data[0] | data[1] << 8));
             cycles += 1;
         } else {
-            state.setXIndexRegister(data[0]);
+            state.setIndexRegister<Register>(data[0]);
         }
         return cycles;
     }
 
-    static std::string toString() { return "LDX"; }
-};
-
-// LDY Load Index Register Y from Memory [Flags affected: n,z]
-class LDY
-{
-public:
-    // §10: Add 1 cycle if x=0 (16-bit index registers)
-    static int invoke(State& state, Byte* data)
-    {
-        int cycles = 0;
-        if (state.is16Bit(State::x)) {
-            state.setYIndexRegister(uint16_t(data[0] | data[1] << 8));
-            cycles += 1;
-        } else {
-            state.setYIndexRegister(data[0]);
-        }
-        return cycles;
-    }
-
-    static std::string toString() { return "LDY"; }
+    static std::string toString() { return "LD" + State::getRegisterName<Register>(); }
 };
 
 // LSR Logical Shift Memory or Accumulator Right [Flags affected: n,z,c]
@@ -1225,30 +1185,23 @@ public:
     static std::string toString() { return "STZ"; }
 };
 
-// TAX Transfer Accumulator to Index Register X [Flags affected: n,z]
-class TAX
+// TAX/Y Transfer Accumulator to Index Register X/Y [Flags affected: n,z]
+template<State::IndexRegister Register>
+class TA
 {
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("TAX is not implemented");
+        if (state.is16Bit(State::x)) {
+            state.setIndexRegister<Register>(state.getAccumulatorC());
+        }
+        else {
+            state.setIndexRegister<Register>(state.getAccumulatorA());
+        }
         return 0;
     }
 
-    static std::string toString() { return "TAX"; }
-};
-
-// TAY Transfer Accumulator to Index Register Y [Flags affected: n,z]
-class TAY
-{
-public:
-    static int invoke(State& state)
-    {
-        throw std::runtime_error("TAY is not implemented");
-        return 0;
-    }
-
-    static std::string toString() { return "TAY"; }
+    static std::string toString() { return "TA" + State::getRegisterName<Register>(); }
 };
 
 // TCD Transfer 16-bit Accumulator to Direct Page Register [Flags affected: n,z]
