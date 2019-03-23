@@ -12,7 +12,7 @@ namespace {
 struct Instruction
 {
     std::string name;
-    std::string mnemonic;
+    std::string operatorName;
     std::string comment;
     std::string code;
     std::string classname;
@@ -29,7 +29,7 @@ struct Instruction
             throw std::runtime_error("Instruction name is empty");
         }
 
-        if (mnemonic.empty()) {
+        if (operatorName.empty()) {
             throw std::runtime_error("Instruction " + name + ": shortname is empty");
         }
 
@@ -480,7 +480,7 @@ void generateOpcode(std::ostream& output, const Instruction& instruction, bool i
 
     output << "class " << classname
         << " : public AddressMode::" << addressModeClass
-        << "<Operator::" << instruction.mnemonic;
+        << "<Operator::" << instruction.operatorName;
     if (!instruction.addressModeClassArg.empty()) {
         output << ", " << instruction.addressModeClassArg;
     }
@@ -609,11 +609,11 @@ void generateAddressMode(std::ofstream& output, const std::string& name, const A
 
     output << "    int invokeOperator(";
     if (actualSize >= 2) {
-        output << "uint8_t lowByte";
+        output << "Byte lowByte";
         if (actualSize >= 3) {
-            output << ", uint8_t highByte";
+            output << ", Byte highByte";
             if (actualSize >= 4) {
-                output << ", uint8_t bankByte";
+                output << ", Byte bankByte";
             }
         }
     }
@@ -626,7 +626,7 @@ void generateAddressMode(std::ofstream& output, const std::string& name, const A
     }
 
     if (name != "Implied") {
-        output << "        uint8_t* data = nullptr;" << std::endl;
+        output << "        Byte* data = nullptr;" << std::endl;
     }
     output << "        return ";
     if (hasCycleModification(args.cycleRemarks)) {
@@ -667,8 +667,8 @@ void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
         << "namespace SPC {" << std::endl
         << std::endl
         << "typedef InstructionBase<State> Instruction1Byte;" << std::endl
-        << "typedef InstructionBase<State, uint8_t> Instruction2Byte;" << std::endl
-        << "typedef InstructionBase<State, uint8_t, uint8_t> Instruction3Byte;" << std::endl
+        << "typedef InstructionBase<State, Byte> Instruction2Byte;" << std::endl
+        << "typedef InstructionBase<State, Byte, Byte> Instruction3Byte;" << std::endl
         << std::endl
         << "namespace AddressMode {" << std::endl
         << std::endl;
@@ -714,7 +714,7 @@ void generateOperators(const OperatorMap& operatorMap)
 
         output << "    static int invoke(State& state";
         if (kvp.second.hasOperand) {
-            output << ", uint8_t& leftOperand, const uint8_t& rightOperand";
+            output << ", Byte& leftOperand, const Byte& rightOperand";
         }
         output << ")" << std::endl
             << "    {" << std::endl
@@ -804,6 +804,11 @@ void generateSpc()
 
             comment = line[5] + "    \t[" + line[6] + "]";
 
+            std::string operatorName = mnemonic;
+            if (operatorName == "MOV" && line[6] == "N.....Z.") {
+                operatorName += "_SignedResult";
+            }
+
             std::string size = line[3];
 
             std::string addressModeClass = addressMode.name;
@@ -828,7 +833,7 @@ void generateSpc()
             }
 
             std::set<int> cyclesRemarks;
-            OperatorArgs& operatorArgs = operatorMap[mnemonic];
+            OperatorArgs& operatorArgs = operatorMap[operatorName];
             std::set<int> operatorIntersection;
             AddressModeClassArgs& addressModeClassArgs = addressModeClassMap[addressModeClass];
 
@@ -880,14 +885,14 @@ void generateSpc()
             addressModeClassArgs.comment = addressModeComment;
             addressModeClassArgs.config = addressMode.config;
 
-            Instruction instruction { name, mnemonic, comment, opcode, classname, addressMode.name, addressModeClass, size, cycles, cyclesRemarks, addressMode.templateArg };
+            Instruction instruction { name, operatorName, comment, opcode, classname, addressMode.name, addressModeClass, size, cycles, cyclesRemarks, addressMode.templateArg };
             instruction.validate();
             instructions.push_back(instruction);
 
             // TMP
             //addressModeMap[addressModeCode].push_back(addressMode + ", " + name + ", code=" + code + ", cycles=" + cycles + ", size=" + size);
             //addressModeMap[addressMode].push_back(name + ", code=" + code + ", cycles=" + cycles + ", size=" + size + ", sizeRemark=" + sizeRemark);
-            addressModeMap[mnemonic].push_back(opcode + ": " + name + ", " + addressMode.name + ", cycles=" + cycles + ", size=" + size);
+            //addressModeMap[mnemonic].push_back(opcode + ": " + name + ", " + addressMode.name + ", cycles=" + cycles + ", size=" + size);
         }
     }
 
@@ -903,11 +908,11 @@ void generateSpc()
             }
         }
         for (const OperatorMap::value_type& kvp : operatorMap) {
-            if (kvp.first == instruction.mnemonic) {
+            if (kvp.first == instruction.operatorName) {
                 for (int remark : kvp.second.cycleRemarks) {
                     instruction.cyclesRemarks.erase(remark);
                     if (removedRemarks.find(remark) != removedRemarks.end()) {
-                        std::cout << "Nope, remark removed twice from " << instruction.classname << ": " << remark << ", " << instruction.mnemonic << ", " << instruction.addressModeClass << std::endl;
+                        std::cout << "Nope, remark removed twice from " << instruction.classname << ": " << remark << ", " << instruction.operatorName << ", " << instruction.addressModeClass << std::endl;
                     }
                 }
             }
@@ -915,9 +920,9 @@ void generateSpc()
     }
 
     generateOpcodes(instructions);
-    generateOpcodeMap(instructions);
-    generateAddressModes(addressModeClassMap);
-    generateOperators(operatorMap);
+    //generateOpcodeMap(instructions);
+    //generateAddressModes(addressModeClassMap);
+    //generateOperators(operatorMap);
 
     int i = 0;
     for (const AddressModeMap::value_type kvp : addressModeMap) {

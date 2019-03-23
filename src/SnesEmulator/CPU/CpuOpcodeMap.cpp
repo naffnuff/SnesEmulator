@@ -8,7 +8,7 @@ namespace CPU {
 
 Instruction* OpcodeMap::getNextInstruction(const State& state) const
 {
-    uint8_t opcode = state.readProgramByte();
+    Byte opcode = state.readProgramByte();
     if (state.is16Bit(State::m) && instructions16BitM[opcode]) {
         return instructions16BitM[opcode].get();
     } else if (state.is16Bit(State::x) && instructions16BitX[opcode]) {

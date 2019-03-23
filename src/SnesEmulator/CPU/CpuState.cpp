@@ -35,7 +35,7 @@ void State::loadRom(const std::string& path, std::ostream& output)
         int romIndex = 0;
         for (int bank = 0; bank < 1 << 8; ++bank) {
             for (int address = 0x8000; address < (1 << 16); ++address) {
-                uint8_t byte = rom[romIndex++];
+                Byte byte(rom[romIndex++]);
                 memory[bank << 16 | address] = byte;
                 if (romIndex >= (int)rom.size()) {
                     romLoaded = true;
@@ -70,17 +70,17 @@ bool State::tryReadHeader(int offset, std::vector<char> rom, std::ostream& outpu
 
     std::string gameTitle;
     for (int i = 0; i < 21; ++i) {
-        gameTitle.push_back((uint8_t)rom[0xFFC0 + i - offset]);
+        gameTitle.push_back((Byte)rom[0xFFC0 + i - offset]);
     }
 
-    std::bitset<8> mapMode((uint8_t)rom[0xFFD5 - offset]);
+    std::bitset<8> mapMode((Byte)rom[0xFFD5 - offset]);
 
     int romSize = 1024 * (int)std::pow(2, (int)rom[0xFFD7 - offset]);
 
-    int fixedValue = (uint8_t)rom[0xFFDA - offset];
+    int fixedValue = (Byte)rom[0xFFDA - offset];
 
-    resetAddress = (uint8_t)rom[0xFFFC - offset];
-    resetAddress += (uint8_t)rom[0xFFFD - offset] << 8;
+    resetAddress = (Byte)rom[0xFFFC - offset];
+    resetAddress += (Byte)rom[0xFFFD - offset] << 8;
 
     output << "gameTitle=" << gameTitle << std::endl
         << "mapMode=" << mapMode << std::endl

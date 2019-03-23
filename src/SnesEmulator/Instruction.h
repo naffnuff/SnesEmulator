@@ -1,6 +1,5 @@
 #pragma once
-
-#include <stdint.h>
+ 
 #include <sstream>
 #include <iomanip>
 #include <tuple>
@@ -38,7 +37,7 @@ protected:
     {
         std::ostringstream ss;
         int offset = size() - 1;
-        ((ss << std::hex << std::setw(2) << std::setfill('0') << +readByte<Bytes>(offset)), ...);
+        ((ss << std::hex << readByte<Bytes>(offset)), ...);
         return ss.str();
     }
 

@@ -5,6 +5,7 @@
 #include <bitset>
 #include <iomanip>
 
+#include "../Types.h"
 #include "../Util.h"
 
 namespace CPU {
@@ -32,17 +33,12 @@ public:
     };
 
     State()
-        : accumulatorA(0)
-        , accumulatorB(0)
-        , dataBank(0)
-        , xIndex(0)
+        : xIndex(0)
         , yIndex(0)
         , directPage(0)
         , stackPointer(0)
-        , programBank(0)
         , programCounter(0)
         , resetAddress(0)
-        , flags(0)
         , emulationMode(true)
         , memory(1 << 24, 0x55)
     {
@@ -53,23 +49,9 @@ public:
     State(State&) = delete;
     State& operator=(State&) = delete;
 
-    std::ostream& printMemoryPage(std::ostream& output, uint32_t startAddress) const
+    size_t getMemorySize() const
     {
-        output << "          0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f" << std::endl;
-        uint32_t address = startAddress - std::bitset<4>(startAddress).to_ulong();
-        for (int i = 0; i < 16 && address < memory.size(); ++i) {
-            uint8_t bank = uint8_t(address >> 16);
-            uint16_t lowAddress = uint16_t(address);
-            lowAddress = lowAddress >> 4;
-            output << std::setw(2) << std::setfill('0') << +bank << ':' << std::setw(3) << std::setfill('0') << lowAddress << "x  ";
-
-            for (int j = 0; j < 16 && address < memory.size(); ++j) {
-                output << std::setw(2) << std::setfill('0') << +memory[address++] << ' ';
-            }
-
-            output << std::endl;
-        }
-        return output;
+        return memory.size();
     }
 
     std::ostream& printRegisters(std::ostream& output) const
@@ -90,19 +72,19 @@ public:
         std::bitset<8> flagSet(flags);
         
         return output
-            << "PB=" << std::setw(2) << std::setfill('0') << +programBank
-            << ", PC=" << std::setw(4) << std::setfill('0') << programCounter
-            << ", A=" << std::setw(4) << std::setfill('0') << getAccumulatorC()
-            << ", X=" << std::setw(4) << std::setfill('0') << xIndex
-            << ", Y=" << std::setw(4) << std::setfill('0') << yIndex
-            << ", S=" << std::setw(4) << std::setfill('0') << stackPointer
-            << ", DP=" << std::setw(4) << std::setfill('0') << directPage
-            << ", DB=" << std::setw(2) << std::setfill('0') << +dataBank
-            << ", flags=" << flagSet << " (" << flagsString << ", $" << std::setw(2) << std::setfill('0') << +flags << ")"
+            << "PB=" << programBank
+            << ", PC=" << std::hex << std::setw(4) << std::setfill('0') << programCounter
+            << ", A=" << std::hex << std::setw(4) << std::setfill('0') << getAccumulatorC()
+            << ", X=" << std::hex << std::setw(4) << std::setfill('0') << xIndex
+            << ", Y=" << std::hex << std::setw(4) << std::setfill('0') << yIndex
+            << ", S=" << std::hex << std::setw(4) << std::setfill('0') << stackPointer
+            << ", DP=" << std::hex << std::setw(4) << std::setfill('0') << directPage
+            << ", DB=" << dataBank
+            << ", flags=" << flagSet << " (" << flagsString << ", $" << flags << ")"
             << ", e=" << emulationMode;
     }
 
-    void setFlag(uint8_t flag, bool value)
+    void setFlag(Byte flag, bool value)
     {
         if (value) {
             flags |= flag;
@@ -116,7 +98,7 @@ public:
         return flags & flag;
     }
 
-    void setFlags(uint8_t value)
+    void setFlags(Byte value)
     {
         flags = value;
     }
@@ -131,7 +113,7 @@ public:
         return isNativeMode() && !getFlag(flag);
     }
 
-    uint8_t readProgramByte(int offset = 0) const
+    Byte readProgramByte(int offset = 0) const
     {
         return memory[getProgramAddress(offset)];
     }
@@ -141,7 +123,7 @@ public:
         programCounter = resetAddress;
     }
 
-    uint8_t nextProgramByte()
+    Byte nextProgramByte()
     {
         return memory[programCounter++];
     }
@@ -161,26 +143,26 @@ public:
         return programCounter + offset;
     }
 
-    uint8_t getAccumulatorA() const
+    Byte getAccumulatorA() const
     {
         return accumulatorA;
     }
 
-    void setAccumulatorA(uint8_t value)
+    void setAccumulatorA(Byte value)
     {
         accumulatorA = value;
         updateSignFlags(value);
     }
 
-    uint8_t getAccumulatorB() const
+    Byte getAccumulatorB() const
     {
         return accumulatorB;
     }
 
     void setAccumulatorC(uint16_t value)
     {
-        accumulatorA = uint8_t(value);
-        accumulatorB = uint8_t(value >> 8);
+        accumulatorA = Byte(value);
+        accumulatorB = Byte(value >> 8);
         updateSignFlags(value);
     }
 
@@ -194,22 +176,27 @@ public:
         return directPage;
     }
 
-    uint8_t* getMemoryPointer(uint32_t address)
+    Byte getMemory(uint32_t address) const
+    {
+        return memory[address];
+    }
+
+    Byte* getMemoryPointer(uint32_t address)
     {
         return &memory[address];
     }
 
-    uint8_t* getMemoryPointer(uint8_t lowByte, uint8_t highByte, uint8_t bankByte)
+    Byte* getMemoryPointer(Byte lowByte, Byte highByte, Byte bankByte, uint16_t offset = 0)
     {
-        return getMemoryPointer(uint32_t(bankByte << 16 | highByte << 8 | lowByte));
+        return getMemoryPointer(uint32_t(bankByte << 16 | highByte << 8 | lowByte) + offset);
     }
 
-    uint8_t* getMemoryPointer(uint8_t lowByte, uint8_t highByte)
+    Byte* getMemoryPointer(Byte lowByte, Byte highByte)
     {
         return getMemoryPointer(lowByte, highByte, dataBank);
     }
 
-    uint8_t* getMemoryPointer(uint8_t lowByte)
+    Byte* getMemoryPointer(Byte lowByte)
     {
         return getMemoryPointer(uint32_t(directPage + lowByte));
     }
@@ -229,16 +216,16 @@ public:
     {
         if (emulationMode) {
             setFlag(x | m, true);
-            ((uint8_t*)(&xIndex))[1] = 0;
-            ((uint8_t*)(&yIndex))[1] = 0;
-            ((uint8_t*)(&stackPointer))[1] = 1;
+            ((Byte*)(&xIndex))[1] = 0;
+            ((Byte*)(&yIndex))[1] = 0;
+            ((Byte*)(&stackPointer))[1] = 1;
         }
     }
 
-    void updateSignFlags(uint8_t value)
+    void updateSignFlags(Byte value)
     {
         setFlag(State::z, value == 0);
-        setFlag(State::n, value & 1 << 7);
+        setFlag(State::n, value.isNegative());
     }
 
     void updateSignFlags(uint16_t value)
@@ -247,7 +234,7 @@ public:
         setFlag(State::n, value & 1 << 15);
     }
 
-    void pushToStack(uint8_t byte)
+    void pushToStack(Byte byte)
     {
         memory[stackPointer--] = byte;
         forceEmulationRegisters();
@@ -255,8 +242,8 @@ public:
 
     void pushToStack(uint16_t byte)
     {
-        pushToStack(uint8_t(byte >> 8));
-        pushToStack(uint8_t(byte));
+        pushToStack(Byte(byte >> 8));
+        pushToStack(Byte(byte));
     }
 
     void pushFlagsToStack()
@@ -264,7 +251,7 @@ public:
         pushToStack(flags);
     }
 
-    void setProgramCounter(uint16_t pc, uint8_t pbr)
+    void setProgramCounter(uint16_t pc, Byte pbr)
     {
         programCounter = pc;
         programBank = pbr;
@@ -277,7 +264,7 @@ public:
 
     void setProgramCounter(uint32_t value)
     {
-        setProgramCounter(uint16_t(value), uint8_t(value >> 16));
+        setProgramCounter(uint16_t(value), Byte(value >> 16));
     }
 
     void setStackPointer(uint16_t value)
@@ -293,7 +280,7 @@ public:
         updateSignFlags(value);
     }
 
-    void setXIndexRegister(uint8_t value)
+    void setXIndexRegister(Byte value)
     {
         xIndex = value;
         updateSignFlags(value);
@@ -306,10 +293,15 @@ public:
         updateSignFlags(value);
     }
 
-    void setYIndexRegister(uint8_t value)
+    void setYIndexRegister(Byte value)
     {
         yIndex = value;
         updateSignFlags(value);
+    }
+
+    uint16_t& getYIndexRegister()
+    {
+        return yIndex;
     }
 
     void setDirectPageRegister(uint16_t value)
@@ -324,22 +316,22 @@ private:
     bool tryReadHeader(int offset, std::vector<char> rom, std::ostream& output);
 
 private:
-    uint8_t accumulatorA;
-    uint8_t accumulatorB;
-    uint8_t dataBank;
+    Byte accumulatorA;
+    Byte accumulatorB;
+    Byte dataBank;
     uint16_t xIndex;
     uint16_t yIndex;
     uint16_t directPage;
     uint16_t stackPointer;
-    uint8_t programBank;
+    Byte programBank;
     uint16_t programCounter;
 
     uint16_t resetAddress;
 
-    uint8_t flags;
+    Byte flags;
     bool emulationMode;
 
-    std::vector<uint8_t> memory;
+    std::vector<Byte> memory;
 };
 
 }

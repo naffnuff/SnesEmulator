@@ -8,8 +8,8 @@
 namespace SPC {
 
 typedef InstructionBase<State> Instruction1Byte;
-typedef InstructionBase<State, uint8_t> Instruction2Byte;
-typedef InstructionBase<State, uint8_t, uint8_t> Instruction3Byte;
+typedef InstructionBase<State, Byte> Instruction2Byte;
+typedef InstructionBase<State, Byte, Byte> Instruction3Byte;
 
 namespace AddressMode {
 
@@ -29,11 +29,11 @@ class Absolute : public Instruction3Byte
 {
     using Instruction3Byte::Instruction3Byte;
 
-    int invokeOperator(uint8_t lowByte, uint8_t highByte) override
+    int invokeOperator(Byte lowByte, Byte highByte) override
     {
         throw std::runtime_error("Absolute is not implemented");
-        uint8_t* data = nullptr;
-        return Operator::invoke(state, *data, 0);
+        Byte* data = nullptr;
+        return Operator::invoke(state, *data);
     }
 
     std::string toString() const override
@@ -49,11 +49,11 @@ class AbsoluteIndexedIndirect : public Instruction3Byte
 {
     using Instruction3Byte::Instruction3Byte;
 
-    int invokeOperator(uint8_t lowByte, uint8_t highByte) override
+    int invokeOperator(Byte lowByte, Byte highByte) override
     {
         throw std::runtime_error("AbsoluteIndexedIndirect is not implemented");
-        uint8_t* data = nullptr;
-        return Operator::invoke(state, *data, 0);
+        Byte* data = nullptr;
+        return Operator::invoke(state, *data);
     }
 
     std::string toString() const override
@@ -70,10 +70,10 @@ class AbsoluteIndexedRegister : public Instruction3Byte
 {
     using Instruction3Byte::Instruction3Byte;
 
-    int invokeOperator(uint8_t lowByte, uint8_t highByte) override
+    int invokeOperator(Byte lowByte, Byte highByte) override
     {
         throw std::runtime_error("AbsoluteIndexedRegister is not implemented");
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return Operator::invoke(state, *data, 0);
     }
 
@@ -92,10 +92,10 @@ class AbsoluteRegister : public Instruction3Byte
 {
     using Instruction3Byte::Instruction3Byte;
 
-    int invokeOperator(uint8_t lowByte, uint8_t highByte) override
+    int invokeOperator(Byte lowByte, Byte highByte) override
     {
         throw std::runtime_error("AbsoluteRegister is not implemented");
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return Operator::invoke(state, *data, 0);
     }
 
@@ -115,10 +115,10 @@ class CarryMemoryBit : public Instruction3Byte
 {
     using Instruction3Byte::Instruction3Byte;
 
-    int invokeOperator(uint8_t lowByte, uint8_t highByte) override
+    int invokeOperator(Byte lowByte, Byte highByte) override
     {
         throw std::runtime_error("CarryMemoryBit is not implemented");
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return Operator::invoke(state, *data, 0);
     }
 
@@ -136,10 +136,10 @@ class CarryNegatedMemoryBit : public Instruction3Byte
 {
     using Instruction3Byte::Instruction3Byte;
 
-    int invokeOperator(uint8_t lowByte, uint8_t highByte) override
+    int invokeOperator(Byte lowByte, Byte highByte) override
     {
         throw std::runtime_error("CarryNegatedMemoryBit is not implemented");
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return Operator::invoke(state, *data, 0);
     }
 
@@ -163,11 +163,11 @@ class Direct : public Instruction2Byte
 {
     using Instruction2Byte::Instruction2Byte;
 
-    int invokeOperator(uint8_t lowByte) override
+    int invokeOperator(Byte lowByte) override
     {
         throw std::runtime_error("Direct is not implemented");
-        uint8_t* data = nullptr;
-        return Operator::invoke(state, *data, 0);
+        Byte* data = nullptr;
+        return Operator::invoke(state, *data);
     }
 
     std::string toString() const override
@@ -198,10 +198,10 @@ class DirectBit : public Instruction2Byte
 {
     using Instruction2Byte::Instruction2Byte;
 
-    int invokeOperator(uint8_t lowByte) override
+    int invokeOperator(Byte lowByte) override
     {
         throw std::runtime_error("DirectBit is not implemented");
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return Operator::invoke(state, *data, 0);
     }
 
@@ -233,10 +233,10 @@ class DirectBitProgramCounterRelative : public Instruction3Byte
 {
     using Instruction3Byte::Instruction3Byte;
 
-    int invokeOperator(uint8_t lowByte, uint8_t highByte) override
+    int invokeOperator(Byte lowByte, Byte highByte) override
     {
         throw std::runtime_error("DirectBitProgramCounterRelative is not implemented");
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return Operator::invoke(state, *data, 0);
     }
 
@@ -259,10 +259,10 @@ class DirectDirect : public Instruction3Byte
 {
     using Instruction3Byte::Instruction3Byte;
 
-    int invokeOperator(uint8_t lowByte, uint8_t highByte) override
+    int invokeOperator(Byte lowByte, Byte highByte) override
     {
         throw std::runtime_error("DirectDirect is not implemented");
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return Operator::invoke(state, *data, 0);
     }
 
@@ -285,16 +285,15 @@ class DirectImmediate : public Instruction3Byte
 {
     using Instruction3Byte::Instruction3Byte;
 
-    int invokeOperator(uint8_t lowByte, uint8_t highByte) override
+    int invokeOperator(Byte lowByte, Byte highByte) override
     {
-        throw std::runtime_error("DirectImmediate is not implemented");
-        uint8_t* data = nullptr;
-        return Operator::invoke(state, *data, 0);
+        return Operator::invoke(state, state.getMemory(highByte), lowByte);
     }
 
     std::string toString() const override
     {
-        return Operator::toString() + " $" + operandToString() + " TODO";
+        std::string operand = operandToString();
+        return Operator::toString() + " $" + operand.substr(0, 2) + ", #$" + operand.substr(2, 2);
     }
 };
 
@@ -310,11 +309,11 @@ class DirectIndexed : public Instruction2Byte
 {
     using Instruction2Byte::Instruction2Byte;
 
-    int invokeOperator(uint8_t lowByte) override
+    int invokeOperator(Byte lowByte) override
     {
         throw std::runtime_error("DirectIndexed is not implemented");
-        uint8_t* data = nullptr;
-        return Operator::invoke(state, *data, 0);
+        Byte* data = nullptr;
+        return Operator::invoke(state, *data);
     }
 
     std::string toString() const override
@@ -330,10 +329,10 @@ class DirectIndexedIndirectRegister : public Instruction2Byte
 {
     using Instruction2Byte::Instruction2Byte;
 
-    int invokeOperator(uint8_t lowByte) override
+    int invokeOperator(Byte lowByte) override
     {
         throw std::runtime_error("DirectIndexedIndirectRegister is not implemented");
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return Operator::invoke(state, *data, 0);
     }
 
@@ -350,10 +349,10 @@ class DirectIndexedProgramCounterRelative : public Instruction3Byte
 {
     using Instruction3Byte::Instruction3Byte;
 
-    int invokeOperator(uint8_t lowByte, uint8_t highByte) override
+    int invokeOperator(Byte lowByte, Byte highByte) override
     {
         throw std::runtime_error("DirectIndexedProgramCounterRelative is not implemented");
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return Operator::invoke(state, *data, 0);
     }
 
@@ -372,10 +371,10 @@ class DirectIndexedRegister : public Instruction2Byte
 {
     using Instruction2Byte::Instruction2Byte;
 
-    int invokeOperator(uint8_t lowByte) override
+    int invokeOperator(Byte lowByte) override
     {
         throw std::runtime_error("DirectIndexedRegister is not implemented");
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return Operator::invoke(state, *data, 0);
     }
 
@@ -392,10 +391,10 @@ class DirectIndirectIndexedRegister : public Instruction2Byte
 {
     using Instruction2Byte::Instruction2Byte;
 
-    int invokeOperator(uint8_t lowByte) override
+    int invokeOperator(Byte lowByte) override
     {
         throw std::runtime_error("DirectIndirectIndexedRegister is not implemented");
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return Operator::invoke(state, *data, 0);
     }
 
@@ -413,10 +412,10 @@ class DirectProgramCounterRelative : public Instruction3Byte
 {
     using Instruction3Byte::Instruction3Byte;
 
-    int invokeOperator(uint8_t lowByte, uint8_t highByte) override
+    int invokeOperator(Byte lowByte, Byte highByte) override
     {
         throw std::runtime_error("DirectProgramCounterRelative is not implemented");
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return Operator::invoke(state, *data, 0);
     }
 
@@ -435,10 +434,10 @@ class DirectRegister : public Instruction2Byte
 {
     using Instruction2Byte::Instruction2Byte;
 
-    int invokeOperator(uint8_t lowByte) override
+    int invokeOperator(Byte lowByte) override
     {
         throw std::runtime_error("DirectRegister is not implemented");
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return Operator::invoke(state, *data, 0);
     }
 
@@ -455,10 +454,10 @@ class DirectYAccumulator : public Instruction2Byte
 {
     using Instruction2Byte::Instruction2Byte;
 
-    int invokeOperator(uint8_t lowByte) override
+    int invokeOperator(Byte lowByte) override
     {
         throw std::runtime_error("DirectYAccumulator is not implemented");
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return Operator::invoke(state, *data, 0);
     }
 
@@ -515,7 +514,7 @@ class IndirectIndirect : public Instruction1Byte
     int invokeOperator() override
     {
         throw std::runtime_error("IndirectIndirect is not implemented");
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return Operator::invoke(state, *data, 0);
     }
 
@@ -532,10 +531,10 @@ class MemoryBit : public Instruction3Byte
 {
     using Instruction3Byte::Instruction3Byte;
 
-    int invokeOperator(uint8_t lowByte, uint8_t highByte) override
+    int invokeOperator(Byte lowByte, Byte highByte) override
     {
         throw std::runtime_error("MemoryBit is not implemented");
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return Operator::invoke(state, *data, 0);
     }
 
@@ -552,10 +551,10 @@ class MemoryBitCarry : public Instruction3Byte
 {
     using Instruction3Byte::Instruction3Byte;
 
-    int invokeOperator(uint8_t lowByte, uint8_t highByte) override
+    int invokeOperator(Byte lowByte, Byte highByte) override
     {
         throw std::runtime_error("MemoryBitCarry is not implemented");
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return Operator::invoke(state, *data, 0);
     }
 
@@ -580,16 +579,19 @@ class ProgramCounterRelative : public Instruction2Byte
 {
     using Instruction2Byte::Instruction2Byte;
 
-    int invokeOperator(uint8_t lowByte) override
+    int invokeOperator(Byte lowByte) override
     {
-        throw std::runtime_error("ProgramCounterRelative is not implemented");
-        uint8_t* data = nullptr;
-        return Operator::invoke(state, *data, 0);
+        return Operator::invoke(state, lowByte);
     }
 
     std::string toString() const override
     {
-        return Operator::toString() + " $" + operandToString() + " TODO";
+        std::ostringstream ss;
+        ss << std::hex;
+        ss << Operator::toString() + " $";
+        uint16_t address = state.getProgramCounter(int((int8_t)size() + (int8_t)state.readProgramByte(1)));
+        ss << std::setw(4) << std::setfill('0') << address;
+        return ss.str();
     }
 };
 
@@ -622,14 +624,12 @@ class Register : public Instruction1Byte
 
     int invokeOperator() override
     {
-        throw std::runtime_error("Register is not implemented");
-        uint8_t* data = nullptr;
-        return Operator::invoke(state, *data, 0);
+        return Operator::invoke(state, state.getRegister<RegisterIndex>());
     }
 
     std::string toString() const override
     {
-        return Operator::toString() + " TODO";
+        return Operator::toString() + " " + state.getRegisterName<RegisterIndex>();
     }
 };
 
@@ -650,10 +650,10 @@ class RegisterAbsolute : public Instruction3Byte
 {
     using Instruction3Byte::Instruction3Byte;
 
-    int invokeOperator(uint8_t lowByte, uint8_t highByte) override
+    int invokeOperator(Byte lowByte, Byte highByte) override
     {
         throw std::runtime_error("RegisterAbsolute is not implemented");
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return Operator::invoke(state, *data, 0);
     }
 
@@ -683,10 +683,10 @@ class RegisterAbsoluteIndexed : public Instruction3Byte
 {
     using Instruction3Byte::Instruction3Byte;
 
-    int invokeOperator(uint8_t lowByte, uint8_t highByte) override
+    int invokeOperator(Byte lowByte, Byte highByte) override
     {
         throw std::runtime_error("RegisterAbsoluteIndexed is not implemented");
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return Operator::invoke(state, *data, 0);
     }
 
@@ -713,10 +713,10 @@ class RegisterDirect : public Instruction2Byte
 {
     using Instruction2Byte::Instruction2Byte;
 
-    int invokeOperator(uint8_t lowByte) override
+    int invokeOperator(Byte lowByte) override
     {
         throw std::runtime_error("RegisterDirect is not implemented");
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return Operator::invoke(state, *data, 0);
     }
 
@@ -741,10 +741,10 @@ class RegisterDirectIndexed : public Instruction2Byte
 {
     using Instruction2Byte::Instruction2Byte;
 
-    int invokeOperator(uint8_t lowByte) override
+    int invokeOperator(Byte lowByte) override
     {
         throw std::runtime_error("RegisterDirectIndexed is not implemented");
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return Operator::invoke(state, *data, 0);
     }
 
@@ -767,10 +767,10 @@ class RegisterDirectIndexedIndirect : public Instruction2Byte
 {
     using Instruction2Byte::Instruction2Byte;
 
-    int invokeOperator(uint8_t lowByte) override
+    int invokeOperator(Byte lowByte) override
     {
         throw std::runtime_error("RegisterDirectIndexedIndirect is not implemented");
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return Operator::invoke(state, *data, 0);
     }
 
@@ -793,10 +793,10 @@ class RegisterDirectIndirectIndexed : public Instruction2Byte
 {
     using Instruction2Byte::Instruction2Byte;
 
-    int invokeOperator(uint8_t lowByte) override
+    int invokeOperator(Byte lowByte) override
     {
         throw std::runtime_error("RegisterDirectIndirectIndexed is not implemented");
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return Operator::invoke(state, *data, 0);
     }
 
@@ -823,16 +823,14 @@ class RegisterImmediate : public Instruction2Byte
 {
     using Instruction2Byte::Instruction2Byte;
 
-    int invokeOperator(uint8_t lowByte) override
+    int invokeOperator(Byte lowByte) override
     {
-        throw std::runtime_error("RegisterImmediate is not implemented");
-        uint8_t* data = nullptr;
-        return Operator::invoke(state, *data, 0);
+        return Operator::invoke(state, state.getRegister<RegisterIndex>(), lowByte);
     }
 
     std::string toString() const override
     {
-        return Operator::toString() + " $" + operandToString() + " TODO";
+        return Operator::toString() + " " + state.getRegisterName<RegisterIndex>() + ", #$" + operandToString();
     }
 };
 
@@ -846,7 +844,7 @@ class RegisterIndirectIncrementRegister : public Instruction1Byte
     int invokeOperator() override
     {
         throw std::runtime_error("RegisterIndirectIncrementRegister is not implemented");
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return Operator::invoke(state, *data, 0);
     }
 
@@ -865,14 +863,12 @@ class RegisterIndirectRegister : public Instruction1Byte
 
     int invokeOperator() override
     {
-        throw std::runtime_error("RegisterIndirectRegister is not implemented");
-        uint8_t* data = nullptr;
-        return Operator::invoke(state, *data, 0);
+        return Operator::invoke(state, state.getMemory(state.getRegister<FirstRegister>()), state.getRegister<SecondRegister>());
     }
 
     std::string toString() const override
     {
-        return Operator::toString() + " TODO";
+        return Operator::toString() + " (" + state.getRegisterName<FirstRegister>() + "), " + state.getRegisterName<SecondRegister>();
     }
 };
 
@@ -883,10 +879,10 @@ class RegisterProgramCounterRelative : public Instruction2Byte
 {
     using Instruction2Byte::Instruction2Byte;
 
-    int invokeOperator(uint8_t lowByte) override
+    int invokeOperator(Byte lowByte) override
     {
         throw std::runtime_error("RegisterProgramCounterRelative is not implemented");
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return Operator::invoke(state, *data, 0);
     }
 
@@ -910,14 +906,12 @@ class RegisterRegister : public Instruction1Byte
 
     int invokeOperator() override
     {
-        throw std::runtime_error("RegisterRegister is not implemented");
-        uint8_t* data = nullptr;
-        return Operator::invoke(state, *data, 0);
+        return Operator::invoke(state, state.getRegister<FirstRegister>(), state.getRegister<SecondRegister>());
     }
 
     std::string toString() const override
     {
-        return Operator::toString() + " TODO";
+        return Operator::toString() + " " + state.getRegisterName<FirstRegister>() + ", " + state.getRegisterName<SecondRegister>();
     }
 };
 
@@ -937,7 +931,7 @@ class RegisterRegisterIndirect : public Instruction1Byte
     int invokeOperator() override
     {
         throw std::runtime_error("RegisterRegisterIndirect is not implemented");
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return Operator::invoke(state, *data, 0);
     }
 
@@ -957,7 +951,7 @@ class RegisterRegisterIndirectIncrement : public Instruction1Byte
     int invokeOperator() override
     {
         throw std::runtime_error("RegisterRegisterIndirectIncrement is not implemented");
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return Operator::invoke(state, *data, 0);
     }
 
@@ -992,7 +986,7 @@ class Table : public Instruction1Byte
     int invokeOperator() override
     {
         throw std::runtime_error("Table is not implemented");
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return Operator::invoke(state, *data, 0);
     }
 
@@ -1009,10 +1003,10 @@ class UPage : public Instruction2Byte
 {
     using Instruction2Byte::Instruction2Byte;
 
-    int invokeOperator(uint8_t lowByte) override
+    int invokeOperator(Byte lowByte) override
     {
         throw std::runtime_error("UPage is not implemented");
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return Operator::invoke(state, *data, 0);
     }
 
@@ -1032,7 +1026,7 @@ class YAccumulator : public Instruction1Byte
     int invokeOperator() override
     {
         throw std::runtime_error("YAccumulator is not implemented");
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return Operator::invoke(state, *data, 0);
     }
 
@@ -1052,10 +1046,10 @@ class YAccumulatorDirect : public Instruction2Byte
 {
     using Instruction2Byte::Instruction2Byte;
 
-    int invokeOperator(uint8_t lowByte) override
+    int invokeOperator(Byte lowByte) override
     {
         throw std::runtime_error("YAccumulatorDirect is not implemented");
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return Operator::invoke(state, *data, 0);
     }
 
@@ -1075,7 +1069,7 @@ class YAccumulatorIndex : public Instruction1Byte
     int invokeOperator() override
     {
         throw std::runtime_error("YAccumulatorIndex is not implemented");
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return Operator::invoke(state, *data, 0);
     }
 

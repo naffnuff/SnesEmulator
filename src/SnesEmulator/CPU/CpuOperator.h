@@ -11,7 +11,7 @@ class ADC
 {
 public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, Byte* data)
     {
         throw std::runtime_error("ADC is not implemented");
         int cycles = 0;
@@ -29,7 +29,7 @@ class AND
 {
 public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, Byte* data)
     {
         throw std::runtime_error("AND is not implemented");
         int cycles = 0;
@@ -47,7 +47,7 @@ class ASL
 {
 public:
     // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, Byte* data)
     {
         throw std::runtime_error("ASL is not implemented");
         int cycles = 0;
@@ -67,8 +67,8 @@ static int branchIf(bool condition, State& state, int8_t offset)
         uint16_t newAddress = state.getProgramCounter(offset);
         cycles += 1;
         if (!state.isNativeMode()) {
-            uint8_t programPage = uint8_t(state.getProgramCounter() >> 8);
-            uint8_t newAddressPage = uint8_t(newAddress >> 8);
+            Byte programPage = Byte(state.getProgramCounter() >> 8);
+            Byte newAddressPage = Byte(newAddress >> 8);
             if (programPage != newAddressPage) {
                 cycles += 1;
             }
@@ -155,7 +155,7 @@ class BIT
 {
 public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, Byte* data)
     {
         throw std::runtime_error("BIT is not implemented");
         int cycles = 0;
@@ -248,7 +248,7 @@ class BRK
 {
 public:
     // §9: Add 1 cycle for 65816 native mode (e=0)
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, Byte* data)
     {
         throw std::runtime_error("BRK is not implemented");
         int cycles = 0;
@@ -265,7 +265,7 @@ public:
 class BRL
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, Byte* data)
     {
         throw std::runtime_error("BRL is not implemented");
         return 0;
@@ -379,7 +379,7 @@ class CMP
 {
 public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, Byte* data)
     {
         int cycles = 0;
         if (state.is16Bit(State::m)) {
@@ -389,9 +389,9 @@ public:
             state.setFlag(State::c, accumulator >= data16Bit);
             state.updateSignFlags(uint16_t(accumulator - data16Bit));
         } else {
-            uint8_t accumulator = state.getAccumulatorA();
+            Byte accumulator = state.getAccumulatorA();
             state.setFlag(State::c, accumulator >= data[0]);
-            state.updateSignFlags(uint8_t(accumulator - data[0]));
+            state.updateSignFlags(Byte(accumulator - data[0]));
         }
         return cycles;
     }
@@ -404,7 +404,7 @@ class COP
 {
 public:
     // §9: Add 1 cycle for 65816 native mode (e=0)
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, Byte* data)
     {
         throw std::runtime_error("COP is not implemented");
         int cycles = 0;
@@ -422,7 +422,7 @@ class CPX
 {
 public:
     // §10: Add 1 cycle if x=0 (16-bit index registers)
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, Byte* data)
     {
         throw std::runtime_error("CPX is not implemented");
         int cycles = 0;
@@ -440,7 +440,7 @@ class CPY
 {
 public:
     // §10: Add 1 cycle if x=0 (16-bit index registers)
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, Byte* data)
     {
         throw std::runtime_error("CPY is not implemented");
         int cycles = 0;
@@ -458,7 +458,7 @@ class DEC
 {
 public:
     // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, Byte* data)
     {
         throw std::runtime_error("DEC is not implemented");
         int cycles = 0;
@@ -502,7 +502,7 @@ class EOR
 {
 public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, Byte* data)
     {
         throw std::runtime_error("EOR is not implemented");
         int cycles = 0;
@@ -520,7 +520,7 @@ class INC
 {
 public:
     // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, Byte* data)
     {
         throw std::runtime_error("INC is not implemented");
         int cycles = 0;
@@ -552,7 +552,7 @@ class INY
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("INY is not implemented");
+        state.updateSignFlags(++state.getYIndexRegister());
         return 0;
     }
 
@@ -563,7 +563,7 @@ public:
 class JMP
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, Byte* data)
     {
         throw std::runtime_error("JMP is not implemented");
         return 0;
@@ -576,7 +576,7 @@ public:
 class JSR
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, Byte* data)
     {
         throw std::runtime_error("JSR is not implemented");
         return 0;
@@ -598,7 +598,7 @@ class LDA
 {
 public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, Byte* data)
     {
         int cycles = 0;
         if (state.is16Bit(State::m)) {
@@ -618,7 +618,7 @@ class LDX
 {
 public:
     // §10: Add 1 cycle if x=0 (16-bit index registers)
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, Byte* data)
     {
         int cycles = 0;
         if (state.is16Bit(State::x)) {
@@ -638,7 +638,7 @@ class LDY
 {
 public:
     // §10: Add 1 cycle if x=0 (16-bit index registers)
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, Byte* data)
     {
         int cycles = 0;
         if (state.is16Bit(State::x)) {
@@ -658,7 +658,7 @@ class LSR
 {
 public:
     // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, Byte* data)
     {
         throw std::runtime_error("LSR is not implemented");
         int cycles = 0;
@@ -676,7 +676,7 @@ class MVN
 {
 public:
     // §13: 7 cycles per byte moved
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, Byte* data)
     {
         throw std::runtime_error("MVN is not implemented");
         return 0;
@@ -690,7 +690,7 @@ class MVP
 {
 public:
     // §13: 7 cycles per byte moved
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, Byte* data)
     {
         throw std::runtime_error("MVP is not implemented");
         return 0;
@@ -717,7 +717,7 @@ class ORA
 {
 public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, Byte* data)
     {
         throw std::runtime_error("ORA is not implemented");
         int cycles = 0;
@@ -734,7 +734,7 @@ public:
 class PEA
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, Byte* data)
     {
         throw std::runtime_error("PEA is not implemented");
         return 0;
@@ -747,7 +747,7 @@ public:
 class PEI
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, Byte* data)
     {
         throw std::runtime_error("PEI is not implemented");
         return 0;
@@ -760,7 +760,7 @@ public:
 class PER
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, Byte* data)
     {
         throw std::runtime_error("PER is not implemented");
         return 0;
@@ -779,10 +779,10 @@ public:
         int cycles = 0;
         if (state.is16Bit(State::m)) {
             cycles += 1;
-            uint8_t highByte = state.getAccumulatorB();
+            Byte highByte = state.getAccumulatorB();
             state.pushToStack(highByte);
         }
-        uint8_t lowByte = state.getAccumulatorA();
+        Byte lowByte = state.getAccumulatorA();
         state.pushToStack(lowByte);
         return cycles;
     }
@@ -975,7 +975,7 @@ public:
 class REP
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, Byte* data)
     {
         state.setFlag(*data, false);
         return 0;
@@ -989,7 +989,7 @@ class ROL
 {
 public:
     // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, Byte* data)
     {
         throw std::runtime_error("ROL is not implemented");
         int cycles = 0;
@@ -1007,7 +1007,7 @@ class ROR
 {
 public:
     // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, Byte* data)
     {
         throw std::runtime_error("ROR is not implemented");
         int cycles = 0;
@@ -1069,7 +1069,7 @@ class SBC
 {
 public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, Byte* data)
     {
         throw std::runtime_error("SBC is not implemented");
         int cycles = 0;
@@ -1125,7 +1125,7 @@ public:
 class SEP
 {
 public:
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, Byte* data)
     {
         state.setFlag(*data, true);
         return 0;
@@ -1139,7 +1139,7 @@ class STA
 {
 public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, Byte* data)
     {
         int cycles = 0;
 
@@ -1175,7 +1175,7 @@ class STX
 {
 public:
     // §10: Add 1 cycle if x=0 (16-bit index registers)
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, Byte* data)
     {
         throw std::runtime_error("STX is not implemented");
         int cycles = 0;
@@ -1193,7 +1193,7 @@ class STY
 {
 public:
     // §10: Add 1 cycle if x=0 (16-bit index registers)
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, Byte* data)
     {
         throw std::runtime_error("STY is not implemented");
         int cycles = 0;
@@ -1211,7 +1211,7 @@ class STZ
 {
 public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, Byte* data)
     {
         data[0] = 0;
         int cycles = 0;
@@ -1295,7 +1295,7 @@ class TRB
 {
 public:
     // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, Byte* data)
     {
         throw std::runtime_error("TRB is not implemented");
         int cycles = 0;
@@ -1313,7 +1313,7 @@ class TSB
 {
 public:
     // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, Byte* data)
     {
         throw std::runtime_error("TSB is not implemented");
         int cycles = 0;
@@ -1436,7 +1436,7 @@ class WDM
 {
 public:
     // §16: Byte and cycle counts subject to change in future processors which expand WDM into 2-byte opcode portions of instructions of varying lengths
-    static int invoke(State& state, uint8_t* data)
+    static int invoke(State& state, Byte* data)
     {
         throw std::runtime_error("WDM is not implemented");
         return 0;

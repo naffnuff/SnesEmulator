@@ -90,7 +90,7 @@ CycleModification getCycleModification(int remarkIndex)
 {
     switch (remarkIndex) {
     case 1: return { "state.is16Bit(State::m)", "cycles += 1" }; // Add 1 cycle if m=0 (16-bit memory / accumulator)
-    case 2: return { "(uint8_t)state.getDirectPage()", "cycles += 1" }; // Add 1 cycle if low byte of Direct Page Register is non-zero
+    case 2: return { "(Byte)state.getDirectPage()", "cycles += 1" }; // Add 1 cycle if low byte of Direct Page Register is non-zero
     case 3: return { "true /*index added crosses page boundary*/", "cycles += 1;\n            throw std::runtime_error(\"TODO03\")" }; // Add 1 cycle if adding index crosses a page boundary
     case 5: return { "state.is16Bit(State::m)", "cycles += 2" }; // Add 2 cycles if m=0 (16-bit memory / accumulator)
     case 7: return { "true /*branch taken*/", "cycles += 1;\n            throw std::runtime_error(\"TODO07\")" }; // Add 1 cycle if branch is taken
@@ -288,7 +288,7 @@ void generateOpcodeMap(const std::vector<Instruction>& instructions)
 
     output << "Instruction* OpcodeMap::getNextInstruction(const State& state) const" << std::endl
         << "{" << std::endl
-        << "    uint8_t opcode = state.readProgramByte();" << std::endl
+        << "    Byte opcode = state.readProgramByte();" << std::endl
         << "    if (state.is16Bit(State::m) && instructions16BitM[opcode]) {" << std::endl
         << "        return instructions16BitM[opcode].get();" << std::endl
         << "    } else if (state.is16Bit(State::x) && instructions16BitX[opcode]) {" << std::endl
@@ -339,11 +339,11 @@ void generateAddressMode(std::ofstream& output, const std::string& name, const A
 
     output << "    int invokeOperator(State& state";
     if (actualSize >= 2) {
-        output << ", uint8_t lowByte";
+        output << ", Byte lowByte";
         if (actualSize >= 3) {
-            output << ", uint8_t highByte";
+            output << ", Byte highByte";
             if (actualSize >= 4) {
-                output << ", uint8_t bankByte";
+                output << ", Byte bankByte";
             }
         }
     }
@@ -356,7 +356,7 @@ void generateAddressMode(std::ofstream& output, const std::string& name, const A
     }
 
     if (name != "Implied") {
-        output << "        uint8_t* data = nullptr;" << std::endl;
+        output << "        Byte* data = nullptr;" << std::endl;
     }
     output << "        return ";
     if (hasCycleModification(args.cycleRemarks)) {
@@ -397,9 +397,9 @@ void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
         << "namespace CPU {" << std::endl
         << std::endl
         << "typedef InstructionBase<State> Instruction1Byte;" << std::endl
-        << "typedef InstructionBase<State, uint8_t> Instruction2Byte;" << std::endl
-        << "typedef InstructionBase<State, uint8_t, uint8_t> Instruction3Byte;" << std::endl
-        << "typedef InstructionBase<State, uint8_t, uint8_t, uint8_t> Instruction4Byte;" << std::endl
+        << "typedef InstructionBase<State, Byte> Instruction2Byte;" << std::endl
+        << "typedef InstructionBase<State, Byte, Byte> Instruction3Byte;" << std::endl
+        << "typedef InstructionBase<State, Byte, Byte, Byte> Instruction4Byte;" << std::endl
         << std::endl
         << std::endl
         << "namespace AddressMode {" << std::endl
@@ -441,7 +441,7 @@ void generateOperators(const OperatorMap& operatorMap)
 
         output << "    static int invoke(State& state";
         if (kvp.second.hasOperand) {
-            output << ", uint8_t* data";
+            output << ", Byte* data";
         }
         output << ")" << std::endl
             << "    {" << std::endl
@@ -636,8 +636,8 @@ void generateCpu()
         }
     }
 
-    generateOpcodes(instructions);
-    generateOpcodeMap(instructions);
+    //generateOpcodes(instructions);
+    //generateOpcodeMap(instructions);
     //generateAddressModes(addressModeClassMap);
     //generateOperators(operatorMap);
 

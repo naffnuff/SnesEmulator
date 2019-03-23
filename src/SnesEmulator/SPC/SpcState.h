@@ -41,7 +41,7 @@ public:
         : programCounter(0xFFC0)
         , memory(1 << 16, 0x55)
     {
-        std::array<uint8_t, 64> bootRomData = {
+        std::array<Byte, 64> bootRomData = {
            0xCD, 0xEF, 0xBD, 0xE8, 0x00, 0xC6, 0x1D, 0xD0, 0xFC, 0x8F, 0xAA, 0xF4, 0x8F, 0xBB, 0xF5, 0x78,
            0xCC, 0xF4, 0xD0, 0xFB, 0x2F, 0x19, 0xEB, 0xF4, 0xD0, 0xFC, 0x7E, 0xF4, 0xD0, 0x0B, 0xE4, 0xF5,
            0xCB, 0xF4, 0xD7, 0x00, 0xFC, 0xD0, 0xF3, 0xAB, 0x01, 0x10, 0xEF, 0x7E, 0xF4, 0x10, 0xEB, 0xBA,
@@ -56,23 +56,27 @@ public:
     State(State&) = delete;
     State& operator=(State&) = delete;
 
-    std::ostream& printMemoryPage(std::ostream& output, uint32_t startAddress) const
+    /*std::ostream& printMemoryPage(std::ostream& output, uint32_t startAddress) const
     {
-        output << "          0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f" << std::endl;
+        output << "       0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f" << std::endl;
         uint32_t address = startAddress - std::bitset<4>(startAddress).to_ulong();
         for (int i = 0; i < 16 && address < memory.size(); ++i) {
-            uint8_t bank = uint8_t(address >> 16);
             uint16_t lowAddress = uint16_t(address);
             lowAddress = lowAddress >> 4;
-            output << std::setw(2) << std::setfill('0') << +bank << ':' << std::setw(3) << std::setfill('0') << lowAddress << "x  ";
+            output << std::setw(3) << std::setfill('0') << lowAddress << "x  ";
 
             for (int j = 0; j < 16 && address < memory.size(); ++j) {
-                output << std::setw(2) << std::setfill('0') << +memory[address++] << ' ';
+                output << memory[address++] << ' ';
             }
 
             output << std::endl;
         }
         return output;
+    }*/
+
+    size_t getMemorySize() const
+    {
+        return memory.size();
     }
 
     std::ostream& printRegisters(std::ostream& output) const
@@ -88,13 +92,13 @@ public:
         std::bitset<8> flagSet(getRegister<PSW>());
 
         return output
-            << "PC=" << std::setw(4) << std::setfill('0') << programCounter
-            << ", A=" << std::setw(2) << std::setfill('0') << +getRegister<A>()
-            << ", X=" << std::setw(2) << std::setfill('0') << +getRegister<X>()
-            << ", Y=" << std::setw(2) << std::setfill('0') << +getRegister<Y>()
-            << ", S=" << std::setw(4) << std::setfill('0') << getStackPointer()
-            << ", YA=" << std::setw(4) << std::setfill('0') << getYAccumulator()
-            << ", flags=" << flagSet << " (" << flagsString << ", $" << std::setw(2) << std::setfill('0') << +getRegister<PSW>() << ")";
+            << "PC=" << std::hex << std::setw(4) << std::setfill('0') << programCounter
+            << ", A=" << getRegister<A>()
+            << ", X=" << getRegister<X>()
+            << ", Y=" << getRegister<Y>()
+            << ", S=" << std::hex << std::setw(4) << std::setfill('0') << getStackPointer()
+            << ", YA=" << std::hex << std::setw(4) << std::setfill('0') << getYAccumulator()
+            << ", flags=" << flagSet << " (" << flagsString << ", $" << getRegister<PSW>() << ")";
     }
 
     uint32_t getProgramAddress(int offset = 0) const
@@ -107,7 +111,12 @@ public:
         return programCounter + offset;
     }
 
-    uint8_t readProgramByte(int offset = 0) const
+    void setProgramCounter(uint16_t value)
+    {
+        programCounter = value;
+    }
+
+    Byte readProgramByte(int offset = 0) const
     {
         return memory[getProgramAddress(offset)];
     }
@@ -132,23 +141,66 @@ public:
         return (uint16_t&)registers[A];
     }
 
+    Byte& getMemory(uint16_t address)
+    {
+        return memory[address];
+    }
+
+    Byte getMemory(uint16_t address) const
+    {
+        return memory[address];
+    }
+
     template<Register RegisterIndex>
-    uint8_t& getRegister()
+    Byte& getRegister()
     {
         return registers[RegisterIndex];
     }
 
     template<Register RegisterIndex>
-    uint8_t getRegister() const
+    Byte getRegister() const
     {
         return registers[RegisterIndex];
+    }
+
+    template<Register RegisterIndex>
+    std::string getRegisterName() const
+    {
+        std::string names[] = { "A", "Y", "X", "SP", "PSW" };
+        return names[RegisterIndex];
+    }
+
+    void setFlag(Byte flag, bool value)
+    {
+        if (value) {
+            getRegister<PSW>() |= flag;
+        }
+        else {
+            getRegister<PSW>() &= ~flag;
+        }
+    }
+
+    bool getFlag(Flag flag) const
+    {
+        return getRegister<PSW>() & flag;
+    }
+
+    void setFlags(Byte value)
+    {
+        getRegister<PSW>() = value;
+    }
+
+    void updateSignFlags(Byte value)
+    {
+        setFlag(State::z, value == 0);
+        setFlag(State::n, value & 1 << 7);
     }
 
 private:
     uint16_t programCounter;
 
-    std::vector<uint8_t> memory;
-    std::array<uint8_t, RegisterCount> registers;
+    std::vector<Byte> memory;
+    std::array<Byte, RegisterCount> registers;
 };
 
 }

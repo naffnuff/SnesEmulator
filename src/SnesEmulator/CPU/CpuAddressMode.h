@@ -1,7 +1,5 @@
 #pragma once
-
-#include <stdint.h>
-
+ 
 #include "../Instruction.h"
 #include "CpuOperator.h"
 #include "CpuState.h"
@@ -9,9 +7,9 @@
 namespace CPU {
 
 typedef InstructionBase<State> Instruction1Byte;
-typedef InstructionBase<State, uint8_t> Instruction2Byte;
-typedef InstructionBase<State, uint8_t, uint8_t> Instruction3Byte;
-typedef InstructionBase<State, uint8_t, uint8_t, uint8_t> Instruction4Byte;
+typedef InstructionBase<State, Byte> Instruction2Byte;
+typedef InstructionBase<State, Byte, Byte> Instruction3Byte;
+typedef InstructionBase<State, Byte, Byte, Byte> Instruction4Byte;
 
 namespace AddressMode {
 
@@ -22,7 +20,7 @@ class Absolute : public Instruction3Byte
 {
     using Instruction3Byte::Instruction3Byte;
 
-    int invokeOperator(uint8_t lowByte, uint8_t highByte) override
+    int invokeOperator(Byte lowByte, Byte highByte) override
     {
         return Operator::invoke(state, state.getMemoryPointer(lowByte, highByte));
     }
@@ -33,7 +31,7 @@ class Absolute : public Instruction3Byte
     }
 };
 
-int Absolute<Operator::JSR>::invokeOperator(uint8_t lowByte, uint8_t highByte)
+int Absolute<Operator::JSR>::invokeOperator(Byte lowByte, Byte highByte)
 {
     return Operator::JSR::invoke(state, lowByte | highByte << 8);
 }
@@ -45,10 +43,10 @@ class AbsoluteIndexedIndirect : public Instruction3Byte
 {
     using Instruction3Byte::Instruction3Byte;
 
-    int invokeOperator(uint8_t lowByte, uint8_t highByte) override
+    int invokeOperator(Byte lowByte, Byte highByte) override
     {
         throw std::runtime_error("AbsoluteIndexedIndirect is not implemented");
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return Operator::invoke(state, data);
     }
 
@@ -66,7 +64,7 @@ class AbsoluteIndexed : public Instruction3Byte
     using Instruction3Byte::Instruction3Byte;
 
     // §3: Add 1 cycle if adding index crosses a page boundary
-    int invokeOperator(uint8_t lowByte, uint8_t highByte) override
+    int invokeOperator(Byte lowByte, Byte highByte) override
     {
         throw std::runtime_error("AbsoluteIndexed is not implemented");
         int cycles = 0;
@@ -74,7 +72,7 @@ class AbsoluteIndexed : public Instruction3Byte
             cycles += 1;
             throw std::runtime_error("TODO03");
         }
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return cycles + Operator::invoke(state, data);
     }
 
@@ -91,10 +89,10 @@ class AbsoluteIndirect : public Instruction3Byte
 {
     using Instruction3Byte::Instruction3Byte;
 
-    int invokeOperator(uint8_t lowByte, uint8_t highByte) override
+    int invokeOperator(Byte lowByte, Byte highByte) override
     {
         throw std::runtime_error("AbsoluteIndirect is not implemented");
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return Operator::invoke(state, data);
     }
 
@@ -111,10 +109,10 @@ class AbsoluteIndirectLong : public Instruction3Byte
 {
     using Instruction3Byte::Instruction3Byte;
 
-    int invokeOperator(uint8_t lowByte, uint8_t highByte) override
+    int invokeOperator(Byte lowByte, Byte highByte) override
     {
         throw std::runtime_error("AbsoluteIndirectLong is not implemented");
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return Operator::invoke(state, data);
     }
 
@@ -131,10 +129,10 @@ class AbsoluteLong : public Instruction4Byte
 {
     using Instruction4Byte::Instruction4Byte;
 
-    int invokeOperator(uint8_t lowByte, uint8_t highByte, uint8_t bankByte) override
+    int invokeOperator(Byte lowByte, Byte highByte, Byte bankByte) override
     {
         throw std::runtime_error("AbsoluteLong is not implemented");
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return Operator::invoke(state, data);
     }
 
@@ -151,10 +149,10 @@ class AbsoluteLongIndexedX : public Instruction4Byte
 {
     using Instruction4Byte::Instruction4Byte;
 
-    int invokeOperator(uint8_t lowByte, uint8_t highByte, uint8_t bankByte) override
+    int invokeOperator(Byte lowByte, Byte highByte, Byte bankByte) override
     {
         throw std::runtime_error("AbsoluteLongIndexedX is not implemented");
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return Operator::invoke(state, data);
     }
 
@@ -179,7 +177,7 @@ class Accumulator : public Instruction1Byte
         if (state.is16Bit(State::m)) {
             cycles -= 2;
         }
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return cycles + Operator::invoke(state, data);
     }
 
@@ -196,10 +194,10 @@ class BlockMove : public Instruction3Byte
 {
     using Instruction3Byte::Instruction3Byte;
 
-    int invokeOperator(uint8_t lowByte, uint8_t highByte) override
+    int invokeOperator(Byte lowByte, Byte highByte) override
     {
         throw std::runtime_error("BlockMove is not implemented");
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return Operator::invoke(state, data);
     }
 
@@ -217,13 +215,13 @@ class DirectPage : public Instruction2Byte
     using Instruction2Byte::Instruction2Byte;
 
     // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    int invokeOperator(uint8_t lowByte) override
+    int invokeOperator(Byte lowByte) override
     {
         int cycles = 0;
         if ((uint8_t)state.getDirectPage()) {
             cycles += 1;
         }
-        uint8_t* data = state.getMemoryPointer(lowByte);
+        Byte* data = state.getMemoryPointer(lowByte);
         return cycles + Operator::invoke(state, data);
     }
 
@@ -241,14 +239,14 @@ class DirectPageIndexedIndirectX : public Instruction2Byte
     using Instruction2Byte::Instruction2Byte;
 
     // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    int invokeOperator(uint8_t lowByte) override
+    int invokeOperator(Byte lowByte) override
     {
         throw std::runtime_error("DirectPageIndexedIndirectX is not implemented");
         int cycles = 0;
-        if ((uint8_t)state.getDirectPage()) {
+        if ((Byte)state.getDirectPage()) {
             cycles += 1;
         }
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return cycles + Operator::invoke(state, data);
     }
 
@@ -266,14 +264,14 @@ class DirectPageIndexed : public Instruction2Byte
     using Instruction2Byte::Instruction2Byte;
 
     // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    int invokeOperator(uint8_t lowByte) override
+    int invokeOperator(Byte lowByte) override
     {
         throw std::runtime_error("DirectPageIndexed is not implemented");
         int cycles = 0;
-        if ((uint8_t)state.getDirectPage()) {
+        if (Byte(state.getDirectPage())) {
             cycles += 1;
         }
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return cycles + Operator::invoke(state, data);
     }
 
@@ -291,14 +289,14 @@ class DirectPageIndirect : public Instruction2Byte
     using Instruction2Byte::Instruction2Byte;
 
     // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    int invokeOperator(uint8_t lowByte) override
+    int invokeOperator(Byte lowByte) override
     {
         throw std::runtime_error("DirectPageIndirect is not implemented");
         int cycles = 0;
-        if ((uint8_t)state.getDirectPage()) {
+        if ((Byte)state.getDirectPage()) {
             cycles += 1;
         }
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return cycles + Operator::invoke(state, data);
     }
 
@@ -317,18 +315,18 @@ class DirectPageIndirectIndexedY : public Instruction2Byte
 
     // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
     // §3: Add 1 cycle if adding index crosses a page boundary
-    int invokeOperator(uint8_t lowByte) override
+    int invokeOperator(Byte lowByte) override
     {
         throw std::runtime_error("DirectPageIndirectIndexedY is not implemented");
         int cycles = 0;
-        if ((uint8_t)state.getDirectPage()) {
+        if ((Byte)state.getDirectPage()) {
             cycles += 1;
         }
         if (true /*index added crosses page boundary*/) {
             cycles += 1;
             throw std::runtime_error("TODO03");
         }
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return cycles + Operator::invoke(state, data);
     }
 
@@ -346,14 +344,14 @@ class DirectPageIndirectLong : public Instruction2Byte
     using Instruction2Byte::Instruction2Byte;
 
     // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    int invokeOperator(uint8_t lowByte) override
+    int invokeOperator(Byte lowByte) override
     {
         throw std::runtime_error("DirectPageIndirectLong is not implemented");
         int cycles = 0;
-        if ((uint8_t)state.getDirectPage()) {
+        if ((Byte)state.getDirectPage()) {
             cycles += 1;
         }
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return cycles + Operator::invoke(state, data);
     }
 
@@ -371,20 +369,20 @@ class DirectPageIndirectLongIndexedY : public Instruction2Byte
     using Instruction2Byte::Instruction2Byte;
 
     // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    int invokeOperator(uint8_t lowByte) override
+    int invokeOperator(Byte lowByte) override
     {
-        throw std::runtime_error("DirectPageIndirectLongIndexedY is not implemented");
         int cycles = 0;
-        if ((uint8_t)state.getDirectPage()) {
+        if ((Byte)state.getDirectPage()) {
             cycles += 1;
         }
-        uint8_t* data = nullptr;
+        Byte* address = state.getMemoryPointer(state.getDirectPage() + lowByte);
+        Byte* data = state.getMemoryPointer(address[0], address[1], address[2], state.getYIndexRegister());
         return cycles + Operator::invoke(state, data);
     }
 
     std::string toString() const override
     {
-        return Operator::toString() + " $" + operandToString() + " TODO";
+        return Operator::toString() + " [$" + operandToString() + "], Y";
     }
 };
 
@@ -395,7 +393,7 @@ class Immediate : public Instruction2Byte
 {
     using Instruction2Byte::Instruction2Byte;
 
-    int invokeOperator(uint8_t lowByte) override
+    int invokeOperator(Byte lowByte) override
     {
         return Operator::invoke(state, &lowByte);
     }
@@ -413,10 +411,10 @@ class Immediate16Bit : public Instruction3Byte
 {
     using Instruction3Byte::Instruction3Byte;
 
-    int invokeOperator(uint8_t lowByte, uint8_t highByte) override
+    int invokeOperator(Byte lowByte, Byte highByte) override
     {
         uint16_t data = lowByte | highByte << 8;
-        return Operator::invoke(state, (uint8_t*)&data);
+        return Operator::invoke(state, (Byte*)&data);
     }
 
     std::string toString() const override
@@ -449,7 +447,7 @@ class ProgramCounterRelative : public Instruction2Byte
 {
     using Instruction2Byte::Instruction2Byte;
 
-    int invokeOperator(uint8_t lowByte) override
+    int invokeOperator(Byte lowByte) override
     {
         return Operator::invoke(state, (int8_t)lowByte);
     }
@@ -472,10 +470,10 @@ class ProgramCounterRelativeLong : public Instruction3Byte
 {
     using Instruction3Byte::Instruction3Byte;
 
-    int invokeOperator(uint8_t lowByte, uint8_t highByte) override
+    int invokeOperator(Byte lowByte, Byte highByte) override
     {
         throw std::runtime_error("ProgramCounterRelativeLong is not implemented");
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return Operator::invoke(state, data);
     }
 
@@ -492,10 +490,10 @@ class StackRelative : public Instruction2Byte
 {
     using Instruction2Byte::Instruction2Byte;
 
-    int invokeOperator(uint8_t lowByte) override
+    int invokeOperator(Byte lowByte) override
     {
         throw std::runtime_error("StackRelative is not implemented");
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return Operator::invoke(state, data);
     }
 
@@ -512,10 +510,10 @@ class StackRelativeIndirectIndexedY : public Instruction2Byte
 {
     using Instruction2Byte::Instruction2Byte;
 
-    int invokeOperator(uint8_t lowByte) override
+    int invokeOperator(Byte lowByte) override
     {
         throw std::runtime_error("StackRelativeIndirectIndexedY is not implemented");
-        uint8_t* data = nullptr;
+        Byte* data = nullptr;
         return Operator::invoke(state, data);
     }
 
