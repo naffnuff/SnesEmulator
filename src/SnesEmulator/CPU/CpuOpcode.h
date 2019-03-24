@@ -3286,7 +3286,6 @@ class ROL_2A : public AddressMode::Accumulator<Operator::ROL>
     // 1   2           acc       m.....mm . ROL
     int execute() override
     {
-        throw std::runtime_error("ROL_2A is not implemented");
         return 2 + applyOperand();
     }
 

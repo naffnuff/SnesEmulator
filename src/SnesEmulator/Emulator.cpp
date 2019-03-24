@@ -110,12 +110,17 @@ public:
         } else if (command == "p") {
             watchMode = false;
             config.inspectedAddress -= (1 << 8);
-        } else if (command == "r") {
+        } else if (command == "q") {
             stepMode = false;
             output << "Run" << std::endl;
             startTime = clock();
             return true;
-        } else if (command.substr(0, 3) == "br ") {
+        }
+        else if (command == "r") {
+            output << "Reset" << std::endl;
+            throw std::runtime_error("Reset command not implemented");
+        }
+        else if (command.substr(0, 3) == "br ") {
             try {
                 int breakpoint = stoi(command.substr(3), 0, 16);
                 if (breakpoints.find(breakpoint) == breakpoints.end()) {

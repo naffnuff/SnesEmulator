@@ -172,18 +172,17 @@ class Accumulator : public Instruction1Byte
     // §21: Remove 2 cycles for the special case of Accumulator
     int invokeOperator() override
     {
-        throw std::runtime_error("Accumulator is not implemented");
         int cycles = 0;
         if (state.is16Bit(State::m)) {
             cycles -= 2;
         }
-        Byte* data = nullptr;
-        return cycles + Operator::invoke(state, data);
+        Byte* accumulator = state.getAccumulatorPointer();
+        return cycles + Operator::invoke(state, accumulator);
     }
 
     std::string toString() const override
     {
-        return Operator::toString() + " TODO";
+        return Operator::toString() + " A";
     }
 };
 

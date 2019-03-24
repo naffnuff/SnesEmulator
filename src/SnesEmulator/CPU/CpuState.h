@@ -134,6 +134,11 @@ public:
         return programCounter + offset;
     }
 
+    Byte* getAccumulatorPointer()
+    {
+        return &accumulatorA;
+    }
+
     Byte getAccumulatorA() const
     {
         return accumulatorA;

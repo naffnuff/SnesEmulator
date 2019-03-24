@@ -947,14 +947,28 @@ public:
 // ROL Rotate Memory or Accumulator Left [Flags affected: n,z,c]
 class ROL
 {
+private:
+    template<typename T>
+    static void rotateLeft(State& state, T& data)
+    {
+        bool carry = data.isNegative();
+        data <<= 1;
+        data |= state.getFlag(State::c);
+        state.setFlag(State::c, carry);
+        state.updateSignFlags(data);
+    }
+
 public:
     // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, Byte* data)
     {
-        throw std::runtime_error("ROL is not implemented");
         int cycles = 0;
         if (state.is16Bit(State::m)) {
             cycles += 2;
+            rotateLeft(state, (Word&)*data);
+        }
+        else {
+            rotateLeft(state, *data);
         }
         return cycles;
     }

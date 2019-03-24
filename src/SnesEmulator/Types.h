@@ -66,6 +66,12 @@ public:
         return *this;
     }
 
+    Byte& operator<<=(Byte operand)
+    {
+        value <<= operand.value;
+        return *this;
+    }
+
     bool isNegative() const
     {
         return value & 1 << 7;
@@ -109,6 +115,18 @@ public:
     Word& operator+=(Word operand)
     {
         value += operand.value;
+        return *this;
+    }
+
+    Word& operator|=(Word operand)
+    {
+        value |= operand.value;
+        return *this;
+    }
+
+    Word& operator<<=(Word operand)
+    {
+        value <<= operand.value;
         return *this;
     }
 
