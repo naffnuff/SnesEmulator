@@ -1,5 +1,6 @@
 #pragma once
-#include <stdint.h>
+
+#include <stdint.h>
 #include <iostream>
 #include <iomanip>
 
@@ -75,6 +76,19 @@ public:
     bool isNegative() const
     {
         return value & 1 << 7;
+    }
+
+    void binaryAdd(Byte addend, bool& unsignedCarry, bool& signedOverflow)
+    {
+        uint16_t result = uint16_t(value) + uint16_t(addend.value);
+        unsignedCarry = result & 1 << 8;
+        value = uint8_t(result);
+        signedOverflow = isNegative() != unsignedCarry;
+    }
+
+    void binarySubtract(Byte subtrahend, bool& invertedUnsignedBorrow, bool& signedOverflow)
+    {
+        binaryAdd(~subtrahend, invertedUnsignedBorrow, signedOverflow);
     }
 
 private:

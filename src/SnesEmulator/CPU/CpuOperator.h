@@ -13,10 +13,19 @@ public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, Byte* data)
     {
-        throw std::runtime_error("ADC is not implemented");
         int cycles = 0;
         if (state.is16Bit(State::m)) {
+            throw std::runtime_error("ADC 16-bit is not implemented");
             cycles += 1;
+        }
+        else {
+            Byte accumulator = state.getAccumulatorA();
+            bool carry = state.getFlag(State::c);
+            bool overflow = false;
+            accumulator.binaryAdd(*data, carry, overflow);
+            state.setFlag(State::c, carry);
+            state.setFlag(State::v, overflow);
+            state.setAccumulatorA(accumulator);
         }
         return cycles;
     }
@@ -306,17 +315,7 @@ public:
     // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, int8_t offset)
     {
-        throw std::runtime_error("BVS is not implemented");
-        int cycles = 0;
-        if (true /*branch taken*/) {
-            cycles += 1;
-            throw std::runtime_error("TODO07");
-        }
-        if (true /*branch taken crosses page boundary*/) {
-            cycles += 1;
-            throw std::runtime_error("TODO08");
-        }
-        return cycles;
+        return branchIf(state.getFlag(State::v), state, offset);
     }
 
     static std::string toString() { return "BVS"; }
@@ -739,11 +738,11 @@ public:
         int cycles = 0;
         if (state.is16Bit(State::m)) {
             cycles += 1;
-            Byte highByte = state.getAccumulatorB();
-            state.pushToStack(highByte);
+            state.pushToStack(state.getAccumulatorC());
         }
-        Byte lowByte = state.getAccumulatorA();
-        state.pushToStack(lowByte);
+        else {
+            state.pushToStack(state.getAccumulatorA());
+        }
         return cycles;
     }
 
@@ -845,10 +844,13 @@ public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     static int invoke(State& state)
     {
-        throw std::runtime_error("PLA is not implemented");
         int cycles = 0;
         if (state.is16Bit(State::m)) {
             cycles += 1;
+            state.setAccumulatorC(state.pullWordFromStack());
+        }
+        else {
+            state.setAccumulatorA(state.pullFromStack());
         }
         return cycles;
     }

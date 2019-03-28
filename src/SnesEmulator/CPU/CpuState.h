@@ -184,7 +184,7 @@ public:
 
     Byte* getMemoryPointer(Byte lowByte, Byte highByte, Byte bankByte, Word offset = 0)
     {
-        return getMemoryPointer(Long((bankByte << 16 | highByte << 8 | lowByte) + offset));
+        return getMemoryPointer(Long(Long(lowByte, highByte, bankByte) + offset));
     }
 
     Byte* getMemoryPointer(Byte lowByte, Byte highByte)
@@ -240,6 +240,20 @@ public:
     void pushFlagsToStack()
     {
         pushToStack(flags);
+    }
+
+    Byte pullFromStack()
+    {
+        ++stackPointer;
+        forceEmulationRegisters();
+        return memory[stackPointer];
+    }
+
+    Word pullWordFromStack()
+    {
+        Byte lowByte = pullFromStack();
+        Byte highByte = pullFromStack();
+        return Word(lowByte, highByte);
     }
 
     void setProgramCounter(Word pc, Byte pbr)

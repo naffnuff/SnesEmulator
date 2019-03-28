@@ -118,7 +118,7 @@ public:
         }
         else if (command == "r") {
             output << "Reset" << std::endl;
-            throw std::runtime_error("Reset command not implemented");
+            //throw std::runtime_error("Reset command not implemented");
         }
         else if (command.substr(0, 3) == "br ") {
             try {
@@ -324,7 +324,9 @@ void Emulator::run()
 
             Instruction* instruction = cpuOpcodeMap.getNextInstruction(cpuState);
             int cycles = 0;
-            if (debugger.stepMode && resumeLast) {
+            if (
+                debugger.stepMode &&
+                resumeLast) {
                 std::ofstream pcFile("address.txt");
                 pcFile << cpuState.getProgramAddress();
             }

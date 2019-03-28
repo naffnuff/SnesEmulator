@@ -108,7 +108,6 @@ class ADC_69 : public AddressMode::Immediate<Operator::ADC>
     // 3-m 3-m         imm       mm....mm . ADC #$54
     int execute() override
     {
-        throw std::runtime_error("ADC_69 is not implemented");
         return 2 + applyOperand();
     }
 
@@ -929,7 +928,6 @@ class BVS_70 : public AddressMode::ProgramCounterRelative<Operator::BVS>
     // 2   2+t+t*e*p   rel8      ........ . BVS LABEL
     int execute() override
     {
-        throw std::runtime_error("BVS_70 is not implemented");
         return 2 + applyOperand();
     }
 
@@ -3151,7 +3149,6 @@ class PLA_68 : public AddressMode::Implied<Operator::PLA>
     // 1   5-m         imp       m.....m. . PLA
     int execute() override
     {
-        throw std::runtime_error("PLA_68 is not implemented");
         return 4 + applyOperand();
     }
 
