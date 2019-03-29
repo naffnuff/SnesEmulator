@@ -13,7 +13,7 @@
 #include <windows.h>
 enum Color
 {
-    Blue = FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_BLUE,
+    Blue = FOREGROUND_INTENSITY | FOREGROUND_BLUE,
     Green = FOREGROUND_INTENSITY | FOREGROUND_GREEN,
     Red = FOREGROUND_INTENSITY | FOREGROUND_RED,
     Purple = FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_BLUE,
@@ -53,14 +53,14 @@ public:
     {
     }
 
-    template<typename State>
-    int executeNext(Instruction* instruction, State& state, Config& config, uint64_t cycleCount)
+    template<typename State, typename OtherState>
+    int executeNext(Instruction* instruction, State& state, Config& config, uint64_t cycleCount, OtherState& otherState, Config& otherConfig)
     {
         try {
             if (stepMode) {
                 printState(state, config);
 
-                if (awaitCommand(config, state)) {
+                if (awaitCommand(config, state, otherConfig, otherState)) {
                     int cycles = instruction->execute();
                     if (stepMode) {
                         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), config.debugColor);
@@ -96,8 +96,8 @@ public:
         return 0;
     }
 
-    template<typename State>
-    bool awaitCommand(Config& config, State& state)
+    template<typename State, typename OtherState>
+    bool awaitCommand(Config& config, State& state, Config& otherConfig, OtherState& otherState)
     {
         output << "Command (h for help): ";
 
@@ -122,8 +122,8 @@ public:
                 << "w: watch executing program memory" << std::endl
                 << "[hex]: inspect memory page containing address [hex]" << std::endl
                 << "[p|s|a|x|y|d|f]=[hex]: set register to [hex]" << std::endl
-                << "[a]=[hex]: set address [a] to [hex]" << std::endl;
-            std::getchar();
+                << "[a]=[hex]: set address [a] to [hex]" << std::endl
+                << "s: switch to other state" << std::endl;
         }
         else if (command == "n") {
             config.watchMode = false;
@@ -182,6 +182,11 @@ public:
             config.watchMode = !config.watchMode;
             output << "Watch mode " << (config.watchMode ? "on" : "off") << std::endl;
         }
+        else if (command == "s") {
+            output << "Switched states" << std::endl;
+            printState(otherState, otherConfig);
+            return awaitCommand(otherConfig, otherState, config, state);
+        }
         else if (command.size() > 1 && command[1] == '=') {
             try {
                 Word value = (Word)stoi(command.substr(2), 0, 16);
@@ -235,7 +240,7 @@ public:
         bool executing = address >= state.getProgramAddress() && address < state.getProgramAddress() + config.nextInstruction->size();
         Color color = DefaultColor;
         if (breakpoint && executing) {
-            color = Purple;
+            color = Blue;
         }
         else if (breakpoint) {
             color = Red;
@@ -254,10 +259,10 @@ public:
         size_t cpuMemorySize = cpuState.getMemorySize();
         size_t spcMemorySize = spcState.getMemorySize();
 
-        output << "          0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f"
-            << "             0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f" << std::endl;
-        Long cpuAddress = startCpuAddress - std::bitset<4>(startCpuAddress).to_ulong();
-        Long spcAddress = startSpcAddress - std::bitset<4>(startSpcAddress).to_ulong();
+        output << "           0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f"
+            << "              0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f" << std::endl;
+        Long cpuAddress = startCpuAddress - std::bitset<8>(startCpuAddress).to_ulong();
+        Long spcAddress = startSpcAddress - std::bitset<8>(startSpcAddress).to_ulong();
 
 
         for (int i = 0; i < 16; ++i) {
@@ -323,7 +328,7 @@ void Emulator::run()
     Debugger debugger(output, input, error);
 
     Debugger::Config cpuConfig("cpu.txt", Green, cpuOpcodeMap.getNextInstruction(cpuState));
-    Debugger::Config spcConfig("spc.txt", Blue, spcOpcodeMap.getNextInstruction(spcState));
+    Debugger::Config spcConfig("spc.txt", Purple, spcOpcodeMap.getNextInstruction(spcState));
 
     const bool resumeLast = true;
 
@@ -370,7 +375,7 @@ void Emulator::run()
                 debugger.printMemory(cpuState, cpuConfig, spcState, spcConfig);
             }
 
-            if (int cycles = debugger.executeNext(instruction, cpuState, cpuConfig, cycleCount)) {
+            if (int cycles = debugger.executeNext(instruction, cpuState, cpuConfig, cycleCount, spcState, spcConfig)) {
                 nextCpu += cycles * 8;
                 for (int i = 0; i < 4; ++i) {
                     spcState.getMemory(Byte(0xf4 + i)) = cpuState.getMemory(0x2140 + i);
@@ -389,7 +394,7 @@ void Emulator::run()
                 debugger.printMemory(cpuState, cpuConfig, spcState, spcConfig);
             }
 
-            if (int cycles = debugger.executeNext(instruction, spcState, spcConfig, cycleCount)) {
+            if (int cycles = debugger.executeNext(instruction, spcState, spcConfig, cycleCount, cpuState, cpuConfig)) {
                 nextSpc += cycles * 16;
                 for (int i = 0; i < 4; ++i) {
                     *cpuState.getMemoryPointer(Long(0x2140 + i)) = spcState.getMemory(Byte(0xf4 + i));
