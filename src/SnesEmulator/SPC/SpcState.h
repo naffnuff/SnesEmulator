@@ -141,6 +141,11 @@ public:
         return (Word&)registers[A];
     }
 
+    Byte* getMemoryPointer(Long address)
+    {
+        return &memory[address];
+    }
+
     Byte& getMemory(Word address)
     {
         return memory[address];
@@ -204,6 +209,35 @@ public:
     {
         setFlag(State::z, value == 0);
         setFlag(State::n, value & 1 << 7);
+    }
+
+    void setRegisterDebug(char name, Word value)
+    {
+        switch (name) {
+        case 'p':
+            setProgramCounter(value);
+            break;
+        case 's':
+            //setStackPointer(value);
+            break;
+        case 'a':
+            //setAccumulatorC(value);
+            break;
+        case 'x':
+            //setIndexRegister<State::X>(value);
+            break;
+        case 'y':
+            //setIndexRegister<State::Y>(value);
+            break;
+        case 'd':
+            //setDirectPageRegister(value);
+            break;
+        case 'f':
+            setFlags((Byte)value);
+            break;
+        default:
+            break;
+        }
     }
 
 private:

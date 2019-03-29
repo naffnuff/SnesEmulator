@@ -318,6 +318,35 @@ public:
         updateSignFlags(value);
     }
 
+    void setRegisterDebug(char name, Word value)
+    {
+        switch (name) {
+        case 'p':
+            setProgramCounter(value);
+            break;
+        case 's':
+            setStackPointer(value);
+            break;
+        case 'a':
+            setAccumulatorC(value);
+            break;
+        case 'x':
+            setIndexRegister<State::X>(value);
+            break;
+        case 'y':
+            setIndexRegister<State::Y>(value);
+            break;
+        case 'd':
+            setDirectPageRegister(value);
+            break;
+        case 'f':
+            setFlags((Byte)value);
+            break;
+        default:
+            break;
+        }
+    }
+
     void loadRom(const std::string& path, std::ostream& output);
 
 private:

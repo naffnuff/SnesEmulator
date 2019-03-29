@@ -38,8 +38,9 @@ int main(int, char*)
     std::istream& input = std::cin;
     std::ostream& error = std::cerr;
 
+    Emulator emulator(output, input, error);
+
     try {
-        Emulator emulator(output, input, error);
         emulator.run();
 
 

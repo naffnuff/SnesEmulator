@@ -4563,7 +4563,6 @@ class XBA_EB : public AddressMode::Implied<Operator::XBA>
     // 1   3           imp       *.....*. . XBA
     int execute() override
     {
-        throw std::runtime_error("XBA_EB is not implemented");
         return 3 + applyOperand();
     }
 

@@ -145,6 +145,10 @@
     <ClInclude Include="..\..\..\src\SnesEmulator\Types.h" />
     <ClInclude Include="..\..\..\src\SnesEmulator\Util.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="cpu.txt" />
+    <Text Include="spc.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

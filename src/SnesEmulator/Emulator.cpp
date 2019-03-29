@@ -13,9 +13,11 @@
 #include <windows.h>
 enum Color
 {
-    Blue = FOREGROUND_INTENSITY | FOREGROUND_BLUE,
-    DefaultColor = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE,
+    Blue = FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_BLUE,
     Green = FOREGROUND_INTENSITY | FOREGROUND_GREEN,
+    Red = FOREGROUND_INTENSITY | FOREGROUND_RED,
+    Purple = FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_BLUE,
+    DefaultColor = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE,
 };
 #endif
 
@@ -25,65 +27,77 @@ public:
     class Config
     {
     public:
-        Config()
+        Config(std::string fileName, Color debugColor, const Instruction* nextInstruction)
             : inspectedAddress(0)
+            , fileName(fileName)
+            , watchMode(true)
+            , debugColor(debugColor)
+            , nextInstruction(nextInstruction)
         {
 
         }
 
         Long inspectedAddress;
+        std::set<Long> breakpoints;
+        std::string fileName;
+        bool watchMode;
+        Color debugColor;
+        const Instruction* nextInstruction;
     };
 
     Debugger(std::ostream& output, std::istream& input, std::ostream& error)
         : output(output)
         , input(input)
         , error(error)
-        , watchMode(true)
         , stepMode(true)
     {
     }
 
     template<typename State>
-    int executeNext(Instruction* instruction, const State& state, Config& config, uint64_t cycleCount, Color color)
+    int executeNext(Instruction* instruction, State& state, Config& config, uint64_t cycleCount)
     {
-        if (stepMode) {
-            printState(instruction, state, color);
-
-            if (awaitCommand(config)) {
-                int cycles = instruction->execute();
-                if (stepMode) {
-                    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
-                    state.printRegisters(output) << std::endl;
-                    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), DefaultColor);
-                }
-                return cycles;
-            }
-
-        } else {
-            /*if (cycleCount > 38000) {
-                stepMode = true;
-            }*/
-
-            for (Long i = state.getProgramAddress(); i < state.getProgramAddress() + instruction->size(); ++i) {
-                if (breakpoints.find(i) != breakpoints.end()) {
-                    stepMode = true;
-                    break;
-                }
-            }
-
+        try {
             if (stepMode) {
-                std::time_t endTime = clock();
-                double elapsedSeconds = double(endTime - startTime) / CLOCKS_PER_SEC;
-                output << "Time delta=" << elapsedSeconds << std::endl;
-                output << "Speed is " << cycleCount / 1000000.0 / elapsedSeconds << " MHz (kind of)" << std::endl;
-            } else {
-                return instruction->execute();
+                printState(state, config);
+
+                if (awaitCommand(config, state)) {
+                    int cycles = instruction->execute();
+                    if (stepMode) {
+                        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), config.debugColor);
+                        state.printRegisters(output) << std::endl;
+                        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), DefaultColor);
+                    }
+                    return cycles;
+                }
+
             }
+            else {
+                for (Long i = state.getProgramAddress(); i < state.getProgramAddress() + instruction->size(); ++i) {
+                    if (config.breakpoints.find(i) != config.breakpoints.end()) {
+                        stepMode = true;
+                        break;
+                    }
+                }
+
+                if (stepMode) {
+                    std::time_t endTime = clock();
+                    double elapsedSeconds = double(endTime - startTime) / CLOCKS_PER_SEC;
+                    output << "Time delta=" << elapsedSeconds << std::endl;
+                    output << "Speed is " << cycleCount / 1000000.0 / elapsedSeconds << " MHz (kind of)" << std::endl;
+                }
+                else {
+                    return instruction->execute();
+                }
+            }
+        } catch (std::exception& e) {
+            error << e.what() << std::endl;
+            stepMode = true;
         }
         return 0;
     }
-    
-    bool awaitCommand(Config& config)
+
+    template<typename State>
+    bool awaitCommand(Config& config, State& state)
     {
         output << "Command (h for help): ";
 
@@ -93,83 +107,91 @@ public:
         if (command.empty()) {
             output << "Step" << std::endl;
             return true;
-        } else if (command == "h") {
+        }
+        else if (command == "h") {
             output << "[return]: step into next instruction" << std::endl
                 << "n: inspect next memory page" << std::endl
                 << "p: inspect previous memory page" << std::endl
-                << "r: run program" << std::endl
-                << "br [hex]: toogle breakpoint at address [hex]" << std::endl
+                << "i: inspect operand address" << std::endl
+                << "q: run program" << std::endl
+                //<< "r: reset" << std::endl
+                << "t: toggle breakpoint at current Program Counter address" << std::endl
+                << "tt: toggle breakpoint at next Program Counter address" << std::endl
+                << "t [hex]: toogle breakpoint at address [hex]" << std::endl
+                << "clear: clear all breakpoints" << std::endl
                 << "w: watch executing program memory" << std::endl
                 << "[hex]: inspect memory page containing address [hex]" << std::endl
                 << "[p|s|a|x|y|d|f]=[hex]: set register to [hex]" << std::endl
                 << "[a]=[hex]: set address [a] to [hex]" << std::endl;
             std::getchar();
-        } else if (command == "n") {
-            watchMode = false;
+        }
+        else if (command == "n") {
+            config.watchMode = false;
             config.inspectedAddress += (1 << 8);
-        } else if (command == "p") {
-            watchMode = false;
+        }
+        else if (command == "p") {
+            config.watchMode = false;
             config.inspectedAddress -= (1 << 8);
-        } else if (command == "q") {
+        }
+        else if (command == "q") {
             stepMode = false;
             output << "Run" << std::endl;
             startTime = clock();
             return true;
         }
         else if (command == "r") {
-            output << "Reset" << std::endl;
-            //throw std::runtime_error("Reset command not implemented");
+            output << "Reset not implemented" << std::endl;
         }
-        else if (command.substr(0, 3) == "br ") {
-            try {
-                int breakpoint = stoi(command.substr(3), 0, 16);
-                if (breakpoints.find(breakpoint) == breakpoints.end()) {
-                    breakpoints.insert(breakpoint);
-                    output << "Breakpoint inserted at address " << breakpoint << std::endl;
-                } else {
-                    breakpoints.erase(breakpoint);
-                    output << "Breakpoint removed at address " << breakpoint << std::endl;
-                }
-            } catch (std::exception& e) {
-                std::cerr << "Not a valid value: " << e.what() << std::endl;
+        else if (command == "i") {
+            output << "Inspect not implemented" << std::endl;
+        }
+        else if (command == "clear") {
+            config.breakpoints.clear();
+            output << "Cleared config " << config.fileName << std::endl;
+            std::ofstream file(config.fileName);
+        }
+        else if (command[0] == 't') {
+            int breakpoint = state.getProgramAddress();
+            std::string twoFirst = command.substr(0, 2);
+            if (twoFirst == "tt") {
+                breakpoint += config.nextInstruction->size();
             }
-        } else if (command == "w") {
-            watchMode = !watchMode;
-            output << "Watch mode " << (watchMode ? "on" : "off") << std::endl;
-        } else if (command.size() > 1 && command[1] == '=') {
+            else if (twoFirst == "t ") {
+                try {
+                    breakpoint = stoi(command.substr(2), 0, 16);
+                } catch (std::exception& e) {
+                    std::cerr << "Not a valid value: " << e.what() << std::endl;
+                }
+            }
+            if (config.breakpoints.find(breakpoint) == config.breakpoints.end()) {
+                config.breakpoints.insert(breakpoint);
+                output << "Breakpoint inserted at address " << breakpoint << std::endl;
+            }
+            else {
+                config.breakpoints.erase(breakpoint);
+                output << "Breakpoint removed at address " << breakpoint << std::endl;
+            }
+            std::ofstream file(config.fileName);
+            if (file) {
+                for (Long breakpoint : config.breakpoints) {
+                    file << breakpoint << " ";
+                }
+            }
+        }
+        else if (command == "w") {
+            config.watchMode = !config.watchMode;
+            output << "Watch mode " << (config.watchMode ? "on" : "off") << std::endl;
+        }
+        else if (command.size() > 1 && command[1] == '=') {
             try {
                 Word value = (Word)stoi(command.substr(2), 0, 16);
                 output << "Setting register " << command[0] << "=" << value << std::endl;
-                /*switch (command[0]) {
-                case 'p':
-                state.setProgramCounter(value);
-                break;
-                case 's':
-                state.setStackPointer(value);
-                break;
-                case 'a':
-                state.setAccumulatorC(value);
-                break;
-                case 'x':
-                state.setXIndexRegister(value);
-                break;
-                case 'y':
-                state.setYIndexRegister(value);
-                break;
-                case 'd':
-                state.setDirectPageRegister(value);
-                break;
-                case 'f':
-                state.setFlags((Byte)value);
-                break;
-                default:
-                error << "Unknown register " << command[0] << std::endl;
-                break;
-                }*/
+                state.setRegisterDebug(command[0], value);
             } catch (std::exception& e) {
                 error << "Not a valid address: " << e.what() << std::endl;
             }
-        } else if (command.find('=') != std::string::npos) {
+        }
+        else if (command.find('=') != std::string::npos) {
             int pos = command.find('=');
             try {
                 output << "Address: " << command.substr(0, pos) << ", value: " << command.substr(pos + 1) << std::endl;
@@ -177,15 +199,16 @@ public:
                 Byte value = (Byte)stoi(command.substr(pos + 1), 0, 16);
                 output << "Setting address " << address <<
                     "=" << value << std::endl;
-                //*state.getMemoryPointer(address) = value;
+                *state.getMemoryPointer(address) = value;
             } catch (std::exception& e) {
                 error << "Not valid: " << command.substr(0, pos) << " or " << command.substr(pos + 1) << ": " << e.what() << std::endl;
             }
-        } else {
+        }
+        else {
             try {
                 config.inspectedAddress = stoi(command, 0, 16);
                 output << "Inspecting address " << config.inspectedAddress << std::endl;
-                watchMode = false;
+                config.watchMode = false;
             } catch (std::exception& e) {
                 error << "Not a valid address: " << e.what() << std::endl;
             }
@@ -195,18 +218,39 @@ public:
     }
 
     template<typename State>
-    void printState(const Instruction* instruction, const State& state, Color color)
+    void printState(const State& state, Config& config)
     {
-        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), config.debugColor);
         state.printRegisters(output) << std::endl;
-        output << instruction->opcodeToString() << std::endl;
+        output << config.nextInstruction->opcodeToString() << std::endl;
         output << state.readProgramByte() << ": ";
-        output << instruction->toString() << std::endl;
+        output << config.nextInstruction->toString() << std::endl;
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), DefaultColor);
     }
 
-    void printMemory(const CPU::State& cpuState, Long startCpuAddress, const SPC::State& spcState, Long startSpcAddress)
+    template<typename State>
+    void setColor(const State& state, const Config& config, Long address)
     {
+        bool breakpoint = config.breakpoints.find(address) != config.breakpoints.end();
+        bool executing = address >= state.getProgramAddress() && address < state.getProgramAddress() + config.nextInstruction->size();
+        Color color = DefaultColor;
+        if (breakpoint && executing) {
+            color = Purple;
+        }
+        else if (breakpoint) {
+            color = Red;
+        }
+        else if (executing) {
+            color = config.debugColor;
+        }
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
+    }
+
+    void printMemory(const CPU::State& cpuState, const Config& cpuConfig, const SPC::State& spcState, const Config& spcConfig)
+    {
+        Long startCpuAddress = cpuConfig.watchMode ? cpuState.getProgramAddress() : cpuConfig.inspectedAddress;
+        Long startSpcAddress = spcConfig.watchMode ? spcState.getProgramAddress() : spcConfig.inspectedAddress;
+
         size_t cpuMemorySize = cpuState.getMemorySize();
         size_t spcMemorySize = spcState.getMemorySize();
 
@@ -224,7 +268,9 @@ public:
                 output << bank << ':' << std::hex << std::setw(3) << std::setfill('0') << lowAddress << "x  " << std::dec;
 
                 for (int j = 0; j < 16 && cpuAddress < cpuMemorySize; ++j) {
+                    setColor(cpuState, cpuConfig, cpuAddress);
                     output << cpuState.getMemory(cpuAddress++) << ' ';
+                    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), DefaultColor);
                 }
             }
 
@@ -236,7 +282,9 @@ public:
                 output << std::hex << std::setw(3) << std::setfill('0') << lowAddress << "x  ";
 
                 for (int j = 0; j < 16 && spcAddress < spcMemorySize; ++j) {
+                    setColor(spcState, spcConfig, spcAddress);
                     output << spcState.getMemory(Word(spcAddress++)) << ' ';
+                    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), DefaultColor);
                 }
             }
 
@@ -244,9 +292,7 @@ public:
         }
     }
 
-    bool watchMode;
     bool stepMode;
-    std::set<Long> breakpoints;
     std::time_t startTime;
 
 private:
@@ -271,70 +317,65 @@ void Emulator::run()
     
     SPC::State spcState;
 
+    CPU::OpcodeMap cpuOpcodeMap(cpuState);
+    SPC::OpcodeMap spcOpcodeMap(spcState);
+
     Debugger debugger(output, input, error);
 
-    Debugger::Config cpuConfig;
-    Debugger::Config spcConfig;
+    Debugger::Config cpuConfig("cpu.txt", Green, cpuOpcodeMap.getNextInstruction(cpuState));
+    Debugger::Config spcConfig("spc.txt", Blue, spcOpcodeMap.getNextInstruction(spcState));
 
     const bool resumeLast = true;
 
     if (resumeLast) {
-        std::ifstream addressFile("address.txt");
-        int programAddress = -1;
-        addressFile >> std::hex >> programAddress;
-        if (programAddress != -1) {
-            Long breakpoint(programAddress);
-            output << "Read breakpoint: " << breakpoint << std::endl;
-            debugger.breakpoints.insert(breakpoint);
+        for (Debugger::Config* config : { &cpuConfig, &spcConfig }) {
+            std::ifstream configFile(config->fileName);
+            if (configFile) {
+                std::string breakpointString;
+                while (std::getline(configFile, breakpointString, ' ')) {
+                    Long breakpoint = std::stoi(breakpointString, 0, 16);
+                    output << "Read breakpoint: " << breakpoint << " from " << config->fileName << std::endl;
+                    config->breakpoints.insert(breakpoint);
+                }
+            }
         }
     }
-
-    CPU::OpcodeMap cpuOpcodeMap(cpuState);
-    SPC::OpcodeMap spcOpcodeMap(spcState);
 
     uint64_t cycleCount = 186;
     uint64_t nextCpu = 186;
     uint64_t nextSpc = 186;
     bool running = true;
     debugger.startTime = clock();
-    
+
     while (running) {
         if (debugger.stepMode) {
             if ((cycleCount == nextCpu || cycleCount == nextSpc)) {
                 output << "cycleCount=" << cycleCount << ", nextCpu=" << nextCpu << ", nextSpc=" << nextSpc << std::endl;
-                if (!debugger.breakpoints.empty()) {
-                    output << "Breakpoints:";
-                    for (Long breakpoint : debugger.breakpoints) {
-                        output << " " << breakpoint;
+                for (const Debugger::Config& config : { cpuConfig, spcConfig }) {
+                    if (!config.breakpoints.empty()) {
+                        output << "Breakpoints:";
+                        for (Long breakpoint : config.breakpoints) {
+                            output << " " << breakpoint;
+                        }
+                        output << std::endl;
                     }
-                    output << std::endl;
                 }
             }
         }
-        
+
         if (cycleCount == nextCpu) {
+            Instruction* instruction = cpuOpcodeMap.getNextInstruction(cpuState);
+
             if (debugger.stepMode) {
-                if (debugger.watchMode) {
-                    debugger.printMemory(cpuState, cpuState.getProgramAddress(), spcState, spcState.getProgramAddress());
-                }
-                else {
-                    debugger.printMemory(cpuState, cpuConfig.inspectedAddress, spcState, spcConfig.inspectedAddress);
-                }
+                debugger.printMemory(cpuState, cpuConfig, spcState, spcConfig);
             }
 
-            Instruction* instruction = cpuOpcodeMap.getNextInstruction(cpuState);
-            int cycles = 0;
-            if (
-                debugger.stepMode &&
-                resumeLast) {
-                std::ofstream pcFile("address.txt");
-                pcFile << cpuState.getProgramAddress();
-            }
-            if (cycles = debugger.executeNext(instruction, cpuState, cpuConfig, cycleCount, Green)) {
+            if (int cycles = debugger.executeNext(instruction, cpuState, cpuConfig, cycleCount)) {
                 nextCpu += cycles * 8;
                 for (int i = 0; i < 4; ++i) {
                     spcState.getMemory(Byte(0xf4 + i)) = cpuState.getMemory(0x2140 + i);
                 }
+                cpuConfig.nextInstruction = cpuOpcodeMap.getNextInstruction(cpuState);
             }
             else {
                 continue;
@@ -342,22 +383,18 @@ void Emulator::run()
         }
 
         if (cycleCount == nextSpc) {
+            Instruction* instruction = spcOpcodeMap.getNextInstruction(spcState);
+
             if (debugger.stepMode) {
-                if (debugger.watchMode) {
-                    debugger.printMemory(cpuState, cpuState.getProgramAddress(), spcState, spcState.getProgramAddress());
-                }
-                else {
-                    debugger.printMemory(cpuState, cpuConfig.inspectedAddress, spcState, spcConfig.inspectedAddress);
-                }
+                debugger.printMemory(cpuState, cpuConfig, spcState, spcConfig);
             }
 
-            Instruction* instruction = spcOpcodeMap.getNextInstruction(spcState);
-            int cycles = 0;
-            if (cycles = debugger.executeNext(instruction, spcState, spcConfig, cycleCount, Blue)) {
+            if (int cycles = debugger.executeNext(instruction, spcState, spcConfig, cycleCount)) {
                 nextSpc += cycles * 16;
                 for (int i = 0; i < 4; ++i) {
                     *cpuState.getMemoryPointer(Long(0x2140 + i)) = spcState.getMemory(Byte(0xf4 + i));
                 }
+                spcConfig.nextInstruction = spcOpcodeMap.getNextInstruction(spcState);
             }
             else {
                 continue;

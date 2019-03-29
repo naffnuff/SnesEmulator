@@ -1420,7 +1420,10 @@ class XBA
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("XBA is not implemented");
+        Byte accumulatorB = state.getAccumulatorB();
+        Byte* accumulatorPointer = state.getAccumulatorPointer();
+        accumulatorPointer[1] = accumulatorPointer[0];
+        state.setAccumulatorA(accumulatorB);
         return 0;
     }
 
