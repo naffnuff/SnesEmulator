@@ -205,10 +205,11 @@ public:
         getRegister<PSW>() = value;
     }
 
-    void updateSignFlags(Byte value)
+    template<typename T>
+    void updateSignFlags(T value)
     {
         setFlag(State::z, value == 0);
-        setFlag(State::n, value & 1 << 7);
+        setFlag(State::n, value.isNegative());
     }
 
     void setRegisterDebug(char name, Word value)

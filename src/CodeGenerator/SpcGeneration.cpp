@@ -919,7 +919,7 @@ void generateSpc()
         }
     }
 
-    generateOpcodes(instructions);
+    //generateOpcodes(instructions);
     //generateOpcodeMap(instructions);
     //generateAddressModes(addressModeClassMap);
     //generateOperators(operatorMap);

@@ -448,12 +448,17 @@ class DEC
 {
 public:
     // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, Byte* data)
+    static int invoke(State& state, Byte* address)
     {
-        throw std::runtime_error("DEC is not implemented");
         int cycles = 0;
         if (state.is16Bit(State::m)) {
             cycles += 2;
+            Word& data = (Word&)*address;
+            state.updateSignFlags(--data);
+        }
+        else {
+            Byte& data = *address;
+            state.updateSignFlags(--data);
         }
         return cycles;
     }
@@ -461,30 +466,27 @@ public:
     static std::string toString() { return "DEC"; }
 };
 
-// DEX Decrement Index Register X [Flags affected: n,z]
-class DEX
+// DEX/Y Decrement Index Register X/Y [Flags affected: n,z]
+template<State::IndexRegister Register>
+class DE
 {
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("DEX is not implemented");
+        int cycles = 0;
+        if (state.is16Bit(State::x)) {
+            cycles += 2;
+            Word& indexRegister = state.getIndexRegister<Register>();
+            state.updateSignFlags(--indexRegister);
+        }
+        else {
+            Byte& indexRegister = (Byte&)state.getIndexRegister<Register>();
+            state.updateSignFlags(--indexRegister);
+        }
         return 0;
     }
 
-    static std::string toString() { return "DEX"; }
-};
-
-// DEY Decrement Index Register Y [Flags affected: n,z]
-class DEY
-{
-public:
-    static int invoke(State& state)
-    {
-        throw std::runtime_error("DEY is not implemented");
-        return 0;
-    }
-
-    static std::string toString() { return "DEY"; }
+    static std::string toString() { return "DE" + State::getRegisterName<Register>(); }
 };
 
 // EOR Exclusive-OR Accumulator with Memory [Flags affected: n,z]
@@ -510,12 +512,17 @@ class INC
 {
 public:
     // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, Byte* data)
+    static int invoke(State& state, Byte* address)
     {
-        throw std::runtime_error("INC is not implemented");
         int cycles = 0;
         if (state.is16Bit(State::m)) {
             cycles += 2;
+            Word& data = (Word&)*address;
+            state.updateSignFlags(++data);
+        }
+        else {
+            Byte& data = *address;
+            state.updateSignFlags(++data);
         }
         return cycles;
     }
@@ -530,7 +537,15 @@ class IN
 public:
     static int invoke(State& state)
     {
-        state.updateSignFlags(++state.getIndexRegister<Register>());
+        int cycles = 0;
+        if (state.is16Bit(State::x)) {
+            Word& indexRegister = state.getIndexRegister<Register>();
+            state.updateSignFlags(++indexRegister);
+        }
+        else {
+            Byte& indexRegister = (Byte&)state.getIndexRegister<Register>();
+            state.updateSignFlags(++indexRegister);
+        }
         return 0;
     }
 

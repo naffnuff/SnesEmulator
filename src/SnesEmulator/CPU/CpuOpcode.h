@@ -1372,7 +1372,6 @@ class CPY_C0_16Bit : public AddressMode::Immediate16Bit<Operator::CP<State::Y>>
     // 3-x 3-x         imm       x.....xx . CPY #$54
     int execute() override
     {
-        throw std::runtime_error("CPY_C0_16Bit is not implemented");
         return 2 + applyOperand();
     }
 
@@ -1521,14 +1520,13 @@ class DEC_DE : public AddressMode::AbsoluteIndexed<Operator::DEC, State::X>
 // DEX Decrement Index Register X [Flags affected: n,z]
 // DEX
 // Implied (1-Byte)
-class DEX_CA : public AddressMode::Implied<Operator::DEX>
+class DEX_CA : public AddressMode::Implied<Operator::DE<State::X>>
 {
     using Implied::Implied;
 
     // 1   2           imp       x.....x. . DEX
     int execute() override
     {
-        throw std::runtime_error("DEX_CA is not implemented");
         return 2 + applyOperand();
     }
 
@@ -1538,7 +1536,7 @@ class DEX_CA : public AddressMode::Implied<Operator::DEX>
 // DEY Decrement Index Register Y [Flags affected: n,z]
 // DEY
 // Implied (1-Byte)
-class DEY_88 : public AddressMode::Implied<Operator::DEY>
+class DEY_88 : public AddressMode::Implied<Operator::DE<State::Y>>
 {
     using Implied::Implied;
 
@@ -1836,7 +1834,6 @@ class INC_1A : public AddressMode::Accumulator<Operator::INC>
     // 1   2           acc       m.....m. . INC
     int execute() override
     {
-        throw std::runtime_error("INC_1A is not implemented");
         return 2 + applyOperand();
     }
 

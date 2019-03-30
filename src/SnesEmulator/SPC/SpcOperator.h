@@ -22,7 +22,7 @@ namespace Operator {
 class ADC
 {
 public:
-    static int invoke(State& state, Byte& leftOperand, const Byte& rightOperand)
+    static int invoke(State& state, Byte& leftOperand, Byte rightOperand)
     {
         throw std::runtime_error("ADC is not implemented");
         return 0;
@@ -36,7 +36,7 @@ public:
 class ADDW
 {
 public:
-    static int invoke(State& state, Byte& leftOperand, const Byte& rightOperand)
+    static int invoke(State& state, Word& leftOperand, Word rightOperand)
     {
         throw std::runtime_error("ADDW is not implemented");
         return 0;
@@ -61,7 +61,7 @@ public:
 class AND
 {
 public:
-    static int invoke(State& state, Byte& leftOperand, const Byte& rightOperand)
+    static int invoke(State& state, Byte& leftOperand, Byte rightOperand)
     {
         throw std::runtime_error("AND is not implemented");
         return 0;
@@ -76,7 +76,7 @@ public:
 class AND1
 {
 public:
-    static int invoke(State& state, Byte& leftOperand, const Byte& rightOperand)
+    static int invoke(State& state, Byte& leftOperand, Byte rightOperand)
     {
         throw std::runtime_error("AND1 is not implemented");
         return 0;
@@ -125,7 +125,7 @@ class BBC
 {
 public:
     // §1: Add 1 cycle if branch is taken
-    static int invoke(State& state, Byte& leftOperand, const Byte& rightOperand)
+    static int invoke(State& state, Byte& leftOperand, Byte rightOperand)
     {
         throw std::runtime_error("BBC is not implemented");
         int cycles = 0;
@@ -152,7 +152,7 @@ class BBS
 {
 public:
     // §1: Add 1 cycle if branch is taken
-    static int invoke(State& state, Byte& leftOperand, const Byte& rightOperand)
+    static int invoke(State& state, Byte& leftOperand, Byte rightOperand)
     {
         throw std::runtime_error("BBS is not implemented");
         int cycles = 0;
@@ -288,13 +288,7 @@ public:
     // §1: Add 1 cycle if branch is taken
     static int invoke(State& state, int8_t offset)
     {
-        throw std::runtime_error("BRA is not implemented");
-        int cycles = 0;
-        if (true /*branch taken*/) {
-            cycles += 2;
-            throw std::runtime_error("TODO01");
-        }
-        return cycles;
+        return branchIf(true, state, offset);
     }
 
     static std::string toString() { return "BRA"; }
@@ -375,7 +369,7 @@ class CBNE
 {
 public:
     // §1: Add 1 cycle if branch is taken
-    static int invoke(State& state, Byte& leftOperand, const Byte& rightOperand)
+    static int invoke(State& state, Byte& leftOperand, Byte rightOperand)
     {
         throw std::runtime_error("CBNE is not implemented");
         int cycles = 0;
@@ -401,7 +395,7 @@ public:
 class CLR1
 {
 public:
-    static int invoke(State& state, Byte& leftOperand, const Byte& rightOperand)
+    static int invoke(State& state, Byte& leftOperand, Byte rightOperand)
     {
         throw std::runtime_error("CLR1 is not implemented");
         return 0;
@@ -474,10 +468,10 @@ public:
 class CMP
 {
 public:
-    static int invoke(State& state, Byte& leftOperand, const Byte& rightOperand)
+    static int invoke(State& state, Byte leftOperand, Byte rightOperand)
     {
         state.setFlag(State::c, leftOperand >= rightOperand);
-        state.updateSignFlags(leftOperand - rightOperand);
+        state.updateSignFlags(Byte(leftOperand - rightOperand));
         return 0;
     }
 
@@ -489,7 +483,7 @@ public:
 class CMPW
 {
 public:
-    static int invoke(State& state, Byte& leftOperand, const Byte& rightOperand)
+    static int invoke(State& state, Word& leftOperand, Word rightOperand)
     {
         throw std::runtime_error("CMPW is not implemented");
         return 0;
@@ -533,7 +527,7 @@ class DBNZ
 {
 public:
     // §1: Add 1 cycle if branch is taken
-    static int invoke(State& state, Byte& leftOperand, const Byte& rightOperand)
+    static int invoke(State& state, Byte& leftOperand, Byte rightOperand)
     {
         throw std::runtime_error("DBNZ is not implemented");
         int cycles = 0;
@@ -599,7 +593,7 @@ public:
 class DIV
 {
 public:
-    static int invoke(State& state, Byte& leftOperand, const Byte& rightOperand)
+    static int invoke(State& state, Byte& leftOperand, Byte rightOperand)
     {
         throw std::runtime_error("DIV is not implemented");
         return 0;
@@ -638,7 +632,7 @@ public:
 class EOR
 {
 public:
-    static int invoke(State& state, Byte& leftOperand, const Byte& rightOperand)
+    static int invoke(State& state, Byte& leftOperand, Byte rightOperand)
     {
         throw std::runtime_error("EOR is not implemented");
         return 0;
@@ -652,7 +646,7 @@ public:
 class EOR1
 {
 public:
-    static int invoke(State& state, Byte& leftOperand, const Byte& rightOperand)
+    static int invoke(State& state, Byte& leftOperand, Byte rightOperand)
     {
         throw std::runtime_error("EOR1 is not implemented");
         return 0;
@@ -748,43 +742,13 @@ public:
 class MOV
 {
 public:
-    static int invoke(State& state, Byte& leftOperand, const Byte& rightOperand)
+    static int invoke(State& state, Byte& leftOperand, Byte rightOperand)
     {
         leftOperand = rightOperand;
         return 0;
     }
 
     static std::string toString() { return "MOV"; }
-};
-
-// MOV1
-// C, m.b: C = (m.b)    	[.......C]
-// m.b, C: (m.b) = C    	[........]
-class MOV1
-{
-public:
-    static int invoke(State& state, Byte& leftOperand, const Byte& rightOperand)
-    {
-        throw std::runtime_error("MOV1 is not implemented");
-        return 0;
-    }
-
-    static std::string toString() { return "MOV1"; }
-};
-
-// MOVW
-// YA, d: YA = word (d)    	[N.....Z.]
-// d, YA: word (d) = YA  (read low only)    	[........]
-class MOVW
-{
-public:
-    static int invoke(State& state, Byte& leftOperand, const Byte& rightOperand)
-    {
-        throw std::runtime_error("MOVW is not implemented");
-        return 0;
-    }
-
-    static std::string toString() { return "MOVW"; }
 };
 
 // MOV_SignedResult
@@ -814,11 +778,50 @@ public:
 class MOV_SignedResult : public MOV
 {
 public:
-    static int invoke(State& state, Byte& leftOperand, const Byte& rightOperand)
+    static int invoke(State& state, Byte& leftOperand, Byte rightOperand)
     {
-        MOV::invoke(state, leftOperand, rightOperand);
-        state.updateSignFlags(leftOperand);
+        state.updateSignFlags(rightOperand);
+        return MOV::invoke(state, leftOperand, rightOperand);
+    }
+};
+
+// MOV1
+// C, m.b: C = (m.b)    	[.......C]
+// m.b, C: (m.b) = C    	[........]
+class MOV1
+{
+public:
+    static int invoke(State& state, Byte& leftOperand, Byte rightOperand)
+    {
+        throw std::runtime_error("MOV1 is not implemented");
         return 0;
+    }
+
+    static std::string toString() { return "MOV1"; }
+};
+
+// MOVW
+// d, YA: word (d) = YA  (read low only)    	[........]
+class MOVW
+{
+public:
+    static int invoke(State& state, Word& leftOperand, Word rightOperand)
+    {
+        leftOperand = rightOperand;
+        return 0;
+    }
+
+    static std::string toString() { return "MOVW"; }
+};
+
+// YA, d: YA = word (d)    	[N.....Z.]
+class MOVW_SignedResult : public MOVW
+{
+public:
+    static int invoke(State& state, Word& leftOperand, Word rightOperand)
+    {
+        state.updateSignFlags(rightOperand);
+        return MOVW::invoke(state, leftOperand, rightOperand);
     }
 };
 
@@ -827,7 +830,7 @@ public:
 class MUL
 {
 public:
-    static int invoke(State& state, Byte& leftOperand, const Byte& rightOperand)
+    static int invoke(State& state, Byte& leftOperand, Byte rightOperand)
     {
         throw std::runtime_error("MUL is not implemented");
         return 0;
@@ -855,7 +858,7 @@ public:
 class NOT1
 {
 public:
-    static int invoke(State& state, Byte& leftOperand, const Byte& rightOperand)
+    static int invoke(State& state, Byte& leftOperand, Byte rightOperand)
     {
         throw std::runtime_error("NOT1 is not implemented");
         return 0;
@@ -894,7 +897,7 @@ public:
 class OR
 {
 public:
-    static int invoke(State& state, Byte& leftOperand, const Byte& rightOperand)
+    static int invoke(State& state, Byte& leftOperand, Byte rightOperand)
     {
         throw std::runtime_error("OR is not implemented");
         return 0;
@@ -909,7 +912,7 @@ public:
 class OR1
 {
 public:
-    static int invoke(State& state, Byte& leftOperand, const Byte& rightOperand)
+    static int invoke(State& state, Byte& leftOperand, Byte rightOperand)
     {
         throw std::runtime_error("OR1 is not implemented");
         return 0;
@@ -923,7 +926,7 @@ public:
 class PCALL
 {
 public:
-    static int invoke(State& state, Byte& leftOperand, const Byte& rightOperand)
+    static int invoke(State& state, Byte& leftOperand, Byte rightOperand)
     {
         throw std::runtime_error("PCALL is not implemented");
         return 0;
@@ -1044,7 +1047,7 @@ public:
 class SBC
 {
 public:
-    static int invoke(State& state, Byte& leftOperand, const Byte& rightOperand)
+    static int invoke(State& state, Byte& leftOperand, Byte rightOperand)
     {
         throw std::runtime_error("SBC is not implemented");
         return 0;
@@ -1065,7 +1068,7 @@ public:
 class SET1
 {
 public:
-    static int invoke(State& state, Byte& leftOperand, const Byte& rightOperand)
+    static int invoke(State& state, Byte& leftOperand, Byte rightOperand)
     {
         throw std::runtime_error("SET1 is not implemented");
         return 0;
@@ -1135,7 +1138,7 @@ public:
 class SUBW
 {
 public:
-    static int invoke(State& state, Byte& leftOperand, const Byte& rightOperand)
+    static int invoke(State& state, Word& leftOperand, Word rightOperand)
     {
         throw std::runtime_error("SUBW is not implemented");
         return 0;
@@ -1164,7 +1167,7 @@ public:
 class TCALL
 {
 public:
-    static int invoke(State& state, Byte& leftOperand, const Byte& rightOperand)
+    static int invoke(State& state, Byte& leftOperand, Byte rightOperand)
     {
         throw std::runtime_error("TCALL is not implemented");
         return 0;

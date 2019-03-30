@@ -436,14 +436,12 @@ class DirectRegister : public Instruction2Byte
 
     int invokeOperator(Byte lowByte) override
     {
-        throw std::runtime_error("DirectRegister is not implemented");
-        Byte* data = nullptr;
-        return Operator::invoke(state, *data, 0);
+        return Operator::invoke(state, state.getMemory(lowByte), state.getRegister<RegisterIndex>());
     }
 
     std::string toString() const override
     {
-        return Operator::toString() + " $" + operandToString() + " TODO";
+        return Operator::toString() + " $" + operandToString() + ", " + state.getRegisterName<RegisterIndex>();
     }
 };
 
@@ -456,14 +454,12 @@ class DirectYAccumulator : public Instruction2Byte
 
     int invokeOperator(Byte lowByte) override
     {
-        throw std::runtime_error("DirectYAccumulator is not implemented");
-        Byte* data = nullptr;
-        return Operator::invoke(state, *data, 0);
+        return Operator::invoke(state, (Word&)state.getMemory(lowByte), state.getYAccumulator());
     }
 
     std::string toString() const override
     {
-        return Operator::toString() + " $" + operandToString() + " TODO";
+        return Operator::toString() + " $" + operandToString() + ", YA";
     }
 };
 
@@ -1046,14 +1042,12 @@ class YAccumulatorDirect : public Instruction2Byte
 
     int invokeOperator(Byte lowByte) override
     {
-        throw std::runtime_error("YAccumulatorDirect is not implemented");
-        Byte* data = nullptr;
-        return Operator::invoke(state, *data, 0);
+        return Operator::invoke(state, state.getYAccumulator(), (Word&)state.getMemory(lowByte));
     }
 
     std::string toString() const override
     {
-        return Operator::toString() + " $" + operandToString() + " TODO";
+        return Operator::toString() + " YA, $" + operandToString();
     }
 };
 

@@ -150,6 +150,12 @@ public:
         return *this;
     }
 
+    Word& operator--()
+    {
+        --value;
+        return *this;
+    }
+
     Word operator--(int)
     {
         Word copy(value);

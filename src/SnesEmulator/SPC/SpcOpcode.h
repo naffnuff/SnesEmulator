@@ -899,7 +899,6 @@ class BRA_2F : public AddressMode::ProgramCounterRelative<Operator::BRA>
 
     int execute() override
     {
-        throw std::runtime_error("BRA_2F is not implemented");
         return 2 + applyOperand();
     }
 
@@ -2255,7 +2254,6 @@ class MOV_DD : public AddressMode::RegisterRegister<Operator::MOV_SignedResult, 
 
     int execute() override
     {
-        throw std::runtime_error("MOV_DD is not implemented");
         return  2 + applyOperand();
     }
 
@@ -2381,7 +2379,6 @@ class MOV_5D : public AddressMode::RegisterRegister<Operator::MOV_SignedResult, 
 
     int execute() override
     {
-        throw std::runtime_error("MOV_5D is not implemented");
         return  2 + applyOperand();
     }
 
@@ -2620,7 +2617,6 @@ class MOV_C4 : public AddressMode::DirectRegister<Operator::MOV, State::A>
 
     int execute() override
     {
-        throw std::runtime_error("MOV_C4 is not implemented");
         return  4 + applyOperand();
     }
 
@@ -2774,13 +2770,12 @@ class MOV1_CA : public AddressMode::MemoryBitCarry<Operator::MOV1>
 // MOVW YA, d
 // YA = word (d)    	[N.....Z.]
 // Y Accumulator Direct (2-Byte)
-class MOVW_BA : public AddressMode::YAccumulatorDirect<Operator::MOVW>
+class MOVW_BA : public AddressMode::YAccumulatorDirect<Operator::MOVW_SignedResult>
 {
     using YAccumulatorDirect::YAccumulatorDirect;
 
     int execute() override
     {
-        throw std::runtime_error("MOVW_BA is not implemented");
         return  5 + applyOperand();
     }
 
@@ -2796,7 +2791,6 @@ class MOVW_DA : public AddressMode::DirectYAccumulator<Operator::MOVW>
 
     int execute() override
     {
-        throw std::runtime_error("MOVW_DA is not implemented");
         return  5 + applyOperand();
     }
 
