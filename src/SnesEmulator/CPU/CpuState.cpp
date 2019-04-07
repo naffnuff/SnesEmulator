@@ -36,7 +36,7 @@ void State::loadRom(const std::string& path, std::ostream& output)
         for (int bank = 0; bank < 1 << 8; ++bank) {
             for (int address = 0x8000; address < (1 << 16); ++address) {
                 Byte byte(rom[romIndex++]);
-                memory[bank << 16 | address] = byte;
+                memory[bank << 16 | address].setValue(byte);
                 if (romIndex >= (int)rom.size()) {
                     romLoaded = true;
                     break;
@@ -77,8 +77,8 @@ bool State::tryReadHeader(int offset, std::vector<char> rom, std::ostream& outpu
 
     int romSize = 1024 * (int)std::pow(2, (int)rom[0xFFD7 - offset]);
 
-    resetAddress = (Byte)rom[0xFFFC - offset];
-    resetAddress += (Byte)rom[0xFFFD - offset] << 8;
+    resetAddress = Word(rom[0xFFFC - offset]);
+    resetAddress += Word(rom[0xFFFD - offset] << 8);
 
     output << "gameTitle=" << gameTitle << std::endl
         << "mapMode=" << mapMode << std::endl

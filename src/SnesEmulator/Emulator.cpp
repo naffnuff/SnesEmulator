@@ -3,6 +3,8 @@
 #include <fstream>
 #include <iostream>
 
+#include "Exception.h"
+
 #include "CPU/CpuState.h"
 #include "SPC/SpcState.h"
 
@@ -90,7 +92,7 @@ public:
                     return instruction->execute();
                 }
             }
-        } catch (std::exception& e) {
+        } catch (OpcodeNotYetImplementedException& e) {
             error << e.what() << std::endl;
             context.stepMode = true;
         }
@@ -217,7 +219,7 @@ public:
                 Byte value = (Byte)stoi(command.substr(pos + 1), 0, 16);
                 output << "Setting address " << address <<
                     "=" << value << std::endl;
-                *state.getMemoryPointer(address) = value;
+                state.getMemoryLocation(address)->setValue(value);
             } catch (std::exception& e) {
                 error << "Not valid: " << command.substr(0, pos) << " or " << command.substr(pos + 1) << ": " << e.what() << std::endl;
             }
@@ -301,7 +303,7 @@ public:
 
                 for (int j = 0; j < 16 && spcAddress < spcMemorySize; ++j) {
                     setColor(spcState, spcContext, spcAddress);
-                    output << spcState.getMemory(Word(spcAddress++)) << ' ';
+                    output << spcState.getMemoryByte(Word(spcAddress++)) << ' ';
                     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), DefaultColor);
                 }
             }
@@ -333,6 +335,14 @@ void Emulator::run()
     //state.loadRom("C:\\cygwin64\\home\\rasmus.knutsson\\wla-dx\\wla\\myrom.smc");
     
     SPC::State spcState;
+
+    // Memory mapping: this is how I/O between the CPU and SPC700 is handled on the SNES
+    for (Word i = 0; i < 4; ++i) {
+        MemoryLocation* cpuMemoryLocation = cpuState.getMemoryLocation(Long(0x2140 + i));
+        MemoryLocation* spcMemoryLocation = spcState.getMemoryLocation(Word(0xf4 + i));
+        cpuMemoryLocation->setMapping(spcMemoryLocation);
+        spcMemoryLocation->setMapping(cpuMemoryLocation);
+    }
 
     CPU::OpcodeMap cpuOpcodeMap(cpuState);
     SPC::OpcodeMap spcOpcodeMap(spcState);
@@ -384,9 +394,6 @@ void Emulator::run()
 
             if (int cycles = debugger.executeNext(instruction, cpuState, cpuContext, cycleCount, spcState, spcContext)) {
                 nextCpu += cycles * 8;
-                for (int i = 0; i < 4; ++i) {
-                    spcState.getMemory(Byte(0xf4 + i)) = cpuState.getMemory(0x2140 + i);
-                }
                 cpuContext.nextInstruction = cpuOpcodeMap.getNextInstruction(cpuState);
             }
             else {
@@ -413,9 +420,6 @@ void Emulator::run()
 
             if (int cycles = debugger.executeNext(instruction, spcState, spcContext, cycleCount, cpuState, cpuContext)) {
                 nextSpc += cycles * 16;
-                for (int i = 0; i < 4; ++i) {
-                    *cpuState.getMemoryPointer(Long(0x2140 + i)) = spcState.getMemory(Byte(0xf4 + i));
-                }
                 spcContext.nextInstruction = spcOpcodeMap.getNextInstruction(spcState);
             }
             else {

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../Exception.h"
 #include "CpuState.h"
 
 namespace CPU {
@@ -11,18 +12,18 @@ class ADC
 {
 public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, Byte* data)
+    static int invoke(State& state, const MemoryLocation* memory)
     {
         int cycles = 0;
         if (state.is16Bit(State::m)) {
-            throw std::runtime_error("ADC 16-bit is not implemented");
+            throw OperatorNotYetImplementedException("ADC 16-bit");
             cycles += 1;
         }
         else {
             Byte accumulator = state.getAccumulatorA();
             bool carry = state.getFlag(State::c);
             bool overflow = false;
-            accumulator.binaryAdd(*data, carry, overflow);
+            accumulator.binaryAdd(memory->getValue(), carry, overflow);
             state.setFlag(State::c, carry);
             state.setFlag(State::v, overflow);
             state.setAccumulatorA(accumulator);
@@ -38,9 +39,9 @@ class AND
 {
 public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, Byte* data)
+    static int invoke(State& state, const MemoryLocation* memory)
     {
-        throw std::runtime_error("AND is not implemented");
+        throw OperatorNotYetImplementedException("AND");
         int cycles = 0;
         if (state.is16Bit(State::m)) {
             cycles += 1;
@@ -56,9 +57,9 @@ class ASL
 {
 public:
     // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, Byte* data)
+    static int invoke(State& state, const MemoryLocation* memory)
     {
-        throw std::runtime_error("ASL is not implemented");
+        throw OperatorNotYetImplementedException("ASL");
         int cycles = 0;
         if (state.is16Bit(State::m)) {
             cycles += 2;
@@ -95,15 +96,15 @@ public:
     // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, int8_t offset)
     {
-        throw std::runtime_error("BCC is not implemented");
+        throw OperatorNotYetImplementedException("BCC");
         int cycles = 0;
         if (true /*branch taken*/) {
             cycles += 1;
-            throw std::runtime_error("TODO07");
+            throw OperatorNotYetImplementedException("TODO07");
         }
         if (true /*branch taken crosses page boundary*/) {
             cycles += 1;
-            throw std::runtime_error("TODO08");
+            throw OperatorNotYetImplementedException("TODO08");
         }
         return cycles;
     }
@@ -119,15 +120,15 @@ public:
     // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, int8_t offset)
     {
-        throw std::runtime_error("BCS is not implemented");
+        throw OperatorNotYetImplementedException("BCS");
         int cycles = 0;
         if (true /*branch taken*/) {
             cycles += 1;
-            throw std::runtime_error("TODO07");
+            throw OperatorNotYetImplementedException("TODO07");
         }
         if (true /*branch taken crosses page boundary*/) {
             cycles += 1;
-            throw std::runtime_error("TODO08");
+            throw OperatorNotYetImplementedException("TODO08");
         }
         return cycles;
     }
@@ -143,17 +144,7 @@ public:
     // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, int8_t offset)
     {
-        throw std::runtime_error("BEQ is not implemented");
-        int cycles = 0;
-        if (true /*branch taken*/) {
-            cycles += 1;
-            throw std::runtime_error("TODO07");
-        }
-        if (true /*branch taken crosses page boundary*/) {
-            cycles += 1;
-            throw std::runtime_error("TODO08");
-        }
-        return cycles;
+        return branchIf(state.getFlag(State::z), state, offset);
     }
 
     static std::string toString() { return "BEQ"; }
@@ -164,9 +155,9 @@ class BIT
 {
 public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, Byte* data)
+    static int invoke(State& state, const MemoryLocation* memory)
     {
-        throw std::runtime_error("BIT is not implemented");
+        throw OperatorNotYetImplementedException("BIT");
         int cycles = 0;
         if (state.is16Bit(State::m)) {
             cycles += 1;
@@ -185,15 +176,15 @@ public:
     // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, int8_t offset)
     {
-        throw std::runtime_error("BMI is not implemented");
+        throw OperatorNotYetImplementedException("BMI");
         int cycles = 0;
         if (true /*branch taken*/) {
             cycles += 1;
-            throw std::runtime_error("TODO07");
+            throw OperatorNotYetImplementedException("TODO07");
         }
         if (true /*branch taken crosses page boundary*/) {
             cycles += 1;
-            throw std::runtime_error("TODO08");
+            throw OperatorNotYetImplementedException("TODO08");
         }
         return cycles;
     }
@@ -223,15 +214,15 @@ public:
     // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, int8_t offset)
     {
-        throw std::runtime_error("BPL is not implemented");
+        throw OperatorNotYetImplementedException("BPL");
         int cycles = 0;
         if (true /*branch taken*/) {
             cycles += 1;
-            throw std::runtime_error("TODO07");
+            throw OperatorNotYetImplementedException("TODO07");
         }
         if (true /*branch taken crosses page boundary*/) {
             cycles += 1;
-            throw std::runtime_error("TODO08");
+            throw OperatorNotYetImplementedException("TODO08");
         }
         return cycles;
     }
@@ -257,9 +248,9 @@ class BRK
 {
 public:
     // §9: Add 1 cycle for 65816 native mode (e=0)
-    static int invoke(State& state, Byte* data)
+    static int invoke(State& state, const MemoryLocation* memory)
     {
-        throw std::runtime_error("BRK is not implemented");
+        throw OperatorNotYetImplementedException("BRK");
         int cycles = 0;
         if (state.isNativeMode()) {
             cycles += 1;
@@ -274,9 +265,9 @@ public:
 class BRL
 {
 public:
-    static int invoke(State& state, Byte* data)
+    static int invoke(State& state, const MemoryLocation* memory)
     {
-        throw std::runtime_error("BRL is not implemented");
+        throw OperatorNotYetImplementedException("BRL");
         return 0;
     }
 
@@ -291,15 +282,15 @@ public:
     // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, int8_t offset)
     {
-        throw std::runtime_error("BVC is not implemented");
+        throw OperatorNotYetImplementedException("BVC");
         int cycles = 0;
         if (true /*branch taken*/) {
             cycles += 1;
-            throw std::runtime_error("TODO07");
+            throw OperatorNotYetImplementedException("TODO07");
         }
         if (true /*branch taken crosses page boundary*/) {
             cycles += 1;
-            throw std::runtime_error("TODO08");
+            throw OperatorNotYetImplementedException("TODO08");
         }
         return cycles;
     }
@@ -340,7 +331,7 @@ class CLD
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("CLD is not implemented");
+        throw OperatorNotYetImplementedException("CLD");
         return 0;
     }
 
@@ -353,7 +344,7 @@ class CLI
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("CLI is not implemented");
+        state.setFlag(State::i, false);
         return 0;
     }
 
@@ -366,7 +357,7 @@ class CLV
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("CLV is not implemented");
+        throw OperatorNotYetImplementedException("CLV");
         return 0;
     }
 
@@ -378,19 +369,20 @@ class CMP
 {
 public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, Byte* data)
+    static int invoke(State& state, const MemoryLocation* memory)
     {
         int cycles = 0;
         if (state.is16Bit(State::m)) {
             cycles += 1;
             Word accumulator = state.getAccumulatorC();
-            Word data16Bit = data[0] | data[1] << 8;
-            state.setFlag(State::c, accumulator >= data16Bit);
-            state.updateSignFlags(Word(accumulator - data16Bit));
+            Word data = memory->getWordValue();
+            state.setFlag(State::c, accumulator >= data);
+            state.updateSignFlags(Word(accumulator - data));
         } else {
             Byte accumulator = state.getAccumulatorA();
-            state.setFlag(State::c, accumulator >= data[0]);
-            state.updateSignFlags(Byte(accumulator - data[0]));
+            Byte data = memory->getValue();
+            state.setFlag(State::c, accumulator >= data);
+            state.updateSignFlags(Byte(accumulator - data));
         }
         return cycles;
     }
@@ -403,9 +395,9 @@ class COP
 {
 public:
     // §9: Add 1 cycle for 65816 native mode (e=0)
-    static int invoke(State& state, Byte* data)
+    static int invoke(State& state, const MemoryLocation* memory)
     {
-        throw std::runtime_error("COP is not implemented");
+        throw OperatorNotYetImplementedException("COP");
         int cycles = 0;
         if (state.isNativeMode()) {
             cycles += 1;
@@ -422,20 +414,21 @@ class CP
 {
 public:
     // §10: Add 1 cycle if x=0 (16-bit index registers)
-    static int invoke(State& state, Byte* data)
+    static int invoke(State& state, const MemoryLocation* memory)
     {
         int cycles = 0;
         if (state.is16Bit(State::x)) {
             cycles += 1;
             Word indexRegister = state.getIndexRegister<Register>();
-            Word data16Bit = data[0] | data[1] << 8;
-            state.setFlag(State::c, indexRegister >= data16Bit);
-            state.updateSignFlags(Word(indexRegister - data16Bit));
+            Word data = memory->getWordValue();
+            state.setFlag(State::c, indexRegister >= data);
+            state.updateSignFlags(Word(indexRegister - data));
         }
         else {
             Byte indexRegister(state.getIndexRegister<Register>());
-            state.setFlag(State::c, indexRegister >= data[0]);
-            state.updateSignFlags(Byte(indexRegister - data[0]));
+            Byte data = memory->getValue();
+            state.setFlag(State::c, indexRegister >= data);
+            state.updateSignFlags(Byte(indexRegister - data));
         }
         return cycles;
     }
@@ -448,17 +441,17 @@ class DEC
 {
 public:
     // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, Byte* address)
+    static int invoke(State& state, MemoryLocation* memory)
     {
         int cycles = 0;
         if (state.is16Bit(State::m)) {
             cycles += 2;
-            Word& data = (Word&)*address;
+            Word data = memory->getWordValue();
             state.updateSignFlags(--data);
+            memory->setWordValue(data);
         }
         else {
-            Byte& data = *address;
-            state.updateSignFlags(--data);
+            state.updateSignFlags(--memory->get());
         }
         return cycles;
     }
@@ -494,9 +487,9 @@ class EOR
 {
 public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, Byte* data)
+    static int invoke(State& state, const MemoryLocation* memory)
     {
-        throw std::runtime_error("EOR is not implemented");
+        throw OperatorNotYetImplementedException("EOR");
         int cycles = 0;
         if (state.is16Bit(State::m)) {
             cycles += 1;
@@ -512,17 +505,17 @@ class INC
 {
 public:
     // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, Byte* address)
+    static int invoke(State& state, MemoryLocation* memory)
     {
         int cycles = 0;
         if (state.is16Bit(State::m)) {
             cycles += 2;
-            Word& data = (Word&)*address;
+            Word data = memory->getWordValue();
             state.updateSignFlags(++data);
+            memory->setWordValue(data);
         }
         else {
-            Byte& data = *address;
-            state.updateSignFlags(++data);
+            state.updateSignFlags(++memory->get());
         }
         return cycles;
     }
@@ -556,9 +549,9 @@ public:
 class JMP
 {
 public:
-    static int invoke(State& state, Byte* data)
+    static int invoke(State& state, const MemoryLocation* memory)
     {
-        throw std::runtime_error("JMP is not implemented");
+        throw OperatorNotYetImplementedException("JMP");
         return 0;
     }
 
@@ -569,16 +562,15 @@ public:
 class JSR
 {
 public:
-    static int invoke(State& state, Byte* data)
+    static int invoke(State& state, const MemoryLocation* memory)
     {
-        throw std::runtime_error("JSR is not implemented");
+        throw OperatorNotYetImplementedException("JSR");
         return 0;
     }
 
     static int invoke(State& state, Word address)
     {
-        Word programCounter = Word(state.getProgramAddress(-1));
-        state.pushToStack(programCounter);
+        state.pushToStack(state.getProgramCounter(-1));
         state.setProgramCounter(address);
         return 0;
     }
@@ -591,14 +583,14 @@ class LDA
 {
 public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, Byte* data)
+    static int invoke(State& state, const MemoryLocation* memory)
     {
         int cycles = 0;
         if (state.is16Bit(State::m)) {
-            state.setAccumulatorC(Word(data[0] | data[1] << 8));
+            state.setAccumulatorC(memory->getWordValue());
             cycles += 1;
         } else {
-            state.setAccumulatorA(data[0]);
+            state.setAccumulatorA(memory->getValue());
         }
         return cycles;
     }
@@ -612,14 +604,14 @@ class LD
 {
 public:
     // §10: Add 1 cycle if x=0 (16-bit index registers)
-    static int invoke(State& state, Byte* data)
+    static int invoke(State& state, const MemoryLocation* memory)
     {
         int cycles = 0;
         if (state.is16Bit(State::x)) {
-            state.setIndexRegister<Register>(Word(data[0] | data[1] << 8));
+            state.setIndexRegister<Register>(memory->getWordValue());
             cycles += 1;
         } else {
-            state.setIndexRegister<Register>(data[0]);
+            state.setIndexRegister<Register>(memory->getValue());
         }
         return cycles;
     }
@@ -632,9 +624,9 @@ class LSR
 {
 public:
     // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, Byte* data)
+    static int invoke(State& state, const MemoryLocation* memory)
     {
-        throw std::runtime_error("LSR is not implemented");
+        throw OperatorNotYetImplementedException("LSR");
         int cycles = 0;
         if (state.is16Bit(State::m)) {
             cycles += 2;
@@ -650,9 +642,9 @@ class MVN
 {
 public:
     // §13: 7 cycles per byte moved
-    static int invoke(State& state, Byte* data)
+    static int invoke(State& state, const MemoryLocation* memory)
     {
-        throw std::runtime_error("MVN is not implemented");
+        throw OperatorNotYetImplementedException("MVN");
         return 0;
     }
 
@@ -664,9 +656,9 @@ class MVP
 {
 public:
     // §13: 7 cycles per byte moved
-    static int invoke(State& state, Byte* data)
+    static int invoke(State& state, const MemoryLocation* memory)
     {
-        throw std::runtime_error("MVP is not implemented");
+        throw OperatorNotYetImplementedException("MVP");
         return 0;
     }
 
@@ -679,7 +671,7 @@ class NOP
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("NOP is not implemented");
+        throw OperatorNotYetImplementedException("NOP");
         return 0;
     }
 
@@ -691,9 +683,9 @@ class ORA
 {
 public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, Byte* data)
+    static int invoke(State& state, const MemoryLocation* memory)
     {
-        throw std::runtime_error("ORA is not implemented");
+        throw OperatorNotYetImplementedException("ORA");
         int cycles = 0;
         if (state.is16Bit(State::m)) {
             cycles += 1;
@@ -708,9 +700,9 @@ public:
 class PEA
 {
 public:
-    static int invoke(State& state, Byte* data)
+    static int invoke(State& state, const MemoryLocation* memory)
     {
-        throw std::runtime_error("PEA is not implemented");
+        throw OperatorNotYetImplementedException("PEA");
         return 0;
     }
 
@@ -721,9 +713,9 @@ public:
 class PEI
 {
 public:
-    static int invoke(State& state, Byte* data)
+    static int invoke(State& state, const MemoryLocation* memory)
     {
-        throw std::runtime_error("PEI is not implemented");
+        throw OperatorNotYetImplementedException("PEI");
         return 0;
     }
 
@@ -734,9 +726,9 @@ public:
 class PER
 {
 public:
-    static int invoke(State& state, Byte* data)
+    static int invoke(State& state, const MemoryLocation* memory)
     {
-        throw std::runtime_error("PER is not implemented");
+        throw OperatorNotYetImplementedException("PER");
         return 0;
     }
 
@@ -770,7 +762,7 @@ class PHB
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("PHB is not implemented");
+        throw OperatorNotYetImplementedException("PHB");
         return 0;
     }
 
@@ -783,7 +775,7 @@ class PHD
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("PHD is not implemented");
+        throw OperatorNotYetImplementedException("PHD");
         return 0;
     }
 
@@ -796,7 +788,7 @@ class PHK
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("PHK is not implemented");
+        throw OperatorNotYetImplementedException("PHK");
         return 0;
     }
 
@@ -809,7 +801,7 @@ class PHP
 public:
     static int invoke(State& state)
     {
-        state.pushFlagsToStack();
+        state.pushToStack(state.getFlags());
         return 0;
     }
 
@@ -823,7 +815,7 @@ public:
     // §10: Add 1 cycle if x=0 (16-bit index registers)
     static int invoke(State& state)
     {
-        throw std::runtime_error("PHX is not implemented");
+        throw OperatorNotYetImplementedException("PHX");
         int cycles = 0;
         if (state.is16Bit(State::x)) {
             cycles += 1;
@@ -841,7 +833,7 @@ public:
     // §10: Add 1 cycle if x=0 (16-bit index registers)
     static int invoke(State& state)
     {
-        throw std::runtime_error("PHY is not implemented");
+        throw OperatorNotYetImplementedException("PHY");
         int cycles = 0;
         if (state.is16Bit(State::x)) {
             cycles += 1;
@@ -879,7 +871,7 @@ class PLB
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("PLB is not implemented");
+        throw OperatorNotYetImplementedException("PLB");
         return 0;
     }
 
@@ -892,20 +884,20 @@ class PLD
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("PLD is not implemented");
+        throw OperatorNotYetImplementedException("PLD");
         return 0;
     }
 
     static std::string toString() { return "PLD"; }
 };
 
-// PLP Pull Processor Status Register [Flags affected: n,z]
+// PLP Pull Processor Status Register [Flags affected: n,z (obviously wrong)]
 class PLP
 {
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("PLP is not implemented");
+        state.setFlags(state.pullFromStack());
         return 0;
     }
 
@@ -919,7 +911,7 @@ public:
     // §10: Add 1 cycle if x=0 (16-bit index registers)
     static int invoke(State& state)
     {
-        throw std::runtime_error("PLX is not implemented");
+        throw OperatorNotYetImplementedException("PLX");
         int cycles = 0;
         if (state.is16Bit(State::x)) {
             cycles += 1;
@@ -937,7 +929,7 @@ public:
     // §10: Add 1 cycle if x=0 (16-bit index registers)
     static int invoke(State& state)
     {
-        throw std::runtime_error("PLY is not implemented");
+        throw OperatorNotYetImplementedException("PLY");
         int cycles = 0;
         if (state.is16Bit(State::x)) {
             cycles += 1;
@@ -952,9 +944,9 @@ public:
 class REP
 {
 public:
-    static int invoke(State& state, Byte* data)
+    static int invoke(State& state, const MemoryLocation* memory)
     {
-        state.setFlag(*data, false);
+        state.setFlag(memory->getValue(), false);
         return 0;
     }
 
@@ -977,15 +969,19 @@ private:
 
 public:
     // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, Byte* data)
+    static int invoke(State& state, MemoryLocation* memory)
     {
         int cycles = 0;
         if (state.is16Bit(State::m)) {
             cycles += 2;
-            rotateLeft(state, (Word&)*data);
+            Word data = memory->getWordValue();
+            rotateLeft(state, data);
+            memory->setWordValue(data);
         }
         else {
-            rotateLeft(state, *data);
+            Byte data = memory->getValue();
+            rotateLeft(state, data);
+            memory->setValue(data);
         }
         return cycles;
     }
@@ -998,9 +994,9 @@ class ROR
 {
 public:
     // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, Byte* data)
+    static int invoke(State& state, const MemoryLocation* memory)
     {
-        throw std::runtime_error("ROR is not implemented");
+        throw OperatorNotYetImplementedException("ROR");
         int cycles = 0;
         if (state.is16Bit(State::m)) {
             cycles += 2;
@@ -1018,7 +1014,7 @@ public:
     // §9: Add 1 cycle for 65816 native mode (e=0)
     static int invoke(State& state)
     {
-        throw std::runtime_error("RTI is not implemented");
+        throw OperatorNotYetImplementedException("RTI");
         int cycles = 0;
         if (state.isNativeMode()) {
             cycles += 1;
@@ -1035,7 +1031,7 @@ class RTL
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("RTL is not implemented");
+        throw OperatorNotYetImplementedException("RTL");
         return 0;
     }
 
@@ -1048,7 +1044,7 @@ class RTS
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("RTS is not implemented");
+        state.setProgramCounter(Word(state.pullWordFromStack() + 1));
         return 0;
     }
 
@@ -1060,9 +1056,9 @@ class SBC
 {
 public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, Byte* data)
+    static int invoke(State& state, const MemoryLocation* memory)
     {
-        throw std::runtime_error("SBC is not implemented");
+        throw OperatorNotYetImplementedException("SBC");
         int cycles = 0;
         if (state.is16Bit(State::m)) {
             cycles += 1;
@@ -1079,7 +1075,7 @@ class SEC
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("SEC is not implemented");
+        throw OperatorNotYetImplementedException("SEC");
         return 0;
     }
 
@@ -1092,7 +1088,7 @@ class SED
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("SED is not implemented");
+        throw OperatorNotYetImplementedException("SED");
         return 0;
     }
 
@@ -1116,9 +1112,9 @@ public:
 class SEP
 {
 public:
-    static int invoke(State& state, Byte* data)
+    static int invoke(State& state, const MemoryLocation* memory)
     {
-        state.setFlag(*data, true);
+        state.setFlag(memory->getValue(), true);
         return 0;
     }
 
@@ -1130,15 +1126,16 @@ class STA
 {
 public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, Byte* data)
+    static int invoke(State& state, MemoryLocation* memory)
     {
         int cycles = 0;
 
-        data[0] = state.getAccumulatorA();
-
         if (state.is16Bit(State::m)) {
-            data[1] = state.getAccumulatorB();
             cycles += 1;
+            memory->setWordValue(state.getAccumulatorC());
+        }
+        else {
+            memory->setValue(state.getAccumulatorA());
         }
 
         return cycles;
@@ -1154,7 +1151,7 @@ public:
     // §14: Uses 3 cycles to shut the processor down; additional cycles are required by reset to restart it
     static int invoke(State& state)
     {
-        throw std::runtime_error("STP is not implemented");
+        throw OperatorNotYetImplementedException("STP");
         return 0;
     }
 
@@ -1166,9 +1163,9 @@ class STX
 {
 public:
     // §10: Add 1 cycle if x=0 (16-bit index registers)
-    static int invoke(State& state, Byte* data)
+    static int invoke(State& state, const MemoryLocation* memory)
     {
-        throw std::runtime_error("STX is not implemented");
+        throw OperatorNotYetImplementedException("STX");
         int cycles = 0;
         if (state.is16Bit(State::x)) {
             cycles += 1;
@@ -1184,9 +1181,9 @@ class STY
 {
 public:
     // §10: Add 1 cycle if x=0 (16-bit index registers)
-    static int invoke(State& state, Byte* data)
+    static int invoke(State& state, const MemoryLocation* memory)
     {
-        throw std::runtime_error("STY is not implemented");
+        throw OperatorNotYetImplementedException("STY");
         int cycles = 0;
         if (state.is16Bit(State::x)) {
             cycles += 1;
@@ -1202,14 +1199,18 @@ class STZ
 {
 public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, Byte* data)
+    static int invoke(State& state, MemoryLocation* memory)
     {
-        data[0] = 0;
         int cycles = 0;
+
         if (state.is16Bit(State::m)) {
-            data[1] = 0;
             cycles += 1;
+            memory->setWordValue(0);
         }
+        else {
+            memory->setValue(0);
+        }
+
         return cycles;
     }
 
@@ -1267,7 +1268,7 @@ class TDC
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("TDC is not implemented");
+        throw OperatorNotYetImplementedException("TDC");
         return 0;
     }
 
@@ -1279,9 +1280,9 @@ class TRB
 {
 public:
     // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, Byte* data)
+    static int invoke(State& state, const MemoryLocation* memory)
     {
-        throw std::runtime_error("TRB is not implemented");
+        throw OperatorNotYetImplementedException("TRB");
         int cycles = 0;
         if (state.is16Bit(State::m)) {
             cycles += 2;
@@ -1297,9 +1298,9 @@ class TSB
 {
 public:
     // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, Byte* data)
+    static int invoke(State& state, const MemoryLocation* memory)
     {
-        throw std::runtime_error("TSB is not implemented");
+        throw OperatorNotYetImplementedException("TSB");
         int cycles = 0;
         if (state.is16Bit(State::m)) {
             cycles += 2;
@@ -1316,7 +1317,7 @@ class TSC
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("TSC is not implemented");
+        throw OperatorNotYetImplementedException("TSC");
         return 0;
     }
 
@@ -1329,7 +1330,7 @@ class TSX
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("TSX is not implemented");
+        throw OperatorNotYetImplementedException("TSX");
         return 0;
     }
 
@@ -1342,7 +1343,7 @@ class TXA
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("TXA is not implemented");
+        throw OperatorNotYetImplementedException("TXA");
         return 0;
     }
 
@@ -1355,7 +1356,7 @@ class TXS
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("TXS is not implemented");
+        throw OperatorNotYetImplementedException("TXS");
         return 0;
     }
 
@@ -1368,7 +1369,7 @@ class TXY
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("TXY is not implemented");
+        throw OperatorNotYetImplementedException("TXY");
         return 0;
     }
 
@@ -1381,7 +1382,7 @@ class TYA
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("TYA is not implemented");
+        throw OperatorNotYetImplementedException("TYA");
         return 0;
     }
 
@@ -1394,7 +1395,7 @@ class TYX
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("TYX is not implemented");
+        throw OperatorNotYetImplementedException("TYX");
         return 0;
     }
 
@@ -1408,7 +1409,7 @@ public:
     // §15: Uses 3 cycles to shut the processor down; additional cycles are required by interrupt to restart it
     static int invoke(State& state)
     {
-        throw std::runtime_error("WAI is not implemented");
+        throw OperatorNotYetImplementedException("WAI");
         return 0;
     }
 
@@ -1420,9 +1421,9 @@ class WDM
 {
 public:
     // §16: Byte and cycle counts subject to change in future processors which expand WDM into 2-byte opcode portions of instructions of varying lengths
-    static int invoke(State& state, Byte* data)
+    static int invoke(State& state, const MemoryLocation* memory)
     {
-        throw std::runtime_error("WDM is not implemented");
+        throw OperatorNotYetImplementedException("WDM");
         return 0;
     }
 
@@ -1436,8 +1437,8 @@ public:
     static int invoke(State& state)
     {
         Byte accumulatorB = state.getAccumulatorB();
-        Byte* accumulatorPointer = state.getAccumulatorPointer();
-        accumulatorPointer[1] = accumulatorPointer[0];
+        MemoryLocation* accumulator = state.getAccumulatorPointer();
+        accumulator[1].setValue(accumulator[0].getValue());
         state.setAccumulatorA(accumulatorB);
         return 0;
     }

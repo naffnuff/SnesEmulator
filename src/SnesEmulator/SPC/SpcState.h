@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <array>
+#include <map>
 #include <bitset>
 #include <iomanip>
 
@@ -39,7 +40,7 @@ public:
 
     State()
         : programCounter(0xFFC0)
-        , memory(1 << 16, 0x55)
+        , memory(1 << 16, MemoryLocation(0x55))
     {
         std::array<Byte, 64> bootRomData = {
            0xCD, 0xEF, 0xBD, 0xE8, 0x00, 0xC6, 0x1D, 0xD0, 0xFC, 0x8F, 0xAA, 0xF4, 0x8F, 0xBB, 0xF5, 0x78,
@@ -49,7 +50,7 @@ public:
         };
 
         for (size_t i = 0; i < bootRomData.size(); ++i) {
-            memory[programCounter + i] = bootRomData[i];
+            memory[programCounter + i].setValue(bootRomData[i]);
         }
     }
 
@@ -84,21 +85,21 @@ public:
         std::string flagsString = "nvpbhizc";
 
         for (size_t i = 0; i < flagsString.size(); ++i) {
-            if (getRegister<PSW>() & 1 << i) {
+            if (getRegisterValue<PSW>() & 1 << i) {
                 flagsString[flagsString.size() - i - 1] = toupper(flagsString[flagsString.size() - i - 1]);
             }
         }
 
-        std::bitset<8> flagSet(getRegister<PSW>());
+        std::bitset<8> flagSet(getRegisterValue<PSW>());
 
         return output
             << "PC=" << programCounter
-            << ", A=" << getRegister<A>()
-            << ", X=" << getRegister<X>()
-            << ", Y=" << getRegister<Y>()
+            << ", A=" << getRegisterValue<A>()
+            << ", X=" << getRegisterValue<X>()
+            << ", Y=" << getRegisterValue<Y>()
             << ", S=" << getStackPointer()
             << ", YA=" << getYAccumulator()
-            << ", flags=" << flagSet << " (" << flagsString << ", $" << getRegister<PSW>() << ")";
+            << ", flags=" << flagSet << " (" << flagsString << ", $" << getRegisterValue<PSW>() << ")";
     }
 
     Long getProgramAddress(int offset = 0) const
@@ -118,7 +119,7 @@ public:
 
     Byte readProgramByte(int offset = 0) const
     {
-        return memory[getProgramAddress(offset)];
+        return memory[getProgramAddress(offset)].getValue();
     }
     
     void incrementProgramCounter(Word increment)
@@ -128,54 +129,59 @@ public:
 
     Word getStackPointer() const
     {
-        return 0x0100 | getRegister<SP>();
-    }
-
-    Word& getYAccumulator()
-    {
-        return (Word&)registers[A];
+        return 0x0100 | getRegisterValue<SP>();
     }
 
     Word getYAccumulator() const
     {
-        return (Word&)registers[A];
+        return registers[A].getWordValue();
     }
 
-    Byte* getMemoryPointer(Long address)
+    Byte getMemoryByte(Word address) const
+    {
+        return memory[address].getValue();
+    }
+
+    Byte getDirectMemoryByte(Byte address) const
+    {
+        return getMemoryByte(Word(address));
+    }
+
+    Word getMemoryWord(Word address) const
+    {
+        return memory[address].getWordValue();
+    }
+
+    Word getDirectMemoryWord(Byte address) const
+    {
+        return getMemoryWord(Word(address));
+    }
+
+    MemoryLocation* getMemoryLocation(Word address)
     {
         return &memory[address];
     }
 
-    Byte& getMemory(Word address)
+    MemoryLocation* getDirectMemoryLocation(Byte address)
     {
-        return memory[address];
+        return getMemoryLocation(Word(address));
     }
 
-    Byte getMemory(Word address) const
+    MemoryLocation* getMemoryLocation(Long address)
     {
-        return memory[address];
-    }
-
-    Byte& getMemory(Byte address)
-    {
-        return getMemory(Word(address));
-    }
-
-    Byte getMemory(Byte address) const
-    {
-        return getMemory(Word(address));
+        return &memory[address];
     }
 
     template<Register RegisterIndex>
-    Byte& getRegister()
+    MemoryLocation* getRegister()
     {
-        return registers[RegisterIndex];
+        return &registers[RegisterIndex];
     }
 
     template<Register RegisterIndex>
-    Byte getRegister() const
+    Byte getRegisterValue() const
     {
-        return registers[RegisterIndex];
+        return registers[RegisterIndex].getValue();
     }
 
     template<Register RegisterIndex>
@@ -188,21 +194,21 @@ public:
     void setFlag(Byte flag, bool value)
     {
         if (value) {
-            getRegister<PSW>() |= flag;
+            getRegister<PSW>()->setValue(getRegisterValue<PSW>() | flag);
         }
         else {
-            getRegister<PSW>() &= ~flag;
+            getRegister<PSW>()->setValue(getRegisterValue<PSW>() & ~flag);
         }
     }
 
     bool getFlag(Flag flag) const
     {
-        return getRegister<PSW>() & flag;
+        return getRegisterValue<PSW>() & flag;
     }
 
     void setFlags(Byte value)
     {
-        getRegister<PSW>() = value;
+        getRegister<PSW>()->setValue(value);
     }
 
     template<typename T>
@@ -244,8 +250,8 @@ public:
 private:
     Word programCounter;
 
-    std::vector<Byte> memory;
-    std::array<Byte, RegisterCount> registers;
+    std::vector<MemoryLocation> memory;
+    std::array<MemoryLocation, RegisterCount> registers;
 };
 
 }

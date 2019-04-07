@@ -1,5 +1,6 @@
 #pragma once
- 
+
+#include "../Exception.h"
 #include "../Instruction.h"
 #include "CpuOperator.h"
 #include "CpuState.h"
@@ -22,7 +23,7 @@ class Absolute : public Instruction3Byte
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
-        return Operator::invoke(state, state.getMemoryPointer(lowByte, highByte));
+        return Operator::invoke(state, state.getMemoryLocation(lowByte, highByte));
     }
 
     std::string toString() const override
@@ -45,9 +46,9 @@ class AbsoluteIndexedIndirect : public Instruction3Byte
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
-        throw std::runtime_error("AbsoluteIndexedIndirect is not implemented");
-        Byte* data = nullptr;
-        return Operator::invoke(state, data);
+        throw AddressModeNotYetImplementedException("AbsoluteIndexedIndirect");
+        MemoryLocation* memory = nullptr;
+        return Operator::invoke(state, memory);
     }
 
     std::string toString() const override
@@ -63,22 +64,33 @@ class AbsoluteIndexed : public Instruction3Byte
 {
     using Instruction3Byte::Instruction3Byte;
 
-    // §3: Add 1 cycle if adding index crosses a page boundary
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
-        throw std::runtime_error("AbsoluteIndexed is not implemented");
-        int cycles = 0;
-        if (true /*index added crosses page boundary*/) {
-            cycles += 1;
-            throw std::runtime_error("TODO03");
-        }
-        Byte* data = nullptr;
-        return cycles + Operator::invoke(state, data);
+        throw AddressModeNotYetImplementedException("AbsoluteIndexed");
+        MemoryLocation* memory = nullptr;
+        return Operator::invoke(state, memory);
     }
 
     std::string toString() const override
     {
         return Operator::toString() + " $" + operandToString() + " TODO";
+    }
+};
+
+template <typename Operator, State::IndexRegister Register>
+class AbsoluteIndexed_ExtraPageBoundaryCycle : public AbsoluteIndexed<Operator, Register>
+{
+    using Instruction3Byte::Instruction3Byte;
+
+    // §3: Add 1 cycle if adding index crosses a page boundary
+    int invokeOperator(Byte lowByte, Byte highByte) override
+    {
+        int cycles = 0;
+        if (true /*index added crosses page boundary*/) {
+            cycles += 1;
+            throw AddressModeNotYetImplementedException("TODO03");
+        }
+        return cycles + AbsoluteIndexed::invokeOperator(lowByte, highByte);
     }
 };
 
@@ -91,9 +103,9 @@ class AbsoluteIndirect : public Instruction3Byte
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
-        throw std::runtime_error("AbsoluteIndirect is not implemented");
-        Byte* data = nullptr;
-        return Operator::invoke(state, data);
+        throw AddressModeNotYetImplementedException("AbsoluteIndirect");
+        MemoryLocation* memory = nullptr;
+        return Operator::invoke(state, memory);
     }
 
     std::string toString() const override
@@ -111,9 +123,9 @@ class AbsoluteIndirectLong : public Instruction3Byte
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
-        throw std::runtime_error("AbsoluteIndirectLong is not implemented");
-        Byte* data = nullptr;
-        return Operator::invoke(state, data);
+        throw AddressModeNotYetImplementedException("AbsoluteIndirectLong");
+        MemoryLocation* memory = nullptr;
+        return Operator::invoke(state, memory);
     }
 
     std::string toString() const override
@@ -131,9 +143,9 @@ class AbsoluteLong : public Instruction4Byte
 
     int invokeOperator(Byte lowByte, Byte highByte, Byte bankByte) override
     {
-        throw std::runtime_error("AbsoluteLong is not implemented");
-        Byte* data = nullptr;
-        return Operator::invoke(state, data);
+        throw AddressModeNotYetImplementedException("AbsoluteLong");
+        MemoryLocation* memory = nullptr;
+        return Operator::invoke(state, memory);
     }
 
     std::string toString() const override
@@ -151,9 +163,9 @@ class AbsoluteLongIndexedX : public Instruction4Byte
 
     int invokeOperator(Byte lowByte, Byte highByte, Byte bankByte) override
     {
-        throw std::runtime_error("AbsoluteLongIndexedX is not implemented");
-        Byte* data = nullptr;
-        return Operator::invoke(state, data);
+        throw AddressModeNotYetImplementedException("AbsoluteLongIndexedX");
+        MemoryLocation* memory = nullptr;
+        return Operator::invoke(state, memory);
     }
 
     std::string toString() const override
@@ -176,7 +188,7 @@ class Accumulator : public Instruction1Byte
         if (state.is16Bit(State::m)) {
             cycles -= 2;
         }
-        Byte* accumulator = state.getAccumulatorPointer();
+        MemoryLocation* accumulator = state.getAccumulatorPointer();
         return cycles + Operator::invoke(state, accumulator);
     }
 
@@ -195,9 +207,9 @@ class BlockMove : public Instruction3Byte
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
-        throw std::runtime_error("BlockMove is not implemented");
-        Byte* data = nullptr;
-        return Operator::invoke(state, data);
+        throw AddressModeNotYetImplementedException("BlockMove");
+        MemoryLocation* memory = nullptr;
+        return Operator::invoke(state, memory);
     }
 
     std::string toString() const override
@@ -220,8 +232,7 @@ class DirectPage : public Instruction2Byte
         if ((uint8_t)state.getDirectPage()) {
             cycles += 1;
         }
-        Byte* data = state.getMemoryPointer(lowByte);
-        return cycles + Operator::invoke(state, data);
+        return cycles + Operator::invoke(state, state.getMemoryLocation(lowByte));
     }
 
     std::string toString() const override
@@ -240,13 +251,13 @@ class DirectPageIndexedIndirectX : public Instruction2Byte
     // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int invokeOperator(Byte lowByte) override
     {
-        throw std::runtime_error("DirectPageIndexedIndirectX is not implemented");
+        throw AddressModeNotYetImplementedException("DirectPageIndexedIndirectX");
         int cycles = 0;
         if ((Byte)state.getDirectPage()) {
             cycles += 1;
         }
-        Byte* data = nullptr;
-        return cycles + Operator::invoke(state, data);
+        MemoryLocation* memory = nullptr;
+        return cycles + Operator::invoke(state, memory);
     }
 
     std::string toString() const override
@@ -265,13 +276,13 @@ class DirectPageIndexed : public Instruction2Byte
     // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int invokeOperator(Byte lowByte) override
     {
-        throw std::runtime_error("DirectPageIndexed is not implemented");
+        throw AddressModeNotYetImplementedException("DirectPageIndexed");
         int cycles = 0;
         if (Byte(state.getDirectPage())) {
             cycles += 1;
         }
-        Byte* data = nullptr;
-        return cycles + Operator::invoke(state, data);
+        MemoryLocation* memory = nullptr;
+        return cycles + Operator::invoke(state, memory);
     }
 
     std::string toString() const override
@@ -290,13 +301,13 @@ class DirectPageIndirect : public Instruction2Byte
     // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int invokeOperator(Byte lowByte) override
     {
-        throw std::runtime_error("DirectPageIndirect is not implemented");
+        throw AddressModeNotYetImplementedException("DirectPageIndirect");
         int cycles = 0;
         if ((Byte)state.getDirectPage()) {
             cycles += 1;
         }
-        Byte* data = nullptr;
-        return cycles + Operator::invoke(state, data);
+        MemoryLocation* memory = nullptr;
+        return cycles + Operator::invoke(state, memory);
     }
 
     std::string toString() const override
@@ -316,17 +327,17 @@ class DirectPageIndirectIndexedY : public Instruction2Byte
     // §3: Add 1 cycle if adding index crosses a page boundary
     int invokeOperator(Byte lowByte) override
     {
-        throw std::runtime_error("DirectPageIndirectIndexedY is not implemented");
+        throw AddressModeNotYetImplementedException("DirectPageIndirectIndexedY");
         int cycles = 0;
         if ((Byte)state.getDirectPage()) {
             cycles += 1;
         }
         if (true /*index added crosses page boundary*/) {
             cycles += 1;
-            throw std::runtime_error("TODO03");
+            throw AddressModeNotYetImplementedException("TODO03");
         }
-        Byte* data = nullptr;
-        return cycles + Operator::invoke(state, data);
+        MemoryLocation* memory = nullptr;
+        return cycles + Operator::invoke(state, memory);
     }
 
     std::string toString() const override
@@ -345,13 +356,13 @@ class DirectPageIndirectLong : public Instruction2Byte
     // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int invokeOperator(Byte lowByte) override
     {
-        throw std::runtime_error("DirectPageIndirectLong is not implemented");
+        throw AddressModeNotYetImplementedException("DirectPageIndirectLong");
         int cycles = 0;
         if ((Byte)state.getDirectPage()) {
             cycles += 1;
         }
-        Byte* data = nullptr;
-        return cycles + Operator::invoke(state, data);
+        MemoryLocation* memory = nullptr;
+        return cycles + Operator::invoke(state, memory);
     }
 
     std::string toString() const override
@@ -374,9 +385,9 @@ class DirectPageIndirectLongIndexedY : public Instruction2Byte
         if ((Byte)state.getDirectPage()) {
             cycles += 1;
         }
-        Byte* address = state.getMemoryPointer(lowByte);
-        Byte* data = state.getMemoryPointer(address[0], address[1], address[2], state.getIndexRegister<State::Y>());
-        return cycles + Operator::invoke(state, data);
+        MemoryLocation* address = state.getMemoryLocation(lowByte);
+        MemoryLocation* memory = state.getMemoryLocation(address[0].getValue(), address[1].getValue(), address[2].getValue(), state.getIndexRegister<State::Y>());
+        return cycles + Operator::invoke(state, memory);
     }
 
     std::string toString() const override
@@ -394,7 +405,7 @@ class Immediate : public Instruction2Byte
 
     int invokeOperator(Byte lowByte) override
     {
-        return Operator::invoke(state, &lowByte);
+        return Operator::invoke(state, &MemoryLocation(lowByte));
     }
 
     std::string toString() const override
@@ -412,8 +423,8 @@ class Immediate16Bit : public Instruction3Byte
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
-        Word data = lowByte | highByte << 8;
-        return Operator::invoke(state, (Byte*)&data);
+        std::array<MemoryLocation, 2> memory = { lowByte, highByte };
+        return Operator::invoke(state, memory.data());
     }
 
     std::string toString() const override
@@ -469,9 +480,9 @@ class ProgramCounterRelativeLong : public Instruction3Byte
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
-        throw std::runtime_error("ProgramCounterRelativeLong is not implemented");
-        Byte* data = nullptr;
-        return Operator::invoke(state, data);
+        throw AddressModeNotYetImplementedException("ProgramCounterRelativeLong");
+        MemoryLocation* memory = nullptr;
+        return Operator::invoke(state, memory);
     }
 
     std::string toString() const override
@@ -489,9 +500,9 @@ class StackRelative : public Instruction2Byte
 
     int invokeOperator(Byte lowByte) override
     {
-        throw std::runtime_error("StackRelative is not implemented");
-        Byte* data = nullptr;
-        return Operator::invoke(state, data);
+        throw AddressModeNotYetImplementedException("StackRelative");
+        MemoryLocation* memory = nullptr;
+        return Operator::invoke(state, memory);
     }
 
     std::string toString() const override
@@ -509,9 +520,9 @@ class StackRelativeIndirectIndexedY : public Instruction2Byte
 
     int invokeOperator(Byte lowByte) override
     {
-        throw std::runtime_error("StackRelativeIndirectIndexedY is not implemented");
-        Byte* data = nullptr;
-        return Operator::invoke(state, data);
+        throw AddressModeNotYetImplementedException("StackRelativeIndirectIndexedY");
+        MemoryLocation* memory = nullptr;
+        return Operator::invoke(state, memory);
     }
 
     std::string toString() const override

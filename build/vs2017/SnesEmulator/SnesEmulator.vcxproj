@@ -136,6 +136,7 @@
     <ClInclude Include="..\..\..\src\SnesEmulator\CPU\CpuOperator.h" />
     <ClInclude Include="..\..\..\src\SnesEmulator\CPU\CpuState.h" />
     <ClInclude Include="..\..\..\src\SnesEmulator\Emulator.h" />
+    <ClInclude Include="..\..\..\src\SnesEmulator\Exception.h" />
     <ClInclude Include="..\..\..\src\SnesEmulator\Instruction.h" />
     <ClInclude Include="..\..\..\src\SnesEmulator\SPC\SpcAddressMode.h" />
     <ClInclude Include="..\..\..\src\SnesEmulator\SPC\SpcOpcode.h" />

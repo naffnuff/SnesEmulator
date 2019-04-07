@@ -86,6 +86,9 @@
     <ClInclude Include="..\..\..\src\SnesEmulator\Types.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\SnesEmulator\Exception.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="cpu.txt">

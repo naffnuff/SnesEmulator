@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../Exception.h"
 #include "SpcState.h"
 
 namespace SPC {
@@ -22,9 +23,9 @@ namespace Operator {
 class ADC
 {
 public:
-    static int invoke(State& state, Byte& leftOperand, Byte rightOperand)
+    static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
     {
-        throw std::runtime_error("ADC is not implemented");
+        throw OperatorNotYetImplementedException("ADC");
         return 0;
     }
 
@@ -36,9 +37,9 @@ public:
 class ADDW
 {
 public:
-    static int invoke(State& state, Word& leftOperand, Word rightOperand)
+    static int invoke(State& state, MemoryLocation* leftOperand, Word rightOperand)
     {
-        throw std::runtime_error("ADDW is not implemented");
+        throw OperatorNotYetImplementedException("ADDW");
         return 0;
     }
 
@@ -61,9 +62,9 @@ public:
 class AND
 {
 public:
-    static int invoke(State& state, Byte& leftOperand, Byte rightOperand)
+    static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
     {
-        throw std::runtime_error("AND is not implemented");
+        throw OperatorNotYetImplementedException("AND");
         return 0;
     }
 
@@ -76,9 +77,9 @@ public:
 class AND1
 {
 public:
-    static int invoke(State& state, Byte& leftOperand, Byte rightOperand)
+    static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
     {
-        throw std::runtime_error("AND1 is not implemented");
+        throw OperatorNotYetImplementedException("AND1");
         return 0;
     }
 
@@ -93,9 +94,9 @@ public:
 class ASL
 {
 public:
-    static int invoke(State& state, Byte& operand)
+    static int invoke(State& state, MemoryLocation* operand)
     {
-        throw std::runtime_error("ASL is not implemented");
+        throw OperatorNotYetImplementedException("ASL");
         return 0;
     }
 
@@ -125,13 +126,13 @@ class BBC
 {
 public:
     // §1: Add 1 cycle if branch is taken
-    static int invoke(State& state, Byte& leftOperand, Byte rightOperand)
+    static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
     {
-        throw std::runtime_error("BBC is not implemented");
+        throw OperatorNotYetImplementedException("BBC");
         int cycles = 0;
         if (true /*branch taken*/) {
             cycles += 2;
-            throw std::runtime_error("TODO01");
+            throw OperatorNotYetImplementedException("TODO01");
         }
         return cycles;
     }
@@ -152,13 +153,13 @@ class BBS
 {
 public:
     // §1: Add 1 cycle if branch is taken
-    static int invoke(State& state, Byte& leftOperand, Byte rightOperand)
+    static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
     {
-        throw std::runtime_error("BBS is not implemented");
+        throw OperatorNotYetImplementedException("BBS");
         int cycles = 0;
         if (true /*branch taken*/) {
             cycles += 2;
-            throw std::runtime_error("TODO01");
+            throw OperatorNotYetImplementedException("TODO01");
         }
         return cycles;
     }
@@ -174,11 +175,11 @@ public:
     // §1: Add 1 cycle if branch is taken
     static int invoke(State& state, int8_t offset)
     {
-        throw std::runtime_error("BCC is not implemented");
+        throw OperatorNotYetImplementedException("BCC");
         int cycles = 0;
         if (true /*branch taken*/) {
             cycles += 2;
-            throw std::runtime_error("TODO01");
+            throw OperatorNotYetImplementedException("TODO01");
         }
         return cycles;
     }
@@ -194,11 +195,11 @@ public:
     // §1: Add 1 cycle if branch is taken
     static int invoke(State& state, int8_t offset)
     {
-        throw std::runtime_error("BCS is not implemented");
+        throw OperatorNotYetImplementedException("BCS");
         int cycles = 0;
         if (true /*branch taken*/) {
             cycles += 2;
-            throw std::runtime_error("TODO01");
+            throw OperatorNotYetImplementedException("TODO01");
         }
         return cycles;
     }
@@ -214,11 +215,11 @@ public:
     // §1: Add 1 cycle if branch is taken
     static int invoke(State& state, int8_t offset)
     {
-        throw std::runtime_error("BEQ is not implemented");
+        throw OperatorNotYetImplementedException("BEQ");
         int cycles = 0;
         if (true /*branch taken*/) {
             cycles += 2;
-            throw std::runtime_error("TODO01");
+            throw OperatorNotYetImplementedException("TODO01");
         }
         return cycles;
     }
@@ -234,11 +235,11 @@ public:
     // §1: Add 1 cycle if branch is taken
     static int invoke(State& state, int8_t offset)
     {
-        throw std::runtime_error("BMI is not implemented");
+        throw OperatorNotYetImplementedException("BMI");
         int cycles = 0;
         if (true /*branch taken*/) {
             cycles += 2;
-            throw std::runtime_error("TODO01");
+            throw OperatorNotYetImplementedException("TODO01");
         }
         return cycles;
     }
@@ -268,13 +269,7 @@ public:
     // §1: Add 1 cycle if branch is taken
     static int invoke(State& state, int8_t offset)
     {
-        throw std::runtime_error("BPL is not implemented");
-        int cycles = 0;
-        if (true /*branch taken*/) {
-            cycles += 2;
-            throw std::runtime_error("TODO01");
-        }
-        return cycles;
+        return branchIf(!state.getFlag(State::n), state, offset);
     }
 
     static std::string toString() { return "BPL"; }
@@ -301,7 +296,7 @@ class BRK
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("BRK is not implemented");
+        throw OperatorNotYetImplementedException("BRK");
         return 0;
     }
 
@@ -316,11 +311,11 @@ public:
     // §1: Add 1 cycle if branch is taken
     static int invoke(State& state, int8_t offset)
     {
-        throw std::runtime_error("BVC is not implemented");
+        throw OperatorNotYetImplementedException("BVC");
         int cycles = 0;
         if (true /*branch taken*/) {
             cycles += 2;
-            throw std::runtime_error("TODO01");
+            throw OperatorNotYetImplementedException("TODO01");
         }
         return cycles;
     }
@@ -336,11 +331,11 @@ public:
     // §1: Add 1 cycle if branch is taken
     static int invoke(State& state, int8_t offset)
     {
-        throw std::runtime_error("BVS is not implemented");
+        throw OperatorNotYetImplementedException("BVS");
         int cycles = 0;
         if (true /*branch taken*/) {
             cycles += 2;
-            throw std::runtime_error("TODO01");
+            throw OperatorNotYetImplementedException("TODO01");
         }
         return cycles;
     }
@@ -353,9 +348,9 @@ public:
 class CALL
 {
 public:
-    static int invoke(State& state, Byte& operand)
+    static int invoke(State& state, MemoryLocation* operand)
     {
-        throw std::runtime_error("CALL is not implemented");
+        throw OperatorNotYetImplementedException("CALL");
         return 0;
     }
 
@@ -369,13 +364,13 @@ class CBNE
 {
 public:
     // §1: Add 1 cycle if branch is taken
-    static int invoke(State& state, Byte& leftOperand, Byte rightOperand)
+    static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
     {
-        throw std::runtime_error("CBNE is not implemented");
+        throw OperatorNotYetImplementedException("CBNE");
         int cycles = 0;
         if (true /*branch taken*/) {
             cycles += 2;
-            throw std::runtime_error("TODO01");
+            throw OperatorNotYetImplementedException("TODO01");
         }
         return cycles;
     }
@@ -395,9 +390,9 @@ public:
 class CLR1
 {
 public:
-    static int invoke(State& state, Byte& leftOperand, Byte rightOperand)
+    static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
     {
-        throw std::runtime_error("CLR1 is not implemented");
+        throw OperatorNotYetImplementedException("CLR1");
         return 0;
     }
 
@@ -411,7 +406,7 @@ class CLRC
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("CLRC is not implemented");
+        throw OperatorNotYetImplementedException("CLRC");
         return 0;
     }
 
@@ -425,7 +420,7 @@ class CLRP
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("CLRP is not implemented");
+        state.setFlag(State::p, false);
         return 0;
     }
 
@@ -439,7 +434,7 @@ class CLRV
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("CLRV is not implemented");
+        throw OperatorNotYetImplementedException("CLRV");
         return 0;
     }
 
@@ -468,10 +463,10 @@ public:
 class CMP
 {
 public:
-    static int invoke(State& state, Byte leftOperand, Byte rightOperand)
+    static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
     {
-        state.setFlag(State::c, leftOperand >= rightOperand);
-        state.updateSignFlags(Byte(leftOperand - rightOperand));
+        state.setFlag(State::c, leftOperand->getValue() >= rightOperand);
+        state.updateSignFlags(Byte(leftOperand->getValue() - rightOperand));
         return 0;
     }
 
@@ -483,9 +478,9 @@ public:
 class CMPW
 {
 public:
-    static int invoke(State& state, Word& leftOperand, Word rightOperand)
+    static int invoke(State& state, MemoryLocation* leftOperand, Word rightOperand)
     {
-        throw std::runtime_error("CMPW is not implemented");
+        throw OperatorNotYetImplementedException("CMPW");
         return 0;
     }
 
@@ -497,9 +492,9 @@ public:
 class DAA
 {
 public:
-    static int invoke(State& state, Byte& operand)
+    static int invoke(State& state, MemoryLocation* operand)
     {
-        throw std::runtime_error("DAA is not implemented");
+        throw OperatorNotYetImplementedException("DAA");
         return 0;
     }
 
@@ -511,9 +506,9 @@ public:
 class DAS
 {
 public:
-    static int invoke(State& state, Byte& operand)
+    static int invoke(State& state, MemoryLocation* operand)
     {
-        throw std::runtime_error("DAS is not implemented");
+        throw OperatorNotYetImplementedException("DAS");
         return 0;
     }
 
@@ -527,13 +522,13 @@ class DBNZ
 {
 public:
     // §1: Add 1 cycle if branch is taken
-    static int invoke(State& state, Byte& leftOperand, Byte rightOperand)
+    static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
     {
-        throw std::runtime_error("DBNZ is not implemented");
+        throw OperatorNotYetImplementedException("DBNZ");
         int cycles = 0;
         if (true /*branch taken*/) {
             cycles += 2;
-            throw std::runtime_error("TODO01");
+            throw OperatorNotYetImplementedException("TODO01");
         }
         return cycles;
     }
@@ -551,9 +546,9 @@ public:
 class DEC
 {
 public:
-    static int invoke(State& state, Byte& operand)
+    static int invoke(State& state, MemoryLocation* operand)
     {
-        state.updateSignFlags(--operand);
+        state.updateSignFlags(--operand->get());
         return 0;
     }
 
@@ -565,9 +560,9 @@ public:
 class DECW
 {
 public:
-    static int invoke(State& state, Byte& operand)
+    static int invoke(State& state, MemoryLocation* operand)
     {
-        throw std::runtime_error("DECW is not implemented");
+        throw OperatorNotYetImplementedException("DECW");
         return 0;
     }
 
@@ -581,7 +576,7 @@ class DI
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("DI is not implemented");
+        throw OperatorNotYetImplementedException("DI");
         return 0;
     }
 
@@ -593,9 +588,9 @@ public:
 class DIV
 {
 public:
-    static int invoke(State& state, Byte& leftOperand, Byte rightOperand)
+    static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
     {
-        throw std::runtime_error("DIV is not implemented");
+        throw OperatorNotYetImplementedException("DIV");
         return 0;
     }
 
@@ -609,7 +604,7 @@ class EI
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("EI is not implemented");
+        throw OperatorNotYetImplementedException("EI");
         return 0;
     }
 
@@ -632,9 +627,9 @@ public:
 class EOR
 {
 public:
-    static int invoke(State& state, Byte& leftOperand, Byte rightOperand)
+    static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
     {
-        throw std::runtime_error("EOR is not implemented");
+        throw OperatorNotYetImplementedException("EOR");
         return 0;
     }
 
@@ -646,9 +641,9 @@ public:
 class EOR1
 {
 public:
-    static int invoke(State& state, Byte& leftOperand, Byte rightOperand)
+    static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
     {
-        throw std::runtime_error("EOR1 is not implemented");
+        throw OperatorNotYetImplementedException("EOR1");
         return 0;
     }
 
@@ -665,9 +660,9 @@ public:
 class INC
 {
 public:
-    static int invoke(State& state, Byte& operand)
+    static int invoke(State& state, MemoryLocation* operand)
     {
-        throw std::runtime_error("INC is not implemented");
+        state.updateSignFlags(++operand->get());
         return 0;
     }
 
@@ -679,9 +674,9 @@ public:
 class INCW
 {
 public:
-    static int invoke(State& state, Byte& operand)
+    static int invoke(State& state, MemoryLocation* operand)
     {
-        throw std::runtime_error("INCW is not implemented");
+        throw OperatorNotYetImplementedException("INCW");
         return 0;
     }
 
@@ -694,9 +689,9 @@ public:
 class JMP
 {
 public:
-    static int invoke(State& state, Byte& operand)
+    static int invoke(State& state, Word address)
     {
-        throw std::runtime_error("JMP is not implemented");
+        state.setProgramCounter(address);
         return 0;
     }
 
@@ -711,9 +706,9 @@ public:
 class LSR
 {
 public:
-    static int invoke(State& state, Byte& operand)
+    static int invoke(State& state, MemoryLocation* operand)
     {
-        throw std::runtime_error("LSR is not implemented");
+        throw OperatorNotYetImplementedException("LSR");
         return 0;
     }
 
@@ -742,9 +737,9 @@ public:
 class MOV
 {
 public:
-    static int invoke(State& state, Byte& leftOperand, Byte rightOperand)
+    static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
     {
-        leftOperand = rightOperand;
+        leftOperand->setValue(rightOperand);
         return 0;
     }
 
@@ -778,7 +773,7 @@ public:
 class MOV_SignedResult : public MOV
 {
 public:
-    static int invoke(State& state, Byte& leftOperand, Byte rightOperand)
+    static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
     {
         state.updateSignFlags(rightOperand);
         return MOV::invoke(state, leftOperand, rightOperand);
@@ -791,9 +786,9 @@ public:
 class MOV1
 {
 public:
-    static int invoke(State& state, Byte& leftOperand, Byte rightOperand)
+    static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
     {
-        throw std::runtime_error("MOV1 is not implemented");
+        throw OperatorNotYetImplementedException("MOV1");
         return 0;
     }
 
@@ -805,9 +800,9 @@ public:
 class MOVW
 {
 public:
-    static int invoke(State& state, Word& leftOperand, Word rightOperand)
+    static int invoke(State& state, MemoryLocation* leftOperand, Word rightOperand)
     {
-        leftOperand = rightOperand;
+        leftOperand->setWordValue(rightOperand);
         return 0;
     }
 
@@ -818,7 +813,7 @@ public:
 class MOVW_SignedResult : public MOVW
 {
 public:
-    static int invoke(State& state, Word& leftOperand, Word rightOperand)
+    static int invoke(State& state, MemoryLocation* leftOperand, Word rightOperand)
     {
         state.updateSignFlags(rightOperand);
         return MOVW::invoke(state, leftOperand, rightOperand);
@@ -830,9 +825,9 @@ public:
 class MUL
 {
 public:
-    static int invoke(State& state, Byte& leftOperand, Byte rightOperand)
+    static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
     {
-        throw std::runtime_error("MUL is not implemented");
+        throw OperatorNotYetImplementedException("MUL");
         return 0;
     }
 
@@ -846,7 +841,7 @@ class NOP
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("NOP is not implemented");
+        throw OperatorNotYetImplementedException("NOP");
         return 0;
     }
 
@@ -858,9 +853,9 @@ public:
 class NOT1
 {
 public:
-    static int invoke(State& state, Byte& leftOperand, Byte rightOperand)
+    static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
     {
-        throw std::runtime_error("NOT1 is not implemented");
+        throw OperatorNotYetImplementedException("NOT1");
         return 0;
     }
 
@@ -874,7 +869,7 @@ class NOTC
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("NOTC is not implemented");
+        throw OperatorNotYetImplementedException("NOTC");
         return 0;
     }
 
@@ -897,9 +892,9 @@ public:
 class OR
 {
 public:
-    static int invoke(State& state, Byte& leftOperand, Byte rightOperand)
+    static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
     {
-        throw std::runtime_error("OR is not implemented");
+        throw OperatorNotYetImplementedException("OR");
         return 0;
     }
 
@@ -912,9 +907,9 @@ public:
 class OR1
 {
 public:
-    static int invoke(State& state, Byte& leftOperand, Byte rightOperand)
+    static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
     {
-        throw std::runtime_error("OR1 is not implemented");
+        throw OperatorNotYetImplementedException("OR1");
         return 0;
     }
 
@@ -926,9 +921,9 @@ public:
 class PCALL
 {
 public:
-    static int invoke(State& state, Byte& leftOperand, Byte rightOperand)
+    static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
     {
-        throw std::runtime_error("PCALL is not implemented");
+        throw OperatorNotYetImplementedException("PCALL");
         return 0;
     }
 
@@ -943,9 +938,9 @@ public:
 class POP
 {
 public:
-    static int invoke(State& state, Byte& operand)
+    static int invoke(State& state, MemoryLocation* operand)
     {
-        throw std::runtime_error("POP is not implemented");
+        throw OperatorNotYetImplementedException("POP");
         return 0;
     }
 
@@ -960,9 +955,9 @@ public:
 class PUSH
 {
 public:
-    static int invoke(State& state, Byte& operand)
+    static int invoke(State& state, MemoryLocation* operand)
     {
-        throw std::runtime_error("PUSH is not implemented");
+        throw OperatorNotYetImplementedException("PUSH");
         return 0;
     }
 
@@ -976,7 +971,7 @@ class RET
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("RET is not implemented");
+        throw OperatorNotYetImplementedException("RET");
         return 0;
     }
 
@@ -990,7 +985,7 @@ class RET1
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("RET1 is not implemented");
+        throw OperatorNotYetImplementedException("RET1");
         return 0;
     }
 
@@ -1005,9 +1000,9 @@ public:
 class ROL
 {
 public:
-    static int invoke(State& state, Byte& operand)
+    static int invoke(State& state, MemoryLocation* operand)
     {
-        throw std::runtime_error("ROL is not implemented");
+        throw OperatorNotYetImplementedException("ROL");
         return 0;
     }
 
@@ -1022,9 +1017,9 @@ public:
 class ROR
 {
 public:
-    static int invoke(State& state, Byte& operand)
+    static int invoke(State& state, MemoryLocation* operand)
     {
-        throw std::runtime_error("ROR is not implemented");
+        throw OperatorNotYetImplementedException("ROR");
         return 0;
     }
 
@@ -1047,9 +1042,9 @@ public:
 class SBC
 {
 public:
-    static int invoke(State& state, Byte& leftOperand, Byte rightOperand)
+    static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
     {
-        throw std::runtime_error("SBC is not implemented");
+        throw OperatorNotYetImplementedException("SBC");
         return 0;
     }
 
@@ -1068,9 +1063,9 @@ public:
 class SET1
 {
 public:
-    static int invoke(State& state, Byte& leftOperand, Byte rightOperand)
+    static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
     {
-        throw std::runtime_error("SET1 is not implemented");
+        throw OperatorNotYetImplementedException("SET1");
         return 0;
     }
 
@@ -1084,7 +1079,7 @@ class SETC
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("SETC is not implemented");
+        throw OperatorNotYetImplementedException("SETC");
         return 0;
     }
 
@@ -1098,7 +1093,7 @@ class SETP
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("SETP is not implemented");
+        throw OperatorNotYetImplementedException("SETP");
         return 0;
     }
 
@@ -1112,7 +1107,7 @@ class SLEEP
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("SLEEP is not implemented");
+        throw OperatorNotYetImplementedException("SLEEP");
         return 0;
     }
 
@@ -1126,7 +1121,7 @@ class STOP
 public:
     static int invoke(State& state)
     {
-        throw std::runtime_error("STOP is not implemented");
+        throw OperatorNotYetImplementedException("STOP");
         return 0;
     }
 
@@ -1138,9 +1133,9 @@ public:
 class SUBW
 {
 public:
-    static int invoke(State& state, Word& leftOperand, Word rightOperand)
+    static int invoke(State& state, MemoryLocation* leftOperand, Word rightOperand)
     {
-        throw std::runtime_error("SUBW is not implemented");
+        throw OperatorNotYetImplementedException("SUBW");
         return 0;
     }
 
@@ -1167,9 +1162,9 @@ public:
 class TCALL
 {
 public:
-    static int invoke(State& state, Byte& leftOperand, Byte rightOperand)
+    static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
     {
-        throw std::runtime_error("TCALL is not implemented");
+        throw OperatorNotYetImplementedException("TCALL");
         return 0;
     }
 
@@ -1181,9 +1176,9 @@ public:
 class TCLR1
 {
 public:
-    static int invoke(State& state, Byte& operand)
+    static int invoke(State& state, MemoryLocation* operand)
     {
-        throw std::runtime_error("TCLR1 is not implemented");
+        throw OperatorNotYetImplementedException("TCLR1");
         return 0;
     }
 
@@ -1195,9 +1190,9 @@ public:
 class TSET1
 {
 public:
-    static int invoke(State& state, Byte& operand)
+    static int invoke(State& state, MemoryLocation* operand)
     {
-        throw std::runtime_error("TSET1 is not implemented");
+        throw OperatorNotYetImplementedException("TSET1");
         return 0;
     }
 
@@ -1209,9 +1204,9 @@ public:
 class XCN
 {
 public:
-    static int invoke(State& state, Byte& operand)
+    static int invoke(State& state, MemoryLocation* operand)
     {
-        throw std::runtime_error("XCN is not implemented");
+        throw OperatorNotYetImplementedException("XCN");
         return 0;
     }
 

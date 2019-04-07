@@ -43,15 +43,22 @@ public:
         return value;
     }
 
-    Byte& operator--()
-    {
-        --value;
-        return *this;
-    }
-
     Byte& operator++()
     {
         ++value;
+        return *this;
+    }
+
+    Byte operator++(int)
+    {
+        Byte copy(value);
+        ++value;
+        return copy;
+    }
+
+    Byte& operator--()
+    {
+        --value;
         return *this;
     }
 
@@ -80,7 +87,7 @@ public:
 
     void binaryAdd(Byte addend, bool& unsignedCarry, bool& signedOverflow)
     {
-        uint16_t result = uint16_t(value) + uint16_t(addend.value);
+        uint16_t result = uint16_t(value) + uint16_t(addend.value) + unsignedCarry;
         unsignedCarry = result & 1 << 8;
         value = uint8_t(result);
         signedOverflow = isNegative() != unsignedCarry;
@@ -118,12 +125,6 @@ public:
     operator uint16_t() const
     {
         return value;
-    }
-
-    Word& operator=(Byte operand)
-    {
-        value = operand;
-        return *this;
     }
 
     Word& operator+=(Word operand)
@@ -242,3 +243,58 @@ inline std::ostream& operator<<(std::ostream& output, Long long_)
 {
     return output << std::hex << std::setw(6) << std::setfill('0') << long_.value << std::dec;
 }
+
+class MemoryLocation
+{
+public:
+    MemoryLocation()
+        : MemoryLocation(0)
+    {
+    }
+
+    MemoryLocation(Byte value)
+        : value(value)
+        , mapping(nullptr)
+    {
+    }
+
+    void setValue(Byte byte)
+    {
+        if (mapping) {
+            mapping->value = byte;
+        }
+        else {
+            value = byte;
+        }
+    }
+
+    Byte getValue() const
+    {
+        return value;
+    }
+
+    Byte& get()
+    {
+        return value;
+    }
+
+    void setWordValue(Word value)
+    {
+        this[0].setValue(Byte(value));
+        this[1].setValue(Byte(value >> 8));
+    }
+
+    Word getWordValue() const
+    {
+        return Word(this[0].getValue(), this[1].getValue());
+    }
+
+    void setMapping(MemoryLocation* memoryByte)
+    {
+        mapping = memoryByte;
+    }
+
+private:
+    Byte value;
+    MemoryLocation* mapping;
+};

@@ -2,7 +2,8 @@
 
 #include <stdint.h>
 
-#include "..\Instruction.h"
+#include "../Exception.h"
+#include "../Instruction.h"
 #include "CpuState.h"
 #include "CpuAddressMode.h"
 #include "CpuOperator.h"
@@ -21,7 +22,7 @@ class ADC_61 : public AddressMode::DirectPageIndexedIndirectX<Operator::ADC>
     // 2   7-m+w       (dir,X)   mm....mm . ADC ($10,X)
     int execute() override
     {
-        throw std::runtime_error("ADC_61 is not implemented");
+        throw OpcodeNotYetImplementedException("ADC_61");
         return 6 + applyOperand();
     }
 
@@ -38,7 +39,7 @@ class ADC_63 : public AddressMode::StackRelative<Operator::ADC>
     // 2   5-m         stk,S     mm....mm . ADC $32,S
     int execute() override
     {
-        throw std::runtime_error("ADC_63 is not implemented");
+        throw OpcodeNotYetImplementedException("ADC_63");
         return 4 + applyOperand();
     }
 
@@ -55,7 +56,7 @@ class ADC_65 : public AddressMode::DirectPage<Operator::ADC>
     // 2   4-m+w       dir       mm....mm . ADC $10
     int execute() override
     {
-        throw std::runtime_error("ADC_65 is not implemented");
+        throw OpcodeNotYetImplementedException("ADC_65");
         return 3 + applyOperand();
     }
 
@@ -72,7 +73,7 @@ class ADC_67 : public AddressMode::DirectPageIndirectLong<Operator::ADC>
     // 2   7-m+w       [dir]     mm....mm . ADC [$10]
     int execute() override
     {
-        throw std::runtime_error("ADC_67 is not implemented");
+        throw OpcodeNotYetImplementedException("ADC_67");
         return 6 + applyOperand();
     }
 
@@ -90,7 +91,7 @@ class ADC_69_16Bit : public AddressMode::Immediate16Bit<Operator::ADC>
     // 3-m 3-m         imm       mm....mm . ADC #$54
     int execute() override
     {
-        throw std::runtime_error("ADC_69_16Bit is not implemented");
+        throw OpcodeNotYetImplementedException("ADC_69_16Bit");
         return 2 + applyOperand();
     }
 
@@ -124,7 +125,7 @@ class ADC_6D : public AddressMode::Absolute<Operator::ADC>
     // 3   5-m         abs       mm....mm . ADC $9876
     int execute() override
     {
-        throw std::runtime_error("ADC_6D is not implemented");
+        throw OpcodeNotYetImplementedException("ADC_6D");
         return 4 + applyOperand();
     }
 
@@ -141,7 +142,7 @@ class ADC_6F : public AddressMode::AbsoluteLong<Operator::ADC>
     // 4   6-m         long      mm....mm . ADC $FEDBCA
     int execute() override
     {
-        throw std::runtime_error("ADC_6F is not implemented");
+        throw OpcodeNotYetImplementedException("ADC_6F");
         return 5 + applyOperand();
     }
 
@@ -158,7 +159,7 @@ class ADC_71 : public AddressMode::DirectPageIndirectIndexedY<Operator::ADC>
     // 2   7-m+w-x+x*p (dir),Y   mm....mm . ADC ($10),Y
     int execute() override
     {
-        throw std::runtime_error("ADC_71 is not implemented");
+        throw OpcodeNotYetImplementedException("ADC_71");
         return 5 + applyOperand();
     }
 
@@ -175,7 +176,7 @@ class ADC_72 : public AddressMode::DirectPageIndirect<Operator::ADC>
     // 2   6-m+w       (dir)     mm....mm . ADC ($10)
     int execute() override
     {
-        throw std::runtime_error("ADC_72 is not implemented");
+        throw OpcodeNotYetImplementedException("ADC_72");
         return 5 + applyOperand();
     }
 
@@ -192,7 +193,7 @@ class ADC_73 : public AddressMode::StackRelativeIndirectIndexedY<Operator::ADC>
     // 2   8-m         (stk,S),Y mm....mm . ADC ($32,S),Y
     int execute() override
     {
-        throw std::runtime_error("ADC_73 is not implemented");
+        throw OpcodeNotYetImplementedException("ADC_73");
         return 7 + applyOperand();
     }
 
@@ -209,7 +210,7 @@ class ADC_75 : public AddressMode::DirectPageIndexed<Operator::ADC, State::X>
     // 2   5-m+w       dir,X     mm....mm . ADC $10,X
     int execute() override
     {
-        throw std::runtime_error("ADC_75 is not implemented");
+        throw OpcodeNotYetImplementedException("ADC_75");
         return 4 + applyOperand();
     }
 
@@ -226,7 +227,7 @@ class ADC_77 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::ADC>
     // 2   7-m+w       [dir],Y   mm....mm . ADC [$10],Y
     int execute() override
     {
-        throw std::runtime_error("ADC_77 is not implemented");
+        throw OpcodeNotYetImplementedException("ADC_77");
         return 6 + applyOperand();
     }
 
@@ -243,7 +244,7 @@ class ADC_79 : public AddressMode::AbsoluteIndexed<Operator::ADC, State::Y>
     // 3   6-m-x+x*p   abs,Y     mm....mm . ADC $9876,Y
     int execute() override
     {
-        throw std::runtime_error("ADC_79 is not implemented");
+        throw OpcodeNotYetImplementedException("ADC_79");
         return 4 + applyOperand();
     }
 
@@ -260,7 +261,7 @@ class ADC_7D : public AddressMode::AbsoluteIndexed<Operator::ADC, State::X>
     // 3   6-m-x+x*p   abs,X     mm....mm . ADC $9876,X
     int execute() override
     {
-        throw std::runtime_error("ADC_7D is not implemented");
+        throw OpcodeNotYetImplementedException("ADC_7D");
         return 4 + applyOperand();
     }
 
@@ -277,7 +278,7 @@ class ADC_7F : public AddressMode::AbsoluteLongIndexedX<Operator::ADC>
     // 4   6-m         long,X    mm....mm . ADC $FEDCBA,X
     int execute() override
     {
-        throw std::runtime_error("ADC_7F is not implemented");
+        throw OpcodeNotYetImplementedException("ADC_7F");
         return 5 + applyOperand();
     }
 
@@ -294,7 +295,7 @@ class AND_21 : public AddressMode::DirectPageIndexedIndirectX<Operator::AND>
     // 2   7-m+w       (dir,X)   m.....m. . AND ($10,X)
     int execute() override
     {
-        throw std::runtime_error("AND_21 is not implemented");
+        throw OpcodeNotYetImplementedException("AND_21");
         return 6 + applyOperand();
     }
 
@@ -311,7 +312,7 @@ class AND_23 : public AddressMode::StackRelative<Operator::AND>
     // 2   5-m         stk,S     m.....m. . AND $32,S
     int execute() override
     {
-        throw std::runtime_error("AND_23 is not implemented");
+        throw OpcodeNotYetImplementedException("AND_23");
         return 4 + applyOperand();
     }
 
@@ -328,7 +329,7 @@ class AND_25 : public AddressMode::DirectPage<Operator::AND>
     // 2   4-m+w       dir       m.....m. . AND $10
     int execute() override
     {
-        throw std::runtime_error("AND_25 is not implemented");
+        throw OpcodeNotYetImplementedException("AND_25");
         return 3 + applyOperand();
     }
 
@@ -345,7 +346,7 @@ class AND_27 : public AddressMode::DirectPageIndirectLong<Operator::AND>
     // 2   7-m+w       [dir]     m.....m. . AND [$10]
     int execute() override
     {
-        throw std::runtime_error("AND_27 is not implemented");
+        throw OpcodeNotYetImplementedException("AND_27");
         return 6 + applyOperand();
     }
 
@@ -363,7 +364,7 @@ class AND_29_16Bit : public AddressMode::Immediate16Bit<Operator::AND>
     // 3-m 3-m         imm       m.....m. . AND #$54
     int execute() override
     {
-        throw std::runtime_error("AND_29_16Bit is not implemented");
+        throw OpcodeNotYetImplementedException("AND_29_16Bit");
         return 2 + applyOperand();
     }
 
@@ -381,7 +382,7 @@ class AND_29 : public AddressMode::Immediate<Operator::AND>
     // 3-m 3-m         imm       m.....m. . AND #$54
     int execute() override
     {
-        throw std::runtime_error("AND_29 is not implemented");
+        throw OpcodeNotYetImplementedException("AND_29");
         return 2 + applyOperand();
     }
 
@@ -398,7 +399,7 @@ class AND_2D : public AddressMode::Absolute<Operator::AND>
     // 3   5-m         abs       m.....m. . AND $9876
     int execute() override
     {
-        throw std::runtime_error("AND_2D is not implemented");
+        throw OpcodeNotYetImplementedException("AND_2D");
         return 4 + applyOperand();
     }
 
@@ -415,7 +416,7 @@ class AND_2F : public AddressMode::AbsoluteLong<Operator::AND>
     // 4   6-m         long      m.....m. . AND $FEDBCA
     int execute() override
     {
-        throw std::runtime_error("AND_2F is not implemented");
+        throw OpcodeNotYetImplementedException("AND_2F");
         return 5 + applyOperand();
     }
 
@@ -432,7 +433,7 @@ class AND_31 : public AddressMode::DirectPageIndirectIndexedY<Operator::AND>
     // 2   7-m+w-x+x*p (dir),Y   m.....m. . AND ($10),Y
     int execute() override
     {
-        throw std::runtime_error("AND_31 is not implemented");
+        throw OpcodeNotYetImplementedException("AND_31");
         return 5 + applyOperand();
     }
 
@@ -449,7 +450,7 @@ class AND_32 : public AddressMode::DirectPageIndirect<Operator::AND>
     // 2   6-m+w       (dir)     m.....m. . AND ($10)
     int execute() override
     {
-        throw std::runtime_error("AND_32 is not implemented");
+        throw OpcodeNotYetImplementedException("AND_32");
         return 5 + applyOperand();
     }
 
@@ -466,7 +467,7 @@ class AND_33 : public AddressMode::StackRelativeIndirectIndexedY<Operator::AND>
     // 2   8-m         (stk,S),Y m.....m. . AND ($32,S),Y
     int execute() override
     {
-        throw std::runtime_error("AND_33 is not implemented");
+        throw OpcodeNotYetImplementedException("AND_33");
         return 7 + applyOperand();
     }
 
@@ -483,7 +484,7 @@ class AND_35 : public AddressMode::DirectPageIndexed<Operator::AND, State::X>
     // 2   5-m+w       dir,X     m.....m. . AND $10,X
     int execute() override
     {
-        throw std::runtime_error("AND_35 is not implemented");
+        throw OpcodeNotYetImplementedException("AND_35");
         return 4 + applyOperand();
     }
 
@@ -500,7 +501,7 @@ class AND_37 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::AND>
     // 2   7-m+w       [dir],Y   m.....m. . AND [$10],Y
     int execute() override
     {
-        throw std::runtime_error("AND_37 is not implemented");
+        throw OpcodeNotYetImplementedException("AND_37");
         return 6 + applyOperand();
     }
 
@@ -517,7 +518,7 @@ class AND_39 : public AddressMode::AbsoluteIndexed<Operator::AND, State::Y>
     // 3   6-m-x+x*p   abs,Y     m.....m. . AND $9876,Y
     int execute() override
     {
-        throw std::runtime_error("AND_39 is not implemented");
+        throw OpcodeNotYetImplementedException("AND_39");
         return 4 + applyOperand();
     }
 
@@ -534,7 +535,7 @@ class AND_3D : public AddressMode::AbsoluteIndexed<Operator::AND, State::X>
     // 3   6-m-x+x*p   abs,X     m.....m. . AND $9876,X
     int execute() override
     {
-        throw std::runtime_error("AND_3D is not implemented");
+        throw OpcodeNotYetImplementedException("AND_3D");
         return 4 + applyOperand();
     }
 
@@ -551,7 +552,7 @@ class AND_3F : public AddressMode::AbsoluteLongIndexedX<Operator::AND>
     // 4   6-m         long,X    m.....m. . AND $FEDCBA,X
     int execute() override
     {
-        throw std::runtime_error("AND_3F is not implemented");
+        throw OpcodeNotYetImplementedException("AND_3F");
         return 5 + applyOperand();
     }
 
@@ -568,7 +569,7 @@ class ASL_06 : public AddressMode::DirectPage<Operator::ASL>
     // 2   7-2*m+w     dir       m.....mm . ASL $10
     int execute() override
     {
-        throw std::runtime_error("ASL_06 is not implemented");
+        throw OpcodeNotYetImplementedException("ASL_06");
         return 5 + applyOperand();
     }
 
@@ -585,7 +586,7 @@ class ASL_0A : public AddressMode::Accumulator<Operator::ASL>
     // 1   2           acc       m.....mm . ASL
     int execute() override
     {
-        throw std::runtime_error("ASL_0A is not implemented");
+        throw OpcodeNotYetImplementedException("ASL_0A");
         return 2 + applyOperand();
     }
 
@@ -602,7 +603,7 @@ class ASL_0E : public AddressMode::Absolute<Operator::ASL>
     // 3   8-2*m       abs       m.....mm . ASL $9876
     int execute() override
     {
-        throw std::runtime_error("ASL_0E is not implemented");
+        throw OpcodeNotYetImplementedException("ASL_0E");
         return 6 + applyOperand();
     }
 
@@ -619,7 +620,7 @@ class ASL_16 : public AddressMode::DirectPageIndexed<Operator::ASL, State::X>
     // 2   8-2*m+w     dir,X     m.....mm . ASL $10,X
     int execute() override
     {
-        throw std::runtime_error("ASL_16 is not implemented");
+        throw OpcodeNotYetImplementedException("ASL_16");
         return 6 + applyOperand();
     }
 
@@ -637,8 +638,8 @@ class ASL_1E : public AddressMode::AbsoluteIndexed<Operator::ASL, State::X>
     // §20: TODO manually add exception for 3
     int execute() override
     {
-        throw std::runtime_error("ASL_1E is not implemented");
-        throw std::runtime_error("TODO20");
+        throw OpcodeNotYetImplementedException("ASL_1E");
+        throw OpcodeNotYetImplementedException("TODO20");
         return 7 + applyOperand();
     }
 
@@ -655,7 +656,7 @@ class BCC_90 : public AddressMode::ProgramCounterRelative<Operator::BCC>
     // 2   2+t+t*e*p   rel8      ........ . BCC LABEL
     int execute() override
     {
-        throw std::runtime_error("BCC_90 is not implemented");
+        throw OpcodeNotYetImplementedException("BCC_90");
         return 2 + applyOperand();
     }
 
@@ -672,7 +673,7 @@ class BCS_B0 : public AddressMode::ProgramCounterRelative<Operator::BCS>
     // 2   2+t+t*e*p   rel8      ........ . BCS LABEL
     int execute() override
     {
-        throw std::runtime_error("BCS_B0 is not implemented");
+        throw OpcodeNotYetImplementedException("BCS_B0");
         return 2 + applyOperand();
     }
 
@@ -689,7 +690,6 @@ class BEQ_F0 : public AddressMode::ProgramCounterRelative<Operator::BEQ>
     // 2   2+t+t*e*p   rel8      ........ . BEQ LABEL
     int execute() override
     {
-        throw std::runtime_error("BEQ_F0 is not implemented");
         return 2 + applyOperand();
     }
 
@@ -706,7 +706,7 @@ class BIT_24 : public AddressMode::DirectPage<Operator::BIT>
     // 2   4-m+w       dir       mm....m. . BIT $10
     int execute() override
     {
-        throw std::runtime_error("BIT_24 is not implemented");
+        throw OpcodeNotYetImplementedException("BIT_24");
         return 3 + applyOperand();
     }
 
@@ -723,7 +723,7 @@ class BIT_2C : public AddressMode::Absolute<Operator::BIT>
     // 3   5-m         abs       mm....m. . BIT $9876
     int execute() override
     {
-        throw std::runtime_error("BIT_2C is not implemented");
+        throw OpcodeNotYetImplementedException("BIT_2C");
         return 4 + applyOperand();
     }
 
@@ -740,7 +740,7 @@ class BIT_34 : public AddressMode::DirectPageIndexed<Operator::BIT, State::X>
     // 2   5-m+w       dir,X     mm....m. . BIT $10,X
     int execute() override
     {
-        throw std::runtime_error("BIT_34 is not implemented");
+        throw OpcodeNotYetImplementedException("BIT_34");
         return 4 + applyOperand();
     }
 
@@ -757,7 +757,7 @@ class BIT_3C : public AddressMode::AbsoluteIndexed<Operator::BIT, State::X>
     // 3   6-m-x+x*p   abs,X     mm....m. . BIT $9876,X
     int execute() override
     {
-        throw std::runtime_error("BIT_3C is not implemented");
+        throw OpcodeNotYetImplementedException("BIT_3C");
         return 4 + applyOperand();
     }
 
@@ -775,7 +775,7 @@ class BIT_89_16Bit : public AddressMode::Immediate16Bit<Operator::BIT>
     // 3-m 3-m         imm       ......m. . BIT #$54
     int execute() override
     {
-        throw std::runtime_error("BIT_89_16Bit is not implemented");
+        throw OpcodeNotYetImplementedException("BIT_89_16Bit");
         return 2 + applyOperand();
     }
 
@@ -793,7 +793,7 @@ class BIT_89 : public AddressMode::Immediate<Operator::BIT>
     // 3-m 3-m         imm       ......m. . BIT #$54
     int execute() override
     {
-        throw std::runtime_error("BIT_89 is not implemented");
+        throw OpcodeNotYetImplementedException("BIT_89");
         return 2 + applyOperand();
     }
 
@@ -810,7 +810,7 @@ class BMI_30 : public AddressMode::ProgramCounterRelative<Operator::BMI>
     // 2   2+t+t*e*p   rel8      ........ . BMI LABEL
     int execute() override
     {
-        throw std::runtime_error("BMI_30 is not implemented");
+        throw OpcodeNotYetImplementedException("BMI_30");
         return 2 + applyOperand();
     }
 
@@ -843,7 +843,7 @@ class BPL_10 : public AddressMode::ProgramCounterRelative<Operator::BPL>
     // 2   2+t+t*e*p   rel8      ........ . BPL LABEL
     int execute() override
     {
-        throw std::runtime_error("BPL_10 is not implemented");
+        throw OpcodeNotYetImplementedException("BPL_10");
         return 2 + applyOperand();
     }
 
@@ -877,7 +877,7 @@ class BRK_00 : public AddressMode::Immediate<Operator::BRK>
     // 1   8-e         imp       ....01.. . BRK
     int execute() override
     {
-        throw std::runtime_error("BRK_00 is not implemented");
+        throw OpcodeNotYetImplementedException("BRK_00");
         return 7 + applyOperand();
     }
 
@@ -894,7 +894,7 @@ class BRL_82 : public AddressMode::ProgramCounterRelativeLong<Operator::BRL>
     // 3   4           rel16     ........ . BRL LABEL
     int execute() override
     {
-        throw std::runtime_error("BRL_82 is not implemented");
+        throw OpcodeNotYetImplementedException("BRL_82");
         return 4 + applyOperand();
     }
 
@@ -911,7 +911,7 @@ class BVC_50 : public AddressMode::ProgramCounterRelative<Operator::BVC>
     // 2   2+t+t*e*p   rel8      ........ . BVC LABEL
     int execute() override
     {
-        throw std::runtime_error("BVC_50 is not implemented");
+        throw OpcodeNotYetImplementedException("BVC_50");
         return 2 + applyOperand();
     }
 
@@ -960,7 +960,7 @@ class CLD_D8 : public AddressMode::Implied<Operator::CLD>
     // 1   2           imp       ....0... . CLD
     int execute() override
     {
-        throw std::runtime_error("CLD_D8 is not implemented");
+        throw OpcodeNotYetImplementedException("CLD_D8");
         return 2 + applyOperand();
     }
 
@@ -977,7 +977,6 @@ class CLI_58 : public AddressMode::Implied<Operator::CLI>
     // 1   2           imp       .....0.. . CLI
     int execute() override
     {
-        throw std::runtime_error("CLI_58 is not implemented");
         return 2 + applyOperand();
     }
 
@@ -994,7 +993,7 @@ class CLV_B8 : public AddressMode::Implied<Operator::CLV>
     // 1   2           imp       .0...... . CLV
     int execute() override
     {
-        throw std::runtime_error("CLV_B8 is not implemented");
+        throw OpcodeNotYetImplementedException("CLV_B8");
         return 2 + applyOperand();
     }
 
@@ -1011,7 +1010,7 @@ class CMP_C1 : public AddressMode::DirectPageIndexedIndirectX<Operator::CMP>
     // 2   7-m+w       (dir,X)   m.....mm . CMP ($10,X)
     int execute() override
     {
-        throw std::runtime_error("CMP_C1 is not implemented");
+        throw OpcodeNotYetImplementedException("CMP_C1");
         return 6 + applyOperand();
     }
 
@@ -1028,7 +1027,7 @@ class CMP_C3 : public AddressMode::StackRelative<Operator::CMP>
     // 2   5-m         stk,S     m.....mm . CMP $32,S
     int execute() override
     {
-        throw std::runtime_error("CMP_C3 is not implemented");
+        throw OpcodeNotYetImplementedException("CMP_C3");
         return 4 + applyOperand();
     }
 
@@ -1045,7 +1044,7 @@ class CMP_C5 : public AddressMode::DirectPage<Operator::CMP>
     // 2   4-m+w       dir       m.....mm . CMP $10
     int execute() override
     {
-        throw std::runtime_error("CMP_C5 is not implemented");
+        throw OpcodeNotYetImplementedException("CMP_C5");
         return 3 + applyOperand();
     }
 
@@ -1062,7 +1061,7 @@ class CMP_C7 : public AddressMode::DirectPageIndirectLong<Operator::CMP>
     // 2   7-m+w       [dir]     m.....mm . CMP [$10]
     int execute() override
     {
-        throw std::runtime_error("CMP_C7 is not implemented");
+        throw OpcodeNotYetImplementedException("CMP_C7");
         return 6 + applyOperand();
     }
 
@@ -1080,7 +1079,7 @@ class CMP_C9_16Bit : public AddressMode::Immediate16Bit<Operator::CMP>
     // 3-m 3-m         imm       m.....mm . CMP #$54
     int execute() override
     {
-        throw std::runtime_error("CMP_C9_16Bit is not implemented");
+        throw OpcodeNotYetImplementedException("CMP_C9_16Bit");
         return 2 + applyOperand();
     }
 
@@ -1098,7 +1097,7 @@ class CMP_C9 : public AddressMode::Immediate<Operator::CMP>
     // 3-m 3-m         imm       m.....mm . CMP #$54
     int execute() override
     {
-        throw std::runtime_error("CMP_C9 is not implemented");
+        throw OpcodeNotYetImplementedException("CMP_C9");
         return 2 + applyOperand();
     }
 
@@ -1131,7 +1130,7 @@ class CMP_CF : public AddressMode::AbsoluteLong<Operator::CMP>
     // 4   6-m         long      m.....mm . CMP $FEDBCA
     int execute() override
     {
-        throw std::runtime_error("CMP_CF is not implemented");
+        throw OpcodeNotYetImplementedException("CMP_CF");
         return 5 + applyOperand();
     }
 
@@ -1148,7 +1147,7 @@ class CMP_D1 : public AddressMode::DirectPageIndirectIndexedY<Operator::CMP>
     // 2   7-m+w-x+x*p (dir),Y   m.....mm . CMP ($10),Y
     int execute() override
     {
-        throw std::runtime_error("CMP_D1 is not implemented");
+        throw OpcodeNotYetImplementedException("CMP_D1");
         return 5 + applyOperand();
     }
 
@@ -1165,7 +1164,7 @@ class CMP_D2 : public AddressMode::DirectPageIndirect<Operator::CMP>
     // 2   6-m+w       (dir)     m.....mm . CMP ($10)
     int execute() override
     {
-        throw std::runtime_error("CMP_D2 is not implemented");
+        throw OpcodeNotYetImplementedException("CMP_D2");
         return 5 + applyOperand();
     }
 
@@ -1182,7 +1181,7 @@ class CMP_D3 : public AddressMode::StackRelativeIndirectIndexedY<Operator::CMP>
     // 2   8-m         (stk,S),Y m.....mm . CMP ($32,S),Y
     int execute() override
     {
-        throw std::runtime_error("CMP_D3 is not implemented");
+        throw OpcodeNotYetImplementedException("CMP_D3");
         return 7 + applyOperand();
     }
 
@@ -1199,7 +1198,7 @@ class CMP_D5 : public AddressMode::DirectPageIndexed<Operator::CMP, State::X>
     // 2   5-m+w       dir,X     m.....mm . CMP $10,X
     int execute() override
     {
-        throw std::runtime_error("CMP_D5 is not implemented");
+        throw OpcodeNotYetImplementedException("CMP_D5");
         return 4 + applyOperand();
     }
 
@@ -1216,7 +1215,7 @@ class CMP_D7 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::CMP>
     // 2   7-m+w       [dir],Y   m.....mm . CMP [$10],Y
     int execute() override
     {
-        throw std::runtime_error("CMP_D7 is not implemented");
+        throw OpcodeNotYetImplementedException("CMP_D7");
         return 6 + applyOperand();
     }
 
@@ -1233,7 +1232,7 @@ class CMP_D9 : public AddressMode::AbsoluteIndexed<Operator::CMP, State::Y>
     // 3   6-m-x+x*p   abs,Y     m.....mm . CMP $9876,Y
     int execute() override
     {
-        throw std::runtime_error("CMP_D9 is not implemented");
+        throw OpcodeNotYetImplementedException("CMP_D9");
         return 4 + applyOperand();
     }
 
@@ -1250,7 +1249,7 @@ class CMP_DD : public AddressMode::AbsoluteIndexed<Operator::CMP, State::X>
     // 3   6-m-x+x*p   abs,X     m.....mm . CMP $9876,X
     int execute() override
     {
-        throw std::runtime_error("CMP_DD is not implemented");
+        throw OpcodeNotYetImplementedException("CMP_DD");
         return 4 + applyOperand();
     }
 
@@ -1267,7 +1266,7 @@ class CMP_DF : public AddressMode::AbsoluteLongIndexedX<Operator::CMP>
     // 4   6-m         long,X    m.....mm . CMP $FEDCBA,X
     int execute() override
     {
-        throw std::runtime_error("CMP_DF is not implemented");
+        throw OpcodeNotYetImplementedException("CMP_DF");
         return 5 + applyOperand();
     }
 
@@ -1285,7 +1284,7 @@ class COP_02 : public AddressMode::Immediate<Operator::COP>
     // 2   8-e         imm       ....01.. . COP #$12
     int execute() override
     {
-        throw std::runtime_error("COP_02 is not implemented");
+        throw OpcodeNotYetImplementedException("COP_02");
         return 7 + applyOperand();
     }
 
@@ -1320,7 +1319,7 @@ class CPX_E0 : public AddressMode::Immediate<Operator::CP<State::X>>
     // 3-x 3-x         imm       x.....xx . CPX #$54
     int execute() override
     {
-        throw std::runtime_error("CPX_E0 is not implemented");
+        throw OpcodeNotYetImplementedException("CPX_E0");
         return 2 + applyOperand();
     }
 
@@ -1337,7 +1336,7 @@ class CPX_E4 : public AddressMode::DirectPage<Operator::CP<State::X>>
     // 2   4-x+w       dir       x.....xx . CPX $10
     int execute() override
     {
-        throw std::runtime_error("CPX_E4 is not implemented");
+        throw OpcodeNotYetImplementedException("CPX_E4");
         return 3 + applyOperand();
     }
 
@@ -1354,7 +1353,7 @@ class CPX_EC : public AddressMode::Absolute<Operator::CP<State::X>>
     // 3   5-x         abs       x.....xx . CPX $9876
     int execute() override
     {
-        throw std::runtime_error("CPX_EC is not implemented");
+        throw OpcodeNotYetImplementedException("CPX_EC");
         return 4 + applyOperand();
     }
 
@@ -1389,7 +1388,7 @@ class CPY_C0 : public AddressMode::Immediate<Operator::CP<State::Y>>
     // 3-x 3-x         imm       x.....xx . CPY #$54
     int execute() override
     {
-        throw std::runtime_error("CPY_C0 is not implemented");
+        throw OpcodeNotYetImplementedException("CPY_C0");
         return 2 + applyOperand();
     }
 
@@ -1406,7 +1405,7 @@ class CPY_C4 : public AddressMode::DirectPage<Operator::CP<State::Y>>
     // 2   4-x+w       dir       x.....xx . CPY $10
     int execute() override
     {
-        throw std::runtime_error("CPY_C4 is not implemented");
+        throw OpcodeNotYetImplementedException("CPY_C4");
         return 3 + applyOperand();
     }
 
@@ -1423,7 +1422,7 @@ class CPY_CC : public AddressMode::Absolute<Operator::CP<State::Y>>
     // 3   5-x         abs       x.....xx . CPY $9876
     int execute() override
     {
-        throw std::runtime_error("CPY_CC is not implemented");
+        throw OpcodeNotYetImplementedException("CPY_CC");
         return 4 + applyOperand();
     }
 
@@ -1440,7 +1439,7 @@ class DEC_3A : public AddressMode::Accumulator<Operator::DEC>
     // 1   2           acc       m.....m. . DEC
     int execute() override
     {
-        throw std::runtime_error("DEC_3A is not implemented");
+        throw OpcodeNotYetImplementedException("DEC_3A");
         return 2 + applyOperand();
     }
 
@@ -1457,7 +1456,7 @@ class DEC_C6 : public AddressMode::DirectPage<Operator::DEC>
     // 2   7-2*m+w     dir       m.....m. . DEC $10
     int execute() override
     {
-        throw std::runtime_error("DEC_C6 is not implemented");
+        throw OpcodeNotYetImplementedException("DEC_C6");
         return 5 + applyOperand();
     }
 
@@ -1474,7 +1473,7 @@ class DEC_CE : public AddressMode::Absolute<Operator::DEC>
     // 3   8-2*m       abs       m.....m. . DEC $9876
     int execute() override
     {
-        throw std::runtime_error("DEC_CE is not implemented");
+        throw OpcodeNotYetImplementedException("DEC_CE");
         return 6 + applyOperand();
     }
 
@@ -1491,7 +1490,7 @@ class DEC_D6 : public AddressMode::DirectPageIndexed<Operator::DEC, State::X>
     // 2   8-2*m+w     dir,X     m.....m. . DEC $10,X
     int execute() override
     {
-        throw std::runtime_error("DEC_D6 is not implemented");
+        throw OpcodeNotYetImplementedException("DEC_D6");
         return 6 + applyOperand();
     }
 
@@ -1509,8 +1508,8 @@ class DEC_DE : public AddressMode::AbsoluteIndexed<Operator::DEC, State::X>
     // §20: TODO manually add exception for 3
     int execute() override
     {
-        throw std::runtime_error("DEC_DE is not implemented");
-        throw std::runtime_error("TODO20");
+        throw OpcodeNotYetImplementedException("DEC_DE");
+        throw OpcodeNotYetImplementedException("TODO20");
         return 7 + applyOperand();
     }
 
@@ -1543,7 +1542,7 @@ class DEY_88 : public AddressMode::Implied<Operator::DE<State::Y>>
     // 1   2           imp       x.....x. . DEY
     int execute() override
     {
-        throw std::runtime_error("DEY_88 is not implemented");
+        throw OpcodeNotYetImplementedException("DEY_88");
         return 2 + applyOperand();
     }
 
@@ -1560,7 +1559,7 @@ class EOR_41 : public AddressMode::DirectPageIndexedIndirectX<Operator::EOR>
     // 2   7-m+w       (dir,X)   m.....m. . EOR ($10,X)
     int execute() override
     {
-        throw std::runtime_error("EOR_41 is not implemented");
+        throw OpcodeNotYetImplementedException("EOR_41");
         return 6 + applyOperand();
     }
 
@@ -1577,7 +1576,7 @@ class EOR_43 : public AddressMode::StackRelative<Operator::EOR>
     // 2   5-m         stk,S     m.....m. . EOR $32,S
     int execute() override
     {
-        throw std::runtime_error("EOR_43 is not implemented");
+        throw OpcodeNotYetImplementedException("EOR_43");
         return 4 + applyOperand();
     }
 
@@ -1594,7 +1593,7 @@ class EOR_45 : public AddressMode::DirectPage<Operator::EOR>
     // 2   4-m+w       dir       m.....m. . EOR $10
     int execute() override
     {
-        throw std::runtime_error("EOR_45 is not implemented");
+        throw OpcodeNotYetImplementedException("EOR_45");
         return 3 + applyOperand();
     }
 
@@ -1611,7 +1610,7 @@ class EOR_47 : public AddressMode::DirectPageIndirectLong<Operator::EOR>
     // 2   7-m+w       [dir]     m.....m. . EOR [$10]
     int execute() override
     {
-        throw std::runtime_error("EOR_47 is not implemented");
+        throw OpcodeNotYetImplementedException("EOR_47");
         return 6 + applyOperand();
     }
 
@@ -1629,7 +1628,7 @@ class EOR_49_16Bit : public AddressMode::Immediate16Bit<Operator::EOR>
     // 3-m 3-m         imm       m.....m. . EOR #$54
     int execute() override
     {
-        throw std::runtime_error("EOR_49_16Bit is not implemented");
+        throw OpcodeNotYetImplementedException("EOR_49_16Bit");
         return 2 + applyOperand();
     }
 
@@ -1647,7 +1646,7 @@ class EOR_49 : public AddressMode::Immediate<Operator::EOR>
     // 3-m 3-m         imm       m.....m. . EOR #$54
     int execute() override
     {
-        throw std::runtime_error("EOR_49 is not implemented");
+        throw OpcodeNotYetImplementedException("EOR_49");
         return 2 + applyOperand();
     }
 
@@ -1664,7 +1663,7 @@ class EOR_4D : public AddressMode::Absolute<Operator::EOR>
     // 3   5-m         abs       m.....m. . EOR $9876
     int execute() override
     {
-        throw std::runtime_error("EOR_4D is not implemented");
+        throw OpcodeNotYetImplementedException("EOR_4D");
         return 4 + applyOperand();
     }
 
@@ -1681,7 +1680,7 @@ class EOR_4F : public AddressMode::AbsoluteLong<Operator::EOR>
     // 4   6-m         long      m.....m. . EOR $FEDBCA
     int execute() override
     {
-        throw std::runtime_error("EOR_4F is not implemented");
+        throw OpcodeNotYetImplementedException("EOR_4F");
         return 5 + applyOperand();
     }
 
@@ -1698,7 +1697,7 @@ class EOR_51 : public AddressMode::DirectPageIndirectIndexedY<Operator::EOR>
     // 2   7-m+w-x+x*p (dir),Y   m.....m. . EOR ($10),Y
     int execute() override
     {
-        throw std::runtime_error("EOR_51 is not implemented");
+        throw OpcodeNotYetImplementedException("EOR_51");
         return 5 + applyOperand();
     }
 
@@ -1715,7 +1714,7 @@ class EOR_52 : public AddressMode::DirectPageIndirect<Operator::EOR>
     // 2   6-m+w       (dir)     m.....m. . EOR ($10)
     int execute() override
     {
-        throw std::runtime_error("EOR_52 is not implemented");
+        throw OpcodeNotYetImplementedException("EOR_52");
         return 5 + applyOperand();
     }
 
@@ -1732,7 +1731,7 @@ class EOR_53 : public AddressMode::StackRelativeIndirectIndexedY<Operator::EOR>
     // 2   8-m         (stk,S),Y m.....m. . EOR ($32,S),Y
     int execute() override
     {
-        throw std::runtime_error("EOR_53 is not implemented");
+        throw OpcodeNotYetImplementedException("EOR_53");
         return 7 + applyOperand();
     }
 
@@ -1749,7 +1748,7 @@ class EOR_55 : public AddressMode::DirectPageIndexed<Operator::EOR, State::X>
     // 2   5-m+w       dir,X     m.....m. . EOR $10,X
     int execute() override
     {
-        throw std::runtime_error("EOR_55 is not implemented");
+        throw OpcodeNotYetImplementedException("EOR_55");
         return 4 + applyOperand();
     }
 
@@ -1766,7 +1765,7 @@ class EOR_57 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::EOR>
     // 2   7-m+w       [dir],Y   m.....m. . EOR [$10],Y
     int execute() override
     {
-        throw std::runtime_error("EOR_57 is not implemented");
+        throw OpcodeNotYetImplementedException("EOR_57");
         return 6 + applyOperand();
     }
 
@@ -1783,7 +1782,7 @@ class EOR_59 : public AddressMode::AbsoluteIndexed<Operator::EOR, State::Y>
     // 3   6-m-x+x*p   abs,Y     m.....m. . EOR $9876,Y
     int execute() override
     {
-        throw std::runtime_error("EOR_59 is not implemented");
+        throw OpcodeNotYetImplementedException("EOR_59");
         return 4 + applyOperand();
     }
 
@@ -1800,7 +1799,7 @@ class EOR_5D : public AddressMode::AbsoluteIndexed<Operator::EOR, State::X>
     // 3   6-m-x+x*p   abs,X     m.....m. . EOR $9876,X
     int execute() override
     {
-        throw std::runtime_error("EOR_5D is not implemented");
+        throw OpcodeNotYetImplementedException("EOR_5D");
         return 4 + applyOperand();
     }
 
@@ -1817,7 +1816,7 @@ class EOR_5F : public AddressMode::AbsoluteLongIndexedX<Operator::EOR>
     // 4   6-m         long,X    m.....m. . EOR $FEDCBA,X
     int execute() override
     {
-        throw std::runtime_error("EOR_5F is not implemented");
+        throw OpcodeNotYetImplementedException("EOR_5F");
         return 5 + applyOperand();
     }
 
@@ -1850,7 +1849,6 @@ class INC_E6 : public AddressMode::DirectPage<Operator::INC>
     // 2   7-2*m+w     dir       m.....m. . INC $10
     int execute() override
     {
-        throw std::runtime_error("INC_E6 is not implemented");
         return 5 + applyOperand();
     }
 
@@ -1867,7 +1865,7 @@ class INC_EE : public AddressMode::Absolute<Operator::INC>
     // 3   8-2*m       abs       m.....m. . INC $9876
     int execute() override
     {
-        throw std::runtime_error("INC_EE is not implemented");
+        throw OpcodeNotYetImplementedException("INC_EE");
         return 6 + applyOperand();
     }
 
@@ -1884,7 +1882,7 @@ class INC_F6 : public AddressMode::DirectPageIndexed<Operator::INC, State::X>
     // 2   8-2*m+w     dir,X     m.....m. . INC $10,X
     int execute() override
     {
-        throw std::runtime_error("INC_F6 is not implemented");
+        throw OpcodeNotYetImplementedException("INC_F6");
         return 6 + applyOperand();
     }
 
@@ -1902,8 +1900,8 @@ class INC_FE : public AddressMode::AbsoluteIndexed<Operator::INC, State::X>
     // §20: TODO manually add exception for 3
     int execute() override
     {
-        throw std::runtime_error("INC_FE is not implemented");
-        throw std::runtime_error("TODO20");
+        throw OpcodeNotYetImplementedException("INC_FE");
+        throw OpcodeNotYetImplementedException("TODO20");
         return 7 + applyOperand();
     }
 
@@ -1920,7 +1918,7 @@ class INX_E8 : public AddressMode::Implied<Operator::IN<State::X>>
     // 1   2           imp       x.....x. . INX
     int execute() override
     {
-        throw std::runtime_error("INX_E8 is not implemented");
+        throw OpcodeNotYetImplementedException("INX_E8");
         return 2 + applyOperand();
     }
 
@@ -1953,7 +1951,7 @@ class JMP_4C : public AddressMode::Absolute<Operator::JMP>
     // 3   3           abs       ........ . JMP $1234
     int execute() override
     {
-        throw std::runtime_error("JMP_4C is not implemented");
+        throw OpcodeNotYetImplementedException("JMP_4C");
         return 3 + applyOperand();
     }
 
@@ -1970,7 +1968,7 @@ class JMP_5C : public AddressMode::AbsoluteLong<Operator::JMP>
     // 4   4           long      ........ . JMP $FEDCBA
     int execute() override
     {
-        throw std::runtime_error("JMP_5C is not implemented");
+        throw OpcodeNotYetImplementedException("JMP_5C");
         return 4 + applyOperand();
     }
 
@@ -1987,7 +1985,7 @@ class JMP_6C : public AddressMode::AbsoluteIndirect<Operator::JMP>
     // 3   5           (abs)     ........ . JMP ($1234)
     int execute() override
     {
-        throw std::runtime_error("JMP_6C is not implemented");
+        throw OpcodeNotYetImplementedException("JMP_6C");
         return 5 + applyOperand();
     }
 
@@ -2004,7 +2002,7 @@ class JMP_7C : public AddressMode::AbsoluteIndexedIndirect<Operator::JMP>
     // 3   6           (abs,X)   ........ . JMP ($1234,X)
     int execute() override
     {
-        throw std::runtime_error("JMP_7C is not implemented");
+        throw OpcodeNotYetImplementedException("JMP_7C");
         return 6 + applyOperand();
     }
 
@@ -2021,7 +2019,7 @@ class JMP_DC : public AddressMode::AbsoluteIndirectLong<Operator::JMP>
     // 3   6           [abs]     ........ . JMP [$1234]
     int execute() override
     {
-        throw std::runtime_error("JMP_DC is not implemented");
+        throw OpcodeNotYetImplementedException("JMP_DC");
         return 6 + applyOperand();
     }
 
@@ -2054,7 +2052,7 @@ class JSR_22 : public AddressMode::AbsoluteLong<Operator::JSR>
     // 4   8           long      ........ . JSL $123456
     int execute() override
     {
-        throw std::runtime_error("JSR_22 is not implemented");
+        throw OpcodeNotYetImplementedException("JSR_22");
         return 8 + applyOperand();
     }
 
@@ -2071,7 +2069,7 @@ class JSR_FC : public AddressMode::AbsoluteIndexedIndirect<Operator::JSR>
     // 3   8           (abs,X)   ........ . JSR ($1234,X)
     int execute() override
     {
-        throw std::runtime_error("JSR_FC is not implemented");
+        throw OpcodeNotYetImplementedException("JSR_FC");
         return 8 + applyOperand();
     }
 
@@ -2088,7 +2086,7 @@ class LDA_A1 : public AddressMode::DirectPageIndexedIndirectX<Operator::LDA>
     // 2   7-m+w       (dir,X)   m.....m. . LDA ($10,X)
     int execute() override
     {
-        throw std::runtime_error("LDA_A1 is not implemented");
+        throw OpcodeNotYetImplementedException("LDA_A1");
         return 6 + applyOperand();
     }
 
@@ -2105,7 +2103,7 @@ class LDA_A3 : public AddressMode::StackRelative<Operator::LDA>
     // 2   5-m         stk,S     m.....m. . LDA $32,S
     int execute() override
     {
-        throw std::runtime_error("LDA_A3 is not implemented");
+        throw OpcodeNotYetImplementedException("LDA_A3");
         return 4 + applyOperand();
     }
 
@@ -2122,7 +2120,7 @@ class LDA_A5 : public AddressMode::DirectPage<Operator::LDA>
     // 2   4-m+w       dir       m.....m. . LDA $10
     int execute() override
     {
-        throw std::runtime_error("LDA_A5 is not implemented");
+        throw OpcodeNotYetImplementedException("LDA_A5");
         return 3 + applyOperand();
     }
 
@@ -2139,7 +2137,7 @@ class LDA_A7 : public AddressMode::DirectPageIndirectLong<Operator::LDA>
     // 2   7-m+w       [dir]     m.....m. . LDA [$10]
     int execute() override
     {
-        throw std::runtime_error("LDA_A7 is not implemented");
+        throw OpcodeNotYetImplementedException("LDA_A7");
         return 6 + applyOperand();
     }
 
@@ -2190,7 +2188,7 @@ class LDA_AD : public AddressMode::Absolute<Operator::LDA>
     // 3   5-m         abs       m.....m. . LDA $9876
     int execute() override
     {
-        throw std::runtime_error("LDA_AD is not implemented");
+        throw OpcodeNotYetImplementedException("LDA_AD");
         return 4 + applyOperand();
     }
 
@@ -2207,7 +2205,7 @@ class LDA_AF : public AddressMode::AbsoluteLong<Operator::LDA>
     // 4   6-m         long      m.....m. . LDA $FEDBCA
     int execute() override
     {
-        throw std::runtime_error("LDA_AF is not implemented");
+        throw OpcodeNotYetImplementedException("LDA_AF");
         return 5 + applyOperand();
     }
 
@@ -2224,7 +2222,7 @@ class LDA_B1 : public AddressMode::DirectPageIndirectIndexedY<Operator::LDA>
     // 2   7-m+w-x+x*p (dir),Y   m.....m. . LDA ($10),Y
     int execute() override
     {
-        throw std::runtime_error("LDA_B1 is not implemented");
+        throw OpcodeNotYetImplementedException("LDA_B1");
         return 5 + applyOperand();
     }
 
@@ -2241,7 +2239,7 @@ class LDA_B2 : public AddressMode::DirectPageIndirect<Operator::LDA>
     // 2   6-m+w       (dir)     m.....m. . LDA ($10)
     int execute() override
     {
-        throw std::runtime_error("LDA_B2 is not implemented");
+        throw OpcodeNotYetImplementedException("LDA_B2");
         return 5 + applyOperand();
     }
 
@@ -2258,7 +2256,7 @@ class LDA_B3 : public AddressMode::StackRelativeIndirectIndexedY<Operator::LDA>
     // 2   8-m         (stk,S),Y m.....m. . LDA ($32,S),Y
     int execute() override
     {
-        throw std::runtime_error("LDA_B3 is not implemented");
+        throw OpcodeNotYetImplementedException("LDA_B3");
         return 7 + applyOperand();
     }
 
@@ -2275,7 +2273,7 @@ class LDA_B5 : public AddressMode::DirectPageIndexed<Operator::LDA, State::X>
     // 2   5-m+w       dir,X     m.....m. . LDA $10,X
     int execute() override
     {
-        throw std::runtime_error("LDA_B5 is not implemented");
+        throw OpcodeNotYetImplementedException("LDA_B5");
         return 4 + applyOperand();
     }
 
@@ -2308,7 +2306,7 @@ class LDA_B9 : public AddressMode::AbsoluteIndexed<Operator::LDA, State::Y>
     // 3   6-m-x+x*p   abs,Y     m.....m. . LDA $9876,Y
     int execute() override
     {
-        throw std::runtime_error("LDA_B9 is not implemented");
+        throw OpcodeNotYetImplementedException("LDA_B9");
         return 4 + applyOperand();
     }
 
@@ -2325,7 +2323,7 @@ class LDA_BD : public AddressMode::AbsoluteIndexed<Operator::LDA, State::X>
     // 3   6-m-x+x*p   abs,X     m.....m. . LDA $9876,X
     int execute() override
     {
-        throw std::runtime_error("LDA_BD is not implemented");
+        throw OpcodeNotYetImplementedException("LDA_BD");
         return 4 + applyOperand();
     }
 
@@ -2342,7 +2340,7 @@ class LDA_BF : public AddressMode::AbsoluteLongIndexedX<Operator::LDA>
     // 4   6-m         long,X    m.....m. . LDA $FEDCBA,X
     int execute() override
     {
-        throw std::runtime_error("LDA_BF is not implemented");
+        throw OpcodeNotYetImplementedException("LDA_BF");
         return 5 + applyOperand();
     }
 
@@ -2360,7 +2358,6 @@ class LDX_A2_16Bit : public AddressMode::Immediate16Bit<Operator::LD<State::X>>
     // 3-x 3-x         imm       x.....x. . LDX #$54
     int execute() override
     {
-        throw std::runtime_error("LDX_A2_16Bit is not implemented");
         return 2 + applyOperand();
     }
 
@@ -2378,7 +2375,7 @@ class LDX_A2 : public AddressMode::Immediate<Operator::LD<State::X>>
     // 3-x 3-x         imm       x.....x. . LDX #$54
     int execute() override
     {
-        throw std::runtime_error("LDX_A2 is not implemented");
+        throw OpcodeNotYetImplementedException("LDX_A2");
         return 2 + applyOperand();
     }
 
@@ -2395,7 +2392,7 @@ class LDX_A6 : public AddressMode::DirectPage<Operator::LD<State::X>>
     // 2   4-x+w       dir       x.....x. . LDX $10
     int execute() override
     {
-        throw std::runtime_error("LDX_A6 is not implemented");
+        throw OpcodeNotYetImplementedException("LDX_A6");
         return 3 + applyOperand();
     }
 
@@ -2412,7 +2409,7 @@ class LDX_AE : public AddressMode::Absolute<Operator::LD<State::X>>
     // 3   5-x         abs       x.....x. . LDX $9876
     int execute() override
     {
-        throw std::runtime_error("LDX_AE is not implemented");
+        throw OpcodeNotYetImplementedException("LDX_AE");
         return 4 + applyOperand();
     }
 
@@ -2429,7 +2426,7 @@ class LDX_B6 : public AddressMode::DirectPageIndexed<Operator::LD<State::X>, Sta
     // 2   5-x+w       dir,Y     x.....x. . LDX $10,Y
     int execute() override
     {
-        throw std::runtime_error("LDX_B6 is not implemented");
+        throw OpcodeNotYetImplementedException("LDX_B6");
         return 4 + applyOperand();
     }
 
@@ -2446,7 +2443,7 @@ class LDX_BE : public AddressMode::AbsoluteIndexed<Operator::LD<State::X>, State
     // 3   6-2*x+x*p   abs,Y     x.....x. . LDX $9876,Y
     int execute() override
     {
-        throw std::runtime_error("LDX_BE is not implemented");
+        throw OpcodeNotYetImplementedException("LDX_BE");
         return 4 + applyOperand();
     }
 
@@ -2481,7 +2478,7 @@ class LDY_A0 : public AddressMode::Immediate<Operator::LD<State::Y>>
     // 3-x 3-x         imm       x.....x. . LDY #$54
     int execute() override
     {
-        throw std::runtime_error("LDY_A0 is not implemented");
+        throw OpcodeNotYetImplementedException("LDY_A0");
         return 2 + applyOperand();
     }
 
@@ -2498,7 +2495,7 @@ class LDY_A4 : public AddressMode::DirectPage<Operator::LD<State::Y>>
     // 2   4-x+w       dir       x.....x. . LDY $10
     int execute() override
     {
-        throw std::runtime_error("LDY_A4 is not implemented");
+        throw OpcodeNotYetImplementedException("LDY_A4");
         return 3 + applyOperand();
     }
 
@@ -2515,7 +2512,6 @@ class LDY_AC : public AddressMode::Absolute<Operator::LD<State::Y>>
     // 3   5-x         abs       x.....x. . LDY $9876
     int execute() override
     {
-        throw std::runtime_error("LDY_AC is not implemented");
         return 4 + applyOperand();
     }
 
@@ -2532,7 +2528,7 @@ class LDY_B4 : public AddressMode::DirectPageIndexed<Operator::LD<State::Y>, Sta
     // 2   5-x+w       dir,X     x.....x. . LDY $10,X
     int execute() override
     {
-        throw std::runtime_error("LDY_B4 is not implemented");
+        throw OpcodeNotYetImplementedException("LDY_B4");
         return 4 + applyOperand();
     }
 
@@ -2549,7 +2545,7 @@ class LDY_BC : public AddressMode::AbsoluteIndexed<Operator::LD<State::Y>, State
     // 3   6-2*x+x*p   abs,X     x.....x. . LDY $9876,X
     int execute() override
     {
-        throw std::runtime_error("LDY_BC is not implemented");
+        throw OpcodeNotYetImplementedException("LDY_BC");
         return 4 + applyOperand();
     }
 
@@ -2566,7 +2562,7 @@ class LSR_46 : public AddressMode::DirectPage<Operator::LSR>
     // 2   7-2*m+w     dir       0.....m* . LSR $10
     int execute() override
     {
-        throw std::runtime_error("LSR_46 is not implemented");
+        throw OpcodeNotYetImplementedException("LSR_46");
         return 5 + applyOperand();
     }
 
@@ -2583,7 +2579,7 @@ class LSR_4A : public AddressMode::Accumulator<Operator::LSR>
     // 1   2           acc       0.....m* . LSR
     int execute() override
     {
-        throw std::runtime_error("LSR_4A is not implemented");
+        throw OpcodeNotYetImplementedException("LSR_4A");
         return 2 + applyOperand();
     }
 
@@ -2600,7 +2596,7 @@ class LSR_4E : public AddressMode::Absolute<Operator::LSR>
     // 3   8-2*m       abs       0.....m* . LSR $9876
     int execute() override
     {
-        throw std::runtime_error("LSR_4E is not implemented");
+        throw OpcodeNotYetImplementedException("LSR_4E");
         return 6 + applyOperand();
     }
 
@@ -2617,7 +2613,7 @@ class LSR_56 : public AddressMode::DirectPageIndexed<Operator::LSR, State::X>
     // 2   8-2*m+w     dir,X     0.....m* . LSR $10,X
     int execute() override
     {
-        throw std::runtime_error("LSR_56 is not implemented");
+        throw OpcodeNotYetImplementedException("LSR_56");
         return 6 + applyOperand();
     }
 
@@ -2635,8 +2631,8 @@ class LSR_5E : public AddressMode::AbsoluteIndexed<Operator::LSR, State::X>
     // §20: TODO manually add exception for 3
     int execute() override
     {
-        throw std::runtime_error("LSR_5E is not implemented");
-        throw std::runtime_error("TODO20");
+        throw OpcodeNotYetImplementedException("LSR_5E");
+        throw OpcodeNotYetImplementedException("TODO20");
         return 7 + applyOperand();
     }
 
@@ -2653,7 +2649,7 @@ class MVN_54 : public AddressMode::BlockMove<Operator::MVN>
     // 3   7           src,dest  ........ . MVN #$12,#$34
     int execute() override
     {
-        throw std::runtime_error("MVN_54 is not implemented");
+        throw OpcodeNotYetImplementedException("MVN_54");
         return 7 + applyOperand();
     }
 
@@ -2670,7 +2666,7 @@ class MVP_44 : public AddressMode::BlockMove<Operator::MVP>
     // 3   7           src,dest  ........ . MVP #$12,#$34
     int execute() override
     {
-        throw std::runtime_error("MVP_44 is not implemented");
+        throw OpcodeNotYetImplementedException("MVP_44");
         return 7 + applyOperand();
     }
 
@@ -2687,7 +2683,7 @@ class NOP_EA : public AddressMode::Implied<Operator::NOP>
     // 1   2           imp       ........ . NOP
     int execute() override
     {
-        throw std::runtime_error("NOP_EA is not implemented");
+        throw OpcodeNotYetImplementedException("NOP_EA");
         return 2 + applyOperand();
     }
 
@@ -2704,7 +2700,7 @@ class ORA_01 : public AddressMode::DirectPageIndexedIndirectX<Operator::ORA>
     // 2   7-m+w       (dir,X)   m.....m. . ORA ($10,X)
     int execute() override
     {
-        throw std::runtime_error("ORA_01 is not implemented");
+        throw OpcodeNotYetImplementedException("ORA_01");
         return 6 + applyOperand();
     }
 
@@ -2721,7 +2717,7 @@ class ORA_03 : public AddressMode::StackRelative<Operator::ORA>
     // 2   5-m         stk,S     m.....m. . ORA $32,S
     int execute() override
     {
-        throw std::runtime_error("ORA_03 is not implemented");
+        throw OpcodeNotYetImplementedException("ORA_03");
         return 4 + applyOperand();
     }
 
@@ -2738,7 +2734,7 @@ class ORA_05 : public AddressMode::DirectPage<Operator::ORA>
     // 2   4-m+w       dir       m.....m. . ORA $10
     int execute() override
     {
-        throw std::runtime_error("ORA_05 is not implemented");
+        throw OpcodeNotYetImplementedException("ORA_05");
         return 3 + applyOperand();
     }
 
@@ -2755,7 +2751,7 @@ class ORA_07 : public AddressMode::DirectPageIndirectLong<Operator::ORA>
     // 2   7-m+w       [dir]     m.....m. . ORA [$10]
     int execute() override
     {
-        throw std::runtime_error("ORA_07 is not implemented");
+        throw OpcodeNotYetImplementedException("ORA_07");
         return 6 + applyOperand();
     }
 
@@ -2773,7 +2769,7 @@ class ORA_09_16Bit : public AddressMode::Immediate16Bit<Operator::ORA>
     // 3-m 3-m         imm       m.....m. . ORA #$54
     int execute() override
     {
-        throw std::runtime_error("ORA_09_16Bit is not implemented");
+        throw OpcodeNotYetImplementedException("ORA_09_16Bit");
         return 2 + applyOperand();
     }
 
@@ -2791,7 +2787,7 @@ class ORA_09 : public AddressMode::Immediate<Operator::ORA>
     // 3-m 3-m         imm       m.....m. . ORA #$54
     int execute() override
     {
-        throw std::runtime_error("ORA_09 is not implemented");
+        throw OpcodeNotYetImplementedException("ORA_09");
         return 2 + applyOperand();
     }
 
@@ -2808,7 +2804,7 @@ class ORA_0D : public AddressMode::Absolute<Operator::ORA>
     // 3   5-m         abs       m.....m. . ORA $9876
     int execute() override
     {
-        throw std::runtime_error("ORA_0D is not implemented");
+        throw OpcodeNotYetImplementedException("ORA_0D");
         return 4 + applyOperand();
     }
 
@@ -2825,7 +2821,7 @@ class ORA_0F : public AddressMode::AbsoluteLong<Operator::ORA>
     // 4   6-m         long      m.....m. . ORA $FEDBCA
     int execute() override
     {
-        throw std::runtime_error("ORA_0F is not implemented");
+        throw OpcodeNotYetImplementedException("ORA_0F");
         return 5 + applyOperand();
     }
 
@@ -2842,7 +2838,7 @@ class ORA_11 : public AddressMode::DirectPageIndirectIndexedY<Operator::ORA>
     // 2   7-m+w-x+x*p (dir),Y   m.....m. . ORA ($10),Y
     int execute() override
     {
-        throw std::runtime_error("ORA_11 is not implemented");
+        throw OpcodeNotYetImplementedException("ORA_11");
         return 5 + applyOperand();
     }
 
@@ -2859,7 +2855,7 @@ class ORA_12 : public AddressMode::DirectPageIndirect<Operator::ORA>
     // 2   6-m+w       (dir)     m.....m. . ORA ($10)
     int execute() override
     {
-        throw std::runtime_error("ORA_12 is not implemented");
+        throw OpcodeNotYetImplementedException("ORA_12");
         return 5 + applyOperand();
     }
 
@@ -2876,7 +2872,7 @@ class ORA_13 : public AddressMode::StackRelativeIndirectIndexedY<Operator::ORA>
     // 2   8-m         (stk,S),Y m.....m. . ORA ($32,S),Y
     int execute() override
     {
-        throw std::runtime_error("ORA_13 is not implemented");
+        throw OpcodeNotYetImplementedException("ORA_13");
         return 7 + applyOperand();
     }
 
@@ -2893,7 +2889,7 @@ class ORA_15 : public AddressMode::DirectPageIndexed<Operator::ORA, State::X>
     // 2   5-m+w       dir,X     m.....m. . ORA $10,X
     int execute() override
     {
-        throw std::runtime_error("ORA_15 is not implemented");
+        throw OpcodeNotYetImplementedException("ORA_15");
         return 4 + applyOperand();
     }
 
@@ -2910,7 +2906,7 @@ class ORA_17 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::ORA>
     // 2   7-m+w       [dir],Y   m.....m. . ORA [$10],Y
     int execute() override
     {
-        throw std::runtime_error("ORA_17 is not implemented");
+        throw OpcodeNotYetImplementedException("ORA_17");
         return 6 + applyOperand();
     }
 
@@ -2927,7 +2923,7 @@ class ORA_19 : public AddressMode::AbsoluteIndexed<Operator::ORA, State::Y>
     // 3   6-m-x+x*p   abs,Y     m.....m. . ORA $9876,Y
     int execute() override
     {
-        throw std::runtime_error("ORA_19 is not implemented");
+        throw OpcodeNotYetImplementedException("ORA_19");
         return 4 + applyOperand();
     }
 
@@ -2944,7 +2940,7 @@ class ORA_1D : public AddressMode::AbsoluteIndexed<Operator::ORA, State::X>
     // 3   6-m-x+x*p   abs,X     m.....m. . ORA $9876,X
     int execute() override
     {
-        throw std::runtime_error("ORA_1D is not implemented");
+        throw OpcodeNotYetImplementedException("ORA_1D");
         return 4 + applyOperand();
     }
 
@@ -2961,7 +2957,7 @@ class ORA_1F : public AddressMode::AbsoluteLongIndexedX<Operator::ORA>
     // 4   6-m         long,X    m.....m. . ORA $FEDCBA,X
     int execute() override
     {
-        throw std::runtime_error("ORA_1F is not implemented");
+        throw OpcodeNotYetImplementedException("ORA_1F");
         return 5 + applyOperand();
     }
 
@@ -2978,7 +2974,7 @@ class PEA_F4 : public AddressMode::Absolute<Operator::PEA>
     // 3   5           imm       ........ . PEA #$1234
     int execute() override
     {
-        throw std::runtime_error("PEA_F4 is not implemented");
+        throw OpcodeNotYetImplementedException("PEA_F4");
         return 5 + applyOperand();
     }
 
@@ -2995,7 +2991,7 @@ class PEI_D4 : public AddressMode::DirectPageIndirect<Operator::PEI>
     // 2   6+w         dir       ........ . PEI $12
     int execute() override
     {
-        throw std::runtime_error("PEI_D4 is not implemented");
+        throw OpcodeNotYetImplementedException("PEI_D4");
         return 6 + applyOperand();
     }
 
@@ -3012,7 +3008,7 @@ class PER_62 : public AddressMode::ProgramCounterRelativeLong<Operator::PER>
     // 3   6           imm       ........ . PER LABEL
     int execute() override
     {
-        throw std::runtime_error("PER_62 is not implemented");
+        throw OpcodeNotYetImplementedException("PER_62");
         return 6 + applyOperand();
     }
 
@@ -3045,7 +3041,7 @@ class PHB_8B : public AddressMode::Implied<Operator::PHB>
     // 1   3           imp       ........ . PHB
     int execute() override
     {
-        throw std::runtime_error("PHB_8B is not implemented");
+        throw OpcodeNotYetImplementedException("PHB_8B");
         return 3 + applyOperand();
     }
 
@@ -3062,7 +3058,7 @@ class PHD_0B : public AddressMode::Implied<Operator::PHD>
     // 1   4           imp       ........ . PHD
     int execute() override
     {
-        throw std::runtime_error("PHD_0B is not implemented");
+        throw OpcodeNotYetImplementedException("PHD_0B");
         return 4 + applyOperand();
     }
 
@@ -3079,7 +3075,7 @@ class PHK_4B : public AddressMode::Implied<Operator::PHK>
     // 1   3           imp       ........ . PHK
     int execute() override
     {
-        throw std::runtime_error("PHK_4B is not implemented");
+        throw OpcodeNotYetImplementedException("PHK_4B");
         return 3 + applyOperand();
     }
 
@@ -3112,7 +3108,7 @@ class PHX_DA : public AddressMode::Implied<Operator::PHX>
     // 1   4-x         imp       ........ . PHX
     int execute() override
     {
-        throw std::runtime_error("PHX_DA is not implemented");
+        throw OpcodeNotYetImplementedException("PHX_DA");
         return 3 + applyOperand();
     }
 
@@ -3129,7 +3125,7 @@ class PHY_5A : public AddressMode::Implied<Operator::PHY>
     // 1   4-x         imp       ........ . PHY
     int execute() override
     {
-        throw std::runtime_error("PHY_5A is not implemented");
+        throw OpcodeNotYetImplementedException("PHY_5A");
         return 3 + applyOperand();
     }
 
@@ -3162,7 +3158,7 @@ class PLB_AB : public AddressMode::Implied<Operator::PLB>
     // 1   4           imp       *.....*. . PLB
     int execute() override
     {
-        throw std::runtime_error("PLB_AB is not implemented");
+        throw OpcodeNotYetImplementedException("PLB_AB");
         return 4 + applyOperand();
     }
 
@@ -3179,7 +3175,7 @@ class PLD_2B : public AddressMode::Implied<Operator::PLD>
     // 1   5           imp       *.....*. . PLD
     int execute() override
     {
-        throw std::runtime_error("PLD_2B is not implemented");
+        throw OpcodeNotYetImplementedException("PLD_2B");
         return 5 + applyOperand();
     }
 
@@ -3196,7 +3192,6 @@ class PLP_28 : public AddressMode::Implied<Operator::PLP>
     // 1   4           imp       ******** . PLP
     int execute() override
     {
-        throw std::runtime_error("PLP_28 is not implemented");
         return 4 + applyOperand();
     }
 
@@ -3213,7 +3208,7 @@ class PLX_FA : public AddressMode::Implied<Operator::PLX>
     // 1   5-x         imp       x.....x. . PLX
     int execute() override
     {
-        throw std::runtime_error("PLX_FA is not implemented");
+        throw OpcodeNotYetImplementedException("PLX_FA");
         return 4 + applyOperand();
     }
 
@@ -3230,7 +3225,7 @@ class PLY_7A : public AddressMode::Implied<Operator::PLY>
     // 1   5-x         imp       x.....x. . PLY
     int execute() override
     {
-        throw std::runtime_error("PLY_7A is not implemented");
+        throw OpcodeNotYetImplementedException("PLY_7A");
         return 4 + applyOperand();
     }
 
@@ -3263,7 +3258,7 @@ class ROL_26 : public AddressMode::DirectPage<Operator::ROL>
     // 2   7-2*m+w     dir       m.....mm . ROL $10
     int execute() override
     {
-        throw std::runtime_error("ROL_26 is not implemented");
+        throw OpcodeNotYetImplementedException("ROL_26");
         return 5 + applyOperand();
     }
 
@@ -3296,7 +3291,7 @@ class ROL_2E : public AddressMode::Absolute<Operator::ROL>
     // 3   8-2*m       abs       m.....mm . ROL $9876
     int execute() override
     {
-        throw std::runtime_error("ROL_2E is not implemented");
+        throw OpcodeNotYetImplementedException("ROL_2E");
         return 6 + applyOperand();
     }
 
@@ -3313,7 +3308,7 @@ class ROL_36 : public AddressMode::DirectPageIndexed<Operator::ROL, State::X>
     // 2   8-2*m+w     dir,X     m.....mm . ROL $10,X
     int execute() override
     {
-        throw std::runtime_error("ROL_36 is not implemented");
+        throw OpcodeNotYetImplementedException("ROL_36");
         return 6 + applyOperand();
     }
 
@@ -3331,8 +3326,8 @@ class ROL_3E : public AddressMode::AbsoluteIndexed<Operator::ROL, State::X>
     // §20: TODO manually add exception for 3
     int execute() override
     {
-        throw std::runtime_error("ROL_3E is not implemented");
-        throw std::runtime_error("TODO20");
+        throw OpcodeNotYetImplementedException("ROL_3E");
+        throw OpcodeNotYetImplementedException("TODO20");
         return 7 + applyOperand();
     }
 
@@ -3349,7 +3344,7 @@ class ROR_66 : public AddressMode::DirectPage<Operator::ROR>
     // 2   7-2*m+w     dir       m.....m* . ROR $10
     int execute() override
     {
-        throw std::runtime_error("ROR_66 is not implemented");
+        throw OpcodeNotYetImplementedException("ROR_66");
         return 5 + applyOperand();
     }
 
@@ -3366,7 +3361,7 @@ class ROR_6A : public AddressMode::Accumulator<Operator::ROR>
     // 1   2           acc       m.....m* . ROR
     int execute() override
     {
-        throw std::runtime_error("ROR_6A is not implemented");
+        throw OpcodeNotYetImplementedException("ROR_6A");
         return 2 + applyOperand();
     }
 
@@ -3383,7 +3378,7 @@ class ROR_6E : public AddressMode::Absolute<Operator::ROR>
     // 3   8-2*m       abs       m.....m* . ROR $9876
     int execute() override
     {
-        throw std::runtime_error("ROR_6E is not implemented");
+        throw OpcodeNotYetImplementedException("ROR_6E");
         return 6 + applyOperand();
     }
 
@@ -3400,7 +3395,7 @@ class ROR_76 : public AddressMode::DirectPageIndexed<Operator::ROR, State::X>
     // 2   8-2*m+w     dir,X     m.....m* . ROR $10,X
     int execute() override
     {
-        throw std::runtime_error("ROR_76 is not implemented");
+        throw OpcodeNotYetImplementedException("ROR_76");
         return 6 + applyOperand();
     }
 
@@ -3418,8 +3413,8 @@ class ROR_7E : public AddressMode::AbsoluteIndexed<Operator::ROR, State::X>
     // §20: TODO manually add exception for 3
     int execute() override
     {
-        throw std::runtime_error("ROR_7E is not implemented");
-        throw std::runtime_error("TODO20");
+        throw OpcodeNotYetImplementedException("ROR_7E");
+        throw OpcodeNotYetImplementedException("TODO20");
         return 7 + applyOperand();
     }
 
@@ -3436,7 +3431,7 @@ class RTI_40 : public AddressMode::Implied<Operator::RTI>
     // 1   7-e         imp       ******** . RTI
     int execute() override
     {
-        throw std::runtime_error("RTI_40 is not implemented");
+        throw OpcodeNotYetImplementedException("RTI_40");
         return 6 + applyOperand();
     }
 
@@ -3453,7 +3448,7 @@ class RTL_6B : public AddressMode::Implied<Operator::RTL>
     // 1   6           imp       ........ . RTL
     int execute() override
     {
-        throw std::runtime_error("RTL_6B is not implemented");
+        throw OpcodeNotYetImplementedException("RTL_6B");
         return 6 + applyOperand();
     }
 
@@ -3470,7 +3465,6 @@ class RTS_60 : public AddressMode::Implied<Operator::RTS>
     // 1   6           imp       ........ . RTS
     int execute() override
     {
-        throw std::runtime_error("RTS_60 is not implemented");
         return 6 + applyOperand();
     }
 
@@ -3487,7 +3481,7 @@ class SBC_E1 : public AddressMode::DirectPageIndexedIndirectX<Operator::SBC>
     // 2   7-m+w       (dir,X)   mm....mm . SBC ($10,X)
     int execute() override
     {
-        throw std::runtime_error("SBC_E1 is not implemented");
+        throw OpcodeNotYetImplementedException("SBC_E1");
         return 6 + applyOperand();
     }
 
@@ -3504,7 +3498,7 @@ class SBC_E3 : public AddressMode::StackRelative<Operator::SBC>
     // 2   5-m         stk,S     mm....mm . SBC $32,S
     int execute() override
     {
-        throw std::runtime_error("SBC_E3 is not implemented");
+        throw OpcodeNotYetImplementedException("SBC_E3");
         return 4 + applyOperand();
     }
 
@@ -3521,7 +3515,7 @@ class SBC_E5 : public AddressMode::DirectPage<Operator::SBC>
     // 2   4-m+w       dir       mm....mm . SBC $10
     int execute() override
     {
-        throw std::runtime_error("SBC_E5 is not implemented");
+        throw OpcodeNotYetImplementedException("SBC_E5");
         return 3 + applyOperand();
     }
 
@@ -3538,7 +3532,7 @@ class SBC_E7 : public AddressMode::DirectPageIndirectLong<Operator::SBC>
     // 2   7-m+w       [dir]     mm....mm . SBC [$10]
     int execute() override
     {
-        throw std::runtime_error("SBC_E7 is not implemented");
+        throw OpcodeNotYetImplementedException("SBC_E7");
         return 6 + applyOperand();
     }
 
@@ -3556,7 +3550,7 @@ class SBC_E9_16Bit : public AddressMode::Immediate16Bit<Operator::SBC>
     // 3-m 3-m         imm       mm....mm . SBC #$54
     int execute() override
     {
-        throw std::runtime_error("SBC_E9_16Bit is not implemented");
+        throw OpcodeNotYetImplementedException("SBC_E9_16Bit");
         return 2 + applyOperand();
     }
 
@@ -3574,7 +3568,7 @@ class SBC_E9 : public AddressMode::Immediate<Operator::SBC>
     // 3-m 3-m         imm       mm....mm . SBC #$54
     int execute() override
     {
-        throw std::runtime_error("SBC_E9 is not implemented");
+        throw OpcodeNotYetImplementedException("SBC_E9");
         return 2 + applyOperand();
     }
 
@@ -3591,7 +3585,7 @@ class SBC_ED : public AddressMode::Absolute<Operator::SBC>
     // 3   5-m         abs       mm....mm . SBC $9876
     int execute() override
     {
-        throw std::runtime_error("SBC_ED is not implemented");
+        throw OpcodeNotYetImplementedException("SBC_ED");
         return 4 + applyOperand();
     }
 
@@ -3608,7 +3602,7 @@ class SBC_EF : public AddressMode::AbsoluteLong<Operator::SBC>
     // 4   6-m         long      mm....mm . SBC $FEDBCA
     int execute() override
     {
-        throw std::runtime_error("SBC_EF is not implemented");
+        throw OpcodeNotYetImplementedException("SBC_EF");
         return 5 + applyOperand();
     }
 
@@ -3625,7 +3619,7 @@ class SBC_F1 : public AddressMode::DirectPageIndirectIndexedY<Operator::SBC>
     // 2   7-m+w-x+x*p (dir),Y   mm....mm . SBC ($10),Y
     int execute() override
     {
-        throw std::runtime_error("SBC_F1 is not implemented");
+        throw OpcodeNotYetImplementedException("SBC_F1");
         return 5 + applyOperand();
     }
 
@@ -3642,7 +3636,7 @@ class SBC_F2 : public AddressMode::DirectPageIndirect<Operator::SBC>
     // 2   6-m+w       (dir)     mm....mm . SBC ($10)
     int execute() override
     {
-        throw std::runtime_error("SBC_F2 is not implemented");
+        throw OpcodeNotYetImplementedException("SBC_F2");
         return 5 + applyOperand();
     }
 
@@ -3659,7 +3653,7 @@ class SBC_F3 : public AddressMode::StackRelativeIndirectIndexedY<Operator::SBC>
     // 2   8-m         (stk,S),Y mm....mm . SBC ($32,S),Y
     int execute() override
     {
-        throw std::runtime_error("SBC_F3 is not implemented");
+        throw OpcodeNotYetImplementedException("SBC_F3");
         return 7 + applyOperand();
     }
 
@@ -3676,7 +3670,7 @@ class SBC_F5 : public AddressMode::DirectPageIndexed<Operator::SBC, State::X>
     // 2   5-m+w       dir,X     mm....mm . SBC $10,X
     int execute() override
     {
-        throw std::runtime_error("SBC_F5 is not implemented");
+        throw OpcodeNotYetImplementedException("SBC_F5");
         return 4 + applyOperand();
     }
 
@@ -3693,7 +3687,7 @@ class SBC_F7 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::SBC>
     // 2   7-m+w       [dir],Y   mm....mm . SBC [$10],Y
     int execute() override
     {
-        throw std::runtime_error("SBC_F7 is not implemented");
+        throw OpcodeNotYetImplementedException("SBC_F7");
         return 6 + applyOperand();
     }
 
@@ -3710,7 +3704,7 @@ class SBC_F9 : public AddressMode::AbsoluteIndexed<Operator::SBC, State::Y>
     // 3   6-m-x+x*p   abs,Y     mm....mm . SBC $9876,Y
     int execute() override
     {
-        throw std::runtime_error("SBC_F9 is not implemented");
+        throw OpcodeNotYetImplementedException("SBC_F9");
         return 4 + applyOperand();
     }
 
@@ -3727,7 +3721,7 @@ class SBC_FD : public AddressMode::AbsoluteIndexed<Operator::SBC, State::X>
     // 3   6-m-x+x*p   abs,X     mm....mm . SBC $9876,X
     int execute() override
     {
-        throw std::runtime_error("SBC_FD is not implemented");
+        throw OpcodeNotYetImplementedException("SBC_FD");
         return 4 + applyOperand();
     }
 
@@ -3744,7 +3738,7 @@ class SBC_FF : public AddressMode::AbsoluteLongIndexedX<Operator::SBC>
     // 4   6-m         long,X    mm....mm . SBC $FEDCBA,X
     int execute() override
     {
-        throw std::runtime_error("SBC_FF is not implemented");
+        throw OpcodeNotYetImplementedException("SBC_FF");
         return 5 + applyOperand();
     }
 
@@ -3761,7 +3755,7 @@ class SEC_38 : public AddressMode::Implied<Operator::SEC>
     // 1   2           imp       .......1 . SEC
     int execute() override
     {
-        throw std::runtime_error("SEC_38 is not implemented");
+        throw OpcodeNotYetImplementedException("SEC_38");
         return 2 + applyOperand();
     }
 
@@ -3778,7 +3772,7 @@ class SED_F8 : public AddressMode::Implied<Operator::SED>
     // 1   2           imp       ....1... . SED
     int execute() override
     {
-        throw std::runtime_error("SED_F8 is not implemented");
+        throw OpcodeNotYetImplementedException("SED_F8");
         return 2 + applyOperand();
     }
 
@@ -3827,7 +3821,7 @@ class STA_81 : public AddressMode::DirectPageIndexedIndirectX<Operator::STA>
     // 2   7-m+w       (dir,X)   ........ . STA ($10,X)
     int execute() override
     {
-        throw std::runtime_error("STA_81 is not implemented");
+        throw OpcodeNotYetImplementedException("STA_81");
         return 6 + applyOperand();
     }
 
@@ -3844,7 +3838,7 @@ class STA_83 : public AddressMode::StackRelative<Operator::STA>
     // 2   5-m         stk,S     ........ . STA $32,S
     int execute() override
     {
-        throw std::runtime_error("STA_83 is not implemented");
+        throw OpcodeNotYetImplementedException("STA_83");
         return 4 + applyOperand();
     }
 
@@ -3877,7 +3871,7 @@ class STA_87 : public AddressMode::DirectPageIndirectLong<Operator::STA>
     // 2   7-m+w       [dir]     ........ . STA [$10]
     int execute() override
     {
-        throw std::runtime_error("STA_87 is not implemented");
+        throw OpcodeNotYetImplementedException("STA_87");
         return 6 + applyOperand();
     }
 
@@ -3910,7 +3904,7 @@ class STA_8F : public AddressMode::AbsoluteLong<Operator::STA>
     // 4   6-m         long      ........ . STA $FEDBCA
     int execute() override
     {
-        throw std::runtime_error("STA_8F is not implemented");
+        throw OpcodeNotYetImplementedException("STA_8F");
         return 5 + applyOperand();
     }
 
@@ -3928,8 +3922,8 @@ class STA_91 : public AddressMode::DirectPageIndirectIndexedY<Operator::STA>
     // §20: TODO manually add exception for 3
     int execute() override
     {
-        throw std::runtime_error("STA_91 is not implemented");
-        throw std::runtime_error("TODO20");
+        throw OpcodeNotYetImplementedException("STA_91");
+        throw OpcodeNotYetImplementedException("TODO20");
         return 6 + applyOperand();
     }
 
@@ -3946,7 +3940,7 @@ class STA_92 : public AddressMode::DirectPageIndirect<Operator::STA>
     // 2   6-m+w       (dir)     ........ . STA ($10)
     int execute() override
     {
-        throw std::runtime_error("STA_92 is not implemented");
+        throw OpcodeNotYetImplementedException("STA_92");
         return 5 + applyOperand();
     }
 
@@ -3963,7 +3957,7 @@ class STA_93 : public AddressMode::StackRelativeIndirectIndexedY<Operator::STA>
     // 2   8-m         (stk,S),Y ........ . STA ($32,S),Y
     int execute() override
     {
-        throw std::runtime_error("STA_93 is not implemented");
+        throw OpcodeNotYetImplementedException("STA_93");
         return 7 + applyOperand();
     }
 
@@ -3980,7 +3974,7 @@ class STA_95 : public AddressMode::DirectPageIndexed<Operator::STA, State::X>
     // 2   5-m+w       dir,X     ........ . STA $10,X
     int execute() override
     {
-        throw std::runtime_error("STA_95 is not implemented");
+        throw OpcodeNotYetImplementedException("STA_95");
         return 4 + applyOperand();
     }
 
@@ -3997,7 +3991,7 @@ class STA_97 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::STA>
     // 2   7-m+w       [dir],Y   ........ . STA [$10],Y
     int execute() override
     {
-        throw std::runtime_error("STA_97 is not implemented");
+        throw OpcodeNotYetImplementedException("STA_97");
         return 6 + applyOperand();
     }
 
@@ -4015,8 +4009,8 @@ class STA_99 : public AddressMode::AbsoluteIndexed<Operator::STA, State::Y>
     // §20: TODO manually add exception for 3
     int execute() override
     {
-        throw std::runtime_error("STA_99 is not implemented");
-        throw std::runtime_error("TODO20");
+        throw OpcodeNotYetImplementedException("STA_99");
+        throw OpcodeNotYetImplementedException("TODO20");
         return 5 + applyOperand();
     }
 
@@ -4034,8 +4028,8 @@ class STA_9D : public AddressMode::AbsoluteIndexed<Operator::STA, State::X>
     // §20: TODO manually add exception for 3
     int execute() override
     {
-        throw std::runtime_error("STA_9D is not implemented");
-        throw std::runtime_error("TODO20");
+        throw OpcodeNotYetImplementedException("STA_9D");
+        throw OpcodeNotYetImplementedException("TODO20");
         return 5 + applyOperand();
     }
 
@@ -4052,7 +4046,7 @@ class STA_9F : public AddressMode::AbsoluteLongIndexedX<Operator::STA>
     // 4   6-m         long,X    ........ . STA $FEDCBA,X
     int execute() override
     {
-        throw std::runtime_error("STA_9F is not implemented");
+        throw OpcodeNotYetImplementedException("STA_9F");
         return 5 + applyOperand();
     }
 
@@ -4069,7 +4063,7 @@ class STP_DB : public AddressMode::Implied<Operator::STP>
     // 1   3           imp       ........ . STP
     int execute() override
     {
-        throw std::runtime_error("STP_DB is not implemented");
+        throw OpcodeNotYetImplementedException("STP_DB");
         return 3 + applyOperand();
     }
 
@@ -4086,7 +4080,7 @@ class STX_86 : public AddressMode::DirectPage<Operator::STX>
     // 2   4-x+w       dir       ........ . STX $10
     int execute() override
     {
-        throw std::runtime_error("STX_86 is not implemented");
+        throw OpcodeNotYetImplementedException("STX_86");
         return 3 + applyOperand();
     }
 
@@ -4103,7 +4097,7 @@ class STX_8E : public AddressMode::Absolute<Operator::STX>
     // 3   5-x         abs       ........ . STX $9876
     int execute() override
     {
-        throw std::runtime_error("STX_8E is not implemented");
+        throw OpcodeNotYetImplementedException("STX_8E");
         return 4 + applyOperand();
     }
 
@@ -4120,7 +4114,7 @@ class STX_96 : public AddressMode::DirectPageIndexed<Operator::STX, State::Y>
     // 2   5-x+w       dir,Y     ........ . STX $10,Y
     int execute() override
     {
-        throw std::runtime_error("STX_96 is not implemented");
+        throw OpcodeNotYetImplementedException("STX_96");
         return 4 + applyOperand();
     }
 
@@ -4137,7 +4131,7 @@ class STY_84 : public AddressMode::DirectPage<Operator::STY>
     // 2   4-x+w       dir       ........ . STY $10
     int execute() override
     {
-        throw std::runtime_error("STY_84 is not implemented");
+        throw OpcodeNotYetImplementedException("STY_84");
         return 3 + applyOperand();
     }
 
@@ -4154,7 +4148,7 @@ class STY_8C : public AddressMode::Absolute<Operator::STY>
     // 3   5-x         abs       ........ . STY $9876
     int execute() override
     {
-        throw std::runtime_error("STY_8C is not implemented");
+        throw OpcodeNotYetImplementedException("STY_8C");
         return 4 + applyOperand();
     }
 
@@ -4171,7 +4165,7 @@ class STY_94 : public AddressMode::DirectPageIndexed<Operator::STY, State::X>
     // 2   5-x+w       dir,X     ........ . STY $10,X
     int execute() override
     {
-        throw std::runtime_error("STY_94 is not implemented");
+        throw OpcodeNotYetImplementedException("STY_94");
         return 4 + applyOperand();
     }
 
@@ -4188,7 +4182,7 @@ class STZ_64 : public AddressMode::DirectPage<Operator::STZ>
     // 2   4-m+w       dir       ........ . STZ $10
     int execute() override
     {
-        throw std::runtime_error("STZ_64 is not implemented");
+        throw OpcodeNotYetImplementedException("STZ_64");
         return 3 + applyOperand();
     }
 
@@ -4205,7 +4199,7 @@ class STZ_74 : public AddressMode::DirectPageIndexed<Operator::STZ, State::X>
     // 2   5-m+w       dir,X     ........ . STZ $10,X
     int execute() override
     {
-        throw std::runtime_error("STZ_74 is not implemented");
+        throw OpcodeNotYetImplementedException("STZ_74");
         return 4 + applyOperand();
     }
 
@@ -4239,8 +4233,8 @@ class STZ_9E : public AddressMode::AbsoluteIndexed<Operator::STZ, State::X>
     // §20: TODO manually add exception for 3
     int execute() override
     {
-        throw std::runtime_error("STZ_9E is not implemented");
-        throw std::runtime_error("TODO20");
+        throw OpcodeNotYetImplementedException("STZ_9E");
+        throw OpcodeNotYetImplementedException("TODO20");
         return 5 + applyOperand();
     }
 
@@ -4273,7 +4267,7 @@ class TAY_A8 : public AddressMode::Implied<Operator::TA<State::Y>>
     // 1   2           imp       x.....x. . TAY
     int execute() override
     {
-        throw std::runtime_error("TAY_A8 is not implemented");
+        throw OpcodeNotYetImplementedException("TAY_A8");
         return 2 + applyOperand();
     }
 
@@ -4322,7 +4316,7 @@ class TDC_7B : public AddressMode::Implied<Operator::TDC>
     // 1   2           imp       *.....*. . TDC
     int execute() override
     {
-        throw std::runtime_error("TDC_7B is not implemented");
+        throw OpcodeNotYetImplementedException("TDC_7B");
         return 2 + applyOperand();
     }
 
@@ -4339,7 +4333,7 @@ class TRB_14 : public AddressMode::DirectPage<Operator::TRB>
     // 2   7-2*m+w     dir       ......m. . TRB $10
     int execute() override
     {
-        throw std::runtime_error("TRB_14 is not implemented");
+        throw OpcodeNotYetImplementedException("TRB_14");
         return 5 + applyOperand();
     }
 
@@ -4356,7 +4350,7 @@ class TRB_1C : public AddressMode::Absolute<Operator::TRB>
     // 3   8-2*m       abs       ......m. . TRB $9876
     int execute() override
     {
-        throw std::runtime_error("TRB_1C is not implemented");
+        throw OpcodeNotYetImplementedException("TRB_1C");
         return 6 + applyOperand();
     }
 
@@ -4373,7 +4367,7 @@ class TSB_04 : public AddressMode::DirectPage<Operator::TSB>
     // 2   7-2*m+w     dir       ......m. . TSB $10
     int execute() override
     {
-        throw std::runtime_error("TSB_04 is not implemented");
+        throw OpcodeNotYetImplementedException("TSB_04");
         return 5 + applyOperand();
     }
 
@@ -4390,7 +4384,7 @@ class TSB_0C : public AddressMode::Absolute<Operator::TSB>
     // 3   8-2*m       abs       ......m. . TSB $9876
     int execute() override
     {
-        throw std::runtime_error("TSB_0C is not implemented");
+        throw OpcodeNotYetImplementedException("TSB_0C");
         return 6 + applyOperand();
     }
 
@@ -4407,7 +4401,7 @@ class TSC_3B : public AddressMode::Implied<Operator::TSC>
     // 1   2           imp       *.....*. . TSC
     int execute() override
     {
-        throw std::runtime_error("TSC_3B is not implemented");
+        throw OpcodeNotYetImplementedException("TSC_3B");
         return 2 + applyOperand();
     }
 
@@ -4424,7 +4418,7 @@ class TSX_BA : public AddressMode::Implied<Operator::TSX>
     // 1   2           imp       x.....x. . TSX
     int execute() override
     {
-        throw std::runtime_error("TSX_BA is not implemented");
+        throw OpcodeNotYetImplementedException("TSX_BA");
         return 2 + applyOperand();
     }
 
@@ -4441,7 +4435,7 @@ class TXA_8A : public AddressMode::Implied<Operator::TXA>
     // 1   2           imp       m.....m. . TXA
     int execute() override
     {
-        throw std::runtime_error("TXA_8A is not implemented");
+        throw OpcodeNotYetImplementedException("TXA_8A");
         return 2 + applyOperand();
     }
 
@@ -4458,7 +4452,7 @@ class TXS_9A : public AddressMode::Implied<Operator::TXS>
     // 1   2           imp       ........ . TXS
     int execute() override
     {
-        throw std::runtime_error("TXS_9A is not implemented");
+        throw OpcodeNotYetImplementedException("TXS_9A");
         return 2 + applyOperand();
     }
 
@@ -4475,7 +4469,7 @@ class TXY_9B : public AddressMode::Implied<Operator::TXY>
     // 1   2           imp       x.....x. . TXY
     int execute() override
     {
-        throw std::runtime_error("TXY_9B is not implemented");
+        throw OpcodeNotYetImplementedException("TXY_9B");
         return 2 + applyOperand();
     }
 
@@ -4492,7 +4486,7 @@ class TYA_98 : public AddressMode::Implied<Operator::TYA>
     // 1   2           imp       m.....m. . TYA
     int execute() override
     {
-        throw std::runtime_error("TYA_98 is not implemented");
+        throw OpcodeNotYetImplementedException("TYA_98");
         return 2 + applyOperand();
     }
 
@@ -4509,7 +4503,7 @@ class TYX_BB : public AddressMode::Implied<Operator::TYX>
     // 1   2           imp       x.....x. . TYX
     int execute() override
     {
-        throw std::runtime_error("TYX_BB is not implemented");
+        throw OpcodeNotYetImplementedException("TYX_BB");
         return 2 + applyOperand();
     }
 
@@ -4526,7 +4520,7 @@ class WAI_CB : public AddressMode::Implied<Operator::WAI>
     // 1   3           imp       ........ . WAI
     int execute() override
     {
-        throw std::runtime_error("WAI_CB is not implemented");
+        throw OpcodeNotYetImplementedException("WAI_CB");
         return 3 + applyOperand();
     }
 
@@ -4543,7 +4537,7 @@ class WDM_42 : public AddressMode::Immediate<Operator::WDM>
     // 2   2           imm       ........ . WDM
     int execute() override
     {
-        throw std::runtime_error("WDM_42 is not implemented");
+        throw OpcodeNotYetImplementedException("WDM_42");
         return 2 + applyOperand();
     }
 

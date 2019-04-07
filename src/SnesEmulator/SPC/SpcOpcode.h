@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 
+#include "../Exception.h"
 #include "../Instruction.h"
 #include "SpcState.h"
 #include "SpcAddressMode.h"
@@ -20,7 +21,7 @@ class ADC_99 : public AddressMode::IndirectIndirect<Operator::ADC>
 
     int execute() override
     {
-        throw std::runtime_error("ADC_99 is not implemented");
+        throw OpcodeNotYetImplementedException("ADC_99");
         return  5 + applyOperand();
     }
 
@@ -36,7 +37,7 @@ class ADC_88 : public AddressMode::RegisterImmediate<Operator::ADC, State::A>
 
     int execute() override
     {
-        throw std::runtime_error("ADC_88 is not implemented");
+        throw OpcodeNotYetImplementedException("ADC_88");
         return  2 + applyOperand();
     }
 
@@ -52,7 +53,7 @@ class ADC_86 : public AddressMode::RegisterRegisterIndirect<Operator::ADC, State
 
     int execute() override
     {
-        throw std::runtime_error("ADC_86 is not implemented");
+        throw OpcodeNotYetImplementedException("ADC_86");
         return  3 + applyOperand();
     }
 
@@ -68,7 +69,7 @@ class ADC_97 : public AddressMode::RegisterDirectIndirectIndexed<Operator::ADC, 
 
     int execute() override
     {
-        throw std::runtime_error("ADC_97 is not implemented");
+        throw OpcodeNotYetImplementedException("ADC_97");
         return  6 + applyOperand();
     }
 
@@ -84,7 +85,7 @@ class ADC_87 : public AddressMode::RegisterDirectIndexedIndirect<Operator::ADC, 
 
     int execute() override
     {
-        throw std::runtime_error("ADC_87 is not implemented");
+        throw OpcodeNotYetImplementedException("ADC_87");
         return  6 + applyOperand();
     }
 
@@ -100,7 +101,7 @@ class ADC_84 : public AddressMode::RegisterDirect<Operator::ADC, State::A>
 
     int execute() override
     {
-        throw std::runtime_error("ADC_84 is not implemented");
+        throw OpcodeNotYetImplementedException("ADC_84");
         return  3 + applyOperand();
     }
 
@@ -116,7 +117,7 @@ class ADC_94 : public AddressMode::RegisterDirectIndexed<Operator::ADC, State::A
 
     int execute() override
     {
-        throw std::runtime_error("ADC_94 is not implemented");
+        throw OpcodeNotYetImplementedException("ADC_94");
         return  4 + applyOperand();
     }
 
@@ -132,7 +133,7 @@ class ADC_85 : public AddressMode::RegisterAbsolute<Operator::ADC, State::A>
 
     int execute() override
     {
-        throw std::runtime_error("ADC_85 is not implemented");
+        throw OpcodeNotYetImplementedException("ADC_85");
         return  4 + applyOperand();
     }
 
@@ -148,7 +149,7 @@ class ADC_95 : public AddressMode::RegisterAbsoluteIndexed<Operator::ADC, State:
 
     int execute() override
     {
-        throw std::runtime_error("ADC_95 is not implemented");
+        throw OpcodeNotYetImplementedException("ADC_95");
         return  5 + applyOperand();
     }
 
@@ -164,7 +165,7 @@ class ADC_96 : public AddressMode::RegisterAbsoluteIndexed<Operator::ADC, State:
 
     int execute() override
     {
-        throw std::runtime_error("ADC_96 is not implemented");
+        throw OpcodeNotYetImplementedException("ADC_96");
         return  5 + applyOperand();
     }
 
@@ -180,7 +181,7 @@ class ADC_89 : public AddressMode::DirectDirect<Operator::ADC>
 
     int execute() override
     {
-        throw std::runtime_error("ADC_89 is not implemented");
+        throw OpcodeNotYetImplementedException("ADC_89");
         return  6 + applyOperand();
     }
 
@@ -196,7 +197,7 @@ class ADC_98 : public AddressMode::DirectImmediate<Operator::ADC>
 
     int execute() override
     {
-        throw std::runtime_error("ADC_98 is not implemented");
+        throw OpcodeNotYetImplementedException("ADC_98");
         return  5 + applyOperand();
     }
 
@@ -212,7 +213,7 @@ class ADDW_7A : public AddressMode::YAccumulatorDirect<Operator::ADDW>
 
     int execute() override
     {
-        throw std::runtime_error("ADDW_7A is not implemented");
+        throw OpcodeNotYetImplementedException("ADDW_7A");
         return  5 + applyOperand();
     }
 
@@ -228,7 +229,7 @@ class AND_39 : public AddressMode::IndirectIndirect<Operator::AND>
 
     int execute() override
     {
-        throw std::runtime_error("AND_39 is not implemented");
+        throw OpcodeNotYetImplementedException("AND_39");
         return  5 + applyOperand();
     }
 
@@ -244,7 +245,7 @@ class AND_28 : public AddressMode::RegisterImmediate<Operator::AND, State::A>
 
     int execute() override
     {
-        throw std::runtime_error("AND_28 is not implemented");
+        throw OpcodeNotYetImplementedException("AND_28");
         return  2 + applyOperand();
     }
 
@@ -260,7 +261,7 @@ class AND_26 : public AddressMode::RegisterRegisterIndirect<Operator::AND, State
 
     int execute() override
     {
-        throw std::runtime_error("AND_26 is not implemented");
+        throw OpcodeNotYetImplementedException("AND_26");
         return  3 + applyOperand();
     }
 
@@ -276,7 +277,7 @@ class AND_37 : public AddressMode::RegisterDirectIndirectIndexed<Operator::AND, 
 
     int execute() override
     {
-        throw std::runtime_error("AND_37 is not implemented");
+        throw OpcodeNotYetImplementedException("AND_37");
         return  6 + applyOperand();
     }
 
@@ -292,7 +293,7 @@ class AND_27 : public AddressMode::RegisterDirectIndexedIndirect<Operator::AND, 
 
     int execute() override
     {
-        throw std::runtime_error("AND_27 is not implemented");
+        throw OpcodeNotYetImplementedException("AND_27");
         return  6 + applyOperand();
     }
 
@@ -308,7 +309,7 @@ class AND_24 : public AddressMode::RegisterDirect<Operator::AND, State::A>
 
     int execute() override
     {
-        throw std::runtime_error("AND_24 is not implemented");
+        throw OpcodeNotYetImplementedException("AND_24");
         return  3 + applyOperand();
     }
 
@@ -324,7 +325,7 @@ class AND_34 : public AddressMode::RegisterDirectIndexed<Operator::AND, State::A
 
     int execute() override
     {
-        throw std::runtime_error("AND_34 is not implemented");
+        throw OpcodeNotYetImplementedException("AND_34");
         return  4 + applyOperand();
     }
 
@@ -340,7 +341,7 @@ class AND_25 : public AddressMode::RegisterAbsolute<Operator::AND, State::A>
 
     int execute() override
     {
-        throw std::runtime_error("AND_25 is not implemented");
+        throw OpcodeNotYetImplementedException("AND_25");
         return  4 + applyOperand();
     }
 
@@ -356,7 +357,7 @@ class AND_35 : public AddressMode::RegisterAbsoluteIndexed<Operator::AND, State:
 
     int execute() override
     {
-        throw std::runtime_error("AND_35 is not implemented");
+        throw OpcodeNotYetImplementedException("AND_35");
         return  5 + applyOperand();
     }
 
@@ -372,7 +373,7 @@ class AND_36 : public AddressMode::RegisterAbsoluteIndexed<Operator::AND, State:
 
     int execute() override
     {
-        throw std::runtime_error("AND_36 is not implemented");
+        throw OpcodeNotYetImplementedException("AND_36");
         return  5 + applyOperand();
     }
 
@@ -388,7 +389,7 @@ class AND_29 : public AddressMode::DirectDirect<Operator::AND>
 
     int execute() override
     {
-        throw std::runtime_error("AND_29 is not implemented");
+        throw OpcodeNotYetImplementedException("AND_29");
         return  6 + applyOperand();
     }
 
@@ -404,7 +405,7 @@ class AND_38 : public AddressMode::DirectImmediate<Operator::AND>
 
     int execute() override
     {
-        throw std::runtime_error("AND_38 is not implemented");
+        throw OpcodeNotYetImplementedException("AND_38");
         return  5 + applyOperand();
     }
 
@@ -420,7 +421,7 @@ class AND1_6A : public AddressMode::CarryNegatedMemoryBit<Operator::AND1>
 
     int execute() override
     {
-        throw std::runtime_error("AND1_6A is not implemented");
+        throw OpcodeNotYetImplementedException("AND1_6A");
         return  4 + applyOperand();
     }
 
@@ -436,7 +437,7 @@ class AND1_4A : public AddressMode::CarryMemoryBit<Operator::AND1>
 
     int execute() override
     {
-        throw std::runtime_error("AND1_4A is not implemented");
+        throw OpcodeNotYetImplementedException("AND1_4A");
         return  4 + applyOperand();
     }
 
@@ -452,7 +453,7 @@ class ASL_1C : public AddressMode::Register<Operator::ASL, State::A>
 
     int execute() override
     {
-        throw std::runtime_error("ASL_1C is not implemented");
+        throw OpcodeNotYetImplementedException("ASL_1C");
         return  2 + applyOperand();
     }
 
@@ -468,7 +469,7 @@ class ASL_0B : public AddressMode::Direct<Operator::ASL>
 
     int execute() override
     {
-        throw std::runtime_error("ASL_0B is not implemented");
+        throw OpcodeNotYetImplementedException("ASL_0B");
         return  4 + applyOperand();
     }
 
@@ -484,7 +485,7 @@ class ASL_1B : public AddressMode::DirectIndexed<Operator::ASL, State::X>
 
     int execute() override
     {
-        throw std::runtime_error("ASL_1B is not implemented");
+        throw OpcodeNotYetImplementedException("ASL_1B");
         return  5 + applyOperand();
     }
 
@@ -500,7 +501,7 @@ class ASL_0C : public AddressMode::Absolute<Operator::ASL>
 
     int execute() override
     {
-        throw std::runtime_error("ASL_0C is not implemented");
+        throw OpcodeNotYetImplementedException("ASL_0C");
         return  5 + applyOperand();
     }
 
@@ -516,7 +517,7 @@ class BBC_13 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC
 
     int execute() override
     {
-        throw std::runtime_error("BBC_13 is not implemented");
+        throw OpcodeNotYetImplementedException("BBC_13");
         return 5 + applyOperand();
     }
 
@@ -532,7 +533,7 @@ class BBC_33 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC
 
     int execute() override
     {
-        throw std::runtime_error("BBC_33 is not implemented");
+        throw OpcodeNotYetImplementedException("BBC_33");
         return 5 + applyOperand();
     }
 
@@ -548,7 +549,7 @@ class BBC_53 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC
 
     int execute() override
     {
-        throw std::runtime_error("BBC_53 is not implemented");
+        throw OpcodeNotYetImplementedException("BBC_53");
         return 5 + applyOperand();
     }
 
@@ -564,7 +565,7 @@ class BBC_73 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC
 
     int execute() override
     {
-        throw std::runtime_error("BBC_73 is not implemented");
+        throw OpcodeNotYetImplementedException("BBC_73");
         return 5 + applyOperand();
     }
 
@@ -580,7 +581,7 @@ class BBC_93 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC
 
     int execute() override
     {
-        throw std::runtime_error("BBC_93 is not implemented");
+        throw OpcodeNotYetImplementedException("BBC_93");
         return 5 + applyOperand();
     }
 
@@ -596,7 +597,7 @@ class BBC_B3 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC
 
     int execute() override
     {
-        throw std::runtime_error("BBC_B3 is not implemented");
+        throw OpcodeNotYetImplementedException("BBC_B3");
         return 5 + applyOperand();
     }
 
@@ -612,7 +613,7 @@ class BBC_D3 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC
 
     int execute() override
     {
-        throw std::runtime_error("BBC_D3 is not implemented");
+        throw OpcodeNotYetImplementedException("BBC_D3");
         return 5 + applyOperand();
     }
 
@@ -628,7 +629,7 @@ class BBC_F3 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC
 
     int execute() override
     {
-        throw std::runtime_error("BBC_F3 is not implemented");
+        throw OpcodeNotYetImplementedException("BBC_F3");
         return 5 + applyOperand();
     }
 
@@ -644,7 +645,7 @@ class BBS_03 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS
 
     int execute() override
     {
-        throw std::runtime_error("BBS_03 is not implemented");
+        throw OpcodeNotYetImplementedException("BBS_03");
         return 5 + applyOperand();
     }
 
@@ -660,7 +661,7 @@ class BBS_23 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS
 
     int execute() override
     {
-        throw std::runtime_error("BBS_23 is not implemented");
+        throw OpcodeNotYetImplementedException("BBS_23");
         return 5 + applyOperand();
     }
 
@@ -676,7 +677,7 @@ class BBS_43 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS
 
     int execute() override
     {
-        throw std::runtime_error("BBS_43 is not implemented");
+        throw OpcodeNotYetImplementedException("BBS_43");
         return 5 + applyOperand();
     }
 
@@ -692,7 +693,7 @@ class BBS_63 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS
 
     int execute() override
     {
-        throw std::runtime_error("BBS_63 is not implemented");
+        throw OpcodeNotYetImplementedException("BBS_63");
         return 5 + applyOperand();
     }
 
@@ -708,7 +709,7 @@ class BBS_83 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS
 
     int execute() override
     {
-        throw std::runtime_error("BBS_83 is not implemented");
+        throw OpcodeNotYetImplementedException("BBS_83");
         return 5 + applyOperand();
     }
 
@@ -724,7 +725,7 @@ class BBS_A3 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS
 
     int execute() override
     {
-        throw std::runtime_error("BBS_A3 is not implemented");
+        throw OpcodeNotYetImplementedException("BBS_A3");
         return 5 + applyOperand();
     }
 
@@ -740,7 +741,7 @@ class BBS_C3 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS
 
     int execute() override
     {
-        throw std::runtime_error("BBS_C3 is not implemented");
+        throw OpcodeNotYetImplementedException("BBS_C3");
         return 5 + applyOperand();
     }
 
@@ -756,7 +757,7 @@ class BBS_E3 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS
 
     int execute() override
     {
-        throw std::runtime_error("BBS_E3 is not implemented");
+        throw OpcodeNotYetImplementedException("BBS_E3");
         return 5 + applyOperand();
     }
 
@@ -772,7 +773,7 @@ class BCC_90 : public AddressMode::ProgramCounterRelative<Operator::BCC>
 
     int execute() override
     {
-        throw std::runtime_error("BCC_90 is not implemented");
+        throw OpcodeNotYetImplementedException("BCC_90");
         return 2 + applyOperand();
     }
 
@@ -788,7 +789,7 @@ class BCS_B0 : public AddressMode::ProgramCounterRelative<Operator::BCS>
 
     int execute() override
     {
-        throw std::runtime_error("BCS_B0 is not implemented");
+        throw OpcodeNotYetImplementedException("BCS_B0");
         return 2 + applyOperand();
     }
 
@@ -804,7 +805,7 @@ class BEQ_F0 : public AddressMode::ProgramCounterRelative<Operator::BEQ>
 
     int execute() override
     {
-        throw std::runtime_error("BEQ_F0 is not implemented");
+        throw OpcodeNotYetImplementedException("BEQ_F0");
         return 2 + applyOperand();
     }
 
@@ -820,7 +821,7 @@ class BMI_30 : public AddressMode::ProgramCounterRelative<Operator::BMI>
 
     int execute() override
     {
-        throw std::runtime_error("BMI_30 is not implemented");
+        throw OpcodeNotYetImplementedException("BMI_30");
         return 2 + applyOperand();
     }
 
@@ -851,7 +852,6 @@ class BPL_10 : public AddressMode::ProgramCounterRelative<Operator::BPL>
 
     int execute() override
     {
-        throw std::runtime_error("BPL_10 is not implemented");
         return 2 + applyOperand();
     }
 
@@ -867,7 +867,7 @@ class BVC_50 : public AddressMode::ProgramCounterRelative<Operator::BVC>
 
     int execute() override
     {
-        throw std::runtime_error("BVC_50 is not implemented");
+        throw OpcodeNotYetImplementedException("BVC_50");
         return 2 + applyOperand();
     }
 
@@ -883,7 +883,7 @@ class BVS_70 : public AddressMode::ProgramCounterRelative<Operator::BVS>
 
     int execute() override
     {
-        throw std::runtime_error("BVS_70 is not implemented");
+        throw OpcodeNotYetImplementedException("BVS_70");
         return 2 + applyOperand();
     }
 
@@ -914,7 +914,7 @@ class BRK_0F : public AddressMode::Implied<Operator::BRK>
 
     int execute() override
     {
-        throw std::runtime_error("BRK_0F is not implemented");
+        throw OpcodeNotYetImplementedException("BRK_0F");
         return  8 + applyOperand();
     }
 
@@ -930,7 +930,7 @@ class CALL_3F : public AddressMode::Absolute<Operator::CALL>
 
     int execute() override
     {
-        throw std::runtime_error("CALL_3F is not implemented");
+        throw OpcodeNotYetImplementedException("CALL_3F");
         return  8 + applyOperand();
     }
 
@@ -946,7 +946,7 @@ class CBNE_DE : public AddressMode::DirectIndexedProgramCounterRelative<Operator
 
     int execute() override
     {
-        throw std::runtime_error("CBNE_DE is not implemented");
+        throw OpcodeNotYetImplementedException("CBNE_DE");
         return 6 + applyOperand();
     }
 
@@ -962,7 +962,7 @@ class CBNE_2E : public AddressMode::DirectProgramCounterRelative<Operator::CBNE>
 
     int execute() override
     {
-        throw std::runtime_error("CBNE_2E is not implemented");
+        throw OpcodeNotYetImplementedException("CBNE_2E");
         return 5 + applyOperand();
     }
 
@@ -978,7 +978,7 @@ class CLR1_12 : public AddressMode::DirectBit<Operator::CLR1, 1 << 0>
 
     int execute() override
     {
-        throw std::runtime_error("CLR1_12 is not implemented");
+        throw OpcodeNotYetImplementedException("CLR1_12");
         return  4 + applyOperand();
     }
 
@@ -994,7 +994,7 @@ class CLR1_32 : public AddressMode::DirectBit<Operator::CLR1, 1 << 1>
 
     int execute() override
     {
-        throw std::runtime_error("CLR1_32 is not implemented");
+        throw OpcodeNotYetImplementedException("CLR1_32");
         return  4 + applyOperand();
     }
 
@@ -1010,7 +1010,7 @@ class CLR1_52 : public AddressMode::DirectBit<Operator::CLR1, 1 << 2>
 
     int execute() override
     {
-        throw std::runtime_error("CLR1_52 is not implemented");
+        throw OpcodeNotYetImplementedException("CLR1_52");
         return  4 + applyOperand();
     }
 
@@ -1026,7 +1026,7 @@ class CLR1_72 : public AddressMode::DirectBit<Operator::CLR1, 1 << 3>
 
     int execute() override
     {
-        throw std::runtime_error("CLR1_72 is not implemented");
+        throw OpcodeNotYetImplementedException("CLR1_72");
         return  4 + applyOperand();
     }
 
@@ -1042,7 +1042,7 @@ class CLR1_92 : public AddressMode::DirectBit<Operator::CLR1, 1 << 4>
 
     int execute() override
     {
-        throw std::runtime_error("CLR1_92 is not implemented");
+        throw OpcodeNotYetImplementedException("CLR1_92");
         return  4 + applyOperand();
     }
 
@@ -1058,7 +1058,7 @@ class CLR1_B2 : public AddressMode::DirectBit<Operator::CLR1, 1 << 5>
 
     int execute() override
     {
-        throw std::runtime_error("CLR1_B2 is not implemented");
+        throw OpcodeNotYetImplementedException("CLR1_B2");
         return  4 + applyOperand();
     }
 
@@ -1074,7 +1074,7 @@ class CLR1_D2 : public AddressMode::DirectBit<Operator::CLR1, 1 << 6>
 
     int execute() override
     {
-        throw std::runtime_error("CLR1_D2 is not implemented");
+        throw OpcodeNotYetImplementedException("CLR1_D2");
         return  4 + applyOperand();
     }
 
@@ -1090,7 +1090,7 @@ class CLR1_F2 : public AddressMode::DirectBit<Operator::CLR1, 1 << 7>
 
     int execute() override
     {
-        throw std::runtime_error("CLR1_F2 is not implemented");
+        throw OpcodeNotYetImplementedException("CLR1_F2");
         return  4 + applyOperand();
     }
 
@@ -1106,7 +1106,7 @@ class CLRC_60 : public AddressMode::Implied<Operator::CLRC>
 
     int execute() override
     {
-        throw std::runtime_error("CLRC_60 is not implemented");
+        throw OpcodeNotYetImplementedException("CLRC_60");
         return  2 + applyOperand();
     }
 
@@ -1122,7 +1122,6 @@ class CLRP_20 : public AddressMode::Implied<Operator::CLRP>
 
     int execute() override
     {
-        throw std::runtime_error("CLRP_20 is not implemented");
         return  2 + applyOperand();
     }
 
@@ -1138,7 +1137,7 @@ class CLRV_E0 : public AddressMode::Implied<Operator::CLRV>
 
     int execute() override
     {
-        throw std::runtime_error("CLRV_E0 is not implemented");
+        throw OpcodeNotYetImplementedException("CLRV_E0");
         return  2 + applyOperand();
     }
 
@@ -1154,7 +1153,7 @@ class CMP_79 : public AddressMode::IndirectIndirect<Operator::CMP>
 
     int execute() override
     {
-        throw std::runtime_error("CMP_79 is not implemented");
+        throw OpcodeNotYetImplementedException("CMP_79");
         return  5 + applyOperand();
     }
 
@@ -1170,7 +1169,7 @@ class CMP_68 : public AddressMode::RegisterImmediate<Operator::CMP, State::A>
 
     int execute() override
     {
-        throw std::runtime_error("CMP_68 is not implemented");
+        throw OpcodeNotYetImplementedException("CMP_68");
         return  2 + applyOperand();
     }
 
@@ -1186,7 +1185,7 @@ class CMP_66 : public AddressMode::RegisterRegisterIndirect<Operator::CMP, State
 
     int execute() override
     {
-        throw std::runtime_error("CMP_66 is not implemented");
+        throw OpcodeNotYetImplementedException("CMP_66");
         return  3 + applyOperand();
     }
 
@@ -1202,7 +1201,7 @@ class CMP_77 : public AddressMode::RegisterDirectIndirectIndexed<Operator::CMP, 
 
     int execute() override
     {
-        throw std::runtime_error("CMP_77 is not implemented");
+        throw OpcodeNotYetImplementedException("CMP_77");
         return  6 + applyOperand();
     }
 
@@ -1218,7 +1217,7 @@ class CMP_67 : public AddressMode::RegisterDirectIndexedIndirect<Operator::CMP, 
 
     int execute() override
     {
-        throw std::runtime_error("CMP_67 is not implemented");
+        throw OpcodeNotYetImplementedException("CMP_67");
         return  6 + applyOperand();
     }
 
@@ -1234,7 +1233,7 @@ class CMP_64 : public AddressMode::RegisterDirect<Operator::CMP, State::A>
 
     int execute() override
     {
-        throw std::runtime_error("CMP_64 is not implemented");
+        throw OpcodeNotYetImplementedException("CMP_64");
         return  3 + applyOperand();
     }
 
@@ -1250,7 +1249,7 @@ class CMP_74 : public AddressMode::RegisterDirectIndexed<Operator::CMP, State::A
 
     int execute() override
     {
-        throw std::runtime_error("CMP_74 is not implemented");
+        throw OpcodeNotYetImplementedException("CMP_74");
         return  4 + applyOperand();
     }
 
@@ -1266,7 +1265,7 @@ class CMP_65 : public AddressMode::RegisterAbsolute<Operator::CMP, State::A>
 
     int execute() override
     {
-        throw std::runtime_error("CMP_65 is not implemented");
+        throw OpcodeNotYetImplementedException("CMP_65");
         return  4 + applyOperand();
     }
 
@@ -1282,7 +1281,7 @@ class CMP_75 : public AddressMode::RegisterAbsoluteIndexed<Operator::CMP, State:
 
     int execute() override
     {
-        throw std::runtime_error("CMP_75 is not implemented");
+        throw OpcodeNotYetImplementedException("CMP_75");
         return  5 + applyOperand();
     }
 
@@ -1298,7 +1297,7 @@ class CMP_76 : public AddressMode::RegisterAbsoluteIndexed<Operator::CMP, State:
 
     int execute() override
     {
-        throw std::runtime_error("CMP_76 is not implemented");
+        throw OpcodeNotYetImplementedException("CMP_76");
         return  5 + applyOperand();
     }
 
@@ -1314,7 +1313,6 @@ class CMP_C8 : public AddressMode::RegisterImmediate<Operator::CMP, State::X>
 
     int execute() override
     {
-        throw std::runtime_error("CMP_C8 is not implemented");
         return  2 + applyOperand();
     }
 
@@ -1330,7 +1328,7 @@ class CMP_3E : public AddressMode::RegisterDirect<Operator::CMP, State::X>
 
     int execute() override
     {
-        throw std::runtime_error("CMP_3E is not implemented");
+        throw OpcodeNotYetImplementedException("CMP_3E");
         return  3 + applyOperand();
     }
 
@@ -1346,7 +1344,7 @@ class CMP_1E : public AddressMode::RegisterAbsolute<Operator::CMP, State::X>
 
     int execute() override
     {
-        throw std::runtime_error("CMP_1E is not implemented");
+        throw OpcodeNotYetImplementedException("CMP_1E");
         return  4 + applyOperand();
     }
 
@@ -1362,7 +1360,7 @@ class CMP_AD : public AddressMode::RegisterImmediate<Operator::CMP, State::Y>
 
     int execute() override
     {
-        throw std::runtime_error("CMP_AD is not implemented");
+        throw OpcodeNotYetImplementedException("CMP_AD");
         return  2 + applyOperand();
     }
 
@@ -1378,7 +1376,6 @@ class CMP_7E : public AddressMode::RegisterDirect<Operator::CMP, State::Y>
 
     int execute() override
     {
-        throw std::runtime_error("CMP_7E is not implemented");
         return  3 + applyOperand();
     }
 
@@ -1394,7 +1391,7 @@ class CMP_5E : public AddressMode::RegisterAbsolute<Operator::CMP, State::Y>
 
     int execute() override
     {
-        throw std::runtime_error("CMP_5E is not implemented");
+        throw OpcodeNotYetImplementedException("CMP_5E");
         return  4 + applyOperand();
     }
 
@@ -1410,7 +1407,7 @@ class CMP_69 : public AddressMode::DirectDirect<Operator::CMP>
 
     int execute() override
     {
-        throw std::runtime_error("CMP_69 is not implemented");
+        throw OpcodeNotYetImplementedException("CMP_69");
         return  6 + applyOperand();
     }
 
@@ -1441,7 +1438,7 @@ class CMPW_5A : public AddressMode::YAccumulatorDirect<Operator::CMPW>
 
     int execute() override
     {
-        throw std::runtime_error("CMPW_5A is not implemented");
+        throw OpcodeNotYetImplementedException("CMPW_5A");
         return  4 + applyOperand();
     }
 
@@ -1457,7 +1454,7 @@ class DAA_DF : public AddressMode::Register<Operator::DAA, State::A>
 
     int execute() override
     {
-        throw std::runtime_error("DAA_DF is not implemented");
+        throw OpcodeNotYetImplementedException("DAA_DF");
         return  3 + applyOperand();
     }
 
@@ -1473,7 +1470,7 @@ class DAS_BE : public AddressMode::Register<Operator::DAS, State::A>
 
     int execute() override
     {
-        throw std::runtime_error("DAS_BE is not implemented");
+        throw OpcodeNotYetImplementedException("DAS_BE");
         return  3 + applyOperand();
     }
 
@@ -1489,7 +1486,7 @@ class DBNZ_FE : public AddressMode::RegisterProgramCounterRelative<Operator::DBN
 
     int execute() override
     {
-        throw std::runtime_error("DBNZ_FE is not implemented");
+        throw OpcodeNotYetImplementedException("DBNZ_FE");
         return 4 + applyOperand();
     }
 
@@ -1505,7 +1502,7 @@ class DBNZ_6E : public AddressMode::DirectProgramCounterRelative<Operator::DBNZ>
 
     int execute() override
     {
-        throw std::runtime_error("DBNZ_6E is not implemented");
+        throw OpcodeNotYetImplementedException("DBNZ_6E");
         return 5 + applyOperand();
     }
 
@@ -1521,7 +1518,7 @@ class DEC_9C : public AddressMode::Register<Operator::DEC, State::A>
 
     int execute() override
     {
-        throw std::runtime_error("DEC_9C is not implemented");
+        throw OpcodeNotYetImplementedException("DEC_9C");
         return  2 + applyOperand();
     }
 
@@ -1552,7 +1549,7 @@ class DEC_DC : public AddressMode::Register<Operator::DEC, State::Y>
 
     int execute() override
     {
-        throw std::runtime_error("DEC_DC is not implemented");
+        throw OpcodeNotYetImplementedException("DEC_DC");
         return  2 + applyOperand();
     }
 
@@ -1568,7 +1565,7 @@ class DEC_8B : public AddressMode::Direct<Operator::DEC>
 
     int execute() override
     {
-        throw std::runtime_error("DEC_8B is not implemented");
+        throw OpcodeNotYetImplementedException("DEC_8B");
         return  4 + applyOperand();
     }
 
@@ -1584,7 +1581,7 @@ class DEC_9B : public AddressMode::DirectIndexed<Operator::DEC, State::X>
 
     int execute() override
     {
-        throw std::runtime_error("DEC_9B is not implemented");
+        throw OpcodeNotYetImplementedException("DEC_9B");
         return  5 + applyOperand();
     }
 
@@ -1600,7 +1597,7 @@ class DEC_8C : public AddressMode::Absolute<Operator::DEC>
 
     int execute() override
     {
-        throw std::runtime_error("DEC_8C is not implemented");
+        throw OpcodeNotYetImplementedException("DEC_8C");
         return  5 + applyOperand();
     }
 
@@ -1616,7 +1613,7 @@ class DECW_1A : public AddressMode::Direct<Operator::DECW>
 
     int execute() override
     {
-        throw std::runtime_error("DECW_1A is not implemented");
+        throw OpcodeNotYetImplementedException("DECW_1A");
         return  6 + applyOperand();
     }
 
@@ -1632,7 +1629,7 @@ class DI_C0 : public AddressMode::Implied<Operator::DI>
 
     int execute() override
     {
-        throw std::runtime_error("DI_C0 is not implemented");
+        throw OpcodeNotYetImplementedException("DI_C0");
         return  3 + applyOperand();
     }
 
@@ -1648,7 +1645,7 @@ class DIV_9E : public AddressMode::YAccumulatorIndex<Operator::DIV, State::X>
 
     int execute() override
     {
-        throw std::runtime_error("DIV_9E is not implemented");
+        throw OpcodeNotYetImplementedException("DIV_9E");
         return 12 + applyOperand();
     }
 
@@ -1664,7 +1661,7 @@ class EI_A0 : public AddressMode::Implied<Operator::EI>
 
     int execute() override
     {
-        throw std::runtime_error("EI_A0 is not implemented");
+        throw OpcodeNotYetImplementedException("EI_A0");
         return  3 + applyOperand();
     }
 
@@ -1680,7 +1677,7 @@ class EOR_59 : public AddressMode::IndirectIndirect<Operator::EOR>
 
     int execute() override
     {
-        throw std::runtime_error("EOR_59 is not implemented");
+        throw OpcodeNotYetImplementedException("EOR_59");
         return  5 + applyOperand();
     }
 
@@ -1696,7 +1693,7 @@ class EOR_48 : public AddressMode::RegisterImmediate<Operator::EOR, State::A>
 
     int execute() override
     {
-        throw std::runtime_error("EOR_48 is not implemented");
+        throw OpcodeNotYetImplementedException("EOR_48");
         return  2 + applyOperand();
     }
 
@@ -1712,7 +1709,7 @@ class EOR_46 : public AddressMode::RegisterRegisterIndirect<Operator::EOR, State
 
     int execute() override
     {
-        throw std::runtime_error("EOR_46 is not implemented");
+        throw OpcodeNotYetImplementedException("EOR_46");
         return  3 + applyOperand();
     }
 
@@ -1728,7 +1725,7 @@ class EOR_57 : public AddressMode::RegisterDirectIndirectIndexed<Operator::EOR, 
 
     int execute() override
     {
-        throw std::runtime_error("EOR_57 is not implemented");
+        throw OpcodeNotYetImplementedException("EOR_57");
         return  6 + applyOperand();
     }
 
@@ -1744,7 +1741,7 @@ class EOR_47 : public AddressMode::RegisterDirectIndexedIndirect<Operator::EOR, 
 
     int execute() override
     {
-        throw std::runtime_error("EOR_47 is not implemented");
+        throw OpcodeNotYetImplementedException("EOR_47");
         return  6 + applyOperand();
     }
 
@@ -1760,7 +1757,7 @@ class EOR_44 : public AddressMode::RegisterDirect<Operator::EOR, State::A>
 
     int execute() override
     {
-        throw std::runtime_error("EOR_44 is not implemented");
+        throw OpcodeNotYetImplementedException("EOR_44");
         return  3 + applyOperand();
     }
 
@@ -1776,7 +1773,7 @@ class EOR_54 : public AddressMode::RegisterDirectIndexed<Operator::EOR, State::A
 
     int execute() override
     {
-        throw std::runtime_error("EOR_54 is not implemented");
+        throw OpcodeNotYetImplementedException("EOR_54");
         return  4 + applyOperand();
     }
 
@@ -1792,7 +1789,7 @@ class EOR_45 : public AddressMode::RegisterAbsolute<Operator::EOR, State::A>
 
     int execute() override
     {
-        throw std::runtime_error("EOR_45 is not implemented");
+        throw OpcodeNotYetImplementedException("EOR_45");
         return  4 + applyOperand();
     }
 
@@ -1808,7 +1805,7 @@ class EOR_55 : public AddressMode::RegisterAbsoluteIndexed<Operator::EOR, State:
 
     int execute() override
     {
-        throw std::runtime_error("EOR_55 is not implemented");
+        throw OpcodeNotYetImplementedException("EOR_55");
         return  5 + applyOperand();
     }
 
@@ -1824,7 +1821,7 @@ class EOR_56 : public AddressMode::RegisterAbsoluteIndexed<Operator::EOR, State:
 
     int execute() override
     {
-        throw std::runtime_error("EOR_56 is not implemented");
+        throw OpcodeNotYetImplementedException("EOR_56");
         return  5 + applyOperand();
     }
 
@@ -1840,7 +1837,7 @@ class EOR_49 : public AddressMode::DirectDirect<Operator::EOR>
 
     int execute() override
     {
-        throw std::runtime_error("EOR_49 is not implemented");
+        throw OpcodeNotYetImplementedException("EOR_49");
         return  6 + applyOperand();
     }
 
@@ -1856,7 +1853,7 @@ class EOR_58 : public AddressMode::DirectImmediate<Operator::EOR>
 
     int execute() override
     {
-        throw std::runtime_error("EOR_58 is not implemented");
+        throw OpcodeNotYetImplementedException("EOR_58");
         return  5 + applyOperand();
     }
 
@@ -1872,7 +1869,7 @@ class EOR1_8A : public AddressMode::CarryMemoryBit<Operator::EOR1>
 
     int execute() override
     {
-        throw std::runtime_error("EOR1_8A is not implemented");
+        throw OpcodeNotYetImplementedException("EOR1_8A");
         return  5 + applyOperand();
     }
 
@@ -1888,7 +1885,7 @@ class INC_BC : public AddressMode::Register<Operator::INC, State::A>
 
     int execute() override
     {
-        throw std::runtime_error("INC_BC is not implemented");
+        throw OpcodeNotYetImplementedException("INC_BC");
         return  2 + applyOperand();
     }
 
@@ -1904,7 +1901,7 @@ class INC_3D : public AddressMode::Register<Operator::INC, State::X>
 
     int execute() override
     {
-        throw std::runtime_error("INC_3D is not implemented");
+        throw OpcodeNotYetImplementedException("INC_3D");
         return  2 + applyOperand();
     }
 
@@ -1920,7 +1917,6 @@ class INC_FC : public AddressMode::Register<Operator::INC, State::Y>
 
     int execute() override
     {
-        throw std::runtime_error("INC_FC is not implemented");
         return  2 + applyOperand();
     }
 
@@ -1936,7 +1932,6 @@ class INC_AB : public AddressMode::Direct<Operator::INC>
 
     int execute() override
     {
-        throw std::runtime_error("INC_AB is not implemented");
         return  4 + applyOperand();
     }
 
@@ -1952,7 +1947,7 @@ class INC_BB : public AddressMode::DirectIndexed<Operator::INC, State::X>
 
     int execute() override
     {
-        throw std::runtime_error("INC_BB is not implemented");
+        throw OpcodeNotYetImplementedException("INC_BB");
         return  5 + applyOperand();
     }
 
@@ -1968,7 +1963,7 @@ class INC_AC : public AddressMode::Absolute<Operator::INC>
 
     int execute() override
     {
-        throw std::runtime_error("INC_AC is not implemented");
+        throw OpcodeNotYetImplementedException("INC_AC");
         return  5 + applyOperand();
     }
 
@@ -1984,7 +1979,7 @@ class INCW_3A : public AddressMode::Direct<Operator::INCW>
 
     int execute() override
     {
-        throw std::runtime_error("INCW_3A is not implemented");
+        throw OpcodeNotYetImplementedException("INCW_3A");
         return  6 + applyOperand();
     }
 
@@ -2000,7 +1995,6 @@ class JMP_1F : public AddressMode::AbsoluteIndexedIndirect<Operator::JMP, State:
 
     int execute() override
     {
-        throw std::runtime_error("JMP_1F is not implemented");
         return  6 + applyOperand();
     }
 
@@ -2016,7 +2010,7 @@ class JMP_5F : public AddressMode::Absolute<Operator::JMP>
 
     int execute() override
     {
-        throw std::runtime_error("JMP_5F is not implemented");
+        throw OpcodeNotYetImplementedException("JMP_5F");
         return  3 + applyOperand();
     }
 
@@ -2032,7 +2026,7 @@ class LSR_5C : public AddressMode::Register<Operator::LSR, State::A>
 
     int execute() override
     {
-        throw std::runtime_error("LSR_5C is not implemented");
+        throw OpcodeNotYetImplementedException("LSR_5C");
         return  2 + applyOperand();
     }
 
@@ -2048,7 +2042,7 @@ class LSR_4B : public AddressMode::Direct<Operator::LSR>
 
     int execute() override
     {
-        throw std::runtime_error("LSR_4B is not implemented");
+        throw OpcodeNotYetImplementedException("LSR_4B");
         return  4 + applyOperand();
     }
 
@@ -2064,7 +2058,7 @@ class LSR_5B : public AddressMode::DirectIndexed<Operator::LSR, State::X>
 
     int execute() override
     {
-        throw std::runtime_error("LSR_5B is not implemented");
+        throw OpcodeNotYetImplementedException("LSR_5B");
         return  5 + applyOperand();
     }
 
@@ -2080,7 +2074,7 @@ class LSR_4C : public AddressMode::Absolute<Operator::LSR>
 
     int execute() override
     {
-        throw std::runtime_error("LSR_4C is not implemented");
+        throw OpcodeNotYetImplementedException("LSR_4C");
         return  5 + applyOperand();
     }
 
@@ -2096,7 +2090,6 @@ class MOV_AF : public AddressMode::RegisterIndirectIncrementRegister<Operator::M
 
     int execute() override
     {
-        throw std::runtime_error("MOV_AF is not implemented");
         return  4 + applyOperand();
     }
 
@@ -2127,7 +2120,6 @@ class MOV_D7 : public AddressMode::DirectIndirectIndexedRegister<Operator::MOV, 
 
     int execute() override
     {
-        throw std::runtime_error("MOV_D7 is not implemented");
         return  7 + applyOperand();
     }
 
@@ -2143,7 +2135,7 @@ class MOV_C7 : public AddressMode::DirectIndexedIndirectRegister<Operator::MOV, 
 
     int execute() override
     {
-        throw std::runtime_error("MOV_C7 is not implemented");
+        throw OpcodeNotYetImplementedException("MOV_C7");
         return  7 + applyOperand();
     }
 
@@ -2174,7 +2166,7 @@ class MOV_E6 : public AddressMode::RegisterRegisterIndirect<Operator::MOV_Signed
 
     int execute() override
     {
-        throw std::runtime_error("MOV_E6 is not implemented");
+        throw OpcodeNotYetImplementedException("MOV_E6");
         return  3 + applyOperand();
     }
 
@@ -2190,7 +2182,7 @@ class MOV_BF : public AddressMode::RegisterRegisterIndirectIncrement<Operator::M
 
     int execute() override
     {
-        throw std::runtime_error("MOV_BF is not implemented");
+        throw OpcodeNotYetImplementedException("MOV_BF");
         return  4 + applyOperand();
     }
 
@@ -2206,7 +2198,7 @@ class MOV_F7 : public AddressMode::RegisterDirectIndirectIndexed<Operator::MOV_S
 
     int execute() override
     {
-        throw std::runtime_error("MOV_F7 is not implemented");
+        throw OpcodeNotYetImplementedException("MOV_F7");
         return  6 + applyOperand();
     }
 
@@ -2222,7 +2214,7 @@ class MOV_E7 : public AddressMode::RegisterDirectIndexedIndirect<Operator::MOV_S
 
     int execute() override
     {
-        throw std::runtime_error("MOV_E7 is not implemented");
+        throw OpcodeNotYetImplementedException("MOV_E7");
         return  6 + applyOperand();
     }
 
@@ -2238,7 +2230,7 @@ class MOV_7D : public AddressMode::RegisterRegister<Operator::MOV_SignedResult, 
 
     int execute() override
     {
-        throw std::runtime_error("MOV_7D is not implemented");
+        throw OpcodeNotYetImplementedException("MOV_7D");
         return  2 + applyOperand();
     }
 
@@ -2269,7 +2261,6 @@ class MOV_E4 : public AddressMode::RegisterDirect<Operator::MOV_SignedResult, St
 
     int execute() override
     {
-        throw std::runtime_error("MOV_E4 is not implemented");
         return  3 + applyOperand();
     }
 
@@ -2285,7 +2276,7 @@ class MOV_F4 : public AddressMode::RegisterDirectIndexed<Operator::MOV_SignedRes
 
     int execute() override
     {
-        throw std::runtime_error("MOV_F4 is not implemented");
+        throw OpcodeNotYetImplementedException("MOV_F4");
         return  4 + applyOperand();
     }
 
@@ -2301,7 +2292,7 @@ class MOV_E5 : public AddressMode::RegisterAbsolute<Operator::MOV_SignedResult, 
 
     int execute() override
     {
-        throw std::runtime_error("MOV_E5 is not implemented");
+        throw OpcodeNotYetImplementedException("MOV_E5");
         return  4 + applyOperand();
     }
 
@@ -2317,7 +2308,7 @@ class MOV_F5 : public AddressMode::RegisterAbsoluteIndexed<Operator::MOV_SignedR
 
     int execute() override
     {
-        throw std::runtime_error("MOV_F5 is not implemented");
+        throw OpcodeNotYetImplementedException("MOV_F5");
         return  5 + applyOperand();
     }
 
@@ -2333,7 +2324,7 @@ class MOV_F6 : public AddressMode::RegisterAbsoluteIndexed<Operator::MOV_SignedR
 
     int execute() override
     {
-        throw std::runtime_error("MOV_F6 is not implemented");
+        throw OpcodeNotYetImplementedException("MOV_F6");
         return  5 + applyOperand();
     }
 
@@ -2394,7 +2385,7 @@ class MOV_9D : public AddressMode::RegisterRegister<Operator::MOV_SignedResult, 
 
     int execute() override
     {
-        throw std::runtime_error("MOV_9D is not implemented");
+        throw OpcodeNotYetImplementedException("MOV_9D");
         return  2 + applyOperand();
     }
 
@@ -2410,7 +2401,7 @@ class MOV_F8 : public AddressMode::RegisterDirect<Operator::MOV_SignedResult, St
 
     int execute() override
     {
-        throw std::runtime_error("MOV_F8 is not implemented");
+        throw OpcodeNotYetImplementedException("MOV_F8");
         return  3 + applyOperand();
     }
 
@@ -2426,7 +2417,7 @@ class MOV_F9 : public AddressMode::RegisterDirectIndexed<Operator::MOV_SignedRes
 
     int execute() override
     {
-        throw std::runtime_error("MOV_F9 is not implemented");
+        throw OpcodeNotYetImplementedException("MOV_F9");
         return  4 + applyOperand();
     }
 
@@ -2442,7 +2433,7 @@ class MOV_E9 : public AddressMode::RegisterAbsolute<Operator::MOV_SignedResult, 
 
     int execute() override
     {
-        throw std::runtime_error("MOV_E9 is not implemented");
+        throw OpcodeNotYetImplementedException("MOV_E9");
         return  4 + applyOperand();
     }
 
@@ -2458,7 +2449,7 @@ class MOV_8D : public AddressMode::RegisterImmediate<Operator::MOV_SignedResult,
 
     int execute() override
     {
-        throw std::runtime_error("MOV_8D is not implemented");
+        throw OpcodeNotYetImplementedException("MOV_8D");
         return  2 + applyOperand();
     }
 
@@ -2474,7 +2465,7 @@ class MOV_FD : public AddressMode::RegisterRegister<Operator::MOV_SignedResult, 
 
     int execute() override
     {
-        throw std::runtime_error("MOV_FD is not implemented");
+        throw OpcodeNotYetImplementedException("MOV_FD");
         return  2 + applyOperand();
     }
 
@@ -2490,7 +2481,6 @@ class MOV_EB : public AddressMode::RegisterDirect<Operator::MOV_SignedResult, St
 
     int execute() override
     {
-        throw std::runtime_error("MOV_EB is not implemented");
         return  3 + applyOperand();
     }
 
@@ -2506,7 +2496,7 @@ class MOV_FB : public AddressMode::RegisterDirectIndexed<Operator::MOV_SignedRes
 
     int execute() override
     {
-        throw std::runtime_error("MOV_FB is not implemented");
+        throw OpcodeNotYetImplementedException("MOV_FB");
         return  4 + applyOperand();
     }
 
@@ -2522,7 +2512,7 @@ class MOV_EC : public AddressMode::RegisterAbsolute<Operator::MOV_SignedResult, 
 
     int execute() override
     {
-        throw std::runtime_error("MOV_EC is not implemented");
+        throw OpcodeNotYetImplementedException("MOV_EC");
         return  4 + applyOperand();
     }
 
@@ -2538,7 +2528,7 @@ class MOV_FA : public AddressMode::DirectDirect<Operator::MOV>
 
     int execute() override
     {
-        throw std::runtime_error("MOV_FA is not implemented");
+        throw OpcodeNotYetImplementedException("MOV_FA");
         return  5 + applyOperand();
     }
 
@@ -2554,7 +2544,7 @@ class MOV_D4 : public AddressMode::DirectIndexedRegister<Operator::MOV, State::X
 
     int execute() override
     {
-        throw std::runtime_error("MOV_D4 is not implemented");
+        throw OpcodeNotYetImplementedException("MOV_D4");
         return  5 + applyOperand();
     }
 
@@ -2570,7 +2560,7 @@ class MOV_DB : public AddressMode::DirectIndexedRegister<Operator::MOV, State::X
 
     int execute() override
     {
-        throw std::runtime_error("MOV_DB is not implemented");
+        throw OpcodeNotYetImplementedException("MOV_DB");
         return  5 + applyOperand();
     }
 
@@ -2586,7 +2576,7 @@ class MOV_D9 : public AddressMode::DirectIndexedRegister<Operator::MOV, State::Y
 
     int execute() override
     {
-        throw std::runtime_error("MOV_D9 is not implemented");
+        throw OpcodeNotYetImplementedException("MOV_D9");
         return  5 + applyOperand();
     }
 
@@ -2632,7 +2622,7 @@ class MOV_D8 : public AddressMode::DirectRegister<Operator::MOV, State::X>
 
     int execute() override
     {
-        throw std::runtime_error("MOV_D8 is not implemented");
+        throw OpcodeNotYetImplementedException("MOV_D8");
         return  4 + applyOperand();
     }
 
@@ -2648,7 +2638,6 @@ class MOV_CB : public AddressMode::DirectRegister<Operator::MOV, State::Y>
 
     int execute() override
     {
-        throw std::runtime_error("MOV_CB is not implemented");
         return  4 + applyOperand();
     }
 
@@ -2664,7 +2653,7 @@ class MOV_D5 : public AddressMode::AbsoluteIndexedRegister<Operator::MOV, State:
 
     int execute() override
     {
-        throw std::runtime_error("MOV_D5 is not implemented");
+        throw OpcodeNotYetImplementedException("MOV_D5");
         return  6 + applyOperand();
     }
 
@@ -2680,7 +2669,7 @@ class MOV_D6 : public AddressMode::AbsoluteIndexedRegister<Operator::MOV, State:
 
     int execute() override
     {
-        throw std::runtime_error("MOV_D6 is not implemented");
+        throw OpcodeNotYetImplementedException("MOV_D6");
         return  6 + applyOperand();
     }
 
@@ -2696,7 +2685,7 @@ class MOV_C5 : public AddressMode::AbsoluteRegister<Operator::MOV, State::A>
 
     int execute() override
     {
-        throw std::runtime_error("MOV_C5 is not implemented");
+        throw OpcodeNotYetImplementedException("MOV_C5");
         return  5 + applyOperand();
     }
 
@@ -2712,7 +2701,7 @@ class MOV_C9 : public AddressMode::AbsoluteRegister<Operator::MOV, State::X>
 
     int execute() override
     {
-        throw std::runtime_error("MOV_C9 is not implemented");
+        throw OpcodeNotYetImplementedException("MOV_C9");
         return  5 + applyOperand();
     }
 
@@ -2728,7 +2717,7 @@ class MOV_CC : public AddressMode::AbsoluteRegister<Operator::MOV, State::Y>
 
     int execute() override
     {
-        throw std::runtime_error("MOV_CC is not implemented");
+        throw OpcodeNotYetImplementedException("MOV_CC");
         return  5 + applyOperand();
     }
 
@@ -2744,7 +2733,7 @@ class MOV1_AA : public AddressMode::CarryMemoryBit<Operator::MOV1>
 
     int execute() override
     {
-        throw std::runtime_error("MOV1_AA is not implemented");
+        throw OpcodeNotYetImplementedException("MOV1_AA");
         return  4 + applyOperand();
     }
 
@@ -2760,7 +2749,7 @@ class MOV1_CA : public AddressMode::MemoryBitCarry<Operator::MOV1>
 
     int execute() override
     {
-        throw std::runtime_error("MOV1_CA is not implemented");
+        throw OpcodeNotYetImplementedException("MOV1_CA");
         return  6 + applyOperand();
     }
 
@@ -2806,7 +2795,7 @@ class MUL_CF : public AddressMode::YAccumulator<Operator::MUL>
 
     int execute() override
     {
-        throw std::runtime_error("MUL_CF is not implemented");
+        throw OpcodeNotYetImplementedException("MUL_CF");
         return  9 + applyOperand();
     }
 
@@ -2822,7 +2811,7 @@ class NOP_00 : public AddressMode::Implied<Operator::NOP>
 
     int execute() override
     {
-        throw std::runtime_error("NOP_00 is not implemented");
+        throw OpcodeNotYetImplementedException("NOP_00");
         return  2 + applyOperand();
     }
 
@@ -2838,7 +2827,7 @@ class NOT1_EA : public AddressMode::MemoryBit<Operator::NOT1>
 
     int execute() override
     {
-        throw std::runtime_error("NOT1_EA is not implemented");
+        throw OpcodeNotYetImplementedException("NOT1_EA");
         return  5 + applyOperand();
     }
 
@@ -2854,7 +2843,7 @@ class NOTC_ED : public AddressMode::Implied<Operator::NOTC>
 
     int execute() override
     {
-        throw std::runtime_error("NOTC_ED is not implemented");
+        throw OpcodeNotYetImplementedException("NOTC_ED");
         return  3 + applyOperand();
     }
 
@@ -2870,7 +2859,7 @@ class OR_19 : public AddressMode::IndirectIndirect<Operator::OR>
 
     int execute() override
     {
-        throw std::runtime_error("OR_19 is not implemented");
+        throw OpcodeNotYetImplementedException("OR_19");
         return  5 + applyOperand();
     }
 
@@ -2886,7 +2875,7 @@ class OR_08 : public AddressMode::RegisterImmediate<Operator::OR, State::A>
 
     int execute() override
     {
-        throw std::runtime_error("OR_08 is not implemented");
+        throw OpcodeNotYetImplementedException("OR_08");
         return  2 + applyOperand();
     }
 
@@ -2902,7 +2891,7 @@ class OR_06 : public AddressMode::RegisterRegisterIndirect<Operator::OR, State::
 
     int execute() override
     {
-        throw std::runtime_error("OR_06 is not implemented");
+        throw OpcodeNotYetImplementedException("OR_06");
         return  3 + applyOperand();
     }
 
@@ -2918,7 +2907,7 @@ class OR_17 : public AddressMode::RegisterDirectIndirectIndexed<Operator::OR, St
 
     int execute() override
     {
-        throw std::runtime_error("OR_17 is not implemented");
+        throw OpcodeNotYetImplementedException("OR_17");
         return  6 + applyOperand();
     }
 
@@ -2934,7 +2923,7 @@ class OR_07 : public AddressMode::RegisterDirectIndexedIndirect<Operator::OR, St
 
     int execute() override
     {
-        throw std::runtime_error("OR_07 is not implemented");
+        throw OpcodeNotYetImplementedException("OR_07");
         return  6 + applyOperand();
     }
 
@@ -2950,7 +2939,7 @@ class OR_04 : public AddressMode::RegisterDirect<Operator::OR, State::A>
 
     int execute() override
     {
-        throw std::runtime_error("OR_04 is not implemented");
+        throw OpcodeNotYetImplementedException("OR_04");
         return  3 + applyOperand();
     }
 
@@ -2966,7 +2955,7 @@ class OR_14 : public AddressMode::RegisterDirectIndexed<Operator::OR, State::A, 
 
     int execute() override
     {
-        throw std::runtime_error("OR_14 is not implemented");
+        throw OpcodeNotYetImplementedException("OR_14");
         return  4 + applyOperand();
     }
 
@@ -2982,7 +2971,7 @@ class OR_05 : public AddressMode::RegisterAbsolute<Operator::OR, State::A>
 
     int execute() override
     {
-        throw std::runtime_error("OR_05 is not implemented");
+        throw OpcodeNotYetImplementedException("OR_05");
         return  4 + applyOperand();
     }
 
@@ -2998,7 +2987,7 @@ class OR_15 : public AddressMode::RegisterAbsoluteIndexed<Operator::OR, State::A
 
     int execute() override
     {
-        throw std::runtime_error("OR_15 is not implemented");
+        throw OpcodeNotYetImplementedException("OR_15");
         return  5 + applyOperand();
     }
 
@@ -3014,7 +3003,7 @@ class OR_16 : public AddressMode::RegisterAbsoluteIndexed<Operator::OR, State::A
 
     int execute() override
     {
-        throw std::runtime_error("OR_16 is not implemented");
+        throw OpcodeNotYetImplementedException("OR_16");
         return  5 + applyOperand();
     }
 
@@ -3030,7 +3019,7 @@ class OR_09 : public AddressMode::DirectDirect<Operator::OR>
 
     int execute() override
     {
-        throw std::runtime_error("OR_09 is not implemented");
+        throw OpcodeNotYetImplementedException("OR_09");
         return  6 + applyOperand();
     }
 
@@ -3046,7 +3035,7 @@ class OR_18 : public AddressMode::DirectImmediate<Operator::OR>
 
     int execute() override
     {
-        throw std::runtime_error("OR_18 is not implemented");
+        throw OpcodeNotYetImplementedException("OR_18");
         return  5 + applyOperand();
     }
 
@@ -3062,7 +3051,7 @@ class OR1_2A : public AddressMode::CarryNegatedMemoryBit<Operator::OR1>
 
     int execute() override
     {
-        throw std::runtime_error("OR1_2A is not implemented");
+        throw OpcodeNotYetImplementedException("OR1_2A");
         return  5 + applyOperand();
     }
 
@@ -3078,7 +3067,7 @@ class OR1_0A : public AddressMode::CarryMemoryBit<Operator::OR1>
 
     int execute() override
     {
-        throw std::runtime_error("OR1_0A is not implemented");
+        throw OpcodeNotYetImplementedException("OR1_0A");
         return  5 + applyOperand();
     }
 
@@ -3094,7 +3083,7 @@ class PCALL_4F : public AddressMode::UPage<Operator::PCALL>
 
     int execute() override
     {
-        throw std::runtime_error("PCALL_4F is not implemented");
+        throw OpcodeNotYetImplementedException("PCALL_4F");
         return  6 + applyOperand();
     }
 
@@ -3110,7 +3099,7 @@ class POP_AE : public AddressMode::Register<Operator::POP, State::A>
 
     int execute() override
     {
-        throw std::runtime_error("POP_AE is not implemented");
+        throw OpcodeNotYetImplementedException("POP_AE");
         return  4 + applyOperand();
     }
 
@@ -3126,7 +3115,7 @@ class POP_8E : public AddressMode::Register<Operator::POP, State::PSW>
 
     int execute() override
     {
-        throw std::runtime_error("POP_8E is not implemented");
+        throw OpcodeNotYetImplementedException("POP_8E");
         return  4 + applyOperand();
     }
 
@@ -3142,7 +3131,7 @@ class POP_CE : public AddressMode::Register<Operator::POP, State::X>
 
     int execute() override
     {
-        throw std::runtime_error("POP_CE is not implemented");
+        throw OpcodeNotYetImplementedException("POP_CE");
         return  4 + applyOperand();
     }
 
@@ -3158,7 +3147,7 @@ class POP_EE : public AddressMode::Register<Operator::POP, State::Y>
 
     int execute() override
     {
-        throw std::runtime_error("POP_EE is not implemented");
+        throw OpcodeNotYetImplementedException("POP_EE");
         return  4 + applyOperand();
     }
 
@@ -3174,7 +3163,7 @@ class PUSH_2D : public AddressMode::Register<Operator::PUSH, State::A>
 
     int execute() override
     {
-        throw std::runtime_error("PUSH_2D is not implemented");
+        throw OpcodeNotYetImplementedException("PUSH_2D");
         return  4 + applyOperand();
     }
 
@@ -3190,7 +3179,7 @@ class PUSH_0D : public AddressMode::Register<Operator::PUSH, State::PSW>
 
     int execute() override
     {
-        throw std::runtime_error("PUSH_0D is not implemented");
+        throw OpcodeNotYetImplementedException("PUSH_0D");
         return  4 + applyOperand();
     }
 
@@ -3206,7 +3195,7 @@ class PUSH_4D : public AddressMode::Register<Operator::PUSH, State::X>
 
     int execute() override
     {
-        throw std::runtime_error("PUSH_4D is not implemented");
+        throw OpcodeNotYetImplementedException("PUSH_4D");
         return  4 + applyOperand();
     }
 
@@ -3222,7 +3211,7 @@ class PUSH_6D : public AddressMode::Register<Operator::PUSH, State::Y>
 
     int execute() override
     {
-        throw std::runtime_error("PUSH_6D is not implemented");
+        throw OpcodeNotYetImplementedException("PUSH_6D");
         return  4 + applyOperand();
     }
 
@@ -3238,7 +3227,7 @@ class RET_6F : public AddressMode::Implied<Operator::RET>
 
     int execute() override
     {
-        throw std::runtime_error("RET_6F is not implemented");
+        throw OpcodeNotYetImplementedException("RET_6F");
         return  5 + applyOperand();
     }
 
@@ -3254,7 +3243,7 @@ class RET1_7F : public AddressMode::Implied<Operator::RET1>
 
     int execute() override
     {
-        throw std::runtime_error("RET1_7F is not implemented");
+        throw OpcodeNotYetImplementedException("RET1_7F");
         return  6 + applyOperand();
     }
 
@@ -3270,7 +3259,7 @@ class ROL_3C : public AddressMode::Register<Operator::ROL, State::A>
 
     int execute() override
     {
-        throw std::runtime_error("ROL_3C is not implemented");
+        throw OpcodeNotYetImplementedException("ROL_3C");
         return  2 + applyOperand();
     }
 
@@ -3286,7 +3275,7 @@ class ROL_2B : public AddressMode::Direct<Operator::ROL>
 
     int execute() override
     {
-        throw std::runtime_error("ROL_2B is not implemented");
+        throw OpcodeNotYetImplementedException("ROL_2B");
         return  4 + applyOperand();
     }
 
@@ -3302,7 +3291,7 @@ class ROL_3B : public AddressMode::DirectIndexed<Operator::ROL, State::X>
 
     int execute() override
     {
-        throw std::runtime_error("ROL_3B is not implemented");
+        throw OpcodeNotYetImplementedException("ROL_3B");
         return  5 + applyOperand();
     }
 
@@ -3318,7 +3307,7 @@ class ROL_2C : public AddressMode::Absolute<Operator::ROL>
 
     int execute() override
     {
-        throw std::runtime_error("ROL_2C is not implemented");
+        throw OpcodeNotYetImplementedException("ROL_2C");
         return  5 + applyOperand();
     }
 
@@ -3334,7 +3323,7 @@ class ROR_7C : public AddressMode::Register<Operator::ROR, State::A>
 
     int execute() override
     {
-        throw std::runtime_error("ROR_7C is not implemented");
+        throw OpcodeNotYetImplementedException("ROR_7C");
         return  2 + applyOperand();
     }
 
@@ -3350,7 +3339,7 @@ class ROR_6B : public AddressMode::Direct<Operator::ROR>
 
     int execute() override
     {
-        throw std::runtime_error("ROR_6B is not implemented");
+        throw OpcodeNotYetImplementedException("ROR_6B");
         return  4 + applyOperand();
     }
 
@@ -3366,7 +3355,7 @@ class ROR_7B : public AddressMode::DirectIndexed<Operator::ROR, State::X>
 
     int execute() override
     {
-        throw std::runtime_error("ROR_7B is not implemented");
+        throw OpcodeNotYetImplementedException("ROR_7B");
         return  5 + applyOperand();
     }
 
@@ -3382,7 +3371,7 @@ class ROR_6C : public AddressMode::Absolute<Operator::ROR>
 
     int execute() override
     {
-        throw std::runtime_error("ROR_6C is not implemented");
+        throw OpcodeNotYetImplementedException("ROR_6C");
         return  5 + applyOperand();
     }
 
@@ -3398,7 +3387,7 @@ class SBC_B9 : public AddressMode::IndirectIndirect<Operator::SBC>
 
     int execute() override
     {
-        throw std::runtime_error("SBC_B9 is not implemented");
+        throw OpcodeNotYetImplementedException("SBC_B9");
         return  5 + applyOperand();
     }
 
@@ -3414,7 +3403,7 @@ class SBC_A8 : public AddressMode::RegisterImmediate<Operator::SBC, State::A>
 
     int execute() override
     {
-        throw std::runtime_error("SBC_A8 is not implemented");
+        throw OpcodeNotYetImplementedException("SBC_A8");
         return  2 + applyOperand();
     }
 
@@ -3430,7 +3419,7 @@ class SBC_A6 : public AddressMode::RegisterRegisterIndirect<Operator::SBC, State
 
     int execute() override
     {
-        throw std::runtime_error("SBC_A6 is not implemented");
+        throw OpcodeNotYetImplementedException("SBC_A6");
         return  3 + applyOperand();
     }
 
@@ -3446,7 +3435,7 @@ class SBC_B7 : public AddressMode::RegisterDirectIndirectIndexed<Operator::SBC, 
 
     int execute() override
     {
-        throw std::runtime_error("SBC_B7 is not implemented");
+        throw OpcodeNotYetImplementedException("SBC_B7");
         return  6 + applyOperand();
     }
 
@@ -3462,7 +3451,7 @@ class SBC_A7 : public AddressMode::RegisterDirectIndexedIndirect<Operator::SBC, 
 
     int execute() override
     {
-        throw std::runtime_error("SBC_A7 is not implemented");
+        throw OpcodeNotYetImplementedException("SBC_A7");
         return  6 + applyOperand();
     }
 
@@ -3478,7 +3467,7 @@ class SBC_A4 : public AddressMode::RegisterDirect<Operator::SBC, State::A>
 
     int execute() override
     {
-        throw std::runtime_error("SBC_A4 is not implemented");
+        throw OpcodeNotYetImplementedException("SBC_A4");
         return  3 + applyOperand();
     }
 
@@ -3494,7 +3483,7 @@ class SBC_B4 : public AddressMode::RegisterDirectIndexed<Operator::SBC, State::A
 
     int execute() override
     {
-        throw std::runtime_error("SBC_B4 is not implemented");
+        throw OpcodeNotYetImplementedException("SBC_B4");
         return  4 + applyOperand();
     }
 
@@ -3510,7 +3499,7 @@ class SBC_A5 : public AddressMode::RegisterAbsolute<Operator::SBC, State::A>
 
     int execute() override
     {
-        throw std::runtime_error("SBC_A5 is not implemented");
+        throw OpcodeNotYetImplementedException("SBC_A5");
         return  4 + applyOperand();
     }
 
@@ -3526,7 +3515,7 @@ class SBC_B5 : public AddressMode::RegisterAbsoluteIndexed<Operator::SBC, State:
 
     int execute() override
     {
-        throw std::runtime_error("SBC_B5 is not implemented");
+        throw OpcodeNotYetImplementedException("SBC_B5");
         return  5 + applyOperand();
     }
 
@@ -3542,7 +3531,7 @@ class SBC_B6 : public AddressMode::RegisterAbsoluteIndexed<Operator::SBC, State:
 
     int execute() override
     {
-        throw std::runtime_error("SBC_B6 is not implemented");
+        throw OpcodeNotYetImplementedException("SBC_B6");
         return  5 + applyOperand();
     }
 
@@ -3558,7 +3547,7 @@ class SBC_A9 : public AddressMode::DirectDirect<Operator::SBC>
 
     int execute() override
     {
-        throw std::runtime_error("SBC_A9 is not implemented");
+        throw OpcodeNotYetImplementedException("SBC_A9");
         return  6 + applyOperand();
     }
 
@@ -3574,7 +3563,7 @@ class SBC_B8 : public AddressMode::DirectImmediate<Operator::SBC>
 
     int execute() override
     {
-        throw std::runtime_error("SBC_B8 is not implemented");
+        throw OpcodeNotYetImplementedException("SBC_B8");
         return  5 + applyOperand();
     }
 
@@ -3590,7 +3579,7 @@ class SET1_02 : public AddressMode::DirectBit<Operator::SET1, 1 << 0>
 
     int execute() override
     {
-        throw std::runtime_error("SET1_02 is not implemented");
+        throw OpcodeNotYetImplementedException("SET1_02");
         return  4 + applyOperand();
     }
 
@@ -3606,7 +3595,7 @@ class SET1_22 : public AddressMode::DirectBit<Operator::SET1, 1 << 1>
 
     int execute() override
     {
-        throw std::runtime_error("SET1_22 is not implemented");
+        throw OpcodeNotYetImplementedException("SET1_22");
         return  4 + applyOperand();
     }
 
@@ -3622,7 +3611,7 @@ class SET1_42 : public AddressMode::DirectBit<Operator::SET1, 1 << 2>
 
     int execute() override
     {
-        throw std::runtime_error("SET1_42 is not implemented");
+        throw OpcodeNotYetImplementedException("SET1_42");
         return  4 + applyOperand();
     }
 
@@ -3638,7 +3627,7 @@ class SET1_62 : public AddressMode::DirectBit<Operator::SET1, 1 << 3>
 
     int execute() override
     {
-        throw std::runtime_error("SET1_62 is not implemented");
+        throw OpcodeNotYetImplementedException("SET1_62");
         return  4 + applyOperand();
     }
 
@@ -3654,7 +3643,7 @@ class SET1_82 : public AddressMode::DirectBit<Operator::SET1, 1 << 4>
 
     int execute() override
     {
-        throw std::runtime_error("SET1_82 is not implemented");
+        throw OpcodeNotYetImplementedException("SET1_82");
         return  4 + applyOperand();
     }
 
@@ -3670,7 +3659,7 @@ class SET1_A2 : public AddressMode::DirectBit<Operator::SET1, 1 << 5>
 
     int execute() override
     {
-        throw std::runtime_error("SET1_A2 is not implemented");
+        throw OpcodeNotYetImplementedException("SET1_A2");
         return  4 + applyOperand();
     }
 
@@ -3686,7 +3675,7 @@ class SET1_C2 : public AddressMode::DirectBit<Operator::SET1, 1 << 6>
 
     int execute() override
     {
-        throw std::runtime_error("SET1_C2 is not implemented");
+        throw OpcodeNotYetImplementedException("SET1_C2");
         return  4 + applyOperand();
     }
 
@@ -3702,7 +3691,7 @@ class SET1_E2 : public AddressMode::DirectBit<Operator::SET1, 1 << 7>
 
     int execute() override
     {
-        throw std::runtime_error("SET1_E2 is not implemented");
+        throw OpcodeNotYetImplementedException("SET1_E2");
         return  4 + applyOperand();
     }
 
@@ -3718,7 +3707,7 @@ class SETC_80 : public AddressMode::Implied<Operator::SETC>
 
     int execute() override
     {
-        throw std::runtime_error("SETC_80 is not implemented");
+        throw OpcodeNotYetImplementedException("SETC_80");
         return  2 + applyOperand();
     }
 
@@ -3734,7 +3723,7 @@ class SETP_40 : public AddressMode::Implied<Operator::SETP>
 
     int execute() override
     {
-        throw std::runtime_error("SETP_40 is not implemented");
+        throw OpcodeNotYetImplementedException("SETP_40");
         return  2 + applyOperand();
     }
 
@@ -3750,7 +3739,7 @@ class SLEEP_EF : public AddressMode::Implied<Operator::SLEEP>
 
     int execute() override
     {
-        throw std::runtime_error("SLEEP_EF is not implemented");
+        throw OpcodeNotYetImplementedException("SLEEP_EF");
         return  3 + applyOperand();
     }
 
@@ -3766,7 +3755,7 @@ class STOP_FF : public AddressMode::Implied<Operator::STOP>
 
     int execute() override
     {
-        throw std::runtime_error("STOP_FF is not implemented");
+        throw OpcodeNotYetImplementedException("STOP_FF");
         return  3 + applyOperand();
     }
 
@@ -3782,7 +3771,7 @@ class SUBW_9A : public AddressMode::YAccumulatorDirect<Operator::SUBW>
 
     int execute() override
     {
-        throw std::runtime_error("SUBW_9A is not implemented");
+        throw OpcodeNotYetImplementedException("SUBW_9A");
         return  5 + applyOperand();
     }
 
@@ -3798,7 +3787,7 @@ class TCALL_01 : public AddressMode::Table<Operator::TCALL, 0>
 
     int execute() override
     {
-        throw std::runtime_error("TCALL_01 is not implemented");
+        throw OpcodeNotYetImplementedException("TCALL_01");
         return  8 + applyOperand();
     }
 
@@ -3814,7 +3803,7 @@ class TCALL_11 : public AddressMode::Table<Operator::TCALL, 1>
 
     int execute() override
     {
-        throw std::runtime_error("TCALL_11 is not implemented");
+        throw OpcodeNotYetImplementedException("TCALL_11");
         return  8 + applyOperand();
     }
 
@@ -3830,7 +3819,7 @@ class TCALL_21 : public AddressMode::Table<Operator::TCALL, 2>
 
     int execute() override
     {
-        throw std::runtime_error("TCALL_21 is not implemented");
+        throw OpcodeNotYetImplementedException("TCALL_21");
         return  8 + applyOperand();
     }
 
@@ -3846,7 +3835,7 @@ class TCALL_31 : public AddressMode::Table<Operator::TCALL, 3>
 
     int execute() override
     {
-        throw std::runtime_error("TCALL_31 is not implemented");
+        throw OpcodeNotYetImplementedException("TCALL_31");
         return  8 + applyOperand();
     }
 
@@ -3862,7 +3851,7 @@ class TCALL_41 : public AddressMode::Table<Operator::TCALL, 4>
 
     int execute() override
     {
-        throw std::runtime_error("TCALL_41 is not implemented");
+        throw OpcodeNotYetImplementedException("TCALL_41");
         return  8 + applyOperand();
     }
 
@@ -3878,7 +3867,7 @@ class TCALL_51 : public AddressMode::Table<Operator::TCALL, 5>
 
     int execute() override
     {
-        throw std::runtime_error("TCALL_51 is not implemented");
+        throw OpcodeNotYetImplementedException("TCALL_51");
         return  8 + applyOperand();
     }
 
@@ -3894,7 +3883,7 @@ class TCALL_61 : public AddressMode::Table<Operator::TCALL, 6>
 
     int execute() override
     {
-        throw std::runtime_error("TCALL_61 is not implemented");
+        throw OpcodeNotYetImplementedException("TCALL_61");
         return  8 + applyOperand();
     }
 
@@ -3910,7 +3899,7 @@ class TCALL_71 : public AddressMode::Table<Operator::TCALL, 7>
 
     int execute() override
     {
-        throw std::runtime_error("TCALL_71 is not implemented");
+        throw OpcodeNotYetImplementedException("TCALL_71");
         return  8 + applyOperand();
     }
 
@@ -3926,7 +3915,7 @@ class TCALL_81 : public AddressMode::Table<Operator::TCALL, 8>
 
     int execute() override
     {
-        throw std::runtime_error("TCALL_81 is not implemented");
+        throw OpcodeNotYetImplementedException("TCALL_81");
         return  8 + applyOperand();
     }
 
@@ -3942,7 +3931,7 @@ class TCALL_91 : public AddressMode::Table<Operator::TCALL, 9>
 
     int execute() override
     {
-        throw std::runtime_error("TCALL_91 is not implemented");
+        throw OpcodeNotYetImplementedException("TCALL_91");
         return  8 + applyOperand();
     }
 
@@ -3958,7 +3947,7 @@ class TCALL_A1 : public AddressMode::Table<Operator::TCALL, 10>
 
     int execute() override
     {
-        throw std::runtime_error("TCALL_A1 is not implemented");
+        throw OpcodeNotYetImplementedException("TCALL_A1");
         return  8 + applyOperand();
     }
 
@@ -3974,7 +3963,7 @@ class TCALL_B1 : public AddressMode::Table<Operator::TCALL, 11>
 
     int execute() override
     {
-        throw std::runtime_error("TCALL_B1 is not implemented");
+        throw OpcodeNotYetImplementedException("TCALL_B1");
         return  8 + applyOperand();
     }
 
@@ -3990,7 +3979,7 @@ class TCALL_C1 : public AddressMode::Table<Operator::TCALL, 12>
 
     int execute() override
     {
-        throw std::runtime_error("TCALL_C1 is not implemented");
+        throw OpcodeNotYetImplementedException("TCALL_C1");
         return  8 + applyOperand();
     }
 
@@ -4006,7 +3995,7 @@ class TCALL_D1 : public AddressMode::Table<Operator::TCALL, 13>
 
     int execute() override
     {
-        throw std::runtime_error("TCALL_D1 is not implemented");
+        throw OpcodeNotYetImplementedException("TCALL_D1");
         return  8 + applyOperand();
     }
 
@@ -4022,7 +4011,7 @@ class TCALL_E1 : public AddressMode::Table<Operator::TCALL, 14>
 
     int execute() override
     {
-        throw std::runtime_error("TCALL_E1 is not implemented");
+        throw OpcodeNotYetImplementedException("TCALL_E1");
         return  8 + applyOperand();
     }
 
@@ -4038,7 +4027,7 @@ class TCALL_F1 : public AddressMode::Table<Operator::TCALL, 15>
 
     int execute() override
     {
-        throw std::runtime_error("TCALL_F1 is not implemented");
+        throw OpcodeNotYetImplementedException("TCALL_F1");
         return  8 + applyOperand();
     }
 
@@ -4054,7 +4043,7 @@ class TCLR1_4E : public AddressMode::Absolute<Operator::TCLR1>
 
     int execute() override
     {
-        throw std::runtime_error("TCLR1_4E is not implemented");
+        throw OpcodeNotYetImplementedException("TCLR1_4E");
         return  6 + applyOperand();
     }
 
@@ -4070,7 +4059,7 @@ class TSET1_0E : public AddressMode::Absolute<Operator::TSET1>
 
     int execute() override
     {
-        throw std::runtime_error("TSET1_0E is not implemented");
+        throw OpcodeNotYetImplementedException("TSET1_0E");
         return  6 + applyOperand();
     }
 
@@ -4086,7 +4075,7 @@ class XCN_9F : public AddressMode::Register<Operator::XCN, State::A>
 
     int execute() override
     {
-        throw std::runtime_error("XCN_9F is not implemented");
+        throw OpcodeNotYetImplementedException("XCN_9F");
         return  5 + applyOperand();
     }
 

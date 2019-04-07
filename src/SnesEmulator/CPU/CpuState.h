@@ -3,6 +3,7 @@
 #include <iostream>
 #include <vector>
 #include <array>
+#include <map>
 #include <bitset>
 #include <iomanip>
 
@@ -34,12 +35,14 @@ public:
         IndexRegisterCount
     };
 
+    static const size_t spcRegisterCount = 4;
+
     State()
         : emulationMode(true)
-        , memory(1 << 24, 0x55)
+        , memory(1 << 24, MemoryLocation(0x55))
     {
         std::cout << "Memory size=" << memory.size() << std::endl;
-        forceEmulationRegisters();
+        forceRegisters();
     }
 
     State(State&) = delete;
@@ -97,6 +100,12 @@ public:
     void setFlags(Byte value)
     {
         flags = value;
+        forceRegisters();
+    }
+
+    Byte getFlags() const
+    {
+        return flags;
     }
 
     bool isNativeMode() const
@@ -111,7 +120,7 @@ public:
 
     Byte readProgramByte(int offset = 0) const
     {
-        return memory[getProgramAddress(offset)];
+        return memory[getProgramAddress(offset)].getValue();
     }
 
     void reset()
@@ -134,37 +143,36 @@ public:
         return programCounter + offset;
     }
 
-    Byte* getAccumulatorPointer()
+    MemoryLocation* getAccumulatorPointer()
     {
-        return &accumulatorA;
+        return accumulator.data();
     }
 
     Byte getAccumulatorA() const
     {
-        return accumulatorA;
-    }
-
-    void setAccumulatorA(Byte value)
-    {
-        accumulatorA = value;
-        updateSignFlags(value);
+        return accumulator[0].getValue();
     }
 
     Byte getAccumulatorB() const
     {
-        return accumulatorB;
+        return accumulator[1].getValue();
+    }
+
+    void setAccumulatorA(Byte value)
+    {
+        accumulator[0].setValue(value);
+        updateSignFlags(value);
     }
 
     void setAccumulatorC(Word value)
     {
-        accumulatorA = Byte(value);
-        accumulatorB = Byte(value >> 8);
+        accumulator[0].setWordValue(value);
         updateSignFlags(value);
     }
 
     Word getAccumulatorC() const
     {
-        return accumulatorB << 8 | accumulatorA;
+        return Word(accumulator[0].getValue(), accumulator[1].getValue());
     }
 
     Word getDirectPage() const
@@ -174,47 +182,49 @@ public:
 
     Byte getMemory(Long address) const
     {
-        return memory[address];
+        return memory[address].getValue();
     }
 
-    Byte* getMemoryPointer(Long address)
+    MemoryLocation* getMemoryLocation(Long address)
     {
         return &memory[address];
     }
 
-    Byte* getMemoryPointer(Byte lowByte, Byte highByte, Byte bankByte, Word offset = 0)
+    MemoryLocation* getMemoryLocation(Byte lowByte, Byte highByte, Byte bankByte, Word offset = 0)
     {
-        return getMemoryPointer(Long(Long(lowByte, highByte, bankByte) + offset));
+        return getMemoryLocation(Long(Long(lowByte, highByte, bankByte) + offset));
     }
 
-    Byte* getMemoryPointer(Byte lowByte, Byte highByte)
+    MemoryLocation* getMemoryLocation(Byte lowByte, Byte highByte)
     {
-        return getMemoryPointer(lowByte, highByte, dataBank);
+        return getMemoryLocation(lowByte, highByte, dataBank);
     }
 
-    Byte* getMemoryPointer(Byte lowByte)
+    MemoryLocation* getMemoryLocation(Byte lowByte)
     {
-        return getMemoryPointer(Long(directPage + lowByte));
+        return getMemoryLocation(Long(directPage + lowByte));
     }
 
     void exchangeCarryAndEmulationFlags()
     {
-        forceEmulationRegisters();
+        forceRegisters();
 
         bool emulation = emulationMode;
         emulationMode = getFlag(c);
         setFlag(c, emulation);
 
-        forceEmulationRegisters();
+        forceRegisters();
     }
 
-    void forceEmulationRegisters()
+    void forceRegisters()
     {
         if (emulationMode) {
             setFlag(x | m, true);
+            ((Byte*)(&stackPointer))[1] = 1;
+        }
+        if (getFlag(x)) {
             ((Byte*)(&getIndexRegister<X>()))[1] = 0;
             ((Byte*)(&getIndexRegister<Y>()))[1] = 0;
-            ((Byte*)(&stackPointer))[1] = 1;
         }
     }
 
@@ -227,8 +237,8 @@ public:
 
     void pushToStack(Byte byte)
     {
-        memory[stackPointer--] = byte;
-        forceEmulationRegisters();
+        memory[stackPointer--].setValue(byte);
+        forceRegisters();
     }
 
     void pushToStack(Word byte)
@@ -237,16 +247,11 @@ public:
         pushToStack(Byte(byte));
     }
 
-    void pushFlagsToStack()
-    {
-        pushToStack(flags);
-    }
-
     Byte pullFromStack()
     {
         ++stackPointer;
-        forceEmulationRegisters();
-        return memory[stackPointer];
+        forceRegisters();
+        return memory[stackPointer].getValue();
     }
 
     Word pullWordFromStack()
@@ -275,21 +280,21 @@ public:
     void setStackPointer(Word value)
     {
         stackPointer = value;
-        forceEmulationRegisters();
+        forceRegisters();
     }
 
     template<IndexRegister Register>
     void setIndexRegister(Word value)
     {
         getIndexRegister<Register>() = value;
-        forceEmulationRegisters();
+        forceRegisters();
         updateSignFlags(value);
     }
 
     template<IndexRegister Register>
     void setIndexRegister(Byte value)
     {
-        getIndexRegister<Register>() = value;
+        getIndexRegister<Register>() = Word(value);
         updateSignFlags(value);
     }
 
@@ -353,8 +358,6 @@ private:
     bool tryReadHeader(int offset, std::vector<char> rom, std::ostream& output);
 
 private:
-    Byte accumulatorA;
-    Byte accumulatorB;
     Byte dataBank;
     Word directPage;
     Word stackPointer;
@@ -366,7 +369,8 @@ private:
     Byte flags;
     bool emulationMode;
 
-    std::vector<Byte> memory;
+    std::vector<MemoryLocation> memory;
+    std::array<MemoryLocation, 2> accumulator;
     std::array<Word, IndexRegisterCount> indexRegisters;
 };
 
