@@ -333,6 +333,15 @@ public:
         return value;
     }
 
+    Byte apply()
+    {
+        if (isReadProtected()) {
+            throw AccessException(__FUNCTION__ + std::string(": Bad memory access"));
+        }
+        ++applicationCount;
+        return value;
+    }
+
     Byte& get()
     {
         if (isReadProtected() || isWriteProtected()) {
@@ -386,10 +395,16 @@ public:
         type = WriteOnly;
     }
 
+    int getApplicationCount() const
+    {
+        return applicationCount;
+    }
+
 private:
     Byte value = 0;
     MemoryLocation* mapping = nullptr;
     Type type = Invalid;
+    int applicationCount = 0;
 
     friend std::ostream& operator<<(std::ostream&, const MemoryLocation&);
 };

@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "Exception.h"
+#include "Rom.h"
 
 #include "CPU/CpuState.h"
 #include "SPC/SpcState.h"
@@ -15,11 +16,13 @@
 #include <windows.h>
 enum Color
 {
-    DarkBlue = FOREGROUND_BLUE | FOREGROUND_GREEN,
+    DarkBlue = FOREGROUND_BLUE,
+    DarkTurquoise = FOREGROUND_BLUE | FOREGROUND_GREEN,
     DarkGreen = FOREGROUND_GREEN,
     DarkRed = FOREGROUND_RED,
     DarkPurple = FOREGROUND_RED | FOREGROUND_BLUE,
     Blue = FOREGROUND_INTENSITY | DarkBlue,
+    Turquoise = FOREGROUND_INTENSITY | DarkTurquoise,
     Green = FOREGROUND_INTENSITY | DarkGreen,
     Red = FOREGROUND_INTENSITY | DarkRed,
     Purple = FOREGROUND_INTENSITY | DarkPurple,
@@ -269,7 +272,10 @@ public:
     void setColor(const State& state, const Context& context, Long address, const MemoryLocation& memory)
     {
         Color color = DefaultColor;
-        if (memory.getType() == MemoryLocation::Mapped) {
+        if (memory.getApplicationCount() > 0) {
+            color = DarkTurquoise;
+        }
+        else if (memory.getType() == MemoryLocation::Mapped) {
             color = DarkGreen;
         }
         else if (memory.getType() == MemoryLocation::ReadOnly) {
@@ -284,7 +290,7 @@ public:
         bool breakpoint = context.breakpoints.find(address) != context.breakpoints.end();
         bool executing = address >= state.getProgramAddress() && address < state.getProgramAddress() + context.nextInstruction->size();
         if (breakpoint && executing) {
-            color = Blue;
+            color = Turquoise;
         }
         else if (breakpoint) {
             color = Red;
@@ -357,15 +363,17 @@ void Emulator::run()
 {
     CPU::State cpuState;
 
-    cpuState.loadRom("..\\..\\Legend of Zelda, The - A Link to the Past (U) [!].smc", output);
-    //state.loadRom("..\\..\\Super Mario World (USA).sfc");
-    //state.loadRom("..\\..\\Super Metroid (Japan, USA) (En,Ja).sfc");
-    //state.loadRom("..\\..\\Super Metroid (JU) [!].smc");
-    //state.loadRom("..\\..\\Megaman X (USA).sfc");
-    //state.loadRom("..\\..\\SnesInitializationROM.smc");
-    //state.loadRom("..\\..\\rom.smc");
-    //state.loadRom("H:\\naffnuff\\wla\\rom.smc");
-    //state.loadRom("C:\\cygwin64\\home\\rasmus.knutsson\\wla-dx\\wla\\myrom.smc");
+    Rom rom(output);
+    rom.loadFromFile("..\\..\\Legend of Zelda, The - A Link to the Past (U) [!].smc");
+    //rom.loadFromFile("..\\..\\Super Mario World (USA).sfc");
+    //rom.loadFromFile("..\\..\\Super Metroid (Japan, USA) (En,Ja).sfc");
+    //rom.loadFromFile("..\\..\\Super Metroid (JU) [!].smc");
+    //rom.loadFromFile("..\\..\\Megaman X (USA).sfc");
+    //rom.loadFromFile("..\\..\\SnesInitializationROM.smc");
+    //rom.loadFromFile("..\\..\\rom.smc");
+    //rom.loadFromFile("H:\\naffnuff\\wla\\rom.smc");
+    //rom.loadFromFile("C:\\cygwin64\\home\\rasmus.knutsson\\wla-dx\\wla\\myrom.smc");
+    rom.loadToState(cpuState);
     
     SPC::State spcState;
 

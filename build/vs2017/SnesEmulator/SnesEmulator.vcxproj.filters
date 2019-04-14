@@ -36,9 +36,6 @@
     <ClCompile Include="..\..\..\src\SnesEmulator\CPU\CpuOpcodeMap.cpp">
       <Filter>Source Files\CPU</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\SnesEmulator\CPU\CpuState.cpp">
-      <Filter>Source Files\CPU</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\SnesEmulator\SPC\SpcOpcodeMap.cpp">
       <Filter>Source Files\SPC</Filter>
     </ClCompile>
@@ -87,6 +84,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\SnesEmulator\Exception.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\SnesEmulator\Rom.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

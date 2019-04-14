@@ -4,7 +4,6 @@
 #include <set>
 
 #include "Instruction.h"
-#include "IState.h"
 
 class Emulator
 {

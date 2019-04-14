@@ -4,9 +4,9 @@
 
 namespace SPC {
 
-Instruction* OpcodeMap::getNextInstruction(const State& state) const
+Instruction* OpcodeMap::getNextInstruction(State& state) const
 {
-    return instructions[state.readProgramByte()].get();
+    return instructions[state.applyProgramByte()].get();
 }
 
 OpcodeMap::OpcodeMap(State& state)

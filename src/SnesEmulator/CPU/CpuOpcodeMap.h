@@ -12,7 +12,7 @@ class OpcodeMap
 {
 public:
     OpcodeMap(State& state);
-    Instruction* getNextInstruction(const State& state) const;
+    Instruction* getNextInstruction(State& state) const;
 
 private:
     std::array<std::unique_ptr<Instruction>, 1 << 8> instructions;

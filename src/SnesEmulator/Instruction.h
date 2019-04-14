@@ -5,6 +5,8 @@
 #include <tuple>
 #include <utility>
 
+#include "Types.h"
+
 class Instruction
 {
 public:
@@ -30,7 +32,7 @@ protected:
     {
         state.incrementProgramCounter(size());
         int offset = -1;
-        return invokeOperator(readByte<Bytes>(offset)...);
+        return invokeOperator(applyByte<Bytes>(offset)...);
     }
 
     std::string operandToString() const
@@ -49,6 +51,12 @@ protected:
     State& state;
 
 private:
+    template <typename Byte>
+    Byte applyByte(int& offset)
+    {
+        return state.applyProgramByte(offset--);
+    }
+
     template <typename Byte>
     Byte readByte(int& offset) const
     {

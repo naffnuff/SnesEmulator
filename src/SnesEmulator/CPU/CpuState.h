@@ -141,7 +141,12 @@ public:
         return memory[getProgramAddress(offset)].getValue();
     }
 
-    void reset()
+    Byte applyProgramByte(int offset = 0)
+    {
+        return memory[getProgramAddress(offset)].apply();
+    }
+
+    void reset(Word resetAddress)
     {
         programCounter = resetAddress;
     }
@@ -380,19 +385,12 @@ public:
         }
     }
 
-    void loadRom(const std::string& path, std::ostream& output);
-
-private:
-    bool tryReadHeader(int offset, std::vector<char> rom, std::ostream& output);
-
 private:
     Byte dataBank;
     Word directPage;
     Word stackPointer;
     Byte programBank;
     Word programCounter;
-
-    Word resetAddress;
 
     Byte flags;
     bool emulationMode;

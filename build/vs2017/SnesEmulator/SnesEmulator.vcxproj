@@ -124,7 +124,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\SnesEmulator\CPU\CpuOpcodeMap.cpp" />
-    <ClCompile Include="..\..\..\src\SnesEmulator\CPU\CpuState.cpp" />
     <ClCompile Include="..\..\..\src\SnesEmulator\Emulator.cpp" />
     <ClCompile Include="..\..\..\src\SnesEmulator\Main.cpp" />
     <ClCompile Include="..\..\..\src\SnesEmulator\SPC\SpcOpcodeMap.cpp" />
@@ -138,6 +137,7 @@
     <ClInclude Include="..\..\..\src\SnesEmulator\Emulator.h" />
     <ClInclude Include="..\..\..\src\SnesEmulator\Exception.h" />
     <ClInclude Include="..\..\..\src\SnesEmulator\Instruction.h" />
+    <ClInclude Include="..\..\..\src\SnesEmulator\Rom.h" />
     <ClInclude Include="..\..\..\src\SnesEmulator\SPC\SpcAddressMode.h" />
     <ClInclude Include="..\..\..\src\SnesEmulator\SPC\SpcOpcode.h" />
     <ClInclude Include="..\..\..\src\SnesEmulator\SPC\SpcOpcodeMap.h" />
