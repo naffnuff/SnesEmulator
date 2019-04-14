@@ -77,9 +77,10 @@ static int branchIf(bool condition, State& state, int8_t offset)
         Word newAddress = state.getProgramCounter(offset);
         cycles += 1;
         if (!state.isNativeMode()) {
-            Byte programPage = Byte(state.getProgramCounter() >> 8);
-            Byte newAddressPage = Byte(newAddress >> 8);
+            Byte programPage = state.getProgramCounter() >> 8;
+            Byte newAddressPage = newAddress >> 8;
             if (programPage != newAddressPage) {
+                throw OperatorNotYetImplementedException("TODO08");
                 cycles += 1;
             }
         }
@@ -433,7 +434,7 @@ public:
         return cycles;
     }
 
-    static std::string toString() { return "CP" + State::getRegisterName<Register>(); }
+    static std::string toString() { return "CP" + State::getIndexRegisterName<Register>(); }
 };
 
 // DEC Decrement [Flags affected: n,z]
@@ -479,7 +480,7 @@ public:
         return 0;
     }
 
-    static std::string toString() { return "DE" + State::getRegisterName<Register>(); }
+    static std::string toString() { return "DE" + State::getIndexRegisterName<Register>(); }
 };
 
 // EOR Exclusive-OR Accumulator with Memory [Flags affected: n,z]
@@ -542,14 +543,14 @@ public:
         return 0;
     }
 
-    static std::string toString() { return "IN" + State::getRegisterName<Register>(); }
+    static std::string toString() { return "IN" + State::getIndexRegisterName<Register>(); }
 };
 
 // JMP Jump [Flags affected: none][Alias: JML for all Long addressing modes]
 class JMP
 {
 public:
-    static int invoke(State& state, const MemoryLocation* memory)
+    static int invoke(State& state, Word address)
     {
         throw OperatorNotYetImplementedException("JMP");
         return 0;
@@ -558,24 +559,48 @@ public:
     static std::string toString() { return "JMP"; }
 };
 
+class JML
+{
+public:
+    static int invoke(State& state, Long address)
+    {
+        throw OperatorNotYetImplementedException("JML");
+        return 0;
+    }
+
+    static std::string toString()
+    {
+        return "JML";
+    }
+};
+
 // JSR Jump to Subroutine [Flags affected: none][Alias: JSL for Absolute Long]
 class JSR
 {
 public:
-    static int invoke(State& state, const MemoryLocation* memory)
-    {
-        throw OperatorNotYetImplementedException("JSR");
-        return 0;
-    }
-
     static int invoke(State& state, Word address)
     {
-        state.pushToStack(state.getProgramCounter(-1));
+        state.pushWordToStack(state.getProgramCounter(-1));
         state.setProgramCounter(address);
         return 0;
     }
 
     static std::string toString() { return "JSR"; }
+};
+
+class JSL
+{
+public:
+    static int invoke(State& state, Long address)
+    {
+        throw OperatorNotYetImplementedException("JSL");
+        return 0;
+    }
+
+    static std::string toString()
+    {
+        return "JSL";
+    }
 };
 
 // LDA Load Accumulator from Memory [Flags affected: n,z]
@@ -616,7 +641,7 @@ public:
         return cycles;
     }
 
-    static std::string toString() { return "LD" + State::getRegisterName<Register>(); }
+    static std::string toString() { return "LD" + State::getIndexRegisterName<Register>(); }
 };
 
 // LSR Logical Shift Memory or Accumulator Right [Flags affected: n,z,c]
@@ -745,7 +770,7 @@ public:
         int cycles = 0;
         if (state.is16Bit(State::m)) {
             cycles += 1;
-            state.pushToStack(state.getAccumulatorC());
+            state.pushWordToStack(state.getAccumulatorC());
         }
         else {
             state.pushToStack(state.getAccumulatorA());
@@ -962,7 +987,7 @@ private:
     {
         bool carry = data.isNegative();
         data <<= 1;
-        data |= state.getFlag(State::c);
+        data |= T(state.getFlag(State::c));
         state.setFlag(State::c, carry);
         state.updateSignFlags(data);
     }
@@ -1233,7 +1258,7 @@ public:
         return 0;
     }
 
-    static std::string toString() { return "TA" + State::getRegisterName<Register>(); }
+    static std::string toString() { return "TA" + State::getIndexRegisterName<Register>(); }
 };
 
 // TCD Transfer 16-bit Accumulator to Direct Page Register [Flags affected: n,z]

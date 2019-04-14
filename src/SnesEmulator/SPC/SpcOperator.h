@@ -64,7 +64,7 @@ class AND
 public:
     static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
     {
-        throw OperatorNotYetImplementedException("AND");
+        state.updateSignFlags(leftOperand->get() &= rightOperand);
         return 0;
     }
 
@@ -96,7 +96,9 @@ class ASL
 public:
     static int invoke(State& state, MemoryLocation* operand)
     {
-        throw OperatorNotYetImplementedException("ASL");
+        Byte& value = operand->get();
+        state.setFlag(State::c, value.isNegative());
+        value <<= 1;
         return 0;
     }
 
@@ -126,15 +128,9 @@ class BBC
 {
 public:
     // §1: Add 1 cycle if branch is taken
-    static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
+    static int invoke(State& state, bool bitValue, int8_t offset)
     {
-        throw OperatorNotYetImplementedException("BBC");
-        int cycles = 0;
-        if (true /*branch taken*/) {
-            cycles += 2;
-            throw OperatorNotYetImplementedException("TODO01");
-        }
-        return cycles;
+        return branchIf(!bitValue, state, offset);
     }
 
     static std::string toString() { return "BBC"; }
@@ -153,7 +149,7 @@ class BBS
 {
 public:
     // §1: Add 1 cycle if branch is taken
-    static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
+    static int invoke(State& state, bool bitValue, int8_t offset)
     {
         throw OperatorNotYetImplementedException("BBS");
         int cycles = 0;
@@ -215,13 +211,7 @@ public:
     // §1: Add 1 cycle if branch is taken
     static int invoke(State& state, int8_t offset)
     {
-        throw OperatorNotYetImplementedException("BEQ");
-        int cycles = 0;
-        if (true /*branch taken*/) {
-            cycles += 2;
-            throw OperatorNotYetImplementedException("TODO01");
-        }
-        return cycles;
+        return branchIf(state.getFlag(State::z), state, offset);
     }
 
     static std::string toString() { return "BEQ"; }
@@ -348,9 +338,10 @@ public:
 class CALL
 {
 public:
-    static int invoke(State& state, MemoryLocation* operand)
+    static int invoke(State& state, Word address)
     {
-        throw OperatorNotYetImplementedException("CALL");
+        state.pushWordToStack(state.getProgramCounter());
+        state.setProgramCounter(address);
         return 0;
     }
 
@@ -401,30 +392,18 @@ public:
 
 // CLRC
 // : C = 0    	[.......0]
-class CLRC
-{
-public:
-    static int invoke(State& state)
-    {
-        throw OperatorNotYetImplementedException("CLRC");
-        return 0;
-    }
-
-    static std::string toString() { return "CLRC"; }
-};
-
-// CLRP
 // : P = 0    	[..0.....]
-class CLRP
+template<State::Flag Flag>
+class CLR
 {
 public:
     static int invoke(State& state)
     {
-        state.setFlag(State::p, false);
+        state.setFlag(Flag, false);
         return 0;
     }
 
-    static std::string toString() { return "CLRP"; }
+    static std::string toString() { return "CLR" + State::getFlagName<Flag>(); }
 };
 
 // CLRV
@@ -522,15 +501,9 @@ class DBNZ
 {
 public:
     // §1: Add 1 cycle if branch is taken
-    static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
+    static int invoke(State& state, MemoryLocation* memory, int8_t offset)
     {
-        throw OperatorNotYetImplementedException("DBNZ");
-        int cycles = 0;
-        if (true /*branch taken*/) {
-            cycles += 2;
-            throw OperatorNotYetImplementedException("TODO01");
-        }
-        return cycles;
+        return branchIf(--memory->get() != 0, state, offset);
     }
 
     static std::string toString() { return "DBNZ"; }
@@ -629,7 +602,7 @@ class EOR
 public:
     static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
     {
-        throw OperatorNotYetImplementedException("EOR");
+        state.updateSignFlags(leftOperand->get() ^= rightOperand);
         return 0;
     }
 
@@ -894,7 +867,7 @@ class OR
 public:
     static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
     {
-        throw OperatorNotYetImplementedException("OR");
+        state.updateSignFlags(leftOperand->get() |= rightOperand);
         return 0;
     }
 
@@ -971,7 +944,7 @@ class RET
 public:
     static int invoke(State& state)
     {
-        throw OperatorNotYetImplementedException("RET");
+        state.setProgramCounter(state.pullWordFromStack());
         return 0;
     }
 
@@ -1074,30 +1047,18 @@ public:
 
 // SETC
 // : C = 1    	[.......1]
-class SETC
-{
-public:
-    static int invoke(State& state)
-    {
-        throw OperatorNotYetImplementedException("SETC");
-        return 0;
-    }
-
-    static std::string toString() { return "SETC"; }
-};
-
-// SETP
 // : P = 1    	[..1.....]
-class SETP
+template<State::Flag Flag>
+class SET
 {
 public:
     static int invoke(State& state)
     {
-        throw OperatorNotYetImplementedException("SETP");
+        state.setFlag(Flag, true);
         return 0;
     }
 
-    static std::string toString() { return "SETP"; }
+    static std::string toString() { return "SET" + State::getFlagName<Flag>(); }
 };
 
 // SLEEP

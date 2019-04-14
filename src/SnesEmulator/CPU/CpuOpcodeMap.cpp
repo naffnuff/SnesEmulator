@@ -1,7 +1,5 @@
 #include "CpuOpcodeMap.h"
 
-#include <stdint.h>
-
 #include "CpuOpcode.h"
 
 namespace CPU {

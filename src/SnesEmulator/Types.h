@@ -4,7 +4,7 @@
 #include <iostream>
 #include <iomanip>
 
-// Wrapper classes Byte (8-bit), Word (16-bit) and Long (24-bit) exist primarily to facilitate nice hexadecimal printing
+// Wrapper classes Byte (8-bit), Word (16-bit) and Long (24-bit)
 class Byte
 {
 public:
@@ -62,27 +62,49 @@ public:
         return *this;
     }
 
-    Byte& operator|=(Byte operand)
+    Byte operator--(int)
     {
-        value |= operand.value;
+        Byte copy(value);
+        --value;
+        return copy;
+    }
+
+    template<typename T>
+    Byte& operator|=(T operand)
+    {
+        value |= operand;
         return *this;
     }
 
-    Byte& operator&=(Byte operand)
+    template<typename T>
+    Byte& operator&=(T operand)
     {
-        value &= operand.value;
+        value &= operand;
         return *this;
     }
 
-    Byte& operator<<=(Byte operand)
+    template<typename T>
+    Byte& operator^=(T operand)
     {
-        value <<= operand.value;
+        value ^= operand;
         return *this;
+    }
+
+    template<typename T>
+    Byte& operator<<=(T operand)
+    {
+        value <<= operand;
+        return *this;
+    }
+
+    bool getBit(int bitIndex) const
+    {
+        return value & 1 << bitIndex;
     }
 
     bool isNegative() const
     {
-        return value & 1 << 7;
+        return getBit(7);
     }
 
     void binaryAdd(Byte addend, bool& unsignedCarry, bool& signedOverflow)
@@ -101,7 +123,7 @@ public:
 private:
     uint8_t value;
 
-    friend std::ostream& operator<<(std::ostream& output, Byte byte);
+    friend std::ostream& operator<<(std::ostream&, Byte);
 };
 
 class Word
@@ -127,21 +149,24 @@ public:
         return value;
     }
 
-    Word& operator+=(Word operand)
+    template<typename T>
+    Word& operator+=(T operand)
     {
-        value += operand.value;
+        value += operand;
         return *this;
     }
 
-    Word& operator|=(Word operand)
+    template<typename T>
+    Word& operator|=(T operand)
     {
-        value |= operand.value;
+        value |= operand;
         return *this;
     }
 
-    Word& operator<<=(Word operand)
+    template<typename T>
+    Word& operator<<=(T operand)
     {
-        value <<= operand.value;
+        value <<= operand;
         return *this;
     }
 
@@ -169,10 +194,20 @@ public:
         return value & 1 << 15;
     }
 
+    Byte getLowByte() const
+    {
+        return Byte(value);
+    }
+
+    Byte getHighByte() const
+    {
+        return Byte(value >> 8);
+    }
+
 private:
     uint16_t value;
 
-    friend std::ostream& operator<<(std::ostream& output, Word word);
+    friend std::ostream& operator<<(std::ostream&, Word);
 };
 
 class Long
@@ -193,20 +228,27 @@ public:
     {
     }
 
+    Long(Word address, Byte bank)
+        : value(address | bank << 16)
+    {
+    }
+
     operator uint32_t() const
     {
         return value;
     }
 
-    Long& operator+=(Long operand)
+    template<typename T>
+    Long& operator+=(T operand)
     {
-        value += operand.value;
+        value += operand;
         return *this;
     }
 
-    Long& operator-=(Long operand)
+    template<typename T>
+    Long& operator-=(T operand)
     {
-        value -= operand.value;
+        value -= operand;
         return *this;
     }
 
@@ -226,7 +268,130 @@ public:
 private:
     uint32_t value;
 
-    friend std::ostream& operator<<(std::ostream&, Long long_);
+    friend std::ostream& operator<<(std::ostream&, Long);
+};
+
+class MemoryLocation
+{
+public:
+    class AccessException : public std::runtime_error
+    {
+        using std::runtime_error::runtime_error;
+    };
+
+    enum Type
+    {
+        Invalid,
+        ReadOnly,
+        ReadWrite,
+        WriteOnly,
+        Mapped
+    };
+
+    MemoryLocation()
+    {
+    }
+
+    MemoryLocation(Byte value)
+        : value(value)
+    {
+    }
+
+    Type getType() const
+    {
+        return type;
+    }
+
+    bool isReadProtected() const
+    {
+        return type != ReadOnly && type != ReadWrite && type != Mapped;
+    }
+
+    bool isWriteProtected() const
+    {
+        return type != ReadWrite && type != WriteOnly && type != Mapped;
+    }
+
+    void setValue(Byte byte)
+    {
+        if (isWriteProtected()) {
+            throw AccessException(__FUNCTION__ + std::string(": Bad memory access"));
+        }
+        if (mapping) {
+            mapping->value = byte;
+        }
+        else {
+            value = byte;
+        }
+    }
+
+    Byte getValue() const
+    {
+        if (isReadProtected()) {
+            throw AccessException(__FUNCTION__ + std::string(": Bad memory access"));
+        }
+        return value;
+    }
+
+    Byte& get()
+    {
+        if (isReadProtected() || isWriteProtected()) {
+            throw AccessException(__FUNCTION__ + std::string(": Bad memory access"));
+        }
+        return value;
+    }
+
+    void setWordValue(Word value)
+    {
+        this[0].setValue(Byte(value));
+        this[1].setValue(Byte(value >> 8));
+    }
+
+    Word getWordValue() const
+    {
+        return Word(this[0].getValue(), this[1].getValue());
+    }
+
+    void setMapping(MemoryLocation* memoryByte)
+    {
+        if (type != Invalid) {
+            throw AccessException(__FUNCTION__ + std::string(": Bad memory access"));
+        }
+        type = Mapped;
+        mapping = memoryByte;
+    }
+
+    void setReadOnlyValue(Byte byte)
+    {
+        if (type != Invalid) {
+            throw AccessException(__FUNCTION__ + std::string(": Bad memory access"));
+        }
+        type = ReadOnly;
+        value = byte;
+    }
+
+    void setReadWrite()
+    {
+        if (type != Invalid) {
+            throw AccessException(__FUNCTION__ + std::string(": Bad memory access"));
+        }
+        type = ReadWrite;
+    }
+
+    void setWriteOnly()
+    {
+        if (type != Invalid) {
+            throw AccessException(__FUNCTION__ + std::string(": Bad memory access"));
+        }
+        type = WriteOnly;
+    }
+
+private:
+    Byte value = 0;
+    MemoryLocation* mapping = nullptr;
+    Type type = Invalid;
+
+    friend std::ostream& operator<<(std::ostream&, const MemoryLocation&);
 };
 
 inline std::ostream& operator<<(std::ostream& output, Byte byte)
@@ -244,57 +409,7 @@ inline std::ostream& operator<<(std::ostream& output, Long long_)
     return output << std::hex << std::setw(6) << std::setfill('0') << long_.value << std::dec;
 }
 
-class MemoryLocation
+inline std::ostream& operator<<(std::ostream& output, const MemoryLocation& memory)
 {
-public:
-    MemoryLocation()
-        : MemoryLocation(0)
-    {
-    }
-
-    MemoryLocation(Byte value)
-        : value(value)
-        , mapping(nullptr)
-    {
-    }
-
-    void setValue(Byte byte)
-    {
-        if (mapping) {
-            mapping->value = byte;
-        }
-        else {
-            value = byte;
-        }
-    }
-
-    Byte getValue() const
-    {
-        return value;
-    }
-
-    Byte& get()
-    {
-        return value;
-    }
-
-    void setWordValue(Word value)
-    {
-        this[0].setValue(Byte(value));
-        this[1].setValue(Byte(value >> 8));
-    }
-
-    Word getWordValue() const
-    {
-        return Word(this[0].getValue(), this[1].getValue());
-    }
-
-    void setMapping(MemoryLocation* memoryByte)
-    {
-        mapping = memoryByte;
-    }
-
-private:
-    Byte value;
-    MemoryLocation* mapping;
-};
+    return output << memory.value << std::dec;
+}

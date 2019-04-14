@@ -1,9 +1,6 @@
 #pragma once
 
-#include <stdint.h>
-
 #include "../Exception.h"
-#include "../Instruction.h"
 #include "CpuState.h"
 #include "CpuAddressMode.h"
 #include "CpuOperator.h"
@@ -237,9 +234,9 @@ class ADC_77 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::ADC>
 // ADC Add With Carry [Flags affected: n,v,z,c]
 // ADC addr,Y
 // Absolute Indexed, Y (3-Byte)
-class ADC_79 : public AddressMode::AbsoluteIndexed<Operator::ADC, State::Y>
+class ADC_79 : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::ADC, State::Y>
 {
-    using AbsoluteIndexed::AbsoluteIndexed;
+    using AbsoluteIndexed_ExtraCycle::AbsoluteIndexed_ExtraCycle;
 
     // 3   6-m-x+x*p   abs,Y     mm....mm . ADC $9876,Y
     int execute() override
@@ -254,9 +251,9 @@ class ADC_79 : public AddressMode::AbsoluteIndexed<Operator::ADC, State::Y>
 // ADC Add With Carry [Flags affected: n,v,z,c]
 // ADC addr,X
 // Absolute Indexed, X (3-Byte)
-class ADC_7D : public AddressMode::AbsoluteIndexed<Operator::ADC, State::X>
+class ADC_7D : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::ADC, State::X>
 {
-    using AbsoluteIndexed::AbsoluteIndexed;
+    using AbsoluteIndexed_ExtraCycle::AbsoluteIndexed_ExtraCycle;
 
     // 3   6-m-x+x*p   abs,X     mm....mm . ADC $9876,X
     int execute() override
@@ -511,9 +508,9 @@ class AND_37 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::AND>
 // AND AND Accumulator With Memory [Flags affected: n,z]
 // AND addr,Y
 // Absolute Indexed, Y (3-Byte)
-class AND_39 : public AddressMode::AbsoluteIndexed<Operator::AND, State::Y>
+class AND_39 : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::AND, State::Y>
 {
-    using AbsoluteIndexed::AbsoluteIndexed;
+    using AbsoluteIndexed_ExtraCycle::AbsoluteIndexed_ExtraCycle;
 
     // 3   6-m-x+x*p   abs,Y     m.....m. . AND $9876,Y
     int execute() override
@@ -528,9 +525,9 @@ class AND_39 : public AddressMode::AbsoluteIndexed<Operator::AND, State::Y>
 // AND AND Accumulator With Memory [Flags affected: n,z]
 // AND addr,X
 // Absolute Indexed, X (3-Byte)
-class AND_3D : public AddressMode::AbsoluteIndexed<Operator::AND, State::X>
+class AND_3D : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::AND, State::X>
 {
-    using AbsoluteIndexed::AbsoluteIndexed;
+    using AbsoluteIndexed_ExtraCycle::AbsoluteIndexed_ExtraCycle;
 
     // 3   6-m-x+x*p   abs,X     m.....m. . AND $9876,X
     int execute() override
@@ -750,9 +747,9 @@ class BIT_34 : public AddressMode::DirectPageIndexed<Operator::BIT, State::X>
 // BIT Test Bits [Flags affected: z (immediate mode) n,v,z (non-immediate modes)]
 // BIT addr,X
 // Absolute Indexed, X (3-Byte)
-class BIT_3C : public AddressMode::AbsoluteIndexed<Operator::BIT, State::X>
+class BIT_3C : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::BIT, State::X>
 {
-    using AbsoluteIndexed::AbsoluteIndexed;
+    using AbsoluteIndexed_ExtraCycle::AbsoluteIndexed_ExtraCycle;
 
     // 3   6-m-x+x*p   abs,X     mm....m. . BIT $9876,X
     int execute() override
@@ -1225,9 +1222,9 @@ class CMP_D7 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::CMP>
 // CMP Compare Accumulator With Memory [Flags affected: n,z,c]
 // CMP addr,Y
 // Absolute Indexed, Y (3-Byte)
-class CMP_D9 : public AddressMode::AbsoluteIndexed<Operator::CMP, State::Y>
+class CMP_D9 : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::CMP, State::Y>
 {
-    using AbsoluteIndexed::AbsoluteIndexed;
+    using AbsoluteIndexed_ExtraCycle::AbsoluteIndexed_ExtraCycle;
 
     // 3   6-m-x+x*p   abs,Y     m.....mm . CMP $9876,Y
     int execute() override
@@ -1242,9 +1239,9 @@ class CMP_D9 : public AddressMode::AbsoluteIndexed<Operator::CMP, State::Y>
 // CMP Compare Accumulator With Memory [Flags affected: n,z,c]
 // CMP addr,X
 // Absolute Indexed, X (3-Byte)
-class CMP_DD : public AddressMode::AbsoluteIndexed<Operator::CMP, State::X>
+class CMP_DD : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::CMP, State::X>
 {
-    using AbsoluteIndexed::AbsoluteIndexed;
+    using AbsoluteIndexed_ExtraCycle::AbsoluteIndexed_ExtraCycle;
 
     // 3   6-m-x+x*p   abs,X     m.....mm . CMP $9876,X
     int execute() override
@@ -1775,9 +1772,9 @@ class EOR_57 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::EOR>
 // EOR Exclusive-OR Accumulator with Memory [Flags affected: n,z]
 // EOR addr,Y
 // Absolute Indexed, Y (3-Byte)
-class EOR_59 : public AddressMode::AbsoluteIndexed<Operator::EOR, State::Y>
+class EOR_59 : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::EOR, State::Y>
 {
-    using AbsoluteIndexed::AbsoluteIndexed;
+    using AbsoluteIndexed_ExtraCycle::AbsoluteIndexed_ExtraCycle;
 
     // 3   6-m-x+x*p   abs,Y     m.....m. . EOR $9876,Y
     int execute() override
@@ -1792,9 +1789,9 @@ class EOR_59 : public AddressMode::AbsoluteIndexed<Operator::EOR, State::Y>
 // EOR Exclusive-OR Accumulator with Memory [Flags affected: n,z]
 // EOR addr,X
 // Absolute Indexed, X (3-Byte)
-class EOR_5D : public AddressMode::AbsoluteIndexed<Operator::EOR, State::X>
+class EOR_5D : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::EOR, State::X>
 {
-    using AbsoluteIndexed::AbsoluteIndexed;
+    using AbsoluteIndexed_ExtraCycle::AbsoluteIndexed_ExtraCycle;
 
     // 3   6-m-x+x*p   abs,X     m.....m. . EOR $9876,X
     int execute() override
@@ -1944,9 +1941,9 @@ class INY_C8 : public AddressMode::Implied<Operator::IN<State::Y>>
 // JMP Jump [Flags affected: none][Alias: JML for all Long addressing modes]
 // JMP addr
 // Absolute (3-Byte)
-class JMP_4C : public AddressMode::Absolute<Operator::JMP>
+class JMP_4C : public AddressMode::Absolute_ControlFlow<Operator::JMP>
 {
-    using Absolute::Absolute;
+    using Absolute_ControlFlow::Absolute_ControlFlow;
 
     // 3   3           abs       ........ . JMP $1234
     int execute() override
@@ -1961,9 +1958,9 @@ class JMP_4C : public AddressMode::Absolute<Operator::JMP>
 // JMP Jump [Flags affected: none][Alias: JML for all Long addressing modes]
 // JMP long
 // Absolute Long (4-Byte)
-class JMP_5C : public AddressMode::AbsoluteLong<Operator::JMP>
+class JMP_5C : public AddressMode::AbsoluteLong_ControlFlow<Operator::JML>
 {
-    using AbsoluteLong::AbsoluteLong;
+    using AbsoluteLong_ControlFlow::AbsoluteLong_ControlFlow;
 
     // 4   4           long      ........ . JMP $FEDCBA
     int execute() override
@@ -2012,7 +2009,7 @@ class JMP_7C : public AddressMode::AbsoluteIndexedIndirect<Operator::JMP>
 // JMP Jump [Flags affected: none][Alias: JML for all Long addressing modes]
 // JMP [addr]
 // Absolute Indirect Long (3-Byte)
-class JMP_DC : public AddressMode::AbsoluteIndirectLong<Operator::JMP>
+class JMP_DC : public AddressMode::AbsoluteIndirectLong<Operator::JML>
 {
     using AbsoluteIndirectLong::AbsoluteIndirectLong;
 
@@ -2029,9 +2026,9 @@ class JMP_DC : public AddressMode::AbsoluteIndirectLong<Operator::JMP>
 // JSR Jump to Subroutine [Flags affected: none][Alias: JSL for Absolute Long]
 // JSR addr
 // Absolute (3-Byte)
-class JSR_20 : public AddressMode::Absolute<Operator::JSR>
+class JSR_20 : public AddressMode::Absolute_ControlFlow<Operator::JSR>
 {
-    using Absolute::Absolute;
+    using Absolute_ControlFlow::Absolute_ControlFlow;
 
     // 3   6           abs       ........ . JSR $1234
     int execute() override
@@ -2045,9 +2042,9 @@ class JSR_20 : public AddressMode::Absolute<Operator::JSR>
 // JSR Jump to Subroutine [Flags affected: none][Alias: JSL for Absolute Long]
 // JSR long
 // Absolute Long (4-Byte)
-class JSR_22 : public AddressMode::AbsoluteLong<Operator::JSR>
+class JSR_22 : public AddressMode::AbsoluteLong_ControlFlow<Operator::JSL>
 {
-    using AbsoluteLong::AbsoluteLong;
+    using AbsoluteLong_ControlFlow::AbsoluteLong_ControlFlow;
 
     // 4   8           long      ........ . JSL $123456
     int execute() override
@@ -2299,9 +2296,9 @@ class LDA_B7 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::LDA>
 // LDA Load Accumulator from Memory [Flags affected: n,z]
 // LDA addr,Y
 // Absolute Indexed, Y (3-Byte)
-class LDA_B9 : public AddressMode::AbsoluteIndexed<Operator::LDA, State::Y>
+class LDA_B9 : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::LDA, State::Y>
 {
-    using AbsoluteIndexed::AbsoluteIndexed;
+    using AbsoluteIndexed_ExtraCycle::AbsoluteIndexed_ExtraCycle;
 
     // 3   6-m-x+x*p   abs,Y     m.....m. . LDA $9876,Y
     int execute() override
@@ -2316,9 +2313,9 @@ class LDA_B9 : public AddressMode::AbsoluteIndexed<Operator::LDA, State::Y>
 // LDA Load Accumulator from Memory [Flags affected: n,z]
 // LDA addr,X
 // Absolute Indexed, X (3-Byte)
-class LDA_BD : public AddressMode::AbsoluteIndexed<Operator::LDA, State::X>
+class LDA_BD : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::LDA, State::X>
 {
-    using AbsoluteIndexed::AbsoluteIndexed;
+    using AbsoluteIndexed_ExtraCycle::AbsoluteIndexed_ExtraCycle;
 
     // 3   6-m-x+x*p   abs,X     m.....m. . LDA $9876,X
     int execute() override
@@ -2436,9 +2433,9 @@ class LDX_B6 : public AddressMode::DirectPageIndexed<Operator::LD<State::X>, Sta
 // LDX Load Index Register X from Memory [Flags affected: n,z]
 // LDX addr,Y
 // Absolute Indexed, Y (3-Byte)
-class LDX_BE : public AddressMode::AbsoluteIndexed<Operator::LD<State::X>, State::Y>
+class LDX_BE : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::LD<State::X>, State::Y>
 {
-    using AbsoluteIndexed::AbsoluteIndexed;
+    using AbsoluteIndexed_ExtraCycle::AbsoluteIndexed_ExtraCycle;
 
     // 3   6-2*x+x*p   abs,Y     x.....x. . LDX $9876,Y
     int execute() override
@@ -2538,9 +2535,9 @@ class LDY_B4 : public AddressMode::DirectPageIndexed<Operator::LD<State::Y>, Sta
 // LDY Load Index Register Y from Memory [Flags affected: n,z]
 // LDY addr,X
 // Absolute Indexed, X (3-Byte)
-class LDY_BC : public AddressMode::AbsoluteIndexed<Operator::LD<State::Y>, State::X>
+class LDY_BC : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::LD<State::Y>, State::X>
 {
-    using AbsoluteIndexed::AbsoluteIndexed;
+    using AbsoluteIndexed_ExtraCycle::AbsoluteIndexed_ExtraCycle;
 
     // 3   6-2*x+x*p   abs,X     x.....x. . LDY $9876,X
     int execute() override
@@ -2916,9 +2913,9 @@ class ORA_17 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::ORA>
 // ORA OR Accumulator with Memory [Flags affected: n,z]
 // ORA addr,Y
 // Absolute Indexed, Y (3-Byte)
-class ORA_19 : public AddressMode::AbsoluteIndexed<Operator::ORA, State::Y>
+class ORA_19 : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::ORA, State::Y>
 {
-    using AbsoluteIndexed::AbsoluteIndexed;
+    using AbsoluteIndexed_ExtraCycle::AbsoluteIndexed_ExtraCycle;
 
     // 3   6-m-x+x*p   abs,Y     m.....m. . ORA $9876,Y
     int execute() override
@@ -2933,9 +2930,9 @@ class ORA_19 : public AddressMode::AbsoluteIndexed<Operator::ORA, State::Y>
 // ORA OR Accumulator with Memory [Flags affected: n,z]
 // ORA addr,X
 // Absolute Indexed, X (3-Byte)
-class ORA_1D : public AddressMode::AbsoluteIndexed<Operator::ORA, State::X>
+class ORA_1D : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::ORA, State::X>
 {
-    using AbsoluteIndexed::AbsoluteIndexed;
+    using AbsoluteIndexed_ExtraCycle::AbsoluteIndexed_ExtraCycle;
 
     // 3   6-m-x+x*p   abs,X     m.....m. . ORA $9876,X
     int execute() override
@@ -3697,9 +3694,9 @@ class SBC_F7 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::SBC>
 // SBC Subtract with Borrow from Accumulator [Flags affected: n,v,z,c]
 // SBC addr,Y
 // Absolute Indexed, Y (3-Byte)
-class SBC_F9 : public AddressMode::AbsoluteIndexed<Operator::SBC, State::Y>
+class SBC_F9 : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::SBC, State::Y>
 {
-    using AbsoluteIndexed::AbsoluteIndexed;
+    using AbsoluteIndexed_ExtraCycle::AbsoluteIndexed_ExtraCycle;
 
     // 3   6-m-x+x*p   abs,Y     mm....mm . SBC $9876,Y
     int execute() override
@@ -3714,9 +3711,9 @@ class SBC_F9 : public AddressMode::AbsoluteIndexed<Operator::SBC, State::Y>
 // SBC Subtract with Borrow from Accumulator [Flags affected: n,v,z,c]
 // SBC addr,X
 // Absolute Indexed, X (3-Byte)
-class SBC_FD : public AddressMode::AbsoluteIndexed<Operator::SBC, State::X>
+class SBC_FD : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::SBC, State::X>
 {
-    using AbsoluteIndexed::AbsoluteIndexed;
+    using AbsoluteIndexed_ExtraCycle::AbsoluteIndexed_ExtraCycle;
 
     // 3   6-m-x+x*p   abs,X     mm....mm . SBC $9876,X
     int execute() override
@@ -4025,11 +4022,8 @@ class STA_9D : public AddressMode::AbsoluteIndexed<Operator::STA, State::X>
     using AbsoluteIndexed::AbsoluteIndexed;
 
     // 3   6-m         abs,X     ........ . STA $9876,X
-    // §20: TODO manually add exception for 3
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("STA_9D");
-        throw OpcodeNotYetImplementedException("TODO20");
         return 5 + applyOperand();
     }
 

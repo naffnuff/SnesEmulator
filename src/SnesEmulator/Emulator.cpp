@@ -15,10 +15,14 @@
 #include <windows.h>
 enum Color
 {
-    Blue = FOREGROUND_INTENSITY | FOREGROUND_BLUE | FOREGROUND_GREEN,
-    Green = FOREGROUND_INTENSITY | FOREGROUND_GREEN,
-    Red = FOREGROUND_INTENSITY | FOREGROUND_RED,
-    Purple = FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_BLUE,
+    DarkBlue = FOREGROUND_BLUE | FOREGROUND_GREEN,
+    DarkGreen = FOREGROUND_GREEN,
+    DarkRed = FOREGROUND_RED,
+    DarkPurple = FOREGROUND_RED | FOREGROUND_BLUE,
+    Blue = FOREGROUND_INTENSITY | DarkBlue,
+    Green = FOREGROUND_INTENSITY | DarkGreen,
+    Red = FOREGROUND_INTENSITY | DarkRed,
+    Purple = FOREGROUND_INTENSITY | DarkPurple,
     DefaultColor = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE,
 };
 #endif
@@ -59,6 +63,7 @@ public:
     template<typename State, typename OtherState>
     int executeNext(Instruction* instruction, State& state, Context& context, uint64_t cycleCount, OtherState& otherState, Context& otherContext)
     {
+        Long lastKnownProgramAddress = state.getProgramAddress();
         try {
             if (context.stepMode) {
                 printState(state, context);
@@ -94,6 +99,18 @@ public:
             }
         } catch (OpcodeNotYetImplementedException& e) {
             error << e.what() << std::endl;
+            context.stepMode = true;
+        } catch (AddressModeNotYetImplementedException& e) {
+            error << e.what() << std::endl;
+            state.setProgramAddress(lastKnownProgramAddress);
+            context.stepMode = true;
+        } catch (OperatorNotYetImplementedException& e) {
+            error << e.what() << std::endl;
+            state.setProgramAddress(lastKnownProgramAddress);
+            context.stepMode = true;
+        } catch (MemoryLocation::AccessException& e) {
+            error << e.what() << std::endl;
+            state.setProgramAddress(lastKnownProgramAddress);
             context.stepMode = true;
         }
         return 0;
@@ -249,11 +266,23 @@ public:
     }
 
     template<typename State>
-    void setColor(const State& state, const Context& context, Long address)
+    void setColor(const State& state, const Context& context, Long address, const MemoryLocation& memory)
     {
+        Color color = DefaultColor;
+        if (memory.getType() == MemoryLocation::Mapped) {
+            color = DarkGreen;
+        }
+        else if (memory.getType() == MemoryLocation::ReadOnly) {
+            color = DarkBlue;
+        }
+        else if (memory.getType() == MemoryLocation::ReadWrite) {
+            color = DarkRed;
+        }
+        else if (memory.getType() == MemoryLocation::WriteOnly) {
+            color = DarkPurple;
+        }
         bool breakpoint = context.breakpoints.find(address) != context.breakpoints.end();
         bool executing = address >= state.getProgramAddress() && address < state.getProgramAddress() + context.nextInstruction->size();
-        Color color = DefaultColor;
         if (breakpoint && executing) {
             color = Blue;
         }
@@ -263,7 +292,9 @@ public:
         else if (executing) {
             color = context.debugColor;
         }
-        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
+        if (color != DefaultColor) {
+            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
+        }
     }
 
     void printMemory(const CPU::State& cpuState, const Context& cpuContext, const SPC::State& spcState, const Context& spcContext)
@@ -274,8 +305,8 @@ public:
         size_t cpuMemorySize = cpuState.getMemorySize();
         size_t spcMemorySize = spcState.getMemorySize();
 
-        output << "           0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f"
-            << "              0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f" << std::endl;
+        output << "          0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f"
+            << "             0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f" << std::endl;
         Long cpuAddress = startCpuAddress - std::bitset<8>(startCpuAddress).to_ulong();
         Long spcAddress = startSpcAddress - std::bitset<8>(startSpcAddress).to_ulong();
 
@@ -283,13 +314,14 @@ public:
         for (int i = 0; i < 16; ++i) {
             if (cpuAddress < cpuMemorySize) {
                 Byte bank = Byte(cpuAddress >> 16);
-                Word lowAddress(cpuAddress);
-                lowAddress = Word(lowAddress >> 4);
+                uint16_t lowAddress(cpuAddress);
+                lowAddress = lowAddress >> 4;
                 output << bank << ':' << std::hex << std::setw(3) << std::setfill('0') << lowAddress << "x  " << std::dec;
 
                 for (int j = 0; j < 16 && cpuAddress < cpuMemorySize; ++j) {
-                    setColor(cpuState, cpuContext, cpuAddress);
-                    output << cpuState.getMemory(cpuAddress++) << ' ';
+                    const MemoryLocation& memory = cpuState.getMemory(cpuAddress);
+                    setColor(cpuState, cpuContext, cpuAddress++, memory);
+                    output << memory << ' ';
                     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), DefaultColor);
                 }
             }
@@ -297,13 +329,14 @@ public:
             output << "     ";
 
             if (spcAddress < spcMemorySize) {
-                Word lowAddress(spcAddress);
-                lowAddress = Word(lowAddress >> 4);
-                output << std::hex << std::setw(3) << std::setfill('0') << lowAddress << "x  ";
+                uint16_t lowAddress(spcAddress);
+                lowAddress = lowAddress >> 4;
+                output << std::hex << std::setw(3) << std::setfill('0') << lowAddress << "x  " << std::dec;
 
                 for (int j = 0; j < 16 && spcAddress < spcMemorySize; ++j) {
-                    setColor(spcState, spcContext, spcAddress);
-                    output << spcState.getMemoryByte(Word(spcAddress++)) << ' ';
+                    const MemoryLocation& memory = spcState.getMemory(spcAddress);
+                    setColor(spcState, spcContext, spcAddress++, memory);
+                    output << memory << ' ';
                     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), DefaultColor);
                 }
             }

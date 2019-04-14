@@ -40,7 +40,7 @@ public:
 
     State()
         : programCounter(0xFFC0)
-        , memory(1 << 16, MemoryLocation(0x55))
+        , memory(1 << 16, MemoryLocation(0xFF))
     {
         std::array<Byte, 64> bootRomData = {
            0xCD, 0xEF, 0xBD, 0xE8, 0x00, 0xC6, 0x1D, 0xD0, 0xFC, 0x8F, 0xAA, 0xF4, 0x8F, 0xBB, 0xF5, 0x78,
@@ -50,7 +50,27 @@ public:
         };
 
         for (size_t i = 0; i < bootRomData.size(); ++i) {
-            memory[programCounter + i].setValue(bootRomData[i]);
+            memory[programCounter + i].setReadOnlyValue(bootRomData[i]);
+        }
+
+        for (MemoryLocation& r : registers) {
+            r.setReadWrite();
+        }
+
+        for (size_t address = 0; address < 0xf0; ++address) {
+            memory[address].setReadWrite();
+        }
+        for (size_t address = 0x100; address < 0xFFC0; ++address) {
+            memory[address].setReadWrite();
+        }
+
+        for (size_t address = 0xf2; address < 0xf3; ++address) {
+            memory[address].setWriteOnly();
+        }
+
+        for (size_t address = 0xf3; address < 0xf4; ++address) {
+            memory[address].setReadWrite();
+            memory[address].setValue(0);
         }
     }
 
@@ -117,6 +137,11 @@ public:
         programCounter = value;
     }
 
+    void setProgramAddress(Long address)
+    {
+        setProgramCounter(Word(address));
+    }
+
     Byte readProgramByte(int offset = 0) const
     {
         return memory[getProgramAddress(offset)].getValue();
@@ -142,6 +167,11 @@ public:
         return memory[address].getValue();
     }
 
+    Byte getMemoryByte(Byte lowByte, Byte highByte) const
+    {
+        return getMemoryByte(Word(lowByte, highByte));
+    }
+
     Byte getDirectMemoryByte(Byte address) const
     {
         return getMemoryByte(Word(address));
@@ -162,6 +192,11 @@ public:
         return &memory[address];
     }
 
+    MemoryLocation* getMemoryLocation(Byte lowByte, Byte highByte)
+    {
+        return getMemoryLocation(Word(lowByte, highByte));
+    }
+
     MemoryLocation* getDirectMemoryLocation(Byte address)
     {
         return getMemoryLocation(Word(address));
@@ -170,6 +205,11 @@ public:
     MemoryLocation* getMemoryLocation(Long address)
     {
         return &memory[address];
+    }
+
+    const MemoryLocation& getMemory(Long address) const
+    {
+        return memory[address];
     }
 
     template<Register RegisterIndex>
@@ -189,6 +229,18 @@ public:
     {
         std::string names[] = { "A", "Y", "X", "SP", "PSW" };
         return names[RegisterIndex];
+    }
+
+    template<Flag Flag>
+    static std::string getFlagName()
+    {
+        std::string names[] = { "C", "Z", "I", "H", "B", "P", "V", "N" };
+        for (int i = 0; i < 8; ++i) {
+            if (1 << i == 1) {
+                return names[i];
+            }
+        }
+        return "";
     }
 
     void setFlag(Byte flag, bool value)
@@ -216,6 +268,31 @@ public:
     {
         setFlag(State::z, value == 0);
         setFlag(State::n, value.isNegative());
+    }
+
+    void pushToStack(Byte byte)
+    {
+        MemoryLocation* memory = getMemoryLocation(registers[SP].get()--, 0x01);
+        memory->setValue(byte);
+    }
+
+    void pushWordToStack(Word word)
+    {
+        pushToStack(word.getHighByte());
+        pushToStack(word.getLowByte());
+    }
+
+    Byte pullFromStack()
+    {
+        MemoryLocation* memory = getMemoryLocation(++registers[SP].get(), 0x01);
+        return memory->getValue();
+    }
+
+    Word pullWordFromStack()
+    {
+        Byte lowByte = pullFromStack();
+        Byte highByte = pullFromStack();
+        return Word(lowByte, highByte);
     }
 
     void setRegisterDebug(char name, Word value)

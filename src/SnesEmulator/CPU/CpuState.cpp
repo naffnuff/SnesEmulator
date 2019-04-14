@@ -36,8 +36,10 @@ void State::loadRom(const std::string& path, std::ostream& output)
         for (int bank = 0; bank < 1 << 8; ++bank) {
             for (int address = 0x8000; address < (1 << 16); ++address) {
                 Byte byte(rom[romIndex++]);
-                memory[bank << 16 | address].setValue(byte);
+                Long longAddress(address, bank);
+                memory[longAddress].setReadOnlyValue(byte);
                 if (romIndex >= (int)rom.size()) {
+                    output << "ROM ends at " << longAddress << std::endl;
                     romLoaded = true;
                     break;
                 }

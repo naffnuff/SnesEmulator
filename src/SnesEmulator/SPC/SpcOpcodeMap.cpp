@@ -1,8 +1,5 @@
 #include "SpcOpcodeMap.h"
 
-#include <stdint.h>
-
-#include "SpcState.h"
 #include "SpcOpcode.h"
 
 namespace SPC {

@@ -2,7 +2,6 @@
 
 #include "../Exception.h"
 #include "../Instruction.h"
-#include "CpuOperator.h"
 #include "CpuState.h"
 
 namespace CPU {
@@ -19,7 +18,7 @@ namespace AddressMode {
 template <typename Operator>
 class Absolute : public Instruction3Byte
 {
-    using Instruction3Byte::Instruction3Byte;
+    using Instruction3Byte::InstructionBase;
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
@@ -28,27 +27,36 @@ class Absolute : public Instruction3Byte
 
     std::string toString() const override
     {
-        return Operator::toString() + " $" + Instruction3Byte::operandToString();
+        return Operator::toString() + " $" + operandToString();
     }
 };
-
-int Absolute<Operator::JSR>::invokeOperator(Byte lowByte, Byte highByte)
+template <typename Operator>
+class Absolute_ControlFlow : public Instruction3Byte
 {
-    return Operator::JSR::invoke(state, Word(lowByte, highByte));
-}
+    using Instruction3Byte::InstructionBase;
+
+    int invokeOperator(Byte lowByte, Byte highByte) override
+    {
+        return Operator::invoke(state, Word(lowByte, highByte));
+    }
+
+    std::string toString() const override
+    {
+        return Operator::toString() + " $" + operandToString();
+    }
+};
 
 // Absolute Indexed Indirect
 // (addr,X)
 template <typename Operator>
 class AbsoluteIndexedIndirect : public Instruction3Byte
 {
-    using Instruction3Byte::Instruction3Byte;
+    using Instruction3Byte::InstructionBase;
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
         throw AddressModeNotYetImplementedException("AbsoluteIndexedIndirect");
-        MemoryLocation* memory = nullptr;
-        return Operator::invoke(state, memory);
+        return Operator::invoke(state, Word());
     }
 
     std::string toString() const override
@@ -62,35 +70,43 @@ class AbsoluteIndexedIndirect : public Instruction3Byte
 template <typename Operator, State::IndexRegister Register>
 class AbsoluteIndexed : public Instruction3Byte
 {
-    using Instruction3Byte::Instruction3Byte;
+    using Instruction3Byte::InstructionBase;
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
-        throw AddressModeNotYetImplementedException("AbsoluteIndexed");
-        MemoryLocation* memory = nullptr;
-        return Operator::invoke(state, memory);
+        Long address = Long(lowByte, highByte, state.getDataBank());
+        Long indexedAddress = address + state.getIndexRegister<Register>();
+        MemoryLocation* memory = state.getMemoryLocation(indexedAddress);
+        return getCycles(address, indexedAddress) + Operator::invoke(state, memory);
     }
 
     std::string toString() const override
     {
-        return Operator::toString() + " $" + operandToString() + " TODO";
+        return Operator::toString() + " $" + operandToString() + "," + state.getIndexRegisterName<Register>();
+    }
+
+    virtual int getCycles(Long, Long) const
+    {
+        return 0;
     }
 };
 
 template <typename Operator, State::IndexRegister Register>
-class AbsoluteIndexed_ExtraPageBoundaryCycle : public AbsoluteIndexed<Operator, Register>
+class AbsoluteIndexed_ExtraCycle : public AbsoluteIndexed<Operator, Register>
 {
-    using Instruction3Byte::Instruction3Byte;
+    using AbsoluteIndexed<Operator, Register>::AbsoluteIndexed;
 
     // §3: Add 1 cycle if adding index crosses a page boundary
-    int invokeOperator(Byte lowByte, Byte highByte) override
+    int getCycles(Long address, Long indexedAddress) const override
     {
+        throw AddressModeNotYetImplementedException("TODO03");
         int cycles = 0;
-        if (true /*index added crosses page boundary*/) {
+        Word addressPage = address >> 8;
+        Word indexedAddressPage = indexedAddress >> 8;
+        if (addressPage != indexedAddressPage) {
             cycles += 1;
-            throw AddressModeNotYetImplementedException("TODO03");
         }
-        return cycles + AbsoluteIndexed::invokeOperator(lowByte, highByte);
+        return cycles;
     }
 };
 
@@ -99,13 +115,12 @@ class AbsoluteIndexed_ExtraPageBoundaryCycle : public AbsoluteIndexed<Operator, 
 template <typename Operator>
 class AbsoluteIndirect : public Instruction3Byte
 {
-    using Instruction3Byte::Instruction3Byte;
+    using Instruction3Byte::InstructionBase;
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
         throw AddressModeNotYetImplementedException("AbsoluteIndirect");
-        MemoryLocation* memory = nullptr;
-        return Operator::invoke(state, memory);
+        return Operator::invoke(state, Word());
     }
 
     std::string toString() const override
@@ -119,13 +134,12 @@ class AbsoluteIndirect : public Instruction3Byte
 template <typename Operator>
 class AbsoluteIndirectLong : public Instruction3Byte
 {
-    using Instruction3Byte::Instruction3Byte;
+    using Instruction3Byte::InstructionBase;
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
         throw AddressModeNotYetImplementedException("AbsoluteIndirectLong");
-        MemoryLocation* memory = nullptr;
-        return Operator::invoke(state, memory);
+        return Operator::invoke(state, Long());
     }
 
     std::string toString() const override
@@ -139,7 +153,7 @@ class AbsoluteIndirectLong : public Instruction3Byte
 template <typename Operator>
 class AbsoluteLong : public Instruction4Byte
 {
-    using Instruction4Byte::Instruction4Byte;
+    using Instruction4Byte::InstructionBase;
 
     int invokeOperator(Byte lowByte, Byte highByte, Byte bankByte) override
     {
@@ -154,12 +168,29 @@ class AbsoluteLong : public Instruction4Byte
     }
 };
 
+template <typename Operator>
+class AbsoluteLong_ControlFlow : public Instruction4Byte
+{
+    using Instruction4Byte::InstructionBase;
+
+    int invokeOperator(Byte lowByte, Byte highByte, Byte bankByte) override
+    {
+        throw AddressModeNotYetImplementedException("AbsoluteLong_ControlFlow");
+        return Operator::invoke(state, Long());
+    }
+
+    std::string toString() const override
+    {
+        return Operator::toString() + " $" + operandToString() + " TODO";
+    }
+};
+
 // Absolute Long Indexed, X
 // long,X
 template <typename Operator>
 class AbsoluteLongIndexedX : public Instruction4Byte
 {
-    using Instruction4Byte::Instruction4Byte;
+    using Instruction4Byte::InstructionBase;
 
     int invokeOperator(Byte lowByte, Byte highByte, Byte bankByte) override
     {
@@ -179,7 +210,7 @@ class AbsoluteLongIndexedX : public Instruction4Byte
 template <typename Operator>
 class Accumulator : public Instruction1Byte
 {
-    using Instruction1Byte::Instruction1Byte;
+    using Instruction1Byte::InstructionBase;
 
     // §21: Remove 2 cycles for the special case of Accumulator
     int invokeOperator() override
@@ -203,7 +234,7 @@ class Accumulator : public Instruction1Byte
 template <typename Operator>
 class BlockMove : public Instruction3Byte
 {
-    using Instruction3Byte::Instruction3Byte;
+    using Instruction3Byte::InstructionBase;
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
@@ -223,7 +254,7 @@ class BlockMove : public Instruction3Byte
 template <typename Operator>
 class DirectPage : public Instruction2Byte
 {
-    using Instruction2Byte::Instruction2Byte;
+    using Instruction2Byte::InstructionBase;
 
     // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int invokeOperator(Byte lowByte) override
@@ -246,7 +277,7 @@ class DirectPage : public Instruction2Byte
 template <typename Operator>
 class DirectPageIndexedIndirectX : public Instruction2Byte
 {
-    using Instruction2Byte::Instruction2Byte;
+    using Instruction2Byte::InstructionBase;
 
     // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int invokeOperator(Byte lowByte) override
@@ -271,7 +302,7 @@ class DirectPageIndexedIndirectX : public Instruction2Byte
 template <typename Operator, State::IndexRegister Register>
 class DirectPageIndexed : public Instruction2Byte
 {
-    using Instruction2Byte::Instruction2Byte;
+    using Instruction2Byte::InstructionBase;
 
     // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int invokeOperator(Byte lowByte) override
@@ -296,7 +327,7 @@ class DirectPageIndexed : public Instruction2Byte
 template <typename Operator>
 class DirectPageIndirect : public Instruction2Byte
 {
-    using Instruction2Byte::Instruction2Byte;
+    using Instruction2Byte::InstructionBase;
 
     // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int invokeOperator(Byte lowByte) override
@@ -321,7 +352,7 @@ class DirectPageIndirect : public Instruction2Byte
 template <typename Operator>
 class DirectPageIndirectIndexedY : public Instruction2Byte
 {
-    using Instruction2Byte::Instruction2Byte;
+    using Instruction2Byte::InstructionBase;
 
     // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
     // §3: Add 1 cycle if adding index crosses a page boundary
@@ -351,7 +382,7 @@ class DirectPageIndirectIndexedY : public Instruction2Byte
 template <typename Operator>
 class DirectPageIndirectLong : public Instruction2Byte
 {
-    using Instruction2Byte::Instruction2Byte;
+    using Instruction2Byte::InstructionBase;
 
     // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int invokeOperator(Byte lowByte) override
@@ -376,7 +407,7 @@ class DirectPageIndirectLong : public Instruction2Byte
 template <typename Operator>
 class DirectPageIndirectLongIndexedY : public Instruction2Byte
 {
-    using Instruction2Byte::Instruction2Byte;
+    using Instruction2Byte::InstructionBase;
 
     // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int invokeOperator(Byte lowByte) override
@@ -401,11 +432,13 @@ class DirectPageIndirectLongIndexedY : public Instruction2Byte
 template <typename Operator>
 class Immediate : public Instruction2Byte
 {
-    using Instruction2Byte::Instruction2Byte;
+    using Instruction2Byte::InstructionBase;
 
     int invokeOperator(Byte lowByte) override
     {
-        return Operator::invoke(state, &MemoryLocation(lowByte));
+        MemoryLocation memory;
+        memory.setReadOnlyValue(lowByte);
+        return Operator::invoke(state, &memory);
     }
 
     std::string toString() const override
@@ -419,11 +452,13 @@ class Immediate : public Instruction2Byte
 template <typename Operator>
 class Immediate16Bit : public Instruction3Byte
 {
-    using Instruction3Byte::Instruction3Byte;
+    using Instruction3Byte::InstructionBase;
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
-        std::array<MemoryLocation, 2> memory = { lowByte, highByte };
+        std::array<MemoryLocation, 2> memory;
+        memory[0].setReadOnlyValue(lowByte);
+        memory[1].setReadOnlyValue(highByte);
         return Operator::invoke(state, memory.data());
     }
 
@@ -437,7 +472,7 @@ class Immediate16Bit : public Instruction3Byte
 template <typename Operator>
 class Implied : public Instruction1Byte
 {
-    using Instruction1Byte::Instruction1Byte;
+    using Instruction1Byte::InstructionBase;
 
     int invokeOperator() override
     {
@@ -455,7 +490,7 @@ class Implied : public Instruction1Byte
 template <typename Operator>
 class ProgramCounterRelative : public Instruction2Byte
 {
-    using Instruction2Byte::Instruction2Byte;
+    using Instruction2Byte::InstructionBase;
 
     int invokeOperator(Byte lowByte) override
     {
@@ -476,7 +511,7 @@ class ProgramCounterRelative : public Instruction2Byte
 template <typename Operator>
 class ProgramCounterRelativeLong : public Instruction3Byte
 {
-    using Instruction3Byte::Instruction3Byte;
+    using Instruction3Byte::InstructionBase;
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
@@ -496,7 +531,7 @@ class ProgramCounterRelativeLong : public Instruction3Byte
 template <typename Operator>
 class StackRelative : public Instruction2Byte
 {
-    using Instruction2Byte::Instruction2Byte;
+    using Instruction2Byte::InstructionBase;
 
     int invokeOperator(Byte lowByte) override
     {
@@ -516,7 +551,7 @@ class StackRelative : public Instruction2Byte
 template <typename Operator>
 class StackRelativeIndirectIndexedY : public Instruction2Byte
 {
-    using Instruction2Byte::Instruction2Byte;
+    using Instruction2Byte::InstructionBase;
 
     int invokeOperator(Byte lowByte) override
     {

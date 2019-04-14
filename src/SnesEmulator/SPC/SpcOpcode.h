@@ -1,9 +1,6 @@
 #pragma once
 
-#include <stdint.h>
-
 #include "../Exception.h"
-#include "../Instruction.h"
 #include "SpcState.h"
 #include "SpcAddressMode.h"
 #include "SpcOperator.h"
@@ -245,7 +242,6 @@ class AND_28 : public AddressMode::RegisterImmediate<Operator::AND, State::A>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("AND_28");
         return  2 + applyOperand();
     }
 
@@ -453,7 +449,6 @@ class ASL_1C : public AddressMode::Register<Operator::ASL, State::A>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ASL_1C");
         return  2 + applyOperand();
     }
 
@@ -511,7 +506,7 @@ class ASL_0C : public AddressMode::Absolute<Operator::ASL>
 // BBC d.0, r
 // PC+=r  if d.0 == 0    	[........]
 // Direct Bit Program Counter Relative (3-Byte)
-class BBC_13 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC, 1 << 0>
+class BBC_13 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC, 0>
 {
     using DirectBitProgramCounterRelative::DirectBitProgramCounterRelative;
 
@@ -527,7 +522,7 @@ class BBC_13 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC
 // BBC d.1, r
 // PC+=r  if d.1 == 0    	[........]
 // Direct Bit Program Counter Relative (3-Byte)
-class BBC_33 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC, 1 << 1>
+class BBC_33 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC, 1>
 {
     using DirectBitProgramCounterRelative::DirectBitProgramCounterRelative;
 
@@ -543,7 +538,7 @@ class BBC_33 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC
 // BBC d.2, r
 // PC+=r  if d.2 == 0    	[........]
 // Direct Bit Program Counter Relative (3-Byte)
-class BBC_53 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC, 1 << 2>
+class BBC_53 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC, 2>
 {
     using DirectBitProgramCounterRelative::DirectBitProgramCounterRelative;
 
@@ -559,7 +554,7 @@ class BBC_53 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC
 // BBC d.3, r
 // PC+=r  if d.3 == 0    	[........]
 // Direct Bit Program Counter Relative (3-Byte)
-class BBC_73 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC, 1 << 3>
+class BBC_73 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC, 3>
 {
     using DirectBitProgramCounterRelative::DirectBitProgramCounterRelative;
 
@@ -575,7 +570,7 @@ class BBC_73 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC
 // BBC d.4, r
 // PC+=r  if d.4 == 0    	[........]
 // Direct Bit Program Counter Relative (3-Byte)
-class BBC_93 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC, 1 << 4>
+class BBC_93 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC, 4>
 {
     using DirectBitProgramCounterRelative::DirectBitProgramCounterRelative;
 
@@ -591,7 +586,7 @@ class BBC_93 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC
 // BBC d.5, r
 // PC+=r  if d.5 == 0    	[........]
 // Direct Bit Program Counter Relative (3-Byte)
-class BBC_B3 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC, 1 << 5>
+class BBC_B3 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC, 5>
 {
     using DirectBitProgramCounterRelative::DirectBitProgramCounterRelative;
 
@@ -607,7 +602,7 @@ class BBC_B3 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC
 // BBC d.6, r
 // PC+=r  if d.6 == 0    	[........]
 // Direct Bit Program Counter Relative (3-Byte)
-class BBC_D3 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC, 1 << 6>
+class BBC_D3 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC, 6>
 {
     using DirectBitProgramCounterRelative::DirectBitProgramCounterRelative;
 
@@ -623,13 +618,12 @@ class BBC_D3 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC
 // BBC d.7, r
 // PC+=r  if d.7 == 0    	[........]
 // Direct Bit Program Counter Relative (3-Byte)
-class BBC_F3 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC, 1 << 7>
+class BBC_F3 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC, 7>
 {
     using DirectBitProgramCounterRelative::DirectBitProgramCounterRelative;
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("BBC_F3");
         return 5 + applyOperand();
     }
 
@@ -639,7 +633,7 @@ class BBC_F3 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC
 // BBS d.0, r
 // PC+=r  if d.0 == 1    	[........]
 // Direct Bit Program Counter Relative (3-Byte)
-class BBS_03 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS, 1 << 0>
+class BBS_03 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS, 0>
 {
     using DirectBitProgramCounterRelative::DirectBitProgramCounterRelative;
 
@@ -655,7 +649,7 @@ class BBS_03 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS
 // BBS d.1, r
 // PC+=r  if d.1 == 1    	[........]
 // Direct Bit Program Counter Relative (3-Byte)
-class BBS_23 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS, 1 << 1>
+class BBS_23 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS, 1>
 {
     using DirectBitProgramCounterRelative::DirectBitProgramCounterRelative;
 
@@ -671,7 +665,7 @@ class BBS_23 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS
 // BBS d.2, r
 // PC+=r  if d.2 == 1    	[........]
 // Direct Bit Program Counter Relative (3-Byte)
-class BBS_43 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS, 1 << 2>
+class BBS_43 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS, 2>
 {
     using DirectBitProgramCounterRelative::DirectBitProgramCounterRelative;
 
@@ -687,7 +681,7 @@ class BBS_43 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS
 // BBS d.3, r
 // PC+=r  if d.3 == 1    	[........]
 // Direct Bit Program Counter Relative (3-Byte)
-class BBS_63 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS, 1 << 3>
+class BBS_63 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS, 3>
 {
     using DirectBitProgramCounterRelative::DirectBitProgramCounterRelative;
 
@@ -703,7 +697,7 @@ class BBS_63 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS
 // BBS d.4, r
 // PC+=r  if d.4 == 1    	[........]
 // Direct Bit Program Counter Relative (3-Byte)
-class BBS_83 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS, 1 << 4>
+class BBS_83 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS, 4>
 {
     using DirectBitProgramCounterRelative::DirectBitProgramCounterRelative;
 
@@ -719,7 +713,7 @@ class BBS_83 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS
 // BBS d.5, r
 // PC+=r  if d.5 == 1    	[........]
 // Direct Bit Program Counter Relative (3-Byte)
-class BBS_A3 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS, 1 << 5>
+class BBS_A3 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS, 5>
 {
     using DirectBitProgramCounterRelative::DirectBitProgramCounterRelative;
 
@@ -735,7 +729,7 @@ class BBS_A3 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS
 // BBS d.6, r
 // PC+=r  if d.6 == 1    	[........]
 // Direct Bit Program Counter Relative (3-Byte)
-class BBS_C3 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS, 1 << 6>
+class BBS_C3 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS, 6>
 {
     using DirectBitProgramCounterRelative::DirectBitProgramCounterRelative;
 
@@ -751,7 +745,7 @@ class BBS_C3 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS
 // BBS d.7, r
 // PC+=r  if d.7 == 1    	[........]
 // Direct Bit Program Counter Relative (3-Byte)
-class BBS_E3 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS, 1 << 7>
+class BBS_E3 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS, 7>
 {
     using DirectBitProgramCounterRelative::DirectBitProgramCounterRelative;
 
@@ -805,7 +799,6 @@ class BEQ_F0 : public AddressMode::ProgramCounterRelative<Operator::BEQ>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("BEQ_F0");
         return 2 + applyOperand();
     }
 
@@ -924,13 +917,12 @@ class BRK_0F : public AddressMode::Implied<Operator::BRK>
 // CALL !a
 // (SP--)=PCh, (SP--)=PCl, PC=a    	[........]
 // Absolute (3-Byte)
-class CALL_3F : public AddressMode::Absolute<Operator::CALL>
+class CALL_3F : public AddressMode::Absolute_ControlFlow<Operator::CALL>
 {
-    using Absolute::Absolute;
+    using Absolute_ControlFlow::Absolute_ControlFlow;
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("CALL_3F");
         return  8 + applyOperand();
     }
 
@@ -972,7 +964,7 @@ class CBNE_2E : public AddressMode::DirectProgramCounterRelative<Operator::CBNE>
 // CLR1 d.0
 // d.0 = 0    	[........]
 // Direct Bit (2-Byte)
-class CLR1_12 : public AddressMode::DirectBit<Operator::CLR1, 1 << 0>
+class CLR1_12 : public AddressMode::DirectBit<Operator::CLR1, 0>
 {
     using DirectBit::DirectBit;
 
@@ -988,7 +980,7 @@ class CLR1_12 : public AddressMode::DirectBit<Operator::CLR1, 1 << 0>
 // CLR1 d.1
 // d.1 = 0    	[........]
 // Direct Bit (2-Byte)
-class CLR1_32 : public AddressMode::DirectBit<Operator::CLR1, 1 << 1>
+class CLR1_32 : public AddressMode::DirectBit<Operator::CLR1, 1>
 {
     using DirectBit::DirectBit;
 
@@ -1004,7 +996,7 @@ class CLR1_32 : public AddressMode::DirectBit<Operator::CLR1, 1 << 1>
 // CLR1 d.2
 // d.2 = 0    	[........]
 // Direct Bit (2-Byte)
-class CLR1_52 : public AddressMode::DirectBit<Operator::CLR1, 1 << 2>
+class CLR1_52 : public AddressMode::DirectBit<Operator::CLR1, 2>
 {
     using DirectBit::DirectBit;
 
@@ -1020,7 +1012,7 @@ class CLR1_52 : public AddressMode::DirectBit<Operator::CLR1, 1 << 2>
 // CLR1 d.3
 // d.3 = 0    	[........]
 // Direct Bit (2-Byte)
-class CLR1_72 : public AddressMode::DirectBit<Operator::CLR1, 1 << 3>
+class CLR1_72 : public AddressMode::DirectBit<Operator::CLR1, 3>
 {
     using DirectBit::DirectBit;
 
@@ -1036,7 +1028,7 @@ class CLR1_72 : public AddressMode::DirectBit<Operator::CLR1, 1 << 3>
 // CLR1 d.4
 // d.4 = 0    	[........]
 // Direct Bit (2-Byte)
-class CLR1_92 : public AddressMode::DirectBit<Operator::CLR1, 1 << 4>
+class CLR1_92 : public AddressMode::DirectBit<Operator::CLR1, 4>
 {
     using DirectBit::DirectBit;
 
@@ -1052,7 +1044,7 @@ class CLR1_92 : public AddressMode::DirectBit<Operator::CLR1, 1 << 4>
 // CLR1 d.5
 // d.5 = 0    	[........]
 // Direct Bit (2-Byte)
-class CLR1_B2 : public AddressMode::DirectBit<Operator::CLR1, 1 << 5>
+class CLR1_B2 : public AddressMode::DirectBit<Operator::CLR1, 5>
 {
     using DirectBit::DirectBit;
 
@@ -1068,7 +1060,7 @@ class CLR1_B2 : public AddressMode::DirectBit<Operator::CLR1, 1 << 5>
 // CLR1 d.6
 // d.6 = 0    	[........]
 // Direct Bit (2-Byte)
-class CLR1_D2 : public AddressMode::DirectBit<Operator::CLR1, 1 << 6>
+class CLR1_D2 : public AddressMode::DirectBit<Operator::CLR1, 6>
 {
     using DirectBit::DirectBit;
 
@@ -1084,7 +1076,7 @@ class CLR1_D2 : public AddressMode::DirectBit<Operator::CLR1, 1 << 6>
 // CLR1 d.7
 // d.7 = 0    	[........]
 // Direct Bit (2-Byte)
-class CLR1_F2 : public AddressMode::DirectBit<Operator::CLR1, 1 << 7>
+class CLR1_F2 : public AddressMode::DirectBit<Operator::CLR1, 7>
 {
     using DirectBit::DirectBit;
 
@@ -1100,7 +1092,7 @@ class CLR1_F2 : public AddressMode::DirectBit<Operator::CLR1, 1 << 7>
 // CLRC 
 // C = 0    	[.......0]
 // Implied (1-Byte)
-class CLRC_60 : public AddressMode::Implied<Operator::CLRC>
+class CLRC_60 : public AddressMode::Implied<Operator::CLR<State::c>>
 {
     using Implied::Implied;
 
@@ -1116,7 +1108,7 @@ class CLRC_60 : public AddressMode::Implied<Operator::CLRC>
 // CLRP 
 // P = 0    	[..0.....]
 // Implied (1-Byte)
-class CLRP_20 : public AddressMode::Implied<Operator::CLRP>
+class CLRP_20 : public AddressMode::Implied<Operator::CLR<State::p>>
 {
     using Implied::Implied;
 
@@ -1233,7 +1225,6 @@ class CMP_64 : public AddressMode::RegisterDirect<Operator::CMP, State::A>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("CMP_64");
         return  3 + applyOperand();
     }
 
@@ -1486,7 +1477,6 @@ class DBNZ_FE : public AddressMode::RegisterProgramCounterRelative<Operator::DBN
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("DBNZ_FE");
         return 4 + applyOperand();
     }
 
@@ -1693,7 +1683,6 @@ class EOR_48 : public AddressMode::RegisterImmediate<Operator::EOR, State::A>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("EOR_48");
         return  2 + applyOperand();
     }
 
@@ -1885,7 +1874,6 @@ class INC_BC : public AddressMode::Register<Operator::INC, State::A>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("INC_BC");
         return  2 + applyOperand();
     }
 
@@ -1901,7 +1889,6 @@ class INC_3D : public AddressMode::Register<Operator::INC, State::X>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("INC_3D");
         return  2 + applyOperand();
     }
 
@@ -2004,9 +1991,9 @@ class JMP_1F : public AddressMode::AbsoluteIndexedIndirect<Operator::JMP, State:
 // JMP !a
 // PC = a    	[........]
 // Absolute (3-Byte)
-class JMP_5F : public AddressMode::Absolute<Operator::JMP>
+class JMP_5F : public AddressMode::Absolute_ControlFlow<Operator::JMP>
 {
-    using Absolute::Absolute;
+    using Absolute_ControlFlow::Absolute_ControlFlow;
 
     int execute() override
     {
@@ -2292,7 +2279,6 @@ class MOV_E5 : public AddressMode::RegisterAbsolute<Operator::MOV_SignedResult, 
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("MOV_E5");
         return  4 + applyOperand();
     }
 
@@ -2324,7 +2310,6 @@ class MOV_F6 : public AddressMode::RegisterAbsoluteIndexed<Operator::MOV_SignedR
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("MOV_F6");
         return  5 + applyOperand();
     }
 
@@ -2449,7 +2434,6 @@ class MOV_8D : public AddressMode::RegisterImmediate<Operator::MOV_SignedResult,
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("MOV_8D");
         return  2 + applyOperand();
     }
 
@@ -2653,7 +2637,6 @@ class MOV_D5 : public AddressMode::AbsoluteIndexedRegister<Operator::MOV, State:
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("MOV_D5");
         return  6 + applyOperand();
     }
 
@@ -2685,7 +2668,6 @@ class MOV_C5 : public AddressMode::AbsoluteRegister<Operator::MOV, State::A>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("MOV_C5");
         return  5 + applyOperand();
     }
 
@@ -2717,7 +2699,6 @@ class MOV_CC : public AddressMode::AbsoluteRegister<Operator::MOV, State::Y>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("MOV_CC");
         return  5 + applyOperand();
     }
 
@@ -2875,7 +2856,6 @@ class OR_08 : public AddressMode::RegisterImmediate<Operator::OR, State::A>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("OR_08");
         return  2 + applyOperand();
     }
 
@@ -3227,7 +3207,6 @@ class RET_6F : public AddressMode::Implied<Operator::RET>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("RET_6F");
         return  5 + applyOperand();
     }
 
@@ -3701,13 +3680,12 @@ class SET1_E2 : public AddressMode::DirectBit<Operator::SET1, 1 << 7>
 // SETC 
 // C = 1    	[.......1]
 // Implied (1-Byte)
-class SETC_80 : public AddressMode::Implied<Operator::SETC>
+class SETC_80 : public AddressMode::Implied<Operator::SET<State::c>>
 {
     using Implied::Implied;
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("SETC_80");
         return  2 + applyOperand();
     }
 
@@ -3717,7 +3695,7 @@ class SETC_80 : public AddressMode::Implied<Operator::SETC>
 // SETP 
 // P = 1    	[..1.....]
 // Implied (1-Byte)
-class SETP_40 : public AddressMode::Implied<Operator::SETP>
+class SETP_40 : public AddressMode::Implied<Operator::SET<State::p>>
 {
     using Implied::Implied;
 

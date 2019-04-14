@@ -39,10 +39,28 @@ public:
 
     State()
         : emulationMode(true)
-        , memory(1 << 24, MemoryLocation(0x55))
+        , memory(1 << 24, MemoryLocation(0x42))
     {
         std::cout << "Memory size=" << memory.size() << std::endl;
         forceRegisters();
+
+        for (MemoryLocation& a : accumulator) {
+            a.setReadWrite();
+        }
+        //for (Byte bank = 0; bank < 0x40; ++bank) {
+        for (size_t address = 0; address < 0x2000; ++address) {
+            memory[address].setReadWrite();
+        }
+        //}
+        for (size_t address = 0x2100; address < 0x2101; ++address) {
+            memory[address].setWriteOnly();
+        }
+        for (size_t address = 0x4200; address < 0x4201; ++address) {
+            memory[address].setWriteOnly();
+        }
+        for (size_t address = 0x420b; address < 0x420d; ++address) {
+            memory[address].setWriteOnly();
+        }
     }
 
     State(State&) = delete;
@@ -135,7 +153,7 @@ public:
 
     Long getProgramAddress(int offset = 0) const
     {
-        return (programBank << 16 | programCounter) + offset;
+        return Long(programCounter, programBank) + offset;
     }
 
     Word getProgramCounter(int offset = 0) const
@@ -180,9 +198,14 @@ public:
         return directPage;
     }
 
-    Byte getMemory(Long address) const
+    Byte getMemoryByte(Long address) const
     {
         return memory[address].getValue();
+    }
+
+    const MemoryLocation& getMemory(Long address) const
+    {
+        return memory[address];
     }
 
     MemoryLocation* getMemoryLocation(Long address)
@@ -241,10 +264,10 @@ public:
         forceRegisters();
     }
 
-    void pushToStack(Word byte)
+    void pushWordToStack(Word word)
     {
-        pushToStack(Byte(byte >> 8));
-        pushToStack(Byte(byte));
+        pushToStack(word.getHighByte());
+        pushToStack(word.getLowByte());
     }
 
     Byte pullFromStack()
@@ -272,7 +295,7 @@ public:
         setProgramCounter(value, programBank);
     }
 
-    void setProgramCounter(Long value)
+    void setProgramAddress(Long value)
     {
         setProgramCounter(Word(value), Byte(value >> 16));
     }
@@ -311,7 +334,7 @@ public:
     }
 
     template<IndexRegister Register>
-    static std::string getRegisterName()
+    static std::string getIndexRegisterName()
     {
         std::string names[] = { "X", "Y" };
         return names[Register];
@@ -321,6 +344,11 @@ public:
     {
         directPage = value;
         updateSignFlags(value);
+    }
+
+    Byte getDataBank() const
+    {
+        return dataBank;
     }
 
     void setRegisterDebug(char name, Word value)
