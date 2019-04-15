@@ -1,22 +1,10 @@
-#include "CpuOpcodeMap.h"
+#include "CpuInstructionDecoder.h"
 
-#include "CpuOpcode.h"
+#include "internal/CpuOpcode.h"
 
 namespace CPU {
 
-Instruction* OpcodeMap::getNextInstruction(State& state) const
-{
-    Byte opcode = state.applyProgramByte();
-    if (state.is16Bit(State::m) && instructions16BitM[opcode]) {
-        return instructions16BitM[opcode].get();
-    } else if (state.is16Bit(State::x) && instructions16BitX[opcode]) {
-        return instructions16BitX[opcode].get();
-    } else {
-        return instructions[opcode].get();
-    }
-}
-
-OpcodeMap::OpcodeMap(State& state)
+InstructionDecoder::InstructionDecoder(State& state)
 {
     instructions[0x61] = std::make_unique<Opcode::ADC_61>(state);
     instructions[0x63] = std::make_unique<Opcode::ADC_63>(state);

@@ -1,7 +1,7 @@
 #include <iostream>
 #include <bitset>
 
-#include "Emulator.h"
+#include "SnesEmulator.h"
 
 void test(std::ostream& output)
 {

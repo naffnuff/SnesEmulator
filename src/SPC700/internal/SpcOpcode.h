@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Exception.h"
+#include "Exception.h"
 #include "SpcState.h"
 #include "SpcAddressMode.h"
 #include "SpcOperator.h"

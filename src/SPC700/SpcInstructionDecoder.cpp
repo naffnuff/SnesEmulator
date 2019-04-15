@@ -1,15 +1,10 @@
-#include "SpcOpcodeMap.h"
+#include "SpcInstructionDecoder.h"
 
-#include "SpcOpcode.h"
+#include "internal/SpcOpcode.h"
 
 namespace SPC {
 
-Instruction* OpcodeMap::getNextInstruction(State& state) const
-{
-    return instructions[state.applyProgramByte()].get();
-}
-
-OpcodeMap::OpcodeMap(State& state)
+InstructionDecoder::InstructionDecoder(State& state)
 {
     instructions[0x99] = std::make_unique<Opcode::ADC_99>(state);
     instructions[0x88] = std::make_unique<Opcode::ADC_88>(state);

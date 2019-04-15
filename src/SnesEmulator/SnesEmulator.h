@@ -3,7 +3,7 @@
 #include <ctime>
 #include <set>
 
-#include "Instruction.h"
+#include "Common/Instruction.h"
 
 class Emulator
 {

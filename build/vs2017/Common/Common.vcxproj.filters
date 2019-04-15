@@ -15,27 +15,17 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\src\SnesEmulator\Main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\SnesEmulator\SnesEmulator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\..\src\SnesEmulator\SnesEmulator.h">
+    <ClInclude Include="..\..\..\src\Common\Exception.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\SnesEmulator\SnesRom.h">
+    <ClInclude Include="..\..\..\src\Common\Instruction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="cpu.txt">
-      <Filter>Resource Files</Filter>
-    </Text>
-    <Text Include="spc.txt">
-      <Filter>Resource Files</Filter>
-    </Text>
+    <ClInclude Include="..\..\..\src\Common\Types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Common\Util.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

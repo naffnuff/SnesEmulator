@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Exception.h"
+#include "Exception.h"
 #include "SpcState.h"
 
 namespace SPC {
@@ -390,7 +390,7 @@ public:
     static std::string toString() { return "CLR1"; }
 };
 
-// CLRC
+// CLRC/P
 // : C = 0    	[.......0]
 // : P = 0    	[..0.....]
 template<State::Flag Flag>
@@ -1045,7 +1045,7 @@ public:
     static std::string toString() { return "SET1"; }
 };
 
-// SETC
+// SETC/P
 // : C = 1    	[.......1]
 // : P = 1    	[..1.....]
 template<State::Flag Flag>

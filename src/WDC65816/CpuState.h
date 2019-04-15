@@ -7,8 +7,8 @@
 #include <bitset>
 #include <iomanip>
 
-#include "../Types.h"
-#include "../Util.h"
+#include "Types.h"
+#include "Util.h"
 
 namespace CPU {
 

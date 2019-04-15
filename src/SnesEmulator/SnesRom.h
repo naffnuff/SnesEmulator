@@ -6,8 +6,8 @@
 #include <bitset>
 #include <algorithm>
 
-#include "Types.h"
-#include "CPU/CpuState.h"
+#include "Common/Types.h"
+#include "WDC65816/CpuState.h"
 
 class Rom
 {

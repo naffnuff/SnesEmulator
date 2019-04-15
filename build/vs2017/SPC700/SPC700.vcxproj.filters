@@ -13,29 +13,30 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\internal">
+      <UniqueIdentifier>{60dd4669-6444-4694-9c2a-c79fd272601f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\src\SnesEmulator\Main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\SnesEmulator\SnesEmulator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\..\src\SnesEmulator\SnesEmulator.h">
+    <ClInclude Include="..\..\..\src\SPC700\SpcState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\SnesEmulator\SnesRom.h">
+    <ClInclude Include="..\..\..\src\SPC700\internal\SpcAddressMode.h">
+      <Filter>Header Files\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\SPC700\internal\SpcOpcode.h">
+      <Filter>Header Files\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\SPC700\internal\SpcOperator.h">
+      <Filter>Header Files\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\SPC700\SpcInstructionDecoder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="cpu.txt">
-      <Filter>Resource Files</Filter>
-    </Text>
-    <Text Include="spc.txt">
-      <Filter>Resource Files</Filter>
-    </Text>
+    <ClCompile Include="..\..\..\src\SPC700\SpcInstructionDecoder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

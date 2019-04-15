@@ -1,16 +1,16 @@
-#include "Emulator.h"
+#include "SnesEmulator.h"
 
 #include <fstream>
 #include <iostream>
 
-#include "Exception.h"
-#include "Rom.h"
+#include "Common/Exception.h"
+#include "SnesRom.h"
 
-#include "CPU/CpuState.h"
-#include "SPC/SpcState.h"
+#include "WDC65816/CpuState.h"
+#include "SPC700/SpcState.h"
 
-#include "CPU/CpuOpcodeMap.h"
-#include "SPC/SpcOpcodeMap.h"
+#include "WDC65816/CpuInstructionDecoder.h"
+#include "SPC700/SpcInstructionDecoder.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -385,13 +385,13 @@ void Emulator::run()
         spcMemoryLocation->setMapping(cpuMemoryLocation);
     }
 
-    CPU::OpcodeMap cpuOpcodeMap(cpuState);
-    SPC::OpcodeMap spcOpcodeMap(spcState);
+    CPU::InstructionDecoder cpuInstructionDecoder(cpuState);
+    SPC::InstructionDecoder spcInstructionDecoder(spcState);
 
     Debugger debugger(output, input, error);
 
-    Debugger::Context cpuContext("cpu.txt", Green, cpuOpcodeMap.getNextInstruction(cpuState));
-    Debugger::Context spcContext("spc.txt", Purple, spcOpcodeMap.getNextInstruction(spcState));
+    Debugger::Context cpuContext("cpu.txt", Green, cpuInstructionDecoder.readNextInstruction(cpuState));
+    Debugger::Context spcContext("spc.txt", Purple, spcInstructionDecoder.readNextInstruction(spcState));
 
     const bool resumeLast = true;
 
@@ -417,7 +417,7 @@ void Emulator::run()
 
     while (running) {
         if (cycleCount == nextCpu) {
-            Instruction* instruction = cpuOpcodeMap.getNextInstruction(cpuState);
+            Instruction* instruction = cpuInstructionDecoder.readNextInstruction(cpuState);
 
             if (cpuContext.stepMode) {
                 output << "cycleCount=" << cycleCount << ", nextCpu=" << nextCpu << ", nextSpc=" << nextSpc << std::endl;
@@ -435,7 +435,7 @@ void Emulator::run()
 
             if (int cycles = debugger.executeNext(instruction, cpuState, cpuContext, cycleCount, spcState, spcContext)) {
                 nextCpu += cycles * 8;
-                cpuContext.nextInstruction = cpuOpcodeMap.getNextInstruction(cpuState);
+                cpuContext.nextInstruction = cpuInstructionDecoder.readNextInstruction(cpuState);
             }
             else {
                 continue;
@@ -443,7 +443,7 @@ void Emulator::run()
         }
 
         if (cycleCount == nextSpc) {
-            Instruction* instruction = spcOpcodeMap.getNextInstruction(spcState);
+            Instruction* instruction = spcInstructionDecoder.readNextInstruction(spcState);
 
             if (spcContext.stepMode) {
                 output << "cycleCount=" << cycleCount << ", nextCpu=" << nextCpu << ", nextSpc=" << nextSpc << std::endl;
@@ -461,7 +461,7 @@ void Emulator::run()
 
             if (int cycles = debugger.executeNext(instruction, spcState, spcContext, cycleCount, cpuState, cpuContext)) {
                 nextSpc += cycles * 16;
-                spcContext.nextInstruction = spcOpcodeMap.getNextInstruction(spcState);
+                spcContext.nextInstruction = spcInstructionDecoder.readNextInstruction(spcState);
             }
             else {
                 continue;

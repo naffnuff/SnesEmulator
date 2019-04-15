@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../Exception.h"
-#include "../Instruction.h"
+#include "Exception.h"
+#include "Instruction.h"
 #include "CpuState.h"
 
 namespace CPU {
