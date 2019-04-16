@@ -15,16 +15,16 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\src\Common\Exception.h">
+    <ClInclude Include="..\..\..\src\include\Common\Exception.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\Common\Instruction.h">
+    <ClInclude Include="..\..\..\src\include\Common\Instruction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\Common\Types.h">
+    <ClInclude Include="..\..\..\src\include\Common\Types.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\Common\Util.h">
+    <ClInclude Include="..\..\..\src\include\Common\Util.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

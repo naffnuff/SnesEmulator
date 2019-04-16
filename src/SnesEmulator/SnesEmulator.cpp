@@ -364,13 +364,13 @@ void Emulator::run()
     CPU::State cpuState;
 
     Rom rom(output);
-    rom.loadFromFile("..\\..\\Legend of Zelda, The - A Link to the Past (U) [!].smc");
-    //rom.loadFromFile("..\\..\\Super Mario World (USA).sfc");
-    //rom.loadFromFile("..\\..\\Super Metroid (Japan, USA) (En,Ja).sfc");
-    //rom.loadFromFile("..\\..\\Super Metroid (JU) [!].smc");
-    //rom.loadFromFile("..\\..\\Megaman X (USA).sfc");
-    //rom.loadFromFile("..\\..\\SnesInitializationROM.smc");
-    //rom.loadFromFile("..\\..\\rom.smc");
+    rom.loadFromFile("../../Legend of Zelda, The - A Link to the Past (U) [!].smc");
+    //rom.loadFromFile("../../Super Mario World (USA).sfc");
+    //rom.loadFromFile("../../Super Metroid (Japan, USA) (En,Ja).sfc");
+    //rom.loadFromFile("../../Super Metroid (JU) [!].smc");
+    //rom.loadFromFile("../../Megaman X (USA).sfc");
+    //rom.loadFromFile("../../SnesInitializationROM.smc");
+    //rom.loadFromFile("../../rom.smc");
     //rom.loadFromFile("H:\\naffnuff\\wla\\rom.smc");
     //rom.loadFromFile("C:\\cygwin64\\home\\rasmus.knutsson\\wla-dx\\wla\\myrom.smc");
     rom.loadToState(cpuState);

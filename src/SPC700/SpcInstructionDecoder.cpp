@@ -1,6 +1,6 @@
 #include "SpcInstructionDecoder.h"
 
-#include "internal/SpcOpcode.h"
+#include "SpcOpcode.h"
 
 namespace SPC {
 

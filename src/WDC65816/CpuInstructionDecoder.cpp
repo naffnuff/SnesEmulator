@@ -1,6 +1,6 @@
 #include "CpuInstructionDecoder.h"
 
-#include "internal/CpuOpcode.h"
+#include "CpuOpcode.h"
 
 namespace CPU {
 

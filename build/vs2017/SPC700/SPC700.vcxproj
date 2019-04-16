@@ -22,11 +22,11 @@
     <ClCompile Include="..\..\..\src\SPC700\SpcInstructionDecoder.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\src\SPC700\internal\SpcAddressMode.h" />
-    <ClInclude Include="..\..\..\src\SPC700\internal\SpcOpcode.h" />
-    <ClInclude Include="..\..\..\src\SPC700\internal\SpcOperator.h" />
-    <ClInclude Include="..\..\..\src\SPC700\SpcInstructionDecoder.h" />
-    <ClInclude Include="..\..\..\src\SPC700\SpcState.h" />
+    <ClInclude Include="..\..\..\src\include\SPC700\SpcInstructionDecoder.h" />
+    <ClInclude Include="..\..\..\src\include\SPC700\SpcState.h" />
+    <ClInclude Include="..\..\..\src\SPC700\SpcAddressMode.h" />
+    <ClInclude Include="..\..\..\src\SPC700\SpcOpcode.h" />
+    <ClInclude Include="..\..\..\src\SPC700\SpcOperator.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -88,7 +88,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\..\src\Common\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\src\include\SPC700\;..\..\..\src\include\Common\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -102,7 +102,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\..\src\Common\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\src\include\SPC700\;..\..\..\src\include\Common\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
@@ -112,7 +112,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\..\src\Common\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\src\include\SPC700\;..\..\..\src\include\Common\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
@@ -124,7 +124,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\..\src\Common\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\src\include\SPC700\;..\..\..\src\include\Common\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
