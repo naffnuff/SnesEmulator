@@ -170,24 +170,6 @@ class CarryNegatedMemoryBit : public Instruction3Byte
 // LSR d:     	Right shift (d) as above    	[N.....ZC]
 // ROL d:     	Left shift (d) as above    	[N.....ZC]
 // ROR d:     	Right shift (d) as above    	[N.....ZC]
-template <typename Operator>
-class Direct : public Instruction2Byte
-{
-    using Instruction2Byte::InstructionBase;
-
-    int invokeOperator(Byte lowByte) override
-    {
-        MemoryLocation* memory = state.getDirectMemoryLocation(lowByte);
-        return Operator::invoke(state, memory);
-    }
-
-    std::string toString() const override
-    {
-        return Operator::toString() + " $" + operandToString();
-    }
-};
-
-// Direct Bit
 // CLR1 d.0:     	d.0 = 0    	[........]
 // CLR1 d.1:     	d.1 = 0    	[........]
 // CLR1 d.2:     	d.2 = 0    	[........]
@@ -204,21 +186,19 @@ class Direct : public Instruction2Byte
 // SET1 d.5:     	d.5 = 1    	[........]
 // SET1 d.6:     	d.6 = 1    	[........]
 // SET1 d.7:     	d.7 = 1    	[........]
-template <typename Operator, int BitIndex>
-class DirectBit : public Instruction2Byte
+template <typename Operator>
+class Direct : public Instruction2Byte
 {
     using Instruction2Byte::InstructionBase;
 
     int invokeOperator(Byte lowByte) override
     {
-        throw AddressModeNotYetImplementedException("DirectBit");
-        MemoryLocation* data = nullptr;
-        return Operator::invoke(state, data, 0);
+        return Operator::invoke(state, state.getDirectMemoryLocation(lowByte));
     }
 
     std::string toString() const override
     {
-        return Operator::toString() + " $" + operandToString() + " TODO";
+        return Operator::toString() + " $" + operandToString();
     }
 };
 

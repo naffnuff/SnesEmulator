@@ -34,7 +34,6 @@ class ADC_88 : public AddressMode::RegisterImmediate<Operator::ADC, State::A>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ADC_88");
         return  2 + applyOperand();
     }
 
@@ -964,9 +963,9 @@ class CBNE_2E : public AddressMode::DirectProgramCounterRelative<Operator::CBNE>
 // CLR1 d.0
 // d.0 = 0    	[........]
 // Direct Bit (2-Byte)
-class CLR1_12 : public AddressMode::DirectBit<Operator::CLR1, 0>
+class CLR1_12 : public AddressMode::Direct<Operator::SET1<0, false>>
 {
-    using DirectBit::DirectBit;
+    using Direct::Direct;
 
     int execute() override
     {
@@ -980,9 +979,9 @@ class CLR1_12 : public AddressMode::DirectBit<Operator::CLR1, 0>
 // CLR1 d.1
 // d.1 = 0    	[........]
 // Direct Bit (2-Byte)
-class CLR1_32 : public AddressMode::DirectBit<Operator::CLR1, 1>
+class CLR1_32 : public AddressMode::Direct<Operator::SET1<1, false>>
 {
-    using DirectBit::DirectBit;
+    using Direct::Direct;
 
     int execute() override
     {
@@ -996,9 +995,9 @@ class CLR1_32 : public AddressMode::DirectBit<Operator::CLR1, 1>
 // CLR1 d.2
 // d.2 = 0    	[........]
 // Direct Bit (2-Byte)
-class CLR1_52 : public AddressMode::DirectBit<Operator::CLR1, 2>
+class CLR1_52 : public AddressMode::Direct<Operator::SET1<2, false>>
 {
-    using DirectBit::DirectBit;
+    using Direct::Direct;
 
     int execute() override
     {
@@ -1012,9 +1011,9 @@ class CLR1_52 : public AddressMode::DirectBit<Operator::CLR1, 2>
 // CLR1 d.3
 // d.3 = 0    	[........]
 // Direct Bit (2-Byte)
-class CLR1_72 : public AddressMode::DirectBit<Operator::CLR1, 3>
+class CLR1_72 : public AddressMode::Direct<Operator::SET1<3, false>>
 {
-    using DirectBit::DirectBit;
+    using Direct::Direct;
 
     int execute() override
     {
@@ -1028,9 +1027,9 @@ class CLR1_72 : public AddressMode::DirectBit<Operator::CLR1, 3>
 // CLR1 d.4
 // d.4 = 0    	[........]
 // Direct Bit (2-Byte)
-class CLR1_92 : public AddressMode::DirectBit<Operator::CLR1, 4>
+class CLR1_92 : public AddressMode::Direct<Operator::SET1<4, false>>
 {
-    using DirectBit::DirectBit;
+    using Direct::Direct;
 
     int execute() override
     {
@@ -1044,9 +1043,9 @@ class CLR1_92 : public AddressMode::DirectBit<Operator::CLR1, 4>
 // CLR1 d.5
 // d.5 = 0    	[........]
 // Direct Bit (2-Byte)
-class CLR1_B2 : public AddressMode::DirectBit<Operator::CLR1, 5>
+class CLR1_B2 : public AddressMode::Direct<Operator::SET1<5, false>>
 {
-    using DirectBit::DirectBit;
+    using Direct::Direct;
 
     int execute() override
     {
@@ -1060,9 +1059,9 @@ class CLR1_B2 : public AddressMode::DirectBit<Operator::CLR1, 5>
 // CLR1 d.6
 // d.6 = 0    	[........]
 // Direct Bit (2-Byte)
-class CLR1_D2 : public AddressMode::DirectBit<Operator::CLR1, 6>
+class CLR1_D2 : public AddressMode::Direct<Operator::SET1<6, false>>
 {
-    using DirectBit::DirectBit;
+    using Direct::Direct;
 
     int execute() override
     {
@@ -1076,9 +1075,9 @@ class CLR1_D2 : public AddressMode::DirectBit<Operator::CLR1, 6>
 // CLR1 d.7
 // d.7 = 0    	[........]
 // Direct Bit (2-Byte)
-class CLR1_F2 : public AddressMode::DirectBit<Operator::CLR1, 7>
+class CLR1_F2 : public AddressMode::Direct<Operator::SET1<7, false>>
 {
-    using DirectBit::DirectBit;
+    using Direct::Direct;
 
     int execute() override
     {
@@ -1092,7 +1091,7 @@ class CLR1_F2 : public AddressMode::DirectBit<Operator::CLR1, 7>
 // CLRC 
 // C = 0    	[.......0]
 // Implied (1-Byte)
-class CLRC_60 : public AddressMode::Implied<Operator::CLR<State::c>>
+class CLRC_60 : public AddressMode::Implied<Operator::SET<State::c, false>>
 {
     using Implied::Implied;
 
@@ -1108,7 +1107,7 @@ class CLRC_60 : public AddressMode::Implied<Operator::CLR<State::c>>
 // CLRP 
 // P = 0    	[..0.....]
 // Implied (1-Byte)
-class CLRP_20 : public AddressMode::Implied<Operator::CLR<State::p>>
+class CLRP_20 : public AddressMode::Implied<Operator::SET<State::p, false>>
 {
     using Implied::Implied;
 
@@ -1997,7 +1996,6 @@ class JMP_5F : public AddressMode::Absolute_ControlFlow<Operator::JMP>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("JMP_5F");
         return  3 + applyOperand();
     }
 
@@ -3552,9 +3550,9 @@ class SBC_B8 : public AddressMode::DirectImmediate<Operator::SBC>
 // SET1 d.0
 // d.0 = 1    	[........]
 // Direct Bit (2-Byte)
-class SET1_02 : public AddressMode::DirectBit<Operator::SET1, 1 << 0>
+class SET1_02 : public AddressMode::Direct<Operator::SET1<0, true>>
 {
-    using DirectBit::DirectBit;
+    using Direct::Direct;
 
     int execute() override
     {
@@ -3568,9 +3566,9 @@ class SET1_02 : public AddressMode::DirectBit<Operator::SET1, 1 << 0>
 // SET1 d.1
 // d.1 = 1    	[........]
 // Direct Bit (2-Byte)
-class SET1_22 : public AddressMode::DirectBit<Operator::SET1, 1 << 1>
+class SET1_22 : public AddressMode::Direct<Operator::SET1<1, true>>
 {
-    using DirectBit::DirectBit;
+    using Direct::Direct;
 
     int execute() override
     {
@@ -3584,9 +3582,9 @@ class SET1_22 : public AddressMode::DirectBit<Operator::SET1, 1 << 1>
 // SET1 d.2
 // d.2 = 1    	[........]
 // Direct Bit (2-Byte)
-class SET1_42 : public AddressMode::DirectBit<Operator::SET1, 1 << 2>
+class SET1_42 : public AddressMode::Direct<Operator::SET1<2, true>>
 {
-    using DirectBit::DirectBit;
+    using Direct::Direct;
 
     int execute() override
     {
@@ -3600,9 +3598,9 @@ class SET1_42 : public AddressMode::DirectBit<Operator::SET1, 1 << 2>
 // SET1 d.3
 // d.3 = 1    	[........]
 // Direct Bit (2-Byte)
-class SET1_62 : public AddressMode::DirectBit<Operator::SET1, 1 << 3>
+class SET1_62 : public AddressMode::Direct<Operator::SET1<3, true>>
 {
-    using DirectBit::DirectBit;
+    using Direct::Direct;
 
     int execute() override
     {
@@ -3616,9 +3614,9 @@ class SET1_62 : public AddressMode::DirectBit<Operator::SET1, 1 << 3>
 // SET1 d.4
 // d.4 = 1    	[........]
 // Direct Bit (2-Byte)
-class SET1_82 : public AddressMode::DirectBit<Operator::SET1, 1 << 4>
+class SET1_82 : public AddressMode::Direct<Operator::SET1<4, true>>
 {
-    using DirectBit::DirectBit;
+    using Direct::Direct;
 
     int execute() override
     {
@@ -3632,9 +3630,9 @@ class SET1_82 : public AddressMode::DirectBit<Operator::SET1, 1 << 4>
 // SET1 d.5
 // d.5 = 1    	[........]
 // Direct Bit (2-Byte)
-class SET1_A2 : public AddressMode::DirectBit<Operator::SET1, 1 << 5>
+class SET1_A2 : public AddressMode::Direct<Operator::SET1<5, true>>
 {
-    using DirectBit::DirectBit;
+    using Direct::Direct;
 
     int execute() override
     {
@@ -3648,9 +3646,9 @@ class SET1_A2 : public AddressMode::DirectBit<Operator::SET1, 1 << 5>
 // SET1 d.6
 // d.6 = 1    	[........]
 // Direct Bit (2-Byte)
-class SET1_C2 : public AddressMode::DirectBit<Operator::SET1, 1 << 6>
+class SET1_C2 : public AddressMode::Direct<Operator::SET1<6, true>>
 {
-    using DirectBit::DirectBit;
+    using Direct::Direct;
 
     int execute() override
     {
@@ -3664,9 +3662,9 @@ class SET1_C2 : public AddressMode::DirectBit<Operator::SET1, 1 << 6>
 // SET1 d.7
 // d.7 = 1    	[........]
 // Direct Bit (2-Byte)
-class SET1_E2 : public AddressMode::DirectBit<Operator::SET1, 1 << 7>
+class SET1_E2 : public AddressMode::Direct<Operator::SET1<7, true>>
 {
-    using DirectBit::DirectBit;
+    using Direct::Direct;
 
     int execute() override
     {
@@ -3680,7 +3678,7 @@ class SET1_E2 : public AddressMode::DirectBit<Operator::SET1, 1 << 7>
 // SETC 
 // C = 1    	[.......1]
 // Implied (1-Byte)
-class SETC_80 : public AddressMode::Implied<Operator::SET<State::c>>
+class SETC_80 : public AddressMode::Implied<Operator::SET<State::c, true>>
 {
     using Implied::Implied;
 
@@ -3695,7 +3693,7 @@ class SETC_80 : public AddressMode::Implied<Operator::SET<State::c>>
 // SETP 
 // P = 1    	[..1.....]
 // Implied (1-Byte)
-class SETP_40 : public AddressMode::Implied<Operator::SET<State::p>>
+class SETP_40 : public AddressMode::Implied<Operator::SET<State::p, true>>
 {
     using Implied::Implied;
 

@@ -25,7 +25,18 @@ class ADC
 public:
     static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
     {
-        throw OperatorNotYetImplementedException("ADC");
+        bool carry = state.getFlag(State::c);
+        bool overflow = false;
+        Byte operandsXor = leftOperand->getValue() ^ rightOperand;
+        bool halfCarry = ((leftOperand->getValue() & 0x0F) + (rightOperand & 0x0F)) & 0x10;
+        leftOperand->get().binaryAdd(rightOperand, carry, overflow);
+        state.setFlag(State::c, carry);
+        state.setFlag(State::v, overflow);
+        bool halfCarryAlt = (operandsXor ^ leftOperand->getValue()) & 0x10;
+        if (halfCarry != halfCarryAlt) {
+            throw std::logic_error(__FUNCTION__ + std::string(" bad half-carry calculation"));
+        }
+        state.setFlag(State::h, halfCarry);
         return 0;
     }
 
@@ -367,43 +378,6 @@ public:
     }
 
     static std::string toString() { return "CBNE"; }
-};
-
-// CLR1
-// d.0: d.0 = 0    	[........]
-// d.1: d.1 = 0    	[........]
-// d.2: d.2 = 0    	[........]
-// d.3: d.3 = 0    	[........]
-// d.4: d.4 = 0    	[........]
-// d.5: d.5 = 0    	[........]
-// d.6: d.6 = 0    	[........]
-// d.7: d.7 = 0    	[........]
-class CLR1
-{
-public:
-    static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
-    {
-        throw OperatorNotYetImplementedException("CLR1");
-        return 0;
-    }
-
-    static std::string toString() { return "CLR1"; }
-};
-
-// CLRC/P
-// : C = 0    	[.......0]
-// : P = 0    	[..0.....]
-template<State::Flag Flag>
-class CLR
-{
-public:
-    static int invoke(State& state)
-    {
-        state.setFlag(Flag, false);
-        return 0;
-    }
-
-    static std::string toString() { return "CLR" + State::getFlagName<Flag>(); }
 };
 
 // CLRV
@@ -1024,7 +998,15 @@ public:
     static std::string toString() { return "SBC"; }
 };
 
-// SET1
+// SET1/CLR1
+// d.0: d.0 = 0    	[........]
+// d.1: d.1 = 0    	[........]
+// d.2: d.2 = 0    	[........]
+// d.3: d.3 = 0    	[........]
+// d.4: d.4 = 0    	[........]
+// d.5: d.5 = 0    	[........]
+// d.6: d.6 = 0    	[........]
+// d.7: d.7 = 0    	[........]
 // d.0: d.0 = 1    	[........]
 // d.1: d.1 = 1    	[........]
 // d.2: d.2 = 1    	[........]
@@ -1033,32 +1015,46 @@ public:
 // d.5: d.5 = 1    	[........]
 // d.6: d.6 = 1    	[........]
 // d.7: d.7 = 1    	[........]
+template <int BitIndex, bool BitValue>
 class SET1
 {
 public:
-    static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
+    static int invoke(State& state, MemoryLocation* operand)
     {
-        throw OperatorNotYetImplementedException("SET1");
+        operand->get().setBit(BitIndex, BitValue);
         return 0;
     }
 
-    static std::string toString() { return "SET1"; }
+    static std::string toString()
+    {
+        std::stringstream ss;
+        if (BitValue) {
+            ss << "SET1.";
+        }
+        else {
+            ss << "CLR1.";
+        }
+        ss << BitIndex;
+        return ss.str();
+    }
 };
 
-// SETC/P
+// SET/CLR C/P
+// : C = 0    	[.......0]
+// : P = 0    	[..0.....]
 // : C = 1    	[.......1]
 // : P = 1    	[..1.....]
-template<State::Flag Flag>
+template<State::Flag Flag, bool Value>
 class SET
 {
 public:
     static int invoke(State& state)
     {
-        state.setFlag(Flag, true);
+        state.setFlag(Flag, Value);
         return 0;
     }
 
-    static std::string toString() { return "SET" + State::getFlagName<Flag>(); }
+    static std::string toString() { return (Value ? "SET" : "CLR") + State::getFlagName<Flag>(); }
 };
 
 // SLEEP

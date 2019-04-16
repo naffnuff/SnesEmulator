@@ -102,6 +102,15 @@ public:
         return value & 1 << bitIndex;
     }
 
+    void setBit(int bitIndex, bool bitValue)
+    {
+        if (bitValue) {
+            value |= 1 << bitIndex;
+        } else {
+            value &= ~(1 << bitIndex);
+        }
+    }
+
     bool isNegative() const
     {
         return getBit(7);
