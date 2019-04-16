@@ -53,7 +53,7 @@ public:
     {
         output << "\33[" << color;
         if (bright) {
-            output << 1;
+            output << ";" << 1;
         }
         output << "m";
     }
