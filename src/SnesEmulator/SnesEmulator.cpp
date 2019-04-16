@@ -14,47 +14,51 @@
 
 #ifdef _WIN32
 #include <windows.h>
-enum Color
-{
-    DarkBlue = FOREGROUND_BLUE,
-    DarkTurquoise = FOREGROUND_BLUE | FOREGROUND_GREEN,
-    DarkGreen = FOREGROUND_GREEN,
-    DarkRed = FOREGROUND_RED,
-    DarkPurple = FOREGROUND_RED | FOREGROUND_BLUE,
-    Blue = FOREGROUND_INTENSITY | DarkBlue,
-    Turquoise = FOREGROUND_INTENSITY | DarkTurquoise,
-    Green = FOREGROUND_INTENSITY | DarkGreen,
-    Red = FOREGROUND_INTENSITY | DarkRed,
-    Purple = FOREGROUND_INTENSITY | DarkPurple,
-    DefaultColor = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE,
-};
-void setOutputColor(Color color)
-{
-    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
-}
-#else
-enum Color
-{
-    DarkBlue,
-    DarkTurquoise,
-    DarkGreen,
-    DarkRed,
-    DarkPurple,
-    Blue,
-    Turquoise,
-    Green,
-    Red,
-    Purple,
-    DefaultColor,
-};
-void setOutputColor(Color color)
-{
-}
 #endif
 
 class Debugger
 {
 public:
+#ifdef _WIN32
+    enum Color
+    {
+        Red = FOREGROUND_RED,
+        Green = FOREGROUND_GREEN,
+        Yellow = FOREGROUND_RED | FOREGROUND_GREEN,
+        Blue = FOREGROUND_BLUE,
+        Magenta = FOREGROUND_RED | FOREGROUND_BLUE,
+        Cyan = FOREGROUND_BLUE | FOREGROUND_GREEN,
+        DefaultColor = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE
+    };
+    void setOutputColor(Color color, bool bright)
+    {
+        int effectiveColor = color;
+        if (bright) {
+            effectiveColor |= FOREGROUND_INTENSITY;
+        }
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), effectiveColor);
+    }
+#else
+    enum Color
+    {
+        Red = 31,
+        Green = 32,
+        Yellow = 33,
+        Blue = 34,
+        Magenta = 35,
+        Cyan = 36,
+        DefaultColor = 0
+    };
+    void setOutputColor(Color color, bool bright)
+    {
+        output << "\33[" << color;
+        if (bright) {
+            output << 1;
+        }
+        output << "m";
+    }
+#endif
+
     class Context
     {
     public:
@@ -96,9 +100,9 @@ public:
                 if (awaitCommand(context, state, otherContext, otherState)) {
                     int cycles = instruction->execute();
                     if (context.stepMode) {
-                        setOutputColor(context.debugColor);
+                        setOutputColor(context.debugColor, true);
                         state.printRegisters(output) << std::endl;
-                        setOutputColor(DefaultColor);
+                        setOutputColor(DefaultColor, false);
                     }
                     return cycles;
                 }
@@ -282,46 +286,49 @@ public:
     template<typename State>
     void printState(const State& state, Context& context)
     {
-        setOutputColor(context.stepMode ? context.debugColor : Red);
+        setOutputColor(context.stepMode ? context.debugColor : Red, true);
         state.printRegisters(output) << std::endl;
         output << context.nextInstruction->opcodeToString() << std::endl;
         output << state.readProgramByte() << ": ";
         output << context.nextInstruction->toString() << std::endl;
-        setOutputColor(DefaultColor);
+        setOutputColor(DefaultColor, false);
     }
 
     template<typename State>
     void setColor(const State& state, const Context& context, Long address, const MemoryLocation& memory)
     {
         Color color = DefaultColor;
+        bool bright = false;
         if (memory.getApplicationCount() > 0) {
-            color = DarkTurquoise;
+            color = Cyan;
         }
         else if (memory.getType() == MemoryLocation::Mapped) {
-            color = DarkGreen;
+            color = Green;
         }
         else if (memory.getType() == MemoryLocation::ReadOnly) {
-            color = DarkBlue;
+            color = Blue;
         }
         else if (memory.getType() == MemoryLocation::ReadWrite) {
-            color = DarkRed;
+            color = Red;
         }
         else if (memory.getType() == MemoryLocation::WriteOnly) {
-            color = DarkPurple;
+            color = Magenta;
         }
         bool breakpoint = context.breakpoints.find(address) != context.breakpoints.end();
         bool executing = address >= state.getProgramAddress() && address < state.getProgramAddress() + context.nextInstruction->size();
         if (breakpoint && executing) {
-            color = Turquoise;
+            color = Cyan;
+            bright = true;
         }
         else if (breakpoint) {
             color = Red;
+            bright = true;
         }
         else if (executing) {
             color = context.debugColor;
         }
         if (color != DefaultColor) {
-            setOutputColor(color);
+            setOutputColor(color, bright);
         }
     }
 
@@ -350,7 +357,7 @@ public:
                     const MemoryLocation& memory = cpuState.getMemory(cpuAddress);
                     setColor(cpuState, cpuContext, cpuAddress++, memory);
                     output << memory << ' ';
-                    setOutputColor(DefaultColor);
+                    setOutputColor(DefaultColor, false);
                 }
             }
 
@@ -365,7 +372,7 @@ public:
                     const MemoryLocation& memory = spcState.getMemory(spcAddress);
                     setColor(spcState, spcContext, spcAddress++, memory);
                     output << memory << ' ';
-                    setOutputColor(DefaultColor);
+                    setOutputColor(DefaultColor, false);
                 }
             }
 
@@ -412,8 +419,8 @@ void Emulator::run()
 
     Debugger debugger(output, input, error);
 
-    Debugger::Context cpuContext("cpu.txt", Green, cpuInstructionDecoder.readNextInstruction(cpuState));
-    Debugger::Context spcContext("spc.txt", Purple, spcInstructionDecoder.readNextInstruction(spcState));
+    Debugger::Context cpuContext("cpu.txt", Debugger::Green, cpuInstructionDecoder.readNextInstruction(cpuState));
+    Debugger::Context spcContext("spc.txt", Debugger::Magenta, spcInstructionDecoder.readNextInstruction(spcState));
 
     const bool resumeLast = true;
 
