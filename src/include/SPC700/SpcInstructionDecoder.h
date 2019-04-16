@@ -3,6 +3,7 @@
 #include <array>
 #include <memory>
 
+#include "System.h"
 #include "Instruction.h"
 #include "SpcState.h"
 
@@ -11,7 +12,7 @@ namespace SPC {
 class InstructionDecoder
 {
 public:
-    __declspec(dllexport) InstructionDecoder(State& state);
+    SHARED InstructionDecoder(State& state);
 
     Instruction* readNextInstruction(State& state) const
     {

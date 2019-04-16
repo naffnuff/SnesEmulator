@@ -3,6 +3,7 @@
 #include <array>
 #include <memory>
 
+#include "System.h"
 #include "Instruction.h"
 #include "CpuState.h"
 
@@ -11,7 +12,7 @@ namespace CPU {
 class InstructionDecoder
 {
 public:
-    __declspec(dllexport) InstructionDecoder(State& state);
+    SHARED InstructionDecoder(State& state);
 
     Instruction* readNextInstruction(State& state) const
     {
