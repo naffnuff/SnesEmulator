@@ -53,7 +53,7 @@ public:
     {
         output << "\33[" << color;
         if (bright) {
-            output << 1;
+            output << ";" << 1;
         }
         output << "m";
     }
@@ -326,6 +326,7 @@ public:
         }
         else if (executing) {
             color = context.debugColor;
+            bright = true;
         }
         if (color != DefaultColor) {
             setOutputColor(color, bright);
