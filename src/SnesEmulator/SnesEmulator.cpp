@@ -28,6 +28,28 @@ enum Color
     Purple = FOREGROUND_INTENSITY | DarkPurple,
     DefaultColor = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE,
 };
+void setOutputColor(Color color)
+{
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
+}
+#else
+enum Color
+{
+    DarkBlue,
+    DarkTurquoise,
+    DarkGreen,
+    DarkRed,
+    DarkPurple,
+    Blue,
+    Turquoise,
+    Green,
+    Red,
+    Purple,
+    DefaultColor,
+};
+void setOutputColor(Color color)
+{
+}
 #endif
 
 class Debugger
@@ -74,9 +96,9 @@ public:
                 if (awaitCommand(context, state, otherContext, otherState)) {
                     int cycles = instruction->execute();
                     if (context.stepMode) {
-                        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), context.debugColor);
+                        setOutputColor(context.debugColor);
                         state.printRegisters(output) << std::endl;
-                        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), DefaultColor);
+                        setOutputColor(DefaultColor);
                     }
                     return cycles;
                 }
@@ -260,12 +282,12 @@ public:
     template<typename State>
     void printState(const State& state, Context& context)
     {
-        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), context.stepMode ? context.debugColor : Red);
+        setOutputColor(context.stepMode ? context.debugColor : Red);
         state.printRegisters(output) << std::endl;
         output << context.nextInstruction->opcodeToString() << std::endl;
         output << state.readProgramByte() << ": ";
         output << context.nextInstruction->toString() << std::endl;
-        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), DefaultColor);
+        setOutputColor(DefaultColor);
     }
 
     template<typename State>
@@ -299,7 +321,7 @@ public:
             color = context.debugColor;
         }
         if (color != DefaultColor) {
-            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
+            setOutputColor(color);
         }
     }
 
@@ -328,7 +350,7 @@ public:
                     const MemoryLocation& memory = cpuState.getMemory(cpuAddress);
                     setColor(cpuState, cpuContext, cpuAddress++, memory);
                     output << memory << ' ';
-                    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), DefaultColor);
+                    setOutputColor(DefaultColor);
                 }
             }
 
@@ -343,7 +365,7 @@ public:
                     const MemoryLocation& memory = spcState.getMemory(spcAddress);
                     setColor(spcState, spcContext, spcAddress++, memory);
                     output << memory << ' ';
-                    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), DefaultColor);
+                    setOutputColor(DefaultColor);
                 }
             }
 
