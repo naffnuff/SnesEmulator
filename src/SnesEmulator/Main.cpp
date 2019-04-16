@@ -32,7 +32,7 @@ void test(std::ostream& output)
         << "Signed:   " << std::bitset<8>(c >> 8) << " " << std::bitset<8>(c) << std::endl;
 }
 
-int main(int, char*)
+int main(int, char**)
 {
     std::ostream& output = std::cout;
     std::istream& input = std::cin;
