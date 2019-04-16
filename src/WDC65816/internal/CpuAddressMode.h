@@ -263,7 +263,7 @@ class DirectPage : public Instruction2Byte
         if ((uint8_t)state.getDirectPage()) {
             cycles += 1;
         }
-        return cycles + Operator::invoke(state, state.getMemoryLocation(lowByte));
+        return cycles + Operator::invoke(state, state.getDirectMemoryLocation(lowByte));
     }
 
     std::string toString() const override
@@ -416,7 +416,7 @@ class DirectPageIndirectLongIndexedY : public Instruction2Byte
         if ((Byte)state.getDirectPage()) {
             cycles += 1;
         }
-        MemoryLocation* address = state.getMemoryLocation(lowByte);
+        MemoryLocation* address = state.getDirectMemoryLocation(lowByte);
         MemoryLocation* memory = state.getMemoryLocation(address[0].getValue(), address[1].getValue(), address[2].getValue(), state.getIndexRegister<State::Y>());
         return cycles + Operator::invoke(state, memory);
     }

@@ -228,7 +228,7 @@ public:
         return getMemoryLocation(lowByte, highByte, dataBank);
     }
 
-    MemoryLocation* getMemoryLocation(Byte lowByte)
+    MemoryLocation* getDirectMemoryLocation(Byte lowByte)
     {
         return getMemoryLocation(Long(directPage + lowByte));
     }

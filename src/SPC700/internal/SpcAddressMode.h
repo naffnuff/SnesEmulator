@@ -1055,7 +1055,7 @@ class YAccumulatorDirect : public Instruction2Byte
 
     int invokeOperator(Byte lowByte) override
     {
-        return Operator::invoke(state, state.getRegister<State::A>(), state.getMemoryWord(Word(lowByte)));
+        return Operator::invoke(state, state.getRegister<State::A>(), state.getDirectMemoryWord(lowByte));
     }
 
     std::string toString() const override

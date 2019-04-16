@@ -177,19 +177,9 @@ public:
         return getMemoryByte(Word(lowByte, highByte));
     }
 
-    Byte getDirectMemoryByte(Byte address) const
-    {
-        return getMemoryByte(Word(address));
-    }
-
     Word getMemoryWord(Word address) const
     {
         return memory[address].getWordValue();
-    }
-
-    Word getDirectMemoryWord(Byte address) const
-    {
-        return getMemoryWord(Word(address));
     }
 
     MemoryLocation* getMemoryLocation(Word address)
@@ -202,14 +192,34 @@ public:
         return getMemoryLocation(Word(lowByte, highByte));
     }
 
-    MemoryLocation* getDirectMemoryLocation(Byte address)
-    {
-        return getMemoryLocation(Word(address));
-    }
-
     MemoryLocation* getMemoryLocation(Long address)
     {
         return &memory[address];
+    }
+
+    Word getDirectAddress(Byte lowByte) const
+    {
+        if (getFlag(p)) {
+            return Word(lowByte, 0x01);
+        }
+        else {
+            return Word(lowByte);
+        }
+    }
+
+    Byte getDirectMemoryByte(Byte address) const
+    {
+        return getMemoryByte(getDirectAddress(address));
+    }
+
+    Word getDirectMemoryWord(Byte address) const
+    {
+        return getMemoryWord(getDirectAddress(address));
+    }
+
+    MemoryLocation* getDirectMemoryLocation(Byte address)
+    {
+        return getMemoryLocation(getDirectAddress(address));
     }
 
     const MemoryLocation& getMemory(Long address) const
