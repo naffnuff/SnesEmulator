@@ -313,58 +313,6 @@ public:
     static std::string toString() { return "BVS"; }
 };
 
-// CLC Clear Carry [Flags affected: c]
-class CLC
-{
-public:
-    static int invoke(State& state)
-    {
-        state.setFlag(State::c, false);
-        return 0;
-    }
-
-    static std::string toString() { return "CLC"; }
-};
-
-// CLD Clear Decimal Mode Flag [Flags affected: d]
-class CLD
-{
-public:
-    static int invoke(State& state)
-    {
-        throw OperatorNotYetImplementedException("CLD");
-        return 0;
-    }
-
-    static std::string toString() { return "CLD"; }
-};
-
-// CLI Clear Interrupt Disable Flag [Flags affected: i]
-class CLI
-{
-public:
-    static int invoke(State& state)
-    {
-        state.setFlag(State::i, false);
-        return 0;
-    }
-
-    static std::string toString() { return "CLI"; }
-};
-
-// CLV Clear Overflow Flag [Flags affected: v]
-class CLV
-{
-public:
-    static int invoke(State& state)
-    {
-        throw OperatorNotYetImplementedException("CLV");
-        return 0;
-    }
-
-    static std::string toString() { return "CLV"; }
-};
-
 // CMP Compare Accumulator With Memory [Flags affected: n,z,c]
 class CMP
 {
@@ -1094,43 +1042,24 @@ public:
     static std::string toString() { return "SBC"; }
 };
 
+// CLC Clear Carry [Flags affected: c]
+// CLD Clear Decimal Mode Flag [Flags affected: d]
+// CLI Clear Interrupt Disable Flag [Flags affected: i]
+// CLV Clear Overflow Flag [Flags affected: v]
 // SEC Set Carry Flag [Flags affected: c]
-class SEC
-{
-public:
-    static int invoke(State& state)
-    {
-        throw OperatorNotYetImplementedException("SEC");
-        return 0;
-    }
-
-    static std::string toString() { return "SEC"; }
-};
-
 // SED Set Decimal Flag [Flags affected: d]
-class SED
-{
-public:
-    static int invoke(State& state)
-    {
-        throw OperatorNotYetImplementedException("SED");
-        return 0;
-    }
-
-    static std::string toString() { return "SED"; }
-};
-
 // SEI Set Interrupt Disable Flag [Flags affected: i]
-class SEI
+template <State::Flag Flag, bool Value>
+class SE
 {
 public:
     static int invoke(State& state)
     {
-        state.setFlag(State::i, true);
+        state.setFlag(Flag, Value);
         return 0;
     }
 
-    static std::string toString() { return "SEI"; }
+    static std::string toString() { return (Value ? "SE" : "CL") + State::getFlagName<Flag>(); }
 };
 
 // SEP Set Processor Status Bits [Flags affected: all except b per operand]

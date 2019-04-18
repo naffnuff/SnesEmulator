@@ -934,7 +934,7 @@ class BVS_70 : public AddressMode::ProgramCounterRelative<Operator::BVS>
 // CLC Clear Carry [Flags affected: c]
 // CLC
 // Implied (1-Byte)
-class CLC_18 : public AddressMode::Implied<Operator::CLC>
+class CLC_18 : public AddressMode::Implied<Operator::SE<State::c, false>>
 {
     using Implied::Implied;
 
@@ -950,7 +950,7 @@ class CLC_18 : public AddressMode::Implied<Operator::CLC>
 // CLD Clear Decimal Mode Flag [Flags affected: d]
 // CLD
 // Implied (1-Byte)
-class CLD_D8 : public AddressMode::Implied<Operator::CLD>
+class CLD_D8 : public AddressMode::Implied<Operator::SE<State::d, false>>
 {
     using Implied::Implied;
 
@@ -967,7 +967,7 @@ class CLD_D8 : public AddressMode::Implied<Operator::CLD>
 // CLI Clear Interrupt Disable Flag [Flags affected: i]
 // CLI
 // Implied (1-Byte)
-class CLI_58 : public AddressMode::Implied<Operator::CLI>
+class CLI_58 : public AddressMode::Implied<Operator::SE<State::i, false>>
 {
     using Implied::Implied;
 
@@ -983,7 +983,7 @@ class CLI_58 : public AddressMode::Implied<Operator::CLI>
 // CLV Clear Overflow Flag [Flags affected: v]
 // CLV
 // Implied (1-Byte)
-class CLV_B8 : public AddressMode::Implied<Operator::CLV>
+class CLV_B8 : public AddressMode::Implied<Operator::SE<State::v, false>>
 {
     using Implied::Implied;
 
@@ -3745,7 +3745,7 @@ class SBC_FF : public AddressMode::AbsoluteLongIndexedX<Operator::SBC>
 // SEC Set Carry Flag [Flags affected: c]
 // SEC
 // Implied (1-Byte)
-class SEC_38 : public AddressMode::Implied<Operator::SEC>
+class SEC_38 : public AddressMode::Implied<Operator::SE<State::c, true>>
 {
     using Implied::Implied;
 
@@ -3762,7 +3762,7 @@ class SEC_38 : public AddressMode::Implied<Operator::SEC>
 // SED Set Decimal Flag [Flags affected: d]
 // SED
 // Implied (1-Byte)
-class SED_F8 : public AddressMode::Implied<Operator::SED>
+class SED_F8 : public AddressMode::Implied<Operator::SE<State::d, true>>
 {
     using Implied::Implied;
 
@@ -3779,7 +3779,7 @@ class SED_F8 : public AddressMode::Implied<Operator::SED>
 // SEI Set Interrupt Disable Flag [Flags affected: i]
 // SEI
 // Implied (1-Byte)
-class SEI_78 : public AddressMode::Implied<Operator::SEI>
+class SEI_78 : public AddressMode::Implied<Operator::SE<State::i, true>>
 {
     using Implied::Implied;
 

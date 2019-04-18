@@ -345,6 +345,18 @@ public:
         return names[Register];
     }
 
+    template<Flag Flag>
+    static std::string getFlagName()
+    {
+        std::string names[] = { "C", "Z", "I", "D", "X", "M", "V", "N" };
+        for (int i = 0; i < 8; ++i) {
+            if (1 << i == Flag) {
+                return names[i];
+            }
+        }
+        return "";
+    }
+
     void setDirectPageRegister(Word value)
     {
         directPage = value;

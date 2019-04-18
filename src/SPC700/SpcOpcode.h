@@ -782,7 +782,6 @@ class BCS_B0 : public AddressMode::ProgramCounterRelative<Operator::BCS>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("BCS_B0");
         return 2 + applyOperand();
     }
 
@@ -1350,7 +1349,6 @@ class CMP_AD : public AddressMode::RegisterImmediate<Operator::CMP, State::Y>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("CMP_AD");
         return  2 + applyOperand();
     }
 
@@ -2151,7 +2149,6 @@ class MOV_E6 : public AddressMode::RegisterRegisterIndirect<Operator::MOV_Signed
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("MOV_E6");
         return  3 + applyOperand();
     }
 
@@ -3636,7 +3633,6 @@ class SET1_A2 : public AddressMode::Direct<Operator::SET1<5, true>>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("SET1_A2");
         return  4 + applyOperand();
     }
 

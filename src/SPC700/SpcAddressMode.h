@@ -917,14 +917,13 @@ class RegisterRegisterIndirect : public Instruction1Byte
 
     int invokeOperator() override
     {
-        throw AddressModeNotYetImplementedException("RegisterRegisterIndirect");
-        MemoryLocation* data = nullptr;
-        return Operator::invoke(state, data, 0);
+        MemoryLocation* memory = state.getDirectMemoryLocation(state.getRegisterValue<SecondRegister>());
+        return Operator::invoke(state, state.getRegister<FirstRegister>(), memory->getValue());
     }
 
     std::string toString() const override
     {
-        return Operator::toString() + " TODO";
+        return Operator::toString() + " " + State::getRegisterName<FirstRegister>() + ", (" + State::getRegisterName<SecondRegister>() + ")";
     }
 };
 

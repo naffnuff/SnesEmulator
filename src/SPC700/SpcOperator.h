@@ -202,13 +202,7 @@ public:
     // §1: Add 1 cycle if branch is taken
     static int invoke(State& state, int8_t offset)
     {
-        throw OperatorNotYetImplementedException("BCS");
-        int cycles = 0;
-        if (true /*branch taken*/) {
-            cycles += 2;
-            throw OperatorNotYetImplementedException("TODO01");
-        }
-        return cycles;
+        return branchIf(state.getFlag(State::c), state, offset);
     }
 
     static std::string toString() { return "BCS"; }
@@ -1029,10 +1023,10 @@ public:
     {
         std::stringstream ss;
         if (BitValue) {
-            ss << "SET1.";
+            ss << "SET.";
         }
         else {
-            ss << "CLR1.";
+            ss << "CLR.";
         }
         ss << BitIndex;
         return ss.str();
@@ -1044,7 +1038,7 @@ public:
 // : P = 0    	[..0.....]
 // : C = 1    	[.......1]
 // : P = 1    	[..1.....]
-template<State::Flag Flag, bool Value>
+template <State::Flag Flag, bool Value>
 class SET
 {
 public:

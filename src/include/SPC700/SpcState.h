@@ -64,7 +64,10 @@ public:
             memory[address].setReadWrite();
         }
 
-        for (size_t address = 0xf2; address < 0xf3; ++address) {
+        for (size_t address = 0xf1; address < 0xf3; ++address) {
+            memory[address].setWriteOnly();
+        }
+        for (size_t address = 0xfa; address < 0xfb; ++address) {
             memory[address].setWriteOnly();
         }
 
