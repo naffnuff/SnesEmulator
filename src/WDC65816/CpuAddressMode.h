@@ -157,14 +157,12 @@ class AbsoluteLong : public Instruction4Byte
 
     int invokeOperator(Byte lowByte, Byte highByte, Byte bankByte) override
     {
-        throw AddressModeNotYetImplementedException("AbsoluteLong");
-        MemoryLocation* memory = nullptr;
-        return Operator::invoke(state, memory);
+        return Operator::invoke(state, state.getMemoryLocation(lowByte, highByte, bankByte));
     }
 
     std::string toString() const override
     {
-        return Operator::toString() + " $" + operandToString() + " TODO";
+        return Operator::toString() + " $" + operandToString();
     }
 };
 

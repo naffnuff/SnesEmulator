@@ -8,6 +8,7 @@
 #include <iomanip>
 
 #include "Types.h"
+#include "MemoryLocation.h"
 #include "Util.h"
 
 namespace CPU {
@@ -39,7 +40,7 @@ public:
 
     State()
         : emulationMode(true)
-        , memory(1 << 24, MemoryLocation(0x42))
+        , memory(1 << 24, MemoryLocation(0x55))
     {
         std::cout << "Memory size=" << memory.size() << std::endl;
         forceRegisters();
@@ -47,20 +48,33 @@ public:
         for (MemoryLocation& a : accumulator) {
             a.setReadWrite();
         }
-        //for (Byte bank = 0; bank < 0x40; ++bank) {
-        for (size_t address = 0; address < 0x2000; ++address) {
+
+        // RAM
+        for (size_t address = 0x7E0000; address < 0x800000; address++) {
             memory[address].setReadWrite();
         }
-        //}
-        for (size_t address = 0x2100; address < 0x2101; ++address) {
-            memory[address].setWriteOnly();
+        // RAM mirrors
+        for (Byte bank = 0; bank < 0x01/*0x40*/; ++bank) {
+            for (Word address = 0; address < 0x2000; ++address) {
+                memory[Long(address, bank)].setMirror(&memory[Long(address, 0x7E)]);
+            }
         }
-        for (size_t address = 0x4200; address < 0x4201; ++address) {
-            memory[address].setWriteOnly();
+
+        // Save RAM
+        for (Byte bank = 0x70; bank < 0x71/*0x78*/; ++bank) {
+            for (Word address = 0; address < 0x8000; ++address) {
+                memory[Long(address, bank)].setReadWrite();
+                memory[Long(address, bank)].setValue(0x00);
+            }
         }
-        for (size_t address = 0x420b; address < 0x420d; ++address) {
-            memory[address].setWriteOnly();
-        }
+
+        // Registers
+        memory[0x2100].setWriteOnly();
+        memory[0x212e].setWriteOnly();
+        memory[0x212f].setWriteOnly();
+        memory[0x4200].setWriteOnly();
+        memory[0x420b].setWriteOnly();
+        memory[0x420c].setWriteOnly();
     }
 
     State(State&) = delete;

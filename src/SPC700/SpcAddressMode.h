@@ -202,43 +202,6 @@ class Direct : public Instruction2Byte
     }
 };
 
-// Direct Bit Program Counter Relative
-// BBC d.0, r:     	PC+=r  if d.0 == 0    	[........]
-// BBC d.1, r:     	PC+=r  if d.1 == 0    	[........]
-// BBC d.2, r:     	PC+=r  if d.2 == 0    	[........]
-// BBC d.3, r:     	PC+=r  if d.3 == 0    	[........]
-// BBC d.4, r:     	PC+=r  if d.4 == 0    	[........]
-// BBC d.5, r:     	PC+=r  if d.5 == 0    	[........]
-// BBC d.6, r:     	PC+=r  if d.6 == 0    	[........]
-// BBC d.7, r:     	PC+=r  if d.7 == 0    	[........]
-// BBS d.0, r:     	PC+=r  if d.0 == 1    	[........]
-// BBS d.1, r:     	PC+=r  if d.1 == 1    	[........]
-// BBS d.2, r:     	PC+=r  if d.2 == 1    	[........]
-// BBS d.3, r:     	PC+=r  if d.3 == 1    	[........]
-// BBS d.4, r:     	PC+=r  if d.4 == 1    	[........]
-// BBS d.5, r:     	PC+=r  if d.5 == 1    	[........]
-// BBS d.6, r:     	PC+=r  if d.6 == 1    	[........]
-// BBS d.7, r:     	PC+=r  if d.7 == 1    	[........]
-template <typename Operator, int BitIndex>
-class DirectBitProgramCounterRelative : public Instruction3Byte
-{
-    using Instruction3Byte::InstructionBase;
-
-    int invokeOperator(Byte directAddress, Byte offset) override
-    {
-        return Operator::invoke(state, state.getDirectMemoryByte(directAddress).getBit(BitIndex), offset);
-    }
-
-    std::string toString() const override
-    {
-        std::ostringstream ss;
-        ss << Operator::toString() + " $";
-        ss << state.readProgramByte(1) << "." << BitIndex << ", $";
-        ss << state.getProgramCounter(int((int8_t)size() + (int8_t)state.readProgramByte(2)));
-        return ss.str();
-    }
-};
-
 // Direct Direct
 // ADC dd, ds:     	(dd) = (dd)+(d)+C    	[NV..H.ZC]
 // AND dd, ds:     	(dd) = (dd) & (ds)    	[N.....Z.]
@@ -254,14 +217,13 @@ class DirectDirect : public Instruction3Byte
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
-        throw AddressModeNotYetImplementedException("DirectDirect");
-        MemoryLocation* data = nullptr;
-        return Operator::invoke(state, data, 0);
+        return Operator::invoke(state, state.getDirectMemoryLocation(highByte), state.getDirectMemoryByte(lowByte));
     }
 
     std::string toString() const override
     {
-        return Operator::toString() + " $" + operandToString() + " TODO";
+        std::string o = operandToString();
+        return Operator::toString() + " $" + o.substr(0, 2) + ", $" + o.substr(2, 2);
     }
 };
 
@@ -398,6 +360,22 @@ class DirectIndirectIndexedRegister : public Instruction2Byte
 };
 
 // Direct Program Counter Relative
+// BBC d.0, r:     	PC+=r  if d.0 == 0    	[........]
+// BBC d.1, r:     	PC+=r  if d.1 == 0    	[........]
+// BBC d.2, r:     	PC+=r  if d.2 == 0    	[........]
+// BBC d.3, r:     	PC+=r  if d.3 == 0    	[........]
+// BBC d.4, r:     	PC+=r  if d.4 == 0    	[........]
+// BBC d.5, r:     	PC+=r  if d.5 == 0    	[........]
+// BBC d.6, r:     	PC+=r  if d.6 == 0    	[........]
+// BBC d.7, r:     	PC+=r  if d.7 == 0    	[........]
+// BBS d.0, r:     	PC+=r  if d.0 == 1    	[........]
+// BBS d.1, r:     	PC+=r  if d.1 == 1    	[........]
+// BBS d.2, r:     	PC+=r  if d.2 == 1    	[........]
+// BBS d.3, r:     	PC+=r  if d.3 == 1    	[........]
+// BBS d.4, r:     	PC+=r  if d.4 == 1    	[........]
+// BBS d.5, r:     	PC+=r  if d.5 == 1    	[........]
+// BBS d.6, r:     	PC+=r  if d.6 == 1    	[........]
+// BBS d.7, r:     	PC+=r  if d.7 == 1    	[........]
 // CBNE d, r:     	CMP A, (d) then BNE    	[........]
 // DBNZ d, r:     	(d)-- then JNZ    	[........]
 template <typename Operator>
@@ -407,7 +385,6 @@ class DirectProgramCounterRelative : public Instruction3Byte
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
-        throw AddressModeNotYetImplementedException("DirectProgramCounterRelative");
         return Operator::invoke(state, state.getDirectMemoryLocation(lowByte), highByte);
     }
 

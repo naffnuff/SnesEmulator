@@ -131,6 +131,7 @@
     <ClCompile Include="..\..\..\src\SnesEmulator\Main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\src\SnesEmulator\Debugger.h" />
     <ClInclude Include="..\..\..\src\SnesEmulator\SnesEmulator.h" />
     <ClInclude Include="..\..\..\src\SnesEmulator\SnesRom.h" />
   </ItemGroup>

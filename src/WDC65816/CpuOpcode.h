@@ -1076,7 +1076,6 @@ class CMP_C9_16Bit : public AddressMode::Immediate16Bit<Operator::CMP>
     // 3-m 3-m         imm       m.....mm . CMP #$54
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("CMP_C9_16Bit");
         return 2 + applyOperand();
     }
 
@@ -2117,7 +2116,6 @@ class LDA_A5 : public AddressMode::DirectPage<Operator::LDA>
     // 2   4-m+w       dir       m.....m. . LDA $10
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("LDA_A5");
         return 3 + applyOperand();
     }
 
@@ -2202,7 +2200,6 @@ class LDA_AF : public AddressMode::AbsoluteLong<Operator::LDA>
     // 4   6-m         long      m.....m. . LDA $FEDBCA
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("LDA_AF");
         return 5 + applyOperand();
     }
 
@@ -3901,7 +3898,6 @@ class STA_8F : public AddressMode::AbsoluteLong<Operator::STA>
     // 4   6-m         long      ........ . STA $FEDBCA
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("STA_8F");
         return 5 + applyOperand();
     }
 
@@ -4067,7 +4063,7 @@ class STP_DB : public AddressMode::Implied<Operator::STP>
 // STX Store Index Register X to Memory [Flags affected: none]
 // STX dp
 // Direct Page (2-Byte)
-class STX_86 : public AddressMode::DirectPage<Operator::STX>
+class STX_86 : public AddressMode::DirectPage<Operator::ST<State::X>>
 {
     using DirectPage::DirectPage;
 
@@ -4084,7 +4080,7 @@ class STX_86 : public AddressMode::DirectPage<Operator::STX>
 // STX Store Index Register X to Memory [Flags affected: none]
 // STX addr
 // Absolute (3-Byte)
-class STX_8E : public AddressMode::Absolute<Operator::STX>
+class STX_8E : public AddressMode::Absolute<Operator::ST<State::X>>
 {
     using Absolute::Absolute;
 
@@ -4101,7 +4097,7 @@ class STX_8E : public AddressMode::Absolute<Operator::STX>
 // STX Store Index Register X to Memory [Flags affected: none]
 // STX dp,Y
 // Direct Page Indexed, Y (2-Byte)
-class STX_96 : public AddressMode::DirectPageIndexed<Operator::STX, State::Y>
+class STX_96 : public AddressMode::DirectPageIndexed<Operator::ST<State::X>, State::Y>
 {
     using DirectPageIndexed::DirectPageIndexed;
 
@@ -4118,7 +4114,7 @@ class STX_96 : public AddressMode::DirectPageIndexed<Operator::STX, State::Y>
 // STY Store Index Register Y to Memory [Flags affected: none]
 // STY dp
 // Direct Page (2-Byte)
-class STY_84 : public AddressMode::DirectPage<Operator::STY>
+class STY_84 : public AddressMode::DirectPage<Operator::ST<State::Y>>
 {
     using DirectPage::DirectPage;
 
@@ -4135,14 +4131,13 @@ class STY_84 : public AddressMode::DirectPage<Operator::STY>
 // STY Store Index Register Y to Memory [Flags affected: none]
 // STY addr
 // Absolute (3-Byte)
-class STY_8C : public AddressMode::Absolute<Operator::STY>
+class STY_8C : public AddressMode::Absolute<Operator::ST<State::Y>>
 {
     using Absolute::Absolute;
 
     // 3   5-x         abs       ........ . STY $9876
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("STY_8C");
         return 4 + applyOperand();
     }
 
@@ -4152,7 +4147,7 @@ class STY_8C : public AddressMode::Absolute<Operator::STY>
 // STY Store Index Register Y to Memory [Flags affected: none]
 // STY dp,X
 // Direct Page Indexed, X (2-Byte)
-class STY_94 : public AddressMode::DirectPageIndexed<Operator::STY, State::X>
+class STY_94 : public AddressMode::DirectPageIndexed<Operator::ST<State::Y>, State::X>
 {
     using DirectPageIndexed::DirectPageIndexed;
 

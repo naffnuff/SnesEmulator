@@ -30,5 +30,8 @@
     <ClInclude Include="..\..\..\src\include\Common\System.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\include\Common\MemoryLocation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

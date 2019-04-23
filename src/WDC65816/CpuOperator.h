@@ -952,9 +952,7 @@ public:
             memory->setWordValue(data);
         }
         else {
-            Byte data = memory->getValue();
-            rotateLeft(state, data);
-            memory->setValue(data);
+            rotateLeft(state, memory->get());
         }
         return cycles;
     }
@@ -1083,7 +1081,6 @@ public:
     static int invoke(State& state, MemoryLocation* memory)
     {
         int cycles = 0;
-
         if (state.is16Bit(State::m)) {
             cycles += 1;
             memory->setWordValue(state.getAccumulatorC());
@@ -1091,7 +1088,6 @@ public:
         else {
             memory->setValue(state.getAccumulatorA());
         }
-
         return cycles;
     }
 
@@ -1112,40 +1108,26 @@ public:
     static std::string toString() { return "STP"; }
 };
 
-// STX Store Index Register X to Memory [Flags affected: none]
-class STX
+// STX Store Index Register X/Y to Memory [Flags affected: none]
+template <State::IndexRegister Register>
+class ST
 {
 public:
     // §10: Add 1 cycle if x=0 (16-bit index registers)
-    static int invoke(State& state, const MemoryLocation* memory)
+    static int invoke(State& state, MemoryLocation* memory)
     {
-        throw OperatorNotYetImplementedException("STX");
         int cycles = 0;
         if (state.is16Bit(State::x)) {
             cycles += 1;
+            memory->setWordValue(state.getIndexRegister<Register>());
+        }
+        else {
+            memory->setValue(Byte(state.getIndexRegister<Register>()));
         }
         return cycles;
     }
 
-    static std::string toString() { return "STX"; }
-};
-
-// STY Store Index Register Y to Memory [Flags affected: none]
-class STY
-{
-public:
-    // §10: Add 1 cycle if x=0 (16-bit index registers)
-    static int invoke(State& state, const MemoryLocation* memory)
-    {
-        throw OperatorNotYetImplementedException("STY");
-        int cycles = 0;
-        if (state.is16Bit(State::x)) {
-            cycles += 1;
-        }
-        return cycles;
-    }
-
-    static std::string toString() { return "STY"; }
+    static std::string toString() { return "ST" + State::getIndexRegisterName<Register>(); }
 };
 
 // STZ Store Zero to Memory [Flags affected: none]

@@ -110,6 +110,7 @@ public:
         Byte& value = operand->get();
         state.setFlag(State::c, value.isNegative());
         value <<= 1;
+        state.updateSignFlags(value);
         return 0;
     }
 
@@ -126,7 +127,7 @@ static int branchIf(bool condition, State& state, int8_t offset)
     return cycles;
 }
 
-// BBC
+// BBS/C
 // d.0, r: PC+=r  if d.0 == 0    	[........]
 // d.1, r: PC+=r  if d.1 == 0    	[........]
 // d.2, r: PC+=r  if d.2 == 0    	[........]
@@ -135,19 +136,6 @@ static int branchIf(bool condition, State& state, int8_t offset)
 // d.5, r: PC+=r  if d.5 == 0    	[........]
 // d.6, r: PC+=r  if d.6 == 0    	[........]
 // d.7, r: PC+=r  if d.7 == 0    	[........]
-class BBC
-{
-public:
-    // §1: Add 1 cycle if branch is taken
-    static int invoke(State& state, bool bitValue, int8_t offset)
-    {
-        return branchIf(!bitValue, state, offset);
-    }
-
-    static std::string toString() { return "BBC"; }
-};
-
-// BBS
 // d.0, r: PC+=r  if d.0 == 1    	[........]
 // d.1, r: PC+=r  if d.1 == 1    	[........]
 // d.2, r: PC+=r  if d.2 == 1    	[........]
@@ -156,56 +144,36 @@ public:
 // d.5, r: PC+=r  if d.5 == 1    	[........]
 // d.6, r: PC+=r  if d.6 == 1    	[........]
 // d.7, r: PC+=r  if d.7 == 1    	[........]
-class BBS
+template <int BitIndex, bool BitValue>
+class BB
 {
 public:
     // §1: Add 1 cycle if branch is taken
-    static int invoke(State& state, bool bitValue, int8_t offset)
+    static int invoke(State& state, MemoryLocation* operand, int8_t offset)
     {
-        throw OperatorNotYetImplementedException("BBS");
-        int cycles = 0;
-        if (true /*branch taken*/) {
-            cycles += 2;
-            throw OperatorNotYetImplementedException("TODO01");
-        }
-        return cycles;
+        return branchIf(operand->getValue().getBit(BitIndex) == BitValue, state, offset);
     }
 
-    static std::string toString() { return "BBS"; }
+    static std::string toString() {
+        std::stringstream ss;
+        ss << "BB" << (BitValue ? "S" : "C") << "." << BitIndex;
+        return ss.str();
+    }
 };
 
-// BCC
+// B[C/V][S/C]
 // r: PC+=r  if C == 0    	[........]
-class BCC
+template <State::Flag Flag, bool Value>
+class B
 {
 public:
     // §1: Add 1 cycle if branch is taken
     static int invoke(State& state, int8_t offset)
     {
-        throw OperatorNotYetImplementedException("BCC");
-        int cycles = 0;
-        if (true /*branch taken*/) {
-            cycles += 2;
-            throw OperatorNotYetImplementedException("TODO01");
-        }
-        return cycles;
+        return branchIf(state.getFlag(Flag) == Value, state, offset);
     }
 
-    static std::string toString() { return "BCC"; }
-};
-
-// BCS
-// r: PC+=r  if C == 1    	[........]
-class BCS
-{
-public:
-    // §1: Add 1 cycle if branch is taken
-    static int invoke(State& state, int8_t offset)
-    {
-        return branchIf(state.getFlag(State::c), state, offset);
-    }
-
-    static std::string toString() { return "BCS"; }
+    static std::string toString() { return "B" + State::getFlagName<Flag>() + (Value ? "S" : "C"); }
 };
 
 // BEQ
@@ -296,46 +264,6 @@ public:
     }
 
     static std::string toString() { return "BRK"; }
-};
-
-// BVC
-// r: PC+=r  if V == 0    	[........]
-class BVC
-{
-public:
-    // §1: Add 1 cycle if branch is taken
-    static int invoke(State& state, int8_t offset)
-    {
-        throw OperatorNotYetImplementedException("BVC");
-        int cycles = 0;
-        if (true /*branch taken*/) {
-            cycles += 2;
-            throw OperatorNotYetImplementedException("TODO01");
-        }
-        return cycles;
-    }
-
-    static std::string toString() { return "BVC"; }
-};
-
-// BVS
-// r: PC+=r  if V == 1    	[........]
-class BVS
-{
-public:
-    // §1: Add 1 cycle if branch is taken
-    static int invoke(State& state, int8_t offset)
-    {
-        throw OperatorNotYetImplementedException("BVS");
-        int cycles = 0;
-        if (true /*branch taken*/) {
-            cycles += 2;
-            throw OperatorNotYetImplementedException("TODO01");
-        }
-        return cycles;
-    }
-
-    static std::string toString() { return "BVS"; }
 };
 
 // CALL
@@ -649,7 +577,10 @@ class LSR
 public:
     static int invoke(State& state, MemoryLocation* operand)
     {
-        throw OperatorNotYetImplementedException("LSR");
+        Byte& value = operand->get();
+        state.setFlag(State::c, value.getBit(0));
+        value >>= 1;
+        state.updateSignFlags(value);
         return 0;
     }
 
@@ -810,7 +741,7 @@ class NOTC
 public:
     static int invoke(State& state)
     {
-        throw OperatorNotYetImplementedException("NOTC");
+        state.setFlag(State::c, !state.getFlag(State::c));
         return 0;
     }
 
@@ -960,7 +891,14 @@ class ROR
 public:
     static int invoke(State& state, MemoryLocation* operand)
     {
-        throw OperatorNotYetImplementedException("ROR");
+        Byte& value = operand->get();
+        bool carry = state.getFlag(State::c);
+        state.setFlag(State::c, value.getBit(0));
+        value >>= 1;
+        if (carry) {
+            value |= 1 << 7;
+        }
+        state.updateSignFlags(value);
         return 0;
     }
 

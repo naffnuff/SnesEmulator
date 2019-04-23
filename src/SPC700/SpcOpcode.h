@@ -505,9 +505,9 @@ class ASL_0C : public AddressMode::Absolute<Operator::ASL>
 // BBC d.0, r
 // PC+=r  if d.0 == 0    	[........]
 // Direct Bit Program Counter Relative (3-Byte)
-class BBC_13 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC, 0>
+class BBC_13 : public AddressMode::DirectProgramCounterRelative<Operator::BB<0, false>>
 {
-    using DirectBitProgramCounterRelative::DirectBitProgramCounterRelative;
+    using DirectProgramCounterRelative::DirectProgramCounterRelative;
 
     int execute() override
     {
@@ -521,9 +521,9 @@ class BBC_13 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC
 // BBC d.1, r
 // PC+=r  if d.1 == 0    	[........]
 // Direct Bit Program Counter Relative (3-Byte)
-class BBC_33 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC, 1>
+class BBC_33 : public AddressMode::DirectProgramCounterRelative<Operator::BB<1, false>>
 {
-    using DirectBitProgramCounterRelative::DirectBitProgramCounterRelative;
+    using DirectProgramCounterRelative::DirectProgramCounterRelative;
 
     int execute() override
     {
@@ -537,9 +537,9 @@ class BBC_33 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC
 // BBC d.2, r
 // PC+=r  if d.2 == 0    	[........]
 // Direct Bit Program Counter Relative (3-Byte)
-class BBC_53 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC, 2>
+class BBC_53 : public AddressMode::DirectProgramCounterRelative<Operator::BB<2, false>>
 {
-    using DirectBitProgramCounterRelative::DirectBitProgramCounterRelative;
+    using DirectProgramCounterRelative::DirectProgramCounterRelative;
 
     int execute() override
     {
@@ -553,9 +553,9 @@ class BBC_53 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC
 // BBC d.3, r
 // PC+=r  if d.3 == 0    	[........]
 // Direct Bit Program Counter Relative (3-Byte)
-class BBC_73 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC, 3>
+class BBC_73 : public AddressMode::DirectProgramCounterRelative<Operator::BB<3, false>>
 {
-    using DirectBitProgramCounterRelative::DirectBitProgramCounterRelative;
+    using DirectProgramCounterRelative::DirectProgramCounterRelative;
 
     int execute() override
     {
@@ -569,9 +569,9 @@ class BBC_73 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC
 // BBC d.4, r
 // PC+=r  if d.4 == 0    	[........]
 // Direct Bit Program Counter Relative (3-Byte)
-class BBC_93 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC, 4>
+class BBC_93 : public AddressMode::DirectProgramCounterRelative<Operator::BB<4, false>>
 {
-    using DirectBitProgramCounterRelative::DirectBitProgramCounterRelative;
+    using DirectProgramCounterRelative::DirectProgramCounterRelative;
 
     int execute() override
     {
@@ -585,9 +585,9 @@ class BBC_93 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC
 // BBC d.5, r
 // PC+=r  if d.5 == 0    	[........]
 // Direct Bit Program Counter Relative (3-Byte)
-class BBC_B3 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC, 5>
+class BBC_B3 : public AddressMode::DirectProgramCounterRelative<Operator::BB<5, false>>
 {
-    using DirectBitProgramCounterRelative::DirectBitProgramCounterRelative;
+    using DirectProgramCounterRelative::DirectProgramCounterRelative;
 
     int execute() override
     {
@@ -601,9 +601,9 @@ class BBC_B3 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC
 // BBC d.6, r
 // PC+=r  if d.6 == 0    	[........]
 // Direct Bit Program Counter Relative (3-Byte)
-class BBC_D3 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC, 6>
+class BBC_D3 : public AddressMode::DirectProgramCounterRelative<Operator::BB<6, false>>
 {
-    using DirectBitProgramCounterRelative::DirectBitProgramCounterRelative;
+    using DirectProgramCounterRelative::DirectProgramCounterRelative;
 
     int execute() override
     {
@@ -617,9 +617,9 @@ class BBC_D3 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC
 // BBC d.7, r
 // PC+=r  if d.7 == 0    	[........]
 // Direct Bit Program Counter Relative (3-Byte)
-class BBC_F3 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC, 7>
+class BBC_F3 : public AddressMode::DirectProgramCounterRelative<Operator::BB<7, false>>
 {
-    using DirectBitProgramCounterRelative::DirectBitProgramCounterRelative;
+    using DirectProgramCounterRelative::DirectProgramCounterRelative;
 
     int execute() override
     {
@@ -632,9 +632,9 @@ class BBC_F3 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBC
 // BBS d.0, r
 // PC+=r  if d.0 == 1    	[........]
 // Direct Bit Program Counter Relative (3-Byte)
-class BBS_03 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS, 0>
+class BBS_03 : public AddressMode::DirectProgramCounterRelative<Operator::BB<0, true>>
 {
-    using DirectBitProgramCounterRelative::DirectBitProgramCounterRelative;
+    using DirectProgramCounterRelative::DirectProgramCounterRelative;
 
     int execute() override
     {
@@ -648,9 +648,9 @@ class BBS_03 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS
 // BBS d.1, r
 // PC+=r  if d.1 == 1    	[........]
 // Direct Bit Program Counter Relative (3-Byte)
-class BBS_23 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS, 1>
+class BBS_23 : public AddressMode::DirectProgramCounterRelative<Operator::BB<1, true>>
 {
-    using DirectBitProgramCounterRelative::DirectBitProgramCounterRelative;
+    using DirectProgramCounterRelative::DirectProgramCounterRelative;
 
     int execute() override
     {
@@ -664,9 +664,9 @@ class BBS_23 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS
 // BBS d.2, r
 // PC+=r  if d.2 == 1    	[........]
 // Direct Bit Program Counter Relative (3-Byte)
-class BBS_43 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS, 2>
+class BBS_43 : public AddressMode::DirectProgramCounterRelative<Operator::BB<2, true>>
 {
-    using DirectBitProgramCounterRelative::DirectBitProgramCounterRelative;
+    using DirectProgramCounterRelative::DirectProgramCounterRelative;
 
     int execute() override
     {
@@ -680,9 +680,9 @@ class BBS_43 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS
 // BBS d.3, r
 // PC+=r  if d.3 == 1    	[........]
 // Direct Bit Program Counter Relative (3-Byte)
-class BBS_63 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS, 3>
+class BBS_63 : public AddressMode::DirectProgramCounterRelative<Operator::BB<3, true>>
 {
-    using DirectBitProgramCounterRelative::DirectBitProgramCounterRelative;
+    using DirectProgramCounterRelative::DirectProgramCounterRelative;
 
     int execute() override
     {
@@ -696,9 +696,9 @@ class BBS_63 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS
 // BBS d.4, r
 // PC+=r  if d.4 == 1    	[........]
 // Direct Bit Program Counter Relative (3-Byte)
-class BBS_83 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS, 4>
+class BBS_83 : public AddressMode::DirectProgramCounterRelative<Operator::BB<4, true>>
 {
-    using DirectBitProgramCounterRelative::DirectBitProgramCounterRelative;
+    using DirectProgramCounterRelative::DirectProgramCounterRelative;
 
     int execute() override
     {
@@ -712,9 +712,9 @@ class BBS_83 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS
 // BBS d.5, r
 // PC+=r  if d.5 == 1    	[........]
 // Direct Bit Program Counter Relative (3-Byte)
-class BBS_A3 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS, 5>
+class BBS_A3 : public AddressMode::DirectProgramCounterRelative<Operator::BB<5, true>>
 {
-    using DirectBitProgramCounterRelative::DirectBitProgramCounterRelative;
+    using DirectProgramCounterRelative::DirectProgramCounterRelative;
 
     int execute() override
     {
@@ -728,9 +728,9 @@ class BBS_A3 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS
 // BBS d.6, r
 // PC+=r  if d.6 == 1    	[........]
 // Direct Bit Program Counter Relative (3-Byte)
-class BBS_C3 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS, 6>
+class BBS_C3 : public AddressMode::DirectProgramCounterRelative<Operator::BB<6, true>>
 {
-    using DirectBitProgramCounterRelative::DirectBitProgramCounterRelative;
+    using DirectProgramCounterRelative::DirectProgramCounterRelative;
 
     int execute() override
     {
@@ -744,13 +744,12 @@ class BBS_C3 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS
 // BBS d.7, r
 // PC+=r  if d.7 == 1    	[........]
 // Direct Bit Program Counter Relative (3-Byte)
-class BBS_E3 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS, 7>
+class BBS_E3 : public AddressMode::DirectProgramCounterRelative<Operator::BB<7, true>>
 {
-    using DirectBitProgramCounterRelative::DirectBitProgramCounterRelative;
+    using DirectProgramCounterRelative::DirectProgramCounterRelative;
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("BBS_E3");
         return 5 + applyOperand();
     }
 
@@ -760,7 +759,7 @@ class BBS_E3 : public AddressMode::DirectBitProgramCounterRelative<Operator::BBS
 // BCC r
 // PC+=r  if C == 0    	[........]
 // Program Counter Relative (2-Byte)
-class BCC_90 : public AddressMode::ProgramCounterRelative<Operator::BCC>
+class BCC_90 : public AddressMode::ProgramCounterRelative<Operator::B<State::c, false>>
 {
     using ProgramCounterRelative::ProgramCounterRelative;
 
@@ -776,7 +775,7 @@ class BCC_90 : public AddressMode::ProgramCounterRelative<Operator::BCC>
 // BCS r
 // PC+=r  if C == 1    	[........]
 // Program Counter Relative (2-Byte)
-class BCS_B0 : public AddressMode::ProgramCounterRelative<Operator::BCS>
+class BCS_B0 : public AddressMode::ProgramCounterRelative<Operator::B<State::c, true>>
 {
     using ProgramCounterRelative::ProgramCounterRelative;
 
@@ -852,7 +851,7 @@ class BPL_10 : public AddressMode::ProgramCounterRelative<Operator::BPL>
 // BVC r
 // PC+=r  if V == 0    	[........]
 // Program Counter Relative (2-Byte)
-class BVC_50 : public AddressMode::ProgramCounterRelative<Operator::BVC>
+class BVC_50 : public AddressMode::ProgramCounterRelative<Operator::B<State::v, false>>
 {
     using ProgramCounterRelative::ProgramCounterRelative;
 
@@ -868,7 +867,7 @@ class BVC_50 : public AddressMode::ProgramCounterRelative<Operator::BVC>
 // BVS r
 // PC+=r  if V == 1    	[........]
 // Program Counter Relative (2-Byte)
-class BVS_70 : public AddressMode::ProgramCounterRelative<Operator::BVS>
+class BVS_70 : public AddressMode::ProgramCounterRelative<Operator::B<State::v, true>>
 {
     using ProgramCounterRelative::ProgramCounterRelative;
 
@@ -1395,7 +1394,6 @@ class CMP_69 : public AddressMode::DirectDirect<Operator::CMP>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("CMP_69");
         return  6 + applyOperand();
     }
 
@@ -1743,7 +1741,6 @@ class EOR_44 : public AddressMode::RegisterDirect<Operator::EOR, State::A>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("EOR_44");
         return  3 + applyOperand();
     }
 
@@ -2009,7 +2006,6 @@ class LSR_5C : public AddressMode::Register<Operator::LSR, State::A>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("LSR_5C");
         return  2 + applyOperand();
     }
 
@@ -2491,7 +2487,6 @@ class MOV_EC : public AddressMode::RegisterAbsolute<Operator::MOV_SignedResult, 
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("MOV_EC");
         return  4 + applyOperand();
     }
 
@@ -2819,7 +2814,6 @@ class NOTC_ED : public AddressMode::Implied<Operator::NOTC>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("NOTC_ED");
         return  3 + applyOperand();
     }
 
@@ -3313,7 +3307,6 @@ class ROR_6B : public AddressMode::Direct<Operator::ROR>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ROR_6B");
         return  4 + applyOperand();
     }
 

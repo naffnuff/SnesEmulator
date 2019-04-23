@@ -97,6 +97,13 @@ public:
         return *this;
     }
 
+    template<typename T>
+    Byte& operator>>=(T operand)
+    {
+        value >>= operand;
+        return *this;
+    }
+
     bool getBit(int bitIndex) const
     {
         return value & 1 << bitIndex;
@@ -280,144 +287,6 @@ private:
     friend std::ostream& operator<<(std::ostream&, Long);
 };
 
-class MemoryLocation
-{
-public:
-    class AccessException : public std::runtime_error
-    {
-        using std::runtime_error::runtime_error;
-    };
-
-    enum Type
-    {
-        Invalid,
-        ReadOnly,
-        ReadWrite,
-        WriteOnly,
-        Mapped
-    };
-
-    MemoryLocation()
-    {
-    }
-
-    MemoryLocation(Byte value)
-        : value(value)
-    {
-    }
-
-    Type getType() const
-    {
-        return type;
-    }
-
-    bool isReadProtected() const
-    {
-        return type != ReadOnly && type != ReadWrite && type != Mapped;
-    }
-
-    bool isWriteProtected() const
-    {
-        return type != ReadWrite && type != WriteOnly && type != Mapped;
-    }
-
-    void setValue(Byte byte)
-    {
-        if (isWriteProtected()) {
-            throw AccessException(__FUNCTION__ + std::string(": Bad memory access"));
-        }
-        if (mapping) {
-            mapping->value = byte;
-        }
-        else {
-            value = byte;
-        }
-    }
-
-    Byte getValue() const
-    {
-        if (isReadProtected()) {
-            throw AccessException(__FUNCTION__ + std::string(": Bad memory access"));
-        }
-        return value;
-    }
-
-    Byte apply()
-    {
-        if (isReadProtected()) {
-            throw AccessException(__FUNCTION__ + std::string(": Bad memory access"));
-        }
-        ++applicationCount;
-        return value;
-    }
-
-    Byte& get()
-    {
-        if (isReadProtected() || isWriteProtected()) {
-            throw AccessException(__FUNCTION__ + std::string(": Bad memory access"));
-        }
-        return value;
-    }
-
-    void setWordValue(Word value)
-    {
-        this[0].setValue(Byte(value));
-        this[1].setValue(Byte(value >> 8));
-    }
-
-    Word getWordValue() const
-    {
-        return Word(this[0].getValue(), this[1].getValue());
-    }
-
-    void setMapping(MemoryLocation* memoryByte)
-    {
-        if (type != Invalid) {
-            throw AccessException(__FUNCTION__ + std::string(": Bad memory access"));
-        }
-        type = Mapped;
-        mapping = memoryByte;
-    }
-
-    void setReadOnlyValue(Byte byte)
-    {
-        if (type != Invalid) {
-            throw AccessException(__FUNCTION__ + std::string(": Bad memory access"));
-        }
-        type = ReadOnly;
-        value = byte;
-    }
-
-    void setReadWrite()
-    {
-        if (type != Invalid) {
-            throw AccessException(__FUNCTION__ + std::string(": Bad memory access"));
-        }
-        type = ReadWrite;
-    }
-
-    void setWriteOnly()
-    {
-        if (type != Invalid) {
-            throw AccessException(__FUNCTION__ + std::string(": Bad memory access"));
-        }
-        type = WriteOnly;
-    }
-
-    int getApplicationCount() const
-    {
-        return applicationCount;
-    }
-
-private:
-    Byte value = 0;
-    MemoryLocation* mapping = nullptr;
-    Type type = Invalid;
-    int applicationCount = 0;
-
-    friend std::ostream& operator<<(std::ostream&, const MemoryLocation&);
-};
-
 inline std::ostream& operator<<(std::ostream& output, Byte byte)
 {
     return output << std::hex << std::setw(2) << std::setfill('0') << +byte.value << std::dec;
@@ -431,9 +300,4 @@ inline std::ostream& operator<<(std::ostream& output, Word word)
 inline std::ostream& operator<<(std::ostream& output, Long long_)
 {
     return output << std::hex << std::setw(6) << std::setfill('0') << long_.value << std::dec;
-}
-
-inline std::ostream& operator<<(std::ostream& output, const MemoryLocation& memory)
-{
-    return output << memory.value << std::dec;
 }

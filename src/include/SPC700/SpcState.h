@@ -9,6 +9,7 @@
 #include <iomanip>
 
 #include "Types.h"
+#include "MemoryLocation.h"
 #include "Util.h"
 
 namespace SPC {
@@ -69,6 +70,10 @@ public:
         }
         for (size_t address = 0xfa; address < 0xfb; ++address) {
             memory[address].setWriteOnly();
+        }
+
+        for (size_t address = 0xfd; address < 0xfe; ++address) {
+            memory[address].setReadOnlyValue(0x00);
         }
 
         for (size_t address = 0xf3; address < 0xf4; ++address) {
