@@ -2,19 +2,74 @@
 
 #include <fstream>
 #include <iostream>
+#include <string>
 
 #include "Common/Exception.h"
-#include "SnesRom.h"
-#include "Debugger.h"
-
-#include "WDC65816/CpuState.h"
-#include "SPC700/SpcState.h"
 
 #include "WDC65816/CpuInstructionDecoder.h"
 #include "SPC700/SpcInstructionDecoder.h"
 
 template<typename State, typename OtherState>
 int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debugger::Context& context, OtherState& otherState, Debugger::Context& otherContext, std::ostream& error);
+
+std::string operationToString(MemoryLocation::Operation operation)
+{
+    switch (operation) {
+    case MemoryLocation::Read:
+        return "Read ";
+    case MemoryLocation::Write:
+        return "Write ";
+    case MemoryLocation::Access:
+        return "Access ";
+    case MemoryLocation::Apply:
+        return "Apply ";
+    default:
+        return "";
+    }
+};
+
+void Emulator::initializeStates(Rom& rom, CPU::State& cpuState, SPC::State& spcState)
+{
+    if (rom.isLowRom()) {
+        // RAM
+        for (Long address = 0x7E0000; address < 0x800000; address++) {
+            cpuState.getMemoryLocation(address)->setReadWrite();
+        }
+        // RAM mirrors
+        for (Byte bank = 0; bank < 0x01/*0x40*/; ++bank) {
+            for (Word address = 0; address < 0x2000; ++address) {
+                cpuState.getMemoryLocation(Long(address, bank))->setMirror(cpuState.getMemoryLocation(Long(address, 0x7E)));
+            }
+        }
+
+        // Save RAM
+        for (Byte bank = 0x70; bank < 0x71/*0x78*/; ++bank) {
+            for (Word address = 0; address < 0x8000; ++address) {
+                cpuState.getMemoryLocation(Long(address, bank))->setReadWrite();
+                cpuState.getMemoryLocation(Long(address, bank))->setValue(0x00);
+            }
+        }
+
+        // Registers
+        debugger.setRegister(cpuState, 0x2100);
+        debugger.setRegister(cpuState, 0x212e);
+        debugger.setRegister(cpuState, 0x212f);
+        debugger.setRegister(cpuState, 0x4200);
+        debugger.setRegister(cpuState, 0x420b);
+        debugger.setRegister(cpuState, 0x420c);
+
+        // Memory mapping: I/O between the CPU and SPC700
+        for (Word i = 0; i < 4; ++i) {
+            MemoryLocation* cpuMemoryLocation = cpuState.getMemoryLocation(Long(0x2140 + i));
+            MemoryLocation* spcMemoryLocation = spcState.getMemoryLocation(Word(0xf4 + i));
+            cpuMemoryLocation->setMapping(spcMemoryLocation);
+            spcMemoryLocation->setMapping(cpuMemoryLocation);
+        }
+    }
+    else {
+        throw std::runtime_error("Only the low-rom mempory map is supported for now");
+    }
+}
 
 void Emulator::run()
 {
@@ -34,19 +89,12 @@ void Emulator::run()
     
     SPC::State spcState;
 
-    // Memory mapping: this is how I/O between the CPU and SPC700 is handled on the SNES
-    for (Word i = 0; i < 4; ++i) {
-        MemoryLocation* cpuMemoryLocation = cpuState.getMemoryLocation(Long(0x2140 + i));
-        MemoryLocation* spcMemoryLocation = spcState.getMemoryLocation(Word(0xf4 + i));
-        cpuMemoryLocation->setMapping(spcMemoryLocation);
-        spcMemoryLocation->setMapping(cpuMemoryLocation);
-    }
+    cycleCount = 186;
+
+    initializeStates(rom, cpuState, spcState);
 
     CPU::InstructionDecoder cpuInstructionDecoder(cpuState);
     SPC::InstructionDecoder spcInstructionDecoder(spcState);
-
-    uint64_t cycleCount = 186;
-    Debugger debugger(output, input, error, cycleCount);
 
     Debugger::Context cpuContext("cpu.txt", Debugger::Green, cpuInstructionDecoder.readNextInstruction(cpuState));
     Debugger::Context spcContext("spc.txt", Debugger::Magenta, spcInstructionDecoder.readNextInstruction(spcState));

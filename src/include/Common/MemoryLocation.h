@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <functional>
 
 #include "Types.h"
 
@@ -20,6 +21,14 @@ public:
         WriteOnly,
         Mapped,
         Mirror
+    };
+
+    enum Operation
+    {
+        Read,
+        Write,
+        Access,
+        Apply
     };
 
     MemoryLocation()
@@ -66,6 +75,9 @@ public:
         } else {
             value = byte;
         }
+        if (trap) {
+            trap(Write, byte);
+        }
     }
 
     Byte getValue() const
@@ -75,6 +87,9 @@ public:
         }
         if (isReadProtected()) {
             ThrowAccessException(__FUNCTION__);
+        }
+        if (trap) {
+            trap(Read, value);
         }
         return value;
     }
@@ -88,6 +103,9 @@ public:
             ThrowAccessException(__FUNCTION__);
         }
         ++applicationCount;
+        if (trap) {
+            trap(Apply, value);
+        }
         return value;
     }
 
@@ -98,6 +116,9 @@ public:
         }
         if (isReadProtected() || isWriteProtected() || type == Mapped) {
             ThrowAccessException(__FUNCTION__);
+        }
+        if (trap) {
+            trap(Access, value);
         }
         return value;
     }
@@ -173,6 +194,9 @@ private:
     MemoryLocation* mirroredMemory = nullptr;
     Type type = Invalid;
     int applicationCount = 0;
+
+public:
+    std::function<void(Operation, Byte)> trap;
 
     friend std::ostream& operator<<(std::ostream&, const MemoryLocation&);
 };

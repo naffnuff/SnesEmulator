@@ -48,33 +48,6 @@ public:
         for (MemoryLocation& a : accumulator) {
             a.setReadWrite();
         }
-
-        // RAM
-        for (size_t address = 0x7E0000; address < 0x800000; address++) {
-            memory[address].setReadWrite();
-        }
-        // RAM mirrors
-        for (Byte bank = 0; bank < 0x01/*0x40*/; ++bank) {
-            for (Word address = 0; address < 0x2000; ++address) {
-                memory[Long(address, bank)].setMirror(&memory[Long(address, 0x7E)]);
-            }
-        }
-
-        // Save RAM
-        for (Byte bank = 0x70; bank < 0x71/*0x78*/; ++bank) {
-            for (Word address = 0; address < 0x8000; ++address) {
-                memory[Long(address, bank)].setReadWrite();
-                memory[Long(address, bank)].setValue(0x00);
-            }
-        }
-
-        // Registers
-        memory[0x2100].setWriteOnly();
-        memory[0x212e].setWriteOnly();
-        memory[0x212f].setWriteOnly();
-        memory[0x4200].setWriteOnly();
-        memory[0x420b].setWriteOnly();
-        memory[0x420c].setWriteOnly();
     }
 
     State(State&) = delete;
