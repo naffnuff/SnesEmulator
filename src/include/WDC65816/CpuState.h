@@ -6,6 +6,7 @@
 #include <map>
 #include <bitset>
 #include <iomanip>
+#include <condition_variable>
 
 #include "Types.h"
 #include "MemoryLocation.h"
@@ -16,6 +17,16 @@ namespace CPU {
 class State
 {
 public:
+    struct InterruptVectors
+    {
+        Word Coprocessor;
+        Word Break;
+        Word Abort;
+        Word Nmi;
+        Word Reset;
+        Word Irq;
+    };
+
     enum Flag
     {
         c = 1 << 0, // Carry
@@ -133,9 +144,9 @@ public:
         return memory[getProgramAddress(offset)].apply();
     }
 
-    void reset(Word resetAddress)
+    void reset()
     {
-        programCounter = resetAddress;
+        programCounter = emulationVectors.Reset;
     }
 
     void incrementProgramCounter(Word increment)
@@ -384,6 +395,49 @@ public:
         }
     }
 
+    void requestInterrupt()
+    {
+        std::unique_lock<std::mutex> lock(interruptMutex);
+        interruptRequested = true;
+        interrupted = false;
+        interruptVariable.wait(lock, [this]() { return !interruptRequested && !interrupted; });
+        lock.unlock();
+    }
+
+    void serviceInterrupt()
+    {
+        std::lock_guard<std::mutex> guard(interruptMutex);
+        if (interruptRequested && !interrupted) {
+            interruptRequested = false;
+            interrupted = true;
+            pushToStack(programBank);
+            pushWordToStack(programCounter);
+            pushToStack(flags);
+            programBank = 0x00;
+            programCounter = getInterruptVectors(isNativeMode()).Nmi;
+            setFlag(i, true);
+        }
+    }
+
+    void endInterrupt()
+    {
+        {
+            std::lock_guard<std::mutex> guard(interruptMutex);
+            interrupted = false;
+        }
+        interruptVariable.notify_one();
+    }
+
+    InterruptVectors& getInterruptVectors(bool native)
+    {
+        if (native) {
+            return nativeVectors;
+        }
+        else {
+            return emulationVectors;
+        }
+    }
+
 private:
     Byte dataBank;
     Word directPage;
@@ -397,6 +451,14 @@ private:
     std::vector<MemoryLocation> memory;
     std::array<MemoryLocation, 2> accumulator;
     std::array<Word, IndexRegisterCount> indexRegisters;
+
+    std::mutex interruptMutex;
+    std::condition_variable interruptVariable;
+    bool interruptRequested = false;
+    bool interrupted = false;
+
+    InterruptVectors nativeVectors;
+    InterruptVectors emulationVectors;
 };
 
 }

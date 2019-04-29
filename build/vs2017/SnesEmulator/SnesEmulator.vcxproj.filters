@@ -21,6 +21,9 @@
     <ClCompile Include="..\..\..\src\SnesEmulator\SnesEmulator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\SnesEmulator\SnesRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\SnesEmulator\SnesEmulator.h">
@@ -30,6 +33,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\SnesEmulator\Debugger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\SnesEmulator\SnesRenderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

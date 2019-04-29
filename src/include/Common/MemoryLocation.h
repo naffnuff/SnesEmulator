@@ -19,8 +19,7 @@ public:
         ReadOnly,
         ReadWrite,
         WriteOnly,
-        Mapped,
-        Mirror
+        Mapped
     };
 
     enum Operation
@@ -45,36 +44,37 @@ public:
         return type;
     }
 
+    bool isMirror() const
+    {
+        return mirroredMemory;
+    }
+
     bool isReadProtected() const
     {
-        if (mirroredMemory) {
-            return mirroredMemory->isReadProtected();
-        }
         return type != ReadOnly && type != ReadWrite && type != Mapped;
     }
 
     bool isWriteProtected() const
     {
-        if (mirroredMemory) {
-            return mirroredMemory->isWriteProtected();
-        }
         return type != ReadWrite && type != WriteOnly && type != Mapped;
     }
 
     void setValue(Byte byte)
     {
-        if (mirroredMemory) {
-            mirroredMemory->setValue(byte);
-            return;
-        }
         if (isWriteProtected()) {
             ThrowAccessException(__FUNCTION__);
         }
-        if (mapping) {
+
+        if (mirroredMemory) {
+            mirroredMemory->value = byte;
+        }
+        else if (mapping) {
             mapping->value = byte;
-        } else {
+        }
+        else {
             value = byte;
         }
+
         if (trap) {
             trap(Write, byte);
         }
@@ -82,45 +82,58 @@ public:
 
     Byte getValue() const
     {
-        if (mirroredMemory) {
-            return mirroredMemory->getValue();
-        }
         if (isReadProtected()) {
             ThrowAccessException(__FUNCTION__);
         }
+
         if (trap) {
             trap(Read, value);
         }
-        return value;
+
+        if (mirroredMemory) {
+            return mirroredMemory->value;
+        }
+        else {
+            return value;
+        }
     }
 
     Byte apply()
     {
-        if (mirroredMemory) {
-            return mirroredMemory->apply();
-        }
         if (isReadProtected() || type == Mapped) {
             ThrowAccessException(__FUNCTION__);
         }
+
         ++applicationCount;
+
         if (trap) {
             trap(Apply, value);
         }
-        return value;
+
+        if (mirroredMemory) {
+            return mirroredMemory->value;
+        }
+        else {
+            return value;
+        }
     }
 
     Byte& get()
     {
-        if (mirroredMemory) {
-            return mirroredMemory->get();
-        }
         if (isReadProtected() || isWriteProtected() || type == Mapped) {
             ThrowAccessException(__FUNCTION__);
         }
+
         if (trap) {
             trap(Access, value);
         }
-        return value;
+
+        if (mirroredMemory) {
+            return mirroredMemory->value;
+        }
+        else {
+            return value;
+        }
     }
 
     void setWordValue(Word value)
@@ -143,12 +156,12 @@ public:
         mapping = memory;
     }
 
-    void setMirror(MemoryLocation* memory)
+    void setMirror(MemoryLocation* memory, Type mirrorType)
     {
         if (type != Invalid) {
             ThrowAccessException(__FUNCTION__);
         }
-        type = Mirror;
+        type = mirrorType;
         mirroredMemory = memory;
     }
 

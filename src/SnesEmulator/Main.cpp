@@ -1,7 +1,9 @@
 #include <iostream>
 #include <bitset>
+#include <thread>
 
 #include "SnesEmulator.h"
+#include "SnesRenderer.h"
 
 void test(std::ostream& output)
 {
@@ -38,11 +40,24 @@ int main(int, char**)
     std::istream& input = std::cin;
     std::ostream& error = std::cerr;
 
-    Emulator emulator(output, input, error);
-
     try {
-        emulator.run();
+        while (true) {
+            Emulator emulator(output, input, error);
+            emulator.initialize();
+            {
+                std::thread thread([&emulator]() {
+                    Nox::Renderer renderer(emulator);
+                    renderer.initialize();
+                    while (renderer.isRunning()) {
+                        renderer.update();
+                    }
+                    });
 
+                emulator.run();
+
+                thread.join();
+            }
+        }
 
     } catch (const std::exception& e) {
 

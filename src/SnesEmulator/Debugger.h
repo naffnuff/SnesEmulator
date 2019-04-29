@@ -55,13 +55,12 @@ public:
     class Context
     {
     public:
-        Context(std::string fileName, Color debugColor, const Instruction* nextInstruction)
+        Context(std::string fileName, Color debugColor)
             : inspectedAddress(0)
             , fileName(fileName)
             , watchMode(true)
             , stepMode(true)
             , debugColor(debugColor)
-            , nextInstruction(nextInstruction)
         {
 
         }
@@ -75,11 +74,12 @@ public:
         const Instruction* nextInstruction;
     };
 
-    Debugger(std::ostream& output, std::istream& input, std::ostream& error, uint64_t& cycleCount)
+    Debugger(std::ostream& output, std::istream& input, std::ostream& error, uint64_t& cycleCount, bool& running)
         : output(output)
         , input(input)
         , error(error)
         , cycleCount(cycleCount)
+        , running(running)
     {
     }
 
@@ -103,7 +103,7 @@ public:
                 << "i: inspect operand address" << std::endl
                 << "r: toggle run context" << std::endl
                 << "rr: run all contexts" << std::endl
-                //<< "r: reset" << std::endl
+                << "q: reset" << std::endl
                 << "t: toggle breakpoint at current Program Counter address" << std::endl
                 << "tt: toggle breakpoint at next Program Counter address" << std::endl
                 << "t [hex]: toogle breakpoint at address [hex]" << std::endl
@@ -138,6 +138,9 @@ public:
             return !context.stepMode;
         } else if (command == "i") {
             output << "Inspect not implemented" << std::endl;
+        } else if (command == "q") {
+            output << "Reset" << std::endl;
+            running = false;
         } else if (command == "clear") {
             context.breakpoints.clear();
             output << "Cleared context " << context.fileName << std::endl;
@@ -233,6 +236,8 @@ public:
         bool bright = false;
         if (memory.getApplicationCount() > 0) {
             color = Cyan;
+        } else if (memory.isMirror()) {
+            color = Yellow;
         } else if (memory.getType() == MemoryLocation::Mapped) {
             color = Green;
         } else if (memory.getType() == MemoryLocation::ReadOnly) {
@@ -241,8 +246,6 @@ public:
             color = Red;
         } else if (memory.getType() == MemoryLocation::WriteOnly) {
             color = Magenta;
-        } else if (memory.getType() == MemoryLocation::Mirror) {
-            color = Yellow;
         }
         bool breakpoint = context.breakpoints.find(address) != context.breakpoints.end();
         bool executing = address >= state.getProgramAddress() && address < state.getProgramAddress() + context.nextInstruction->size();
@@ -336,4 +339,5 @@ private:
     std::istream& input;
     std::ostream& error;
     uint64_t& cycleCount;
+    bool& running;
 };

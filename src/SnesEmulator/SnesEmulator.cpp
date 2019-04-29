@@ -6,30 +6,21 @@
 
 #include "Common/Exception.h"
 
-#include "WDC65816/CpuInstructionDecoder.h"
-#include "SPC700/SpcInstructionDecoder.h"
-
 template<typename State, typename OtherState>
 int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debugger::Context& context, OtherState& otherState, Debugger::Context& otherContext, std::ostream& error);
 
-std::string operationToString(MemoryLocation::Operation operation)
+void Emulator::initialize()
 {
-    switch (operation) {
-    case MemoryLocation::Read:
-        return "Read ";
-    case MemoryLocation::Write:
-        return "Write ";
-    case MemoryLocation::Access:
-        return "Access ";
-    case MemoryLocation::Apply:
-        return "Apply ";
-    default:
-        return "";
-    }
-};
+    rom.loadFromFile("../../Legend of Zelda, The - A Link to the Past (U) [!].smc", cpuState);
+    //rom.loadFromFile("../../Super Mario World (USA).sfc", cpuState);
+    //rom.loadFromFile("../../Super Metroid (Japan, USA) (En,Ja).sfc", cpuState);
+    //rom.loadFromFile("../../Super Metroid (JU) [!].smc", cpuState);
+    //rom.loadFromFile("../../Megaman X (USA).sfc", cpuState);
+    //rom.loadFromFile("../../SnesInitializationROM.smc", cpuState);
+    //rom.loadFromFile("../../rom.smc", cpuState);
+    //rom.loadFromFile("H:\\naffnuff\\wla\\rom.smc", cpuState);
+    //rom.loadFromFile("C:\\cygwin64\\home\\rasmus.knutsson\\wla-dx\\wla\\myrom.smc", cpuState);
 
-void Emulator::initializeStates(Rom& rom, CPU::State& cpuState, SPC::State& spcState)
-{
     if (rom.isLowRom()) {
         // RAM
         for (Long address = 0x7E0000; address < 0x800000; address++) {
@@ -38,7 +29,7 @@ void Emulator::initializeStates(Rom& rom, CPU::State& cpuState, SPC::State& spcS
         // RAM mirrors
         for (Byte bank = 0; bank < 0x01/*0x40*/; ++bank) {
             for (Word address = 0; address < 0x2000; ++address) {
-                cpuState.getMemoryLocation(Long(address, bank))->setMirror(cpuState.getMemoryLocation(Long(address, 0x7E)));
+                cpuState.getMemoryLocation(Long(address, bank))->setMirror(cpuState.getMemoryLocation(Long(address, 0x7E)), MemoryLocation::ReadWrite);
             }
         }
 
@@ -65,63 +56,58 @@ void Emulator::initializeStates(Rom& rom, CPU::State& cpuState, SPC::State& spcS
             cpuMemoryLocation->setMapping(spcMemoryLocation);
             spcMemoryLocation->setMapping(cpuMemoryLocation);
         }
-    }
-    else {
+    } else {
         throw std::runtime_error("Only the low-rom mempory map is supported for now");
     }
-}
 
-void Emulator::run()
-{
-    CPU::State cpuState;
-
-    Rom rom(output);
-    rom.loadFromFile("../../Legend of Zelda, The - A Link to the Past (U) [!].smc");
-    //rom.loadFromFile("../../Super Mario World (USA).sfc");
-    //rom.loadFromFile("../../Super Metroid (Japan, USA) (En,Ja).sfc");
-    //rom.loadFromFile("../../Super Metroid (JU) [!].smc");
-    //rom.loadFromFile("../../Megaman X (USA).sfc");
-    //rom.loadFromFile("../../SnesInitializationROM.smc");
-    //rom.loadFromFile("../../rom.smc");
-    //rom.loadFromFile("H:\\naffnuff\\wla\\rom.smc");
-    //rom.loadFromFile("C:\\cygwin64\\home\\rasmus.knutsson\\wla-dx\\wla\\myrom.smc");
-    rom.loadToState(cpuState);
-    
-    SPC::State spcState;
-
-    cycleCount = 186;
-
-    initializeStates(rom, cpuState, spcState);
-
-    CPU::InstructionDecoder cpuInstructionDecoder(cpuState);
-    SPC::InstructionDecoder spcInstructionDecoder(spcState);
-
-    Debugger::Context cpuContext("cpu.txt", Debugger::Green, cpuInstructionDecoder.readNextInstruction(cpuState));
-    Debugger::Context spcContext("spc.txt", Debugger::Magenta, spcInstructionDecoder.readNextInstruction(spcState));
-
-    const bool resumeLast = true;
-
-    if (resumeLast) {
-        for (Debugger::Context* context : { &cpuContext, &spcContext }) {
-            std::ifstream contextFile(context->fileName);
-            if (contextFile) {
-                std::string breakpointString;
-                while (std::getline(contextFile, breakpointString, ' ')) {
-                    Long breakpoint = std::stoi(breakpointString, 0, 16);
-                    output << "Read breakpoint: " << breakpoint << " from " << context->fileName << std::endl;
-                    context->breakpoints.insert(breakpoint);
-                }
+    for (Debugger::Context* context : { &cpuContext, &spcContext }) {
+        std::ifstream contextFile(context->fileName);
+        if (contextFile) {
+            std::string breakpointString;
+            while (std::getline(contextFile, breakpointString, ' ')) {
+                Long breakpoint = std::stoi(breakpointString, 0, 16);
+                output << "Read breakpoint: " << breakpoint << " from " << context->fileName << std::endl;
+                context->breakpoints.insert(breakpoint);
             }
         }
     }
 
+    cpuContext.nextInstruction = cpuInstructionDecoder.readNextInstruction(cpuState);
+    spcContext.nextInstruction = spcInstructionDecoder.readNextInstruction(spcState);
+}
+
+void Emulator::initializeSPPURegisters(std::map<Word, MemoryLocation>& registers)
+{
+    registers[0x4200].setMirror(cpuState.getMemoryLocation(0x4200), MemoryLocation::ReadOnly);
+}
+
+std::string operationToString(MemoryLocation::Operation operation)
+{
+    switch (operation) {
+    case MemoryLocation::Read:
+        return "Read ";
+    case MemoryLocation::Write:
+        return "Write ";
+    case MemoryLocation::Access:
+        return "Access ";
+    case MemoryLocation::Apply:
+        return "Apply ";
+    default:
+        return "";
+    }
+};
+
+void Emulator::run()
+{
     uint64_t nextCpu = 186;
     uint64_t nextSpc = 186;
-    bool running = true;
     debugger.startTime = clock();
 
     while (running) {
         if (cycleCount == nextCpu) {
+
+            cpuState.serviceInterrupt();
+
             Instruction* instruction = cpuInstructionDecoder.readNextInstruction(cpuState);
 
             if (cpuContext.stepMode) {

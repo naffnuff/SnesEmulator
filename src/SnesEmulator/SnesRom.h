@@ -18,7 +18,7 @@ public:
     {
     }
 
-    void loadFromFile(const std::string& path)
+    void loadFromFile(const std::string& path, CPU::State& state)
     {
         output << "Reading " << path << std::endl;
 
@@ -40,13 +40,10 @@ public:
         data.resize(rom.size());
         std::transform(rom.begin(), rom.end(), data.begin(), [](char c) { return Byte(c); });
 
-        if (!tryReadHeader(0x8000) && !tryReadHeader(0)) {
+        if (!tryReadHeader(0x8000, state) && !tryReadHeader(0, state)) {
             throw std::runtime_error("Could not read header");
         }
-    }
 
-    void loadToState(CPU::State& state)
-    {
         bool romLoaded = false;
 
         int romIndex = 0;
@@ -69,7 +66,7 @@ public:
             throw std::runtime_error("ROM not fully loaded");
         }
 
-        state.setProgramAddress(Long(resetAddress, 0));
+        state.reset();
 
         output << "Success reading header" << std::endl;
 
@@ -82,7 +79,7 @@ public:
     }
 
 private:
-    bool tryReadHeader(Word offset)
+    bool tryReadHeader(Word offset, CPU::State& state)
     {
         output << "Trying to read ROM header assuming address offset " << offset << std::endl;
 
@@ -107,21 +104,22 @@ private:
         //sRamSize = 0x400 << data[0xFFD8 - offset];
         sRamSize = 1024 * (int)std::pow(2, (int)data[0xFFD8 - offset]);
 
-        nativeCoprocessorVector = Word(data[0xFFE4 - offset], data[0xFFE5 - offset]);
-        nativeBreakVector = Word(data[0xFFE6 - offset], data[0xFFE7 - offset]);
-        nativeAbortVector = Word(data[0xFFE8 - offset], data[0xFFE9 - offset]);
-        nativeNmiVector = Word(data[0xFFEA - offset], data[0xFFEB - offset]);
-        nativeResetVector = Word(data[0xFFEC - offset], data[0xFFED - offset]);
-        nativeIrqVector = Word(data[0xFFEE - offset], data[0xFFEF - offset]);
+        CPU::State::InterruptVectors& nativeVectors = state.getInterruptVectors(true);
+        CPU::State::InterruptVectors& emulationVectors = state.getInterruptVectors(false);
 
-        emulationCoprocessorVector = Word(data[0xFFF4 - offset], data[0xFFF5 - offset]);
-        emulationBreakVector = Word(data[0xFFF6 - offset], data[0xFFF7 - offset]);
-        emulationAbortVector = Word(data[0xFFF8 - offset], data[0xFFF9 - offset]);
-        emulationNmiVector = Word(data[0xFFFA - offset], data[0xFFFB - offset]);
-        emulationResetVector = Word(data[0xFFFC - offset], data[0xFFFD - offset]);
-        emulationIrqVector = Word(data[0xFFFE - offset], data[0xFFFF - offset]);
+        nativeVectors.Coprocessor = Word(data[0xFFE4 - offset], data[0xFFE5 - offset]);
+        nativeVectors.Break = Word(data[0xFFE6 - offset], data[0xFFE7 - offset]);
+        nativeVectors.Abort = Word(data[0xFFE8 - offset], data[0xFFE9 - offset]);
+        nativeVectors.Nmi = Word(data[0xFFEA - offset], data[0xFFEB - offset]);
+        nativeVectors.Reset = Word(data[0xFFEC - offset], data[0xFFED - offset]);
+        nativeVectors.Irq = Word(data[0xFFEE - offset], data[0xFFEF - offset]);
 
-        resetAddress = emulationResetVector;
+        emulationVectors.Coprocessor = Word(data[0xFFF4 - offset], data[0xFFF5 - offset]);
+        emulationVectors.Break = Word(data[0xFFF6 - offset], data[0xFFF7 - offset]);
+        emulationVectors.Abort = Word(data[0xFFF8 - offset], data[0xFFF9 - offset]);
+        emulationVectors.Nmi = Word(data[0xFFFA - offset], data[0xFFFB - offset]);
+        emulationVectors.Reset = Word(data[0xFFFC - offset], data[0xFFFD - offset]);
+        emulationVectors.Irq = Word(data[0xFFFE - offset], data[0xFFFF - offset]);
 
         output
             << "Game Title=" << gameTitle << std::endl
@@ -129,18 +127,18 @@ private:
             << "Cartridge Type=" << cartridgeType << std::endl
             << "ROM Size=" << romSize << std::endl
             << "SRAM Size=" << sRamSize << std::endl
-            << "Native co-processor=" << nativeCoprocessorVector << std::endl
-            << "Native Break=" << nativeBreakVector << std::endl
-            << "Native Abort=" << nativeAbortVector << std::endl
-            << "Native NMI=" << nativeNmiVector << std::endl
-            << "Native Reset=" << nativeResetVector << std::endl
-            << "Native IRQ=" << nativeIrqVector << std::endl
-            << "Emulation Co-processor=" << emulationCoprocessorVector << std::endl
-            << "Emulation Break=" << emulationBreakVector << std::endl
-            << "Emulation Abort=" << emulationAbortVector << std::endl
-            << "Emulation NMI=" << emulationNmiVector << std::endl
-            << "Emulation Reset=" << emulationResetVector << std::endl
-            << "Emulation IRQ=" << emulationIrqVector << std::endl;
+            << "Native Co-processor=" << nativeVectors.Coprocessor << std::endl
+            << "Native Break=" << nativeVectors.Break << std::endl
+            << "Native Abort=" << nativeVectors.Abort << std::endl
+            << "Native NMI=" << nativeVectors.Nmi << std::endl
+            << "Native Reset=" << nativeVectors.Reset << std::endl
+            << "Native IRQ=" << nativeVectors.Irq << std::endl
+            << "Emulation Co-processor=" << emulationVectors.Coprocessor << std::endl
+            << "Emulation Break=" << emulationVectors.Break << std::endl
+            << "Emulation Abort=" << emulationVectors.Abort << std::endl
+            << "Emulation NMI=" << emulationVectors.Nmi << std::endl
+            << "Emulation Reset=" << emulationVectors.Reset << std::endl
+            << "Emulation IRQ=" << emulationVectors.Irq << std::endl;
 
         return true;
     }
@@ -155,19 +153,4 @@ public:
     Byte cartridgeType;
     int romSize;
     int sRamSize;
-    Word resetAddress;
-
-    Word nativeCoprocessorVector;
-    Word nativeBreakVector;
-    Word nativeAbortVector;
-    Word nativeNmiVector;
-    Word nativeResetVector;
-    Word nativeIrqVector;
-
-    Word emulationCoprocessorVector;
-    Word emulationBreakVector;
-    Word emulationAbortVector;
-    Word emulationNmiVector;
-    Word emulationResetVector;
-    Word emulationIrqVector;
 };
