@@ -62,8 +62,10 @@ public:
             , stepMode(true)
             , debugColor(debugColor)
         {
-
         }
+        
+        Context(Context&) = delete;
+        Context& operator=(Context&) = delete;
 
         std::string fileName;
         Long inspectedAddress;
@@ -82,6 +84,9 @@ public:
         , running(running)
     {
     }
+
+    Debugger(Debugger&) = delete;
+    Debugger& operator=(Debugger&) = delete;
 
     template<typename State, typename OtherState>
     bool awaitCommand(Context& context, State& state, Context& otherContext, OtherState& otherState)

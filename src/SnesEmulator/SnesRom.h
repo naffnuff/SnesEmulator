@@ -18,6 +18,9 @@ public:
     {
     }
 
+    Rom(Rom&) = delete;
+    Rom& operator=(Rom&) = delete;
+
     void loadFromFile(const std::string& path, CPU::State& state)
     {
         output << "Reading " << path << std::endl;
@@ -127,6 +130,7 @@ private:
             << "Cartridge Type=" << cartridgeType << std::endl
             << "ROM Size=" << romSize << std::endl
             << "SRAM Size=" << sRamSize << std::endl
+            << std::endl
             << "Native Co-processor=" << nativeVectors.Coprocessor << std::endl
             << "Native Break=" << nativeVectors.Break << std::endl
             << "Native Abort=" << nativeVectors.Abort << std::endl
@@ -138,7 +142,8 @@ private:
             << "Emulation Abort=" << emulationVectors.Abort << std::endl
             << "Emulation NMI=" << emulationVectors.Nmi << std::endl
             << "Emulation Reset=" << emulationVectors.Reset << std::endl
-            << "Emulation IRQ=" << emulationVectors.Irq << std::endl;
+            << "Emulation IRQ=" << emulationVectors.Irq << std::endl
+            << std::endl;
 
         return true;
     }

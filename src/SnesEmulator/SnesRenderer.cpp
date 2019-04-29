@@ -17,20 +17,6 @@ namespace Nox {
 //GLuint LoadShaders(const char * vertex_file_path, const char * fragment_file_path);
 //Float4x4 rotationZ(float angle);
 
-Renderer::Renderer(Emulator& emulator)
-    : emulator(emulator)
-    , pixelBuffer(height * 3 * scale * width * 3 * scale)
-{
-    emulator.initializeSPPURegisters(registers);
-}
-
-Renderer::~Renderer()
-{
-    std::cout << "Renderer destructor start" << std::endl;
-    glfwTerminate();
-    std::cout << "Renderer destructor end" << std::endl;
-}
-
 void Renderer::initialize()
 {
     // Initialise GLFW
@@ -45,7 +31,8 @@ void Renderer::initialize()
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
 
     // Open a window and create its OpenGL context
-    window = glfwCreateWindow(width * scale, height * scale, "Tutorial 02 - Red triangle", NULL, NULL);
+    std::string romTitle = emulator.getRomTitle();
+    window = glfwCreateWindow(width * scale, height * scale, romTitle.c_str(), NULL, NULL);
     if (window == NULL) {
         glfwTerminate();
         throw std::runtime_error("Failed to open GLFW window.");
@@ -62,7 +49,7 @@ void Renderer::initialize()
 
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 
-    //glfwSwapInterval(1);
+    glfwSwapInterval(1);
 
     glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 
@@ -94,35 +81,48 @@ void Renderer::update()
     // If a second has passed.
     if (currentTime - previousTime >= 1.0) {
         // Display the frame count here any way you want.
-        std::cout << frameCount << std::endl;
+        output << frameCount << std::endl;
 
         frameCount = 0;
         previousTime = currentTime;
     }
 
     if (registers[0x4200].getValue().getBit(7)) {
-        std::cout << "Initiating VBlank" << std::endl;
+        output << "Initiating VBlank" << std::endl;
         double before = glfwGetTime();
         emulator.initiateVBlank();
         double after = glfwGetTime();
-        std::cout << "VBlank ended after" << after - before << " seconds" << std::endl;
+        output << "VBlank ended after" << after - before << " seconds" << std::endl;
     }
 
     static int row = 0;
     static int col = 0;
-    static int color = 0;
-    //while (true) {
+    static Byte color = 255;
+    static bool ascending = false;
+    while (true) {
         if (col >= width) {
             ++row;
             col = 0;
             if (row >= height) {
                 row = 0;
-                //break;
+                if (ascending) {
+                    ++color;
+                    if (color == 255) {
+                        ascending = false;
+                    }
+                }
+                else {
+                    --color;
+                    if (color == 0) {
+                        ascending = true;
+                    }
+                }
+                break;
             }
         }
-        setPixel(row, col, row, 0, col);
+        setPixel(row, col, row, col, color);
         ++col;
-    //}
+    }
 
     static float angle = 0.0f;
 

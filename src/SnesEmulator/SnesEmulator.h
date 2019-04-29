@@ -30,9 +30,17 @@ public:
     {
     }
 
+    Emulator(Emulator&) = delete;
+    Emulator& operator=(Emulator&) = delete;
+
     void initialize();
     void initializeSPPURegisters(std::map<Word, MemoryLocation>& registers);
     void run();
+
+    std::string getRomTitle() const
+    {
+        return rom.gameTitle;
+    }
 
     void pause()
     {

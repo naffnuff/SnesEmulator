@@ -45,8 +45,8 @@ int main(int, char**)
             Emulator emulator(output, input, error);
             emulator.initialize();
             {
-                std::thread thread([&emulator]() {
-                    Nox::Renderer renderer(emulator);
+                std::thread thread([&emulator, &output, &input, &error]() {
+                    Nox::Renderer renderer(emulator, output, input, error);
                     renderer.initialize();
                     while (renderer.isRunning()) {
                         renderer.update();

@@ -112,10 +112,10 @@ void Emulator::run()
 
             if (cpuContext.stepMode) {
                 output << "cycleCount=" << cycleCount << ", nextCpu=" << nextCpu << ", nextSpc=" << nextSpc << std::endl;
-                for (const Debugger::Context& context : { cpuContext, spcContext }) {
-                    if (!context.breakpoints.empty()) {
+                for (const Debugger::Context* context : { &cpuContext, &spcContext }) {
+                    if (!context->breakpoints.empty()) {
                         output << "Breakpoints:";
-                        for (Long breakpoint : context.breakpoints) {
+                        for (Long breakpoint : context->breakpoints) {
                             output << " " << breakpoint;
                         }
                         output << std::endl;
@@ -138,10 +138,10 @@ void Emulator::run()
 
             if (spcContext.stepMode) {
                 output << "cycleCount=" << cycleCount << ", nextCpu=" << nextCpu << ", nextSpc=" << nextSpc << std::endl;
-                for (const Debugger::Context& context : { cpuContext, spcContext }) {
-                    if (!context.breakpoints.empty()) {
+                for (const Debugger::Context* context : { &cpuContext, &spcContext }) {
+                    if (!context->breakpoints.empty()) {
                         output << "Breakpoints:";
-                        for (Long breakpoint : context.breakpoints) {
+                        for (Long breakpoint : context->breakpoints) {
                             output << " " << breakpoint;
                         }
                         output << std::endl;

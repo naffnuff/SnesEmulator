@@ -10,8 +10,26 @@ namespace Nox {
 class Renderer
 {
 public:
-    Renderer(Emulator& emulator);
-    ~Renderer();
+    Renderer(Emulator& emulator, std::ostream& output, std::istream& input, std::ostream& error)
+        : emulator(emulator)
+        , pixelBuffer(height * 3 * scale * width * 3 * scale)
+        , output(output)
+        , input(input)
+        , error(error)
+    {
+        emulator.initializeSPPURegisters(registers);
+    }
+
+    ~Renderer()
+    {
+        output << "Renderer destructor start" << std::endl;
+        glfwTerminate();
+        output << "Renderer destructor end" << std::endl;
+    }
+
+    Renderer(Renderer&) = delete;
+    Renderer& operator=(Renderer&) = delete;
+
     void initialize();
     void update();
     bool isRunning() const;
@@ -20,6 +38,10 @@ private:
     void setPixel(int row, int column, GLubyte red, GLubyte green, GLubyte blue);
 
 private:
+    std::ostream& output;
+    std::istream& input;
+    std::ostream& error;
+
     GLFWwindow* window;
 
     Emulator& emulator;
@@ -27,7 +49,7 @@ private:
 
     static const int width = 256;
     static const int height = 224;
-    static const int scale = 3;
+    int scale = 1;
 
     std::vector<GLubyte> pixelBuffer;
 };

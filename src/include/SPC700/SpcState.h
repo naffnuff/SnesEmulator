@@ -85,24 +85,6 @@ public:
     State(State&) = delete;
     State& operator=(State&) = delete;
 
-    /*std::ostream& printMemoryPage(std::ostream& output, Long startAddress) const
-    {
-        output << "       0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f" << std::endl;
-        Long address = startAddress - std::bitset<4>(startAddress).to_ulong();
-        for (int i = 0; i < 16 && address < memory.size(); ++i) {
-            Word lowAddress = Word(address);
-            lowAddress = lowAddress >> 4;
-            output << std::setw(3) << std::setfill('0') << lowAddress << "x  ";
-
-            for (int j = 0; j < 16 && address < memory.size(); ++j) {
-                output << memory[address++] << ' ';
-            }
-
-            output << std::endl;
-        }
-        return output;
-    }*/
-
     size_t getMemorySize() const
     {
         return memory.size();

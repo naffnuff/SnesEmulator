@@ -14,6 +14,9 @@ class InstructionDecoder
 public:
     SHARED InstructionDecoder(State& state);
 
+    InstructionDecoder(InstructionDecoder&) = delete;
+    InstructionDecoder& operator=(InstructionDecoder&) = delete;
+
     Instruction* readNextInstruction(State& state) const
     {
         return instructions[state.applyProgramByte()].get();
