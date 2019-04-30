@@ -55,7 +55,7 @@ public:
                 Long longAddress(address, bank);
                 state.getMemoryLocation(longAddress)->setReadOnlyValue(data[romIndex++]);
                 if (romIndex >= (int)data.size()) {
-                    output << "ROM ends at " << longAddress << std::endl;
+                    output << "ROM ends at " << longAddress << std::endl << std::endl;
                     romLoaded = true;
                     break;
                 }
@@ -68,6 +68,27 @@ public:
         if (!romLoaded) {
             throw std::runtime_error("ROM not fully loaded");
         }
+
+        state.loadInterruptVectors();
+
+        CPU::State::InterruptVectors& nativeVectors = state.getInterruptVectors(true);
+        CPU::State::InterruptVectors& emulationVectors = state.getInterruptVectors(false);
+
+        output
+            << "Native Co-processor=" << nativeVectors.Coprocessor << std::endl
+            << "Native Break=" << nativeVectors.Break << std::endl
+            << "Native Abort=" << nativeVectors.Abort << std::endl
+            << "Native NMI=" << nativeVectors.Nmi << std::endl
+            << "Native Reset=" << nativeVectors.Reset << std::endl
+            << "Native IRQ=" << nativeVectors.Irq << std::endl
+            << std::endl
+            << "Emulation Co-processor=" << emulationVectors.Coprocessor << std::endl
+            << "Emulation Break=" << emulationVectors.Break << std::endl
+            << "Emulation Abort=" << emulationVectors.Abort << std::endl
+            << "Emulation NMI=" << emulationVectors.Nmi << std::endl
+            << "Emulation Reset=" << emulationVectors.Reset << std::endl
+            << "Emulation IRQ=" << emulationVectors.Irq << std::endl
+            << std::endl;
 
         state.reset();
 
@@ -107,42 +128,12 @@ private:
         //sRamSize = 0x400 << data[0xFFD8 - offset];
         sRamSize = 1024 * (int)std::pow(2, (int)data[0xFFD8 - offset]);
 
-        CPU::State::InterruptVectors& nativeVectors = state.getInterruptVectors(true);
-        CPU::State::InterruptVectors& emulationVectors = state.getInterruptVectors(false);
-
-        nativeVectors.Coprocessor = Word(data[0xFFE4 - offset], data[0xFFE5 - offset]);
-        nativeVectors.Break = Word(data[0xFFE6 - offset], data[0xFFE7 - offset]);
-        nativeVectors.Abort = Word(data[0xFFE8 - offset], data[0xFFE9 - offset]);
-        nativeVectors.Nmi = Word(data[0xFFEA - offset], data[0xFFEB - offset]);
-        nativeVectors.Reset = Word(data[0xFFEC - offset], data[0xFFED - offset]);
-        nativeVectors.Irq = Word(data[0xFFEE - offset], data[0xFFEF - offset]);
-
-        emulationVectors.Coprocessor = Word(data[0xFFF4 - offset], data[0xFFF5 - offset]);
-        emulationVectors.Break = Word(data[0xFFF6 - offset], data[0xFFF7 - offset]);
-        emulationVectors.Abort = Word(data[0xFFF8 - offset], data[0xFFF9 - offset]);
-        emulationVectors.Nmi = Word(data[0xFFFA - offset], data[0xFFFB - offset]);
-        emulationVectors.Reset = Word(data[0xFFFC - offset], data[0xFFFD - offset]);
-        emulationVectors.Irq = Word(data[0xFFFE - offset], data[0xFFFF - offset]);
-
         output
             << "Game Title=" << gameTitle << std::endl
             << "Map Mode=" << mapMode << std::endl
             << "Cartridge Type=" << cartridgeType << std::endl
             << "ROM Size=" << romSize << std::endl
             << "SRAM Size=" << sRamSize << std::endl
-            << std::endl
-            << "Native Co-processor=" << nativeVectors.Coprocessor << std::endl
-            << "Native Break=" << nativeVectors.Break << std::endl
-            << "Native Abort=" << nativeVectors.Abort << std::endl
-            << "Native NMI=" << nativeVectors.Nmi << std::endl
-            << "Native Reset=" << nativeVectors.Reset << std::endl
-            << "Native IRQ=" << nativeVectors.Irq << std::endl
-            << "Emulation Co-processor=" << emulationVectors.Coprocessor << std::endl
-            << "Emulation Break=" << emulationVectors.Break << std::endl
-            << "Emulation Abort=" << emulationVectors.Abort << std::endl
-            << "Emulation NMI=" << emulationVectors.Nmi << std::endl
-            << "Emulation Reset=" << emulationVectors.Reset << std::endl
-            << "Emulation IRQ=" << emulationVectors.Irq << std::endl
             << std::endl;
 
         return true;

@@ -106,9 +106,12 @@ void Emulator::run()
     while (running) {
         if (cycleCount == nextCpu) {
 
-            cpuState.serviceInterrupt();
+            if (cpuState.serviceInterrupt()){
+                nextCpu += 9 * 8; // TODO: check the correct cycles for interrupt
+            }
 
             Instruction* instruction = cpuInstructionDecoder.readNextInstruction(cpuState);
+            cpuContext.nextInstruction = instruction;
 
             if (cpuContext.stepMode) {
                 output << "cycleCount=" << cycleCount << ", nextCpu=" << nextCpu << ", nextSpc=" << nextSpc << std::endl;
@@ -135,6 +138,7 @@ void Emulator::run()
 
         if (cycleCount == nextSpc) {
             Instruction* instruction = spcInstructionDecoder.readNextInstruction(spcState);
+            spcContext.nextInstruction = instruction;
 
             if (spcContext.stepMode) {
                 output << "cycleCount=" << cycleCount << ", nextCpu=" << nextCpu << ", nextSpc=" << nextSpc << std::endl;

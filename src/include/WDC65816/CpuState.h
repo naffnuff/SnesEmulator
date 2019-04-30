@@ -64,6 +64,23 @@ public:
     State(State&) = delete;
     State& operator=(State&) = delete;
 
+    void loadInterruptVectors()
+    {
+        nativeVectors.Coprocessor = memory[0xFFE4].getWordValue();
+        nativeVectors.Break = memory[0xFFE6].getWordValue();
+        nativeVectors.Abort = memory[0xFFE8].getWordValue();
+        nativeVectors.Nmi = memory[0xFFEA].getWordValue();
+        nativeVectors.Reset = memory[0xFFEC].getWordValue();
+        nativeVectors.Irq = memory[0xFFEE].getWordValue();
+
+        emulationVectors.Coprocessor = memory[0xFFF4].getWordValue();
+        emulationVectors.Break = memory[0xFFF6].getWordValue();
+        emulationVectors.Abort = memory[0xFFF8].getWordValue();
+        emulationVectors.Nmi = memory[0xFFFA].getWordValue();
+        emulationVectors.Reset = memory[0xFFFC].getWordValue();
+        emulationVectors.Irq = memory[0xFFFE].getWordValue();
+    }
+
     size_t getMemorySize() const
     {
         return memory.size();
@@ -162,6 +179,11 @@ public:
     Word getProgramCounter(int offset = 0) const
     {
         return programCounter + offset;
+    }
+
+    Byte getProgramBank() const
+    {
+        return programBank;
     }
 
     MemoryLocation* getAccumulatorPointer()
@@ -287,10 +309,10 @@ public:
         return Word(lowByte, highByte);
     }
 
-    void setProgramCounter(Word pc, Byte pbr)
+    void setProgramCounter(Word address, Byte bank)
     {
-        programCounter = pc;
-        programBank = pbr;
+        programCounter = address;
+        programBank = bank;
     }
 
     void setProgramCounter(Word value)
@@ -404,7 +426,7 @@ public:
         lock.unlock();
     }
 
-    void serviceInterrupt()
+    bool serviceInterrupt()
     {
         std::lock_guard<std::mutex> guard(interruptMutex);
         if (interruptRequested && !interrupted) {
@@ -416,6 +438,10 @@ public:
             programBank = 0x00;
             programCounter = getInterruptVectors(isNativeMode()).Nmi;
             setFlag(i, true);
+            return true;
+        }
+        else {
+            return false;
         }
     }
 

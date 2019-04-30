@@ -3102,7 +3102,6 @@ class PHX_DA : public AddressMode::Implied<Operator::PHX>
     // 1   4-x         imp       ........ . PHX
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("PHX_DA");
         return 3 + applyOperand();
     }
 
