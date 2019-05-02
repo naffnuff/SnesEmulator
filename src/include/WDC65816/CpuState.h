@@ -388,6 +388,12 @@ public:
         return dataBank;
     }
 
+    void setDataBank(Byte value)
+    {
+        dataBank = value;
+        updateSignFlags(value);
+    }
+
     void setRegisterDebug(char name, Word value)
     {
         switch (name) {

@@ -735,7 +735,7 @@ class PHB
 public:
     static int invoke(State& state)
     {
-        throw OperatorNotYetImplementedException("PHB");
+        state.pushToStack(state.getDataBank());
         return 0;
     }
 
@@ -748,7 +748,7 @@ class PHD
 public:
     static int invoke(State& state)
     {
-        throw OperatorNotYetImplementedException("PHD");
+        state.pushWordToStack(state.getDirectPage());
         return 0;
     }
 
@@ -761,7 +761,7 @@ class PHK
 public:
     static int invoke(State& state)
     {
-        throw OperatorNotYetImplementedException("PHK");
+        state.pushToStack(state.getProgramBank());
         return 0;
     }
 
@@ -781,40 +781,27 @@ public:
     static std::string toString() { return "PHP"; }
 };
 
-// PHX Push Index Register X [Flags affected: none]
-class PHX
+// PHX/Y Push Index Register X/Y [Flags affected: none]
+template<State::IndexRegister Register>
+class PH
 {
 public:
     // §10: Add 1 cycle if x=0 (16-bit index registers)
     static int invoke(State& state)
     {
-        throw OperatorNotYetImplementedException("PHX");
         int cycles = 0;
+        Word indexRegister = state.getIndexRegister<Register>();
         if (state.is16Bit(State::x)) {
             cycles += 1;
+            state.pushWordToStack(indexRegister);
+        }
+        else {
+            state.pushToStack(Byte(indexRegister));
         }
         return cycles;
     }
 
-    static std::string toString() { return "PHX"; }
-};
-
-// PHY Push Index Register Y [Flags affected: none]
-class PHY
-{
-public:
-    // §10: Add 1 cycle if x=0 (16-bit index registers)
-    static int invoke(State& state)
-    {
-        throw OperatorNotYetImplementedException("PHY");
-        int cycles = 0;
-        if (state.is16Bit(State::x)) {
-            cycles += 1;
-        }
-        return cycles;
-    }
-
-    static std::string toString() { return "PHY"; }
+    static std::string toString() { return "PH" + State::getIndexRegisterName<Register>(); }
 };
 
 // PLA Pull Accumulator [Flags affected: n,z]
@@ -844,7 +831,7 @@ class PLB
 public:
     static int invoke(State& state)
     {
-        throw OperatorNotYetImplementedException("PLB");
+        state.setDataBank(state.pullFromStack());
         return 0;
     }
 
@@ -877,40 +864,26 @@ public:
     static std::string toString() { return "PLP"; }
 };
 
-// PLX Pull Index Register X [Flags affected: n,z]
-class PLX
+// PL Pull Index Register X [Flags affected: n,z]
+template<State::IndexRegister Register>
+class PL
 {
 public:
     // §10: Add 1 cycle if x=0 (16-bit index registers)
     static int invoke(State& state)
     {
-        throw OperatorNotYetImplementedException("PLX");
+        throw OperatorNotYetImplementedException("PL");
         int cycles = 0;
         if (state.is16Bit(State::x)) {
             cycles += 1;
+            state.setIndexRegister<Register>(state.pullWordFromStack());
+        } else {
+            state.setIndexRegister<Register>(state.pullFromStack());
         }
         return cycles;
     }
 
-    static std::string toString() { return "PLX"; }
-};
-
-// PLY Pull Index Register Y [Flags affected: n,z]
-class PLY
-{
-public:
-    // §10: Add 1 cycle if x=0 (16-bit index registers)
-    static int invoke(State& state)
-    {
-        throw OperatorNotYetImplementedException("PLY");
-        int cycles = 0;
-        if (state.is16Bit(State::x)) {
-            cycles += 1;
-        }
-        return cycles;
-    }
-
-    static std::string toString() { return "PLY"; }
+    static std::string toString() { return "PL" + State::getIndexRegisterName<Register>(); }
 };
 
 // REP Reset Processor Status Bits [Flags affected: all except b per operand]
@@ -1047,7 +1020,7 @@ public:
 // SEC Set Carry Flag [Flags affected: c]
 // SED Set Decimal Flag [Flags affected: d]
 // SEI Set Interrupt Disable Flag [Flags affected: i]
-template <State::Flag Flag, bool Value>
+template<State::Flag Flag, bool Value>
 class SE
 {
 public:
@@ -1109,7 +1082,7 @@ public:
 };
 
 // STX Store Index Register X/Y to Memory [Flags affected: none]
-template <State::IndexRegister Register>
+template<State::IndexRegister Register>
 class ST
 {
 public:

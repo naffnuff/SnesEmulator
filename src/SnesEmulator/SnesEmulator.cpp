@@ -115,15 +115,7 @@ void Emulator::run()
 
             if (cpuContext.stepMode) {
                 output << "cycleCount=" << cycleCount << ", nextCpu=" << nextCpu << ", nextSpc=" << nextSpc << std::endl;
-                for (const Debugger::Context* context : { &cpuContext, &spcContext }) {
-                    if (!context->breakpoints.empty()) {
-                        output << "Breakpoints:";
-                        for (Long breakpoint : context->breakpoints) {
-                            output << " " << breakpoint;
-                        }
-                        output << std::endl;
-                    }
-                }
+                debugger.printBreakpoints(cpuContext, spcContext);
                 debugger.printMemory(cpuState, cpuContext, spcState, spcContext);
             }
 
@@ -142,15 +134,7 @@ void Emulator::run()
 
             if (spcContext.stepMode) {
                 output << "cycleCount=" << cycleCount << ", nextCpu=" << nextCpu << ", nextSpc=" << nextSpc << std::endl;
-                for (const Debugger::Context* context : { &cpuContext, &spcContext }) {
-                    if (!context->breakpoints.empty()) {
-                        output << "Breakpoints:";
-                        for (Long breakpoint : context->breakpoints) {
-                            output << " " << breakpoint;
-                        }
-                        output << std::endl;
-                    }
-                }
+                debugger.printBreakpoints(cpuContext, spcContext);
                 debugger.printMemory(cpuState, cpuContext, spcState, spcContext);
             }
 
@@ -165,11 +149,6 @@ void Emulator::run()
 
         ++cycleCount;
     }
-
-    std::time_t endTime = clock();
-    double elapsedSeconds = double(endTime - debugger.startTime) / CLOCKS_PER_SEC;
-    output << "Time delta=" << elapsedSeconds << std::endl;
-    output << "Speed is " << cycleCount / 1000000.0 / elapsedSeconds << " MHz (kind of)" << std::endl;
 }
 
 template<typename State, typename OtherState>
@@ -187,8 +166,8 @@ int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debu
                 }
                 return cycles;
             }
-
-        } else {
+        }
+        else {
             for (Long i = state.getProgramAddress(); i < state.getProgramAddress() + instruction->size(); ++i) {
                 if (context.breakpoints.find(i) != context.breakpoints.end()) {
                     context.stepMode = true;
@@ -198,7 +177,8 @@ int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debu
 
             if (context.stepMode) {
                 debugger.printClockSpeed();
-            } else {
+            }
+            else {
                 return instruction->execute();
             }
         }

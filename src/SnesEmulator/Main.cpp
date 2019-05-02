@@ -60,7 +60,6 @@ int main(int, char**)
         }
 
     } catch (const std::exception& e) {
-
         error << "Caught std::exception: " << e.what() << std::endl;
         error << "Failure";
         std::getchar();

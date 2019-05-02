@@ -317,6 +317,19 @@ public:
         }
     }
 
+    void printBreakpoints(const Context& cpuContext, const Context& spcContext) const
+    {
+        for (const Debugger::Context* context : { &cpuContext, &spcContext }) {
+            if (!context->breakpoints.empty()) {
+                output << "Breakpoints:";
+                for (Long breakpoint : context->breakpoints) {
+                    output << " " << breakpoint;
+                }
+                output << std::endl;
+            }
+        }
+    }
+
     void printClockSpeed() const
     {
         std::time_t endTime = clock();

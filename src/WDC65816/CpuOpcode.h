@@ -2183,7 +2183,6 @@ class LDA_AD : public AddressMode::Absolute<Operator::LDA>
     // 3   5-m         abs       m.....m. . LDA $9876
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("LDA_AD");
         return 4 + applyOperand();
     }
 
@@ -3035,7 +3034,6 @@ class PHB_8B : public AddressMode::Implied<Operator::PHB>
     // 1   3           imp       ........ . PHB
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("PHB_8B");
         return 3 + applyOperand();
     }
 
@@ -3052,7 +3050,6 @@ class PHD_0B : public AddressMode::Implied<Operator::PHD>
     // 1   4           imp       ........ . PHD
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("PHD_0B");
         return 4 + applyOperand();
     }
 
@@ -3069,7 +3066,6 @@ class PHK_4B : public AddressMode::Implied<Operator::PHK>
     // 1   3           imp       ........ . PHK
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("PHK_4B");
         return 3 + applyOperand();
     }
 
@@ -3095,7 +3091,7 @@ class PHP_08 : public AddressMode::Implied<Operator::PHP>
 // PHX Push Index Register X [Flags affected: none]
 // PHX
 // Implied (1-Byte)
-class PHX_DA : public AddressMode::Implied<Operator::PHX>
+class PHX_DA : public AddressMode::Implied<Operator::PH<State::X>>
 {
     using Implied::Implied;
 
@@ -3111,14 +3107,13 @@ class PHX_DA : public AddressMode::Implied<Operator::PHX>
 // PHY Push Index Register Y [Flags affected: none]
 // PHY
 // Implied (1-Byte)
-class PHY_5A : public AddressMode::Implied<Operator::PHY>
+class PHY_5A : public AddressMode::Implied<Operator::PH<State::Y>>
 {
     using Implied::Implied;
 
     // 1   4-x         imp       ........ . PHY
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("PHY_5A");
         return 3 + applyOperand();
     }
 
@@ -3151,7 +3146,6 @@ class PLB_AB : public AddressMode::Implied<Operator::PLB>
     // 1   4           imp       *.....*. . PLB
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("PLB_AB");
         return 4 + applyOperand();
     }
 
@@ -3194,7 +3188,7 @@ class PLP_28 : public AddressMode::Implied<Operator::PLP>
 // PLX Pull Index Register X [Flags affected: n,z]
 // PLX
 // Implied (1-Byte)
-class PLX_FA : public AddressMode::Implied<Operator::PLX>
+class PLX_FA : public AddressMode::Implied<Operator::PL<State::X>>
 {
     using Implied::Implied;
 
@@ -3211,7 +3205,7 @@ class PLX_FA : public AddressMode::Implied<Operator::PLX>
 // PLY Pull Index Register Y [Flags affected: n,z]
 // PLY
 // Implied (1-Byte)
-class PLY_7A : public AddressMode::Implied<Operator::PLY>
+class PLY_7A : public AddressMode::Implied<Operator::PL<State::Y>>
 {
     using Implied::Implied;
 
