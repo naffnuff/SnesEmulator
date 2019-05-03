@@ -21,6 +21,8 @@ void Emulator::initialize()
     //rom.loadFromFile("H:\\naffnuff\\wla\\rom.smc", cpuState);
     //rom.loadFromFile("C:\\cygwin64\\home\\rasmus.knutsson\\wla-dx\\wla\\myrom.smc", cpuState);
 
+    renderer.initialize(rom.gameTitle);
+
     if (rom.isLowRom()) {
         // RAM
         for (Long address = 0x7E0000; address < 0x800000; address++) {
@@ -41,13 +43,24 @@ void Emulator::initialize()
             }
         }
 
+        std::function<void(Word address)> setOutputRegister = [this](Word address)
+        {
+            MemoryLocation* memory = cpuState.getMemoryLocation(Long(address, 0));
+            memory->setWriteOnly();
+            memory->trap =
+                [this, address](MemoryLocation::Operation operation, Byte value) {
+                    debugger.printMemoryRegister(operation, value, address);
+            };
+            registers[address].setMirror(memory, MemoryLocation::ReadOnly);
+        };
+
         // Registers
-        debugger.setRegister(cpuState, 0x2100);
-        debugger.setRegister(cpuState, 0x212e);
-        debugger.setRegister(cpuState, 0x212f);
-        debugger.setRegister(cpuState, 0x4200);
-        debugger.setRegister(cpuState, 0x420b);
-        debugger.setRegister(cpuState, 0x420c);
+        setOutputRegister(0x2100);
+        setOutputRegister(0x212e);
+        setOutputRegister(0x212f);
+        setOutputRegister(0x4200);
+        setOutputRegister(0x420b);
+        setOutputRegister(0x420c);
 
         // Memory mapping: I/O between the CPU and SPC700
         for (Word i = 0; i < 4; ++i) {
@@ -76,37 +89,35 @@ void Emulator::initialize()
     spcContext.nextInstruction = spcInstructionDecoder.readNextInstruction(spcState);
 }
 
-void Emulator::initializeSPPURegisters(std::map<Word, MemoryLocation>& registers)
-{
-    registers[0x4200].setMirror(cpuState.getMemoryLocation(0x4200), MemoryLocation::ReadOnly);
-}
-
-std::string operationToString(MemoryLocation::Operation operation)
-{
-    switch (operation) {
-    case MemoryLocation::Read:
-        return "Read ";
-    case MemoryLocation::Write:
-        return "Write ";
-    case MemoryLocation::Access:
-        return "Access ";
-    case MemoryLocation::Apply:
-        return "Apply ";
-    default:
-        return "";
-    }
-};
-
 void Emulator::run()
 {
     uint64_t nextCpu = 186;
     uint64_t nextSpc = 186;
-    debugger.startTime = clock();
+
+    int hCounter = 186;
+    int vCounter = 0;
+    bool vBlank = false;
+
+    std::array<Renderer::Pixel, Renderer::width> scanline;
+
+    bool irq = false;
+    bool nmi = false;
+
+    double runStartTime;
+    bool stepMode = cpuContext.stepMode || spcContext.stepMode;
+    if (!stepMode) {
+        debugger.startTime = clock();
+        runStartTime = renderer.getTime();
+    }
 
     while (running) {
         if (cycleCount == nextCpu) {
 
-            if (cpuState.serviceInterrupt()){
+            if (nmi) {
+                nmi = false;
+                if (registers[0x4200].getValue().getBit(7)) {
+                    //cpuState.startNmi();
+                }
                 nextCpu += 9 * 8; // TODO: check the correct cycles for interrupt
             }
 
@@ -147,7 +158,93 @@ void Emulator::run()
             }
         }
 
-        ++cycleCount;
+        bool increment = false;
+        if (cpuContext.stepMode || spcContext.stepMode) { // step mode
+            increment = true;
+            stepMode = true;
+        }
+        else if (stepMode) { // run mode initiated
+            stepMode = false;
+            runStartTime = renderer.getTime();
+        }
+        else { // run mode continued
+            double elapsedTime = renderer.getTime() - runStartTime;
+            static const double clockSpeed = 1.89e9 / 88.0;
+            uint64_t elapsedCycles = uint64_t(elapsedTime * clockSpeed);
+            
+            if (elapsedCycles > cycleCount) {
+                increment = true;
+            }
+
+            static int incrementCount = 0;
+            static int totalCount = 0;
+
+            if (increment) {
+                ++incrementCount;
+            }
+            ++totalCount;
+
+            static int nextPrintout = 5;
+            double actualSpeed = double(cycleCount) / elapsedTime;
+            if (nextPrintout == int(elapsedTime)) {
+                nextPrintout += 5;
+                output << "Renderer time: " << elapsedTime << std::endl;
+                output << "Elapsed cycles: " << elapsedCycles << std::endl;
+                output << "Actual cycles: " << cycleCount << std::endl;
+                output << "Clock speed: " << clockSpeed << std::endl;
+                output << "Actual speed: " << actualSpeed << std::endl;
+                output << "ratio: " << actualSpeed / clockSpeed << std::endl;
+                output << std::endl;
+                output << "increments: " << incrementCount << std::endl;
+                output << "total: " << totalCount << std::endl;
+                output << "ratio: " << double(incrementCount) / double(totalCount) << std::endl;
+                output << std::endl;
+                output << "V counter: " << vCounter << std::endl;
+                output << "H counter: " << hCounter << std::endl;
+                output << std::endl;
+            }
+        }
+
+        static uint8_t color = 0;
+        static bool ascending = true;
+        if (increment) {
+            ++cycleCount;
+            ++hCounter;
+            if (hCounter == 1360) {
+                hCounter = 0;
+                if (vCounter < 224) {
+                    for (int i = 0; i < scanline.size(); ++i) {
+                        scanline[i] = { color, uint8_t(vCounter), uint8_t(i) };
+                    }
+                    renderer.setScanline(vCounter, scanline);
+                }
+                ++vCounter;
+                if (vCounter == 224) {
+                    vBlank = true;
+                    nmi = true;
+                    if (ascending) {
+                        ++color;
+                        if (color == 255) {
+                            ascending = false;
+                        }
+                    } else {
+                        --color;
+                        if (color == 0) {
+                            ascending = true;
+                        }
+                    }
+                }
+                else if (vCounter == 262) {
+                    vCounter = 0;
+                    vBlank = false;
+                    renderer.update();
+                    if (renderer.pause) {
+                        renderer.pause = false;
+                        cpuContext.stepMode = true;
+                    }
+                }
+            }
+        }
     }
 }
 

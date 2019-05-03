@@ -13,6 +13,7 @@
 
 #include "SnesRom.h"
 #include "Debugger.h"
+#include "SnesRenderer.h"
 
 class Emulator
 {
@@ -21,12 +22,14 @@ public:
         : output(output)
         , input(input)
         , error(error)
+        , renderer(output, input, error)
         , debugger(output, input, error, cycleCount, running)
         , rom(output)
         , cpuInstructionDecoder(cpuState)
         , spcInstructionDecoder(spcState)
         , cpuContext("cpu.txt", Debugger::Green)
         , spcContext("spc.txt", Debugger::Magenta)
+        , registers(0x4380)
     {
     }
 
@@ -34,7 +37,6 @@ public:
     Emulator& operator=(Emulator&) = delete;
 
     void initialize();
-    void initializeSPPURegisters(std::map<Word, MemoryLocation>& registers);
     void run();
 
     std::string getRomTitle() const
@@ -47,16 +49,12 @@ public:
         cpuContext.stepMode = true;
     }
 
-    void initiateVBlank()
-    {
-        cpuState.requestInterrupt();
-    }
-
 private:
     std::ostream& output;
     std::istream& input;
     std::ostream& error;
 
+    Renderer renderer;
     Debugger debugger;
     Rom rom;
     CPU::State cpuState;
@@ -65,6 +63,8 @@ private:
     SPC::InstructionDecoder spcInstructionDecoder;
     Debugger::Context cpuContext;
     Debugger::Context spcContext;
+
+    std::vector<MemoryLocation> registers;
 
     bool running = true;
     uint64_t cycleCount = 186;

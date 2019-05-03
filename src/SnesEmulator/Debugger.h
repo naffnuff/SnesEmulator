@@ -338,16 +338,27 @@ public:
         output << "Speed is " << cycleCount / 1000000.0 / elapsedSeconds << " MHz (kind of)" << std::endl;
     }
 
-    template <typename State>
-    void setRegister(State& state, Word address)
+    std::string operationToString(MemoryLocation::Operation operation)
     {
-        state.getMemoryLocation(Long(address, 0))->setWriteOnly();
-        state.getMemoryLocation(Long(address, 0))->trap =
-            [this, address](MemoryLocation::Operation operation, Byte value) {
-            setOutputColor(Debugger::Yellow, true);
-            output << operationToString(operation) << value << " @ " << address << ", " << cycleCount << std::endl;
-            setOutputColor(Debugger::DefaultColor, false);
-        };
+        switch (operation) {
+        case MemoryLocation::Read:
+            return "Read ";
+        case MemoryLocation::Write:
+            return "Write ";
+        case MemoryLocation::Access:
+            return "Access ";
+        case MemoryLocation::Apply:
+            return "Apply ";
+        default:
+            return "";
+        }
+    };
+
+    void printMemoryRegister(MemoryLocation::Operation operation, Byte value, Word address)
+    {
+        setOutputColor(Debugger::Yellow, true);
+        output << operationToString(operation) << value << " @ " << address << ", " << cycleCount << std::endl;
+        setOutputColor(Debugger::DefaultColor, false);
     }
 
     std::time_t startTime;

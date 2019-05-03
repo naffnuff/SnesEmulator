@@ -1,23 +1,30 @@
 #pragma once
 
+#include <iostream>
+#include <vector>
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-
-#include "SnesEmulator.h"
-
-namespace Nox {
 
 class Renderer
 {
 public:
-    Renderer(Emulator& emulator, std::ostream& output, std::istream& input, std::ostream& error)
-        : emulator(emulator)
-        , pixelBuffer(height * 3 * scale * width * 3 * scale)
+    struct Pixel
+    {
+        GLubyte red;
+        GLubyte green;
+        GLubyte blue;
+    };
+
+    static const int width = 256;
+    static const int height = 224;
+
+    Renderer(std::ostream& output, std::istream& input, std::ostream& error)
+        : pixelBuffer(height * width)
         , output(output)
         , input(input)
         , error(error)
     {
-        emulator.initializeSPPURegisters(registers);
     }
 
     ~Renderer()
@@ -30,12 +37,21 @@ public:
     Renderer(Renderer&) = delete;
     Renderer& operator=(Renderer&) = delete;
 
-    void initialize();
+    void initialize(const std::string& windowTitle);
+    void setScanline(int lineIndex, const std::array<Pixel, width>& pixels);
     void update();
     bool isRunning() const;
 
+    double getTime()
+    {
+        return glfwGetTime();
+    }
+
 private:
-    void setPixel(int row, int column, GLubyte red, GLubyte green, GLubyte blue);
+    void setPixel(int row, int column, Pixel pixel);
+
+public:
+    bool pause = false;
 
 private:
     std::ostream& output;
@@ -44,14 +60,7 @@ private:
 
     GLFWwindow* window;
 
-    Emulator& emulator;
-    std::map<Word, MemoryLocation> registers;
+    float scale2 = 4.5f;
 
-    static const int width = 256;
-    static const int height = 224;
-    int scale = 1;
-
-    std::vector<GLubyte> pixelBuffer;
+    std::vector<Pixel> pixelBuffer;
 };
-
-}

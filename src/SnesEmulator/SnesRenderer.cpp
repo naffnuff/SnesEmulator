@@ -10,14 +10,7 @@
 
 #include "Common/System.h"
 
-namespace Nox {
-
-//typedef std::vector<std::vector<float>> Float4x4;
-
-//GLuint LoadShaders(const char * vertex_file_path, const char * fragment_file_path);
-//Float4x4 rotationZ(float angle);
-
-void Renderer::initialize()
+void Renderer::initialize(const std::string& windowTitle)
 {
     // Initialise GLFW
     if (!glfwInit()) {
@@ -31,8 +24,7 @@ void Renderer::initialize()
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
 
     // Open a window and create its OpenGL context
-    std::string romTitle = emulator.getRomTitle();
-    window = glfwCreateWindow(width * scale, height * scale, romTitle.c_str(), NULL, NULL);
+    window = glfwCreateWindow(width * scale2, height * scale2, windowTitle.c_str(), NULL, NULL);
     if (window == NULL) {
         glfwTerminate();
         throw std::runtime_error("Failed to open GLFW window.");
@@ -49,7 +41,7 @@ void Renderer::initialize()
 
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 
-    glfwSwapInterval(1);
+    //glfwSwapInterval(1);
 
     glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 
@@ -57,17 +49,17 @@ void Renderer::initialize()
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 }
 
-void Renderer::setPixel(int row, int column, GLubyte red, GLubyte green, GLubyte blue)
+void Renderer::setScanline(int lineIndex, const std::array<Pixel, width>& pixels)
+{
+    for (int i = 0; i < pixels.size(); ++i) {
+        setPixel(lineIndex, i, pixels[i]);
+    }
+}
+
+void Renderer::setPixel(int row, int column, Pixel pixel)
 {
     row = height - 1 - row;
-    for (int i = 0; i < scale; ++i) {
-        for (int j = 0; j < scale; ++j) {
-            int index = (row * scale + i) * width * scale * 3 + (column * scale + j) * 3;
-            pixelBuffer[index] = red;
-            pixelBuffer[index + 1] = green;
-            pixelBuffer[index + 2] = blue;
-        }
-    }
+    pixelBuffer[row * width + column] = pixel;
 }
 
 void Renderer::update()
@@ -87,19 +79,20 @@ void Renderer::update()
         previousTime = currentTime;
     }
 
-    if (registers[0x4200].getValue().getBit(7)) {
+    /*if (registers[0x4200].getValue().getBit(7)) {
         output << "Initiating VBlank" << std::endl;
         double before = glfwGetTime();
         emulator.initiateVBlank();
         double after = glfwGetTime();
         output << "VBlank ended after" << after - before << " seconds" << std::endl;
-    }
+    }*/
 
-    static int row = 0;
+    /*static int row = 0;
     static int col = 0;
-    static Byte color = 255;
+    static uint8_t color = 255;
     static bool ascending = false;
-    while (true) {
+    while (true)
+    {
         if (col >= width) {
             ++row;
             col = 0;
@@ -120,17 +113,16 @@ void Renderer::update()
                 break;
             }
         }
-        setPixel(row, col, row, col, color);
+        setPixel(row, col, { uint8_t(row), uint8_t(col), uint8_t(color) });
         ++col;
-    }
-
-    static float angle = 0.0f;
+    }*/
 
     // Clear the screen
     glClear(GL_COLOR_BUFFER_BIT);
 
     glRasterPos2i(-1, -1);
-    glDrawPixels(width * scale, height * scale, GL_RGB, GL_UNSIGNED_BYTE, pixelBuffer.data());
+    glPixelZoom(scale2, scale2);
+    glDrawPixels(width, height, GL_RGB, GL_UNSIGNED_BYTE, pixelBuffer.data());
     glFlush();
 
     // Swap buffers
@@ -138,13 +130,11 @@ void Renderer::update()
     glfwPollEvents();
 
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-        emulator.pause();
+        pause = true;
     }
 }
 
 bool Renderer::isRunning() const
 {
     return glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(window) == 0;
-}
-
 }

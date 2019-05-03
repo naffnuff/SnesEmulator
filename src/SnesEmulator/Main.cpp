@@ -41,23 +41,9 @@ int main(int, char**)
     std::ostream& error = std::cerr;
 
     try {
-        while (true) {
-            Emulator emulator(output, input, error);
-            emulator.initialize();
-            {
-                std::thread thread([&emulator, &output, &input, &error]() {
-                    Nox::Renderer renderer(emulator, output, input, error);
-                    renderer.initialize();
-                    while (renderer.isRunning()) {
-                        renderer.update();
-                    }
-                    });
-
-                emulator.run();
-
-                thread.join();
-            }
-        }
+        Emulator emulator(output, input, error);
+        emulator.initialize();
+        emulator.run();
 
     } catch (const std::exception& e) {
         error << "Caught std::exception: " << e.what() << std::endl;

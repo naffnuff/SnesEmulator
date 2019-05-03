@@ -423,41 +423,17 @@ public:
         }
     }
 
-    void requestInterrupt()
+    void startNmi()
     {
-        std::unique_lock<std::mutex> lock(interruptMutex);
-        interruptRequested = true;
-        interrupted = false;
-        interruptVariable.wait(lock, [this]() { return !interruptRequested && !interrupted; });
-        lock.unlock();
-    }
+        pushToStack(programBank);
+        programBank = 0x00;
 
-    bool serviceInterrupt()
-    {
-        std::lock_guard<std::mutex> guard(interruptMutex);
-        if (interruptRequested && !interrupted) {
-            interruptRequested = false;
-            interrupted = true;
-            pushToStack(programBank);
-            pushWordToStack(programCounter);
-            pushToStack(flags);
-            programBank = 0x00;
-            programCounter = getInterruptVectors(isNativeMode()).Nmi;
-            setFlag(i, true);
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
+        pushWordToStack(programCounter);
+        programCounter = getInterruptVectors(isNativeMode()).Nmi;
 
-    void endInterrupt()
-    {
-        {
-            std::lock_guard<std::mutex> guard(interruptMutex);
-            interrupted = false;
-        }
-        interruptVariable.notify_one();
+        pushToStack(flags);
+        setFlag(i, true);
+        setFlag(d, false);
     }
 
     InterruptVectors& getInterruptVectors(bool native)
@@ -483,11 +459,6 @@ private:
     std::vector<MemoryLocation> memory;
     std::array<MemoryLocation, 2> accumulator;
     std::array<Word, IndexRegisterCount> indexRegisters;
-
-    std::mutex interruptMutex;
-    std::condition_variable interruptVariable;
-    bool interruptRequested = false;
-    bool interrupted = false;
 
     InterruptVectors nativeVectors;
     InterruptVectors emulationVectors;
