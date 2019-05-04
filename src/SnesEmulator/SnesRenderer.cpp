@@ -12,6 +12,8 @@
 
 void Renderer::initialize(const std::string& windowTitle)
 {
+    title = windowTitle;
+
     // Initialise GLFW
     if (!glfwInit()) {
         throw std::runtime_error("Failed to initialize GLFW");
@@ -24,7 +26,7 @@ void Renderer::initialize(const std::string& windowTitle)
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
 
     // Open a window and create its OpenGL context
-    window = glfwCreateWindow(width * scale2, height * scale2, windowTitle.c_str(), NULL, NULL);
+    window = glfwCreateWindow(width * int(scale), height * int(scale), windowTitle.c_str(), NULL, NULL);
     if (window == NULL) {
         glfwTerminate();
         throw std::runtime_error("Failed to open GLFW window.");
@@ -41,7 +43,9 @@ void Renderer::initialize(const std::string& windowTitle)
 
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 
-    //glfwSwapInterval(1);
+    if (syncUpdate) {
+        glfwSwapInterval(1);
+    }
 
     glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 
@@ -49,7 +53,7 @@ void Renderer::initialize(const std::string& windowTitle)
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 }
 
-void Renderer::setScanline(int lineIndex, const std::array<Pixel, width>& pixels)
+void Renderer::setScanline(int lineIndex, const std::vector<Pixel>& pixels)
 {
     for (int i = 0; i < pixels.size(); ++i) {
         setPixel(lineIndex, i, pixels[i]);
@@ -60,6 +64,11 @@ void Renderer::setPixel(int row, int column, Pixel pixel)
 {
     row = height - 1 - row;
     pixelBuffer[row * width + column] = pixel;
+}
+
+void Renderer::setPixel(int address, Pixel pixel)
+{
+    pixelBuffer[address] = pixel;
 }
 
 void Renderer::update()
@@ -73,7 +82,7 @@ void Renderer::update()
     // If a second has passed.
     if (currentTime - previousTime >= 1.0) {
         // Display the frame count here any way you want.
-        output << frameCount << std::endl;
+        //output << title << ": " << frameCount << std::endl;
 
         frameCount = 0;
         previousTime = currentTime;
@@ -121,7 +130,7 @@ void Renderer::update()
     glClear(GL_COLOR_BUFFER_BIT);
 
     glRasterPos2i(-1, -1);
-    glPixelZoom(scale2, scale2);
+    glPixelZoom(scale, scale);
     glDrawPixels(width, height, GL_RGB, GL_UNSIGNED_BYTE, pixelBuffer.data());
     glFlush();
 

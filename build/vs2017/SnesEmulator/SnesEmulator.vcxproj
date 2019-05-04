@@ -141,6 +141,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\SnesEmulator\Debugger.h" />
+    <ClInclude Include="..\..\..\src\SnesEmulator\DmaInstruction.h" />
     <ClInclude Include="..\..\..\src\SnesEmulator\SnesEmulator.h" />
     <ClInclude Include="..\..\..\src\SnesEmulator\SnesRenderer.h" />
     <ClInclude Include="..\..\..\src\SnesEmulator\SnesRom.h" />

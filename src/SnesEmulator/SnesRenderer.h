@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <vector>
+#include <string>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -16,29 +17,29 @@ public:
         GLubyte blue;
     };
 
-    static const int width = 256;
-    static const int height = 224;
-
-    Renderer(std::ostream& output, std::istream& input, std::ostream& error)
-        : pixelBuffer(height * width)
+    Renderer(int width, int height, float scale, bool syncUpdate, std::ostream& output)
+        : width(width)
+        , height(height)
+        , scale(scale)
+        , syncUpdate(syncUpdate)
+        , pixelBuffer(height * width)
         , output(output)
-        , input(input)
-        , error(error)
     {
     }
 
     ~Renderer()
     {
-        output << "Renderer destructor start" << std::endl;
+        output << "Renderer " << title << " destructor" << std::endl;
         glfwTerminate();
-        output << "Renderer destructor end" << std::endl;
     }
 
     Renderer(Renderer&) = delete;
     Renderer& operator=(Renderer&) = delete;
 
     void initialize(const std::string& windowTitle);
-    void setScanline(int lineIndex, const std::array<Pixel, width>& pixels);
+    void setScanline(int lineIndex, const std::vector<Pixel>& pixels);
+    void setPixel(int row, int column, Pixel pixel);
+    void setPixel(int address, Pixel pixel);
     void update();
     bool isRunning() const;
 
@@ -47,20 +48,20 @@ public:
         return glfwGetTime();
     }
 
-private:
-    void setPixel(int row, int column, Pixel pixel);
-
 public:
     bool pause = false;
 
 private:
     std::ostream& output;
-    std::istream& input;
-    std::ostream& error;
 
     GLFWwindow* window;
 
-    float scale2 = 4.5f;
+    std::string title;
+
+    const int width = 256;
+    const int height = 224;
+    const float scale = 1.f;
+    const bool syncUpdate = false;
 
     std::vector<Pixel> pixelBuffer;
 };

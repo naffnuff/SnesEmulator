@@ -6,6 +6,8 @@
 
 #include "Common/Exception.h"
 
+#include "DmaInstruction.h"
+
 template<typename State, typename OtherState>
 int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debugger::Context& context, OtherState& otherState, Debugger::Context& otherContext, std::ostream& error);
 
@@ -29,7 +31,7 @@ void Emulator::initialize()
             cpuState.getMemoryLocation(address)->setReadWrite();
         }
         // RAM mirrors
-        for (Byte bank = 0; bank < 0x01/*0x40*/; ++bank) {
+        for (Byte bank = 0; bank < 0x40; ++bank) {
             for (Word address = 0; address < 0x2000; ++address) {
                 cpuState.getMemoryLocation(Long(address, bank))->setMirror(cpuState.getMemoryLocation(Long(address, 0x7E)), MemoryLocation::ReadWrite);
             }
@@ -43,26 +45,128 @@ void Emulator::initialize()
             }
         }
 
-        std::function<void(Word address)> setOutputRegister = [this](Word address)
+        auto setRegister = [this](Word address, bool cpuOutRegister, const std::string& info, std::function<void(MemoryLocation::Operation operation, Byte value)> callback = nullptr)
         {
             MemoryLocation* memory = cpuState.getMemoryLocation(Long(address, 0));
-            memory->setWriteOnly();
+            if (cpuOutRegister) {
+                memory->setWriteOnly();
+                memory->setValue(0);
+                registers[address].setMirror(memory, MemoryLocation::ReadOnly);
+            } else {
+                registers[address].setWriteOnly();
+                memory->setMirror(&registers[address], MemoryLocation::ReadOnly);
+            }
             memory->trap =
-                [this, address](MemoryLocation::Operation operation, Byte value) {
-                    debugger.printMemoryRegister(operation, value, address);
+                [this, address, callback, info](MemoryLocation::Operation operation, Byte value) {
+                //debugger.printMemoryRegister(operation, value, address, info);
+                if (callback) {
+                    callback(operation, value);
+                }
             };
-            registers[address].setMirror(memory, MemoryLocation::ReadOnly);
         };
 
         // Registers
-        setOutputRegister(0x2100);
-        setOutputRegister(0x212e);
-        setOutputRegister(0x212f);
-        setOutputRegister(0x4200);
-        setOutputRegister(0x420b);
-        setOutputRegister(0x420c);
+        setRegister(0x2100, true, "Screen Display");
+        setRegister(0x2115, true, "Video Port Control");
+        setRegister(0x2116, true, "VRAM Address low byte");
+        setRegister(0x2117, true, "VRAM Address high byte");
+        setRegister(0x2118, true, "VRAM Data Write low byte", [this](MemoryLocation::Operation operation, Byte value) {
+            if (operation != MemoryLocation::Write) {
+                throw std::logic_error("2118 can only be written by CPU");
+            }
+            Word vramAddress = registers[0x2116].getWordValue();
+            videoMemory[vramAddress].setLowByte(value);
 
-        // Memory mapping: I/O between the CPU and SPC700
+            Byte pixelValue1 = value & 0x0f;
+            Byte pixelValue2 = value >> 4;
+            Byte pixelValue1x2 = pixelValue1 ? 255 : 0;
+            Byte pixelValue2x2 = pixelValue2 ? 255 : 0;
+            //Byte pixelValue1x2 = (pixelValue1 + 1) * (pixelValue1 + 1) - 1;
+            //Byte pixelValue2x2 = (pixelValue2 + 1) * (pixelValue2 + 1) - 1;
+            //vramRenderer.setPixel(vramAddress * 4, { pixelValue1x2, pixelValue1x2, pixelValue1x2 });
+            //vramRenderer.setPixel(vramAddress * 4 + 1, { pixelValue2x2, pixelValue2x2, pixelValue2x2 });
+            vramRenderer.setPixel(vramAddress * 2, { value, value, value });
+        });
+        setRegister(0x2119, true, "VRAM Data Write high byte", [this](MemoryLocation::Operation operation, Byte value) {
+            if (operation != MemoryLocation::Write) {
+                throw std::logic_error("2119 can only be written by CPU");
+            }
+            Word vramAddress = registers[0x2116].getWordValue();
+            videoMemory[vramAddress].setHighByte(value);
+
+            Byte pixelValue1 = value & 0x0f;
+            Byte pixelValue2 = value >> 4;
+
+            Byte pixelValue1x2 = pixelValue1 ? 255 : 0;
+            Byte pixelValue2x2 = pixelValue2 ? 255 : 0;
+            //Byte pixelValue1x2 = (pixelValue1 + 1) * (pixelValue1 + 1) - 1;
+            //Byte pixelValue2x2 = (pixelValue2 + 1) * (pixelValue2 + 1) - 1;
+            //vramRenderer.setPixel(vramAddress * 4 + 2, { pixelValue1x2, pixelValue1x2, pixelValue1x2 });
+            //vramRenderer.setPixel(vramAddress * 4 + 3, { pixelValue2x2, pixelValue2x2, pixelValue2x2 });
+            vramRenderer.setPixel(vramAddress * 2 + 1, { value, value, value });
+
+            Byte videoPortControl = registers[0x2115].getValue();
+            if (videoPortControl.getBit(7)) {
+                cpuState.getMemoryLocation(0x2116)->setWordValue(vramAddress + 1);
+            } else {
+                error << "DMA: Video port control: " << videoPortControl << std::endl;
+                throw std::logic_error("DMA: Video port control not implemented");
+            }
+        });
+        setRegister(0x212e, true, "Window Mask Designation for the Main Screen");
+        setRegister(0x212f, true, "Window Mask Designation for the Subscreen");
+
+        setRegister(0x4200, true, "Interrupt Enable Flags");
+        setRegister(0x420b, true, "DMA Enable");
+        setRegister(0x420c, true, "HDMA Enable");
+        setRegister(0x4210, false, "NMI Flag and 5A22 Version");
+
+        // DMA channel 0
+        setRegister(0x4300, true, "DMA Control Channel 0");
+        setRegister(0x4301, true, "DMA Destination Register Channel 0");
+        setRegister(0x4302, true, "DMA Source Address low byte Channel 0");
+        setRegister(0x4303, true, "DMA Source Address high byte Channel 0");
+        setRegister(0x4304, true, "DMA Source Address bank byte Channel 0");
+        setRegister(0x4305, true, "DMA Size/HDMA Indirect Address low byte Channel 0");
+        setRegister(0x4306, true, "DMA Size/HDMA Indirect Address high byte Channel 0");
+
+        // DMA channel 1
+        setRegister(0x4310, true, "DMA Control Channel 1");
+        setRegister(0x4311, true, "DMA Destination Register Channel 1");
+        setRegister(0x4312, true, "DMA Source Address low byte Channel 1");
+        setRegister(0x4313, true, "DMA Source Address high byte Channel 1");
+        setRegister(0x4314, true, "DMA Source Address bank byte Channel 1");
+        setRegister(0x4315, true, "DMA Size/HDMA Indirect Address low byte Channel 1");
+        setRegister(0x4316, true, "DMA Size/HDMA Indirect Address high byte Channel 1");
+
+        // DMA channel 2
+        setRegister(0x4320, true, "DMA Control Channel 2");
+        setRegister(0x4321, true, "DMA Destination Register Channel 2");
+        setRegister(0x4322, true, "DMA Source Address low byte Channel 2");
+        setRegister(0x4323, true, "DMA Source Address high byte Channel 2");
+        setRegister(0x4324, true, "DMA Source Address bank byte Channel 2");
+        setRegister(0x4325, true, "DMA Size/HDMA Indirect Address low byte Channel 2");
+        setRegister(0x4326, true, "DMA Size/HDMA Indirect Address high byte Channel 2");
+
+        // DMA channel 3
+        setRegister(0x4330, true, "DMA Control Channel 3");
+        setRegister(0x4331, true, "DMA Destination Register Channel 3");
+        setRegister(0x4332, true, "DMA Source Address low byte Channel 3");
+        setRegister(0x4333, true, "DMA Source Address high byte Channel 3");
+        setRegister(0x4334, true, "DMA Source Address bank byte Channel 3");
+        setRegister(0x4335, true, "DMA Size/HDMA Indirect Address low byte Channel 3");
+        setRegister(0x4336, true, "DMA Size/HDMA Indirect Address high byte Channel 3");
+
+        // DMA channel 4
+        setRegister(0x4340, true, "DMA Control Channel 4");
+        setRegister(0x4341, true, "DMA Destination Register Channel 4");
+        setRegister(0x4342, true, "DMA Source Address low byte Channel 4");
+        setRegister(0x4343, true, "DMA Source Address high byte Channel 4");
+        setRegister(0x4344, true, "DMA Source Address bank byte Channel 4");
+        setRegister(0x4345, true, "DMA Size/HDMA Indirect Address low byte Channel 4");
+        setRegister(0x4346, true, "DMA Size/HDMA Indirect Address high byte Channel 4");
+
+        // I/O between the CPU and SPC700
         for (Word i = 0; i < 4; ++i) {
             MemoryLocation* cpuMemoryLocation = cpuState.getMemoryLocation(Long(0x2140 + i));
             MemoryLocation* spcMemoryLocation = spcState.getMemoryLocation(Word(0xf4 + i));
@@ -91,6 +195,16 @@ void Emulator::initialize()
 
 void Emulator::run()
 {
+    std::thread vramRendererThread([this]()
+        {
+            vramRenderer.initialize("VRAM viewer");
+            while (running) {
+                vramRenderer.update();
+            }
+        });
+
+    DmaInstruction dmaInstruction(registers, cpuState.accessMemory(), output);
+
     uint64_t nextCpu = 186;
     uint64_t nextSpc = 186;
 
@@ -98,7 +212,7 @@ void Emulator::run()
     int vCounter = 0;
     bool vBlank = false;
 
-    std::array<Renderer::Pixel, Renderer::width> scanline;
+    std::vector<Renderer::Pixel> scanline(256);
 
     bool irq = false;
     bool nmi = false;
@@ -110,142 +224,160 @@ void Emulator::run()
         runStartTime = renderer.getTime();
     }
 
-    while (running) {
-        if (cycleCount == nextCpu) {
+    try {
 
-            if (nmi) {
-                nmi = false;
-                if (registers[0x4200].getValue().getBit(7)) {
-                    //cpuState.startNmi();
+        while (running) {
+
+            if (cycleCount == nextCpu) {
+
+                if (nmi) {
+                    nmi = false;
+                    if (registers[0x4200].getValue().getBit(7)) {
+                        cpuState.startNmi();
+                        //cpuContext.stepMode = true;
+                    }
+                    nextCpu += 9 * 8; // TODO: check the correct cycles for interrupt
                 }
-                nextCpu += 9 * 8; // TODO: check the correct cycles for interrupt
+
+                Instruction* instruction = cpuInstructionDecoder.readNextInstruction(cpuState);
+
+                if (dmaInstruction.enabled()) { // DMA enabled
+                    dmaInstruction.blockedInstruction = instruction;
+                    instruction = static_cast<Instruction*>(&dmaInstruction);
+                }
+
+                cpuContext.nextInstruction = instruction;
+
+                if (cpuContext.stepMode) {
+                    output << "Cycle count: " << cycleCount << ", Next cpu: " << nextCpu << ", Next spc: " << nextSpc << std::endl;
+                    output << "V counter: " << vCounter << ", H counter: " << hCounter << ", V blank: " << vBlank << std::endl;
+                    debugger.printBreakpoints(cpuContext, spcContext);
+                    debugger.printMemory(cpuState, cpuContext, spcState, spcContext);
+                }
+
+                if (int cycles = executeNext(instruction, cpuState, debugger, cpuContext, spcState, spcContext, error)) {
+                    nextCpu += cycles * 8;
+                    cpuContext.nextInstruction = cpuInstructionDecoder.readNextInstruction(cpuState);
+                } else {
+                    continue;
+                }
             }
 
-            Instruction* instruction = cpuInstructionDecoder.readNextInstruction(cpuState);
-            cpuContext.nextInstruction = instruction;
+            if (cycleCount == nextSpc) {
+                Instruction* instruction = spcInstructionDecoder.readNextInstruction(spcState);
+                spcContext.nextInstruction = instruction;
 
-            if (cpuContext.stepMode) {
-                output << "cycleCount=" << cycleCount << ", nextCpu=" << nextCpu << ", nextSpc=" << nextSpc << std::endl;
-                debugger.printBreakpoints(cpuContext, spcContext);
-                debugger.printMemory(cpuState, cpuContext, spcState, spcContext);
+                if (spcContext.stepMode) {
+                    output << "cycleCount=" << cycleCount << ", nextCpu=" << nextCpu << ", nextSpc=" << nextSpc << std::endl;
+                    debugger.printBreakpoints(cpuContext, spcContext);
+                    debugger.printMemory(cpuState, cpuContext, spcState, spcContext);
+                }
+
+                if (int cycles = executeNext(instruction, spcState, debugger, spcContext, cpuState, cpuContext, error)) {
+                    nextSpc += cycles * 16;
+                    spcContext.nextInstruction = spcInstructionDecoder.readNextInstruction(spcState);
+                } else {
+                    continue;
+                }
             }
 
-            if (int cycles = executeNext(instruction, cpuState, debugger, cpuContext, spcState, spcContext, error)) {
-                nextCpu += cycles * 8;
-                cpuContext.nextInstruction = cpuInstructionDecoder.readNextInstruction(cpuState);
-            }
-            else {
-                continue;
-            }
-        }
-
-        if (cycleCount == nextSpc) {
-            Instruction* instruction = spcInstructionDecoder.readNextInstruction(spcState);
-            spcContext.nextInstruction = instruction;
-
-            if (spcContext.stepMode) {
-                output << "cycleCount=" << cycleCount << ", nextCpu=" << nextCpu << ", nextSpc=" << nextSpc << std::endl;
-                debugger.printBreakpoints(cpuContext, spcContext);
-                debugger.printMemory(cpuState, cpuContext, spcState, spcContext);
-            }
-
-            if (int cycles = executeNext(instruction, spcState, debugger, spcContext, cpuState, cpuContext, error)) {
-                nextSpc += cycles * 16;
-                spcContext.nextInstruction = spcInstructionDecoder.readNextInstruction(spcState);
-            }
-            else {
-                continue;
-            }
-        }
-
-        bool increment = false;
-        if (cpuContext.stepMode || spcContext.stepMode) { // step mode
-            increment = true;
-            stepMode = true;
-        }
-        else if (stepMode) { // run mode initiated
-            stepMode = false;
-            runStartTime = renderer.getTime();
-        }
-        else { // run mode continued
-            double elapsedTime = renderer.getTime() - runStartTime;
-            static const double clockSpeed = 1.89e9 / 88.0;
-            uint64_t elapsedCycles = uint64_t(elapsedTime * clockSpeed);
-            
-            if (elapsedCycles > cycleCount) {
+            bool increment = false;
+            if (cpuContext.stepMode || spcContext.stepMode) { // step mode
                 increment = true;
+                stepMode = true;
+            } else if (stepMode) { // run mode initiated
+                stepMode = false;
+                runStartTime = renderer.getTime();
+            } else { // run mode continued
+                double elapsedTime = renderer.getTime() - runStartTime;
+                static const double clockSpeed = 1.89e9 / 88.0;
+                uint64_t elapsedCycles = uint64_t(elapsedTime * clockSpeed);
+
+                if (elapsedCycles > cycleCount) {
+                    increment = true;
+                }
+
+                static int incrementCount = 0;
+                static int totalCount = 0;
+
+                if (increment) {
+                    ++incrementCount;
+                }
+                ++totalCount;
+
+                static int nextPrintout = 5;
+                double actualSpeed = double(cycleCount) / elapsedTime;
+                if (nextPrintout == int(elapsedTime)) {
+                    nextPrintout += 5;
+                    output << "Renderer time: " << elapsedTime << std::endl;
+                    output << "Elapsed cycles: " << elapsedCycles << std::endl;
+                    output << "Actual cycles: " << cycleCount << std::endl;
+                    output << "Clock speed: " << clockSpeed << std::endl;
+                    output << "Actual speed: " << actualSpeed << std::endl;
+                    output << "ratio: " << actualSpeed / clockSpeed << std::endl;
+                    output << std::endl;
+                    output << "increments: " << incrementCount << std::endl;
+                    output << "total: " << totalCount << std::endl;
+                    output << "ratio: " << double(incrementCount) / double(totalCount) << std::endl;
+                    output << std::endl;
+                    output << "V counter: " << vCounter << std::endl;
+                    output << "H counter: " << hCounter << std::endl;
+                    output << std::endl;
+                }
             }
 
-            static int incrementCount = 0;
-            static int totalCount = 0;
-
+            static uint8_t color = 0;
+            static bool ascending = true;
             if (increment) {
-                ++incrementCount;
-            }
-            ++totalCount;
-
-            static int nextPrintout = 5;
-            double actualSpeed = double(cycleCount) / elapsedTime;
-            if (nextPrintout == int(elapsedTime)) {
-                nextPrintout += 5;
-                output << "Renderer time: " << elapsedTime << std::endl;
-                output << "Elapsed cycles: " << elapsedCycles << std::endl;
-                output << "Actual cycles: " << cycleCount << std::endl;
-                output << "Clock speed: " << clockSpeed << std::endl;
-                output << "Actual speed: " << actualSpeed << std::endl;
-                output << "ratio: " << actualSpeed / clockSpeed << std::endl;
-                output << std::endl;
-                output << "increments: " << incrementCount << std::endl;
-                output << "total: " << totalCount << std::endl;
-                output << "ratio: " << double(incrementCount) / double(totalCount) << std::endl;
-                output << std::endl;
-                output << "V counter: " << vCounter << std::endl;
-                output << "H counter: " << hCounter << std::endl;
-                output << std::endl;
-            }
-        }
-
-        static uint8_t color = 0;
-        static bool ascending = true;
-        if (increment) {
-            ++cycleCount;
-            ++hCounter;
-            if (hCounter == 1360) {
-                hCounter = 0;
-                if (vCounter < 224) {
-                    for (int i = 0; i < scanline.size(); ++i) {
-                        scanline[i] = { color, uint8_t(vCounter), uint8_t(i) };
-                    }
-                    renderer.setScanline(vCounter, scanline);
-                }
-                ++vCounter;
-                if (vCounter == 224) {
-                    vBlank = true;
-                    nmi = true;
-                    if (ascending) {
-                        ++color;
-                        if (color == 255) {
-                            ascending = false;
+                ++cycleCount;
+                ++hCounter;
+                if (hCounter == 1360) {
+                    hCounter = 0;
+                    if (vCounter < 224) {
+                        for (int i = 0; i < scanline.size(); ++i) {
+                            scanline[i] = { color, uint8_t(vCounter), uint8_t(i) };
                         }
-                    } else {
-                        --color;
-                        if (color == 0) {
-                            ascending = true;
-                        }
+                        renderer.setScanline(vCounter, scanline);
                     }
-                }
-                else if (vCounter == 262) {
-                    vCounter = 0;
-                    vBlank = false;
-                    renderer.update();
-                    if (renderer.pause) {
-                        renderer.pause = false;
-                        cpuContext.stepMode = true;
+                    ++vCounter;
+                    if (vCounter == 224) {
+                        vBlank = true;
+                        nmi = true;
+                        registers[0x4210].setValue(0x82);
+                        if (ascending) {
+                            ++color;
+                            if (color == 255) {
+                                ascending = false;
+                            }
+                        } else {
+                            --color;
+                            if (color == 0) {
+                                ascending = true;
+                            }
+                        }
+                    } else if (vCounter == 262) {
+                        vCounter = 0;
+                        vBlank = false;
+                        registers[0x4210].setValue(0x02);
+                        renderer.update();
+                        if (renderer.pause) {
+                            renderer.pause = false;
+                            cpuContext.stepMode = true;
+                        }
                     }
                 }
             }
         }
+    } catch (const std::exception& e) {
+        running = false;
+        output << "Joining vramRendererThread" << std::endl;
+        vramRendererThread.join();
+        output << "Joined vramRendererThread" << std::endl;
+        throw e;
     }
+    output << "Joining vramRendererThread 2" << std::endl;
+    vramRendererThread.join();
+    output << "Joined vramRendererThread 2" << std::endl;
 }
 
 template<typename State, typename OtherState>

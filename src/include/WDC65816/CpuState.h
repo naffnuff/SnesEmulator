@@ -446,6 +446,11 @@ public:
         }
     }
 
+    std::vector<MemoryLocation>& accessMemory()
+    {
+        return memory;
+    }
+
 private:
     Byte dataBank;
     Word directPage;

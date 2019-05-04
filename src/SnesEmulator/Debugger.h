@@ -56,10 +56,7 @@ public:
     {
     public:
         Context(std::string fileName, Color debugColor)
-            : inspectedAddress(0)
-            , fileName(fileName)
-            , watchMode(true)
-            , stepMode(true)
+            : fileName(fileName)
             , debugColor(debugColor)
         {
         }
@@ -68,9 +65,9 @@ public:
         Context& operator=(Context&) = delete;
 
         std::string fileName;
-        Long inspectedAddress;
-        bool watchMode;
-        bool stepMode;
+        Long inspectedAddress = 0;
+        bool watchMode = true;
+        bool stepMode = false;
         Color debugColor;
         std::set<Long> breakpoints;
         const Instruction* nextInstruction;
@@ -247,6 +244,7 @@ public:
             color = Green;
         } else if (memory.getType() == MemoryLocation::ReadOnly) {
             color = Blue;
+            //bright = true;
         } else if (memory.getType() == MemoryLocation::ReadWrite) {
             color = Red;
         } else if (memory.getType() == MemoryLocation::WriteOnly) {
@@ -354,10 +352,10 @@ public:
         }
     };
 
-    void printMemoryRegister(MemoryLocation::Operation operation, Byte value, Word address)
+    void printMemoryRegister(MemoryLocation::Operation operation, Byte value, Word address, const std::string& info)
     {
         setOutputColor(Debugger::Yellow, true);
-        output << operationToString(operation) << value << " @ " << address << ", " << cycleCount << std::endl;
+        output << operationToString(operation) << value << " (" << std::bitset<8>(value) << ") " << " @ " << address << " (" << info << "), " << cycleCount << std::endl;
         setOutputColor(Debugger::DefaultColor, false);
     }
 

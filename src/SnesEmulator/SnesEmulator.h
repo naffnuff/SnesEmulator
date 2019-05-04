@@ -22,7 +22,8 @@ public:
         : output(output)
         , input(input)
         , error(error)
-        , renderer(output, input, error)
+        , renderer(256, 224, 1.f, false, output)
+        , vramRenderer(0x200, 0x100, 1.f, true, output)
         , debugger(output, input, error, cycleCount, running)
         , rom(output)
         , cpuInstructionDecoder(cpuState)
@@ -30,6 +31,7 @@ public:
         , cpuContext("cpu.txt", Debugger::Green)
         , spcContext("spc.txt", Debugger::Magenta)
         , registers(0x4380)
+        , videoMemory(0x8000)
     {
     }
 
@@ -55,6 +57,7 @@ private:
     std::ostream& error;
 
     Renderer renderer;
+    Renderer vramRenderer;
     Debugger debugger;
     Rom rom;
     CPU::State cpuState;
@@ -65,6 +68,7 @@ private:
     Debugger::Context spcContext;
 
     std::vector<MemoryLocation> registers;
+    std::vector<Word> videoMemory;
 
     bool running = true;
     uint64_t cycleCount = 186;

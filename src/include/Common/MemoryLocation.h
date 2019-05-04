@@ -86,16 +86,16 @@ public:
             ThrowAccessException(__FUNCTION__);
         }
 
-        if (trap) {
-            trap(Read, value);
+        Byte result = value;
+        if (mirroredMemory) {
+            result = mirroredMemory->value;
         }
 
-        if (mirroredMemory) {
-            return mirroredMemory->value;
+        if (trap) {
+            trap(Read, result);
         }
-        else {
-            return value;
-        }
+
+        return result;
     }
 
     Byte apply()
@@ -106,16 +106,16 @@ public:
 
         ++applicationCount;
 
-        if (trap) {
-            trap(Apply, value);
+        Byte result = value;
+        if (mirroredMemory) {
+            result = mirroredMemory->value;
         }
 
-        if (mirroredMemory) {
-            return mirroredMemory->value;
+        if (trap) {
+            trap(Apply, result);
         }
-        else {
-            return value;
-        }
+
+        return result;
     }
 
     Byte& get()
@@ -124,14 +124,16 @@ public:
             ThrowAccessException(__FUNCTION__);
         }
 
-        if (trap) {
-            trap(Access, value);
-        }
-
         if (mirroredMemory) {
+            if (trap) {
+                trap(Access, mirroredMemory->value);
+            }
             return mirroredMemory->value;
         }
         else {
+            if (trap) {
+                trap(Access, value);
+            }
             return value;
         }
     }

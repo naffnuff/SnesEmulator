@@ -2402,7 +2402,6 @@ class LDX_AE : public AddressMode::Absolute<Operator::LD<State::X>>
     // 3   5-x         abs       x.....x. . LDX $9876
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("LDX_AE");
         return 4 + applyOperand();
     }
 
@@ -4080,7 +4079,6 @@ class STX_8E : public AddressMode::Absolute<Operator::ST<State::X>>
     // 3   5-x         abs       ........ . STX $9876
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("STX_8E");
         return 4 + applyOperand();
     }
 

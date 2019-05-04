@@ -215,9 +215,19 @@ public:
         return Byte(value);
     }
 
+    void setLowByte(Byte lowByte)
+    {
+        value = lowByte | value & 0xff00;
+    }
+
     Byte getHighByte() const
     {
         return Byte(value >> 8);
+    }
+
+    void setHighByte(Byte highByte)
+    {
+        value = value & 0x00ff | highByte;
     }
 
 private:
