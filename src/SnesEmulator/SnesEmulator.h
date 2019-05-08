@@ -14,6 +14,7 @@
 #include "SnesRom.h"
 #include "Debugger.h"
 #include "SnesRenderer.h"
+#include "VideoMemory.h"
 
 class Emulator
 {
@@ -23,15 +24,14 @@ public:
         , input(input)
         , error(error)
         , renderer(256, 224, 1.f, false, output)
-        , vramRenderer(0x200, 0x100, 1.f, true, output)
+        , vramRenderer(vramRendererWidth, vramRendererHeight, 1.f, true, output)
         , debugger(output, input, error, cycleCount, running)
         , rom(output)
         , cpuInstructionDecoder(cpuState)
         , spcInstructionDecoder(spcState)
         , cpuContext("cpu.txt", Debugger::Green)
         , spcContext("spc.txt", Debugger::Magenta)
-        , registers(0x4380)
-        , videoMemory(0x8000)
+        , registers(0x6000)
     {
     }
 
@@ -52,6 +52,9 @@ public:
     }
 
 private:
+    static const int vramRendererWidth = 0x200;
+    static const int vramRendererHeight = 0x100;
+
     std::ostream& output;
     std::istream& input;
     std::ostream& error;
@@ -68,7 +71,7 @@ private:
     Debugger::Context spcContext;
 
     std::vector<MemoryLocation> registers;
-    std::vector<Word> videoMemory;
+    VideoMemory videoMemory;
 
     bool running = true;
     uint64_t cycleCount = 186;

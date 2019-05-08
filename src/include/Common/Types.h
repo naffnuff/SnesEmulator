@@ -173,6 +173,13 @@ public:
     }
 
     template<typename T>
+    Word& operator-=(T operand)
+    {
+        value -= operand;
+        return *this;
+    }
+
+    template<typename T>
     Word& operator|=(T operand)
     {
         value |= operand;
@@ -217,7 +224,7 @@ public:
 
     void setLowByte(Byte lowByte)
     {
-        value = lowByte | value & 0xff00;
+        value = lowByte | (value & 0xff00);
     }
 
     Byte getHighByte() const
@@ -227,7 +234,7 @@ public:
 
     void setHighByte(Byte highByte)
     {
-        value = value & 0x00ff | highByte;
+        value = (value & 0x00ff) | highByte << 8;
     }
 
 private:

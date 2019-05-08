@@ -326,7 +326,6 @@ class AND_25 : public AddressMode::DirectPage<Operator::AND>
     // 2   4-m+w       dir       m.....m. . AND $10
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("AND_25");
         return 3 + applyOperand();
     }
 
@@ -583,7 +582,6 @@ class ASL_0A : public AddressMode::Accumulator<Operator::ASL>
     // 1   2           acc       m.....mm . ASL
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ASL_0A");
         return 2 + applyOperand();
     }
 
@@ -1589,7 +1587,6 @@ class EOR_45 : public AddressMode::DirectPage<Operator::EOR>
     // 2   4-m+w       dir       m.....m. . EOR $10
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("EOR_45");
         return 3 + applyOperand();
     }
 
@@ -1998,7 +1995,6 @@ class JMP_7C : public AddressMode::AbsoluteIndexedIndirect<Operator::JMP>
     // 3   6           (abs,X)   ........ . JMP ($1234,X)
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("JMP_7C");
         return 6 + applyOperand();
     }
 
@@ -2385,7 +2381,6 @@ class LDX_A6 : public AddressMode::DirectPage<Operator::LD<State::X>>
     // 2   4-x+w       dir       x.....x. . LDX $10
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("LDX_A6");
         return 3 + applyOperand();
     }
 
@@ -2470,7 +2465,6 @@ class LDY_A0 : public AddressMode::Immediate<Operator::LD<State::Y>>
     // 3-x 3-x         imm       x.....x. . LDY #$54
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("LDY_A0");
         return 2 + applyOperand();
     }
 
@@ -2487,7 +2481,6 @@ class LDY_A4 : public AddressMode::DirectPage<Operator::LD<State::Y>>
     // 2   4-x+w       dir       x.....x. . LDY $10
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("LDY_A4");
         return 3 + applyOperand();
     }
 
@@ -4112,7 +4105,6 @@ class STY_84 : public AddressMode::DirectPage<Operator::ST<State::Y>>
     // 2   4-x+w       dir       ........ . STY $10
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("STY_84");
         return 3 + applyOperand();
     }
 
@@ -4162,7 +4154,6 @@ class STZ_64 : public AddressMode::DirectPage<Operator::STZ>
     // 2   4-m+w       dir       ........ . STZ $10
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("STZ_64");
         return 3 + applyOperand();
     }
 
@@ -4247,7 +4238,6 @@ class TAY_A8 : public AddressMode::Implied<Operator::TA<State::Y>>
     // 1   2           imp       x.....x. . TAY
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("TAY_A8");
         return 2 + applyOperand();
     }
 

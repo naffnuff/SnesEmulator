@@ -41,10 +41,13 @@ public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, const MemoryLocation* memory)
     {
-        throw OperatorNotYetImplementedException("AND");
         int cycles = 0;
         if (state.is16Bit(State::m)) {
+            throw OperatorNotYetImplementedException("AND 16-bit");
             cycles += 1;
+        }
+        else {
+            state.updateSignFlags(state.getAccumulatorPointer()->get() &= memory->getValue());
         }
         return cycles;
     }
@@ -57,12 +60,18 @@ class ASL
 {
 public:
     // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, const MemoryLocation* memory)
+    static int invoke(State& state, MemoryLocation* memory)
     {
-        throw OperatorNotYetImplementedException("ASL");
         int cycles = 0;
         if (state.is16Bit(State::m)) {
+            throw OperatorNotYetImplementedException("ASL 16-bit");
             cycles += 2;
+        }
+        else {
+            Byte& value = memory->get();
+            state.setFlag(State::c, value.isNegative());
+            value <<= 1;
+            state.updateSignFlags(value);
         }
         return cycles;
     }
@@ -438,10 +447,13 @@ public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, const MemoryLocation* memory)
     {
-        throw OperatorNotYetImplementedException("EOR");
         int cycles = 0;
         if (state.is16Bit(State::m)) {
+            throw OperatorNotYetImplementedException("EOR");
             cycles += 1;
+        }
+        else {
+            state.updateSignFlags(state.getAccumulatorPointer()->get() ^= memory->getValue());
         }
         return cycles;
     }
@@ -500,7 +512,7 @@ class JMP
 public:
     static int invoke(State& state, Word address)
     {
-        throw OperatorNotYetImplementedException("JMP");
+        state.setProgramCounter(address);
         return 0;
     }
 

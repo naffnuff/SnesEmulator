@@ -67,6 +67,15 @@ void Emulator::initialize()
 
         // Registers
         setRegister(0x2100, true, "Screen Display");
+        setRegister(0x2102, true, "OAM Address low byte");
+        setRegister(0x2103, true, "OAM Address high bit and Obj Priority");
+        setRegister(0x2104, true, "Data for OAM write", [this](MemoryLocation::Operation operation, Byte value) {
+            if (operation != MemoryLocation::Write) {
+                throw std::logic_error("2104 can only be written by CPU");
+            }
+            Word oamAddress = registers[0x2102].getWordValue();
+            //debugger.printMemoryRegister(operation, value, oamAddress, "Data for OAM write");
+            });
         setRegister(0x2115, true, "Video Port Control");
         setRegister(0x2116, true, "VRAM Address low byte");
         setRegister(0x2117, true, "VRAM Address high byte");
@@ -75,35 +84,28 @@ void Emulator::initialize()
                 throw std::logic_error("2118 can only be written by CPU");
             }
             Word vramAddress = registers[0x2116].getWordValue();
-            videoMemory[vramAddress].setLowByte(value);
-
-            Byte pixelValue1 = value & 0x0f;
-            Byte pixelValue2 = value >> 4;
-            Byte pixelValue1x2 = pixelValue1 ? 255 : 0;
-            Byte pixelValue2x2 = pixelValue2 ? 255 : 0;
-            //Byte pixelValue1x2 = (pixelValue1 + 1) * (pixelValue1 + 1) - 1;
-            //Byte pixelValue2x2 = (pixelValue2 + 1) * (pixelValue2 + 1) - 1;
-            //vramRenderer.setPixel(vramAddress * 4, { pixelValue1x2, pixelValue1x2, pixelValue1x2 });
-            //vramRenderer.setPixel(vramAddress * 4 + 1, { pixelValue2x2, pixelValue2x2, pixelValue2x2 });
-            vramRenderer.setPixel(vramAddress * 2, { value, value, value });
+            videoMemory.setLowByte(vramAddress, value);
         });
         setRegister(0x2119, true, "VRAM Data Write high byte", [this](MemoryLocation::Operation operation, Byte value) {
             if (operation != MemoryLocation::Write) {
                 throw std::logic_error("2119 can only be written by CPU");
             }
             Word vramAddress = registers[0x2116].getWordValue();
-            videoMemory[vramAddress].setHighByte(value);
+            videoMemory.setHighByte(vramAddress, value);
 
-            Byte pixelValue1 = value & 0x0f;
-            Byte pixelValue2 = value >> 4;
-
-            Byte pixelValue1x2 = pixelValue1 ? 255 : 0;
-            Byte pixelValue2x2 = pixelValue2 ? 255 : 0;
-            //Byte pixelValue1x2 = (pixelValue1 + 1) * (pixelValue1 + 1) - 1;
-            //Byte pixelValue2x2 = (pixelValue2 + 1) * (pixelValue2 + 1) - 1;
-            //vramRenderer.setPixel(vramAddress * 4 + 2, { pixelValue1x2, pixelValue1x2, pixelValue1x2 });
-            //vramRenderer.setPixel(vramAddress * 4 + 3, { pixelValue2x2, pixelValue2x2, pixelValue2x2 });
-            vramRenderer.setPixel(vramAddress * 2 + 1, { value, value, value });
+            const int bitsPerPixel = 4;
+            static const int tilePixelCount = 8 * 8;
+            int tileBitCount = tilePixelCount * bitsPerPixel;
+            int tileWordCount = tileBitCount / 16;
+            int tileIndex = vramAddress / tileWordCount;
+            int tileWordOffset = vramAddress % tileWordCount;
+            if (tileWordOffset == tileWordCount - 1) {
+                std::array<std::array<uint8_t, 8>, 8> tile = videoMemory.readTile(tileIndex, bitsPerPixel);
+                int tilesPerRow = vramRendererWidth / 8;
+                int tileRow = tileIndex / tilesPerRow;
+                int tileColumn = tileIndex % tilesPerRow;
+                vramRenderer.setGrayscaleTile(tileRow * 8, tileColumn * 8, tile);
+            }
 
             Byte videoPortControl = registers[0x2115].getValue();
             if (videoPortControl.getBit(7)) {
@@ -113,13 +115,26 @@ void Emulator::initialize()
                 throw std::logic_error("DMA: Video port control not implemented");
             }
         });
+        setRegister(0x2121, true, "CGRAM Address");
+        setRegister(0x2122, true, "CGRAM Data Write low byte", [this](MemoryLocation::Operation operation, Byte value) {
+            if (operation != MemoryLocation::Write) {
+                throw std::logic_error("2122 can only be written by CPU");
+            }
+            Byte cgramAddress = registers[0x2121].getValue();
+            //debugger.printMemoryRegister(operation, value, Word(cgramAddress), "CGRAM Data Write");
+            });
         setRegister(0x212e, true, "Window Mask Designation for the Main Screen");
         setRegister(0x212f, true, "Window Mask Designation for the Subscreen");
+
+        setRegister(0x4016, true, "NES-style Joypad Access Port 1");
 
         setRegister(0x4200, true, "Interrupt Enable Flags");
         setRegister(0x420b, true, "DMA Enable");
         setRegister(0x420c, true, "HDMA Enable");
         setRegister(0x4210, false, "NMI Flag and 5A22 Version");
+
+        setRegister(0x4218, false, "Controller Port 1 Data1 Register low byte");
+        setRegister(0x4219, false, "Controller Port 1 Data1 Register high byte");
 
         // DMA channel 0
         setRegister(0x4300, true, "DMA Control Channel 0");
@@ -203,12 +218,13 @@ void Emulator::run()
             }
         });
 
-    DmaInstruction dmaInstruction(registers, cpuState.accessMemory(), output);
+    DmaInstruction dmaInstruction(registers, cpuState.accessMemory(), output, error);
 
-    uint64_t nextCpu = 186;
-    uint64_t nextSpc = 186;
+    uint64_t nextCpu = cycleCount;
+    uint64_t nextSpc = cycleCount;
+    uint64_t cycleCountTarget = cycleCount;
 
-    int hCounter = 186;
+    int hCounter = int(cycleCount);
     int vCounter = 0;
     bool vBlank = false;
 
@@ -220,12 +236,13 @@ void Emulator::run()
     double runStartTime;
     bool stepMode = cpuContext.stepMode || spcContext.stepMode;
     if (!stepMode) {
+        output << "Snip" << std::endl;
         debugger.startTime = clock();
         runStartTime = renderer.getTime();
     }
 
     try {
-
+        uint64_t iteration = 0;
         while (running) {
 
             if (cycleCount == nextCpu) {
@@ -242,6 +259,7 @@ void Emulator::run()
                 Instruction* instruction = cpuInstructionDecoder.readNextInstruction(cpuState);
 
                 if (dmaInstruction.enabled()) { // DMA enabled
+                    //cpuContext.stepMode = true;
                     dmaInstruction.blockedInstruction = instruction;
                     instruction = static_cast<Instruction*>(&dmaInstruction);
                 }
@@ -252,7 +270,7 @@ void Emulator::run()
                     output << "Cycle count: " << cycleCount << ", Next cpu: " << nextCpu << ", Next spc: " << nextSpc << std::endl;
                     output << "V counter: " << vCounter << ", H counter: " << hCounter << ", V blank: " << vBlank << std::endl;
                     debugger.printBreakpoints(cpuContext, spcContext);
-                    debugger.printMemory(cpuState, cpuContext, spcState, spcContext);
+                    debugger.printMemory(cpuState, cpuContext, spcState, spcContext, videoMemory);
                 }
 
                 if (int cycles = executeNext(instruction, cpuState, debugger, cpuContext, spcState, spcContext, error)) {
@@ -270,7 +288,7 @@ void Emulator::run()
                 if (spcContext.stepMode) {
                     output << "cycleCount=" << cycleCount << ", nextCpu=" << nextCpu << ", nextSpc=" << nextSpc << std::endl;
                     debugger.printBreakpoints(cpuContext, spcContext);
-                    debugger.printMemory(cpuState, cpuContext, spcState, spcContext);
+                    debugger.printMemory(cpuState, cpuContext, spcState, spcContext, videoMemory);
                 }
 
                 if (int cycles = executeNext(instruction, spcState, debugger, spcContext, cpuState, cpuContext, error)) {
@@ -289,13 +307,19 @@ void Emulator::run()
                 stepMode = false;
                 runStartTime = renderer.getTime();
             } else { // run mode continued
-                double elapsedTime = renderer.getTime() - runStartTime;
-                static const double clockSpeed = 1.89e9 / 88.0;
-                uint64_t elapsedCycles = uint64_t(elapsedTime * clockSpeed);
+                if (iteration % 1000 == 0)
+                {
+                    double elapsedTime = renderer.getTime() - runStartTime;
+                    static const double clockSpeedTarget = 1.89e9 / 88.0;
+                    cycleCountTarget = uint64_t(elapsedTime * clockSpeedTarget);
+                }
 
-                if (elapsedCycles > cycleCount) {
+                if (cycleCountTarget > cycleCount)
+                {
                     increment = true;
                 }
+
+                increment = true;
 
                 static int incrementCount = 0;
                 static int totalCount = 0;
@@ -305,7 +329,7 @@ void Emulator::run()
                 }
                 ++totalCount;
 
-                static int nextPrintout = 5;
+                /*static int nextPrintout = 5;
                 double actualSpeed = double(cycleCount) / elapsedTime;
                 if (nextPrintout == int(elapsedTime)) {
                     nextPrintout += 5;
@@ -323,7 +347,7 @@ void Emulator::run()
                     output << "V counter: " << vCounter << std::endl;
                     output << "H counter: " << hCounter << std::endl;
                     output << std::endl;
-                }
+                }*/
             }
 
             static uint8_t color = 0;
@@ -335,12 +359,13 @@ void Emulator::run()
                     hCounter = 0;
                     if (vCounter < 224) {
                         for (int i = 0; i < scanline.size(); ++i) {
-                            scanline[i] = { color, uint8_t(vCounter), uint8_t(i) };
+                            //scanline[i] = { color, uint8_t(vCounter), uint8_t(i) };
+                            renderer.setGrayscalePixel(vCounter, i, vCounter);
                         }
-                        renderer.setScanline(vCounter, scanline);
+                        //renderer.setScanline(vCounter, scanline);
                     }
                     ++vCounter;
-                    if (vCounter == 224) {
+                    if (vCounter == 225) {
                         vBlank = true;
                         nmi = true;
                         registers[0x4210].setValue(0x82);
@@ -367,6 +392,7 @@ void Emulator::run()
                     }
                 }
             }
+            ++iteration;
         }
     } catch (const std::exception& e) {
         running = false;

@@ -20,13 +20,14 @@ private:
     };
 
 public:
-    DmaInstruction(std::vector<MemoryLocation>& registers, std::vector<MemoryLocation>& memory, std::ostream& output)
+    DmaInstruction(std::vector<MemoryLocation>& registers, std::vector<MemoryLocation>& memory, std::ostream& output, std::ostream& error)
         : registers(registers)
         , memory(memory)
         , dmaEnabledRead(registers[0x420b])
         , dmaEnabledWrite(memory[0x420b])
         , channels(8)
         , output(output)
+        , error(error)
     {
         for (int i = 0; i < channels.size(); ++i) {
             Word baseAddress = 0x4300 | i << 4;
@@ -46,6 +47,7 @@ public:
     virtual std::string toString() const
     {
         std::stringstream ss;
+        ss << blockedInstruction->toString() << " (blocked by DMA)" << std::endl;
         ss << "DMA ";
         if (Byte dmaEnabled = dmaEnabledRead.getValue()) {
             for (int i = 0; i < 7; ++i) {
@@ -53,15 +55,13 @@ public:
                     Channel channel = channels[i];
                     Word sourceAddress = channel.sourceAddressRead->getWordValue();
                     Byte sourceBank = channel.sourceBank->getValue();
-                    ss << sourceBank << ":" << sourceAddress;
+                    MemoryLocation& memoryLocation = memory[Long(sourceAddress, sourceBank)];
+                    ss << "Channel " << i << ": ";
+                    ss << sourceBank << sourceAddress;
                     ss << " -> ";
                     ss << Word(0x2100 | channel.registerAddress->getValue()) << std::endl;
                     ss << "Bytes left: " << channel.dataSizeRead->getWordValue() << std::endl;
-                    ss << "Next word: " << memory[Long(sourceAddress, sourceBank)].getWordValue() << std::endl;
                     ss << "DMA control: " << channel.dmaControl->getValue() << std::endl;
-                    ss << "Video port control: " << registers[0x2115].getValue() << std::endl;
-                    Word vramAddress = registers[0x2116].getWordValue();
-                    ss << "VRAM address " << vramAddress;
                     return ss.str();
                 }
             }
@@ -70,7 +70,7 @@ public:
 
     virtual std::string opcodeToString() const
     {
-        return blockedInstruction->opcodeToString() + " (blocked by DMA)";
+        return blockedInstruction->opcodeToString();
     }
 
     virtual int execute()
@@ -78,30 +78,45 @@ public:
         int cycles = 0;
         if (Byte dmaEnabled = dmaEnabledRead.getValue()) {
             for (int i = 0; i < 7; ++i) {
-                if (dmaEnabled.getBit(i)) {
+                while (dmaEnabled.getBit(i)) {
                     Channel& channel = channels[i];
+
+                    Word registerAddress = 0x2100 | channel.registerAddress->getValue();
+                    Word sourceAddress = channel.sourceAddressRead->getWordValue();
+                    Byte sourceBank = channel.sourceBank->getValue();
+                    Word dataSize = channel.dataSizeRead->getWordValue();
+                    MemoryLocation& memoryLocation = memory[Long(sourceAddress, sourceBank)];
+
                     Byte dmaControl = channel.dmaControl->getValue();
-                    if (dmaControl == 0x01) {
-                        Word registerAddress = 0x2100 | channel.registerAddress->getValue();
-                        Word sourceAddress = channel.sourceAddressRead->getWordValue();
-                        Byte sourceBank = channel.sourceBank->getValue();
-                        Word dataSize = channel.dataSizeRead->getWordValue();
-                        Word data = memory[Long(sourceAddress, sourceBank)].getWordValue();
+                    int byteCount = 0;
+                    if (dmaControl == 0x00) {
+                        Byte data = memoryLocation.getValue();
+                        memory[registerAddress].setValue(data);
+
+                        byteCount = 1;
+                    }
+                    else if (dmaControl == 0x01) {
+                        Word data = memoryLocation.getWordValue();
                         memory[registerAddress].setWordValue(data);
 
-                        cycles = 8 * 2;
-
-                        channel.sourceAddressWrite->setWordValue(sourceAddress + 2);
-                        channel.dataSizeWrite->setWordValue(dataSize - 2);
-
-                        if (dataSize - 2 == 0) {
-                            dmaEnabled.setBit(i, false);
-                            dmaEnabledWrite.setValue(dmaEnabled);
-                        }
-                    } else {
-                        throw std::logic_error("DMA control not implemented");
+                        byteCount = 2;
                     }
-                    break;
+                    else {
+                        error << "DMA control: " << dmaControl << std::endl;
+                        throw OpcodeNotYetImplementedException("DMA control not implemented");
+                    }
+
+                    channel.sourceAddressWrite->setWordValue(sourceAddress + byteCount);
+                    dataSize -= byteCount;
+                    cycles += byteCount;
+
+                    channel.dataSizeWrite->setWordValue(dataSize);
+
+                    if (dataSize == 0) {
+                        dmaEnabled.setBit(i, false);
+                        dmaEnabledWrite.setValue(dmaEnabled);
+                        return cycles;
+                    }
                 }
             }
         }
@@ -130,4 +145,5 @@ private:
     std::vector<Channel> channels;
 
     std::ostream& output;
+    std::ostream& error;
 };

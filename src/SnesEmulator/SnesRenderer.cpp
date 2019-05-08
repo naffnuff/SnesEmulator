@@ -63,12 +63,30 @@ void Renderer::setScanline(int lineIndex, const std::vector<Pixel>& pixels)
 void Renderer::setPixel(int row, int column, Pixel pixel)
 {
     row = height - 1 - row;
+    if (pixel.red == 0 && pixelBuffer[row * width + column].red > 0) {
+        output << "WTF DUDE!" << std::endl;
+    }
     pixelBuffer[row * width + column] = pixel;
 }
 
-void Renderer::setPixel(int address, Pixel pixel)
+void Renderer::setGrayscalePixel(int row, int column, uint8_t white)
 {
-    pixelBuffer[address] = pixel;
+    /*if (white > 0) {
+        output << "row=" << row << std::endl;
+        output << "column=" << column << std::endl;
+        output << "white=" << +white << std::endl;
+        output << "index=" << std::hex << row * width + column << std::dec << std::endl << std::endl;
+    }*/
+    setPixel(row, column, { white, white, white });
+}
+
+void Renderer::setGrayscaleTile(int startRow, int startColumn, const std::array<std::array<uint8_t, 8>, 8>& tile)
+{
+    for (int row = 0; row < 8; ++row) {
+        for (int column = 0; column < 8; ++column) {
+            setGrayscalePixel(startRow + row, startColumn + column, tile[row][column] ? 255 : 0);
+        }
+    }
 }
 
 void Renderer::update()

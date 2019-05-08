@@ -145,15 +145,13 @@
     <ClInclude Include="..\..\..\src\SnesEmulator\SnesEmulator.h" />
     <ClInclude Include="..\..\..\src\SnesEmulator\SnesRenderer.h" />
     <ClInclude Include="..\..\..\src\SnesEmulator\SnesRom.h" />
+    <ClInclude Include="..\..\..\src\SnesEmulator\VideoMemory.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="cpu.txt" />
     <Text Include="spc.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Common\Common.vcxproj">
-      <Project>{0390f7ba-7ea0-409f-ad82-2de104b2fce6}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\SPC700\SPC700.vcxproj">
       <Project>{2eda2912-5c78-44b7-a3ba-4dfd0b7fce5e}</Project>
     </ProjectReference>

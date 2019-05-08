@@ -9,6 +9,8 @@
 #include "WDC65816/CpuState.h"
 #include "SPC700/SpcState.h"
 
+#include "VideoMemory.h"
+
 class Debugger
 {
 public:
@@ -112,6 +114,7 @@ public:
                 << "clear: clear all breakpoints" << std::endl
                 << "w: watch executing program memory" << std::endl
                 << "[hex]: inspect memory page containing address [hex]" << std::endl
+                << "v [hex]: inspect video memory containing address [hex]" << std::endl
                 << "[p|s|a|x|y|d|f]=[hex]: set register to [hex]" << std::endl
                 << "[a]=[hex]: set address [a] to [hex]" << std::endl
                 << "s: switch contexts" << std::endl;
@@ -135,6 +138,7 @@ public:
             }
             if (!context.stepMode && !otherContext.stepMode) {
                 output << "All running" << std::endl;
+                output << "Snip" << std::endl;
                 startTime = clock();
             }
             return !context.stepMode;
@@ -172,7 +176,15 @@ public:
                     file << breakpoint << " ";
                 }
             }
-        } else if (command == "w") {
+        }
+        else if (command[0] == 'v') {
+            try {
+                inspectedVideoMemory = stoi(command.substr(2), 0, 16);
+            } catch (std::exception& e) {
+                std::cerr << "Not a valid value: " << e.what() << std::endl;
+            }
+        }
+        else if (command == "w") {
             context.watchMode = !context.watchMode;
             output << "Watch mode " << (context.watchMode ? "on" : "off") << std::endl;
         } else if (command == "s") {
@@ -267,8 +279,27 @@ public:
         }
     }
 
-    void printMemory(const CPU::State& cpuState, const Context& cpuContext, const SPC::State& spcState, const Context& spcContext)
+    void printMemory(const CPU::State& cpuState, const Context& cpuContext, const SPC::State& spcState, const Context& spcContext, VideoMemory& videoMemory)
     {
+        setOutputColor(DefaultColor, false);
+        output << "         0    1    2    3    4    5    6    7" << std::endl;
+        output << "         8    9    a    b    c    d    e    f" << std::endl;
+        int vramAddress = inspectedVideoMemory & 0xFF80;
+        for (int i = 0; i < 16; ++i) {
+            if (vramAddress < videoMemory.getVramSize()) {
+                uint16_t lowAddress(vramAddress);
+                lowAddress = lowAddress >> 4;
+                output << std::hex << std::setw(3) << std::setfill('0') << lowAddress << "x  " << std::dec;
+
+                for (int j = 0; j < 8 && vramAddress < videoMemory.getVramSize(); ++j) {
+                    Word memory = videoMemory.getWord(vramAddress);
+                    output << memory << ' ';
+                    ++vramAddress;
+                }
+            }
+            output << std::endl;
+        }
+
         Long startCpuAddress = cpuContext.watchMode ? cpuState.getProgramAddress() : cpuContext.inspectedAddress;
         Long startSpcAddress = spcContext.watchMode ? spcState.getProgramAddress() : spcContext.inspectedAddress;
 
@@ -277,8 +308,8 @@ public:
 
         output << "          0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f"
             << "             0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f" << std::endl;
-        Long cpuAddress = startCpuAddress - std::bitset<8>(startCpuAddress).to_ulong();
-        Long spcAddress = startSpcAddress - std::bitset<8>(startSpcAddress).to_ulong();
+        Long cpuAddress = startCpuAddress & 0xFFFF00;
+        Long spcAddress = startSpcAddress & 0xFFFF00;
 
 
         for (int i = 0; i < 16; ++i) {
@@ -331,6 +362,7 @@ public:
     void printClockSpeed() const
     {
         std::time_t endTime = clock();
+        output << "Snap" << std::endl;
         double elapsedSeconds = double(endTime - startTime) / CLOCKS_PER_SEC;
         output << "Time delta=" << elapsedSeconds << std::endl;
         output << "Speed is " << cycleCount / 1000000.0 / elapsedSeconds << " MHz (kind of)" << std::endl;
@@ -367,4 +399,5 @@ private:
     std::ostream& error;
     uint64_t& cycleCount;
     bool& running;
+    Word inspectedVideoMemory = 0x4100;
 };

@@ -55,13 +55,15 @@ class AbsoluteIndexedIndirect : public Instruction3Byte
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
-        throw AddressModeNotYetImplementedException("AbsoluteIndexedIndirect");
-        return Operator::invoke(state, Word());
+        Long address = Long(lowByte, highByte, state.getDataBank());
+        Long indexedAddress = address + state.getIndexRegister<State::X>();
+        MemoryLocation* memory = state.getMemoryLocation(indexedAddress);
+        return Operator::invoke(state, memory->getWordValue());
     }
 
     std::string toString() const override
     {
-        return Operator::toString() + " $" + operandToString() + " TODO";
+        return Operator::toString() + " ($" + operandToString() + ",X)";
     }
 };
 
