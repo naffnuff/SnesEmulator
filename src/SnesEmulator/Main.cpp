@@ -40,6 +40,16 @@ int main(int, char**)
     std::istream& input = std::cin;
     std::ostream& error = std::cerr;
 
+    /*for (int i = 0; i < 256; i += 32) {
+        for (int j = 0; j < 256; j += 32) {
+            Byte a(i);
+            Byte b(j);
+            bool carry = false;
+            bool overflow = false;
+            output << +char(a) << " + " << +char(b) << " = " << +char(Types::binaryAdd(a, b, carry, overflow)) << ", carry=" << carry << ", overflow=" << overflow << std::endl;
+        }
+    }*/
+
     try {
         Emulator emulator(output, input, error);
         emulator.initialize();

@@ -360,7 +360,6 @@ class AND_29_16Bit : public AddressMode::Immediate16Bit<Operator::AND>
     // 3-m 3-m         imm       m.....m. . AND #$54
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("AND_29_16Bit");
         return 2 + applyOperand();
     }
 
@@ -378,7 +377,6 @@ class AND_29 : public AddressMode::Immediate<Operator::AND>
     // 3-m 3-m         imm       m.....m. . AND #$54
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("AND_29");
         return 2 + applyOperand();
     }
 
@@ -651,7 +649,6 @@ class BCC_90 : public AddressMode::ProgramCounterRelative<Operator::BCC>
     // 2   2+t+t*e*p   rel8      ........ . BCC LABEL
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("BCC_90");
         return 2 + applyOperand();
     }
 
@@ -838,7 +835,6 @@ class BPL_10 : public AddressMode::ProgramCounterRelative<Operator::BPL>
     // 2   2+t+t*e*p   rel8      ........ . BPL LABEL
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("BPL_10");
         return 2 + applyOperand();
     }
 
@@ -1091,7 +1087,6 @@ class CMP_C9 : public AddressMode::Immediate<Operator::CMP>
     // 3-m 3-m         imm       m.....mm . CMP #$54
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("CMP_C9");
         return 2 + applyOperand();
     }
 
@@ -2011,7 +2006,6 @@ class JMP_DC : public AddressMode::AbsoluteIndirectLong<Operator::JML>
     // 3   6           [abs]     ........ . JMP [$1234]
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("JMP_DC");
         return 6 + applyOperand();
     }
 
@@ -2044,7 +2038,6 @@ class JSR_22 : public AddressMode::AbsoluteLong_ControlFlow<Operator::JSL>
     // 4   8           long      ........ . JSL $123456
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("JSR_22");
         return 8 + applyOperand();
     }
 
@@ -2295,7 +2288,6 @@ class LDA_B9 : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::LDA, Sta
     // 3   6-m-x+x*p   abs,Y     m.....m. . LDA $9876,Y
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("LDA_B9");
         return 4 + applyOperand();
     }
 
@@ -2364,7 +2356,6 @@ class LDX_A2 : public AddressMode::Immediate<Operator::LD<State::X>>
     // 3-x 3-x         imm       x.....x. . LDX #$54
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("LDX_A2");
         return 2 + applyOperand();
     }
 
@@ -3154,7 +3145,6 @@ class PLD_2B : public AddressMode::Implied<Operator::PLD>
     // 1   5           imp       *.....*. . PLD
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("PLD_2B");
         return 5 + applyOperand();
     }
 
@@ -3187,7 +3177,6 @@ class PLX_FA : public AddressMode::Implied<Operator::PL<State::X>>
     // 1   5-x         imp       x.....x. . PLX
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("PLX_FA");
         return 4 + applyOperand();
     }
 
@@ -3204,7 +3193,6 @@ class PLY_7A : public AddressMode::Implied<Operator::PL<State::Y>>
     // 1   5-x         imp       x.....x. . PLY
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("PLY_7A");
         return 4 + applyOperand();
     }
 
@@ -3410,7 +3398,6 @@ class RTI_40 : public AddressMode::Implied<Operator::RTI>
     // 1   7-e         imp       ******** . RTI
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("RTI_40");
         return 6 + applyOperand();
     }
 
@@ -3547,7 +3534,6 @@ class SBC_E9 : public AddressMode::Immediate<Operator::SBC>
     // 3-m 3-m         imm       mm....mm . SBC #$54
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("SBC_E9");
         return 2 + applyOperand();
     }
 
@@ -3734,7 +3720,6 @@ class SEC_38 : public AddressMode::Implied<Operator::SE<State::c, true>>
     // 1   2           imp       .......1 . SEC
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("SEC_38");
         return 2 + applyOperand();
     }
 
@@ -4398,14 +4383,13 @@ class TSX_BA : public AddressMode::Implied<Operator::TSX>
 // TXA Transfer Index Register X to Accumulator [Flags affected: n,z]
 // TXA
 // Implied (1-Byte)
-class TXA_8A : public AddressMode::Implied<Operator::TXA>
+class TXA_8A : public AddressMode::Implied<Operator::T_A<State::X>>
 {
     using Implied::Implied;
 
     // 1   2           imp       m.....m. . TXA
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("TXA_8A");
         return 2 + applyOperand();
     }
 
@@ -4449,7 +4433,7 @@ class TXY_9B : public AddressMode::Implied<Operator::TXY>
 // TYA Transfer Index Register Y to Accumulator [Flags affected: n,z]
 // TYA
 // Implied (1-Byte)
-class TYA_98 : public AddressMode::Implied<Operator::TYA>
+class TYA_98 : public AddressMode::Implied<Operator::T_A<State::Y>>
 {
     using Implied::Implied;
 

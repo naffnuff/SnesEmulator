@@ -4,6 +4,26 @@
 #include <iostream>
 #include <iomanip>
 
+namespace Types {
+
+template<typename T>
+T binaryAdd(T augend, T addend, bool& unsignedCarry, bool& signedOverflow)
+{
+    uint32_t sum = uint32_t(augend) + uint32_t(addend) + unsignedCarry;
+    unsignedCarry = sum & 1 << T::bitCount();
+    T result(sum);
+    signedOverflow = augend.isNegative() == addend.isNegative() && addend.isNegative() != result.isNegative();
+    return result;
+}
+
+template<typename T>
+T binarySubtract(T minuhend, T subtrahend, bool& invertedUnsignedBorrow, bool& signedOverflow)
+{
+    return binaryAdd(minuhend, T(~subtrahend), invertedUnsignedBorrow, signedOverflow);
+}
+
+}
+
 // Wrapper classes Byte (8-bit), Word (16-bit) and Long (24-bit)
 class Byte
 {
@@ -118,22 +138,14 @@ public:
         }
     }
 
+    static int bitCount()
+    {
+        return 8;
+    }
+
     bool isNegative() const
     {
         return getBit(7);
-    }
-
-    void binaryAdd(Byte addend, bool& unsignedCarry, bool& signedOverflow)
-    {
-        uint16_t result = uint16_t(value) + uint16_t(addend.value) + unsignedCarry;
-        unsignedCarry = result & 1 << 8;
-        value = uint8_t(result);
-        signedOverflow = isNegative() != unsignedCarry;
-    }
-
-    void binarySubtract(Byte subtrahend, bool& invertedUnsignedBorrow, bool& signedOverflow)
-    {
-        binaryAdd(~subtrahend, invertedUnsignedBorrow, signedOverflow);
     }
 
 private:
@@ -212,6 +224,11 @@ public:
         return copy;
     }
 
+    static int bitCount()
+    {
+        return 16;
+    }
+
     bool isNegative() const
     {
         return value & 1 << 15;
@@ -252,7 +269,7 @@ public:
     }
 
     Long(uint32_t value)
-        : value(value)
+        : Long(Byte(value), Byte(value >> 8), Byte(value >> 16))
     {
     }
 

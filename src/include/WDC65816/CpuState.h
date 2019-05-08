@@ -436,6 +436,13 @@ public:
         setFlag(d, false);
     }
 
+    void endInterrupt()
+    {
+        setFlags(pullFromStack());
+        programCounter = pullWordFromStack();
+        programBank = pullFromStack();
+    }
+
     InterruptVectors& getInterruptVectors(bool native)
     {
         if (native) {

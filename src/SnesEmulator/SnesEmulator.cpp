@@ -67,6 +67,7 @@ void Emulator::initialize()
 
         // Registers
         setRegister(0x2100, true, "Screen Display");
+
         setRegister(0x2102, true, "OAM Address low byte");
         setRegister(0x2103, true, "OAM Address high bit and Obj Priority");
         setRegister(0x2104, true, "Data for OAM write", [this](MemoryLocation::Operation operation, Byte value) {
@@ -76,6 +77,16 @@ void Emulator::initialize()
             Word oamAddress = registers[0x2102].getWordValue();
             //debugger.printMemoryRegister(operation, value, oamAddress, "Data for OAM write");
             });
+
+        setRegister(0x2105, true, "BG Mode and Character Size");
+        setRegister(0x2106, true, "Screen Pixelation");
+        setRegister(0x210d, true, "BG1 Horizontal Scroll / Mode 7 BG Horizontal Scroll");
+        setRegister(0x210e, true, "BG1 Vertical Scroll / Mode 7 BG Vertical Scroll");
+        setRegister(0x210f, true, "BG2 Horizontal Scroll");
+        setRegister(0x2110, true, "BG2 Vertical Scroll");
+        setRegister(0x2111, true, "BG3 Horizontal Scroll");
+        setRegister(0x2112, true, "BG3 Vertical Scroll");
+
         setRegister(0x2115, true, "Video Port Control");
         setRegister(0x2116, true, "VRAM Address low byte");
         setRegister(0x2117, true, "VRAM Address high byte");
@@ -85,7 +96,7 @@ void Emulator::initialize()
             }
             Word vramAddress = registers[0x2116].getWordValue();
             videoMemory.setLowByte(vramAddress, value);
-        });
+            });
         setRegister(0x2119, true, "VRAM Data Write high byte", [this](MemoryLocation::Operation operation, Byte value) {
             if (operation != MemoryLocation::Write) {
                 throw std::logic_error("2119 can only be written by CPU");
@@ -114,7 +125,8 @@ void Emulator::initialize()
                 error << "DMA: Video port control: " << videoPortControl << std::endl;
                 throw std::logic_error("DMA: Video port control not implemented");
             }
-        });
+            });
+
         setRegister(0x2121, true, "CGRAM Address");
         setRegister(0x2122, true, "CGRAM Data Write low byte", [this](MemoryLocation::Operation operation, Byte value) {
             if (operation != MemoryLocation::Write) {
@@ -123,8 +135,17 @@ void Emulator::initialize()
             Byte cgramAddress = registers[0x2121].getValue();
             //debugger.printMemoryRegister(operation, value, Word(cgramAddress), "CGRAM Data Write");
             });
+
+        setRegister(0x2123, true, "Window Mask Settings for BG1 and BG2");
+        setRegister(0x2124, true, "Window Mask Settings for BG3 and BG4");
+        setRegister(0x2125, true, "Window Mask Settings for OBJ and Color Window");
+        setRegister(0x212c, true, "Main Screen Designation");
+        setRegister(0x212d, true, "Subscreen Designation");
         setRegister(0x212e, true, "Window Mask Designation for the Main Screen");
         setRegister(0x212f, true, "Window Mask Designation for the Subscreen");
+        setRegister(0x2130, true, "Color Addition Select");
+        setRegister(0x2131, true, "Color math designation");
+        setRegister(0x2132, true, "Fixed Color Data");
 
         setRegister(0x4016, true, "NES-style Joypad Access Port 1");
 

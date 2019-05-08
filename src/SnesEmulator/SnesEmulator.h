@@ -23,7 +23,7 @@ public:
         : output(output)
         , input(input)
         , error(error)
-        , renderer(256, 224, 1.f, false, output)
+        , renderer(256, 224, 3.f, false, output)
         , vramRenderer(vramRendererWidth, vramRendererHeight, 1.f, true, output)
         , debugger(output, input, error, cycleCount, running)
         , rom(output)

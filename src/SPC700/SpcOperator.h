@@ -29,14 +29,15 @@ public:
         bool overflow = false;
         Byte operandsXor = leftOperand->getValue() ^ rightOperand;
         bool halfCarry = ((leftOperand->getValue() & 0x0F) + (rightOperand & 0x0F)) & 0x10;
-        leftOperand->get().binaryAdd(rightOperand, carry, overflow);
+        Byte result = Types::binaryAdd(leftOperand->getValue(), rightOperand, carry, overflow);
         state.setFlag(State::c, carry);
         state.setFlag(State::v, overflow);
-        bool halfCarryAlt = (operandsXor ^ leftOperand->getValue()) & 0x10;
+        bool halfCarryAlt = (operandsXor ^ result) & 0x10;
         if (halfCarry != halfCarryAlt) {
             throw std::logic_error(__FUNCTION__ + std::string(" bad half-carry calculation"));
         }
         state.setFlag(State::h, halfCarry);
+        leftOperand->setValue(result);
         return 0;
     }
 

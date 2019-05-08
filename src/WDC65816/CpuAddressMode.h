@@ -101,7 +101,6 @@ class AbsoluteIndexed_ExtraCycle : public AbsoluteIndexed<Operator, Register>
     // §3: Add 1 cycle if adding index crosses a page boundary
     int getCycles(Long address, Long indexedAddress) const override
     {
-        throw AddressModeNotYetImplementedException("TODO03");
         int cycles = 0;
         Word addressPage = address >> 8;
         Word indexedAddressPage = indexedAddress >> 8;
@@ -140,13 +139,13 @@ class AbsoluteIndirectLong : public Instruction3Byte
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
-        throw AddressModeNotYetImplementedException("AbsoluteIndirectLong");
-        return Operator::invoke(state, Long());
+        MemoryLocation* memory = state.getMemoryLocation(lowByte, highByte);
+        return Operator::invoke(state, Long(memory[0].getWordValue(), memory[2].getValue()));
     }
 
     std::string toString() const override
     {
-        return Operator::toString() + " $" + operandToString() + " TODO";
+        return Operator::toString() + " $" + operandToString();
     }
 };
 
@@ -175,13 +174,12 @@ class AbsoluteLong_ControlFlow : public Instruction4Byte
 
     int invokeOperator(Byte lowByte, Byte highByte, Byte bankByte) override
     {
-        throw AddressModeNotYetImplementedException("AbsoluteLong_ControlFlow");
-        return Operator::invoke(state, Long());
+        return Operator::invoke(state, Long(lowByte, highByte, bankByte));
     }
 
     std::string toString() const override
     {
-        return Operator::toString() + " $" + operandToString() + " TODO";
+        return Operator::toString() + " $" + operandToString();
     }
 };
 

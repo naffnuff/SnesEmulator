@@ -20,13 +20,12 @@ public:
             cycles += 1;
         }
         else {
-            Byte accumulator = state.getAccumulatorA();
             bool carry = state.getFlag(State::c);
             bool overflow = false;
-            accumulator.binaryAdd(memory->getValue(), carry, overflow);
+            Byte result = Types::binaryAdd(state.getAccumulatorA(), memory->getValue(), carry, overflow);
             state.setFlag(State::c, carry);
             state.setFlag(State::v, overflow);
-            state.setAccumulatorA(accumulator);
+            state.setAccumulatorA(result);
         }
         return cycles;
     }
@@ -106,17 +105,7 @@ public:
     // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, int8_t offset)
     {
-        throw OperatorNotYetImplementedException("BCC");
-        int cycles = 0;
-        if (true /*branch taken*/) {
-            cycles += 1;
-            throw OperatorNotYetImplementedException("TODO07");
-        }
-        if (true /*branch taken crosses page boundary*/) {
-            cycles += 1;
-            throw OperatorNotYetImplementedException("TODO08");
-        }
-        return cycles;
+        return branchIf(!state.getFlag(State::c), state, offset);
     }
 
     static std::string toString() { return "BCC"; }
@@ -224,17 +213,7 @@ public:
     // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, int8_t offset)
     {
-        throw OperatorNotYetImplementedException("BPL");
-        int cycles = 0;
-        if (true /*branch taken*/) {
-            cycles += 1;
-            throw OperatorNotYetImplementedException("TODO07");
-        }
-        if (true /*branch taken crosses page boundary*/) {
-            cycles += 1;
-            throw OperatorNotYetImplementedException("TODO08");
-        }
-        return cycles;
+        return branchIf(!state.getFlag(State::n), state, offset);
     }
 
     static std::string toString() { return "BPL"; }
@@ -524,14 +503,11 @@ class JML
 public:
     static int invoke(State& state, Long address)
     {
-        throw OperatorNotYetImplementedException("JML");
+        state.setProgramAddress(address);
         return 0;
     }
 
-    static std::string toString()
-    {
-        return "JML";
-    }
+    static std::string toString() { return "JML"; }
 };
 
 // JSR Jump to Subroutine [Flags affected: none][Alias: JSL for Absolute Long]
@@ -553,14 +529,13 @@ class JSL
 public:
     static int invoke(State& state, Long address)
     {
-        throw OperatorNotYetImplementedException("JSL");
+        state.pushToStack(state.getProgramBank());
+        state.pushWordToStack(state.getProgramCounter(-1));
+        state.setProgramAddress(address);
         return 0;
     }
 
-    static std::string toString()
-    {
-        return "JSL";
-    }
+    static std::string toString() { return "JSL"; }
 };
 
 // LDA Load Accumulator from Memory [Flags affected: n,z]
@@ -856,7 +831,7 @@ class PLD
 public:
     static int invoke(State& state)
     {
-        throw OperatorNotYetImplementedException("PLD");
+        state.setDirectPageRegister(state.pullWordFromStack());
         return 0;
     }
 
@@ -884,7 +859,6 @@ public:
     // §10: Add 1 cycle if x=0 (16-bit index registers)
     static int invoke(State& state)
     {
-        throw OperatorNotYetImplementedException("PL");
         int cycles = 0;
         if (state.is16Bit(State::x)) {
             cycles += 1;
@@ -970,11 +944,11 @@ public:
     // §9: Add 1 cycle for 65816 native mode (e=0)
     static int invoke(State& state)
     {
-        throw OperatorNotYetImplementedException("RTI");
         int cycles = 0;
         if (state.isNativeMode()) {
             cycles += 1;
         }
+        state.endInterrupt();
         return cycles;
     }
 
@@ -1014,10 +988,18 @@ public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, const MemoryLocation* memory)
     {
-        throw OperatorNotYetImplementedException("SBC");
         int cycles = 0;
         if (state.is16Bit(State::m)) {
+            throw OperatorNotYetImplementedException("SBC 16-bit");
             cycles += 1;
+        }
+        else {
+            bool carry = state.getFlag(State::c);
+            bool overflow = false;
+            Byte result = Types::binarySubtract(state.getAccumulatorA(), memory->getValue(), carry, overflow);
+            state.setFlag(State::c, carry);
+            state.setFlag(State::v, overflow);
+            state.setAccumulatorA(result);
         }
         return cycles;
     }
@@ -1259,16 +1241,22 @@ public:
 };
 
 // TXA Transfer Index Register X to Accumulator [Flags affected: n,z]
-class TXA
+template<State::IndexRegister Register>
+class T_A
 {
 public:
     static int invoke(State& state)
     {
-        throw OperatorNotYetImplementedException("TXA");
+        if (state.is16Bit(State::x)) {
+            state.setAccumulatorC(state.getIndexRegister<Register>());
+        }
+        else {
+            state.setAccumulatorA(Byte(state.getIndexRegister<Register>()));
+        }
         return 0;
     }
 
-    static std::string toString() { return "TXA"; }
+    static std::string toString() { return "T" + State::getIndexRegisterName<Register>() + "A"; }
 };
 
 // TXS Transfer Index Register X to Stack Pointer [Flags affected: none]
@@ -1295,19 +1283,6 @@ public:
     }
 
     static std::string toString() { return "TXY"; }
-};
-
-// TYA Transfer Index Register Y to Accumulator [Flags affected: n,z]
-class TYA
-{
-public:
-    static int invoke(State& state)
-    {
-        throw OperatorNotYetImplementedException("TYA");
-        return 0;
-    }
-
-    static std::string toString() { return "TYA"; }
 };
 
 // TYX Transfer Index Register Y to Index Register X [Flags affected: n,z]
