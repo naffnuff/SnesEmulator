@@ -76,7 +76,9 @@ class AND
 public:
     static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
     {
-        state.updateSignFlags(leftOperand->get() &= rightOperand);
+        Byte value = leftOperand->getValue() & rightOperand;
+        leftOperand->setValue(value);
+        state.updateSignFlags(value);
         return 0;
     }
 
@@ -108,9 +110,10 @@ class ASL
 public:
     static int invoke(State& state, MemoryLocation* operand)
     {
-        Byte& value = operand->get();
+        Byte value = operand->getValue();
         state.setFlag(State::c, value.isNegative());
         value <<= 1;
+        operand->setValue(value);
         state.updateSignFlags(value);
         return 0;
     }
@@ -400,7 +403,9 @@ public:
     // §1: Add 1 cycle if branch is taken
     static int invoke(State& state, MemoryLocation* memory, int8_t offset)
     {
-        return branchIf(--memory->get() != 0, state, offset);
+        Byte value = memory->getValue() - 1;
+        memory->setValue(value);
+        return branchIf(value != 0, state, offset);
     }
 
     static std::string toString() { return "DBNZ"; }
@@ -418,7 +423,9 @@ class DEC
 public:
     static int invoke(State& state, MemoryLocation* operand)
     {
-        state.updateSignFlags(--operand->get());
+        Byte value = operand->getValue() - 1;
+        operand->setValue(value);
+        state.updateSignFlags(value);
         return 0;
     }
 
@@ -499,7 +506,9 @@ class EOR
 public:
     static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
     {
-        state.updateSignFlags(leftOperand->get() ^= rightOperand);
+        Byte value = leftOperand->getValue() ^ rightOperand;
+        leftOperand->setValue(value);
+        state.updateSignFlags(value);
         return 0;
     }
 
@@ -532,7 +541,9 @@ class INC
 public:
     static int invoke(State& state, MemoryLocation* operand)
     {
-        state.updateSignFlags(++operand->get());
+        Byte value = operand->getValue() + 1;
+        operand->setValue(value);
+        state.updateSignFlags(value);
         return 0;
     }
 
@@ -578,9 +589,10 @@ class LSR
 public:
     static int invoke(State& state, MemoryLocation* operand)
     {
-        Byte& value = operand->get();
+        Byte value = operand->getValue();
         state.setFlag(State::c, value.getBit(0));
         value >>= 1;
+        operand->setValue(value);
         state.updateSignFlags(value);
         return 0;
     }
@@ -767,7 +779,9 @@ class OR
 public:
     static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
     {
-        state.updateSignFlags(leftOperand->get() |= rightOperand);
+        Byte value = leftOperand->getValue() | rightOperand;
+        leftOperand->setValue(value);
+        state.updateSignFlags(value);
         return 0;
     }
 
@@ -892,13 +906,14 @@ class ROR
 public:
     static int invoke(State& state, MemoryLocation* operand)
     {
-        Byte& value = operand->get();
+        Byte value = operand->getValue();
         bool carry = state.getFlag(State::c);
         state.setFlag(State::c, value.getBit(0));
         value >>= 1;
         if (carry) {
             value |= 1 << 7;
         }
+        operand->setValue(value);
         state.updateSignFlags(value);
         return 0;
     }
@@ -954,7 +969,9 @@ class SET1
 public:
     static int invoke(State& state, MemoryLocation* operand)
     {
-        operand->get().setBit(BitIndex, BitValue);
+        Byte value = operand->getValue();
+        value.setBit(BitIndex, BitValue);
+        operand->setValue(value);
         return 0;
     }
 

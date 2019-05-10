@@ -16,8 +16,13 @@ public:
     {
         int cycles = 0;
         if (state.is16Bit(State::m)) {
-            throw OperatorNotYetImplementedException("ADC 16-bit");
             cycles += 1;
+            bool carry = state.getFlag(State::c);
+            bool overflow = false;
+            Word result = Types::binaryAdd(state.getAccumulatorC(), memory->getWordValue(), carry, overflow);
+            state.setFlag(State::c, carry);
+            state.setFlag(State::v, overflow);
+            state.setAccumulatorC(result);
         }
         else {
             bool carry = state.getFlag(State::c);
@@ -42,11 +47,11 @@ public:
     {
         int cycles = 0;
         if (state.is16Bit(State::m)) {
-            throw OperatorNotYetImplementedException("AND 16-bit");
             cycles += 1;
+            state.setAccumulatorC(state.getAccumulatorC() & memory->getWordValue());
         }
         else {
-            state.updateSignFlags(state.getAccumulatorPointer()->get() &= memory->getValue());
+            state.setAccumulatorA(state.getAccumulatorA() & memory->getValue());
         }
         return cycles;
     }
@@ -57,20 +62,27 @@ public:
 // ASL Accumulator or Memory Shift Left [Flags affected: n,z,c]
 class ASL
 {
+private:
+    template<typename T>
+    static T arithmeticShiftLeft(State& state, T value)
+    {
+        state.setFlag(State::c, value.isNegative());
+        value <<= 1;
+        state.updateSignFlags(value);
+        return value;
+    }
+
 public:
     // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, MemoryLocation* memory)
     {
         int cycles = 0;
         if (state.is16Bit(State::m)) {
-            throw OperatorNotYetImplementedException("ASL 16-bit");
             cycles += 2;
+            memory->setWordValue(arithmeticShiftLeft(state, memory->getWordValue()));
         }
         else {
-            Byte& value = memory->get();
-            state.setFlag(State::c, value.isNegative());
-            value <<= 1;
-            state.updateSignFlags(value);
+            memory->setValue(arithmeticShiftLeft(state, memory->getValue()));
         }
         return cycles;
     }
@@ -175,17 +187,7 @@ public:
     // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, int8_t offset)
     {
-        throw OperatorNotYetImplementedException("BMI");
-        int cycles = 0;
-        if (true /*branch taken*/) {
-            cycles += 1;
-            throw OperatorNotYetImplementedException("TODO07");
-        }
-        if (true /*branch taken crosses page boundary*/) {
-            cycles += 1;
-            throw OperatorNotYetImplementedException("TODO08");
-        }
-        return cycles;
+        return branchIf(state.getFlag(State::n), state, offset);
     }
 
     static std::string toString() { return "BMI"; }
@@ -383,12 +385,14 @@ public:
         int cycles = 0;
         if (state.is16Bit(State::m)) {
             cycles += 2;
-            Word data = memory->getWordValue();
-            state.updateSignFlags(--data);
-            memory->setWordValue(data);
+            Word value = memory->getWordValue() - 1;
+            memory->setWordValue(value);
+            state.updateSignFlags(value);
         }
         else {
-            state.updateSignFlags(--memory->get());
+            Byte value = memory->getValue() - 1;
+            memory->setValue(value);
+            state.updateSignFlags(value);
         }
         return cycles;
     }
@@ -432,7 +436,7 @@ public:
             cycles += 1;
         }
         else {
-            state.updateSignFlags(state.getAccumulatorPointer()->get() ^= memory->getValue());
+            state.setAccumulatorA(state.getAccumulatorA() ^ memory->getValue());
         }
         return cycles;
     }
@@ -450,12 +454,14 @@ public:
         int cycles = 0;
         if (state.is16Bit(State::m)) {
             cycles += 2;
-            Word data = memory->getWordValue();
-            state.updateSignFlags(++data);
-            memory->setWordValue(data);
+            Word value = memory->getWordValue() + 1;
+            memory->setWordValue(value);
+            state.updateSignFlags(value);
         }
         else {
-            state.updateSignFlags(++memory->get());
+            Byte value = memory->getValue() + 1;
+            memory->setValue(value);
+            state.updateSignFlags(value);
         }
         return cycles;
     }
@@ -547,8 +553,8 @@ public:
     {
         int cycles = 0;
         if (state.is16Bit(State::m)) {
-            state.setAccumulatorC(memory->getWordValue());
             cycles += 1;
+            state.setAccumulatorC(memory->getWordValue());
         } else {
             state.setAccumulatorA(memory->getValue());
         }
@@ -582,14 +588,27 @@ public:
 // LSR Logical Shift Memory or Accumulator Right [Flags affected: n,z,c]
 class LSR
 {
+private:
+    template<typename T>
+    static T logicalShiftLeft(State& state, T value)
+    {
+        state.setFlag(State::c, value.getBit(0));
+        value >>= 1;
+        state.updateSignFlags(value);
+        return value;
+    }
+
 public:
     // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, const MemoryLocation* memory)
+    static int invoke(State& state, MemoryLocation* memory)
     {
-        throw OperatorNotYetImplementedException("LSR");
         int cycles = 0;
         if (state.is16Bit(State::m)) {
+            throw OperatorNotYetImplementedException("LSR 16-bit");
             cycles += 2;
+            memory->setWordValue(logicalShiftLeft(state, memory->getWordValue()));
+        } else {
+            memory->setValue(logicalShiftLeft(state, memory->getValue()));
         }
         return cycles;
     }
@@ -890,13 +909,14 @@ class ROL
 {
 private:
     template<typename T>
-    static void rotateLeft(State& state, T& data)
+    static T rotateLeft(State& state, T value)
     {
-        bool carry = data.isNegative();
-        data <<= 1;
-        data |= T(state.getFlag(State::c));
+        bool carry = value.isNegative();
+        value <<= 1;
+        value.setBit(0, state.getFlag(State::c));
         state.setFlag(State::c, carry);
-        state.updateSignFlags(data);
+        state.updateSignFlags(value);
+        return value;
     }
 
 public:
@@ -906,12 +926,10 @@ public:
         int cycles = 0;
         if (state.is16Bit(State::m)) {
             cycles += 2;
-            Word data = memory->getWordValue();
-            rotateLeft(state, data);
-            memory->setWordValue(data);
+            memory->setWordValue(rotateLeft(state, memory->getWordValue()));
         }
         else {
-            rotateLeft(state, memory->get());
+            memory->setValue(rotateLeft(state, memory->getValue()));
         }
         return cycles;
     }
@@ -922,14 +940,30 @@ public:
 // ROR Rotate Memory or Accumulator Right [Flags affected: n,z,c]
 class ROR
 {
+private:
+    template<typename T>
+    static T rotateRight(State& state, T value)
+    {
+        bool carry = value.getBit(0);
+        value >>= 1;
+        value.setBit(T::bitCount() - 1, state.getFlag(State::c));
+        state.setFlag(State::c, carry);
+        state.updateSignFlags(value);
+        return value;
+    }
+
 public:
     // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, const MemoryLocation* memory)
+    static int invoke(State& state, MemoryLocation* memory)
     {
-        throw OperatorNotYetImplementedException("ROR");
         int cycles = 0;
         if (state.is16Bit(State::m)) {
+            throw OperatorNotYetImplementedException("ROR 16-bit");
             cycles += 2;
+            memory->setWordValue(rotateRight(state, memory->getWordValue()));
+        } else {
+            throw OperatorNotYetImplementedException("ROR");
+            memory->setValue(rotateRight(state, memory->getValue()));
         }
         return cycles;
     }
@@ -961,7 +995,9 @@ class RTL
 public:
     static int invoke(State& state)
     {
-        throw OperatorNotYetImplementedException("RTL");
+        Word programCounter(state.pullWordFromStack() + 1);
+        Byte programBank(state.pullFromStack());
+        state.setProgramCounter(programCounter, programBank);
         return 0;
     }
 

@@ -806,8 +806,10 @@ class RegisterIndirectIncrementRegister : public Instruction1Byte
     int invokeOperator() override
     {
         MemoryLocation* firstRegister = state.getRegister<FirstRegister>();
-        MemoryLocation* data = state.getDirectMemoryLocation(firstRegister->get()++);
-        return Operator::invoke(state, data, state.getRegisterValue<SecondRegister>());
+        Byte firstRegisterValue = firstRegister->getValue();
+        MemoryLocation* memory = state.getDirectMemoryLocation(firstRegisterValue);
+        firstRegister->setValue(firstRegisterValue + 1);
+        return Operator::invoke(state, memory, state.getRegisterValue<SecondRegister>());
     }
 
     std::string toString() const override

@@ -67,6 +67,7 @@ void Emulator::initialize()
 
         // Registers
         setRegister(0x2100, true, "Screen Display");
+        setRegister(0x2101, true, "Object Size and Chr Address");
 
         setRegister(0x2102, true, "OAM Address low byte");
         setRegister(0x2103, true, "OAM Address high bit and Obj Priority");
@@ -80,6 +81,11 @@ void Emulator::initialize()
 
         setRegister(0x2105, true, "BG Mode and Character Size");
         setRegister(0x2106, true, "Screen Pixelation");
+        setRegister(0x2107, true, "BG1 Tilemap Address and Size");
+        setRegister(0x2108, true, "BG2 Tilemap Address and Size");
+        setRegister(0x2109, true, "BG3 Tilemap Address and Size");
+        setRegister(0x210b, true, "BG1 and 2 Chr Address");
+        setRegister(0x210c, true, "BG3 and 4 Chr Address");
         setRegister(0x210d, true, "BG1 Horizontal Scroll / Mode 7 BG Horizontal Scroll");
         setRegister(0x210e, true, "BG1 Vertical Scroll / Mode 7 BG Vertical Scroll");
         setRegister(0x210f, true, "BG2 Horizontal Scroll");
@@ -146,6 +152,7 @@ void Emulator::initialize()
         setRegister(0x2130, true, "Color Addition Select");
         setRegister(0x2131, true, "Color math designation");
         setRegister(0x2132, true, "Fixed Color Data");
+        setRegister(0x2133, true, "Screen Mode/Video Select");
 
         setRegister(0x4016, true, "NES-style Joypad Access Port 1");
 

@@ -62,10 +62,11 @@ public:
                     ss << Word(0x2100 | channel.registerAddress->getValue()) << std::endl;
                     ss << "Bytes left: " << channel.dataSizeRead->getWordValue() << std::endl;
                     ss << "DMA control: " << channel.dmaControl->getValue() << std::endl;
-                    return ss.str();
+                    break;
                 }
             }
         }
+        return ss.str();
     }
 
     virtual std::string opcodeToString() const

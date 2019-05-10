@@ -26,7 +26,6 @@ public:
     {
         Read,
         Write,
-        Access,
         Apply
     };
 
@@ -116,26 +115,6 @@ public:
         }
 
         return result;
-    }
-
-    Byte& get()
-    {
-        if (isReadProtected() || isWriteProtected() || type == Mapped) {
-            ThrowAccessException(__FUNCTION__);
-        }
-
-        if (mirroredMemory) {
-            if (trap) {
-                trap(Access, mirroredMemory->value);
-            }
-            return mirroredMemory->value;
-        }
-        else {
-            if (trap) {
-                trap(Access, value);
-            }
-            return value;
-        }
     }
 
     void setWordValue(Word value)

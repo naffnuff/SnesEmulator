@@ -82,12 +82,12 @@ public:
         return *this;
     }
 
-    Byte operator--(int)
+    /*Byte operator--(int)
     {
         Byte copy(value);
         --value;
         return copy;
-    }
+    }*/
 
     template<typename T>
     Byte& operator|=(T operand)
@@ -103,12 +103,12 @@ public:
         return *this;
     }
 
-    template<typename T>
+    /*template<typename T>
     Byte& operator^=(T operand)
     {
         value ^= operand;
         return *this;
-    }
+    }*/
 
     template<typename T>
     Byte& operator<<=(T operand)
@@ -205,6 +205,13 @@ public:
         return *this;
     }
 
+    template<typename T>
+    Word& operator>>=(T operand)
+    {
+        value >>= operand;
+        return *this;
+    }
+
     Word& operator++()
     {
         ++value;
@@ -232,6 +239,20 @@ public:
     bool isNegative() const
     {
         return value & 1 << 15;
+    }
+
+    bool getBit(int bitIndex) const
+    {
+        return value & 1 << bitIndex;
+    }
+
+    void setBit(int bitIndex, bool bitValue)
+    {
+        if (bitValue) {
+            value |= 1 << bitIndex;
+        } else {
+            value &= ~(1 << bitIndex);
+        }
     }
 
     Byte getLowByte() const

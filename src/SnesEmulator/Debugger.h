@@ -375,8 +375,6 @@ public:
             return "Read ";
         case MemoryLocation::Write:
             return "Write ";
-        case MemoryLocation::Access:
-            return "Access ";
         case MemoryLocation::Apply:
             return "Apply ";
         default:

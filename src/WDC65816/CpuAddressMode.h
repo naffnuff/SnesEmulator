@@ -217,8 +217,7 @@ class Accumulator : public Instruction1Byte
         if (state.is16Bit(State::m)) {
             cycles -= 2;
         }
-        MemoryLocation* accumulator = state.getAccumulatorPointer();
-        return cycles + Operator::invoke(state, accumulator);
+        return cycles + Operator::invoke(state, state.getAccumulatorPointer());
     }
 
     std::string toString() const override
@@ -385,18 +384,18 @@ class DirectPageIndirectLong : public Instruction2Byte
     // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int invokeOperator(Byte lowByte) override
     {
-        throw AddressModeNotYetImplementedException("DirectPageIndirectLong");
         int cycles = 0;
         if ((Byte)state.getDirectPage()) {
             cycles += 1;
         }
-        MemoryLocation* memory = nullptr;
-        return cycles + Operator::invoke(state, memory);
+        MemoryLocation* directMemory = state.getDirectMemoryLocation(lowByte);
+        Long effectiveAddress(directMemory[0].getWordValue(), directMemory[2].getValue());
+        return cycles + Operator::invoke(state, state.getMemoryLocation(effectiveAddress));
     }
 
     std::string toString() const override
     {
-        return Operator::toString() + " $" + operandToString() + " TODO";
+        return Operator::toString() + " [$" + operandToString() + "]";
     }
 };
 

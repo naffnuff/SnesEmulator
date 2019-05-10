@@ -66,7 +66,7 @@ public:
                     word = std::bitset<16>(vram[tileAddress + tileAddressOffset]);
                     wordBitIndex = 0;
                 }
-                result[row][column] = pixel.to_ulong();
+                result[row][column] = uint8_t(pixel.to_ulong());
             }
         }
         return result;

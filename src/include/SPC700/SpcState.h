@@ -277,7 +277,9 @@ public:
 
     void pushToStack(Byte byte)
     {
-        MemoryLocation* memory = getMemoryLocation(registers[SP].get()--, 0x01);
+        Byte stackLowByte = registers[SP].getValue();
+        MemoryLocation* memory = getMemoryLocation(stackLowByte, 0x01);
+        registers[SP].setValue(stackLowByte - 1);
         memory->setValue(byte);
     }
 
@@ -289,7 +291,9 @@ public:
 
     Byte pullFromStack()
     {
-        MemoryLocation* memory = getMemoryLocation(++registers[SP].get(), 0x01);
+        Byte stackLowByte = registers[SP].getValue();
+        MemoryLocation* memory = getMemoryLocation(++stackLowByte, 0x01);
+        registers[SP].setValue(stackLowByte);
         return memory->getValue();
     }
 
