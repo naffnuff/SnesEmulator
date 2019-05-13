@@ -192,14 +192,15 @@ class AbsoluteLongIndexedX : public Instruction4Byte
 
     int invokeOperator(Byte lowByte, Byte highByte, Byte bankByte) override
     {
-        throw AddressModeNotYetImplementedException("AbsoluteLongIndexedX");
-        MemoryLocation* memory = nullptr;
+        Long address = Long(lowByte, highByte, bankByte);
+        Long indexedAddress = address + state.getIndexRegister<State::X>();
+        MemoryLocation* memory = state.getMemoryLocation(indexedAddress);
         return Operator::invoke(state, memory);
     }
 
     std::string toString() const override
     {
-        return Operator::toString() + " $" + operandToString() + " TODO";
+        return Operator::toString() + " $" + operandToString() + ",X";
     }
 };
 

@@ -25,6 +25,7 @@ public:
         , error(error)
         , renderer(256, 224, 3.f, false, output)
         , vramRenderer(vramRendererWidth, vramRendererHeight, 1.f, true, output)
+        , cgramRenderer(16, 16, 16.f, true, output)
         , debugger(output, input, error, cycleCount, running)
         , rom(output)
         , cpuInstructionDecoder(cpuState)
@@ -53,7 +54,7 @@ public:
 
 private:
     static const int vramRendererWidth = 0x200;
-    static const int vramRendererHeight = 0x100;
+    static const int vramRendererHeight = 0x200;
 
     std::ostream& output;
     std::istream& input;
@@ -61,6 +62,7 @@ private:
 
     Renderer renderer;
     Renderer vramRenderer;
+    Renderer cgramRenderer;
     Debugger debugger;
     Rom rom;
     CPU::State cpuState;

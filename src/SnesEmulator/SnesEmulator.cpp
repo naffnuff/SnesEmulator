@@ -45,7 +45,7 @@ void Emulator::initialize()
             }
         }
 
-        auto setRegister = [this](Word address, bool cpuOutRegister, const std::string& info, std::function<void(MemoryLocation::Operation operation, Byte value)> callback = nullptr)
+        auto setRegister = [this](Word address, bool cpuOutRegister, const std::string& info, bool debug = false, std::function<void(MemoryLocation::Operation operation, Byte value)> callback = nullptr)
         {
             MemoryLocation* memory = cpuState.getMemoryLocation(Long(address, 0));
             if (cpuOutRegister) {
@@ -57,21 +57,23 @@ void Emulator::initialize()
                 memory->setMirror(&registers[address], MemoryLocation::ReadOnly);
             }
             memory->trap =
-                [this, address, callback, info](MemoryLocation::Operation operation, Byte value) {
-                //debugger.printMemoryRegister(operation, value, address, info);
+                [this, address, callback, info, debug](MemoryLocation::Operation operation, Byte oldValue, Byte newValue) {
+                if (debug && newValue && oldValue != newValue) {
+                    debugger.printMemoryRegister(operation, newValue, address, info);
+                }
                 if (callback) {
-                    callback(operation, value);
+                    callback(operation, newValue);
                 }
             };
         };
 
         // Registers
-        setRegister(0x2100, true, "Screen Display");
-        setRegister(0x2101, true, "Object Size and Chr Address");
+        setRegister(0x2100, true, "Screen Display", true);
+        setRegister(0x2101, true, "Object Size and Chr Address", true);
 
-        setRegister(0x2102, true, "OAM Address low byte");
-        setRegister(0x2103, true, "OAM Address high bit and Obj Priority");
-        setRegister(0x2104, true, "Data for OAM write", [this](MemoryLocation::Operation operation, Byte value) {
+        setRegister(0x2102, true, "OAM Address low byte", true);
+        setRegister(0x2103, true, "OAM Address high bit and Obj Priority", true);
+        setRegister(0x2104, true, "OAM Data write", false, [this](MemoryLocation::Operation operation, Byte value) {
             if (operation != MemoryLocation::Write) {
                 throw std::logic_error("2104 can only be written by CPU");
             }
@@ -79,49 +81,50 @@ void Emulator::initialize()
             //debugger.printMemoryRegister(operation, value, oamAddress, "Data for OAM write");
             });
 
-        setRegister(0x2105, true, "BG Mode and Character Size");
-        setRegister(0x2106, true, "Screen Pixelation");
-        setRegister(0x2107, true, "BG1 Tilemap Address and Size");
-        setRegister(0x2108, true, "BG2 Tilemap Address and Size");
-        setRegister(0x2109, true, "BG3 Tilemap Address and Size");
-        setRegister(0x210b, true, "BG1 and 2 Chr Address");
-        setRegister(0x210c, true, "BG3 and 4 Chr Address");
-        setRegister(0x210d, true, "BG1 Horizontal Scroll / Mode 7 BG Horizontal Scroll");
-        setRegister(0x210e, true, "BG1 Vertical Scroll / Mode 7 BG Vertical Scroll");
-        setRegister(0x210f, true, "BG2 Horizontal Scroll");
-        setRegister(0x2110, true, "BG2 Vertical Scroll");
-        setRegister(0x2111, true, "BG3 Horizontal Scroll");
-        setRegister(0x2112, true, "BG3 Vertical Scroll");
+        setRegister(0x2105, true, "BG Mode and Character Size", true);
+        setRegister(0x2106, true, "Screen Pixelation", true);
+        setRegister(0x2107, true, "BG1 Tilemap Address and Size", true);
+        setRegister(0x2108, true, "BG2 Tilemap Address and Size", true);
+        setRegister(0x2109, true, "BG3 Tilemap Address and Size", true);
+        setRegister(0x210b, true, "BG1 and 2 Chr Address", true);
+        setRegister(0x210c, true, "BG3 and 4 Chr Address", true);
+        setRegister(0x210d, true, "BG1 Horizontal Scroll / Mode 7 BG Horizontal Scroll", true);
+        setRegister(0x210e, true, "BG1 Vertical Scroll / Mode 7 BG Vertical Scroll", true);
+        setRegister(0x210f, true, "BG2 Horizontal Scroll", true);
+        setRegister(0x2110, true, "BG2 Vertical Scroll", true);
+        setRegister(0x2111, true, "BG3 Horizontal Scroll", true);
+        setRegister(0x2112, true, "BG3 Vertical Scroll", true);
 
-        setRegister(0x2115, true, "Video Port Control");
-        setRegister(0x2116, true, "VRAM Address low byte");
-        setRegister(0x2117, true, "VRAM Address high byte");
-        setRegister(0x2118, true, "VRAM Data Write low byte", [this](MemoryLocation::Operation operation, Byte value) {
+        setRegister(0x2115, true, "Video Port Control", true);
+        setRegister(0x2116, true, "VRAM Address low byte", false);
+        setRegister(0x2117, true, "VRAM Address high byte", false);
+        setRegister(0x2118, true, "VRAM Data Write low byte", false, [this](MemoryLocation::Operation operation, Byte value) {
             if (operation != MemoryLocation::Write) {
                 throw std::logic_error("2118 can only be written by CPU");
             }
             Word vramAddress = registers[0x2116].getWordValue();
             videoMemory.setLowByte(vramAddress, value);
             });
-        setRegister(0x2119, true, "VRAM Data Write high byte", [this](MemoryLocation::Operation operation, Byte value) {
+        setRegister(0x2119, true, "VRAM Data Write high byte", false, [this](MemoryLocation::Operation operation, Byte value) {
             if (operation != MemoryLocation::Write) {
                 throw std::logic_error("2119 can only be written by CPU");
             }
             Word vramAddress = registers[0x2116].getWordValue();
             videoMemory.setHighByte(vramAddress, value);
 
-            const int bitsPerPixel = 4;
-            static const int tilePixelCount = 8 * 8;
-            int tileBitCount = tilePixelCount * bitsPerPixel;
-            int tileWordCount = tileBitCount / 16;
-            int tileIndex = vramAddress / tileWordCount;
-            int tileWordOffset = vramAddress % tileWordCount;
-            if (tileWordOffset == tileWordCount - 1) {
-                std::array<std::array<uint8_t, 8>, 8> tile = videoMemory.readTile(tileIndex, bitsPerPixel);
-                int tilesPerRow = vramRendererWidth / 8;
-                int tileRow = tileIndex / tilesPerRow;
-                int tileColumn = tileIndex % tilesPerRow;
-                vramRenderer.setGrayscaleTile(tileRow * 8, tileColumn * 8, tile);
+            static const int bitsPerPixel = 4;
+            static const int pixelPerTile = 8 * 8;
+            static const int bitPerTile = pixelPerTile * bitsPerPixel;
+            static const int bitsPerWord = 16;
+            static const int wordPerTile = bitPerTile / bitsPerWord;
+            const int tileIndex = vramAddress / wordPerTile;
+            const int tileWordOffset = vramAddress % wordPerTile;
+            if (tileWordOffset == wordPerTile - 1) {
+                const std::array<std::array<uint8_t, 8>, 8> tile = videoMemory.readTile(tileIndex, bitsPerPixel);
+                static const int tilesPerRow = vramRendererWidth / 8;
+                const int rowIndex = tileIndex / tilesPerRow;
+                const int columnIndex = tileIndex % tilesPerRow;
+                vramRenderer.setGrayscaleTile(rowIndex * 8, columnIndex * 8, tile, bitsPerPixel);
             }
 
             Byte videoPortControl = registers[0x2115].getValue();
@@ -133,8 +136,8 @@ void Emulator::initialize()
             }
             });
 
-        setRegister(0x2121, true, "CGRAM Address");
-        setRegister(0x2122, true, "CGRAM Data Write low byte", [this](MemoryLocation::Operation operation, Byte value) {
+        setRegister(0x2121, true, "CGRAM Address", true);
+        setRegister(0x2122, true, "CGRAM Data Write low byte", false, [this](MemoryLocation::Operation operation, Byte value) {
             if (operation != MemoryLocation::Write) {
                 throw std::logic_error("2122 can only be written by CPU");
             }
@@ -142,27 +145,27 @@ void Emulator::initialize()
             //debugger.printMemoryRegister(operation, value, Word(cgramAddress), "CGRAM Data Write");
             });
 
-        setRegister(0x2123, true, "Window Mask Settings for BG1 and BG2");
-        setRegister(0x2124, true, "Window Mask Settings for BG3 and BG4");
-        setRegister(0x2125, true, "Window Mask Settings for OBJ and Color Window");
-        setRegister(0x212c, true, "Main Screen Designation");
-        setRegister(0x212d, true, "Subscreen Designation");
-        setRegister(0x212e, true, "Window Mask Designation for the Main Screen");
-        setRegister(0x212f, true, "Window Mask Designation for the Subscreen");
-        setRegister(0x2130, true, "Color Addition Select");
-        setRegister(0x2131, true, "Color math designation");
-        setRegister(0x2132, true, "Fixed Color Data");
-        setRegister(0x2133, true, "Screen Mode/Video Select");
+        setRegister(0x2123, true, "Window Mask Settings for BG1 and BG2", true);
+        setRegister(0x2124, true, "Window Mask Settings for BG3 and BG4", true);
+        setRegister(0x2125, true, "Window Mask Settings for OBJ and Color Window", true);
+        setRegister(0x212c, true, "Main Screen Designation", true);
+        setRegister(0x212d, true, "Subscreen Designation", true);
+        setRegister(0x212e, true, "Window Mask Designation for the Main Screen", true);
+        setRegister(0x212f, true, "Window Mask Designation for the Subscreen", true);
+        setRegister(0x2130, true, "Color Addition Select", true);
+        setRegister(0x2131, true, "Color math designation", true);
+        setRegister(0x2132, true, "Fixed Color Data", true);
+        setRegister(0x2133, true, "Screen Mode/Video Select", true);
 
-        setRegister(0x4016, true, "NES-style Joypad Access Port 1");
+        setRegister(0x4016, true, "NES-style Joypad Access Port 1", true);
 
-        setRegister(0x4200, true, "Interrupt Enable Flags");
-        setRegister(0x420b, true, "DMA Enable");
-        setRegister(0x420c, true, "HDMA Enable");
-        setRegister(0x4210, false, "NMI Flag and 5A22 Version");
+        setRegister(0x4200, true, "Interrupt Enable Flags", true);
+        setRegister(0x420b, true, "DMA Enable", false);
+        setRegister(0x420c, true, "HDMA Enable", true);
+        setRegister(0x4210, false, "NMI Flag and 5A22 Version", true);
 
-        setRegister(0x4218, false, "Controller Port 1 Data1 Register low byte");
-        setRegister(0x4219, false, "Controller Port 1 Data1 Register high byte");
+        setRegister(0x4218, false, "Controller Port 1 Data1 Register low byte", true);
+        setRegister(0x4219, false, "Controller Port 1 Data1 Register high byte", true);
 
         // DMA channel 0
         setRegister(0x4300, true, "DMA Control Channel 0");
@@ -241,8 +244,10 @@ void Emulator::run()
     std::thread vramRendererThread([this]()
         {
             vramRenderer.initialize("VRAM viewer");
+            cgramRenderer.initialize("CGRAM viewer");
             while (running) {
                 vramRenderer.update();
+                cgramRenderer.update();
             }
         });
 
@@ -296,7 +301,7 @@ void Emulator::run()
 
                 if (cpuContext.stepMode) {
                     output << "Cycle count: " << cycleCount << ", Next cpu: " << nextCpu << ", Next spc: " << nextSpc << std::endl;
-                    output << "V counter: " << vCounter << ", H counter: " << hCounter << ", V blank: " << vBlank << std::endl;
+                    output << "V counter: " << vCounter << ", H counter: " << hCounter << ", V blank: " << vBlank << ", interrupted: " << cpuState.isInterrupted() << std::endl;
                     debugger.printBreakpoints(cpuContext, spcContext);
                     debugger.printMemory(cpuState, cpuContext, spcState, spcContext, videoMemory);
                 }

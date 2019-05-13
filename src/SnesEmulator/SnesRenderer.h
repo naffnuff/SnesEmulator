@@ -40,7 +40,7 @@ public:
     void setScanline(int lineIndex, const std::vector<Pixel>& pixels);
     void setPixel(int row, int column, Pixel pixel);
     void setGrayscalePixel(int row, int column, uint8_t white);
-    void setGrayscaleTile(int startRow, int startColumn, const std::array<std::array<uint8_t, 8>, 8>& tile);
+    void setGrayscaleTile(int startRow, int startColumn, const std::array<std::array<uint8_t, 8>, 8>& tile, int bitsPerPixel);
     void update();
     bool isRunning() const;
 

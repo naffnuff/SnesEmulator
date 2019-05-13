@@ -42,32 +42,32 @@ public:
 
     std::array<std::array<uint8_t, 8>, 8> readTile(int tileIndex, int bitsPerPixel)
     {
-        static const int tilePixelCount = 8 * 8;
-        int tileBitCount = tilePixelCount * bitsPerPixel;
-        int tileWordCount = tileBitCount / 16;
+        static const int pixelsPerTile = 8 * 8;
+        const int bitsPerTile = pixelsPerTile * bitsPerPixel;
+        static const int bitsPerWord = 16;
+        static const int tileWordCount = bitsPerTile / bitsPerWord;
         int tileAddress = tileIndex * tileWordCount;
         std::array<std::array<uint8_t, 8>, 8> result;
-        std::bitset<16> word(vram[tileAddress]);
-        int tileAddressOffset = 0;
-        int bitIndex = 0;
-        int bitExpansion = 8 / bitsPerPixel;
-        int wordBitIndex = 0;
         for (int row = 0; row < 8; ++row) {
+            std::bitset<8> firstLowByte(vram[tileAddress].getLowByte());
+            std::bitset<8> firstHighByte(vram[tileAddress].getHighByte());
+            std::bitset<8> secondLowByte(vram[tileAddress + tileWordCount / 2].getLowByte());
+            std::bitset<8> secondHighByte(vram[tileAddress + tileWordCount / 2].getHighByte());
             for (int column = 0; column < 8; ++column) {
-                std::bitset<8> pixel;
-                for (int i = 0; i < bitsPerPixel; ++i) {
-                    for (int j = 0; j < bitExpansion; ++j) {
-                        pixel[i * bitExpansion + j] = word[wordBitIndex + i];
-                    }
+                Byte pixel;
+                if (bitsPerPixel >= 2) {
+                    int firstLowBitValue = firstLowByte[7 - column] ? 1 : 0;
+                    int firstHighBitValue = firstHighByte[7 - column] ? 2 : 0;
+                    pixel = firstLowBitValue + firstHighBitValue;
                 }
-                wordBitIndex += 4;
-                if (wordBitIndex == 16) {
-                    ++tileAddressOffset;
-                    word = std::bitset<16>(vram[tileAddress + tileAddressOffset]);
-                    wordBitIndex = 0;
+                if (bitsPerPixel >= 4) {
+                    int secondLowBitValue = secondLowByte[7 - column] ? 4 : 0;
+                    int secondHighBitValue = secondHighByte[7 - column] ? 8 : 0;
+                    pixel += secondLowBitValue + secondHighBitValue;
                 }
-                result[row][column] = uint8_t(pixel.to_ulong());
+                result[row][column] = pixel;
             }
+            ++tileAddress;
         }
         return result;
     }

@@ -15,23 +15,19 @@ public:
     static int invoke(State& state, const MemoryLocation* memory)
     {
         int cycles = 0;
+        bool carry = state.getFlag(State::c);
+        bool overflow = false;
         if (state.is16Bit(State::m)) {
             cycles += 1;
-            bool carry = state.getFlag(State::c);
-            bool overflow = false;
             Word result = Types::binaryAdd(state.getAccumulatorC(), memory->getWordValue(), carry, overflow);
-            state.setFlag(State::c, carry);
-            state.setFlag(State::v, overflow);
             state.setAccumulatorC(result);
         }
         else {
-            bool carry = state.getFlag(State::c);
-            bool overflow = false;
             Byte result = Types::binaryAdd(state.getAccumulatorA(), memory->getValue(), carry, overflow);
-            state.setFlag(State::c, carry);
-            state.setFlag(State::v, overflow);
             state.setAccumulatorA(result);
         }
+        state.setFlag(State::c, carry);
+        state.setFlag(State::v, overflow);
         return cycles;
     }
 
@@ -131,17 +127,7 @@ public:
     // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, int8_t offset)
     {
-        throw OperatorNotYetImplementedException("BCS");
-        int cycles = 0;
-        if (true /*branch taken*/) {
-            cycles += 1;
-            throw OperatorNotYetImplementedException("TODO07");
-        }
-        if (true /*branch taken crosses page boundary*/) {
-            cycles += 1;
-            throw OperatorNotYetImplementedException("TODO08");
-        }
-        return cycles;
+        return branchIf(state.getFlag(State::c), state, offset);
     }
 
     static std::string toString() { return "BCS"; }
@@ -604,7 +590,6 @@ public:
     {
         int cycles = 0;
         if (state.is16Bit(State::m)) {
-            throw OperatorNotYetImplementedException("LSR 16-bit");
             cycles += 2;
             memory->setWordValue(logicalShiftLeft(state, memory->getWordValue()));
         } else {
@@ -664,10 +649,13 @@ public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, const MemoryLocation* memory)
     {
-        throw OperatorNotYetImplementedException("ORA");
         int cycles = 0;
         if (state.is16Bit(State::m)) {
             cycles += 1;
+            state.setAccumulatorC(state.getAccumulatorC() | memory->getWordValue());
+        }
+        else {
+            state.setAccumulatorA(state.getAccumulatorA() | memory->getValue());
         }
         return cycles;
     }
@@ -1025,18 +1013,19 @@ public:
     static int invoke(State& state, const MemoryLocation* memory)
     {
         int cycles = 0;
+        bool carry = state.getFlag(State::c);
+        bool overflow = false;
         if (state.is16Bit(State::m)) {
-            throw OperatorNotYetImplementedException("SBC 16-bit");
             cycles += 1;
+            Word result = Types::binarySubtract(state.getAccumulatorC(), memory->getWordValue(), carry, overflow);
+            state.setAccumulatorC(result);
         }
         else {
-            bool carry = state.getFlag(State::c);
-            bool overflow = false;
             Byte result = Types::binarySubtract(state.getAccumulatorA(), memory->getValue(), carry, overflow);
-            state.setFlag(State::c, carry);
-            state.setFlag(State::v, overflow);
             state.setAccumulatorA(result);
         }
+        state.setFlag(State::c, carry);
+        state.setFlag(State::v, overflow);
         return cycles;
     }
 
@@ -1308,30 +1297,18 @@ public:
     static std::string toString() { return "TXS"; }
 };
 
-// TXY Transfer Index Register X to Index Register Y [Flags affected: n,z]
-class TXY
+// TXY/YX Transfer Index Register X/Y to Index Register Y/X [Flags affected: n,z]
+template<State::IndexRegister SourceRegister, State::IndexRegister TargetRegister>
+class T
 {
 public:
     static int invoke(State& state)
     {
-        throw OperatorNotYetImplementedException("TXY");
+        state.setIndexRegister<TargetRegister>(state.getIndexRegister<SourceRegister>());
         return 0;
     }
 
-    static std::string toString() { return "TXY"; }
-};
-
-// TYX Transfer Index Register Y to Index Register X [Flags affected: n,z]
-class TYX
-{
-public:
-    static int invoke(State& state)
-    {
-        throw OperatorNotYetImplementedException("TYX");
-        return 0;
-    }
-
-    static std::string toString() { return "TYX"; }
+    static std::string toString() { return "T" + State::getIndexRegisterName<SourceRegister>() + State::getIndexRegisterName<TargetRegister>(); }
 };
 
 // WAI Wait for Interrupt [Flags affected: none]

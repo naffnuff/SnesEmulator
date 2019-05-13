@@ -50,8 +50,7 @@ public:
     static const size_t spcRegisterCount = 4;
 
     State()
-        : emulationMode(true)
-        , memory(1 << 24, MemoryLocation(0x55))
+        : memory(1 << 24, MemoryLocation(0x55))
     {
         std::cout << "Memory size=" << memory.size() << std::endl;
         forceRegisters();
@@ -118,10 +117,14 @@ public:
 
     void setFlag(Byte flag, bool value)
     {
+        Byte oldFlags = flags;
         if (value) {
             flags |= flag;
         } else {
             flags &= ~flag;
+        }
+        if (oldFlags != flags) {
+            forceRegisters();
         }
     }
 
@@ -257,9 +260,9 @@ public:
     {
         forceRegisters();
 
-        bool emulation = emulationMode;
+        bool carry = emulationMode;
         emulationMode = getFlag(c);
-        setFlag(c, emulation);
+        setFlag(c, carry);
 
         forceRegisters();
     }
@@ -425,6 +428,8 @@ public:
 
     void startNmi()
     {
+        interrupted = true;
+
         pushToStack(programBank);
         programBank = 0x00;
 
@@ -441,6 +446,13 @@ public:
         setFlags(pullFromStack());
         programCounter = pullWordFromStack();
         programBank = pullFromStack();
+
+        interrupted = false;
+    }
+
+    bool isInterrupted() const
+    {
+        return interrupted;
     }
 
     InterruptVectors& getInterruptVectors(bool native)
@@ -459,14 +471,14 @@ public:
     }
 
 private:
-    Byte dataBank;
-    Word directPage;
-    Word stackPointer;
-    Byte programBank;
-    Word programCounter;
+    Byte dataBank = 0;
+    Word directPage = 0;
+    Word stackPointer = 0;
+    Byte programBank = 0;
+    Word programCounter = 0;
 
-    Byte flags;
-    bool emulationMode;
+    Byte flags = 0;
+    bool emulationMode = true;
 
     std::vector<MemoryLocation> memory;
     std::array<MemoryLocation, 2> accumulator;
@@ -474,6 +486,8 @@ private:
 
     InterruptVectors nativeVectors;
     InterruptVectors emulationVectors;
+
+    bool interrupted = false;
 };
 
 }

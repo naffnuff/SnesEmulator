@@ -58,24 +58,28 @@ public:
         return type != ReadWrite && type != WriteOnly && type != Mapped;
     }
 
-    void setValue(Byte byte)
+    void setValue(Byte newValue)
     {
         if (isWriteProtected()) {
             ThrowAccessException(__FUNCTION__);
         }
 
+        Byte oldValue;
         if (mirroredMemory) {
-            mirroredMemory->value = byte;
+            oldValue = mirroredMemory->value;
+            mirroredMemory->value = newValue;
         }
         else if (mapping) {
-            mapping->value = byte;
+            oldValue = mapping->value;
+            mapping->value = newValue;
         }
         else {
-            value = byte;
+            oldValue = value;
+            value = newValue;
         }
 
         if (trap) {
-            trap(Write, byte);
+            trap(Write, oldValue, newValue);
         }
     }
 
@@ -91,7 +95,7 @@ public:
         }
 
         if (trap) {
-            trap(Read, result);
+            trap(Read, 0, result);
         }
 
         return result;
@@ -111,7 +115,7 @@ public:
         }
 
         if (trap) {
-            trap(Apply, result);
+            trap(Apply, 0, result);
         }
 
         return result;
@@ -190,7 +194,7 @@ private:
     int applicationCount = 0;
 
 public:
-    std::function<void(Operation, Byte)> trap;
+    std::function<void(Operation, Byte oldValue, Byte newValue)> trap;
 
     friend std::ostream& operator<<(std::ostream&, const MemoryLocation&);
 };

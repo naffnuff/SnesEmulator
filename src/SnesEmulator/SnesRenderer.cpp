@@ -77,14 +77,14 @@ void Renderer::setGrayscalePixel(int row, int column, uint8_t white)
         output << "white=" << +white << std::endl;
         output << "index=" << std::hex << row * width + column << std::dec << std::endl << std::endl;
     }*/
-    setPixel(row, column, { white, white, white });
+    setPixel(row, column, { white, /*uint8_t(*/white/* ? 255 : 0)*/, /*uint8_t(*/white/* ? 255 : 0)*/ });
 }
 
-void Renderer::setGrayscaleTile(int startRow, int startColumn, const std::array<std::array<uint8_t, 8>, 8>& tile)
+void Renderer::setGrayscaleTile(int startRow, int startColumn, const std::array<std::array<uint8_t, 8>, 8>& tile, int bitsPerPixel)
 {
     for (int row = 0; row < 8; ++row) {
         for (int column = 0; column < 8; ++column) {
-            setGrayscalePixel(startRow + row, startColumn + column, tile[row][column] ? 255 : 0);
+            setGrayscalePixel(startRow + row, startColumn + column, tile[row][column] * (bitsPerPixel == 2 ? 85 : 17));
         }
     }
 }

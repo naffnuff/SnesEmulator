@@ -90,6 +90,13 @@ public:
     }*/
 
     template<typename T>
+    Byte& operator+=(T operand)
+    {
+        value += operand;
+        return *this;
+    }
+
+    template<typename T>
     Byte& operator|=(T operand)
     {
         value |= operand;
@@ -102,13 +109,6 @@ public:
         value &= operand;
         return *this;
     }
-
-    /*template<typename T>
-    Byte& operator^=(T operand)
-    {
-        value ^= operand;
-        return *this;
-    }*/
 
     template<typename T>
     Byte& operator<<=(T operand)
