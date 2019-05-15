@@ -10,12 +10,7 @@
 class Renderer
 {
 public:
-    struct Pixel
-    {
-        GLubyte red;
-        GLubyte green;
-        GLubyte blue;
-    };
+    typedef uint16_t Pixel;
 
     Renderer(int width, int height, float scale, bool syncUpdate, std::ostream& output)
         : width(width)

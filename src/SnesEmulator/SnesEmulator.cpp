@@ -103,14 +103,14 @@ void Emulator::initialize()
                 throw std::logic_error("2118 can only be written by CPU");
             }
             Word vramAddress = registers[0x2116].getWordValue();
-            videoMemory.setLowByte(vramAddress, value);
+            videoMemory.vramLowTable[vramAddress] = value;
             });
         setRegister(0x2119, true, "VRAM Data Write high byte", false, [this](MemoryLocation::Operation operation, Byte value) {
             if (operation != MemoryLocation::Write) {
                 throw std::logic_error("2119 can only be written by CPU");
             }
             Word vramAddress = registers[0x2116].getWordValue();
-            videoMemory.setHighByte(vramAddress, value);
+            videoMemory.vramHighTable[vramAddress] = value;
 
             static const int bitsPerPixel = 4;
             static const int pixelPerTile = 8 * 8;
@@ -136,12 +136,25 @@ void Emulator::initialize()
             }
             });
 
-        setRegister(0x2121, true, "CGRAM Address", true);
+        setRegister(0x2121, true, "CGRAM Address", false);
         setRegister(0x2122, true, "CGRAM Data Write low byte", false, [this](MemoryLocation::Operation operation, Byte value) {
             if (operation != MemoryLocation::Write) {
                 throw std::logic_error("2122 can only be written by CPU");
             }
             Byte cgramAddress = registers[0x2121].getValue();
+            if (videoMemory.cgramHighTableSelect) {
+                videoMemory.cgramHighTable[cgramAddress] = value;
+
+                int row = cgramAddress / 0x10;
+                int column = cgramAddress % 0x10;
+                cgramRenderer.setPixel(row, column, videoMemory.readCgramWord(cgramAddress));
+
+                cpuState.getMemoryLocation(0x2121)->setValue(cgramAddress + 1);
+            }
+            else {
+                videoMemory.cgramLowTable[cgramAddress] = value;
+            }
+            videoMemory.cgramHighTableSelect = !videoMemory.cgramHighTableSelect;
             //debugger.printMemoryRegister(operation, value, Word(cgramAddress), "CGRAM Data Write");
             });
 
@@ -241,12 +254,15 @@ void Emulator::initialize()
 
 void Emulator::run()
 {
-    std::thread vramRendererThread([this]()
-        {
+    std::thread vramRendererThread([this]() {
             vramRenderer.initialize("VRAM viewer");
-            cgramRenderer.initialize("CGRAM viewer");
             while (running) {
                 vramRenderer.update();
+            }
+        });
+    std::thread cgramRendererThread([this]() {
+            cgramRenderer.initialize("CGRAM viewer");
+            while (running) {
                 cgramRenderer.update();
             }
         });

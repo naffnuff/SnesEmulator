@@ -286,13 +286,13 @@ public:
         output << "         8    9    a    b    c    d    e    f" << std::endl;
         int vramAddress = inspectedVideoMemory & 0xFF80;
         for (int i = 0; i < 16; ++i) {
-            if (vramAddress < videoMemory.getVramSize()) {
+            if (vramAddress < videoMemory.vramLowTable.size()) {
                 uint16_t lowAddress(vramAddress);
                 lowAddress = lowAddress >> 4;
                 output << std::hex << std::setw(3) << std::setfill('0') << lowAddress << "x  " << std::dec;
 
-                for (int j = 0; j < 8 && vramAddress < videoMemory.getVramSize(); ++j) {
-                    Word memory = videoMemory.getWord(vramAddress);
+                for (int j = 0; j < 8 && vramAddress < videoMemory.vramLowTable.size(); ++j) {
+                    Word memory(videoMemory.vramLowTable[vramAddress], videoMemory.vramHighTable[vramAddress]);
                     output << memory << ' ';
                     ++vramAddress;
                 }

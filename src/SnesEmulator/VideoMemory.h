@@ -8,36 +8,19 @@ class VideoMemory
 {
 public:
     VideoMemory()
-        : vram(0x8000)
+        : vramLowTable(0x8000)
+        , vramHighTable(0x8000)
+        , cgramLowTable(0x100)
+        , cgramHighTable(0x100)
     {
     }
 
     VideoMemory(VideoMemory&) = delete;
     VideoMemory& operator=(VideoMemory&) = delete;
 
-    void setWord(Word address, Word word)
+    Word readCgramWord(Byte address) const
     {
-        vram[address] = word;
-    }
-
-    Word getWord(Word wordAddress) const
-    {
-        return vram[wordAddress];
-    }
-
-    size_t getVramSize() const
-    {
-        return vram.size();
-    }
-
-    void setLowByte(Word address, Byte lowByte)
-    {
-        vram[address].setLowByte(lowByte);
-    }
-
-    void setHighByte(Word address, Byte lowByte)
-    {
-        vram[address].setHighByte(lowByte);
+        return Word(cgramHighTable[address] << 8 | cgramLowTable[address]);
     }
 
     std::array<std::array<uint8_t, 8>, 8> readTile(int tileIndex, int bitsPerPixel)
@@ -49,10 +32,10 @@ public:
         int tileAddress = tileIndex * tileWordCount;
         std::array<std::array<uint8_t, 8>, 8> result;
         for (int row = 0; row < 8; ++row) {
-            std::bitset<8> firstLowByte(vram[tileAddress].getLowByte());
-            std::bitset<8> firstHighByte(vram[tileAddress].getHighByte());
-            std::bitset<8> secondLowByte(vram[tileAddress + tileWordCount / 2].getLowByte());
-            std::bitset<8> secondHighByte(vram[tileAddress + tileWordCount / 2].getHighByte());
+            std::bitset<8> firstLowByte(vramLowTable[tileAddress]);
+            std::bitset<8> firstHighByte(vramHighTable[tileAddress]);
+            std::bitset<8> secondLowByte(vramLowTable[tileAddress + tileWordCount / 2]);
+            std::bitset<8> secondHighByte(vramHighTable[tileAddress + tileWordCount / 2]);
             for (int column = 0; column < 8; ++column) {
                 Byte pixel;
                 if (bitsPerPixel >= 2) {
@@ -72,6 +55,10 @@ public:
         return result;
     }
 
-private:
-    std::vector<Word> vram;
+    std::vector<Byte> vramLowTable;
+    std::vector<Byte> vramHighTable;
+    std::vector<Byte> cgramLowTable;
+    std::vector<Byte> cgramHighTable;
+
+    bool cgramHighTableSelect = false;
 };

@@ -63,21 +63,14 @@ void Renderer::setScanline(int lineIndex, const std::vector<Pixel>& pixels)
 void Renderer::setPixel(int row, int column, Pixel pixel)
 {
     row = height - 1 - row;
-    if (pixel.red == 0 && pixelBuffer[row * width + column].red > 0) {
-        output << "WTF DUDE!" << std::endl;
-    }
     pixelBuffer[row * width + column] = pixel;
 }
 
 void Renderer::setGrayscalePixel(int row, int column, uint8_t white)
 {
-    /*if (white > 0) {
-        output << "row=" << row << std::endl;
-        output << "column=" << column << std::endl;
-        output << "white=" << +white << std::endl;
-        output << "index=" << std::hex << row * width + column << std::dec << std::endl << std::endl;
-    }*/
-    setPixel(row, column, { white, /*uint8_t(*/white/* ? 255 : 0)*/, /*uint8_t(*/white/* ? 255 : 0)*/ });
+    uint8_t white5Bit = white >> 3;
+    Pixel pixel = white5Bit << 0 | white5Bit << 5 | white5Bit << 10;
+    setPixel(row, column, pixel);
 }
 
 void Renderer::setGrayscaleTile(int startRow, int startColumn, const std::array<std::array<uint8_t, 8>, 8>& tile, int bitsPerPixel)
@@ -106,50 +99,12 @@ void Renderer::update()
         previousTime = currentTime;
     }
 
-    /*if (registers[0x4200].getValue().getBit(7)) {
-        output << "Initiating VBlank" << std::endl;
-        double before = glfwGetTime();
-        emulator.initiateVBlank();
-        double after = glfwGetTime();
-        output << "VBlank ended after" << after - before << " seconds" << std::endl;
-    }*/
-
-    /*static int row = 0;
-    static int col = 0;
-    static uint8_t color = 255;
-    static bool ascending = false;
-    while (true)
-    {
-        if (col >= width) {
-            ++row;
-            col = 0;
-            if (row >= height) {
-                row = 0;
-                if (ascending) {
-                    ++color;
-                    if (color == 255) {
-                        ascending = false;
-                    }
-                }
-                else {
-                    --color;
-                    if (color == 0) {
-                        ascending = true;
-                    }
-                }
-                break;
-            }
-        }
-        setPixel(row, col, { uint8_t(row), uint8_t(col), uint8_t(color) });
-        ++col;
-    }*/
-
     // Clear the screen
     glClear(GL_COLOR_BUFFER_BIT);
 
     glRasterPos2i(-1, -1);
     glPixelZoom(scale, scale);
-    glDrawPixels(width, height, GL_RGB, GL_UNSIGNED_BYTE, pixelBuffer.data());
+    glDrawPixels(width, height, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, pixelBuffer.data());
     glFlush();
 
     // Swap buffers
