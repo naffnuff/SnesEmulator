@@ -44,8 +44,16 @@ public:
         return glfwGetTime();
     }
 
+    void clearDisplay(uint16_t clearColor)
+    {
+        std::fill(pixelBuffer.begin(), pixelBuffer.end(), clearColor);
+    }
+
 public:
     bool pause = false;
+    
+    const int width;
+    const int height;
 
 private:
     std::ostream& output;
@@ -54,10 +62,8 @@ private:
 
     std::string title;
 
-    const int width = 256;
-    const int height = 224;
-    const float scale = 1.f;
-    const bool syncUpdate = false;
+    const float scale;
+    const bool syncUpdate;
 
     std::vector<Pixel> pixelBuffer;
 };

@@ -200,7 +200,7 @@ public:
                 error << "Not a valid address: " << e.what() << std::endl;
             }
         } else if (command.find('=') != std::string::npos) {
-            int pos = command.find('=');
+            size_t pos = command.find('=');
             try {
                 output << "Address: " << command.substr(0, pos) << ", value: " << command.substr(pos + 1) << std::endl;
                 Long address = stoi(command.substr(0, pos), 0, 16);
@@ -282,21 +282,20 @@ public:
     void printMemory(const CPU::State& cpuState, const Context& cpuContext, const SPC::State& spcState, const Context& spcContext, VideoMemory& videoMemory)
     {
         setOutputColor(DefaultColor, false);
-        output << "         0    1    2    3    4    5    6    7" << std::endl;
-        output << "         8    9    a    b    c    d    e    f" << std::endl;
-        int vramAddress = inspectedVideoMemory & 0xFF80;
+        int oamAddress = inspectedVideoMemory & 0xFF80;
+        int oamAuxAddress = oamAddress / 8;
+        int oamAuxOffset = oamAddress % 8;
         for (int i = 0; i < 16; ++i) {
-            if (vramAddress < videoMemory.vramLowTable.size()) {
-                uint16_t lowAddress(vramAddress);
-                lowAddress = lowAddress >> 4;
-                output << std::hex << std::setw(3) << std::setfill('0') << lowAddress << "x  " << std::dec;
-
-                for (int j = 0; j < 8 && vramAddress < videoMemory.vramLowTable.size(); ++j) {
-                    Word memory(videoMemory.vramLowTable[vramAddress], videoMemory.vramHighTable[vramAddress]);
-                    output << memory << ' ';
-                    ++vramAddress;
-                }
-            }
+            VideoMemory::Object object = videoMemory.readObject(i);
+            output << "size: " << videoMemory.getObjectSize(object.size);
+            output << ", x: " << object.x;
+            output << ", y: " << object.y;
+            output << ", tile: " << object.tileIndex;
+            output << ", name: " << object.nameTable;
+            output << ", palette: " << object.palette;
+            output << ", priority: " << object.priority;
+            output << ", horizontalFlip: " << object.horizontalFlip;
+            output << ", verticalFlip: " << object.verticalFlip;
             output << std::endl;
         }
 
@@ -397,5 +396,5 @@ private:
     std::ostream& error;
     uint64_t& cycleCount;
     bool& running;
-    Word inspectedVideoMemory = 0x4100;
+    Word inspectedVideoMemory = 0x0;
 };

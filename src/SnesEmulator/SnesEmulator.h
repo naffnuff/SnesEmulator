@@ -23,7 +23,7 @@ public:
         : output(output)
         , input(input)
         , error(error)
-        , renderer(256, 224, 3.f, false, output)
+        , videoMemory(output)
         , vramRenderer(vramRendererWidth, vramRendererHeight, 1.f, true, output)
         , cgramRenderer(16, 16, 16.f, true, output)
         , debugger(output, input, error, cycleCount, running)
@@ -60,7 +60,6 @@ private:
     std::istream& input;
     std::ostream& error;
 
-    Renderer renderer;
     Renderer vramRenderer;
     Renderer cgramRenderer;
     Debugger debugger;
