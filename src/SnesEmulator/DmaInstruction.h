@@ -89,14 +89,22 @@ public:
                     MemoryLocation& memoryLocation = memory[Long(sourceAddress, sourceBank)];
 
                     Byte dmaControl = channel.dmaControl->getValue();
+                    Byte transferMode = dmaControl.getBits(0, 3);
+                    bool fixedTransfer = dmaControl.getBit(3);
+                    bool increment = dmaControl.getBit(4);
+                    bool hdmaMode = dmaControl.getBit(6);
+                    bool direction = dmaControl.getBit(7);
+                    if (direction) {
+                        throw OpcodeNotYetImplementedException("DMA control direction not implemented");
+                    }
                     int byteCount = 0;
-                    if (dmaControl == 0x00) {
+                    if (transferMode == 0x0) {
                         Byte data = memoryLocation.getValue();
                         memory[registerAddress].setValue(data);
 
                         byteCount = 1;
                     }
-                    else if (dmaControl == 0x01) {
+                    else if (transferMode == 0x1) {
                         Word data = memoryLocation.getWordValue();
                         memory[registerAddress].setWordValue(data);
 
@@ -107,7 +115,10 @@ public:
                         throw OpcodeNotYetImplementedException("DMA control not implemented");
                     }
 
-                    channel.sourceAddressWrite->setWordValue(sourceAddress + byteCount);
+                    if (!fixedTransfer)
+                    {
+                        channel.sourceAddressWrite->setWordValue(sourceAddress + (increment ? -byteCount : byteCount));
+                    }
                     dataSize -= byteCount;
                     cycles += byteCount;
 

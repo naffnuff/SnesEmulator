@@ -305,9 +305,33 @@ class DirectPageIndexed : public Instruction2Byte
     // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int invokeOperator(Byte lowByte) override
     {
-        throw AddressModeNotYetImplementedException("DirectPageIndexed");
         int cycles = 0;
         if (Byte(state.getDirectPage())) {
+            cycles += 1;
+        }
+        MemoryLocation* memory = state.getDirectMemoryLocation(lowByte, state.getIndexRegister<Register>());
+        return cycles + Operator::invoke(state, memory);
+    }
+
+    std::string toString() const override
+    {
+        return Operator::toString() + " $" + operandToString() + ",X";
+    }
+};
+
+// Direct Page Indirect
+// (dp)
+template <typename Operator>
+class DirectPageIndirect : public Instruction2Byte
+{
+    using Instruction2Byte::InstructionBase;
+
+    // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
+    int invokeOperator(Byte lowByte) override
+    {
+        throw AddressModeNotYetImplementedException("DirectPageIndirect");
+        int cycles = 0;
+        if ((Byte)state.getDirectPage()) {
             cycles += 1;
         }
         MemoryLocation* memory = nullptr;
@@ -323,14 +347,14 @@ class DirectPageIndexed : public Instruction2Byte
 // Direct Page Indirect
 // (dp)
 template <typename Operator>
-class DirectPageIndirect : public Instruction2Byte
+class DirectPageIndirect_NewInstruction : public Instruction2Byte
 {
     using Instruction2Byte::InstructionBase;
 
     // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int invokeOperator(Byte lowByte) override
     {
-        throw AddressModeNotYetImplementedException("DirectPageIndirect");
+        throw AddressModeNotYetImplementedException("DirectPageIndirect_NewInstruction");
         int cycles = 0;
         if ((Byte)state.getDirectPage()) {
             cycles += 1;

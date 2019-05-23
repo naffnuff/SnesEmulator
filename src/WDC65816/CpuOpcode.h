@@ -120,7 +120,6 @@ class ADC_6D : public AddressMode::Absolute<Operator::ADC>
     // 3   5-m         abs       mm....mm . ADC $9876
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ADC_6D");
         return 4 + applyOperand();
     }
 
@@ -239,7 +238,6 @@ class ADC_79 : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::ADC, Sta
     // 3   6-m-x+x*p   abs,Y     mm....mm . ADC $9876,Y
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ADC_79");
         return 4 + applyOperand();
     }
 
@@ -272,7 +270,6 @@ class ADC_7F : public AddressMode::AbsoluteLongIndexedX<Operator::ADC>
     // 4   6-m         long,X    mm....mm . ADC $FEDCBA,X
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ADC_7F");
         return 5 + applyOperand();
     }
 
@@ -2305,7 +2302,6 @@ class LDA_BF : public AddressMode::AbsoluteLongIndexedX<Operator::LDA>
     // 4   6-m         long,X    m.....m. . LDA $FEDCBA,X
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("LDA_BF");
         return 5 + applyOperand();
     }
 
@@ -2845,7 +2841,6 @@ class ORA_15 : public AddressMode::DirectPageIndexed<Operator::ORA, State::X>
     // 2   5-m+w       dir,X     m.....m. . ORA $10,X
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ORA_15");
         return 4 + applyOperand();
     }
 
@@ -2939,9 +2934,9 @@ class PEA_F4 : public AddressMode::Absolute<Operator::PEA>
 // PEI Push Effective Indirect Address [Flags affected: none]
 // PEI (dp)
 // Direct Page Indirect (2-Byte)
-class PEI_D4 : public AddressMode::DirectPageIndirect<Operator::PEI>
+class PEI_D4 : public AddressMode::DirectPageIndirect_NewInstruction<Operator::PEI>
 {
-    using DirectPageIndirect::DirectPageIndirect;
+    using DirectPageIndirect_NewInstruction::DirectPageIndirect_NewInstruction;
 
     // 2   6+w         dir       ........ . PEI $12
     int execute() override
@@ -3914,7 +3909,6 @@ class STA_95 : public AddressMode::DirectPageIndexed<Operator::STA, State::X>
     // 2   5-m+w       dir,X     ........ . STA $10,X
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("STA_95");
         return 4 + applyOperand();
     }
 
@@ -3931,7 +3925,6 @@ class STA_97 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::STA>
     // 2   7-m+w       [dir],Y   ........ . STA [$10],Y
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("STA_97");
         return 6 + applyOperand();
     }
 
@@ -4396,7 +4389,6 @@ class TXY_9B : public AddressMode::Implied<Operator::T<State::X, State::Y>>
     // 1   2           imp       x.....x. . TXY
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("TXY_9B");
         return 2 + applyOperand();
     }
 

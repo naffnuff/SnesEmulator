@@ -251,9 +251,12 @@ public:
         return getMemoryLocation(lowByte, highByte, dataBank);
     }
 
-    MemoryLocation* getDirectMemoryLocation(Byte lowByte)
+    MemoryLocation* getDirectMemoryLocation(Byte lowByte, Word offset = 0)
     {
-        return getMemoryLocation(Long(directPage + lowByte));
+        if (emulationMode && directPage.getLowByte() == 0) {
+            return getMemoryLocation(Long(lowByte + offset, directPage.getHighByte(), 0));
+        }
+        return getMemoryLocation(Long(Word(directPage + lowByte + offset), 0));
     }
 
     void exchangeCarryAndEmulationFlags()

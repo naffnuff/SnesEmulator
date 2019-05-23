@@ -207,7 +207,7 @@ void Emulator::initialize()
         setRegister(0x4200, true, "Interrupt Enable Flags", true);
         setRegister(0x420b, true, "DMA Enable", false);
         setRegister(0x420c, true, "HDMA Enable", true);
-        setRegister(0x4210, false, "NMI Flag and 5A22 Version", true);
+        setRegister(0x4210, false, "NMI Flag and 5A22 Version", false);
 
         setRegister(0x4218, false, "Controller Port 1 Data1 Register low byte", true);
         setRegister(0x4219, false, "Controller Port 1 Data1 Register high byte", true);
