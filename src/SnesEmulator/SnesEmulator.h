@@ -24,7 +24,7 @@ public:
         , input(input)
         , error(error)
         , videoMemory(output)
-        , vramRenderer(vramRendererWidth, vramRendererHeight, 1.f, true, output)
+        , vramRenderer(vramRendererWidth, vramRendererHeight, 2.f, true, output)
         , cgramRenderer(16, 16, 16.f, true, output)
         , debugger(output, input, error, cycleCount, running)
         , rom(output)

@@ -337,6 +337,11 @@ public:
         forceRegisters();
     }
 
+    Word getStackPointer() const
+    {
+        return stackPointer;
+    }
+
     template<IndexRegister Register>
     void setIndexRegister(Word value)
     {

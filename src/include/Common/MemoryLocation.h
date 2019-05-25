@@ -18,15 +18,7 @@ public:
         Invalid,
         ReadOnly,
         ReadWrite,
-        WriteOnly,
-        Mapped
-    };
-
-    enum Operation
-    {
-        Read,
-        Write,
-        Apply
+        WriteOnly
     };
 
     MemoryLocation()
@@ -40,62 +32,69 @@ public:
 
     Type getType() const
     {
-        return type;
+        if (mirroredMemory) {
+            return mirroredMemory->getType();
+        }
+        else {
+            return type;
+        }
     }
 
     bool isMirror() const
     {
-        return mirroredMemory;
+        return false;
     }
 
     bool isReadProtected() const
     {
-        return type != ReadOnly && type != ReadWrite && type != Mapped;
+        return type != ReadOnly && type != ReadWrite;
     }
 
     bool isWriteProtected() const
     {
-        return type != ReadWrite && type != WriteOnly && type != Mapped;
+        return type != ReadWrite && type != WriteOnly;
     }
 
     void setValue(Byte newValue)
     {
+        if (mirroredMemory) {
+            mirroredMemory->setValue(newValue);
+            return;
+        }
+
         if (isWriteProtected()) {
             ThrowAccessException(__FUNCTION__);
         }
 
         Byte oldValue;
-        if (mirroredMemory) {
-            oldValue = mirroredMemory->value;
-            mirroredMemory->value = newValue;
-        }
-        else if (mapping) {
-            oldValue = mapping->value;
-            mapping->value = newValue;
-        }
-        else {
+        if (writeMapping) {
+            oldValue = writeMapping->value;
+            writeMapping->value = newValue;
+        } else {
             oldValue = value;
             value = newValue;
         }
-
-        if (trap) {
-            trap(Write, oldValue, newValue);
+        if (onWrite) {
+            onWrite(oldValue, newValue);
         }
     }
 
     Byte getValue() const
     {
+        if (mirroredMemory) {
+            return mirroredMemory->getValue();
+        }
+
         if (isReadProtected()) {
             ThrowAccessException(__FUNCTION__);
         }
 
         Byte result = value;
-        if (mirroredMemory) {
-            result = mirroredMemory->value;
+        if (readMapping) {
+            result = readMapping->value;
         }
-
-        if (trap) {
-            trap(Read, 0, result);
+        if (onRead) {
+            onRead(result);
         }
 
         return result;
@@ -103,22 +102,21 @@ public:
 
     Byte apply()
     {
-        if (isReadProtected() || type == Mapped) {
+        if (mirroredMemory) {
+            return mirroredMemory->apply();
+        }
+
+        if (isReadProtected() || readMapping || writeMapping) {
             ThrowAccessException(__FUNCTION__);
         }
 
         ++applicationCount;
 
-        Byte result = value;
-        if (mirroredMemory) {
-            result = mirroredMemory->value;
+        if (onApply) {
+            onApply(value);
         }
 
-        if (trap) {
-            trap(Apply, 0, result);
-        }
-
-        return result;
+        return value;
     }
 
     void setWordValue(Word value)
@@ -132,21 +130,21 @@ public:
         return Word(this[0].getValue(), this[1].getValue());
     }
 
-    void setMapping(MemoryLocation* memory)
+    void setMappings(MemoryLocation* readMapping, MemoryLocation* writeMapping, Type type)
     {
-        if (type != Invalid) {
+        if (this->type != Invalid) {
             ThrowAccessException(__FUNCTION__);
         }
-        type = Mapped;
-        mapping = memory;
+        this->readMapping = readMapping;
+        this->writeMapping = writeMapping;
+        this->type = type;
     }
 
-    void setMirror(MemoryLocation* memory, Type mirrorType)
+    void setMirrorOf(MemoryLocation* memory)
     {
         if (type != Invalid) {
             ThrowAccessException(__FUNCTION__);
         }
-        type = mirrorType;
         mirroredMemory = memory;
     }
 
@@ -188,13 +186,16 @@ private:
 
 private:
     Byte value = 0;
-    MemoryLocation* mapping = nullptr;
+    MemoryLocation* readMapping = nullptr;
+    MemoryLocation* writeMapping = nullptr;
     MemoryLocation* mirroredMemory = nullptr;
     Type type = Invalid;
     int applicationCount = 0;
 
 public:
-    std::function<void(Operation, Byte oldValue, Byte newValue)> trap;
+    std::function<void(Byte value)> onRead;
+    std::function<void(Byte oldValue, Byte newValue)> onWrite;
+    std::function<void(Byte value)> onApply;
 
     friend std::ostream& operator<<(std::ostream&, const MemoryLocation&);
 };
@@ -204,5 +205,7 @@ inline std::ostream& operator<<(std::ostream& output, const MemoryLocation& memo
     if (memory.mirroredMemory) {
         return output << memory.mirroredMemory->value << std::dec;
     }
-    return output << memory.value << std::dec;
+    else {
+        return output << memory.value << std::dec;
+    }
 }

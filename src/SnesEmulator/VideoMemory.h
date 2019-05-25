@@ -230,7 +230,7 @@ public:
                     int secondHighBitValue = secondHighByte[7 - column] ? 8 : 0;
                     pixel += secondLowBitValue + secondHighBitValue;
                 }
-                result[row][column] = pixel ? 0xffff : 0;
+                result[row][column] = pixel * 85;
             }
             ++tileAddress;
         }

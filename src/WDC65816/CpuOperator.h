@@ -606,9 +606,15 @@ class MVN
 {
 public:
     // §13: 7 cycles per byte moved
-    static int invoke(State& state, const MemoryLocation* memory)
+    static int invoke(State& state, Byte sourceBank, Byte destinationBank, Word byteCount)
     {
-        throw OperatorNotYetImplementedException("MVN");
+        Word sourceAddress = state.getIndexRegister<State::X>();
+        Word destinationAddress = state.getIndexRegister<State::Y>();
+        
+        state.getMemoryLocation(Long(destinationAddress, destinationBank))->setValue(state.getMemoryByte(Long(sourceAddress, sourceBank)));
+
+        state.setIndexRegister<State::X>(Word(sourceAddress + 1));
+        state.setIndexRegister<State::Y>(Word(destinationAddress + 1));
         return 0;
     }
 
@@ -620,7 +626,7 @@ class MVP
 {
 public:
     // §13: 7 cycles per byte moved
-    static int invoke(State& state, const MemoryLocation* memory)
+    static int invoke(State& state, Byte sourceBank, Byte destinationBank, Word byteCount)
     {
         throw OperatorNotYetImplementedException("MVP");
         return 0;
@@ -1245,7 +1251,7 @@ class TSC
 public:
     static int invoke(State& state)
     {
-        throw OperatorNotYetImplementedException("TSC");
+        state.setAccumulatorC(state.getStackPointer());
         return 0;
     }
 

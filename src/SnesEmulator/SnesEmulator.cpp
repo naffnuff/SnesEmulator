@@ -33,7 +33,7 @@ void Emulator::initialize()
         // RAM mirrors
         for (Byte bank = 0; bank < 0x40; ++bank) {
             for (Word address = 0; address < 0x2000; ++address) {
-                cpuState.getMemoryLocation(Long(address, bank))->setMirror(cpuState.getMemoryLocation(Long(address, 0x7E)), MemoryLocation::ReadWrite);
+                cpuState.getMemoryLocation(Long(address, bank))->setMirrorOf(cpuState.getMemoryLocation(Long(address, 0x7E)));
             }
         }
 
@@ -45,32 +45,42 @@ void Emulator::initialize()
             }
         }
 
-        auto setRegister = [this](Word address, bool cpuOutRegister, const std::string& info, bool debug = false, std::function<void(MemoryLocation::Operation operation, Byte value)> callback = nullptr)
+        auto setRegister = [this](Word address, bool cpuOutRegister, const std::string& info, bool debug = false, std::function<void(Byte value)> callback = nullptr)
         {
             MemoryLocation* memory = cpuState.getMemoryLocation(Long(address, 0));
             if (cpuOutRegister) {
                 memory->setWriteOnly();
                 memory->setValue(0);
-                registers[address].setMirror(memory, MemoryLocation::ReadOnly);
-            } else {
-                registers[address].setWriteOnly();
-                memory->setMirror(&registers[address], MemoryLocation::ReadOnly);
+                registers[address].setMappings(memory, nullptr, MemoryLocation::ReadOnly);
+                memory->onWrite =
+                    [this, address, callback, info, debug](Byte oldValue, Byte newValue) {
+                    if (debug && newValue && oldValue != newValue) {
+                        debugger.printMemoryRegister(true, newValue, address, info);
+                    }
+                    if (callback) {
+                        callback(newValue);
+                    }
+                };
             }
-            memory->trap =
-                [this, address, callback, info, debug](MemoryLocation::Operation operation, Byte oldValue, Byte newValue) {
-                if (debug && newValue && oldValue != newValue) {
-                    debugger.printMemoryRegister(operation, newValue, address, info);
-                }
-                if (callback) {
-                    callback(operation, newValue);
-                }
-            };
+            else {
+                registers[address].setWriteOnly();
+                memory->setMappings(&registers[address], nullptr, MemoryLocation::ReadOnly);
+                memory->onRead =
+                    [this, address, callback, info, debug](Byte value) {
+                    if (debug && value) {
+                        debugger.printMemoryRegister(false, value, address, info);
+                    }
+                    if (callback) {
+                        callback(value);
+                    }
+                };
+            }
         };
 
         // Registers
-        setRegister(0x2100, true, "Screen Display", true);
+        setRegister(0x2100, true, "Screen Display", false);
         setRegister(0x2101, true, "Object Size and Chr Address", true,
-            [this](MemoryLocation::Operation operation, Byte value) {
+            [this](Byte value) {
                 videoMemory.nameBaseSelect = value.getBits(0, 3);
                 output << "videoMemory.nameBaseSelect: " << videoMemory.nameBaseSelect << std::endl;
                 videoMemory.nameSelect = value.getBits(3, 2);
@@ -79,15 +89,15 @@ void Emulator::initialize()
         );
 
         setRegister(0x2102, true, "OAM Address low byte", false,
-            [this](MemoryLocation::Operation operation, Byte value) {
+            [this](Byte value) {
                 videoMemory.oam.address.setLowByte(value);
             });
         setRegister(0x2103, true, "OAM Address high bit and Obj Priority", false,
-            [this](MemoryLocation::Operation operation, Byte value) {
+            [this](Byte value) {
                 videoMemory.oam.address.setHighByte(value.getBit(0));
             });
         setRegister(0x2104, true, "OAM Data write", false,
-            [this](MemoryLocation::Operation operation, Byte value) {
+            [this](Byte value) {
                 videoMemory.oam.writeByte(value);
             }
         );
@@ -108,23 +118,23 @@ void Emulator::initialize()
 
         setRegister(0x2115, true, "Video Port Control", true);
         setRegister(0x2116, true, "VRAM Address low byte", false,
-            [this](MemoryLocation::Operation operation, Byte value) {
+            [this](Byte value) {
                 videoMemory.vram.address.setLowByte(value);
             }
         );
         setRegister(0x2117, true, "VRAM Address high byte", false,
-            [this](MemoryLocation::Operation operation, Byte value) {
+            [this](Byte value) {
                 videoMemory.vram.address.setHighByte(value);
             }
         );
         setRegister(0x2118, true, "VRAM Data Write low byte", false,
-            [this](MemoryLocation::Operation operation, Byte value) {
+            [this](Byte value) {
                 videoMemory.vram.writeByte(value, false, false);
             }
         );
 
         setRegister(0x2119, true, "VRAM Data Write high byte", false,
-            [this](MemoryLocation::Operation operation, Byte value) {
+            [this](Byte value) {
                 Byte videoPortControl = registers[0x2115].getValue();
                 if (!videoPortControl.getBit(7)) {
                     error << "DMA: Video port control: " << videoPortControl << std::endl;
@@ -152,14 +162,21 @@ void Emulator::initialize()
             }
         );
 
+        setRegister(0x211b, true, "Mode 7 Matrix A (also used with $2134/6)", true,
+            [this](Byte value) {
+            });
+        setRegister(0x211c, true, "Mode 7 Matrix B (also used with $2134/6)", true,
+            [this](Byte value) {
+            });
+
         setRegister(0x2121, true, "CGRAM Address", true,
-            [this](MemoryLocation::Operation operation, Byte value) {
+            [this](Byte value) {
                 videoMemory.cgram.address.setLowByte(value);
                 videoMemory.cgram.address.setHighByte(0x00);
             }
         );
         setRegister(0x2122, true, "CGRAM Data Write", false,
-            [this](MemoryLocation::Operation operation, Byte value) {
+            [this](Byte value) {
                 Word cgramAddress = videoMemory.cgram.address;
                 bool cgramHighTable = videoMemory.cgram.highTableSelect;
 
@@ -183,7 +200,7 @@ void Emulator::initialize()
         setRegister(0x2130, true, "Color Addition Select", true);
         setRegister(0x2131, true, "Color math designation", true);
         setRegister(0x2132, true, "Fixed Color Data", false,
-            [this](MemoryLocation::Operation operation, Byte value) {
+            [this](Byte value) {
                 switch (value & 0xE0) {
                 case 0x80:
                     videoMemory.clearBlueIntensity = value & 0x1F;
@@ -201,10 +218,14 @@ void Emulator::initialize()
         );
         
         setRegister(0x2133, true, "Screen Mode/Video Select", true);
+        setRegister(0x2135, false, "Multiplication Result middle byte", true);
+        setRegister(0x2136, false, "Multiplication Result high byte", true);
 
         setRegister(0x4016, true, "NES-style Joypad Access Port 1", true);
 
         setRegister(0x4200, true, "Interrupt Enable Flags", true);
+        setRegister(0x4209, true, "V Timer low byte", true);
+        setRegister(0x420a, true, "V Timer high byte", true);
         setRegister(0x420b, true, "DMA Enable", false);
         setRegister(0x420c, true, "HDMA Enable", true);
         setRegister(0x4210, false, "NMI Flag and 5A22 Version", false);
@@ -257,12 +278,19 @@ void Emulator::initialize()
         setRegister(0x4345, true, "DMA Size/HDMA Indirect Address low byte Channel 4");
         setRegister(0x4346, true, "DMA Size/HDMA Indirect Address high byte Channel 4");
 
+        // Register mirrors
+        for (Byte bank = 0x01; bank < 0x40; ++bank) {
+            for (Word address = 0x2000; address < 0x6000; ++address) {
+                cpuState.getMemoryLocation(Long(address, bank))->setMirrorOf(cpuState.getMemoryLocation(Long(address, 0x00)));
+            }
+        }
+
         // I/O between the CPU and SPC700
         for (Word i = 0; i < 4; ++i) {
             MemoryLocation* cpuMemoryLocation = cpuState.getMemoryLocation(Long(0x2140 + i));
             MemoryLocation* spcMemoryLocation = spcState.getMemoryLocation(Word(0xf4 + i));
-            cpuMemoryLocation->setMapping(spcMemoryLocation);
-            spcMemoryLocation->setMapping(cpuMemoryLocation);
+            cpuMemoryLocation->setMappings(nullptr, spcMemoryLocation, MemoryLocation::ReadWrite);
+            spcMemoryLocation->setMappings(nullptr, cpuMemoryLocation, MemoryLocation::ReadWrite);
         }
     } else {
         throw std::runtime_error("Only the low-rom mempory map is supported for now");
@@ -286,19 +314,22 @@ void Emulator::initialize()
 
 void Emulator::run()
 {
-    std::thread oamRendererThread([this]() {
-        videoMemory.oamRenderer.initialize("OAM viewer");
-        while (running) {
-            videoMemory.oamRenderer.update();
-        }
+    std::thread oamRendererThread(
+        [this]() {
+            videoMemory.oamRenderer.initialize("OAM viewer");
+            while (running) {
+                videoMemory.oamRenderer.update();
+            }
         });
-    std::thread vramRendererThread([this]() {
+    std::thread vramRendererThread(
+        [this]() {
             vramRenderer.initialize("VRAM viewer");
             while (running) {
                 vramRenderer.update();
             }
         });
-    std::thread cgramRendererThread([this]() {
+    std::thread cgramRendererThread(
+        [this]() {
             cgramRenderer.initialize("CGRAM viewer");
             while (running) {
                 cgramRenderer.update();
@@ -314,6 +345,7 @@ void Emulator::run()
     int hCounter = int(cycleCount);
     int vCounter = 0;
     bool vBlank = false;
+    int frame = 0;
 
     std::vector<Renderer::Pixel> scanline(256);
 
@@ -355,7 +387,7 @@ void Emulator::run()
 
                 if (cpuContext.stepMode) {
                     output << "Cycle count: " << cycleCount << ", Next cpu: " << nextCpu << ", Next spc: " << nextSpc << std::endl;
-                    output << "V counter: " << vCounter << ", H counter: " << hCounter << ", V blank: " << vBlank << ", interrupted: " << cpuState.isInterrupted() << std::endl;
+                    output << "Frame: " << frame << ", V counter: " << vCounter << ", H counter: " << hCounter << ", V blank: " << vBlank << ", interrupted: " << cpuState.isInterrupted() << std::endl;
                     debugger.printBreakpoints(cpuContext, spcContext);
                     debugger.printMemory(cpuState, cpuContext, spcState, spcContext, videoMemory);
                 }
@@ -464,6 +496,7 @@ void Emulator::run()
                             }
                         }
                     } else if (vCounter == 262) {
+                        ++frame;
                         vCounter = 0;
                         vBlank = false;
                         registers[0x4210].setValue(0x02);

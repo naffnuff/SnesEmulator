@@ -236,14 +236,18 @@ class BlockMove : public Instruction3Byte
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
-        throw AddressModeNotYetImplementedException("BlockMove");
-        MemoryLocation* memory = nullptr;
-        return Operator::invoke(state, memory);
+        Word byteCount = state.getAccumulatorC();
+        if (byteCount != 0) {
+            state.incrementProgramCounter(-size());
+        }
+        state.setAccumulatorC(byteCount - 1);
+        return Operator::invoke(state, highByte, lowByte, byteCount);
     }
 
     std::string toString() const override
     {
-        return Operator::toString() + " $" + operandToString() + " TODO";
+        std::string operands = operandToString();
+        return Operator::toString() + " $" + operands.substr(0, 2) + ",$" + operands.substr(2, 2);
     }
 };
 

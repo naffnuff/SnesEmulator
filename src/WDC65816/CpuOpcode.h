@@ -1620,7 +1620,6 @@ class EOR_49 : public AddressMode::Immediate<Operator::EOR>
     // 3-m 3-m         imm       m.....m. . EOR #$54
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("EOR_49");
         return 2 + applyOperand();
     }
 
@@ -2603,7 +2602,6 @@ class MVN_54 : public AddressMode::BlockMove<Operator::MVN>
     // 3   7           src,dest  ........ . MVN #$12,#$34
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("MVN_54");
         return 7 + applyOperand();
     }
 
@@ -3454,7 +3452,6 @@ class SBC_E5 : public AddressMode::DirectPage<Operator::SBC>
     // 2   4-m+w       dir       mm....mm . SBC $10
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("SBC_E5");
         return 3 + applyOperand();
     }
 
@@ -4155,8 +4152,6 @@ class STZ_9E : public AddressMode::AbsoluteIndexed<Operator::STZ, State::X>
     // §20: TODO manually add exception for 3
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("STZ_9E");
-        throw OpcodeNotYetImplementedException("TODO20");
         return 5 + applyOperand();
     }
 
@@ -4319,10 +4314,9 @@ class TSC_3B : public AddressMode::Implied<Operator::TSC>
 {
     using Implied::Implied;
 
-    // 1   2           imp       *.....*. . TSC
+    // 1   2           imp       *.....*. . TSC<<<<<<<
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("TSC_3B");
         return 2 + applyOperand();
     }
 

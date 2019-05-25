@@ -250,16 +250,21 @@ public:
         bool bright = false;
         if (memory.getApplicationCount() > 0) {
             color = Cyan;
-        } else if (memory.isMirror()) {
+        }
+        else if (memory.isMirror()) {
             color = Yellow;
-        } else if (memory.getType() == MemoryLocation::Mapped) {
-            color = Green;
-        } else if (memory.getType() == MemoryLocation::ReadOnly) {
+        }
+        //else if (memory.getType() == MemoryLocation::Mapped) {
+        //    color = Green;
+        //}
+        else if (memory.getType() == MemoryLocation::ReadOnly) {
             color = Blue;
             //bright = true;
-        } else if (memory.getType() == MemoryLocation::ReadWrite) {
+        }
+        else if (memory.getType() == MemoryLocation::ReadWrite) {
             color = Red;
-        } else if (memory.getType() == MemoryLocation::WriteOnly) {
+        }
+        else if (memory.getType() == MemoryLocation::WriteOnly) {
             color = Magenta;
         }
         bool breakpoint = context.breakpoints.find(address) != context.breakpoints.end();
@@ -367,24 +372,10 @@ public:
         output << "Speed is " << cycleCount / 1000000.0 / elapsedSeconds << " MHz (kind of)" << std::endl;
     }
 
-    std::string operationToString(MemoryLocation::Operation operation)
-    {
-        switch (operation) {
-        case MemoryLocation::Read:
-            return "Read ";
-        case MemoryLocation::Write:
-            return "Write ";
-        case MemoryLocation::Apply:
-            return "Apply ";
-        default:
-            return "";
-        }
-    };
-
-    void printMemoryRegister(MemoryLocation::Operation operation, Byte value, Word address, const std::string& info)
+    void printMemoryRegister(bool write, Byte value, Word address, const std::string& info)
     {
         setOutputColor(Debugger::Yellow, true);
-        output << operationToString(operation) << value << " (" << std::bitset<8>(value) << ") " << " @ " << address << " (" << info << "), " << cycleCount << std::endl;
+        output << (write ? "Write " : "Read ") << value << " (" << std::bitset<8>(value) << ") @ " << address << " (" << info << "), " << cycleCount << std::endl;
         setOutputColor(Debugger::DefaultColor, false);
     }
 
