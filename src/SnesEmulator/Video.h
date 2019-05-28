@@ -4,9 +4,9 @@
 
 #include "Common/Types.h"
 
-#include "SnesRenderer.h"
+#include "Renderer.h"
 
-class VideoMemory
+class Video
 {
 public:
     class Table
@@ -68,23 +68,25 @@ public:
         bool verticalFlip = false;
     };
 
-    VideoMemory(std::ostream& output)
+    Video(std::ostream& output)
         : output(output)
         , vram(0x8000)
         , cgram(0x100)
         , oam(0x110)
-        , renderer(256, 224, 4.f, false, output)
-        , oamRenderer(0x100, 0x100, 3.f, true, output)
+        , renderer(256, 224, 3.f, false, output)
+        , vramRenderer(0x200, 0x200, 1.f, true, output)
+        , cgramRenderer(16, 16, 16.f, true, output)
+        , oamRenderer(0x200, 0x100, 3.f, true, output)
     {
     }
 
-    ~VideoMemory()
+    ~Video()
     {
 
     }
 
-    VideoMemory(VideoMemory&) = delete;
-    VideoMemory& operator=(VideoMemory&) = delete;
+    Video(const Video&) = delete;
+    Video& operator=(const Video&) = delete;
 
     void initialize(const std::string& gameTitle)
     {
@@ -111,6 +113,37 @@ public:
         }
     }
 
+    void drawDebugInfo()
+    {
+        oamRenderer.clearDisplay(0);
+
+        int rowOffset = 0;
+        int columnOffset = 0;
+        for (int i = 0; i < 128 && rowOffset < oamRenderer.height && columnOffset < oamRenderer.width; ++i) {
+            Object object = readObject(i);
+
+            int objectSize = getObjectSize(object.size);
+            int objectTileSize = objectSize / 8;
+            for (int tileRow = 0; tileRow < objectTileSize; ++tileRow) {
+                for (int tileColumn = 0; tileColumn < objectTileSize; ++tileColumn) {
+                    int tileIndex = object.tileIndex + tileRow * 0x10 + tileColumn;
+                    Word tileAddress = (nameBaseSelect << 13) + (tileIndex << 4);
+                    if (object.nameTable) {
+                        tileAddress += (nameSelect + 1) << 12;
+                    }
+                    for (int row = 0; row < 8; ++row, ++tileAddress) {
+                        drawRow(oamRenderer, rowOffset + tileRow * 8 + row, columnOffset, tileColumn * 8, tileAddress, object.palette, objectSize, object.horizontalFlip);
+                    }
+                }
+            }
+            columnOffset += 64;
+            if (columnOffset >= oamRenderer.width) {
+                columnOffset = 0;
+                rowOffset += 64;
+            }
+        }
+    }
+
     void drawScanline(int vCounter)
     {
         for (int i = 0; i < 128; ++i) {
@@ -127,42 +160,18 @@ public:
                 int objectTileSize = objectSize / 8;
                 for (int tileColumn = 0; tileColumn < objectTileSize; ++tileColumn) {
                     int tileIndex = object.tileIndex + tileRow * 0x10 + tileColumn;
-                    Word tileAddress = (nameBaseSelect << 13) + (tileIndex << 4) + row;
-
-                    drawRow(renderer, vCounter, object.x + tileColumn * 8, tileAddress, object.palette);
-                }
-            }
-        }
-    }
-
-    void drawDebugInfo()
-    {
-        oamRenderer.clearDisplay(0);
-
-        int rowOffset = 0;
-        int columnOffset = 0;
-        for (int i = 0; i < 128 && rowOffset < oamRenderer.height && columnOffset < oamRenderer.width; ++i) {
-            Object object = readObject(i);
-
-            int objectTileSize = getObjectSize(object.size) / 8;
-            for (int tileRow = 0; tileRow < objectTileSize; ++tileRow) {
-                for (int tileColumn = 0; tileColumn < objectTileSize; ++tileColumn) {
-                    int tileIndex = object.tileIndex + tileRow * 0x10 + tileColumn;
                     Word tileAddress = (nameBaseSelect << 13) + (tileIndex << 4);
-                    for (int row = 0; row < 8; ++row, ++tileAddress) {
-                        drawRow(oamRenderer, rowOffset + tileRow * 8 + row, columnOffset + tileColumn * 8, tileAddress, object.palette);
+                    if (object.nameTable) {
+                        tileAddress += (nameSelect + 1) << 12;
                     }
+                    tileAddress += row;
+                    drawRow(renderer, vCounter, object.x, tileColumn * 8, tileAddress, object.palette, objectSize, object.horizontalFlip);
                 }
-            }
-            columnOffset += 64;
-            if (columnOffset >= oamRenderer.width) {
-                columnOffset = 0;
-                rowOffset += 64;
             }
         }
     }
 
-    void drawRow(Renderer& renderer, int displayRow, int displayStartColumn, Word tileAddress, int palette)
+    void drawRow(Renderer& renderer, int displayRow, int displayStartColumn, int displayColumnOffset, Word tileAddress, int palette, int objectSize, bool horizontalFlip)
     {
         std::bitset<8> firstLowByte(vram.lowTable[tileAddress]);
         std::bitset<8> firstHighByte(vram.highTable[tileAddress]);
@@ -179,7 +188,12 @@ public:
             if (paletteIndex > 0) {
                 Byte colorAddress = 0x80 + 0x10 * palette + paletteIndex;
                 Word color(cgram.lowTable[colorAddress], cgram.highTable[colorAddress]);
-                renderer.setPixel(displayRow, displayStartColumn + column, color);
+                if (horizontalFlip) {
+                    renderer.setPixel(displayRow, displayStartColumn + objectSize - 1 - displayColumnOffset - column, color);
+                }
+                else {
+                    renderer.setPixel(displayRow, displayStartColumn + displayColumnOffset + column, color);
+                }
             }
         }
     }
@@ -249,6 +263,8 @@ public:
     Table oam;
 
     Renderer renderer;
+    Renderer vramRenderer;
+    Renderer cgramRenderer;
     Renderer oamRenderer;
 
     uint8_t clearBlueIntensity = 0;
@@ -258,6 +274,4 @@ public:
     Byte objectSize;
     Byte nameSelect;
     Byte nameBaseSelect;
-
-
 };

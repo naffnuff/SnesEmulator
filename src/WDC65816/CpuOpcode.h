@@ -540,7 +540,6 @@ class AND_3F : public AddressMode::AbsoluteLongIndexedX<Operator::AND>
     // 4   6-m         long,X    m.....m. . AND $FEDCBA,X
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("AND_3F");
         return 5 + applyOperand();
     }
 
@@ -684,7 +683,7 @@ class BEQ_F0 : public AddressMode::ProgramCounterRelative<Operator::BEQ>
 // BIT Test Bits [Flags affected: z (immediate mode) n,v,z (non-immediate modes)]
 // BIT dp
 // Direct Page (2-Byte)
-class BIT_24 : public AddressMode::DirectPage<Operator::BIT>
+class BIT_24 : public AddressMode::DirectPage<Operator::BIT<false>>
 {
     using DirectPage::DirectPage;
 
@@ -701,7 +700,7 @@ class BIT_24 : public AddressMode::DirectPage<Operator::BIT>
 // BIT Test Bits [Flags affected: z (immediate mode) n,v,z (non-immediate modes)]
 // BIT addr
 // Absolute (3-Byte)
-class BIT_2C : public AddressMode::Absolute<Operator::BIT>
+class BIT_2C : public AddressMode::Absolute<Operator::BIT<false>>
 {
     using Absolute::Absolute;
 
@@ -718,7 +717,7 @@ class BIT_2C : public AddressMode::Absolute<Operator::BIT>
 // BIT Test Bits [Flags affected: z (immediate mode) n,v,z (non-immediate modes)]
 // BIT dp,X
 // Direct Page Indexed, X (2-Byte)
-class BIT_34 : public AddressMode::DirectPageIndexed<Operator::BIT, State::X>
+class BIT_34 : public AddressMode::DirectPageIndexed<Operator::BIT<false>, State::X>
 {
     using DirectPageIndexed::DirectPageIndexed;
 
@@ -735,7 +734,7 @@ class BIT_34 : public AddressMode::DirectPageIndexed<Operator::BIT, State::X>
 // BIT Test Bits [Flags affected: z (immediate mode) n,v,z (non-immediate modes)]
 // BIT addr,X
 // Absolute Indexed, X (3-Byte)
-class BIT_3C : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::BIT, State::X>
+class BIT_3C : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::BIT<false>, State::X>
 {
     using AbsoluteIndexed_ExtraCycle::AbsoluteIndexed_ExtraCycle;
 
@@ -753,7 +752,7 @@ class BIT_3C : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::BIT, Sta
 // BIT #const
 // Immediate (2-Byte [17])
 // ¤17: Add 1 byte if m=0 (16-bit memory/accumulator)
-class BIT_89_16Bit : public AddressMode::Immediate16Bit<Operator::BIT>
+class BIT_89_16Bit : public AddressMode::Immediate16Bit<Operator::BIT<true>>
 {
     using Immediate16Bit::Immediate16Bit;
 
@@ -771,14 +770,13 @@ class BIT_89_16Bit : public AddressMode::Immediate16Bit<Operator::BIT>
 // BIT #const
 // Immediate (2-Byte [17])
 // ¤17: Add 1 byte if m=0 (16-bit memory/accumulator)
-class BIT_89 : public AddressMode::Immediate<Operator::BIT>
+class BIT_89 : public AddressMode::Immediate<Operator::BIT<true>>
 {
     using Immediate::Immediate;
 
     // 3-m 3-m         imm       ......m. . BIT #$54
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("BIT_89");
         return 2 + applyOperand();
     }
 
@@ -1027,7 +1025,6 @@ class CMP_C5 : public AddressMode::DirectPage<Operator::CMP>
     // 2   4-m+w       dir       m.....mm . CMP $10
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("CMP_C5");
         return 3 + applyOperand();
     }
 
@@ -1179,7 +1176,6 @@ class CMP_D5 : public AddressMode::DirectPageIndexed<Operator::CMP, State::X>
     // 2   5-m+w       dir,X     m.....mm . CMP $10,X
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("CMP_D5");
         return 4 + applyOperand();
     }
 
@@ -1230,7 +1226,6 @@ class CMP_DD : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::CMP, Sta
     // 3   6-m-x+x*p   abs,X     m.....mm . CMP $9876,X
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("CMP_DD");
         return 4 + applyOperand();
     }
 
@@ -1449,7 +1444,6 @@ class DEC_CE : public AddressMode::Absolute<Operator::DEC>
     // 3   8-2*m       abs       m.....m. . DEC $9876
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("DEC_CE");
         return 6 + applyOperand();
     }
 
@@ -1602,7 +1596,6 @@ class EOR_49_16Bit : public AddressMode::Immediate16Bit<Operator::EOR>
     // 3-m 3-m         imm       m.....m. . EOR #$54
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("EOR_49_16Bit");
         return 2 + applyOperand();
     }
 
@@ -1755,7 +1748,6 @@ class EOR_59 : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::EOR, Sta
     // 3   6-m-x+x*p   abs,Y     m.....m. . EOR $9876,Y
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("EOR_59");
         return 4 + applyOperand();
     }
 
@@ -1872,8 +1864,6 @@ class INC_FE : public AddressMode::AbsoluteIndexed<Operator::INC, State::X>
     // §20: TODO manually add exception for 3
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("INC_FE");
-        throw OpcodeNotYetImplementedException("TODO20");
         return 7 + applyOperand();
     }
 
@@ -1938,7 +1928,6 @@ class JMP_5C : public AddressMode::AbsoluteLong_ControlFlow<Operator::JML>
     // 4   4           long      ........ . JMP $FEDCBA
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("JMP_5C");
         return 4 + applyOperand();
     }
 
@@ -2185,7 +2174,6 @@ class LDA_B1 : public AddressMode::DirectPageIndirectIndexedY<Operator::LDA>
     // 2   7-m+w-x+x*p (dir),Y   m.....m. . LDA ($10),Y
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("LDA_B1");
         return 5 + applyOperand();
     }
 
@@ -2236,7 +2224,6 @@ class LDA_B5 : public AddressMode::DirectPageIndexed<Operator::LDA, State::X>
     // 2   5-m+w       dir,X     m.....m. . LDA $10,X
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("LDA_B5");
         return 4 + applyOperand();
     }
 
@@ -2516,7 +2503,6 @@ class LSR_46 : public AddressMode::DirectPage<Operator::LSR>
     // 2   7-2*m+w     dir       0.....m* . LSR $10
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("LSR_46");
         return 5 + applyOperand();
     }
 
@@ -2635,7 +2621,6 @@ class NOP_EA : public AddressMode::Implied<Operator::NOP>
     // 1   2           imp       ........ . NOP
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("NOP_EA");
         return 2 + applyOperand();
     }
 
@@ -2719,7 +2704,6 @@ class ORA_09_16Bit : public AddressMode::Immediate16Bit<Operator::ORA>
     // 3-m 3-m         imm       m.....m. . ORA #$54
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ORA_09_16Bit");
         return 2 + applyOperand();
     }
 
@@ -2737,7 +2721,6 @@ class ORA_09 : public AddressMode::Immediate<Operator::ORA>
     // 3-m 3-m         imm       m.....m. . ORA #$54
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ORA_09");
         return 2 + applyOperand();
     }
 
@@ -3519,7 +3502,6 @@ class SBC_ED : public AddressMode::Absolute<Operator::SBC>
     // 3   5-m         abs       mm....mm . SBC $9876
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("SBC_ED");
         return 4 + applyOperand();
     }
 
@@ -3536,7 +3518,6 @@ class SBC_EF : public AddressMode::AbsoluteLong<Operator::SBC>
     // 4   6-m         long      mm....mm . SBC $FEDBCA
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("SBC_EF");
         return 5 + applyOperand();
     }
 

@@ -148,17 +148,35 @@ public:
 };
 
 // BIT Test Bits [Flags affected: z (immediate mode) n,v,z (non-immediate modes)]
+template<bool ImmediateMode>
 class BIT
 {
 public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, const MemoryLocation* memory)
     {
-        throw OperatorNotYetImplementedException("BIT");
         int cycles = 0;
+        bool zFlag = false;
+        bool nFlag = false;
+        bool vFlag = false;
         if (state.is16Bit(State::m)) {
             cycles += 1;
+            Word data = memory->getWordValue();
+            nFlag = data.isNegative();
+            vFlag = data.getBit(14);
+            zFlag = (state.getAccumulatorC() & data) == 0;
         }
+        else {
+            Byte data = memory->getValue();
+            nFlag = data.isNegative();
+            vFlag = data.getBit(6);
+            zFlag = (state.getAccumulatorA() & data) == 0;
+        }
+        if (!ImmediateMode) {
+            state.setFlag(State::n, nFlag);
+            state.setFlag(State::v, vFlag);
+        }
+        state.setFlag(State::z, zFlag);
         return cycles;
     }
 
@@ -418,8 +436,8 @@ public:
     {
         int cycles = 0;
         if (state.is16Bit(State::m)) {
-            throw OperatorNotYetImplementedException("EOR");
             cycles += 1;
+            state.setAccumulatorC(state.getAccumulatorC() ^ memory->getWordValue());
         }
         else {
             state.setAccumulatorA(state.getAccumulatorA() ^ memory->getValue());
@@ -641,7 +659,6 @@ class NOP
 public:
     static int invoke(State& state)
     {
-        throw OperatorNotYetImplementedException("NOP");
         return 0;
     }
 

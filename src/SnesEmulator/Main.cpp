@@ -2,8 +2,8 @@
 #include <bitset>
 #include <thread>
 
-#include "SnesEmulator.h"
-#include "SnesRenderer.h"
+#include "Emulator.h"
+#include "Renderer.h"
 
 void test(std::ostream& output)
 {

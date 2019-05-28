@@ -14,8 +14,8 @@ class InstructionDecoder
 public:
     SHARED InstructionDecoder(State& state);
 
-    InstructionDecoder(InstructionDecoder&) = delete;
-    InstructionDecoder& operator=(InstructionDecoder&) = delete;
+    InstructionDecoder(const InstructionDecoder&) = delete;
+    InstructionDecoder& operator=(const InstructionDecoder&) = delete;
 
     Instruction* readNextInstruction(State& state) const
     {

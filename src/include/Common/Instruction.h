@@ -25,8 +25,8 @@ public:
     {
     }
 
-    InstructionBase(InstructionBase&) = delete;
-    InstructionBase& operator=(InstructionBase&) = delete;
+    InstructionBase(const InstructionBase&) = delete;
+    InstructionBase& operator=(const InstructionBase&) = delete;
 
 protected:
     virtual int invokeOperator(Bytes...) = 0;

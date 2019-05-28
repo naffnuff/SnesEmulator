@@ -9,7 +9,7 @@
 #include "WDC65816/CpuState.h"
 #include "SPC700/SpcState.h"
 
-#include "VideoMemory.h"
+#include "Video.h"
 
 class Debugger
 {
@@ -63,8 +63,8 @@ public:
         {
         }
         
-        Context(Context&) = delete;
-        Context& operator=(Context&) = delete;
+        Context(const Context&) = delete;
+        Context& operator=(const Context&) = delete;
 
         std::string fileName;
         Long inspectedAddress = 0;
@@ -84,8 +84,43 @@ public:
     {
     }
 
-    Debugger(Debugger&) = delete;
-    Debugger& operator=(Debugger&) = delete;
+    Debugger(const Debugger&) = delete;
+    Debugger& operator=(const Debugger&) = delete;
+
+    template<typename State>
+    void loadBreakpoints(Context& context, State& state)
+    {
+        std::ifstream contextFile(context.fileName);
+        if (contextFile) {
+            std::string breakpointString;
+            while (std::getline(contextFile, breakpointString, ' ')) {
+                Long breakpoint = std::stoi(breakpointString, 0, 16);
+                output << "Read breakpoint: " << breakpoint << " from " << context.fileName << std::endl;
+                toggleBreakpoint(context, state, breakpoint);
+            }
+        }
+    }
+
+    template<typename State>
+    void toggleBreakpoint(Context& context, State& state, Long breakpoint)
+    {
+        MemoryLocation* memory = state.getMemoryLocation(breakpoint);
+        if (memory->breakpoint == nullptr) {
+            memory->breakpoint = [this, &context, breakpoint]() {
+                context.stepMode = true;
+                setOutputColor(Red, true);
+                output << "Breakpoint hit @ " << breakpoint << std::endl;
+                setOutputColor(DefaultColor, false);
+            };
+            context.breakpoints.insert(breakpoint);
+            output << "Breakpoint inserted at address " << breakpoint << std::endl;
+        }
+        else {
+            memory->breakpoint = nullptr;
+            context.breakpoints.erase(breakpoint);
+            output << "Breakpoint removed at address " << breakpoint << std::endl;
+        }
+    }
 
     template<typename State, typename OtherState>
     bool awaitCommand(Context& context, State& state, Context& otherContext, OtherState& otherState)
@@ -148,11 +183,14 @@ public:
             output << "Reset" << std::endl;
             running = false;
         } else if (command == "clear") {
+            for (Long address : context.breakpoints) {
+                state.getMemoryLocation(address)->breakpoint = nullptr;
+            }
             context.breakpoints.clear();
             output << "Cleared context " << context.fileName << std::endl;
             std::ofstream file(context.fileName);
         } else if (command[0] == 't') {
-            int breakpoint = state.getProgramAddress();
+            Long breakpoint = state.getProgramAddress();
             std::string twoFirst = command.substr(0, 2);
             if (twoFirst == "tt") {
                 breakpoint += context.nextInstruction->size();
@@ -163,13 +201,7 @@ public:
                     std::cerr << "Not a valid value: " << e.what() << std::endl;
                 }
             }
-            if (context.breakpoints.find(breakpoint) == context.breakpoints.end()) {
-                context.breakpoints.insert(breakpoint);
-                output << "Breakpoint inserted at address " << breakpoint << std::endl;
-            } else {
-                context.breakpoints.erase(breakpoint);
-                output << "Breakpoint removed at address " << breakpoint << std::endl;
-            }
+            toggleBreakpoint(context, state, breakpoint);
             std::ofstream file(context.fileName);
             if (file) {
                 for (Long breakpoint : context.breakpoints) {
@@ -267,12 +299,11 @@ public:
         else if (memory.getType() == MemoryLocation::WriteOnly) {
             color = Magenta;
         }
-        bool breakpoint = context.breakpoints.find(address) != context.breakpoints.end();
         bool executing = address >= state.getProgramAddress() && address < state.getProgramAddress() + context.nextInstruction->size();
-        if (breakpoint && executing) {
+        if (memory.breakpoint && executing) {
             color = Cyan;
             bright = true;
-        } else if (breakpoint) {
+        } else if (memory.breakpoint) {
             color = Red;
             bright = true;
         } else if (executing) {
@@ -284,15 +315,15 @@ public:
         }
     }
 
-    void printMemory(const CPU::State& cpuState, const Context& cpuContext, const SPC::State& spcState, const Context& spcContext, VideoMemory& videoMemory)
+    void printMemory(const CPU::State& cpuState, const Context& cpuContext, const SPC::State& spcState, const Context& spcContext, Video& video)
     {
         setOutputColor(DefaultColor, false);
         int oamAddress = inspectedVideoMemory & 0xFF80;
         int oamAuxAddress = oamAddress / 8;
         int oamAuxOffset = oamAddress % 8;
-        for (int i = 0; i < 16; ++i) {
-            VideoMemory::Object object = videoMemory.readObject(i);
-            output << "size: " << videoMemory.getObjectSize(object.size);
+        for (int i = 0; i < 32; ++i) {
+            Video::Object object = video.readObject(i);
+            output << "size: " << video.getObjectSize(object.size);
             output << ", x: " << object.x;
             output << ", y: " << object.y;
             output << ", tile: " << object.tileIndex;
@@ -352,7 +383,7 @@ public:
 
     void printBreakpoints(const Context& cpuContext, const Context& spcContext) const
     {
-        for (const Debugger::Context* context : { &cpuContext, &spcContext }) {
+        /*for (const Debugger::Context* context : { &cpuContext, &spcContext }) {
             if (!context->breakpoints.empty()) {
                 output << "Breakpoints:";
                 for (Long breakpoint : context->breakpoints) {
@@ -360,7 +391,7 @@ public:
                 }
                 output << std::endl;
             }
-        }
+        }*/
     }
 
     void printClockSpeed() const

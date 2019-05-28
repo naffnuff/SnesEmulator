@@ -41,8 +41,8 @@ public:
         }
     }
 
-    DmaInstruction(DmaInstruction&) = delete;
-    DmaInstruction& operator=(DmaInstruction&) = delete;
+    DmaInstruction(const DmaInstruction&) = delete;
+    DmaInstruction& operator=(const DmaInstruction&) = delete;
 
     virtual std::string toString() const
     {
@@ -55,7 +55,6 @@ public:
                     Channel channel = channels[i];
                     Word sourceAddress = channel.sourceAddressRead->getWordValue();
                     Byte sourceBank = channel.sourceBank->getValue();
-                    MemoryLocation& memoryLocation = memory[Long(sourceAddress, sourceBank)];
                     ss << "Channel " << i << ": ";
                     ss << sourceBank << sourceAddress;
                     ss << " -> ";

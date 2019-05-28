@@ -82,8 +82,8 @@ public:
         }
     }
 
-    State(State&) = delete;
-    State& operator=(State&) = delete;
+    State(const State&) = delete;
+    State& operator=(const State&) = delete;
 
     size_t getMemorySize() const
     {

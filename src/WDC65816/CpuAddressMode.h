@@ -384,22 +384,21 @@ class DirectPageIndirectIndexedY : public Instruction2Byte
     // §3: Add 1 cycle if adding index crosses a page boundary
     int invokeOperator(Byte lowByte) override
     {
-        throw AddressModeNotYetImplementedException("DirectPageIndirectIndexedY");
         int cycles = 0;
         if ((Byte)state.getDirectPage()) {
             cycles += 1;
         }
-        if (true /*index added crosses page boundary*/) {
+        Long address(state.getDirectMemoryLocation(lowByte)->getWordValue(), state.getDataBank());
+        Long indexedAddress = address + state.getIndexRegister<State::Y>();
+        if (address >> 8 != indexedAddress >> 8) {
             cycles += 1;
-            throw AddressModeNotYetImplementedException("TODO03");
         }
-        MemoryLocation* memory = nullptr;
-        return cycles + Operator::invoke(state, memory);
+        return cycles + Operator::invoke(state, state.getMemoryLocation(indexedAddress));
     }
 
     std::string toString() const override
     {
-        return Operator::toString() + " $" + operandToString() + " TODO";
+        return Operator::toString() + " ($" + operandToString() + "),Y";
     }
 };
 

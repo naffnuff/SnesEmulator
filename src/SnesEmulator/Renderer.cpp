@@ -1,4 +1,4 @@
-#include "SnesRenderer.h"
+#include "Renderer.h"
 
 #include <cmath>
 

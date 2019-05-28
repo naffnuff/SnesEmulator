@@ -28,8 +28,8 @@ public:
         glfwTerminate();
     }
 
-    Renderer(Renderer&) = delete;
-    Renderer& operator=(Renderer&) = delete;
+    Renderer(const Renderer&) = delete;
+    Renderer& operator=(const Renderer&) = delete;
 
     void initialize(const std::string& windowTitle);
     void setScanline(int lineIndex, const std::vector<Pixel>& pixels);

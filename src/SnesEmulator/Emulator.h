@@ -11,10 +11,11 @@
 #include "WDC65816/CpuInstructionDecoder.h"
 #include "SPC700/SpcInstructionDecoder.h"
 
-#include "SnesRom.h"
+#include "Rom.h"
 #include "Debugger.h"
-#include "SnesRenderer.h"
-#include "VideoMemory.h"
+#include "Renderer.h"
+#include "Video.h"
+#include "Registers.h"
 
 class Emulator
 {
@@ -23,21 +24,21 @@ public:
         : output(output)
         , input(input)
         , error(error)
-        , videoMemory(output)
-        , vramRenderer(vramRendererWidth, vramRendererHeight, 2.f, true, output)
-        , cgramRenderer(16, 16, 16.f, true, output)
+        , video(output)
+        , cpuState()
+        , spcState()
+        , registers(output, error, debugger, cpuState, video)
         , debugger(output, input, error, cycleCount, running)
         , rom(output)
         , cpuInstructionDecoder(cpuState)
         , spcInstructionDecoder(spcState)
         , cpuContext("cpu.txt", Debugger::Green)
         , spcContext("spc.txt", Debugger::Magenta)
-        , registers(0x6000)
     {
     }
 
-    Emulator(Emulator&) = delete;
-    Emulator& operator=(Emulator&) = delete;
+    Emulator(const Emulator&) = delete;
+    Emulator& operator=(const Emulator&) = delete;
 
     void initialize();
     void run();
@@ -53,15 +54,10 @@ public:
     }
 
 private:
-    static const int vramRendererWidth = 0x200;
-    static const int vramRendererHeight = 0x200;
-
     std::ostream& output;
     std::istream& input;
     std::ostream& error;
 
-    Renderer vramRenderer;
-    Renderer cgramRenderer;
     Debugger debugger;
     Rom rom;
     CPU::State cpuState;
@@ -71,8 +67,8 @@ private:
     Debugger::Context cpuContext;
     Debugger::Context spcContext;
 
-    std::vector<MemoryLocation> registers;
-    VideoMemory videoMemory;
+    Video video;
+    Registers registers;
 
     bool running = true;
     uint64_t cycleCount = 186;

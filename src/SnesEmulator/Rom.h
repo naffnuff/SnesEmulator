@@ -18,8 +18,8 @@ public:
     {
     }
 
-    Rom(Rom&) = delete;
-    Rom& operator=(Rom&) = delete;
+    Rom(const Rom&) = delete;
+    Rom& operator=(const Rom&) = delete;
 
     void loadFromFile(const std::string& path, CPU::State& state)
     {

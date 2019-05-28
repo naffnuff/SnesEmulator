@@ -22,13 +22,28 @@ public:
     };
 
     MemoryLocation()
+        : nextInMemory(&this[1])
+        , nextInBank(&this[1])
+        , nextInPage(&this[1])
     {
     }
 
     MemoryLocation(Byte value)
         : value(value)
+        , nextInMemory(&this[1])
+        , nextInBank(&this[1])
+        , nextInPage(&this[1])
     {
     }
+
+    MemoryLocation(const MemoryLocation&)
+        : nextInMemory(&this[1])
+        , nextInBank(&this[1])
+        , nextInPage(&this[1])
+    {
+    }
+
+    MemoryLocation& operator=(const MemoryLocation&) = delete;
 
     Type getType() const
     {
@@ -77,6 +92,10 @@ public:
         if (onWrite) {
             onWrite(oldValue, newValue);
         }
+        if (breakpoint) {
+            std::cout << "Write: ";
+            breakpoint();
+        }
     }
 
     Byte getValue() const
@@ -96,6 +115,10 @@ public:
         if (onRead) {
             onRead(result);
         }
+        if (breakpoint) {
+            std::cout << "Read: ";
+            breakpoint();
+        }
 
         return result;
     }
@@ -114,6 +137,10 @@ public:
 
         if (onApply) {
             onApply(value);
+        }
+        if (breakpoint) {
+            std::cout << "Apply: ";
+            breakpoint();
         }
 
         return value;
@@ -191,11 +218,16 @@ private:
     MemoryLocation* mirroredMemory = nullptr;
     Type type = Invalid;
     int applicationCount = 0;
+    MemoryLocation* nextInMemory = nullptr;
+    MemoryLocation* nextInBank = nullptr;
+    MemoryLocation* nextInPage = nullptr;
 
 public:
-    std::function<void(Byte value)> onRead;
-    std::function<void(Byte oldValue, Byte newValue)> onWrite;
-    std::function<void(Byte value)> onApply;
+    std::function<void(Byte value)> onRead = nullptr;
+    std::function<void(Byte oldValue, Byte newValue)> onWrite = nullptr;
+    std::function<void(Byte value)> onApply = nullptr;
+
+    std::function<void()> breakpoint = nullptr;
 
     friend std::ostream& operator<<(std::ostream&, const MemoryLocation&);
 };
@@ -204,6 +236,9 @@ inline std::ostream& operator<<(std::ostream& output, const MemoryLocation& memo
 {
     if (memory.mirroredMemory) {
         return output << memory.mirroredMemory->value << std::dec;
+    }
+    else if (memory.readMapping) {
+        return output << memory.readMapping->value << std::dec;
     }
     else {
         return output << memory.value << std::dec;
