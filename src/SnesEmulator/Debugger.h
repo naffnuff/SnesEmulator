@@ -66,6 +66,27 @@ public:
         Context(const Context&) = delete;
         Context& operator=(const Context&) = delete;
 
+        void addKnownAddress(Long address)
+        {
+            knownAddresses[++lastKnownAddressIndex] = address;
+        }
+
+        Long getLastKnownAddress() const
+        {
+            return knownAddresses[lastKnownAddressIndex];
+        }
+
+        void printAddressHistory(std::ostream& output)
+        {
+            output << "Address history:" << std::endl;
+            for (Byte i = lastKnownAddressIndex; i != Byte(lastKnownAddressIndex - 10); --i) {
+                output << knownAddresses[i] << std::endl;
+            }
+        }
+
+        std::array<Long, 0x100> knownAddresses;
+        Byte lastKnownAddressIndex = 0;
+
         std::string fileName;
         Long inspectedAddress = 0;
         bool watchMode = true;
@@ -419,4 +440,5 @@ private:
     uint64_t& cycleCount;
     bool& running;
     Word inspectedVideoMemory = 0x0;
+
 };

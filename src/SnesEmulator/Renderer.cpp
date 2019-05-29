@@ -84,19 +84,20 @@ void Renderer::setGrayscaleTile(int startRow, int startColumn, const std::array<
 
 void Renderer::update()
 {
-    static double previousTime = glfwGetTime();
-    static int frameCount = 0;
+    if (!syncUpdate) {
+        static double previousTime = glfwGetTime();
+        static int frameCount = 0;
 
-    // Measure speed
-    double currentTime = glfwGetTime();
-    frameCount++;
-    // If a second has passed.
-    if (currentTime - previousTime >= 1.0) {
-        // Display the frame count here any way you want.
-        //output << title << ": " << frameCount << std::endl;
+        // Measure speed
+        double currentTime = glfwGetTime();
+        frameCount++;
+        // If a second has passed.
+        if (currentTime - previousTime >= 1.0) {
+            output << frameCount << std::endl;
 
-        frameCount = 0;
-        previousTime = currentTime;
+            frameCount = 0;
+            previousTime = currentTime;
+        }
     }
 
     // Clear the screen

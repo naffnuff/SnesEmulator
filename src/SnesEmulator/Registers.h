@@ -56,7 +56,6 @@ public:
 
     void makeRegister(Word address, bool cpuOutRegister, const std::string& info, bool debug = false, std::function<void(Byte value)> callback = nullptr)
     {
-        std::cout << "Memory size: " << cpuState.accessMemory().size() << std::endl;
         MemoryLocation* memory = cpuState.getMemoryLocation(Long(address, 0));
         if (cpuOutRegister) {
             memory->setWriteOnly();
@@ -65,7 +64,7 @@ public:
             memory->onWrite =
                 [this, address, callback, info, debug](Byte oldValue, Byte newValue) {
                 if (debug && newValue && oldValue != newValue) {
-                    debugger.printMemoryRegister(true, newValue, address, info);
+                    //debugger.printMemoryRegister(true, newValue, address, info);
                 }
                 if (callback) {
                     callback(newValue);
@@ -78,7 +77,7 @@ public:
             memory->onRead =
                 [this, address, callback, info, debug](Byte value) {
                 if (debug && value) {
-                    debugger.printMemoryRegister(false, value, address, info);
+                    //debugger.printMemoryRegister(false, value, address, info);
                 }
                 if (callback) {
                     callback(value);
@@ -157,7 +156,7 @@ public:
 
                 video.vram.writeByte(value, true, true);
 
-                static const int bitsPerPixel = 4;
+                /*static const int bitsPerPixel = 4;
                 static const int pixelPerTile = 8 * 8;
                 static const int bitPerTile = pixelPerTile * bitsPerPixel;
                 static const int bitsPerWord = 16;
@@ -170,7 +169,7 @@ public:
                     const int rowIndex = tileIndex / tilesPerRow;
                     const int columnIndex = tileIndex % tilesPerRow;
                     video.vramRenderer.setGrayscaleTile(rowIndex * 8, columnIndex * 8, tile, bitsPerPixel);
-                }
+                }*/
             }
         );
 
@@ -204,11 +203,11 @@ public:
 
                 video.cgram.writeByte(value);
 
-                if (cgramHighTable) {
+                /*if (cgramHighTable) {
                     int row = cgramAddress / 0x10;
                     int column = cgramAddress % 0x10;
                     video.cgramRenderer.setPixel(row, column, video.cgram.readWord(cgramAddress));
-                }
+                }*/
             }
         );
 

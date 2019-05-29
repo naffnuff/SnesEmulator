@@ -74,7 +74,7 @@ void Emulator::initialize()
 
 void Emulator::run()
 {
-    std::thread oamRendererThread(
+    /*std::thread oamRendererThread(
         [this]() {
             video.oamRenderer.initialize("OAM viewer");
             while (running) {
@@ -94,7 +94,7 @@ void Emulator::run()
             while (running) {
                 video.cgramRenderer.update();
             }
-        });
+        });*/
 
     DmaInstruction dmaInstruction(registers.registerBus, cpuState.accessMemory(), output, error);
 
@@ -113,7 +113,8 @@ void Emulator::run()
     bool nmiRequested = false;
     registers.setNmiActive(false);
 
-    double runStartTime;
+    double runStartTime = 0.0;
+    uint64_t cycleCountDelta = 0;
     bool stepMode = cpuContext.stepMode || spcContext.stepMode;
     if (!stepMode) {
         output << "Snip" << std::endl;
@@ -191,6 +192,7 @@ void Emulator::run()
             else if (stepMode) { // run mode initiated
                 stepMode = false;
                 runStartTime = video.renderer.getTime();
+                cycleCountDelta = 0;
             }
             else { // run mode continued
                 if (iteration % 100 == 0)
@@ -200,7 +202,7 @@ void Emulator::run()
                     cycleCountTarget = uint64_t(elapsedTime * clockSpeedTarget);
                 }
 
-                if (cycleCountTarget > cycleCount)
+                if (cycleCountTarget > cycleCountDelta)
                 {
                     increment = true;
                 }
@@ -212,6 +214,7 @@ void Emulator::run()
 
                 if (increment) {
                     ++incrementCount;
+                    ++cycleCountDelta;
                 }
                 ++totalCount;
             }
@@ -248,20 +251,20 @@ void Emulator::run()
         }
     } catch (const std::exception& e) {
         running = false;
-        oamRendererThread.join();
-        vramRendererThread.join();
-        cgramRendererThread.join();
+        //oamRendererThread.join();
+        //vramRendererThread.join();
+        //cgramRendererThread.join();
         throw e;
     }
-    oamRendererThread.join();
-    vramRendererThread.join();
-    cgramRendererThread.join();
+    //oamRendererThread.join();
+    //vramRendererThread.join();
+    //cgramRendererThread.join();
 }
 
 template<typename State, typename OtherState>
 int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debugger::Context& context, OtherState& otherState, Debugger::Context& otherContext, std::ostream& error)
 {
-    Long lastKnownProgramAddress = state.getProgramAddress();
+    context.addKnownAddress(state.getProgramAddress());
     try {
         if (context.stepMode) {
             debugger.printState(state, context);
@@ -284,6 +287,7 @@ int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debu
 
             if (context.stepMode) {
                 debugger.printClockSpeed();
+                context.printAddressHistory(error);
             }
             else {
                 return instruction->execute();
@@ -292,18 +296,22 @@ int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debu
     } catch (OpcodeNotYetImplementedException& e) {
         error << e.what() << std::endl;
         context.stepMode = true;
+        context.printAddressHistory(error);
     } catch (AddressModeNotYetImplementedException& e) {
         error << e.what() << std::endl;
-        state.setProgramAddress(lastKnownProgramAddress);
+        state.setProgramAddress(context.getLastKnownAddress());
         context.stepMode = true;
+        context.printAddressHistory(error);
     } catch (OperatorNotYetImplementedException& e) {
         error << e.what() << std::endl;
-        state.setProgramAddress(lastKnownProgramAddress);
+        state.setProgramAddress(context.getLastKnownAddress());
         context.stepMode = true;
+        context.printAddressHistory(error);
     } catch (MemoryLocation::AccessException& e) {
         error << e.what() << std::endl;
-        state.setProgramAddress(lastKnownProgramAddress);
+        state.setProgramAddress(context.getLastKnownAddress());
         context.stepMode = true;
+        context.printAddressHistory(error);
     }
     return 0;
 }

@@ -74,9 +74,9 @@ public:
         , cgram(0x100)
         , oam(0x110)
         , renderer(256, 224, 3.f, false, output)
-        , vramRenderer(0x200, 0x200, 1.f, true, output)
-        , cgramRenderer(16, 16, 16.f, true, output)
-        , oamRenderer(0x200, 0x100, 3.f, true, output)
+        //, vramRenderer(0x200, 0x200, 1.f, true, output)
+        //, cgramRenderer(16, 16, 16.f, true, output)
+        //, oamRenderer(0x200, 0x100, 3.f, true, output)
     {
     }
 
@@ -115,7 +115,7 @@ public:
 
     void drawDebugInfo()
     {
-        oamRenderer.clearDisplay(0);
+        /*oamRenderer.clearDisplay(0);
 
         int rowOffset = 0;
         int columnOffset = 0;
@@ -141,7 +141,7 @@ public:
                 columnOffset = 0;
                 rowOffset += 64;
             }
-        }
+        }*/
     }
 
     void drawScanline(int vCounter)
@@ -263,9 +263,9 @@ public:
     Table oam;
 
     Renderer renderer;
-    Renderer vramRenderer;
-    Renderer cgramRenderer;
-    Renderer oamRenderer;
+    //Renderer vramRenderer;
+    //Renderer cgramRenderer;
+    //Renderer oamRenderer;
 
     uint8_t clearBlueIntensity = 0;
     uint8_t clearGreenIntensity = 0;
