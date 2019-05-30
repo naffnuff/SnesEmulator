@@ -55,7 +55,7 @@ class AbsoluteIndexedIndirect : public Instruction3Byte
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
-        Long address = Long(lowByte, highByte, state.getDataBank());
+        Long address = Long(lowByte, highByte, state.getProgramBank());
         Long indexedAddress = address + state.getIndexRegister<State::X>();
         MemoryLocation* memory = state.getMemoryLocation(indexedAddress);
         return Operator::invoke(state, memory->getWordValue());
@@ -120,13 +120,13 @@ class AbsoluteIndirect : public Instruction3Byte
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
-        throw AddressModeNotYetImplementedException("AbsoluteIndirect");
-        return Operator::invoke(state, Word());
+        MemoryLocation* memory = state.getMemoryLocation(lowByte, highByte);
+        return Operator::invoke(state, memory->getWordValue());
     }
 
     std::string toString() const override
     {
-        return Operator::toString() + " $" + operandToString() + " TODO";
+        return Operator::toString() + " ($" + operandToString() + ")";
     }
 };
 
@@ -540,14 +540,15 @@ class ProgramCounterRelativeLong : public Instruction3Byte
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
-        throw AddressModeNotYetImplementedException("ProgramCounterRelativeLong");
-        MemoryLocation* memory = nullptr;
-        return Operator::invoke(state, memory);
+        return Operator::invoke(state, int16_t(highByte << 8 | lowByte));
     }
 
     std::string toString() const override
     {
-        return Operator::toString() + " $" + operandToString() + " TODO";
+        std::ostringstream ss;
+        ss << Operator::toString() + " $";
+        ss << state.getProgramCounter(int((int8_t)size() + int16_t(state.readProgramByte(2) << 8 | state.readProgramByte(1))));
+        return ss.str();
     }
 };
 

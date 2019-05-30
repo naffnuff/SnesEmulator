@@ -53,35 +53,6 @@ void Renderer::initialize(const std::string& windowTitle)
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 }
 
-void Renderer::setScanline(int lineIndex, const std::vector<Pixel>& pixels)
-{
-    for (int i = 0; i < pixels.size(); ++i) {
-        setPixel(lineIndex, i, pixels[i]);
-    }
-}
-
-void Renderer::setPixel(int row, int column, Pixel pixel)
-{
-    row = height - 1 - row;
-    pixelBuffer[row * width + column] = pixel;
-}
-
-void Renderer::setGrayscalePixel(int row, int column, uint8_t white)
-{
-    uint8_t white5Bit = white >> 3;
-    Pixel pixel = white5Bit << 0 | white5Bit << 5 | white5Bit << 10;
-    setPixel(row, column, pixel);
-}
-
-void Renderer::setGrayscaleTile(int startRow, int startColumn, const std::array<std::array<uint8_t, 8>, 8>& tile, int bitsPerPixel)
-{
-    for (int row = 0; row < 8; ++row) {
-        for (int column = 0; column < 8; ++column) {
-            setGrayscalePixel(startRow + row, startColumn + column, tile[row][column] * (bitsPerPixel == 2 ? 85 : 17));
-        }
-    }
-}
-
 void Renderer::update()
 {
     if (!syncUpdate) {

@@ -202,13 +202,7 @@ public:
     // §1: Add 1 cycle if branch is taken
     static int invoke(State& state, int8_t offset)
     {
-        throw OperatorNotYetImplementedException("BMI");
-        int cycles = 0;
-        if (true /*branch taken*/) {
-            cycles += 2;
-            throw OperatorNotYetImplementedException("TODO01");
-        }
-        return cycles;
+        return branchIf(state.getFlag(State::n), state, offset);
     }
 
     static std::string toString() { return "BMI"; }
@@ -710,9 +704,10 @@ public:
 class MUL
 {
 public:
-    static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
+    static int invoke(State& state, MemoryLocation* accumulator, const MemoryLocation* yRegister)
     {
-        throw OperatorNotYetImplementedException("MUL");
+        accumulator->setWordValue(yRegister->getValue() * accumulator->getValue());
+        state.updateSignFlags(yRegister->getValue());
         return 0;
     }
 
@@ -827,7 +822,7 @@ class POP
 public:
     static int invoke(State& state, MemoryLocation* operand)
     {
-        throw OperatorNotYetImplementedException("POP");
+        operand->setValue(state.pullFromStack());
         return 0;
     }
 
@@ -844,7 +839,7 @@ class PUSH
 public:
     static int invoke(State& state, MemoryLocation* operand)
     {
-        throw OperatorNotYetImplementedException("PUSH");
+        state.pushToStack(operand->getValue());
         return 0;
     }
 

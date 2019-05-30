@@ -434,18 +434,25 @@ public:
         }
     }
 
-    void startNmi()
+    void startInterrupt(bool isNmi)
     {
-        interrupted = true;
-
         pushToStack(programBank);
         programBank = 0x00;
 
         pushWordToStack(programCounter);
-        programCounter = getInterruptVectors(isNativeMode()).Nmi;
 
         pushToStack(flags);
-        setFlag(i, true);
+
+        if (isNmi) {
+            programCounter = getInterruptVectors(isNativeMode()).Nmi;
+            nmiActive = true;
+            setFlag(i, true);
+        }
+        else {
+            programCounter = getInterruptVectors(isNativeMode()).Irq;
+            irqActive = true;
+        }
+
         setFlag(d, false);
     }
 
@@ -455,12 +462,25 @@ public:
         programCounter = pullWordFromStack();
         programBank = pullFromStack();
 
-        interrupted = false;
+        if (nmiActive) {
+            nmiActive = false;
+        }
+        else if (irqActive) {
+            irqActive = false;
+        }
+        else {
+            throw std::logic_error("End interrupt with neither nmi not irq ongoing");
+        }
     }
 
-    bool isInterrupted() const
+    bool isNmiActive() const
     {
-        return interrupted;
+        return nmiActive;
+    }
+
+    bool isIrqActive() const
+    {
+        return irqActive;
     }
 
     InterruptVectors& getInterruptVectors(bool native)
@@ -495,7 +515,8 @@ private:
     InterruptVectors nativeVectors;
     InterruptVectors emulationVectors;
 
-    bool interrupted = false;
+    bool nmiActive = false;
+    bool irqActive = false;
 };
 
 }

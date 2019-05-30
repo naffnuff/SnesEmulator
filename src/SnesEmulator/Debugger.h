@@ -129,9 +129,7 @@ public:
         if (memory->breakpoint == nullptr) {
             memory->breakpoint = [this, &context, breakpoint]() {
                 context.stepMode = true;
-                setOutputColor(Red, true);
                 output << "Breakpoint hit @ " << breakpoint << std::endl;
-                setOutputColor(DefaultColor, false);
             };
             context.breakpoints.insert(breakpoint);
             output << "Breakpoint inserted at address " << breakpoint << std::endl;

@@ -506,7 +506,6 @@ class AND_39 : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::AND, Sta
     // 3   6-m-x+x*p   abs,Y     m.....m. . AND $9876,Y
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("AND_39");
         return 4 + applyOperand();
     }
 
@@ -556,7 +555,6 @@ class ASL_06 : public AddressMode::DirectPage<Operator::ASL>
     // 2   7-2*m+w     dir       m.....mm . ASL $10
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ASL_06");
         return 5 + applyOperand();
     }
 
@@ -707,7 +705,6 @@ class BIT_2C : public AddressMode::Absolute<Operator::BIT<false>>
     // 3   5-m         abs       mm....m. . BIT $9876
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("BIT_2C");
         return 4 + applyOperand();
     }
 
@@ -875,7 +872,6 @@ class BRL_82 : public AddressMode::ProgramCounterRelativeLong<Operator::BRL>
     // 3   4           rel16     ........ . BRL LABEL
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("BRL_82");
         return 4 + applyOperand();
     }
 
@@ -892,7 +888,6 @@ class BVC_50 : public AddressMode::ProgramCounterRelative<Operator::BVC>
     // 2   2+t+t*e*p   rel8      ........ . BVC LABEL
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("BVC_50");
         return 2 + applyOperand();
     }
 
@@ -1378,7 +1373,6 @@ class CPY_C4 : public AddressMode::DirectPage<Operator::CP<State::Y>>
     // 2   4-x+w       dir       x.....xx . CPY $10
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("CPY_C4");
         return 3 + applyOperand();
     }
 
@@ -4099,7 +4093,6 @@ class STZ_74 : public AddressMode::DirectPageIndexed<Operator::STZ, State::X>
     // 2   5-m+w       dir,X     ........ . STZ $10,X
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("STZ_74");
         return 4 + applyOperand();
     }
 

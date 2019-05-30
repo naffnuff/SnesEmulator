@@ -328,9 +328,7 @@ class DirectIndexedRegister : public Instruction2Byte
 
     int invokeOperator(Byte lowByte) override
     {
-        throw AddressModeNotYetImplementedException("DirectIndexedRegister");
-        MemoryLocation* data = nullptr;
-        return Operator::invoke(state, data, 0);
+        return Operator::invoke(state, state.getDirectMemoryLocation(lowByte + state.getRegisterValue<FirstRegister>()), state.getRegisterValue<SecondRegister>());
     }
 
     std::string toString() const override
@@ -705,9 +703,7 @@ class RegisterDirectIndexed : public Instruction2Byte
 
     int invokeOperator(Byte lowByte) override
     {
-        throw AddressModeNotYetImplementedException("RegisterDirectIndexed");
-        MemoryLocation* data = nullptr;
-        return Operator::invoke(state, data, 0);
+        return Operator::invoke(state, state.getRegister<FirstRegister>(), state.getDirectMemoryByte(lowByte + state.getRegisterValue<SecondRegister>()));
     }
 
     std::string toString() const override
@@ -990,14 +986,12 @@ class YAccumulator : public Instruction1Byte
 
     int invokeOperator() override
     {
-        throw AddressModeNotYetImplementedException("YAccumulator");
-        MemoryLocation* data = nullptr;
-        return Operator::invoke(state, data, 0);
+        return Operator::invoke(state, state.getRegister<State::A>(), state.getRegister<State::Y>());
     }
 
     std::string toString() const override
     {
-        return Operator::toString() + " TODO";
+        return Operator::toString() + " YA";
     }
 };
 

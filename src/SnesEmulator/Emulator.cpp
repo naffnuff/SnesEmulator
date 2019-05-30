@@ -13,15 +13,11 @@ int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debu
 
 void Emulator::initialize()
 {
-    rom.loadFromFile("../../Legend of Zelda, The - A Link to the Past (U) [!].smc", cpuState);
     //rom.loadFromFile("../../Super Mario World (USA).sfc", cpuState);
+    rom.loadFromFile("../../Legend of Zelda, The - A Link to the Past (U) [!].smc", cpuState);
     //rom.loadFromFile("../../Super Metroid (Japan, USA) (En,Ja).sfc", cpuState);
     //rom.loadFromFile("../../Super Metroid (JU) [!].smc", cpuState);
     //rom.loadFromFile("../../Megaman X (USA).sfc", cpuState);
-    //rom.loadFromFile("../../SnesInitializationROM.smc", cpuState);
-    //rom.loadFromFile("../../rom.smc", cpuState);
-    //rom.loadFromFile("H:\\naffnuff\\wla\\rom.smc", cpuState);
-    //rom.loadFromFile("C:\\cygwin64\\home\\rasmus.knutsson\\wla-dx\\wla\\myrom.smc", cpuState);
 
     if (rom.isLowRom()) {
         // RAM
@@ -33,6 +29,11 @@ void Emulator::initialize()
             for (Word address = 0; address < 0x2000; ++address) {
                 cpuState.getMemoryLocation(Long(address, bank))->setMirrorOf(cpuState.getMemoryLocation(Long(address, 0x7E)));
             }
+        }
+
+        // ROM mirrors
+        for (Long address = 0; address < 0x800000; ++address) {
+            cpuState.getMemoryLocation(address + 0x800000)->setMirrorOf(cpuState.getMemoryLocation(address));
         }
 
         // Save RAM
@@ -104,14 +105,12 @@ void Emulator::run()
 
     int hCounter = int(cycleCount);
     int vCounter = 0;
-    bool vBlank = false;
     int frame = 0;
 
     std::vector<Renderer::Pixel> scanline(256);
 
-    bool irq = false;
     bool nmiRequested = false;
-    registers.setNmiActive(false);
+    bool irqRequested = false;
 
     double runStartTime = 0.0;
     uint64_t cycleCountDelta = 0;
@@ -131,11 +130,12 @@ void Emulator::run()
 
                 if (nmiRequested) {
                     nmiRequested = false;
-                    if (registers.nmiEnabled()) {
-                        registers.setNmiActive(true);
-                        cpuState.startNmi();
-                        //cpuContext.stepMode = true;
-                    }
+                    cpuState.startInterrupt(true);
+                    nextCpu += 9 * 8; // TODO: check the correct cycles for interrupt
+                }
+                else if (irqRequested && !cpuState.getFlag(CPU::State::i) && !cpuState.isNmiActive()) {
+                    irqRequested = false;
+                    cpuState.startInterrupt(false);
                     nextCpu += 9 * 8; // TODO: check the correct cycles for interrupt
                 }
 
@@ -151,7 +151,7 @@ void Emulator::run()
 
                 if (cpuContext.stepMode) {
                     output << "Cycle count: " << cycleCount << ", Next cpu: " << nextCpu << ", Next spc: " << nextSpc << std::endl;
-                    output << "Frame: " << frame << ", V counter: " << vCounter << ", H counter: " << hCounter << ", V blank: " << vBlank << ", interrupted: " << cpuState.isInterrupted() << std::endl;
+                    output << "Frame: " << frame << ", V counter: " << vCounter << ", H counter: " << hCounter << ", V blank: " << registers.vBlank << ", H blank: " << registers.hBlank << ", nmi: " << cpuState.isNmiActive() << ", irq: " << cpuState.isIrqActive() << std::endl;
                     debugger.printBreakpoints(cpuContext, spcContext);
                     debugger.printMemory(cpuState, cpuContext, spcState, spcContext, video);
                 }
@@ -222,27 +222,34 @@ void Emulator::run()
             if (increment) {
                 ++cycleCount;
                 ++hCounter;
-                if (hCounter == 1360) {
-                    hCounter = 0;
+                if (hCounter == 1100) {
                     if (vCounter < 224) {
                         video.drawScanline(vCounter);
                     }
+                    registers.hBlank = true;
+                }
+                else if (hCounter == 1364) {
+                    hCounter = 0;
+                    registers.hBlank = false;
                     ++vCounter;
-                    if (vCounter == 225) {
-                        vBlank = true;
-                        nmiRequested = true;
+                    if (registers.vCounterIrqEnabled() && registers.getVTimer() == vCounter) {
+                        irqRequested = true;
                     }
-                    else if (vCounter == 262) {
-                        ++frame;
-                        vCounter = 0;
-                        vBlank = false;
-                        registers.setNmiActive(false);
+                    if (vCounter == 224) {
                         video.renderer.update();
-                        video.clearDisplay();
                         if (video.renderer.pause) {
                             video.renderer.pause = false;
                             cpuContext.stepMode = true;
                         }
+                        registers.vBlank = true;
+                        if (registers.nmiEnabled()) {
+                            nmiRequested = true;
+                        }
+                    }
+                    else if (vCounter == 262) {
+                        ++frame;
+                        vCounter = 0;
+                        registers.vBlank = false;
                         video.drawDebugInfo();
                     }
                 }
@@ -294,24 +301,24 @@ int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debu
             }
         }
     } catch (OpcodeNotYetImplementedException& e) {
-        error << e.what() << std::endl;
         context.stepMode = true;
         context.printAddressHistory(error);
+        error << e.what() << std::endl;
     } catch (AddressModeNotYetImplementedException& e) {
-        error << e.what() << std::endl;
         state.setProgramAddress(context.getLastKnownAddress());
         context.stepMode = true;
         context.printAddressHistory(error);
+        error << e.what() << std::endl;
     } catch (OperatorNotYetImplementedException& e) {
-        error << e.what() << std::endl;
         state.setProgramAddress(context.getLastKnownAddress());
         context.stepMode = true;
         context.printAddressHistory(error);
+        error << e.what() << std::endl;
     } catch (MemoryLocation::AccessException& e) {
-        error << e.what() << std::endl;
         state.setProgramAddress(context.getLastKnownAddress());
         context.stepMode = true;
         context.printAddressHistory(error);
+        error << e.what() << std::endl;
     }
     return 0;
 }

@@ -146,6 +146,8 @@ public:
 
     void drawScanline(int vCounter)
     {
+        clearScanline(vCounter);
+
         for (int i = 0; i < 128; ++i) {
             Object object = readObject(i);
 
@@ -251,9 +253,14 @@ public:
         return result;
     }
 
-    void clearDisplay()
+    void clearDisplay(bool oddLines)
     {
-        renderer.clearDisplay(clearRedIntensity | clearGreenIntensity << 5 | clearBlueIntensity << 10);
+        renderer.clearDisplay(clearRedIntensity | clearGreenIntensity << 5 | clearBlueIntensity << 10, oddLines);
+    }
+
+    void clearScanline(int vCounter)
+    {
+        renderer.clearScanline(vCounter, clearRedIntensity | clearGreenIntensity << 5 | clearBlueIntensity << 10);
     }
 
     std::ostream& output;

@@ -223,7 +223,7 @@ private:
     MemoryLocation* nextInPage = nullptr;
 
 public:
-    std::function<void(Byte value)> onRead = nullptr;
+    std::function<void(Byte& value)> onRead = nullptr;
     std::function<void(Byte oldValue, Byte newValue)> onWrite = nullptr;
     std::function<void(Byte value)> onApply = nullptr;
 

@@ -86,7 +86,7 @@ public:
     static std::string toString() { return "ASL"; }
 };
 
-static int branchIf(bool condition, State& state, int8_t offset)
+static int branchIf(bool condition, State& state, int offset)
 {
     int cycles = 0;
     if (condition) {
@@ -260,9 +260,9 @@ public:
 class BRL
 {
 public:
-    static int invoke(State& state, const MemoryLocation* memory)
+    static int invoke(State& state, int16_t offset)
     {
-        throw OperatorNotYetImplementedException("BRL");
+        return branchIf(true, state, offset);
         return 0;
     }
 
@@ -277,17 +277,7 @@ public:
     // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, int8_t offset)
     {
-        throw OperatorNotYetImplementedException("BVC");
-        int cycles = 0;
-        if (true /*branch taken*/) {
-            cycles += 1;
-            throw OperatorNotYetImplementedException("TODO07");
-        }
-        if (true /*branch taken crosses page boundary*/) {
-            cycles += 1;
-            throw OperatorNotYetImplementedException("TODO08");
-        }
-        return cycles;
+        return branchIf(!state.getFlag(State::v), state, offset);
     }
 
     static std::string toString() { return "BVC"; }
@@ -716,7 +706,7 @@ public:
 class PER
 {
 public:
-    static int invoke(State& state, const MemoryLocation* memory)
+    static int invoke(State& state, int16_t offset)
     {
         throw OperatorNotYetImplementedException("PER");
         return 0;
@@ -1313,7 +1303,7 @@ class TXS
 public:
     static int invoke(State& state)
     {
-        throw OperatorNotYetImplementedException("TXS");
+        state.setStackPointer(state.getIndexRegister<State::X>());
         return 0;
     }
 

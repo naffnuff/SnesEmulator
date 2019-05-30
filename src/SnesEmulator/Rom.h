@@ -99,7 +99,7 @@ public:
 
     bool isLowRom() const
     {
-        return mapMode == 0x20;
+        return mapMode == 0x20 || mapMode == 0x30;
     }
 
 private:
