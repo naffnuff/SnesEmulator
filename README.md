@@ -3,7 +3,7 @@
 This is intended as a showcase of my abilities as a software engineer and as a C++ programmer. The source code is, in design and execution, 100% my own.
 
 ## Scope
-This emulator will probably never be able to run all or even most SNES games. I will be extremely please if some day I manage to finish my three favorite SNES games on it:
+This emulator will probably never be able to run all or even most SNES games. I will be extremely please if some day I manage to finish my three favorite SNES games on it, namely
 * Super Mario World
 * The Legend of Zelda - A Link to the Past
 * Super Metroid
