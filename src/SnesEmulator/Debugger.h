@@ -76,6 +76,16 @@ public:
             return knownAddresses[lastKnownAddressIndex];
         }
 
+        Long getPreviousAddress(Long currentAddress) const
+        {
+            for (Byte i = lastKnownAddressIndex; i != Byte(lastKnownAddressIndex - 0xff); --i) {
+                if (knownAddresses[i] != currentAddress) {
+                    return knownAddresses[i];
+                }
+            }
+            return currentAddress;
+        }
+
         void printAddressHistory(std::ostream& output)
         {
             output << "Address history:" << std::endl;
@@ -127,9 +137,15 @@ public:
     {
         MemoryLocation* memory = state.getMemoryLocation(breakpoint);
         if (memory->breakpoint == nullptr) {
-            memory->breakpoint = [this, &context, breakpoint]() {
-                context.stepMode = true;
-                output << "Breakpoint hit @ " << breakpoint << std::endl;
+            memory->breakpoint = [this, &context, breakpoint](MemoryLocation::Operation operation) {
+                if (operation == MemoryLocation::Apply) {
+                    context.stepMode = true;
+                    output << "Apply: Breakpoint hit @ " << breakpoint << std::endl;
+                }
+                /*else if (operation == MemoryLocation::Write) {
+                    context.stepMode = true;
+                    output << "Write: Breakpoint hit @ " << breakpoint << std::endl;
+                }*/
             };
             context.breakpoints.insert(breakpoint);
             output << "Breakpoint inserted at address " << breakpoint << std::endl;
@@ -152,7 +168,8 @@ public:
         if (command.empty()) {
             output << "Step" << std::endl;
             return true;
-        } else if (command == "h") {
+        }
+        else if (command == "h") {
             output
                 << "Commands:"
                 << "[return]: step into next instruction" << std::endl
@@ -172,21 +189,26 @@ public:
                 << "[p|s|a|x|y|d|f]=[hex]: set register to [hex]" << std::endl
                 << "[a]=[hex]: set address [a] to [hex]" << std::endl
                 << "s: switch contexts" << std::endl;
-        } else if (command == "n") {
+        }
+        else if (command == "n") {
             context.watchMode = false;
             context.inspectedAddress += (1 << 8);
-        } else if (command == "p") {
+        }
+        else if (command == "p") {
             context.watchMode = false;
             context.inspectedAddress -= (1 << 8);
-        } else if (command[0] == 'r') {
+        }
+        else if (command[0] == 'r') {
             if (command == "rr") {
                 context.stepMode = false;
                 otherContext.stepMode = false;
-            } else {
+            }
+            else {
                 context.stepMode = !context.stepMode;
                 if (context.stepMode) {
                     output << "Step mode" << std::endl;
-                } else {
+                }
+                else {
                     output << "Run mode" << std::endl;
                 }
             }
@@ -196,24 +218,31 @@ public:
                 startTime = clock();
             }
             return !context.stepMode;
-        } else if (command == "i") {
+        }
+        else if (command == "i") {
             output << "Inspect not implemented" << std::endl;
-        } else if (command == "q") {
+        }
+        else if (command == "q") {
             output << "Reset" << std::endl;
             running = false;
-        } else if (command == "clear") {
+        }
+        else if (command == "clear") {
             for (Long address : context.breakpoints) {
                 state.getMemoryLocation(address)->breakpoint = nullptr;
             }
             context.breakpoints.clear();
             output << "Cleared context " << context.fileName << std::endl;
             std::ofstream file(context.fileName);
-        } else if (command[0] == 't') {
+        }
+        else if (command[0] == 't') {
             Long breakpoint = state.getProgramAddress();
-            std::string twoFirst = command.substr(0, 2);
-            if (twoFirst == "tt") {
+            if (command.substr(0, 3) == "ttt") {
+                breakpoint = context.getPreviousAddress(breakpoint);
+            }
+            else if (command.substr(0, 2) == "tt") {
                 breakpoint += context.nextInstruction->size();
-            } else if (twoFirst == "t ") {
+            }
+            else if (command.substr(0, 2) == "t ") {
                 try {
                     breakpoint = stoi(command.substr(2), 0, 16);
                 } catch (std::exception& e) {
@@ -238,11 +267,13 @@ public:
         else if (command == "w") {
             context.watchMode = !context.watchMode;
             output << "Watch mode " << (context.watchMode ? "on" : "off") << std::endl;
-        } else if (command == "s") {
+        }
+        else if (command == "s") {
             output << "Switched contexts" << std::endl;
             printState(otherState, otherContext);
             return awaitCommand(otherContext, otherState, context, state);
-        } else if (command.size() > 1 && command[1] == '=') {
+        }
+        else if (command.size() > 1 && command[1] == '=') {
             try {
                 Word value = (Word)stoi(command.substr(2), 0, 16);
                 output << "Setting register " << command[0] << "=" << value << std::endl;
@@ -250,7 +281,8 @@ public:
             } catch (std::exception& e) {
                 error << "Not a valid address: " << e.what() << std::endl;
             }
-        } else if (command.find('=') != std::string::npos) {
+        }
+        else if (command.find('=') != std::string::npos) {
             size_t pos = command.find('=');
             try {
                 output << "Address: " << command.substr(0, pos) << ", value: " << command.substr(pos + 1) << std::endl;
@@ -262,7 +294,8 @@ public:
             } catch (std::exception& e) {
                 error << "Not valid: " << command.substr(0, pos) << " or " << command.substr(pos + 1) << ": " << e.what() << std::endl;
             }
-        } else {
+        }
+        else {
             try {
                 context.inspectedAddress = stoi(command, 0, 16);
                 output << "Inspecting address " << context.inspectedAddress << std::endl;
@@ -340,7 +373,7 @@ public:
         int oamAddress = inspectedVideoMemory & 0xFF80;
         int oamAuxAddress = oamAddress / 8;
         int oamAuxOffset = oamAddress % 8;
-        for (int i = 0; i < 32; ++i) {
+        for (int i = 0; i < 16; ++i) {
             Video::Object object = video.readObject(i);
             output << "size: " << video.getObjectSize(object.size);
             output << ", x: " << object.x;
@@ -402,7 +435,7 @@ public:
 
     void printBreakpoints(const Context& cpuContext, const Context& spcContext) const
     {
-        /*for (const Debugger::Context* context : { &cpuContext, &spcContext }) {
+        for (const Debugger::Context* context : { &cpuContext, &spcContext }) {
             if (!context->breakpoints.empty()) {
                 output << "Breakpoints:";
                 for (Long breakpoint : context->breakpoints) {
@@ -410,7 +443,7 @@ public:
                 }
                 output << std::endl;
             }
-        }*/
+        }
     }
 
     void printClockSpeed() const

@@ -387,7 +387,6 @@ class AND_2D : public AddressMode::Absolute<Operator::AND>
     // 3   5-m         abs       m.....m. . AND $9876
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("AND_2D");
         return 4 + applyOperand();
     }
 
@@ -587,7 +586,6 @@ class ASL_0E : public AddressMode::Absolute<Operator::ASL>
     // 3   8-2*m       abs       m.....mm . ASL $9876
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ASL_0E");
         return 6 + applyOperand();
     }
 
@@ -1204,7 +1202,6 @@ class CMP_D9 : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::CMP, Sta
     // 3   6-m-x+x*p   abs,Y     m.....mm . CMP $9876,Y
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("CMP_D9");
         return 4 + applyOperand();
     }
 
@@ -1237,7 +1234,6 @@ class CMP_DF : public AddressMode::AbsoluteLongIndexedX<Operator::CMP>
     // 4   6-m         long,X    m.....mm . CMP $FEDCBA,X
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("CMP_DF");
         return 5 + applyOperand();
     }
 
@@ -1322,7 +1318,6 @@ class CPX_EC : public AddressMode::Absolute<Operator::CP<State::X>>
     // 3   5-x         abs       x.....xx . CPX $9876
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("CPX_EC");
         return 4 + applyOperand();
     }
 
@@ -1389,7 +1384,6 @@ class CPY_CC : public AddressMode::Absolute<Operator::CP<State::Y>>
     // 3   5-x         abs       x.....xx . CPY $9876
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("CPY_CC");
         return 4 + applyOperand();
     }
 
@@ -1472,8 +1466,6 @@ class DEC_DE : public AddressMode::AbsoluteIndexed<Operator::DEC, State::X>
     // §20: TODO manually add exception for 3
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("DEC_DE");
-        throw OpcodeNotYetImplementedException("TODO20");
         return 7 + applyOperand();
     }
 
@@ -1623,7 +1615,6 @@ class EOR_4D : public AddressMode::Absolute<Operator::EOR>
     // 3   5-m         abs       m.....m. . EOR $9876
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("EOR_4D");
         return 4 + applyOperand();
     }
 
@@ -2184,7 +2175,6 @@ class LDA_B2 : public AddressMode::DirectPageIndirect<Operator::LDA>
     // 2   6-m+w       (dir)     m.....m. . LDA ($10)
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("LDA_B2");
         return 5 + applyOperand();
     }
 
@@ -2364,7 +2354,6 @@ class LDX_B6 : public AddressMode::DirectPageIndexed<Operator::LD<State::X>, Sta
     // 2   5-x+w       dir,Y     x.....x. . LDX $10,Y
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("LDX_B6");
         return 4 + applyOperand();
     }
 
@@ -2381,7 +2370,6 @@ class LDX_BE : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::LD<State
     // 3   6-2*x+x*p   abs,Y     x.....x. . LDX $9876,Y
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("LDX_BE");
         return 4 + applyOperand();
     }
 
@@ -2464,7 +2452,6 @@ class LDY_B4 : public AddressMode::DirectPageIndexed<Operator::LD<State::Y>, Sta
     // 2   5-x+w       dir,X     x.....x. . LDY $10,X
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("LDY_B4");
         return 4 + applyOperand();
     }
 
@@ -2731,7 +2718,6 @@ class ORA_0D : public AddressMode::Absolute<Operator::ORA>
     // 3   5-m         abs       m.....m. . ORA $9876
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ORA_0D");
         return 4 + applyOperand();
     }
 
@@ -3579,7 +3565,6 @@ class SBC_F5 : public AddressMode::DirectPageIndexed<Operator::SBC, State::X>
     // 2   5-m+w       dir,X     mm....mm . SBC $10,X
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("SBC_F5");
         return 4 + applyOperand();
     }
 
@@ -3613,7 +3598,6 @@ class SBC_F9 : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::SBC, Sta
     // 3   6-m-x+x*p   abs,Y     mm....mm . SBC $9876,Y
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("SBC_F9");
         return 4 + applyOperand();
     }
 
@@ -3630,7 +3614,6 @@ class SBC_FD : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::SBC, Sta
     // 3   6-m-x+x*p   abs,X     mm....mm . SBC $9876,X
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("SBC_FD");
         return 4 + applyOperand();
     }
 
@@ -3779,7 +3762,6 @@ class STA_87 : public AddressMode::DirectPageIndirectLong<Operator::STA>
     // 2   7-m+w       [dir]     ........ . STA [$10]
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("STA_87");
         return 6 + applyOperand();
     }
 
@@ -4223,7 +4205,6 @@ class TRB_14 : public AddressMode::DirectPage<Operator::TRB>
     // 2   7-2*m+w     dir       ......m. . TRB $10
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("TRB_14");
         return 5 + applyOperand();
     }
 

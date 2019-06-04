@@ -97,7 +97,6 @@ class ADC_84 : public AddressMode::RegisterDirect<Operator::ADC, State::A>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ADC_84");
         return  3 + applyOperand();
     }
 
@@ -145,7 +144,6 @@ class ADC_95 : public AddressMode::RegisterAbsoluteIndexed<Operator::ADC, State:
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ADC_95");
         return  5 + applyOperand();
     }
 
@@ -161,7 +159,6 @@ class ADC_96 : public AddressMode::RegisterAbsoluteIndexed<Operator::ADC, State:
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ADC_96");
         return  5 + applyOperand();
     }
 
@@ -193,7 +190,6 @@ class ADC_98 : public AddressMode::DirectImmediate<Operator::ADC>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ADC_98");
         return  5 + applyOperand();
     }
 
@@ -209,7 +205,6 @@ class ADDW_7A : public AddressMode::YAccumulatorDirect<Operator::ADDW>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ADDW_7A");
         return  5 + applyOperand();
     }
 
@@ -256,7 +251,6 @@ class AND_26 : public AddressMode::RegisterRegisterIndirect<Operator::AND, State
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("AND_26");
         return  3 + applyOperand();
     }
 
@@ -304,7 +298,6 @@ class AND_24 : public AddressMode::RegisterDirect<Operator::AND, State::A>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("AND_24");
         return  3 + applyOperand();
     }
 
@@ -336,7 +329,6 @@ class AND_25 : public AddressMode::RegisterAbsolute<Operator::AND, State::A>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("AND_25");
         return  4 + applyOperand();
     }
 
@@ -463,7 +455,6 @@ class ASL_0B : public AddressMode::Direct<Operator::ASL>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ASL_0B");
         return  4 + applyOperand();
     }
 
@@ -495,7 +486,6 @@ class ASL_0C : public AddressMode::Absolute<Operator::ASL>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ASL_0C");
         return  5 + applyOperand();
     }
 
@@ -511,7 +501,6 @@ class BBC_13 : public AddressMode::DirectProgramCounterRelative<Operator::BB<0, 
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("BBC_13");
         return 5 + applyOperand();
     }
 
@@ -527,7 +516,6 @@ class BBC_33 : public AddressMode::DirectProgramCounterRelative<Operator::BB<1, 
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("BBC_33");
         return 5 + applyOperand();
     }
 
@@ -734,7 +722,6 @@ class BBS_C3 : public AddressMode::DirectProgramCounterRelative<Operator::BB<6, 
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("BBS_C3");
         return 5 + applyOperand();
     }
 
@@ -765,7 +752,6 @@ class BCC_90 : public AddressMode::ProgramCounterRelative<Operator::B<State::c, 
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("BCC_90");
         return 2 + applyOperand();
     }
 
@@ -811,7 +797,6 @@ class BMI_30 : public AddressMode::ProgramCounterRelative<Operator::BMI>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("BMI_30");
         return 2 + applyOperand();
     }
 
@@ -935,7 +920,6 @@ class CBNE_DE : public AddressMode::DirectIndexedProgramCounterRelative<Operator
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("CBNE_DE");
         return 6 + applyOperand();
     }
 
@@ -951,7 +935,6 @@ class CBNE_2E : public AddressMode::DirectProgramCounterRelative<Operator::CBNE>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("CBNE_2E");
         return 5 + applyOperand();
     }
 
@@ -1063,7 +1046,6 @@ class CLR1_D2 : public AddressMode::Direct<Operator::SET1<6, false>>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("CLR1_D2");
         return  4 + applyOperand();
     }
 
@@ -1079,7 +1061,6 @@ class CLR1_F2 : public AddressMode::Direct<Operator::SET1<7, false>>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("CLR1_F2");
         return  4 + applyOperand();
     }
 
@@ -1095,7 +1076,6 @@ class CLRC_60 : public AddressMode::Implied<Operator::SET<State::c, false>>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("CLRC_60");
         return  2 + applyOperand();
     }
 
@@ -1158,7 +1138,6 @@ class CMP_68 : public AddressMode::RegisterImmediate<Operator::CMP, State::A>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("CMP_68");
         return  2 + applyOperand();
     }
 
@@ -1253,7 +1232,6 @@ class CMP_65 : public AddressMode::RegisterAbsolute<Operator::CMP, State::A>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("CMP_65");
         return  4 + applyOperand();
     }
 
@@ -1269,7 +1247,6 @@ class CMP_75 : public AddressMode::RegisterAbsoluteIndexed<Operator::CMP, State:
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("CMP_75");
         return  5 + applyOperand();
     }
 
@@ -1378,7 +1355,6 @@ class CMP_5E : public AddressMode::RegisterAbsolute<Operator::CMP, State::Y>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("CMP_5E");
         return  4 + applyOperand();
     }
 
@@ -1487,7 +1463,6 @@ class DBNZ_6E : public AddressMode::DirectProgramCounterRelative<Operator::DBNZ>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("DBNZ_6E");
         return 5 + applyOperand();
     }
 
@@ -1503,7 +1478,6 @@ class DEC_9C : public AddressMode::Register<Operator::DEC, State::A>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("DEC_9C");
         return  2 + applyOperand();
     }
 
@@ -1534,7 +1508,6 @@ class DEC_DC : public AddressMode::Register<Operator::DEC, State::Y>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("DEC_DC");
         return  2 + applyOperand();
     }
 
@@ -1566,7 +1539,6 @@ class DEC_9B : public AddressMode::DirectIndexed<Operator::DEC, State::X>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("DEC_9B");
         return  5 + applyOperand();
     }
 
@@ -1582,7 +1554,6 @@ class DEC_8C : public AddressMode::Absolute<Operator::DEC>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("DEC_8C");
         return  5 + applyOperand();
     }
 
@@ -1624,13 +1595,12 @@ class DI_C0 : public AddressMode::Implied<Operator::DI>
 // DIV YA, X
 // A=YA/X, Y=mod(YA,X)    	[NV..H.Z.]
 // Y Accumulator Index (1-Byte)
-class DIV_9E : public AddressMode::YAccumulatorIndex<Operator::DIV, State::X>
+class DIV_9E : public AddressMode::YAccumulatorRegister<Operator::DIV, State::X>
 {
-    using YAccumulatorIndex::YAccumulatorIndex;
+    using YAccumulatorRegister::YAccumulatorRegister;
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("DIV_9E");
         return 12 + applyOperand();
     }
 
@@ -1928,7 +1898,6 @@ class INC_BB : public AddressMode::DirectIndexed<Operator::INC, State::X>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("INC_BB");
         return  5 + applyOperand();
     }
 
@@ -1944,7 +1913,6 @@ class INC_AC : public AddressMode::Absolute<Operator::INC>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("INC_AC");
         return  5 + applyOperand();
     }
 
@@ -1960,7 +1928,6 @@ class INCW_3A : public AddressMode::Direct<Operator::INCW>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("INCW_3A");
         return  6 + applyOperand();
     }
 
@@ -2021,7 +1988,6 @@ class LSR_4B : public AddressMode::Direct<Operator::LSR>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("LSR_4B");
         return  4 + applyOperand();
     }
 
@@ -2053,7 +2019,6 @@ class LSR_4C : public AddressMode::Absolute<Operator::LSR>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("LSR_4C");
         return  5 + applyOperand();
     }
 
@@ -2176,7 +2141,6 @@ class MOV_F7 : public AddressMode::RegisterDirectIndirectIndexed<Operator::MOV_S
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("MOV_F7");
         return  6 + applyOperand();
     }
 
@@ -2192,7 +2156,6 @@ class MOV_E7 : public AddressMode::RegisterDirectIndexedIndirect<Operator::MOV_S
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("MOV_E7");
         return  6 + applyOperand();
     }
 
@@ -2208,7 +2171,6 @@ class MOV_7D : public AddressMode::RegisterRegister<Operator::MOV_SignedResult, 
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("MOV_7D");
         return  2 + applyOperand();
     }
 
@@ -2254,7 +2216,6 @@ class MOV_F4 : public AddressMode::RegisterDirectIndexed<Operator::MOV_SignedRes
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("MOV_F4");
         return  4 + applyOperand();
     }
 
@@ -2285,7 +2246,6 @@ class MOV_F5 : public AddressMode::RegisterAbsoluteIndexed<Operator::MOV_SignedR
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("MOV_F5");
         return  5 + applyOperand();
     }
 
@@ -2377,7 +2337,6 @@ class MOV_F8 : public AddressMode::RegisterDirect<Operator::MOV_SignedResult, St
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("MOV_F8");
         return  3 + applyOperand();
     }
 
@@ -2409,7 +2368,6 @@ class MOV_E9 : public AddressMode::RegisterAbsolute<Operator::MOV_SignedResult, 
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("MOV_E9");
         return  4 + applyOperand();
     }
 
@@ -2440,7 +2398,6 @@ class MOV_FD : public AddressMode::RegisterRegister<Operator::MOV_SignedResult, 
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("MOV_FD");
         return  2 + applyOperand();
     }
 
@@ -2518,7 +2475,6 @@ class MOV_D4 : public AddressMode::DirectIndexedRegister<Operator::MOV, State::X
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("MOV_D4");
         return  5 + applyOperand();
     }
 
@@ -2534,7 +2490,6 @@ class MOV_DB : public AddressMode::DirectIndexedRegister<Operator::MOV, State::X
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("MOV_DB");
         return  5 + applyOperand();
     }
 
@@ -2596,7 +2551,6 @@ class MOV_D8 : public AddressMode::DirectRegister<Operator::MOV, State::X>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("MOV_D8");
         return  4 + applyOperand();
     }
 
@@ -2642,7 +2596,6 @@ class MOV_D6 : public AddressMode::AbsoluteIndexedRegister<Operator::MOV, State:
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("MOV_D6");
         return  6 + applyOperand();
     }
 
@@ -2673,7 +2626,6 @@ class MOV_C9 : public AddressMode::AbsoluteRegister<Operator::MOV, State::X>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("MOV_C9");
         return  5 + applyOperand();
     }
 
@@ -2766,7 +2718,6 @@ class MUL_CF : public AddressMode::YAccumulator<Operator::MUL>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("MUL_CF");
         return  9 + applyOperand();
     }
 
@@ -2782,7 +2733,6 @@ class NOP_00 : public AddressMode::Implied<Operator::NOP>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("NOP_00");
         return  2 + applyOperand();
     }
 
@@ -2908,7 +2858,6 @@ class OR_04 : public AddressMode::RegisterDirect<Operator::OR, State::A>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("OR_04");
         return  3 + applyOperand();
     }
 
@@ -2940,7 +2889,6 @@ class OR_05 : public AddressMode::RegisterAbsolute<Operator::OR, State::A>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("OR_05");
         return  4 + applyOperand();
     }
 
@@ -2988,7 +2936,6 @@ class OR_09 : public AddressMode::DirectDirect<Operator::OR>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("OR_09");
         return  6 + applyOperand();
     }
 
@@ -3068,7 +3015,6 @@ class POP_AE : public AddressMode::Register<Operator::POP, State::A>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("POP_AE");
         return  4 + applyOperand();
     }
 
@@ -3100,7 +3046,6 @@ class POP_CE : public AddressMode::Register<Operator::POP, State::X>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("POP_CE");
         return  4 + applyOperand();
     }
 
@@ -3116,7 +3061,6 @@ class POP_EE : public AddressMode::Register<Operator::POP, State::Y>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("POP_EE");
         return  4 + applyOperand();
     }
 
@@ -3132,7 +3076,6 @@ class PUSH_2D : public AddressMode::Register<Operator::PUSH, State::A>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("PUSH_2D");
         return  4 + applyOperand();
     }
 
@@ -3164,7 +3107,6 @@ class PUSH_4D : public AddressMode::Register<Operator::PUSH, State::X>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("PUSH_4D");
         return  4 + applyOperand();
     }
 
@@ -3180,7 +3122,6 @@ class PUSH_6D : public AddressMode::Register<Operator::PUSH, State::Y>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("PUSH_6D");
         return  4 + applyOperand();
     }
 
@@ -3243,7 +3184,6 @@ class ROL_2B : public AddressMode::Direct<Operator::ROL>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ROL_2B");
         return  4 + applyOperand();
     }
 
@@ -3291,7 +3231,6 @@ class ROR_7C : public AddressMode::Register<Operator::ROR, State::A>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ROR_7C");
         return  2 + applyOperand();
     }
 
@@ -3370,7 +3309,6 @@ class SBC_A8 : public AddressMode::RegisterImmediate<Operator::SBC, State::A>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("SBC_A8");
         return  2 + applyOperand();
     }
 
@@ -3434,7 +3372,6 @@ class SBC_A4 : public AddressMode::RegisterDirect<Operator::SBC, State::A>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("SBC_A4");
         return  3 + applyOperand();
     }
 
@@ -3466,7 +3403,6 @@ class SBC_A5 : public AddressMode::RegisterAbsolute<Operator::SBC, State::A>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("SBC_A5");
         return  4 + applyOperand();
     }
 
@@ -3498,7 +3434,6 @@ class SBC_B6 : public AddressMode::RegisterAbsoluteIndexed<Operator::SBC, State:
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("SBC_B6");
         return  5 + applyOperand();
     }
 
@@ -3641,7 +3576,6 @@ class SET1_C2 : public AddressMode::Direct<Operator::SET1<6, true>>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("SET1_C2");
         return  4 + applyOperand();
     }
 
@@ -3736,7 +3670,6 @@ class SUBW_9A : public AddressMode::YAccumulatorDirect<Operator::SUBW>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("SUBW_9A");
         return  5 + applyOperand();
     }
 
@@ -4008,7 +3941,6 @@ class TCLR1_4E : public AddressMode::Absolute<Operator::TCLR1>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("TCLR1_4E");
         return  6 + applyOperand();
     }
 
@@ -4024,7 +3956,6 @@ class TSET1_0E : public AddressMode::Absolute<Operator::TSET1>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("TSET1_0E");
         return  6 + applyOperand();
     }
 
@@ -4040,7 +3971,6 @@ class XCN_9F : public AddressMode::Register<Operator::XCN, State::A>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("XCN_9F");
         return  5 + applyOperand();
     }
 

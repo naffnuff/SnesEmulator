@@ -21,6 +21,13 @@ public:
         WriteOnly
     };
 
+    enum Operation
+    {
+        Read,
+        Write,
+        Apply
+    };
+
     MemoryLocation()
         : nextInMemory(&this[1])
         , nextInBank(&this[1])
@@ -93,8 +100,7 @@ public:
             onWrite(oldValue, newValue);
         }
         if (breakpoint) {
-            std::cout << "Write: ";
-            breakpoint();
+            breakpoint(Write);
         }
     }
 
@@ -116,8 +122,7 @@ public:
             onRead(result);
         }
         if (breakpoint) {
-            std::cout << "Read: ";
-            breakpoint();
+            breakpoint(Read);
         }
 
         return result;
@@ -139,8 +144,7 @@ public:
             onApply(value);
         }
         if (breakpoint) {
-            std::cout << "Apply: ";
-            breakpoint();
+            breakpoint(Apply);
         }
 
         return value;
@@ -227,7 +231,7 @@ public:
     std::function<void(Byte oldValue, Byte newValue)> onWrite = nullptr;
     std::function<void(Byte value)> onApply = nullptr;
 
-    std::function<void()> breakpoint = nullptr;
+    std::function<void(Operation operation)> breakpoint = nullptr;
 
     friend std::ostream& operator<<(std::ostream&, const MemoryLocation&);
 };

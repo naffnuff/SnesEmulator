@@ -7,19 +7,26 @@
 namespace Types {
 
 template<typename T>
-T binaryAdd(T augend, T addend, bool& unsignedCarry, bool& signedOverflow)
+T binaryAdd(T augend, T addend, bool& unsignedCarry, bool& signedOverflow, bool& halfCarry)
 {
     uint32_t sum = uint32_t(augend) + uint32_t(addend) + unsignedCarry;
-    unsignedCarry = sum & 1 << T::bitCount();
     T result(sum);
+    T halfCarryHighBitMask = 1 << (T::bitCount() - 4);
+    T halfCarryLowBitsMask = halfCarryHighBitMask - 1;
+    halfCarry = ((augend & halfCarryLowBitsMask) + (addend & halfCarryLowBitsMask) + unsignedCarry) & halfCarryHighBitMask;
+    bool halfCarryAlt = (augend ^ addend ^ result) & halfCarryHighBitMask;
+    if (halfCarry != halfCarryAlt) {
+        throw std::logic_error(__FUNCTION__ + std::string(" bad half-carry calculation"));
+    }
+    unsignedCarry = sum & 1 << T::bitCount();
     signedOverflow = augend.isNegative() == addend.isNegative() && addend.isNegative() != result.isNegative();
     return result;
 }
 
 template<typename T>
-T binarySubtract(T minuhend, T subtrahend, bool& invertedUnsignedBorrow, bool& signedOverflow)
+T binarySubtract(T minuhend, T subtrahend, bool& invertedUnsignedBorrow, bool& signedOverflow, bool& halfCarry)
 {
-    return binaryAdd(minuhend, T(~subtrahend), invertedUnsignedBorrow, signedOverflow);
+    return binaryAdd(minuhend, T(~subtrahend), invertedUnsignedBorrow, signedOverflow, halfCarry);
 }
 
 }

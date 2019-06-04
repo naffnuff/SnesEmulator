@@ -25,6 +25,7 @@ public:
         DmaSourceBankByte = 0x0004,
         DmaSizeLowByte = 0x0005,
         DmaSizeHighByte = 0x0006,
+        HdmaIndeirectAddressBankByte = 0x0007
     };
 
     static int toDmaAddress(int channel, DmaFunction function)
@@ -151,7 +152,7 @@ public:
 
                 video.vram.writeByte(value, true, true);
 
-                /*static const int bitsPerPixel = 4;
+                static const int bitsPerPixel = 4;
                 static const int pixelPerTile = 8 * 8;
                 static const int bitPerTile = pixelPerTile * bitsPerPixel;
                 static const int bitsPerWord = 16;
@@ -164,7 +165,7 @@ public:
                     const int rowIndex = tileIndex / tilesPerRow;
                     const int columnIndex = tileIndex % tilesPerRow;
                     video.vramRenderer.setGrayscaleTile(rowIndex * 8, columnIndex * 8, tile, bitsPerPixel);
-                }*/
+                }
             }
         );
 
@@ -204,11 +205,11 @@ public:
 
                 video.cgram.writeByte(value);
 
-                /*if (cgramHighTable) {
+                if (cgramHighTable) {
                     int row = cgramAddress / 0x10;
                     int column = cgramAddress % 0x10;
                     video.cgramRenderer.setPixel(row, column, video.cgram.readWord(cgramAddress));
-                }*/
+                }
             }
         );
 
@@ -254,7 +255,10 @@ public:
         makeReadRegister(0x2134, "Multiplication Result low byte", false);
         makeReadRegister(0x2136, "Multiplication Result high byte", false);
         
-        makeWriteRegister(0x4016, "NES-style Joypad Access Port 1", true);
+        //makeWriteRegister(0x4016, "NES-style Joypad Access Port 1", true);
+        //makeWriteRegister(0x4017, "NES-style Joypad Access Port 2", true);
+        makeReadRegister(0x4016, "NES-style Joypad Access Port 1", true);
+        makeReadRegister(0x4017, "NES-style Joypad Access Port 2", true);
         
         makeWriteRegister(0x4200, "Interrupt Enable Flags", true);
         makeWriteRegister(0x4201, "Programmable I/O port (out-port)", true);
@@ -312,6 +316,8 @@ public:
 
         makeReadRegister(0x4218, "Controller Port 1 Data1 Register low byte", false);
         makeReadRegister(0x4219, "Controller Port 1 Data1 Register high byte", false);
+        makeReadRegister(0x421a, "Controller Port 2 Data1 Register low byte", false);
+        makeReadRegister(0x421b, "Controller Port 2 Data1 Register high byte", false);
 
         for (int i = 0; i < 8; ++i) {
             std::stringstream ss;
@@ -323,6 +329,7 @@ public:
             makeWriteRegister(toDmaAddress(i, DmaSourceBankByte), "DMA Source Address bank byte Channel " + ss.str());
             makeWriteRegister(toDmaAddress(i, DmaSizeLowByte), "DMA Size/HDMA Indirect Address low byte Channel " + ss.str());
             makeWriteRegister(toDmaAddress(i, DmaSizeHighByte), "DMA Size/HDMA Indirect Address high byte Channel " + ss.str());
+            makeWriteRegister(toDmaAddress(i, HdmaIndeirectAddressBankByte), "HDMA Indirect Address bank byte Channel " + ss.str());
         }
     }
 

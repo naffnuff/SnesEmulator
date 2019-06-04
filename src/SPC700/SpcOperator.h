@@ -27,17 +27,13 @@ public:
     {
         bool carry = state.getFlag(State::c);
         bool overflow = false;
-        Byte operandsXor = leftOperand->getValue() ^ rightOperand;
-        bool halfCarry = ((leftOperand->getValue() & 0x0F) + (rightOperand & 0x0F)) & 0x10;
-        Byte result = Types::binaryAdd(leftOperand->getValue(), rightOperand, carry, overflow);
+        bool halfCarry = false;
+        Byte result = Types::binaryAdd(leftOperand->getValue(), rightOperand, carry, overflow, halfCarry);
         state.setFlag(State::c, carry);
         state.setFlag(State::v, overflow);
-        bool halfCarryAlt = (operandsXor ^ result) & 0x10;
-        if (halfCarry != halfCarryAlt) {
-            throw std::logic_error(__FUNCTION__ + std::string(" bad half-carry calculation"));
-        }
         state.setFlag(State::h, halfCarry);
         leftOperand->setValue(result);
+        state.updateSignFlags(result);
         return 0;
     }
 
@@ -51,7 +47,15 @@ class ADDW
 public:
     static int invoke(State& state, MemoryLocation* leftOperand, Word rightOperand)
     {
-        throw OperatorNotYetImplementedException("ADDW");
+        bool carry = false;
+        bool overflow = false;
+        bool halfCarry = false;
+        Word result = Types::binaryAdd(leftOperand->getWordValue(), rightOperand, carry, overflow, halfCarry);
+        state.setFlag(State::c, carry);
+        state.setFlag(State::v, overflow);
+        state.setFlag(State::h, halfCarry);
+        leftOperand->setWordValue(result);
+        state.updateSignFlags(result);
         return 0;
     }
 
@@ -286,15 +290,9 @@ class CBNE
 {
 public:
     // §1: Add 1 cycle if branch is taken
-    static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
+    static int invoke(State& state, const MemoryLocation* memory, int8_t offset)
     {
-        throw OperatorNotYetImplementedException("CBNE");
-        int cycles = 0;
-        if (true /*branch taken*/) {
-            cycles += 2;
-            throw OperatorNotYetImplementedException("TODO01");
-        }
-        return cycles;
+        return branchIf(state.getRegisterValue<State::A>() != memory->getValue(), state, offset);
     }
 
     static std::string toString() { return "CBNE"; }
@@ -459,9 +457,16 @@ public:
 class DIV
 {
 public:
-    static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
+    static int invoke(State& state, MemoryLocation* memory, Byte divisor)
     {
-        throw OperatorNotYetImplementedException("DIV");
+        Word dividend = memory->getWordValue();
+        Byte quotient = dividend / divisor;
+        Byte remainder = dividend % divisor;
+        state.setFlag(State::v, divisor <= dividend.getHighByte());
+        state.setFlag(State::h, (divisor & 0xf) <= (dividend.getHighByte() & 0xf));
+        memory[0].setValue(quotient);
+        memory[1].setValue(remainder);
+        state.updateSignFlags(quotient);
         return 0;
     }
 
@@ -551,7 +556,9 @@ class INCW
 public:
     static int invoke(State& state, MemoryLocation* operand)
     {
-        throw OperatorNotYetImplementedException("INCW");
+        Word value = operand->getWordValue() + 1;
+        operand->setWordValue(value);
+        state.updateSignFlags(value);
         return 0;
     }
 
@@ -721,7 +728,7 @@ class NOP
 public:
     static int invoke(State& state)
     {
-        throw OperatorNotYetImplementedException("NOP");
+        state.incrementProgramCounter(-1);
         return 0;
     }
 
@@ -884,7 +891,13 @@ class ROL
 public:
     static int invoke(State& state, MemoryLocation* operand)
     {
-        throw OperatorNotYetImplementedException("ROL");
+        Byte value = operand->getValue();
+        bool carry = state.getFlag(State::c);
+        state.setFlag(State::c, value.getBit(7));
+        value <<= 1;
+        value.setBit(0, carry);
+        operand->setValue(value);
+        state.updateSignFlags(value);
         return 0;
     }
 
@@ -905,9 +918,7 @@ public:
         bool carry = state.getFlag(State::c);
         state.setFlag(State::c, value.getBit(0));
         value >>= 1;
-        if (carry) {
-            value |= 1 << 7;
-        }
+        value.setBit(7, carry);
         operand->setValue(value);
         state.updateSignFlags(value);
         return 0;
@@ -934,7 +945,15 @@ class SBC
 public:
     static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
     {
-        throw OperatorNotYetImplementedException("SBC");
+        bool carry = state.getFlag(State::c);
+        bool overflow = false;
+        bool halfCarry = false;
+        Byte result = Types::binarySubtract(leftOperand->getValue(), rightOperand, carry, overflow, halfCarry);
+        state.setFlag(State::c, carry);
+        state.setFlag(State::v, overflow);
+        state.setFlag(State::h, halfCarry);
+        leftOperand->setValue(result);
+        state.updateSignFlags(result);
         return 0;
     }
 
@@ -1037,7 +1056,15 @@ class SUBW
 public:
     static int invoke(State& state, MemoryLocation* leftOperand, Word rightOperand)
     {
-        throw OperatorNotYetImplementedException("SUBW");
+        bool carry = true;
+        bool overflow = false;
+        bool halfCarry = false;
+        Word result = Types::binarySubtract(leftOperand->getWordValue(), rightOperand, carry, overflow, halfCarry);
+        state.setFlag(State::c, carry);
+        state.setFlag(State::v, overflow);
+        state.setFlag(State::h, halfCarry);
+        leftOperand->setWordValue(result);
+        state.updateSignFlags(result);
         return 0;
     }
 
@@ -1080,7 +1107,10 @@ class TCLR1
 public:
     static int invoke(State& state, MemoryLocation* operand)
     {
-        throw OperatorNotYetImplementedException("TCLR1");
+        Byte accumulator = state.getRegisterValue<State::A>();
+        Byte data = operand->getValue();
+        state.updateSignFlags(Byte(accumulator - data));
+        operand->setValue(data & ~accumulator);
         return 0;
     }
 
@@ -1094,7 +1124,10 @@ class TSET1
 public:
     static int invoke(State& state, MemoryLocation* operand)
     {
-        throw OperatorNotYetImplementedException("TSET1");
+        Byte accumulator = state.getRegisterValue<State::A>();
+        Byte data = operand->getValue();
+        state.updateSignFlags(Byte(accumulator - data));
+        operand->setValue(data | accumulator);
         return 0;
     }
 
@@ -1108,7 +1141,10 @@ class XCN
 public:
     static int invoke(State& state, MemoryLocation* operand)
     {
-        throw OperatorNotYetImplementedException("XCN");
+        Byte value = operand->getValue();
+        Byte result = value >> 4 | value << 4;
+        operand->setValue(result);
+        state.updateSignFlags(result);
         return 0;
     }
 

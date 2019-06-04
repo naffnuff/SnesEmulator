@@ -70,9 +70,9 @@ public:
         }
     }
 
-    void clearDisplay(uint16_t clearColor, bool oddLines)
+    void clearDisplay(uint16_t clearColor)
     {
-        for (int row = (oddLines ? 1 : 0); row < height; row += 2) {
+        for (int row = 0; row < height; ++row) {
             for (int column = 0; column < width; ++column) {
                 setPixel(row, column, clearColor);
             }

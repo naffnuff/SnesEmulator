@@ -256,7 +256,9 @@ public:
         if (emulationMode && directPage.getLowByte() == 0) {
             return getMemoryLocation(Long(lowByte + offset, directPage.getHighByte(), 0));
         }
-        return getMemoryLocation(Long(Word(directPage + lowByte + offset), 0));
+        else {
+            return getMemoryLocation(Long(Word(directPage + lowByte + offset), 0));
+        }
     }
 
     void exchangeCarryAndEmulationFlags()

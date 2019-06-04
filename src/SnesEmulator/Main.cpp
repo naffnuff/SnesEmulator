@@ -51,9 +51,11 @@ int main(int, char**)
     }*/
 
     try {
-        Emulator emulator(output, input, error);
-        emulator.initialize();
-        emulator.run();
+        while (true) {
+            Emulator emulator(output, input, error);
+            emulator.initialize();
+            emulator.run();
+        }
 
     } catch (const std::exception& e) {
         error << "Caught std::exception: " << e.what() << std::endl;

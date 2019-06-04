@@ -333,18 +333,17 @@ class DirectPageIndirect : public Instruction2Byte
     // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int invokeOperator(Byte lowByte) override
     {
-        throw AddressModeNotYetImplementedException("DirectPageIndirect");
         int cycles = 0;
         if ((Byte)state.getDirectPage()) {
             cycles += 1;
         }
-        MemoryLocation* memory = nullptr;
-        return cycles + Operator::invoke(state, memory);
+        Long address(state.getDirectMemoryLocation(lowByte)->getWordValue(), state.getDataBank());
+        return cycles + Operator::invoke(state, state.getMemoryLocation(address));
     }
 
     std::string toString() const override
     {
-        return Operator::toString() + " $" + operandToString() + " TODO";
+        return Operator::toString() + " ($" + operandToString() + ")";
     }
 };
 

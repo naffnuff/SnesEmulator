@@ -73,7 +73,7 @@ public:
         }
 
         for (size_t address = 0xfd; address < 0xfe; ++address) {
-            memory[address].setReadOnlyValue(0x00);
+            memory[address].setReadOnlyValue(0x01);
         }
 
         for (size_t address = 0xf3; address < 0xf4; ++address) {

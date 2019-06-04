@@ -17,13 +17,14 @@ public:
         int cycles = 0;
         bool carry = state.getFlag(State::c);
         bool overflow = false;
+        bool dummy = false;
         if (state.is16Bit(State::m)) {
             cycles += 1;
-            Word result = Types::binaryAdd(state.getAccumulatorC(), memory->getWordValue(), carry, overflow);
+            Word result = Types::binaryAdd(state.getAccumulatorC(), memory->getWordValue(), carry, overflow, dummy);
             state.setAccumulatorC(result);
         }
         else {
-            Byte result = Types::binaryAdd(state.getAccumulatorA(), memory->getValue(), carry, overflow);
+            Byte result = Types::binaryAdd(state.getAccumulatorA(), memory->getValue(), carry, overflow, dummy);
             state.setAccumulatorA(result);
         }
         state.setFlag(State::c, carry);
@@ -1028,13 +1029,14 @@ public:
         int cycles = 0;
         bool carry = state.getFlag(State::c);
         bool overflow = false;
+        bool dummy = false;
         if (state.is16Bit(State::m)) {
             cycles += 1;
-            Word result = Types::binarySubtract(state.getAccumulatorC(), memory->getWordValue(), carry, overflow);
+            Word result = Types::binarySubtract(state.getAccumulatorC(), memory->getWordValue(), carry, overflow, dummy);
             state.setAccumulatorC(result);
         }
         else {
-            Byte result = Types::binarySubtract(state.getAccumulatorA(), memory->getValue(), carry, overflow);
+            Byte result = Types::binarySubtract(state.getAccumulatorA(), memory->getValue(), carry, overflow, dummy);
             state.setAccumulatorA(result);
         }
         state.setFlag(State::c, carry);

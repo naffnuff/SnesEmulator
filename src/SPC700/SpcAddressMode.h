@@ -28,9 +28,7 @@ class Absolute : public Instruction3Byte
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
-        throw AddressModeNotYetImplementedException("Absolute");
-        MemoryLocation* data = nullptr;
-        return Operator::invoke(state, data);
+        return Operator::invoke(state, state.getMemoryLocation(lowByte, highByte));
     }
 
     std::string toString() const override
@@ -266,14 +264,12 @@ class DirectIndexed : public Instruction2Byte
 
     int invokeOperator(Byte lowByte) override
     {
-        throw AddressModeNotYetImplementedException("DirectIndexed");
-        MemoryLocation* data = nullptr;
-        return Operator::invoke(state, data);
+        return Operator::invoke(state, state.getDirectMemoryLocation(lowByte + state.getRegisterValue<RegisterIndex>()));
     }
 
     std::string toString() const override
     {
-        return Operator::toString() + " $" + operandToString() + " TODO";
+        return Operator::toString() + " $" + operandToString() + "+" + State::getRegisterName<RegisterIndex>();
     }
 };
 
@@ -306,14 +302,16 @@ class DirectIndexedProgramCounterRelative : public Instruction3Byte
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
-        throw AddressModeNotYetImplementedException("DirectIndexedProgramCounterRelative");
-        MemoryLocation* data = nullptr;
-        return Operator::invoke(state, data, 0);
+        return Operator::invoke(state, state.getDirectMemoryLocation(lowByte + state.getRegisterValue<RegisterIndex>()), highByte);
     }
 
     std::string toString() const override
     {
-        return Operator::toString() + " $" + operandToString() + " TODO";
+        std::ostringstream ss;
+        ss << Operator::toString() + " $";
+        ss << state.readProgramByte(1) << "+X, $";
+        ss << state.getProgramCounter(int((int8_t)size() + (int8_t)state.readProgramByte(2)));
+        return ss.str();
     }
 };
 
@@ -333,7 +331,7 @@ class DirectIndexedRegister : public Instruction2Byte
 
     std::string toString() const override
     {
-        return Operator::toString() + " $" + operandToString() + " TODO";
+        return Operator::toString() + " $" + operandToString() + "+" + State::getRegisterName<FirstRegister>() + ", " + State::getRegisterName<SecondRegister>();
     }
 };
 
@@ -708,7 +706,7 @@ class RegisterDirectIndexed : public Instruction2Byte
 
     std::string toString() const override
     {
-        return Operator::toString() + " $" + operandToString() + " TODO";
+        return Operator::toString() + " " + State::getRegisterName<FirstRegister>() + ", $" + operandToString() + "+X";
     }
 };
 
@@ -727,14 +725,14 @@ class RegisterDirectIndexedIndirect : public Instruction2Byte
 
     int invokeOperator(Byte lowByte) override
     {
-        throw AddressModeNotYetImplementedException("RegisterDirectIndexedIndirect");
-        MemoryLocation* data = nullptr;
-        return Operator::invoke(state, data, 0);
+        Word address = state.getDirectMemoryWord(lowByte + state.getRegisterValue<SecondRegister>());
+        MemoryLocation* memory = state.getMemoryLocation(address);
+        return Operator::invoke(state, state.getRegister<FirstRegister>(), memory->getValue());
     }
 
     std::string toString() const override
     {
-        return Operator::toString() + " $" + operandToString() + " TODO";
+        return Operator::toString() + " " + State::getRegisterName<FirstRegister>() + ", [$" + operandToString() + "+" + State::getRegisterName<SecondRegister>() + "]";
     }
 };
 
@@ -753,14 +751,13 @@ class RegisterDirectIndirectIndexed : public Instruction2Byte
 
     int invokeOperator(Byte lowByte) override
     {
-        throw AddressModeNotYetImplementedException("RegisterDirectIndirectIndexed");
-        MemoryLocation* data = nullptr;
-        return Operator::invoke(state, data, 0);
+        Word address = state.getDirectMemoryLocation(lowByte)->getWordValue();
+        return Operator::invoke(state, state.getRegister<FirstRegister>(), state.getMemoryByte(address) + state.getRegisterValue<SecondRegister>());
     }
 
     std::string toString() const override
     {
-        return Operator::toString() + " $" + operandToString() + " TODO";
+        return Operator::toString() + " " + State::getRegisterName<FirstRegister>() + ", [$" + operandToString() + "]+" + State::getRegisterName<SecondRegister>();
     }
 };
 
@@ -1019,20 +1016,18 @@ class YAccumulatorDirect : public Instruction2Byte
 // Y Accumulator Index
 // DIV YA, X:     	A=YA/X, Y=mod(YA,X)    	[NV..H.Z.]
 template <typename Operator, State::Register RegisterIndex>
-class YAccumulatorIndex : public Instruction1Byte
+class YAccumulatorRegister : public Instruction1Byte
 {
     using Instruction1Byte::InstructionBase;
 
     int invokeOperator() override
     {
-        throw AddressModeNotYetImplementedException("YAccumulatorIndex");
-        MemoryLocation* data = nullptr;
-        return Operator::invoke(state, data, 0);
+        return Operator::invoke(state, state.getRegister<State::A>(), state.getRegisterValue<RegisterIndex>());
     }
 
     std::string toString() const override
     {
-        return Operator::toString() + " TODO";
+        return Operator::toString() + " YA, " + State::getRegisterName<RegisterIndex>();
     }
 };
 
