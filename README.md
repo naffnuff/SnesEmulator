@@ -1,7 +1,7 @@
 # SnesEmulator
 
 ## Sources
-I found that the following documents contain all the information I needed to write this emulator. On the other hand, without them, I don't think I could have done it.
+I found that the following documents contain all the information I needed to write this emulator. Without them, I don't think I could have done it.
 ### 65816
 http://www.defence-force.org/computing/oric/coding/annexe_2/index.htm
 http://www.6502.org/tutorials/65c816opcodes.html
