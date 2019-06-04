@@ -14,28 +14,22 @@ void Renderer::initialize(const std::string& windowTitle)
 {
     title = windowTitle;
 
-    // Initialise GLFW
     if (!glfwInit()) {
         throw std::runtime_error("Failed to initialize GLFW");
     }
 
-    //glfwWindowHint(GLFW_SAMPLES, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-    //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // To make MacOS happy; should not be needed
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
 
-    // Open a window and create its OpenGL context
     window = glfwCreateWindow(width * int(scale), height * int(scale), windowTitle.c_str(), NULL, NULL);
-    if (window == NULL) {
+    if (window == nullptr) {
         glfwTerminate();
         throw std::runtime_error("Failed to open GLFW window.");
     }
     glfwMakeContextCurrent(window);
     glfwSetWindowPos(window, 1000, 40);
 
-    // Initialize GLEW
-    glewExperimental = true; // Needed for core profile
     if (glewInit() != GLEW_OK) {
         glfwTerminate();
         throw std::runtime_error("Failed to initialize GLEW");
@@ -59,10 +53,8 @@ void Renderer::update()
         static double previousTime = glfwGetTime();
         static int frameCount = 0;
 
-        // Measure speed
         double currentTime = glfwGetTime();
         frameCount++;
-        // If a second has passed.
         if (currentTime - previousTime >= 1.0) {
             output << frameCount << std::endl;
 
@@ -71,7 +63,6 @@ void Renderer::update()
         }
     }
 
-    // Clear the screen
     glClear(GL_COLOR_BUFFER_BIT);
 
     glRasterPos2i(-1, -1);
@@ -79,7 +70,6 @@ void Renderer::update()
     glDrawPixels(width, height, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, pixelBuffer.data());
     glFlush();
 
-    // Swap buffers
     glfwSwapBuffers(window);
     glfwPollEvents();
 

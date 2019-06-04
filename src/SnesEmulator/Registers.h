@@ -257,8 +257,10 @@ public:
         
         //makeWriteRegister(0x4016, "NES-style Joypad Access Port 1", true);
         //makeWriteRegister(0x4017, "NES-style Joypad Access Port 2", true);
-        makeReadRegister(0x4016, "NES-style Joypad Access Port 1", true);
-        makeReadRegister(0x4017, "NES-style Joypad Access Port 2", true);
+        //makeReadRegister(0x4016, "NES-style Joypad Access Port 1", true);
+        //makeReadRegister(0x4017, "NES-style Joypad Access Port 2", true);
+        cpuState.getMemoryLocation(Long(0x4016, 0))->setReadWrite();
+        cpuState.getMemoryLocation(Long(0x4017, 0))->setReadWrite();
         
         makeWriteRegister(0x4200, "Interrupt Enable Flags", true);
         makeWriteRegister(0x4201, "Programmable I/O port (out-port)", true);

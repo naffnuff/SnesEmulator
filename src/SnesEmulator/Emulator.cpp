@@ -13,8 +13,8 @@ int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debu
 
 void Emulator::initialize()
 {
-    //rom.loadFromFile("../../Super Mario World (USA).sfc", cpuState);
-    rom.loadFromFile("../../Legend of Zelda, The - A Link to the Past (U) [!].smc", cpuState);
+    rom.loadFromFile("../../Super Mario World (USA).sfc", cpuState);
+    //rom.loadFromFile("../../Legend of Zelda, The - A Link to the Past (U) [!].smc", cpuState);
     //rom.loadFromFile("../../Super Metroid (Japan, USA) (En,Ja).sfc", cpuState);
     //rom.loadFromFile("../../Super Metroid (JU) [!].smc", cpuState);
     //rom.loadFromFile("../../Megaman X (USA).sfc", cpuState);
