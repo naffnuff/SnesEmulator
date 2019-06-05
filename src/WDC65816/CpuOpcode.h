@@ -204,7 +204,6 @@ class ADC_75 : public AddressMode::DirectPageIndexed<Operator::ADC, State::X>
     // 2   5-m+w       dir,X     mm....mm . ADC $10,X
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ADC_75");
         return 4 + applyOperand();
     }
 
@@ -521,7 +520,6 @@ class AND_3D : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::AND, Sta
     // 3   6-m-x+x*p   abs,X     m.....m. . AND $9876,X
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("AND_3D");
         return 4 + applyOperand();
     }
 
@@ -686,7 +684,6 @@ class BIT_24 : public AddressMode::DirectPage<Operator::BIT<false>>
     // 2   4-m+w       dir       mm....m. . BIT $10
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("BIT_24");
         return 3 + applyOperand();
     }
 
@@ -1749,7 +1746,6 @@ class EOR_5D : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::EOR, Sta
     // 3   6-m-x+x*p   abs,X     m.....m. . EOR $9876,X
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("EOR_5D");
         return 4 + applyOperand();
     }
 
@@ -2835,7 +2831,6 @@ class ORA_19 : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::ORA, Sta
     // 3   6-m-x+x*p   abs,Y     m.....m. . ORA $9876,Y
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ORA_19");
         return 4 + applyOperand();
     }
 
@@ -3160,7 +3155,6 @@ class ROL_26 : public AddressMode::DirectPage<Operator::ROL>
     // 2   7-2*m+w     dir       m.....mm . ROL $10
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ROL_26");
         return 5 + applyOperand();
     }
 
@@ -3263,7 +3257,6 @@ class ROR_6A : public AddressMode::Accumulator<Operator::ROR>
     // 1   2           acc       m.....m* . ROR
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ROR_6A");
         return 2 + applyOperand();
     }
 
@@ -4238,7 +4231,6 @@ class TSB_04 : public AddressMode::DirectPage<Operator::TSB>
     // 2   7-2*m+w     dir       ......m. . TSB $10
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("TSB_04");
         return 5 + applyOperand();
     }
 

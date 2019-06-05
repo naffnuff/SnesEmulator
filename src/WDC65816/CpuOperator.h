@@ -960,7 +960,6 @@ public:
     {
         int cycles = 0;
         if (state.is16Bit(State::m)) {
-            throw OperatorNotYetImplementedException("ROR 16-bit");
             cycles += 2;
             memory->setWordValue(rotateRight(state, memory->getWordValue()));
         } else {
@@ -1221,14 +1220,25 @@ public:
 // TRB Test and Reset Memory Bits Against Accumulator [Flags affected: z]
 class TRB
 {
+private:
+    template<typename T>
+    static T testAndReset(State& state, T data, T accumulator)
+    {
+        state.setFlag(State::z, (data & accumulator) == 0);
+        return data & ~accumulator;
+    }
+
 public:
     // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, const MemoryLocation* memory)
+    static int invoke(State& state, MemoryLocation* memory)
     {
-        throw OperatorNotYetImplementedException("TRB");
         int cycles = 0;
         if (state.is16Bit(State::m)) {
+            throw OperatorNotYetImplementedException("TRB 16-bit");
             cycles += 2;
+        }
+        else {
+            memory->setValue(testAndReset(state, memory->getValue(), state.getAccumulatorA()));
         }
         return cycles;
     }
@@ -1239,14 +1249,25 @@ public:
 // TSB Test and Set Memory Bits Against Accumulator [Flags affected: z]
 class TSB
 {
+private:
+    template<typename T>
+    static T testAndSet(State& state, T data, T accumulator)
+    {
+        state.setFlag(State::z, (data & accumulator) == 0);
+        return data | accumulator;
+    }
+
 public:
     // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, const MemoryLocation* memory)
+    static int invoke(State& state, MemoryLocation* memory)
     {
-        throw OperatorNotYetImplementedException("TSB");
         int cycles = 0;
         if (state.is16Bit(State::m)) {
+            throw OperatorNotYetImplementedException("TSB 16-bit");
             cycles += 2;
+        }
+        else {
+            memory->setValue(testAndSet(state, memory->getValue(), state.getAccumulatorA()));
         }
         return cycles;
     }
