@@ -4,6 +4,7 @@
 #include <set>
 
 #include "Common/Instruction.h"
+#include "Common/System.h"
 
 #include "WDC65816/CpuState.h"
 #include "SPC700/SpcState.h"
@@ -27,13 +28,13 @@ public:
         , video(output)
         , cpuState()
         , spcState()
-        , registers(output, error, debugger, cpuState, video)
-        , debugger(output, input, error, cycleCount, running)
+        , debugger(output, input, error, registers, cycleCount, running)
+        , registers(output, error, cpuState, video)
         , rom(output)
         , cpuInstructionDecoder(cpuState)
         , spcInstructionDecoder(spcState)
-        , cpuContext("cpu.txt", Debugger::Green)
-        , spcContext("spc.txt", Debugger::Magenta)
+        , cpuContext("cpu.txt", System::Green)
+        , spcContext("spc.txt", System::Magenta)
     {
     }
 

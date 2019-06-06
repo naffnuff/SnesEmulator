@@ -2,6 +2,7 @@
 
 #include <vector>
 
+#include "Common/System.h"
 #include "Common/MemoryLocation.h"
 
 #include "Video.h"
@@ -33,11 +34,10 @@ public:
         return DmaBase | channel << 4 | function;
     }
 
-    Registers(std::ostream& output, std::ostream& error, Debugger& debugger, CPU::State& cpuState, Video& video)
+    Registers(std::ostream& output, std::ostream& error, CPU::State& state, Video& video)
         : output(output)
         , error(error)
-        , debugger(debugger)
-        , cpuState(cpuState)
+        , state(state)
         , registerBus(0x6000)
         , video(video)
     {
@@ -46,16 +46,23 @@ public:
     Registers(const Registers&) = delete;
     Registers& operator=(const Registers&) = delete;
 
+    void printMemoryRegister(bool write, Byte value, Word address, const std::string& info)
+    {
+        System::setOutputColor(output, System::Yellow, true);
+        output << (write ? "Write " : "Read ") << value << " (" << std::bitset<8>(value) << ") @ " << address << " (" << info << "), " << std::endl;
+        System::setOutputColor(output, System::DefaultColor, false);
+    }
+
     void makeWriteRegister(Word address, const std::string& info, bool debug = false, std::function<void(Byte value)> callback = nullptr)
     {
-        MemoryLocation* memory = cpuState.getMemoryLocation(Long(address, 0));
+        MemoryLocation* memory = state.getMemoryLocation(Long(address, 0));
         memory->setWriteOnly();
         memory->setValue(0);
         registerBus[address].setMappings(memory, nullptr, MemoryLocation::ReadOnly);
         memory->onWrite =
             [this, address, callback, info, debug](Byte oldValue, Byte newValue) {
             if (debug && newValue && oldValue != newValue) {
-                debugger.printMemoryRegister(true, newValue, address, info);
+                printMemoryRegister(true, newValue, address, info);
             }
             if (callback) {
                 callback(newValue);
@@ -65,13 +72,13 @@ public:
 
     void makeReadRegister(Word address, const std::string& info, bool debug = false, std::function<void(Byte& value)> callback = nullptr)
     {
-        MemoryLocation* memory = cpuState.getMemoryLocation(Long(address, 0));
+        MemoryLocation* memory = state.getMemoryLocation(Long(address, 0));
         registerBus[address].setWriteOnly();
         memory->setMappings(&registerBus[address], nullptr, MemoryLocation::ReadOnly);
         memory->onRead =
             [this, address, callback, info, debug](Byte& value) {
             if (debug) {
-                debugger.printMemoryRegister(false, value, address, info);
+                printMemoryRegister(false, value, address, info);
             }
             if (callback) {
                 callback(value);
@@ -259,8 +266,8 @@ public:
         //makeWriteRegister(0x4017, "NES-style Joypad Access Port 2", true);
         //makeReadRegister(0x4016, "NES-style Joypad Access Port 1", true);
         //makeReadRegister(0x4017, "NES-style Joypad Access Port 2", true);
-        cpuState.getMemoryLocation(Long(0x4016, 0))->setReadWrite();
-        cpuState.getMemoryLocation(Long(0x4017, 0))->setReadWrite();
+        state.getMemoryLocation(Long(0x4016, 0))->setReadWrite();
+        state.getMemoryLocation(Long(0x4017, 0))->setReadWrite();
         
         makeWriteRegister(0x4200, "Interrupt Enable Flags", true);
         makeWriteRegister(0x4201, "Programmable I/O port (out-port)", true);
@@ -298,11 +305,11 @@ public:
 
         makeReadRegister(0x4210, "NMI Flag and 5A22 Version", false,
             [this](Byte& value) {
-                value = cpuState.isNmiActive() ? 0x82 : 0x02;
+                value = state.isNmiActive() ? 0x82 : 0x02;
             });
         makeReadRegister(0x4211, "IRQ Flag", false,
             [this](Byte& value) {
-                value = cpuState.isIrqActive() ? 0x80 : 0x00;
+                value = state.isIrqActive() ? 0x80 : 0x00;
             });
 
         makeReadRegister(0x4212, "PPU Status", false,
@@ -350,11 +357,19 @@ public:
         return registerBus[0x4209].getWordValue();
     }
 
+    void reset()
+    {
+        vBlank = false;
+        hBlank = false;
+
+        m7Buffer = 0;
+        m7Multiplicand = 0;
+    }
+
     std::ostream& output;
     std::ostream& error;
-    Debugger& debugger;
     std::vector<MemoryLocation> registerBus;
-    CPU::State& cpuState;
+    CPU::State& state;
     Video& video;
 
     bool vBlank = false;

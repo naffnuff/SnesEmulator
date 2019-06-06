@@ -41,7 +41,7 @@ public:
 
     State()
         : programCounter(0xFFC0)
-        , memory(1 << 16, MemoryLocation(0xFF))
+        , memory(0x10000, MemoryLocation(0xFF))
     {
         std::array<Byte, 64> bootRomData = {
            0xCD, 0xEF, 0xBD, 0xE8, 0x00, 0xC6, 0x1D, 0xD0, 0xFC, 0x8F, 0xAA, 0xF4, 0x8F, 0xBB, 0xF5, 0x78,
@@ -84,6 +84,14 @@ public:
 
     State(const State&) = delete;
     State& operator=(const State&) = delete;
+
+    void reset()
+    {
+        programCounter = 0xFFC0;
+        for (int i = 0; i < memory.size(); ++i) {
+            memory[i].reset();
+        }
+    }
 
     size_t getMemorySize() const
     {

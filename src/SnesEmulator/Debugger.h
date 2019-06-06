@@ -1,63 +1,22 @@
 #pragma once
 
-#ifdef _WIN32
-#include <windows.h>
-#endif
-
 #include <iostream>
+
+#include "Common/System.h"
 
 #include "WDC65816/CpuState.h"
 #include "SPC700/SpcState.h"
 
 #include "Video.h"
+#include "Registers.h"
 
 class Debugger
 {
 public:
-#ifdef _WIN32
-    enum Color
-    {
-        Red = FOREGROUND_RED,
-        Green = FOREGROUND_GREEN,
-        Yellow = FOREGROUND_RED | FOREGROUND_GREEN,
-        Blue = FOREGROUND_BLUE,
-        Magenta = FOREGROUND_RED | FOREGROUND_BLUE,
-        Cyan = FOREGROUND_BLUE | FOREGROUND_GREEN,
-        DefaultColor = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE
-    };
-    void setOutputColor(Color color, bool bright)
-    {
-        int effectiveColor = color;
-        if (bright) {
-            effectiveColor |= FOREGROUND_INTENSITY;
-        }
-        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), effectiveColor);
-    }
-#else
-    enum Color
-    {
-        Red = 31,
-        Green = 32,
-        Yellow = 33,
-        Blue = 34,
-        Magenta = 35,
-        Cyan = 36,
-        DefaultColor = 0
-    };
-    void setOutputColor(Color color, bool bright)
-    {
-        output << "\33[" << color;
-        if (bright) {
-            output << ";" << 1;
-        }
-        output << "m";
-    }
-#endif
-
     class Context
     {
     public:
-        Context(std::string fileName, Color debugColor)
+        Context(std::string fileName, System::Color debugColor)
             : fileName(fileName)
             , debugColor(debugColor)
         {
@@ -101,15 +60,16 @@ public:
         Long inspectedAddress = 0;
         bool watchMode = true;
         bool stepMode = false;
-        Color debugColor;
+        System::Color debugColor;
         std::set<Long> breakpoints;
         const Instruction* nextInstruction;
     };
 
-    Debugger(std::ostream& output, std::istream& input, std::ostream& error, uint64_t& cycleCount, bool& running)
+    Debugger(std::ostream& output, std::istream& input, std::ostream& error, Registers& registers, uint64_t& cycleCount, bool& running)
         : output(output)
         , input(input)
         , error(error)
+        , registers(registers)
         , cycleCount(cycleCount)
         , running(running)
     {
@@ -178,9 +138,11 @@ public:
                 << "i: inspect operand address" << std::endl
                 << "r: toggle run context" << std::endl
                 << "rr: run all contexts" << std::endl
-                << "q: reset" << std::endl
+                << "q: soft reset" << std::endl
+                << "qq: hard reset" << std::endl
                 << "t: toggle breakpoint at current Program Counter address" << std::endl
                 << "tt: toggle breakpoint at next Program Counter address" << std::endl
+                << "ttt: toggle breakpoint at last executed Program Counter address" << std::endl
                 << "t [hex]: toogle breakpoint at address [hex]" << std::endl
                 << "clear: clear all breakpoints" << std::endl
                 << "w: watch executing program memory" << std::endl
@@ -223,7 +185,13 @@ public:
             output << "Inspect not implemented" << std::endl;
         }
         else if (command == "q") {
-            output << "Reset" << std::endl;
+            output << "Soft reset" << std::endl;
+            state.reset();
+            otherState.reset();
+            registers.reset();
+        }
+        else if (command == "qq") {
+            output << "Hard reset" << std::endl;
             running = false;
         }
         else if (command == "clear") {
@@ -311,65 +279,65 @@ public:
     template<typename State>
     void printRegisters(const State& state, Context& context)
     {
-        setOutputColor(context.debugColor, true);
+        System::setOutputColor(output, context.debugColor, true);
         state.printRegisters(output) << std::endl;
-        setOutputColor(DefaultColor, false);
+        System::setOutputColor(output, System::DefaultColor, false);
     }
 
     template<typename State>
     void printState(const State& state, Context& context)
     {
-        setOutputColor(context.stepMode ? context.debugColor : Red, true);
+        System::setOutputColor(output, context.stepMode ? context.debugColor : System::Red, true);
         state.printRegisters(output) << std::endl;
         output << context.nextInstruction->opcodeToString() << std::endl;
         output << state.readProgramByte() << ": ";
         output << context.nextInstruction->toString() << std::endl;
-        setOutputColor(DefaultColor, false);
+        System::setOutputColor(output, System::DefaultColor, false);
     }
 
     template<typename State>
     void setColor(const State& state, const Context& context, Long address, const MemoryLocation& memory)
     {
-        Color color = DefaultColor;
+        System::Color color = System::DefaultColor;
         bool bright = false;
         if (memory.getApplicationCount() > 0) {
-            color = Cyan;
+            color = System::Cyan;
         }
         else if (memory.isMirror()) {
-            color = Yellow;
+            color = System::Yellow;
         }
         //else if (memory.getType() == MemoryLocation::Mapped) {
         //    color = Green;
         //}
         else if (memory.getType() == MemoryLocation::ReadOnly) {
-            color = Blue;
+            color = System::Blue;
             //bright = true;
         }
         else if (memory.getType() == MemoryLocation::ReadWrite) {
-            color = Red;
+            color = System::Red;
         }
         else if (memory.getType() == MemoryLocation::WriteOnly) {
-            color = Magenta;
+            color = System::Magenta;
         }
         bool executing = address >= state.getProgramAddress() && address < state.getProgramAddress() + context.nextInstruction->size();
         if (memory.breakpoint && executing) {
-            color = Cyan;
+            color = System::Cyan;
             bright = true;
         } else if (memory.breakpoint) {
-            color = Red;
+            color = System::Red;
             bright = true;
         } else if (executing) {
             color = context.debugColor;
             bright = true;
         }
-        if (color != DefaultColor) {
-            setOutputColor(color, bright);
+        if (color != System::DefaultColor) {
+            System::setOutputColor(output, color, bright);
         }
     }
 
     void printMemory(const CPU::State& cpuState, const Context& cpuContext, const SPC::State& spcState, const Context& spcContext, Video& video)
     {
-        setOutputColor(DefaultColor, false);
+        System::setOutputColor(output, System::DefaultColor, false);
         int oamAddress = inspectedVideoMemory & 0xFF80;
         int oamAuxAddress = oamAddress / 8;
         int oamAuxOffset = oamAddress % 8;
@@ -410,7 +378,7 @@ public:
                     const MemoryLocation& memory = cpuState.getMemory(cpuAddress);
                     setColor(cpuState, cpuContext, cpuAddress++, memory);
                     output << memory << ' ';
-                    setOutputColor(DefaultColor, false);
+                    System::setOutputColor(output, System::DefaultColor, false);
                 }
             }
 
@@ -425,7 +393,7 @@ public:
                     const MemoryLocation& memory = spcState.getMemory(spcAddress);
                     setColor(spcState, spcContext, spcAddress++, memory);
                     output << memory << ' ';
-                    setOutputColor(DefaultColor, false);
+                    System::setOutputColor(output, System::DefaultColor, false);
                 }
             }
 
@@ -455,19 +423,13 @@ public:
         output << "Speed is " << cycleCount / 1000000.0 / elapsedSeconds << " MHz (kind of)" << std::endl;
     }
 
-    void printMemoryRegister(bool write, Byte value, Word address, const std::string& info)
-    {
-        setOutputColor(Debugger::Yellow, true);
-        output << (write ? "Write " : "Read ") << value << " (" << std::bitset<8>(value) << ") @ " << address << " (" << info << "), " << cycleCount << std::endl;
-        setOutputColor(Debugger::DefaultColor, false);
-    }
-
     std::time_t startTime;
 
 private:
     std::ostream& output;
     std::istream& input;
     std::ostream& error;
+    Registers& registers;
     uint64_t& cycleCount;
     bool& running;
     Word inspectedVideoMemory = 0x0;

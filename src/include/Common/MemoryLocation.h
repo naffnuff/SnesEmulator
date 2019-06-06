@@ -37,6 +37,7 @@ public:
 
     MemoryLocation(Byte value)
         : value(value)
+        , resetValue(value)
         , nextInMemory(&this[1])
         , nextInBank(&this[1])
         , nextInPage(&this[1])
@@ -171,6 +172,11 @@ public:
         this->type = type;
     }
 
+    void setMappings(MemoryLocation* mapping)
+    {
+        setMappings(mapping, mapping, ReadWrite);
+    }
+
     void setMirrorOf(MemoryLocation* memory)
     {
         if (type != Invalid) {
@@ -186,6 +192,7 @@ public:
         }
         type = ReadOnly;
         value = byte;
+        resetValue = value;
     }
 
     void setReadWrite()
@@ -209,6 +216,11 @@ public:
         return applicationCount;
     }
 
+    void reset()
+    {
+        value = resetValue;
+    }
+
 private:
     static void ThrowAccessException(const std::string& function)
     {
@@ -217,6 +229,7 @@ private:
 
 private:
     Byte value = 0;
+    Byte resetValue = 0;
     MemoryLocation* readMapping = nullptr;
     MemoryLocation* writeMapping = nullptr;
     MemoryLocation* mirroredMemory = nullptr;

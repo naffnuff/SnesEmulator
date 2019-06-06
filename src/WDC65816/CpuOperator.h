@@ -344,7 +344,7 @@ public:
 
 // CPX/Y Compare Index Register X/Y with Memory [Flags affected: n,z,c]
 template<State::IndexRegister Register>
-class CP
+class CP_
 {
 public:
     // §10: Add 1 cycle if x=0 (16-bit index registers)
@@ -397,7 +397,7 @@ public:
 
 // DEX/Y Decrement Index Register X/Y [Flags affected: n,z]
 template<State::IndexRegister Register>
-class DE
+class DE_
 {
 public:
     static int invoke(State& state)
@@ -466,7 +466,7 @@ public:
 
 // INX/Y Increment Index Register X/Y [Flags affected: n,z]
 template<State::IndexRegister Register>
-class IN
+class IN_
 {
 public:
     static int invoke(State& state)
@@ -561,7 +561,7 @@ public:
 
 // LDX/Y Load Index Register X/Y from Memory [Flags affected: n,z]
 template<State::IndexRegister Register>
-class LD
+class LD_
 {
 public:
     // §10: Add 1 cycle if x=0 (16-bit index registers)
@@ -791,7 +791,7 @@ public:
 
 // PHX/Y Push Index Register X/Y [Flags affected: none]
 template<State::IndexRegister Register>
-class PH
+class PH_
 {
 public:
     // §10: Add 1 cycle if x=0 (16-bit index registers)
@@ -874,7 +874,7 @@ public:
 
 // PL Pull Index Register X [Flags affected: n,z]
 template<State::IndexRegister Register>
-class PL
+class PL_
 {
 public:
     // §10: Add 1 cycle if x=0 (16-bit index registers)
@@ -1054,7 +1054,7 @@ public:
 // SED Set Decimal Flag [Flags affected: d]
 // SEI Set Interrupt Disable Flag [Flags affected: i]
 template<State::Flag Flag, bool Value>
-class SE
+class SE_
 {
 public:
     static int invoke(State& state)
@@ -1116,7 +1116,7 @@ public:
 
 // STX Store Index Register X/Y to Memory [Flags affected: none]
 template<State::IndexRegister Register>
-class ST
+class ST_
 {
 public:
     // §10: Add 1 cycle if x=0 (16-bit index registers)
@@ -1161,7 +1161,7 @@ public:
 
 // TAX/Y Transfer Accumulator to Index Register X/Y [Flags affected: n,z]
 template<State::IndexRegister Register>
-class TA
+class TA_
 {
 public:
     static int invoke(State& state)
@@ -1335,7 +1335,7 @@ public:
 
 // TXY/YX Transfer Index Register X/Y to Index Register Y/X [Flags affected: n,z]
 template<State::IndexRegister SourceRegister, State::IndexRegister TargetRegister>
-class T
+class T__
 {
 public:
     static int invoke(State& state)

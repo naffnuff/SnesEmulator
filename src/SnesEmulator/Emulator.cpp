@@ -97,7 +97,7 @@ void Emulator::run()
             }
         });*/
 
-    DmaInstruction dmaInstruction(registers.registerBus, cpuState.accessMemory(), output, error);
+    DmaInstruction dmaInstruction(output, error, cpuState);
 
     uint64_t nextCpu = cycleCount;
     uint64_t nextSpc = cycleCount;
@@ -207,7 +207,7 @@ void Emulator::run()
                     increment = true;
                 }
 
-                //increment = true;
+                increment = true;
 
                 static int incrementCount = 0;
                 static int totalCount = 0;

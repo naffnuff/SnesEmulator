@@ -47,10 +47,10 @@ public:
         IndexRegisterCount
     };
 
-    static const size_t spcRegisterCount = 4;
+    //static const size_t spcRegisterCount = 4;
 
     State()
-        : memory(1 << 24, MemoryLocation(0x55))
+        : memory(0x1000000, MemoryLocation(0x55))
     {
         std::cout << "Memory size=" << memory.size() << std::endl;
         forceRegisters();
@@ -162,11 +162,6 @@ public:
     Byte applyProgramByte(int offset = 0)
     {
         return memory[getProgramAddress(offset)].apply();
-    }
-
-    void reset()
-    {
-        programCounter = emulationVectors.Reset;
     }
 
     void incrementProgramCounter(Word increment)
@@ -498,6 +493,34 @@ public:
     std::vector<MemoryLocation>& accessMemory()
     {
         return memory;
+    }
+
+    void reset()
+    {
+        for (int i = 0; i < memory.size(); ++i) {
+            memory[i].reset();
+        }
+
+        dataBank = 0;
+        directPage = 0;
+        stackPointer = 0;
+        programBank = 0;
+        programCounter = emulationVectors.Reset;
+        flags = 0;
+        emulationMode = true;
+
+        nmiActive = false;
+        irqActive = false;
+
+        for (MemoryLocation& a : accumulator) {
+            a.reset();
+        }
+
+        for (Word& r : indexRegisters) {
+            r = 0;
+        }
+
+        forceRegisters();
     }
 
 private:
