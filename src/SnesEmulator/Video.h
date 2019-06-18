@@ -57,7 +57,7 @@ public:
 
     struct Object
     {
-        bool size = false;
+        bool sizeSelect = false;
         int x = 0;
         int y = 0;
         int tileIndex = 0;
@@ -66,6 +66,34 @@ public:
         int priority = 0;
         bool horizontalFlip = false;
         bool verticalFlip = false;
+    };
+
+    class WriteTwiceRegister
+    {
+    public:
+        void write(Byte byte)
+        {
+            if (highByteSelect) {
+                value.setHighByte(byte);
+            }
+            else {
+                value.setLowByte(byte);
+            }
+            highByteSelect = !highByteSelect;
+        }
+    private:
+        Word value;
+        bool highByteSelect = false;
+    };
+
+    struct Background
+    {
+        Byte tilemapAddress;
+        bool horizontalMirroring;
+        bool verticalMirroring;
+        Byte characterAddress;
+        WriteTwiceRegister horizontalScroll;
+        WriteTwiceRegister verticalScroll;
     };
 
     Video(std::ostream& output)
@@ -77,6 +105,7 @@ public:
         , vramRenderer(0x200, 0x200, 2.f, true, output)
         , cgramRenderer(16, 16, 16.f, true, output)
         , oamRenderer(0x100, 0x100, 3.f, true, output)
+        , backgrounds(4)
     {
     }
 
@@ -95,7 +124,7 @@ public:
 
     int getObjectSize(bool sizeSelect) const
     {
-        switch (objectSize) {
+        switch (objectSizeIndex) {
         case 0:
             return sizeSelect ? 16 : 8;
         case 1:
@@ -122,17 +151,17 @@ public:
         for (int i = 0; i < 128 && rowOffset < oamRenderer.height && columnOffset < oamRenderer.width; ++i) {
             Object object = readObject(i);
 
-            int objectSize = getObjectSize(object.size);
+            int objectSize = getObjectSize(object.sizeSelect);
             int objectTileSize = objectSize / 8;
             for (int tileRow = 0; tileRow < objectTileSize; ++tileRow) {
                 for (int tileColumn = 0; tileColumn < objectTileSize; ++tileColumn) {
                     int tileIndex = object.tileIndex + tileRow * 0x10 + tileColumn;
-                    Word tileAddress = (nameBaseSelect << 13) + (tileIndex << 4);
+                    Word tileAddress = nameBaseSelect + (tileIndex << 4);
                     if (object.nameTable) {
-                        tileAddress += (nameSelect + 1) << 12;
+                        tileAddress += nameSelect;
                     }
                     for (int row = 0; row < 8; ++row, ++tileAddress) {
-                        drawRow(oamRenderer, rowOffset + tileRow * 8 + row, columnOffset, tileColumn * 8, tileAddress, object.palette, objectSize, object.horizontalFlip);
+                        drawTileLine(oamRenderer, rowOffset + tileRow * 8 + row, columnOffset, tileColumn * 8, tileAddress, object.palette, objectSize, object.horizontalFlip);
                     }
                 }
             }
@@ -146,34 +175,45 @@ public:
 
     void drawScanline(int vCounter)
     {
-        clearScanline(vCounter);
+        clearLine(vCounter);
+
+        drawBackgroundLine(backgrounds[0], vCounter);
 
         for (int i = 0; i < 128; ++i) {
             Object object = readObject(i);
+            drawObjectLine(object, vCounter);
+        }
+    }
 
-            int objectSize = getObjectSize(object.size);
-            int row = vCounter - object.y;
-            if (row >= 0 && row < objectSize) {
-                int tileRow = 0;
-                while (row >= 8) {
-                    ++tileRow;
-                    row -= 8;
+    void drawBackgroundLine(Background& background, int displayRow)
+    {
+
+    }
+
+    void drawObjectLine(Object& object, int displayRow)
+    {
+        int objectSize = getObjectSize(object.sizeSelect);
+        int row = displayRow - object.y;
+        if (row >= 0 && row < objectSize) {
+            int tileRow = 0;
+            while (row >= 8) {
+                ++tileRow;
+                row -= 8;
+            }
+            int objectTileSize = objectSize / 8;
+            for (int tileColumn = 0; tileColumn < objectTileSize; ++tileColumn) {
+                int tileIndex = object.tileIndex + tileRow * 0x10 + tileColumn;
+                Word tileAddress = nameBaseSelect + (tileIndex << 4);
+                if (object.nameTable) {
+                    tileAddress += nameSelect;
                 }
-                int objectTileSize = objectSize / 8;
-                for (int tileColumn = 0; tileColumn < objectTileSize; ++tileColumn) {
-                    int tileIndex = object.tileIndex + tileRow * 0x10 + tileColumn;
-                    Word tileAddress = (nameBaseSelect << 13) + (tileIndex << 4);
-                    if (object.nameTable) {
-                        tileAddress += (nameSelect + 1) << 12;
-                    }
-                    tileAddress += row;
-                    drawRow(renderer, vCounter, object.x, tileColumn * 8, tileAddress, object.palette, objectSize, object.horizontalFlip);
-                }
+                tileAddress += row;
+                drawTileLine(renderer, displayRow, object.x, tileColumn * 8, tileAddress, object.palette, objectSize, object.horizontalFlip);
             }
         }
     }
 
-    void drawRow(Renderer& renderer, int displayRow, int displayStartColumn, int displayColumnOffset, Word tileAddress, int palette, int objectSize, bool horizontalFlip)
+    void drawTileLine(Renderer& renderer, int displayRow, int displayStartColumn, int displayColumnOffset, Word tileAddress, int palette, int objectSize, bool horizontalFlip)
     {
         std::bitset<8> firstLowByte(vram.lowTable[tileAddress]);
         std::bitset<8> firstHighByte(vram.highTable[tileAddress]);
@@ -209,7 +249,7 @@ public:
         Word secondWord(oam.lowTable[lowAddress + 1], oam.highTable[lowAddress + 1]);
         Word thirdWord(oam.lowTable[0x100 | highAddress], oam.highTable[0x100 | highAddress]);
         Object result;
-        result.size = thirdWord.getBit(highTableOffset * 2 + 1);
+        result.sizeSelect = thirdWord.getBit(highTableOffset * 2 + 1);
         result.x = thirdWord.getBit(highTableOffset * 2) << 8 | firstWord.getLowByte();
         result.y = firstWord.getHighByte();
         result.tileIndex = secondWord.getLowByte();
@@ -258,9 +298,9 @@ public:
         renderer.clearDisplay(clearRedIntensity | clearGreenIntensity << 5 | clearBlueIntensity << 10);
     }
 
-    void clearScanline(int vCounter)
+    void clearLine(int displayRow)
     {
-        renderer.clearScanline(vCounter, clearRedIntensity | clearGreenIntensity << 5 | clearBlueIntensity << 10);
+        renderer.clearScanline(displayRow, clearRedIntensity | clearGreenIntensity << 5 | clearBlueIntensity << 10);
     }
 
     std::ostream& output;
@@ -278,7 +318,9 @@ public:
     uint8_t clearGreenIntensity = 0;
     uint8_t clearRedIntensity = 0;
 
-    Byte objectSize;
-    Byte nameSelect;
-    Byte nameBaseSelect;
+    Byte objectSizeIndex;
+    Word nameSelect;
+    Word nameBaseSelect;
+
+    std::vector<Background> backgrounds;
 };

@@ -355,6 +355,21 @@ public:
         return copy;
     }
 
+    Byte getLowByte() const
+    {
+        return Byte(value);
+    }
+
+    Byte getHighByte() const
+    {
+        return Byte(value >> 8);
+    }
+
+    Byte getBankByte() const
+    {
+        return Byte(value >> 16);
+    }
+
 private:
     uint32_t value;
 

@@ -343,7 +343,7 @@ public:
         int oamAuxOffset = oamAddress % 8;
         for (int i = 0; i < 16; ++i) {
             Video::Object object = video.readObject(i);
-            output << "size: " << video.getObjectSize(object.size);
+            output << "size: " << video.getObjectSize(object.sizeSelect);
             output << ", x: " << object.x;
             output << ", y: " << object.y;
             output << ", tile: " << object.tileIndex;
