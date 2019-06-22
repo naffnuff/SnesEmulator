@@ -59,7 +59,7 @@ public:
 
     void makeWriteRegister(Word address, const std::string& info, bool debug, Word& variable)
     {
-        makeWriteRegister(address, info + " low bye", debug, [&variable](Byte value) { variable.setLowByte(value); });
+        makeWriteRegister(address, info + " low byte", debug, [&variable](Byte value) { variable.setLowByte(value); });
         makeWriteRegister(address + 1, info + " high byte", debug, [&variable](Byte value) { variable.setHighByte(value); });
     }
 
@@ -100,7 +100,7 @@ public:
     {
         // Registers
         makeWriteRegister(0x2100, "Screen Display", false);
-        makeWriteRegister(0x2101, "Object Size and Chr Address", true,
+        makeWriteRegister(0x2101, "Object Size and Chr Address", false,
             [this](Byte value) {
                 video.nameBaseSelect = value.getBits(0, 3) << 13;
                 video.nameSelect = (value.getBits(3, 2) + 1) << 12;
@@ -115,6 +115,10 @@ public:
         makeWriteRegister(0x2103, "OAM Address high bit and Obj Priority", false,
             [this](Byte value) {
                 video.oam.address.setHighByte(value.getBit(0));
+                if (value.getBit(7)) {
+                    error << "OAM Address high bit and Obj Priority: " << value << std::endl;
+                    throw MemoryLocation::AccessException("Priority bit set");
+                }
             });
         makeWriteRegister(0x2104, "OAM Data write", false,
             [this](Byte value) {
@@ -122,13 +126,19 @@ public:
             }
         );
 
-        makeWriteRegister(0x2105, "BG Mode and Character Size", true);
+        makeWriteRegister(0x2105, "BG Mode and Character Size", false,
+            [this](Byte value) {
+                if (value != 0 && value != 0x09 && value != 0x07) {
+                    error << "BG Mode and Character Size: " << value << std::endl;
+                    throw MemoryLocation::AccessException("Not implemented");
+                }
+            });
         makeWriteRegister(0x2106, "Screen Pixelation", true);
         for (int i = 0; i < 2; ++i) {
             std::string bgName = "BG";
             std::string bgName1 = bgName + char('1' + i * 2);
             std::string bgName2 = bgName + char('2' + i * 2);
-            makeWriteRegister(0x210b + i, bgName1 + " and " + bgName2 + " Chr Address", true,
+            makeWriteRegister(0x210b + i, bgName1 + " and " + bgName2 + " Chr Address", false,
                 [this, i](Byte value) {
                     video.backgrounds[i * 2].characterAddress = value.getBits(0, 4) << 12;
                     video.backgrounds[i * 2 + 1].characterAddress = value.getBits(4, 4) << 12;
@@ -137,7 +147,7 @@ public:
         for (int i = 0; i < 4; ++i) {
             std::string bgName = "BG";
             bgName += '1' + i;
-            makeWriteRegister(0x2107 + i, bgName + " Tilemap Address and Size", true,
+            makeWriteRegister(0x2107 + i, bgName + " Tilemap Address and Size", false,
                 [this, i](Byte value) {
                     video.backgrounds[i].horizontalMirroring = value.getBit(0);
                     video.backgrounds[i].verticalMirroring = value.getBit(1);
@@ -147,7 +157,7 @@ public:
             makeWriteRegister(0x210e + i * 2, bgName + " Vertical Scroll", false, video.backgrounds[i].verticalScroll);
         }
 
-        makeWriteRegister(0x2115, "Video Port Control", true, videoPortControl);
+        makeWriteRegister(0x2115, "Video Port Control", false, videoPortControl);
 
         makeWriteRegister(0x2116, "VRAM Address", false, video.vram.address);
         makeWriteRegister(0x2118, "VRAM Data Write low byte", false,
@@ -160,7 +170,7 @@ public:
             [this](Byte value) {
                 if (!videoPortControl.getBit(7)) {
                     error << "DMA: Video port control: " << videoPortControl << std::endl;
-                    throw std::logic_error("DMA: Video port control not implemented");
+                    throw MemoryLocation::AccessException("DMA: Video port control not implemented");
                 }
 
                 Word vramAddress = video.vram.address;
@@ -207,8 +217,8 @@ public:
         );
         makeWriteRegister(0x211d, "Mode 7 Matrix C", true);
         makeWriteRegister(0x211e, "Mode 7 Matrix D", true);
-        makeWriteRegister(0x211f, "Mode 7 Center X", true);
-        makeWriteRegister(0x2120, "Mode 7 Center Y", true);
+        makeWriteRegister(0x211f, "Mode 7 Center X", false);
+        makeWriteRegister(0x2120, "Mode 7 Center Y", false);
 
         makeWriteRegister(0x2121, "CGRAM Address", true,
             [this](Byte value) {
@@ -278,10 +288,13 @@ public:
         state.getMemoryLocation(Long(0x4016, 0))->setReadWrite();
         state.getMemoryLocation(Long(0x4017, 0))->setReadWrite();
         
-        makeWriteRegister(0x4200, "Interrupt Enable Flags", true, interruptEnableFlags);
+        makeWriteRegister(0x4200, "Interrupt Enable Flags", false, interruptEnableFlags);
         makeWriteRegister(0x4201, "Programmable I/O port (out-port)", true);
-        makeWriteRegister(0x4202, "Multiplicand A", true);
-        makeWriteRegister(0x4203, "Multiplicand B", true);
+        makeWriteRegister(0x4202, "Multiplicand A", false, multiplicandA);
+        makeWriteRegister(0x4203, "Multiplicand B", false,
+            [this](Byte multiplicandB) {
+                product = multiplicandA * multiplicandB;
+            });
         
         makeWriteRegister(0x4204, "Dividend C", false, dividend);
         makeWriteRegister(0x4206, "Divisor B", false,
@@ -300,9 +313,9 @@ public:
 
         makeWriteRegister(0x4207, "H Timer low byte", true);
         makeWriteRegister(0x4208, "H Timer high byte", true);
-        makeWriteRegister(0x4209, "V Timer", true, vTimer);
+        makeWriteRegister(0x4209, "V Timer", false, vTimer);
         makeWriteRegister(0x420b, "DMA Enable", false);
-        makeWriteRegister(0x420c, "HDMA Enable", true);
+        makeWriteRegister(0x420c, "HDMA Enable", false);
         makeWriteRegister(0x420d, "ROM Access Speed", true);
 
         makeReadRegister(0x4210, "NMI Flag and 5A22 Version", false,
@@ -379,6 +392,7 @@ private:
     Byte m7Buffer;
     int16_t m7Multiplicand = 0;
     Long m7MultiplicationResult;
+    Byte multiplicandA;
     Word dividend;
     Word quotient;
     Word product;

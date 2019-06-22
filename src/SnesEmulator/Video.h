@@ -79,7 +79,6 @@ public:
             }
             highByteSelect = !highByteSelect;
         }
-    private:
         Word value;
         bool highByteSelect = false;
     };
@@ -247,7 +246,7 @@ public:
     {
         const int tileSize = 8;
         for (int i = 0, tileRow = 0; tileRow < 32; ++tileRow) {
-            int row = displayRow - tileRow * tileSize;
+            int row = displayRow - tileRow * tileSize + background.verticalScroll.value;
             if (row >= 0 && row < tileSize) {
                 for (int tileColumn = 0; tileColumn < 32; ++tileColumn) {
                     Word tileData = vram.readWord(background.tilemapAddress + (tileRow << 5) + tileColumn);
@@ -258,7 +257,7 @@ public:
                         bool horizontalFlip = tileData.getBit(14);
                         bool verticalFlip = tileData.getBit(15);
                         Word tileAddress = background.characterAddress + (tileNumber * tileSize * bpp / 2) + (verticalFlip ? tileSize - 1 - row : row);
-                        drawTileLine(renderer, displayRow, tileColumn * tileSize, 0, tileAddress, palette, false, tileSize, horizontalFlip, bpp);
+                        drawTileLine(renderer, displayRow, tileColumn * tileSize + background.horizontalScroll.value, 0, tileAddress, palette, false, tileSize, horizontalFlip, bpp);
                     }
                 }
             }

@@ -3240,7 +3240,6 @@ class ROR_66 : public AddressMode::DirectPage<Operator::ROR>
     // 2   7-2*m+w     dir       m.....m* . ROR $10
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ROR_66");
         return 5 + applyOperand();
     }
 
