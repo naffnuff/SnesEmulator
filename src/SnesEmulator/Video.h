@@ -35,12 +35,10 @@ public:
             ++address;
         }
 
-        void writeByte(Byte data, bool highTableSelect, bool increment)
+        void writeByte(Byte data, bool highTableSelect, int increment)
         {
             (highTableSelect ? highTable : lowTable)[address] = data;
-            if (increment) {
-                ++address;
-            }
+            address += increment;
         }
 
         void writeByte(Byte data)
@@ -88,10 +86,10 @@ public:
 
     struct Background
     {
-        Byte tilemapAddress;
+        Word tilemapAddress;
         bool horizontalMirroring;
         bool verticalMirroring;
-        Byte characterAddress;
+        Word characterAddress;
         WriteTwiceRegister horizontalScroll;
         WriteTwiceRegister verticalScroll;
     };
@@ -161,7 +159,8 @@ public:
                         tileAddress += nameSelect;
                     }
                     for (int row = 0; row < 8; ++row, ++tileAddress) {
-                        drawTileLine(oamRenderer, rowOffset + tileRow * 8 + row, columnOffset, tileColumn * 8, tileAddress, object.palette, objectSize, object.horizontalFlip);
+                        const int bpp = 4;
+                        drawTileLine(oamRenderer, rowOffset + tileRow * 8 + row, columnOffset, tileColumn * 8, tileAddress, object.palette, true, objectSize, object.horizontalFlip, bpp);
                     }
                 }
             }
@@ -176,18 +175,94 @@ public:
     void drawScanline(int vCounter)
     {
         clearLine(vCounter);
-
-        drawBackgroundLine(backgrounds[0], vCounter);
-
-        for (int i = 0; i < 128; ++i) {
-            Object object = readObject(i);
-            drawObjectLine(object, vCounter);
-        }
+        mode1e(vCounter);
     }
 
-    void drawBackgroundLine(Background& background, int displayRow)
+    void mode1e(int displayRow)
     {
+        if (
+            mainScreenDesignation.getBit(2) ||
+            subscreenDesignation.getBit(2)) {
+            drawBackgroundLine(backgrounds[2], displayRow, 2, 0);
+        }
+        if (true || mainScreenDesignation.getBit(4) || subscreenDesignation.getBit(4)) {
+            for (int i = 0; i < 128; ++i) {
+                Object object = readObject(i);
+                if (object.priority == 0) {
+                    drawObjectLine(object, displayRow);
+                }
+            }
+            for (int i = 0; i < 128; ++i) {
+                Object object = readObject(i);
+                if (object.priority == 1) {
+                    drawObjectLine(object, displayRow);
+                }
+            }
+        }
+        if (
+            mainScreenDesignation.getBit(1) ||
+            subscreenDesignation.getBit(1)) {
+            drawBackgroundLine(backgrounds[1], displayRow, 4, 0);
+        }
+        if (
+            mainScreenDesignation.getBit(0) ||
+            subscreenDesignation.getBit(0)) {
+            drawBackgroundLine(backgrounds[0], displayRow, 4, 0);
+        }
+        if (true || mainScreenDesignation.getBit(4) || subscreenDesignation.getBit(4)) {
+            for (int i = 0; i < 128; ++i) {
+                Object object = readObject(i);
+                if (object.priority == 2) {
+                    drawObjectLine(object, displayRow);
+                }
+            }
+        }
+        if (
+            mainScreenDesignation.getBit(1) ||
+            subscreenDesignation.getBit(1)) {
+            drawBackgroundLine(backgrounds[1], displayRow, 4, 1);
+        }
+        if (
+            mainScreenDesignation.getBit(0) ||
+            subscreenDesignation.getBit(0)) {
+            drawBackgroundLine(backgrounds[0], displayRow, 4, 1);
+        }
+        if (true || mainScreenDesignation.getBit(4) || subscreenDesignation.getBit(4)) {
+            for (int i = 0; i < 128; ++i) {
+                Object object = readObject(i);
+                if (object.priority == 3) {
+                    drawObjectLine(object, displayRow);
+                }
+            }
+        }
+        if (
+            mainScreenDesignation.getBit(2) ||
+            subscreenDesignation.getBit(2)) {
+            drawBackgroundLine(backgrounds[2], displayRow, 2, 1);
+        }
 
+    }
+
+    void drawBackgroundLine(Background& background, int displayRow, int bpp, int priority)
+    {
+        const int tileSize = 8;
+        for (int i = 0, tileRow = 0; tileRow < 32; ++tileRow) {
+            int row = displayRow - tileRow * tileSize;
+            if (row >= 0 && row < tileSize) {
+                for (int tileColumn = 0; tileColumn < 32; ++tileColumn) {
+                    Word tileData = vram.readWord(background.tilemapAddress + (tileRow << 5) + tileColumn);
+                    int tilePriority = tileData.getBits(13, 1);
+                    if (priority == tilePriority) {
+                        Word tileNumber = tileData.getBits(0, 10);
+                        int palette = tileData.getBits(10, 3);
+                        bool horizontalFlip = tileData.getBit(14);
+                        bool verticalFlip = tileData.getBit(15);
+                        Word tileAddress = background.characterAddress + (tileNumber * tileSize * bpp / 2) + (verticalFlip ? tileSize - 1 - row : row);
+                        drawTileLine(renderer, displayRow, tileColumn * tileSize, 0, tileAddress, palette, false, tileSize, horizontalFlip, bpp);
+                    }
+                }
+            }
+        }
     }
 
     void drawObjectLine(Object& object, int displayRow)
@@ -208,12 +283,13 @@ public:
                     tileAddress += nameSelect;
                 }
                 tileAddress += row;
-                drawTileLine(renderer, displayRow, object.x, tileColumn * 8, tileAddress, object.palette, objectSize, object.horizontalFlip);
+                const int bpp = 4;
+                drawTileLine(renderer, displayRow, object.x, tileColumn * 8, tileAddress, object.palette, true, objectSize, object.horizontalFlip, bpp);
             }
         }
     }
 
-    void drawTileLine(Renderer& renderer, int displayRow, int displayStartColumn, int displayColumnOffset, Word tileAddress, int palette, int objectSize, bool horizontalFlip)
+    void drawTileLine(Renderer& renderer, int displayRow, int displayStartColumn, int displayColumnOffset, Word tileAddress, int palette, bool spritePalette, int objectSize, bool horizontalFlip, int bpp)
     {
         std::bitset<8> firstLowByte(vram.lowTable[tileAddress]);
         std::bitset<8> firstHighByte(vram.highTable[tileAddress]);
@@ -223,13 +299,15 @@ public:
             Byte paletteIndex;
             int firstLowBitValue = firstLowByte[7 - column] ? 1 : 0;
             int firstHighBitValue = firstHighByte[7 - column] ? 2 : 0;
-            paletteIndex = firstLowBitValue + firstHighBitValue;
-            int secondLowBitValue = secondLowByte[7 - column] ? 4 : 0;
-            int secondHighBitValue = secondHighByte[7 - column] ? 8 : 0;
-            paletteIndex += secondLowBitValue + secondHighBitValue;
+            paletteIndex = firstLowBitValue | firstHighBitValue;
+            if (bpp >= 4) {
+                int secondLowBitValue = secondLowByte[7 - column] ? 4 : 0;
+                int secondHighBitValue = secondHighByte[7 - column] ? 8 : 0;
+                paletteIndex |= secondLowBitValue | secondHighBitValue;
+            }
             if (paletteIndex > 0) {
-                Byte colorAddress = 0x80 + 0x10 * palette + paletteIndex;
-                Word color(cgram.lowTable[colorAddress], cgram.highTable[colorAddress]);
+                Word colorAddress = (spritePalette ? 0x80 : 0) + std::pow(2, bpp) * palette + paletteIndex;
+                Word color = cgram.readWord(colorAddress);
                 if (horizontalFlip) {
                     renderer.setPixel(displayRow, displayStartColumn + objectSize - 1 - displayColumnOffset - column, color);
                 }
@@ -317,6 +395,9 @@ public:
     uint8_t clearBlueIntensity = 0;
     uint8_t clearGreenIntensity = 0;
     uint8_t clearRedIntensity = 0;
+
+    Byte mainScreenDesignation;
+    Byte subscreenDesignation;
 
     Byte objectSizeIndex;
     Word nameSelect;

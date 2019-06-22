@@ -207,7 +207,7 @@ void Emulator::run()
                     increment = true;
                 }
 
-                //increment = true;
+                increment = true;
 
                 static int incrementCount = 0;
                 static int totalCount = 0;

@@ -274,6 +274,11 @@ public:
         }
     }
 
+    Word getBits(int offset, int count) const
+    {
+        return value >> offset & int(std::pow(2, count) - 1);
+    }
+
     Byte getLowByte() const
     {
         return Byte(value);

@@ -124,22 +124,27 @@ public:
 
         makeWriteRegister(0x2105, "BG Mode and Character Size", true);
         makeWriteRegister(0x2106, "Screen Pixelation", true);
-        makeWriteRegister(0x210b, "BG1 and 2 Chr Address", true);
-        makeWriteRegister(0x210c, "BG3 and 4 Chr Address", true);
+        for (int i = 0; i < 2; ++i) {
+            std::string bgName = "BG";
+            std::string bgName1 = bgName + char('1' + i * 2);
+            std::string bgName2 = bgName + char('2' + i * 2);
+            makeWriteRegister(0x210b + i, bgName1 + " and " + bgName2 + " Chr Address", true,
+                [this, i](Byte value) {
+                    video.backgrounds[i * 2].characterAddress = value.getBits(0, 4) << 12;
+                    video.backgrounds[i * 2 + 1].characterAddress = value.getBits(4, 4) << 12;
+                });
+        }
         for (int i = 0; i < 4; ++i) {
             std::string bgName = "BG";
             bgName += '1' + i;
             makeWriteRegister(0x2107 + i, bgName + " Tilemap Address and Size", true,
-                [this, i, bgName](Byte value) {
+                [this, i](Byte value) {
                     video.backgrounds[i].horizontalMirroring = value.getBit(0);
                     video.backgrounds[i].verticalMirroring = value.getBit(1);
-                    video.backgrounds[i].tilemapAddress = value.getBits(2, 6);
-                    std::cout << bgName << " horizontalMirroring: " << video.backgrounds[i].horizontalMirroring << std::endl;
-                    std::cout << bgName << " verticalMirroring: " << video.backgrounds[i].verticalMirroring << std::endl;
-                    std::cout << bgName << " tilemapAddress: " << video.backgrounds[i].tilemapAddress << std::endl;
+                    video.backgrounds[i].tilemapAddress = value.getBits(2, 6) << 10;
                 });
-            makeWriteRegister(0x210d + i * 2, bgName + " Horizontal Scroll", true, video.backgrounds[i].horizontalScroll);
-            makeWriteRegister(0x210e + i * 2, bgName + " Vertical Scroll", true, video.backgrounds[i].verticalScroll);
+            makeWriteRegister(0x210d + i * 2, bgName + " Horizontal Scroll", false, video.backgrounds[i].horizontalScroll);
+            makeWriteRegister(0x210e + i * 2, bgName + " Vertical Scroll", false, video.backgrounds[i].verticalScroll);
         }
 
         makeWriteRegister(0x2115, "Video Port Control", true, videoPortControl);
@@ -147,7 +152,7 @@ public:
         makeWriteRegister(0x2116, "VRAM Address", false, video.vram.address);
         makeWriteRegister(0x2118, "VRAM Data Write low byte", false,
             [this](Byte value) {
-                video.vram.writeByte(value, false, false);
+                video.vram.writeByte(value, false, 0);
             }
         );
 
@@ -160,7 +165,14 @@ public:
 
                 Word vramAddress = video.vram.address;
 
-                video.vram.writeByte(value, true, true);
+                int increment = 1;
+                if (videoPortControl.getBit(1)) {
+                    increment = 128;
+                }
+                else if (videoPortControl.getBit(0)) {
+                    increment = 32;
+                }
+                video.vram.writeByte(value, true, increment);
 
                 static const int bitsPerPixel = 4;
                 static const int pixelPerTile = 8 * 8;
@@ -228,8 +240,8 @@ public:
         makeWriteRegister(0x2129, "Window 2 Right Position", true);
         makeWriteRegister(0x212a, "Window mask logic for BGs", true);
         makeWriteRegister(0x212b, "Window mask logic for OBJs and Color Window", true);
-        makeWriteRegister(0x212c, "Main Screen Designation", true);
-        makeWriteRegister(0x212d, "Subscreen Designation", true);
+        makeWriteRegister(0x212c, "Main Screen Designation", true, video.mainScreenDesignation);
+        makeWriteRegister(0x212d, "Subscreen Designation", true, video.subscreenDesignation);
         makeWriteRegister(0x212e, "Window Mask Designation for the Main Screen", true);
         makeWriteRegister(0x212f, "Window Mask Designation for the Subscreen", true);
         makeWriteRegister(0x2130, "Color Addition Select", true);
