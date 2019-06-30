@@ -250,7 +250,7 @@ void Emulator::run()
                         ++frame;
                         vCounter = 0;
                         registers.vBlank = false;
-                        video.drawDebugInfo();
+                        //video.drawDebugInfo();
                     }
                 }
             }

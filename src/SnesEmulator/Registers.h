@@ -184,7 +184,7 @@ public:
                 }
                 video.vram.writeByte(value, true, increment);
 
-                static const int bitsPerPixel = 4;
+                /*static const int bitsPerPixel = 4;
                 static const int pixelPerTile = 8 * 8;
                 static const int bitPerTile = pixelPerTile * bitsPerPixel;
                 static const int bitsPerWord = 16;
@@ -196,8 +196,8 @@ public:
                     static const int tilesPerRow = video.vramRenderer.width / 8;
                     const int rowIndex = tileIndex / tilesPerRow;
                     const int columnIndex = tileIndex % tilesPerRow;
-                    video.vramRenderer.setGrayscaleTile(rowIndex * 8, columnIndex * 8, tile, bitsPerPixel);
-                }
+                    //video.vramRenderer.setGrayscaleTile(rowIndex * 8, columnIndex * 8, tile, bitsPerPixel);
+                }*/
             }
         );
 
@@ -236,7 +236,7 @@ public:
                 if (cgramHighTable) {
                     int row = cgramAddress / 0x10;
                     int column = cgramAddress % 0x10;
-                    video.cgramRenderer.setPixel(row, column, video.cgram.readWord(cgramAddress));
+                    //video.cgramRenderer.setPixel(row, column, video.cgram.readWord(cgramAddress));
                 }
             }
         );
