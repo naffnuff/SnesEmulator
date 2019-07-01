@@ -103,13 +103,43 @@ public:
         ObjectLayer
     };
 
-    struct LayerEntry
+    struct ModeEntry
     {
         Layer layer;
         int priority;
     };
 
     static const int rendererWidth = 256;
+
+    struct ScanlineBuffer
+    {
+        std::array<int, rendererWidth> data;
+    };
+
+    struct ScanlineBuffers
+    {
+        struct BackgroundBuffer
+        {
+            std::array<ScanlineBuffer, 2> priorities;
+        };
+        struct ObjectsBuffer
+        {
+            std::array<ScanlineBuffer, 4> priorities;
+        };
+
+        ScanlineBuffer& getBuffer(Layer layer, int priority)
+        {
+            if (layer == ObjectLayer) {
+                return objectsBuffer.priorities[priority];
+            }
+            else {
+                return backgroundBuffers[layer].priorities[priority];
+            }
+        }
+
+        std::array<BackgroundBuffer, 4> backgroundBuffers;
+        ObjectsBuffer objectsBuffer;
+    };
 
     Video(std::ostream& output)
         : output(output)
@@ -193,7 +223,7 @@ public:
     {
         //renderer.clearScanline(vCounter, cgram.readWord(0));
         //mode1e(vCounter);
-        static const std::vector<LayerEntry> mode1e =
+        static const std::vector<ModeEntry> mode1e =
         {
             { BackgroundLayer3, 1 },
             { ObjectLayer, 3 },
@@ -209,73 +239,68 @@ public:
         backgrounds[BackgroundLayer1].bitsPerPixel = 4;
         backgrounds[BackgroundLayer2].bitsPerPixel = 4;
         backgrounds[BackgroundLayer3].bitsPerPixel = 2;
-        drawLayers(mode1e, vCounter);
+        drawLayers(mode1e, 3, vCounter);
     }
 
-    void drawLayers(const std::vector<LayerEntry>& layers, int displayRow)
+    void drawLayers(const std::vector<ModeEntry>& mode, int layerCount, int displayRow)
     {
         Word backdropColor = cgram.readWord(0);
         Word fixedColor = clearRedIntensity | clearGreenIntensity << 5 | clearBlueIntensity << 10;
 
-        std::array<std::array<std::array<int, rendererWidth>, 2>, 4> mainScreenBackgroundLayers;
-        createBackgroundLayers(mainScreenBackgroundLayers, displayRow, mainScreenDesignation);
-        std::array<std::array<int, rendererWidth>, 4> mainScreenObjectLayers;
-        createObjectLayers(mainScreenObjectLayers, displayRow, mainScreenDesignation.getBit(4));
+        ScanlineBuffers mainScreenBackgroundLayers;
+        createLayers(mainScreenBackgroundLayers, layerCount, displayRow, mainScreenDesignation);
 
-        std::array<std::array<std::array<int, rendererWidth>, 2>, 4> subscreenBackgroundLayers;
-        createBackgroundLayers(subscreenBackgroundLayers, displayRow, subscreenDesignation);
-        std::array<std::array<int, rendererWidth>, 4> subscreenObjectLayers;
-        createObjectLayers(subscreenObjectLayers, displayRow, subscreenDesignation.getBit(4));
+        ScanlineBuffers subscreenBackgroundLayers;
+        createLayers(subscreenBackgroundLayers, layerCount, displayRow, subscreenDesignation);
 
         for (int displayColumn = 0; displayColumn < renderer.width; ++displayColumn) {
-            Word mainScreenPixel = calculatePixel(layers, mainScreenBackgroundLayers, mainScreenObjectLayers, mainScreenDesignation, displayRow, displayColumn, backdropColor);
             Word addendPixel;
-            if (true) {
-                addendPixel = calculatePixel(layers, subscreenBackgroundLayers, subscreenObjectLayers, subscreenDesignation, displayRow, displayColumn, fixedColor);
+            if (false) {
+                addendPixel = calculatePixel(mode, subscreenBackgroundLayers, subscreenDesignation, displayRow, displayColumn, fixedColor);
             }
             else {
                 addendPixel = fixedColor;
             }
-            Word sumPixel = mainScreenPixel;
-            // add pixels
-            renderer.setPixel(displayRow, displayColumn, sumPixel);
+            Word mainScreenPixel = calculatePixel(mode, mainScreenBackgroundLayers, mainScreenDesignation, displayRow, displayColumn, backdropColor);
+            renderer.setPixel(displayRow, displayColumn, mainScreenPixel);
         }
     }
 
-    Word calculatePixel(const std::vector<LayerEntry>& layers, std::array<std::array<std::array<int, rendererWidth>, 2>, 4>& backgroundLayers, std::array<std::array<int, rendererWidth>, 4>& objectLayers, Byte designation, int displayRow, int displayColumn, Word defaultPixel)
+    Word calculatePixel(const std::vector<ModeEntry>& mode, ScanlineBuffers& buffers, Byte designation, int displayRow, int displayColumn, Word defaultPixel)
     {
-        for (const LayerEntry& layer : layers) {
-            if (designation.getBit(layer.layer)) {
-                if (layer.layer == ObjectLayer) {
-                    int result = objectLayers[layer.priority][displayColumn];
-                    if (result != -1) {
-                        return result;
-                    }
-                }
-                else {
-                    int result = backgroundLayers[layer.layer][layer.priority][displayColumn];
-                    if (result != -1) {
-                        return result;
-                    }
+        for (const ModeEntry& modeEntry : mode) {
+            if (designation.getBit(modeEntry.layer)) {
+                int result = buffers.getBuffer(modeEntry.layer, modeEntry.priority).data[displayColumn];
+                if (result != -1) {
+                    return result;
                 }
             }
         }
         return defaultPixel;
     }
 
-    void createBackgroundLayers(std::array<std::array<std::array<int, rendererWidth>, 2>, 4>& backgroundLayers, int displayRow, Byte screenDesignation)
+    void createLayers(ScanlineBuffers& buffers, int layerCount, int displayRow, Byte screenDesignation)
     {
-        std::fill(backgroundLayers[0][0].begin(), backgroundLayers[3][1].end(), -1);
-        for (int layerIndex = 0; layerIndex < 4; ++layerIndex) {
+        for (int layerIndex = 0; layerIndex < layerCount; ++layerIndex) {
             if (screenDesignation.getBit(layerIndex)) {
                 for (int priority = 0; priority < 2; ++priority) {
-                    drawBackgroundLine(backgroundLayers[layerIndex][priority], backgrounds[layerIndex], displayRow, priority);
+                    buffers.getBuffer(Layer(layerIndex), priority).data.fill(-1);
+                    drawBackgroundLine(buffers.getBuffer(Layer(layerIndex), priority), backgrounds[layerIndex], displayRow, priority);
                 }
+            }
+        }
+        if (screenDesignation) {
+            for (int priority = 0; priority < 4; ++priority) {
+                buffers.getBuffer(ObjectLayer, priority).data.fill(-1);
+            }
+            for (int i = 0; i < 128; ++i) {
+                Object object = readObject(i);
+                drawObjectLine(buffers.getBuffer(ObjectLayer, object.priority), object, displayRow);
             }
         }
     }
 
-    void drawBackgroundLine(std::array<int, rendererWidth>& layer, Background& background, int displayRow, int priority)
+    void drawBackgroundLine(ScanlineBuffer& buffer, Background& background, int displayRow, int priority)
     {
         const int tileSize = 8;
         for (int i = 0, tileRow = 0; tileRow < 32; ++tileRow) {
@@ -290,25 +315,14 @@ public:
                         bool horizontalFlip = tileData.getBit(14);
                         bool verticalFlip = tileData.getBit(15);
                         Word tileAddress = background.characterAddress + (tileNumber * tileSize * background.bitsPerPixel / 2) + (verticalFlip ? tileSize - 1 - row : row);
-                        drawTileLine(layer, tileColumn * tileSize + background.horizontalScroll.value, 0, tileAddress, std::pow(2, background.bitsPerPixel) * palette, tileSize, horizontalFlip, background.bitsPerPixel);
+                        drawTileLine(buffer, tileColumn * tileSize + background.horizontalScroll.value, 0, tileAddress, std::pow(2, background.bitsPerPixel) * palette, tileSize, horizontalFlip, background.bitsPerPixel);
                     }
                 }
             }
         }
     }
 
-    void createObjectLayers(std::array<std::array<int, rendererWidth>, 4>& objectLayers, int displayRow, bool objectsVisible)
-    {
-        std::fill(objectLayers[0].begin(), objectLayers[3].end(), -1);
-        if (objectsVisible) {
-            for (int i = 0; i < 128; ++i) {
-                Object object = readObject(i);
-                drawObjectLine(objectLayers[object.priority], object, displayRow);
-            }
-        }
-    }
-
-    void drawObjectLine(std::array<int, rendererWidth>& layer, Object& object, int displayRow)
+    void drawObjectLine(ScanlineBuffer& buffer, Object& object, int displayRow)
     {
         int objectSize = getObjectSize(object.sizeSelect);
         int row = displayRow - object.y;
@@ -327,12 +341,12 @@ public:
                 }
                 tileAddress += row;
                 const int bpp = 4;
-                drawTileLine(layer, object.x, tileColumn * 8, tileAddress, 0x80 + std::pow(2, bpp) * object.palette, objectSize, object.horizontalFlip, bpp);
+                drawTileLine(buffer, object.x, tileColumn * 8, tileAddress, 0x80 + std::pow(2, bpp) * object.palette, objectSize, object.horizontalFlip, bpp);
             }
         }
     }
 
-    void drawTileLine(std::array<int, rendererWidth>& layer, int displayStartColumn, int displayColumnOffset, Word tileAddress, int paletteAddress, int objectSize, bool horizontalFlip, int bpp)
+    void drawTileLine(ScanlineBuffer& buffer, int displayStartColumn, int displayColumnOffset, Word tileAddress, int paletteAddress, int objectSize, bool horizontalFlip, int bpp)
     {
         Byte firstLowByte(vram.lowTable[tileAddress]);
         Byte firstHighByte(vram.highTable[tileAddress]);
@@ -350,10 +364,10 @@ public:
                 Word colorAddress = paletteAddress + paletteIndex;
                 int color = cgram.readWord(colorAddress);
                 if (horizontalFlip) {
-                    layer[displayStartColumn + objectSize - 1 - displayColumnOffset - column] = color;
+                    buffer.data[displayStartColumn + objectSize - 1 - displayColumnOffset - column] = color;
                 }
                 else {
-                    layer[displayStartColumn + displayColumnOffset + column] = color;
+                    buffer.data[displayStartColumn + displayColumnOffset + column] = color;
                 }
             }
         }
