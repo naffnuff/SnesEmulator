@@ -963,7 +963,6 @@ public:
             cycles += 2;
             memory->setWordValue(rotateRight(state, memory->getWordValue()));
         } else {
-            throw OperatorNotYetImplementedException("ROR");
             memory->setValue(rotateRight(state, memory->getValue()));
         }
         return cycles;
@@ -1263,7 +1262,7 @@ public:
     {
         int cycles = 0;
         if (state.is16Bit(State::m)) {
-            throw OperatorNotYetImplementedException("TSB 16-bit");
+            memory->setWordValue(testAndSet(state, memory->getWordValue(), state.getAccumulatorC()));
             cycles += 2;
         }
         else {

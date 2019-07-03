@@ -1925,7 +1925,6 @@ class JMP_6C : public AddressMode::AbsoluteIndirect<Operator::JMP>
     // 3   5           (abs)     ........ . JMP ($1234)
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("JMP_6C");
         return 5 + applyOperand();
     }
 
@@ -2006,7 +2005,6 @@ class JSR_FC : public AddressMode::AbsoluteIndexedIndirect<Operator::JSR>
     // 3   8           (abs,X)   ........ . JSR ($1234,X)
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("JSR_FC");
         return 8 + applyOperand();
     }
 
@@ -3803,8 +3801,6 @@ class STA_91 : public AddressMode::DirectPageIndirectIndexedY<Operator::STA>
     // §20: TODO manually add exception for 3
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("STA_91");
-        throw OpcodeNotYetImplementedException("TODO20");
         return 6 + applyOperand();
     }
 

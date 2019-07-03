@@ -355,6 +355,24 @@ public:
             output << std::endl;
         }
 
+        output << "         0    1    2    3    4    5    6    7" << std::endl;
+        output << "         8    9    a    b    c    d    e    f" << std::endl;
+        int vramAddress = inspectedVideoMemory & 0xFF80;
+        for (int i = 0; i < 16; ++i) {
+            if (vramAddress < video.vram.lowTable.size()) {
+                uint16_t lowAddress(vramAddress);
+                lowAddress = lowAddress >> 4;
+                output << std::hex << std::setw(3) << std::setfill('0') << lowAddress << "x  " << std::dec;
+
+                for (int j = 0; j < 8 && vramAddress < video.vram.lowTable.size(); ++j) {
+                    Word memory(video.vram.lowTable[vramAddress], video.vram.highTable[vramAddress]);
+                    output << memory << ' ';
+                    ++vramAddress;
+                }
+            }
+            output << std::endl;
+        }
+
         Long startCpuAddress = cpuContext.watchMode ? cpuState.getProgramAddress() : cpuContext.inspectedAddress;
         Long startSpcAddress = spcContext.watchMode ? spcState.getProgramAddress() : spcContext.inspectedAddress;
 
@@ -365,7 +383,6 @@ public:
             << "             0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f" << std::endl;
         Long cpuAddress = startCpuAddress & 0xFFFF00;
         Long spcAddress = startSpcAddress & 0xFFFF00;
-
 
         for (int i = 0; i < 16; ++i) {
             if (cpuAddress < cpuMemorySize) {

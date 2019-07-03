@@ -126,7 +126,7 @@ public:
             }
         );
 
-        makeWriteRegister(0x2105, "BG Mode and Character Size", false,
+        makeWriteRegister(0x2105, "BG Mode and Character Size", true,
             [this](Byte value) {
                 if (value != 0 && value != 0x09 && value != 0x07) {
                     error << "BG Mode and Character Size: " << value << std::endl;
@@ -157,14 +157,10 @@ public:
             makeWriteRegister(0x210e + i * 2, bgName + " Vertical Scroll", false, video.backgrounds[i].verticalScroll);
         }
 
-        makeWriteRegister(0x2115, "Video Port Control", false, videoPortControl);
+        makeWriteRegister(0x2115, "Video Port Control", true, videoPortControl);
 
         makeWriteRegister(0x2116, "VRAM Address", false, video.vram.address);
-        makeWriteRegister(0x2118, "VRAM Data Write low byte", false,
-            [this](Byte value) {
-                video.vram.writeByte(value, false, 0);
-            }
-        );
+        makeWriteRegister(0x2118, "VRAM Data Write low byte", false, vramDataWriteLowByte);
 
         makeWriteRegister(0x2119, "VRAM Data Write high byte", false,
             [this](Byte value) {
@@ -182,6 +178,7 @@ public:
                 else if (videoPortControl.getBit(0)) {
                     increment = 32;
                 }
+                video.vram.writeByte(vramDataWriteLowByte, false, 0);
                 video.vram.writeByte(value, true, increment);
 
                 /*static const int bitsPerPixel = 4;
@@ -196,7 +193,7 @@ public:
                     static const int tilesPerRow = video.vramRenderer.width / 8;
                     const int rowIndex = tileIndex / tilesPerRow;
                     const int columnIndex = tileIndex % tilesPerRow;
-                    //video.vramRenderer.setGrayscaleTile(rowIndex * 8, columnIndex * 8, tile, bitsPerPixel);
+                    video.vramRenderer.setGrayscaleTile(rowIndex * 8, columnIndex * 8, tile, bitsPerPixel);
                 }*/
             }
         );
@@ -233,11 +230,11 @@ public:
 
                 video.cgram.writeByte(value);
 
-                if (cgramHighTable) {
+                /*if (cgramHighTable) {
                     int row = cgramAddress / 0x10;
                     int column = cgramAddress % 0x10;
-                    //video.cgramRenderer.setPixel(row, column, video.cgram.readWord(cgramAddress));
-                }
+                    video.cgramRenderer.setPixel(row, column, video.cgram.readWord(cgramAddress));
+                }*/
             }
         );
 
@@ -254,19 +251,19 @@ public:
         makeWriteRegister(0x212d, "Subscreen Designation", true, video.subscreenDesignation);
         makeWriteRegister(0x212e, "Window Mask Designation for the Main Screen", true);
         makeWriteRegister(0x212f, "Window Mask Designation for the Subscreen", true);
-        makeWriteRegister(0x2130, "Color Addition Select", true);
-        makeWriteRegister(0x2131, "Color math designation", true);
+        makeWriteRegister(0x2130, "Color Addition Select", true, video.colorAdditionSelect);
+        makeWriteRegister(0x2131, "Color Math Designation", true, video.colorMathDesignation);
         makeWriteRegister(0x2132, "Fixed Color Data", false,
             [this](Byte value) {
                 switch (value & 0xE0) {
                 case 0x80:
-                    video.clearBlueIntensity = value & 0x1F;
+                    video.clearColor.blue = value & 0x1F;
                     break;
                 case 0x40:
-                    video.clearGreenIntensity = value & 0x1F;
+                    video.clearColor.green = value & 0x1F;
                     break;
                 case 0x20:
-                    video.clearRedIntensity = value & 0x1F;
+                    video.clearColor.red = value & 0x1F;
                     break;
                 default:
                     break;
@@ -288,7 +285,7 @@ public:
         state.getMemoryLocation(Long(0x4016, 0))->setReadWrite();
         state.getMemoryLocation(Long(0x4017, 0))->setReadWrite();
         
-        makeWriteRegister(0x4200, "Interrupt Enable Flags", false, interruptEnableFlags);
+        makeWriteRegister(0x4200, "Interrupt Enable Flags", true, interruptEnableFlags);
         makeWriteRegister(0x4201, "Programmable I/O port (out-port)", true);
         makeWriteRegister(0x4202, "Multiplicand A", false, multiplicandA);
         makeWriteRegister(0x4203, "Multiplicand B", false,
@@ -389,6 +386,7 @@ public:
 
 private:
     Byte videoPortControl;
+    Byte vramDataWriteLowByte;
     Byte m7Buffer;
     int16_t m7Multiplicand = 0;
     Long m7MultiplicationResult;

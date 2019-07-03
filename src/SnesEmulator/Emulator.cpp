@@ -96,6 +96,13 @@ void Emulator::run()
                 video.cgramRenderer.update();
             }
         });*/
+    /*std::thread bgRendererThread(
+        [this]() {
+            video.bgRenderer.initialize("Background viewer");
+            while (running) {
+                video.bgRenderer.update();
+            }
+        });*/
 
     DmaInstruction dmaInstruction(output, error, cpuState);
 
@@ -251,6 +258,7 @@ void Emulator::run()
                         vCounter = 0;
                         registers.vBlank = false;
                         //video.drawDebugInfo();
+                        video.updateBackgroundViewer();
                     }
                 }
             }
@@ -261,11 +269,13 @@ void Emulator::run()
         //oamRendererThread.join();
         //vramRendererThread.join();
         //cgramRendererThread.join();
+        //bgRendererThread.join();
         throw e;
     }
     //oamRendererThread.join();
     //vramRendererThread.join();
     //cgramRendererThread.join();
+    //bgRendererThread.join();
 }
 
 template<typename State, typename OtherState>
