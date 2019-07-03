@@ -141,7 +141,7 @@ public:
         for (int i = 0; i < 4; ++i) {
             std::string bgName = "BG";
             bgName += '1' + i;
-            makeWriteRegister(0x2107 + i, bgName + " Tilemap Address and Size", false,
+            makeWriteRegister(0x2107 + i, bgName + " Tilemap Address and Size", true,
                 [this, i](Byte value) {
                     video.backgrounds[i].horizontalMirroring = value.getBit(0);
                     video.backgrounds[i].verticalMirroring = value.getBit(1);

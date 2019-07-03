@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <vector>
 
@@ -273,6 +273,107 @@ public:
 #endif
     };
 
+    #define DEBUGBG
+
+    class BackgroundViewer
+    {
+    public:
+#ifdef DEBUGBG
+        BackgroundViewer(Video& video, Layer backgroundLayer)
+            : video(video)
+            , backgroundLayer(backgroundLayer)
+            , renderer(rendererWidth * 2, rendererWidth * 2, 1.f, true, video.output)
+        {
+            thread = std::thread([this]() { run(); });
+        }
+
+        ~BackgroundViewer()
+        {
+            running = false;
+            thread.join();
+        }
+
+        void run()
+        {
+            renderer.initialize(std::string("Background ") + char('1' + backgroundLayer) + " viewer");
+            while (running) {
+                renderer.update();
+            }
+        }
+
+        void update()
+        {
+            Background& background = video.backgrounds[backgroundLayer];
+
+            const int tileSize = 8;
+            for (int screenRow = 0; screenRow < 2; ++screenRow)
+            {
+                for (int screenColumn = 0; screenColumn < 2; ++screenColumn)
+                {
+                    for (int tileRow = 0; tileRow < 32; ++tileRow) {
+                        for (int tileColumn = 0; tileColumn < 32; ++tileColumn) {
+                            Word tileDataAddress = background.tilemapAddress + (tileRow << 5) + tileColumn;
+                            if (screenRow) {
+                                tileDataAddress += 0x800;
+                            }
+                            if (screenColumn) {
+                                tileDataAddress += 0x400;
+                            }
+                            Word tileData = video.vram.readWord(tileDataAddress);
+                            int tilePriority = tileData.getBits(13, 1);
+                            Word tileNumber = tileData.getBits(0, 10);
+                            int palette = tileData.getBits(10, 3);
+                            bool horizontalFlip = tileData.getBit(14);
+                            bool verticalFlip = tileData.getBit(15);
+                            Word tileAddress = background.characterAddress + (tileNumber * tileSize * background.bitsPerPixel / 2);
+                            int paletteAddress = std::pow(2, background.bitsPerPixel) * palette;
+                            for (int row = 0; row < 8; ++row) {
+                                Byte firstLowByte(video.vram.lowTable[tileAddress + row]);
+                                Byte firstHighByte(video.vram.highTable[tileAddress + row]);
+                                Byte secondLowByte(video.vram.lowTable[tileAddress + row + 8]);
+                                Byte secondHighByte(video.vram.highTable[tileAddress + row + 8]);
+                                int displayRow = tileRow * tileSize + screenRow * rendererWidth + (verticalFlip ? tileSize - 1 - row : row);
+                                for (int column = 0; column < 8; ++column) {
+                                    Byte paletteIndex;
+                                    paletteIndex.setBit(0, firstLowByte.getBit(7 - column));
+                                    paletteIndex.setBit(1, firstHighByte.getBit(7 - column));
+                                    if (background.bitsPerPixel >= 4) {
+                                        paletteIndex.setBit(2, secondLowByte.getBit(7 - column));
+                                        paletteIndex.setBit(3, secondHighByte.getBit(7 - column));
+                                    }
+                                    Word color = 0x5555;
+                                    int displayColumn = tileColumn * tileSize + screenColumn * rendererWidth + (horizontalFlip ? tileSize - 1 - column : column);
+                                    if (paletteIndex > 0) {
+                                        Word colorAddress = paletteAddress + paletteIndex;
+                                        color = video.cgram.readWord(colorAddress);
+                                    }
+                                    if (tilePriority) {
+                                        color = addColors(color, Word(2108));//0x1084));
+                                    }
+                                    renderer.setPixel(displayRow, displayColumn, color);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        std::thread thread;
+        Renderer renderer;
+        Video& video;
+        bool running = true;
+        Layer backgroundLayer;
+#else
+        BackgroundViewer(Video& video)
+        {
+        }
+        void update()
+        {
+        }
+#endif
+    };
+
     Video(std::ostream& output)
         : output(output)
         , vram(0x8000)
@@ -281,8 +382,6 @@ public:
         , renderer(rendererWidth, 224, 3.f, false, output)
         //, vramRenderer(0x200, 0x200, 1.f, true, output)
         //, cgramRenderer(16, 16, 16.f, true, output)
-        //, oamRenderer(0x100, 0x100, 3.f, true, output)
-        //, bgRenderer(rendererWidth, 224, 3.f, true, output)
         , backgrounds(4)
     {
     }
@@ -320,70 +419,19 @@ public:
         }
     }
 
-    void updateBackgroundViewer()
-    {
-        Background& background = backgrounds[BackgroundLayer2];
-
-        const int tileSize = 8;
-        for (int tileRow = 0; tileRow < 32; ++tileRow) {
-            for (int tileColumn = 0; tileColumn < 32; ++tileColumn) {
-                Word tileData = vram.readWord(background.tilemapAddress + (tileRow << 5) + tileColumn);
-                int tilePriority = tileData.getBits(13, 1);
-                Word tileNumber = tileData.getBits(0, 10);
-                int palette = tileData.getBits(10, 3);
-                bool horizontalFlip = tileData.getBit(14);
-                bool verticalFlip = tileData.getBit(15);
-                Word tileAddress = background.characterAddress + (tileNumber * tileSize * background.bitsPerPixel / 2);
-                int paletteAddress = std::pow(2, background.bitsPerPixel) * palette;
-                for (int row = 0; row < 8; ++row) {
-                    Byte firstLowByte(vram.lowTable[tileAddress + row]);
-                    Byte firstHighByte(vram.highTable[tileAddress + row]);
-                    Byte secondLowByte(vram.lowTable[tileAddress + row + 8]);
-                    Byte secondHighByte(vram.highTable[tileAddress + row + 8]);
-                    for (int column = 0; column < 8; ++column) {
-                        Byte paletteIndex;
-                        paletteIndex.setBit(0, firstLowByte.getBit(7 - column));
-                        paletteIndex.setBit(1, firstHighByte.getBit(7 - column));
-                        if (background.bitsPerPixel >= 4) {
-                            paletteIndex.setBit(2, secondLowByte.getBit(7 - column));
-                            paletteIndex.setBit(3, secondHighByte.getBit(7 - column));
-                        }
-                        Word color = 0x5555;
-                        int displayRow = tileRow * tileSize + (verticalFlip ? tileSize - 1 - row : row);
-                        int displayColumn = tileColumn * tileSize + (horizontalFlip ? tileSize - 1 - column : column);
-                        if (tilePriority) {
-                            color = 0x9999;
-                        }
-                        else if (paletteIndex > 0)
-                        {
-                            Word colorAddress = paletteAddress + paletteIndex;
-                            color = cgram.readWord(colorAddress);
-                        }
-                        //bgRenderer.setPixel(displayRow, displayColumn, color);
-                    }
-                }
-            }
-        }
-    }
-
     void drawScanline(int vCounter)
     {
         if (colorMathDesignation.getBit(6)) {
             throw NotYetImplementedException("Half math");
+        }
+        if (backgroundModeAndCharacterSize.getBits(4, 4) != 0) {
+            throw NotYetImplementedException("16x16 backgrounds");
         }
 
         int backgroundMode = backgroundModeAndCharacterSize.getBits(0, 3);
         bool mode1Extension = backgroundModeAndCharacterSize.getBit(3);
 
         static bool skip = true;
-
-        if (backgroundMode == 7) {
-            skip = false;
-        }
-
-        if (skip) {
-            return;
-        }
 
         //renderer.clearScanline(vCounter, cgram.readWord(0));
         //mode1e(vCounter);
@@ -404,9 +452,14 @@ public:
             backgrounds[BackgroundLayer1].bitsPerPixel = 4;
             backgrounds[BackgroundLayer2].bitsPerPixel = 4;
             backgrounds[BackgroundLayer3].bitsPerPixel = 2;
+            backgrounds[BackgroundLayer4].bitsPerPixel = 4;
+            if (skip) {
+                return;
+            }
             drawLayers(mode1e, 3, vCounter);
         }
         else if (backgroundMode == 7) {
+            skip = false;
         }
         else if (backgroundMode != 0) {
             output << "BG mode: " << backgroundMode << ", e: " << mode1Extension << std::endl;

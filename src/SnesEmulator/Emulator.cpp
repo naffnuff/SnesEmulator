@@ -76,6 +76,10 @@ void Emulator::initialize()
 void Emulator::run()
 {
     Video::OamViewer oamViewer(video);
+    Video::BackgroundViewer background1Viewer(video, Video::BackgroundLayer1);
+    Video::BackgroundViewer background2Viewer(video, Video::BackgroundLayer2);
+    Video::BackgroundViewer background3Viewer(video, Video::BackgroundLayer3);
+    //Video::BackgroundViewer background4Viewer(video, Video::BackgroundLayer4);
     /*std::thread vramRendererThread(
         [this]() {
             video.vramRenderer.initialize("VRAM viewer");
@@ -252,8 +256,10 @@ void Emulator::run()
                         vCounter = 0;
                         registers.vBlank = false;
                         oamViewer.update();
-                        //video.drawDebugInfo();
-                        //video.updateBackgroundViewer();
+                        background1Viewer.update();
+                        background2Viewer.update();
+                        background3Viewer.update();
+                        //background4Viewer.update();
                     }
                 }
             }
