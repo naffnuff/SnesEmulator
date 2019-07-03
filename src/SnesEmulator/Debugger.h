@@ -341,7 +341,7 @@ public:
         int oamAddress = inspectedVideoMemory & 0xFF80;
         int oamAuxAddress = oamAddress / 8;
         int oamAuxOffset = oamAddress % 8;
-        for (int i = 0; i < 16; ++i) {
+        for (int i = Video::OamViewer::firstObjectIndex; i < Video::OamViewer::firstObjectIndex + 16; ++i) {
             Video::Object object = video.readObject(i);
             output << "size: " << video.getObjectSize(object.sizeSelect);
             output << ", x: " << object.x;

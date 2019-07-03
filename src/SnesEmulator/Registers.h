@@ -126,13 +126,7 @@ public:
             }
         );
 
-        makeWriteRegister(0x2105, "BG Mode and Character Size", true,
-            [this](Byte value) {
-                if (value != 0 && value != 0x09 && value != 0x07) {
-                    error << "BG Mode and Character Size: " << value << std::endl;
-                    throw MemoryLocation::AccessException("Not implemented");
-                }
-            });
+        makeWriteRegister(0x2105, "BG Mode and Character Size", true, video.backgroundModeAndCharacterSize);
         makeWriteRegister(0x2106, "Screen Pixelation", true);
         for (int i = 0; i < 2; ++i) {
             std::string bgName = "BG";

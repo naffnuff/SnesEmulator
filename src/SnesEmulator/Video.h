@@ -9,6 +9,15 @@
 class Video
 {
 public:
+    class NotYetImplementedException : public std::logic_error
+    {
+    public:
+        NotYetImplementedException(const std::string& name)
+            : std::logic_error("Video feature not yet implemented: " + name)
+        {
+        }
+    };
+
     class Table
     {
     public:
@@ -165,6 +174,105 @@ public:
         Byte blue;
     };
 
+//#define DEBUGOAM
+
+    class OamViewer
+    {
+    public:
+        static const int firstObjectIndex = 64;
+
+#ifdef DEBUGOAM
+        OamViewer(Video& video)
+            : video(video)
+            , renderer(0x100, 0x100, 3.f, true, video.output)
+        {
+            thread = std::thread([this]() { run(); });
+        }
+
+        ~OamViewer()
+        {
+            running = false;
+            thread.join();
+        }
+
+        void run()
+        {
+            renderer.initialize("OAM viewer");
+            while (running) {
+                renderer.update();
+            }
+        }
+
+        void update()
+        {
+            renderer.clearDisplay(0);
+
+            int rowOffset = 0;
+            int columnOffset = 0;
+            for (int i = firstObjectIndex; i < 128 && rowOffset < renderer.height && columnOffset < renderer.width; ++i) {
+                Object object = video.readObject(i);
+
+                int objectSize = video.getObjectSize(object.sizeSelect);
+                int objectTileSize = objectSize / 8;
+                for (int tileRow = 0; tileRow < objectTileSize; ++tileRow) {
+                    for (int tileColumn = 0; tileColumn < objectTileSize; ++tileColumn) {
+                        int tileIndex = object.tileIndex + tileRow * 0x10 + tileColumn;
+                        Word tileAddress = video.nameBaseSelect + (tileIndex << 4);
+                        if (object.nameTable) {
+                            tileAddress += video.nameSelect;
+                        }
+                        for (int row = 0; row < 8; ++row, ++tileAddress) {
+                            const int bpp = 4;
+                            const int displayRow = rowOffset + tileRow * 8 + row;
+                            const int displayColumnOffset = tileColumn * 8;
+                            Byte firstLowByte(video.vram.lowTable[tileAddress]);
+                            Byte firstHighByte(video.vram.highTable[tileAddress]);
+                            Byte secondLowByte(video.vram.lowTable[tileAddress + 8]);
+                            Byte secondHighByte(video.vram.highTable[tileAddress + 8]);
+                            for (int column = 0; column < 8; ++column) {
+                                Byte paletteIndex;
+                                paletteIndex.setBit(0, firstLowByte.getBit(7 - column));
+                                paletteIndex.setBit(1, firstHighByte.getBit(7 - column));
+                                if (bpp >= 4) {
+                                    paletteIndex.setBit(2, secondLowByte.getBit(7 - column));
+                                    paletteIndex.setBit(3, secondHighByte.getBit(7 - column));
+                                }
+                                if (paletteIndex > 0) {
+                                    Word colorAddress = 0x80 + std::pow(2, bpp) * object.palette + paletteIndex;
+                                    Word color = video.cgram.readWord(colorAddress);
+                                    if (object.horizontalFlip) {
+                                        renderer.setPixel(displayRow, columnOffset + objectSize - 1 - displayColumnOffset - column, color);
+                                    }
+                                    else {
+                                        renderer.setPixel(displayRow, columnOffset + displayColumnOffset + column, color);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                columnOffset += 64;
+                if (columnOffset >= renderer.width) {
+                    columnOffset = 0;
+                    rowOffset += 64;
+                }
+            }
+        }
+
+        std::thread thread;
+        Renderer renderer;
+        Video& video;
+        bool running = true;
+#else
+        OamViewer(Video& video)
+        {
+        }
+        void update()
+        {
+        }
+#endif
+    };
+
     Video(std::ostream& output)
         : output(output)
         , vram(0x8000)
@@ -212,45 +320,12 @@ public:
         }
     }
 
-    /*void drawDebugInfo()
-    {
-        oamRenderer.clearDisplay(0);
-
-        int rowOffset = 0;
-        int columnOffset = 0;
-        for (int i = 0; i < 128 && rowOffset < oamRenderer.height && columnOffset < oamRenderer.width; ++i) {
-            Object object = readObject(i);
-
-            int objectSize = getObjectSize(object.sizeSelect);
-            int objectTileSize = objectSize / 8;
-            for (int tileRow = 0; tileRow < objectTileSize; ++tileRow) {
-                for (int tileColumn = 0; tileColumn < objectTileSize; ++tileColumn) {
-                    int tileIndex = object.tileIndex + tileRow * 0x10 + tileColumn;
-                    Word tileAddress = nameBaseSelect + (tileIndex << 4);
-                    if (object.nameTable) {
-                        tileAddress += nameSelect;
-                    }
-                    for (int row = 0; row < 8; ++row, ++tileAddress) {
-                        const int bpp = 4;
-                        drawTileLine(oamRenderer, rowOffset + tileRow * 8 + row, columnOffset, tileColumn * 8, tileAddress, object.palette, true, objectSize, object.horizontalFlip, bpp);
-                    }
-                }
-            }
-            columnOffset += 64;
-            if (columnOffset >= oamRenderer.width) {
-                columnOffset = 0;
-                rowOffset += 64;
-            }
-        }
-    }*/
-
     void updateBackgroundViewer()
     {
         Background& background = backgrounds[BackgroundLayer2];
 
         const int tileSize = 8;
         for (int tileRow = 0; tileRow < 32; ++tileRow) {
-            //output << tileRow << ": " << Word(background.tilemapAddress + (tileRow << 5));
             for (int tileColumn = 0; tileColumn < 32; ++tileColumn) {
                 Word tileData = vram.readWord(background.tilemapAddress + (tileRow << 5) + tileColumn);
                 int tilePriority = tileData.getBits(13, 1);
@@ -288,31 +363,55 @@ public:
                     }
                 }
             }
-            //output << std::endl;
         }
     }
 
     void drawScanline(int vCounter)
     {
+        if (colorMathDesignation.getBit(6)) {
+            throw NotYetImplementedException("Half math");
+        }
+
+        int backgroundMode = backgroundModeAndCharacterSize.getBits(0, 3);
+        bool mode1Extension = backgroundModeAndCharacterSize.getBit(3);
+
+        static bool skip = true;
+
+        if (backgroundMode == 7) {
+            skip = false;
+        }
+
+        if (skip) {
+            return;
+        }
+
         //renderer.clearScanline(vCounter, cgram.readWord(0));
         //mode1e(vCounter);
-        static const std::vector<ModeEntry> mode1e =
-        {
-            { BackgroundLayer3, 1 },
-            { ObjectLayer, 3 },
-            { BackgroundLayer1, 1 },
-            { BackgroundLayer2, 1 },
-            { ObjectLayer, 2 },
-            { BackgroundLayer1, 0 },
-            { BackgroundLayer2, 0 },
-            { ObjectLayer, 1 },
-            { ObjectLayer, 0 },
-            { BackgroundLayer3, 0 }
-        };
-        backgrounds[BackgroundLayer1].bitsPerPixel = 4;
-        backgrounds[BackgroundLayer2].bitsPerPixel = 4;
-        backgrounds[BackgroundLayer3].bitsPerPixel = 2;
-        drawLayers(mode1e, 3, vCounter);
+        if (backgroundMode == 1 && mode1Extension) {
+            static const std::vector<ModeEntry> mode1e =
+            {
+                { BackgroundLayer3, 1 },
+                { ObjectLayer, 3 },
+                { BackgroundLayer1, 1 },
+                { BackgroundLayer2, 1 },
+                { ObjectLayer, 2 },
+                { BackgroundLayer1, 0 },
+                { BackgroundLayer2, 0 },
+                { ObjectLayer, 1 },
+                { ObjectLayer, 0 },
+                { BackgroundLayer3, 0 }
+            };
+            backgrounds[BackgroundLayer1].bitsPerPixel = 4;
+            backgrounds[BackgroundLayer2].bitsPerPixel = 4;
+            backgrounds[BackgroundLayer3].bitsPerPixel = 2;
+            drawLayers(mode1e, 3, vCounter);
+        }
+        else if (backgroundMode == 7) {
+        }
+        else if (backgroundMode != 0) {
+            output << "BG mode: " << backgroundMode << ", e: " << mode1Extension << std::endl;
+            throw NotYetImplementedException("bg mode");
+        }
         //drawLayers({}, 0, vCounter);
     }
 
@@ -330,7 +429,6 @@ public:
         for (int displayColumn = 0; displayColumn < renderer.width; ++displayColumn) {
             Word addendPixel;
             if (colorAdditionSelect.getBit(1)) {
-            //if (false) {
                 addendPixel = calculatePixel(mode, subscreenBackgroundLayers, subscreenDesignation, displayRow, displayColumn, fixedColor, 0, 0);
             }
             else {
@@ -341,19 +439,6 @@ public:
         }
     }
 
-    static Word colorAddition(ColorComponents augend, ColorComponents addend)
-    {
-        ColorComponents result;
-        result.red = augend.red + addend.red;
-        result.green = augend.green + addend.green;
-        result.blue = augend.blue + addend.blue;
-        Byte maxColor = 0x1f;
-        result.red = min(result.red, maxColor);
-        result.green = min(result.green, maxColor);
-        result.blue = min(result.blue, maxColor);
-        return result;
-    }
-
     Word calculatePixel(const std::vector<ModeEntry>& mode, ScanlineBuffers& buffers, Byte designation, int displayRow, int displayColumn, Word defaultPixel, Word addendPixel, Byte colorMathDesignation)
     {
         for (const ModeEntry& modeEntry : mode) {
@@ -362,7 +447,7 @@ public:
                 if (result >= 0) {
                     if (colorMathDesignation.getBit(modeEntry.layer))
                     {
-                        return colorAddition(Word(result), addendPixel);
+                        return colorMathDesignation.getBit(7) ? subtractColors(Word(result), addendPixel) : addColors(Word(result), addendPixel);
                     }
                     else
                     {
@@ -372,12 +457,34 @@ public:
             }
         }
         if (colorMathDesignation.getBit(BackdropLayer)) {
-            return colorAddition(defaultPixel, addendPixel);
+            return addColors(defaultPixel, addendPixel);
         }
         else
         {
             return defaultPixel;
         }
+    }
+
+    static Word addColors(ColorComponents a, ColorComponents b)
+    {
+        ColorComponents sum;
+        sum.red = a.red + b.red;
+        sum.green = a.green + b.green;
+        sum.blue = a.blue + b.blue;
+        Byte maxColor = 0x1f;
+        sum.red = min(sum.red, maxColor);
+        sum.green = min(sum.green, maxColor);
+        sum.blue = min(sum.blue, maxColor);
+        return sum;
+    }
+
+    static Word subtractColors(ColorComponents a, ColorComponents b)
+    {
+        ColorComponents difference;
+        difference.red = b.red < a.red ? a.red - b.red : 0;
+        difference.green = b.green < a.green ? a.green - b.green : 0;
+        difference.blue = b.blue < a.blue ? a.blue - b.blue : 0;
+        return difference;
     }
 
     void createLayers(ScanlineBuffers& buffers, int layerCount, int displayRow, Byte screenDesignation)
@@ -404,7 +511,7 @@ public:
     void drawBackgroundLine(ScanlineBuffer& buffer, Background& background, int displayRow, int priority)
     {
         const int tileSize = 8;
-        //displayRow += background.verticalScroll.value;
+        displayRow += background.verticalScroll.value;
         while (displayRow < 0) {
             displayRow += rendererWidth;
         }
@@ -422,7 +529,7 @@ public:
                 bool horizontalFlip = tileData.getBit(14);
                 bool verticalFlip = tileData.getBit(15);
                 Word tileAddress = background.characterAddress + (tileNumber * tileSize * background.bitsPerPixel / 2) + (verticalFlip ? tileSize - 1 - row : row);
-                drawTileLine(buffer, tileColumn * tileSize/* - background.horizontalScroll.value*/, 0, tileAddress, std::pow(2, background.bitsPerPixel) * palette, tileSize, horizontalFlip, background.bitsPerPixel);
+                drawTileLine(buffer, tileColumn * tileSize - background.horizontalScroll.value, 0, tileAddress, std::pow(2, background.bitsPerPixel) * palette, tileSize, horizontalFlip, background.bitsPerPixel, true);
             }
         }
     }
@@ -430,7 +537,12 @@ public:
     void drawObjectLine(ScanlineBuffer& buffer, Object& object, int displayRow)
     {
         int objectSize = getObjectSize(object.sizeSelect);
-        int row = displayRow - object.y;
+        int objectY = object.y;
+        int distanceFromTop = rendererWidth - objectY;
+        if (distanceFromTop >= 0 && distanceFromTop < objectSize) {
+            objectY -= rendererWidth;
+        }
+        int row = displayRow - objectY;
         if (row >= 0 && row < objectSize) {
             int tileRow = 0;
             while (row >= 8) {
@@ -438,6 +550,10 @@ public:
                 row -= 8;
             }
             int objectTileSize = objectSize / 8;
+            int objectX = object.x;
+            if (objectX >= rendererWidth) {
+                objectX -= rendererWidth * 2;
+            }
             for (int tileColumn = 0; tileColumn < objectTileSize; ++tileColumn) {
                 int tileIndex = object.tileIndex + tileRow * 0x10 + tileColumn;
                 Word tileAddress = nameBaseSelect + (tileIndex << 4);
@@ -445,13 +561,13 @@ public:
                     tileAddress += nameSelect;
                 }
                 tileAddress += row;
-                const int bpp = 4;
-                drawTileLine(buffer, object.x, tileColumn * 8, tileAddress, 0x80 + std::pow(2, bpp) * object.palette, objectSize, object.horizontalFlip, bpp);
+                const int bitsPerPixel = 4;
+                drawTileLine(buffer, objectX, tileColumn * 8, tileAddress, 0x80 + std::pow(2, bitsPerPixel) * object.palette, objectSize, object.horizontalFlip, bitsPerPixel, false);
             }
         }
     }
 
-    void drawTileLine(ScanlineBuffer& buffer, int displayStartColumn, int displayColumnOffset, Word tileAddress, int paletteAddress, int objectSize, bool horizontalFlip, int bpp)
+    void drawTileLine(ScanlineBuffer& buffer, int displayStartColumn, int displayColumnOffset, Word tileAddress, int paletteAddress, int objectSize, bool horizontalFlip, int bitsPerPixel, bool wrap)
     {
         Byte firstLowByte(vram.lowTable[tileAddress]);
         Byte firstHighByte(vram.highTable[tileAddress]);
@@ -461,7 +577,7 @@ public:
             Byte paletteIndex;
             paletteIndex.setBit(0, firstLowByte.getBit(7 - column));
             paletteIndex.setBit(1, firstHighByte.getBit(7 - column));
-            if (bpp >= 4) {
+            if (bitsPerPixel >= 4) {
                 paletteIndex.setBit(2, secondLowByte.getBit(7 - column));
                 paletteIndex.setBit(3, secondHighByte.getBit(7 - column));
             }
@@ -475,11 +591,20 @@ public:
                 else {
                     displayColumn = displayStartColumn + displayColumnOffset + column;
                 }
-                while (displayColumn < 0) {
-                    displayColumn += rendererWidth;
-                }
-                while (displayColumn >= rendererWidth) {
-                    displayColumn -= rendererWidth;
+                if (displayColumn < 0 || displayColumn >= rendererWidth) {
+                    if (wrap)
+                    {
+                        while (displayColumn < 0) {
+                            displayColumn += rendererWidth;
+                        }
+                        while (displayColumn >= rendererWidth) {
+                            displayColumn -= rendererWidth;
+                        }
+                    }
+                    else
+                    {
+                        continue;
+                    }
                 }
                 buffer.data[displayColumn] = color;
             }
@@ -663,35 +788,6 @@ public:
         }
     }*/
 
-    /*void drawTileLine(Renderer& renderer, int displayRow, int displayStartColumn, int displayColumnOffset, Word tileAddress, int palette, bool spritePalette, int objectSize, bool horizontalFlip, int bpp)
-    {
-        std::bitset<8> firstLowByte(vram.lowTable[tileAddress]);
-        std::bitset<8> firstHighByte(vram.highTable[tileAddress]);
-        std::bitset<8> secondLowByte(vram.lowTable[tileAddress + 8]);
-        std::bitset<8> secondHighByte(vram.highTable[tileAddress + 8]);
-        for (int column = 0; column < 8; ++column) {
-            Byte paletteIndex;
-            int firstLowBitValue = firstLowByte[7 - column] ? 1 : 0;
-            int firstHighBitValue = firstHighByte[7 - column] ? 2 : 0;
-            paletteIndex = firstLowBitValue | firstHighBitValue;
-            if (bpp >= 4) {
-                int secondLowBitValue = secondLowByte[7 - column] ? 4 : 0;
-                int secondHighBitValue = secondHighByte[7 - column] ? 8 : 0;
-                paletteIndex |= secondLowBitValue | secondHighBitValue;
-            }
-            if (paletteIndex > 0) {
-                Word colorAddress = (spritePalette ? 0x80 : 0) + std::pow(2, bpp) * palette + paletteIndex;
-                Word color = cgram.readWord(colorAddress);
-                if (horizontalFlip) {
-                    renderer.setPixel(displayRow, displayStartColumn + objectSize - 1 - displayColumnOffset - column, color);
-                }
-                else {
-                    renderer.setPixel(displayRow, displayStartColumn + displayColumnOffset + column, color);
-                }
-            }
-        }
-    }*/
-
     Object readObject(int index) const
     {
         Byte lowAddress = index * 2;
@@ -754,10 +850,11 @@ public:
     Renderer renderer;
     //Renderer vramRenderer;
     //Renderer cgramRenderer;
-    //Renderer oamRenderer;
     //Renderer bgRenderer;
 
     ColorComponents clearColor;
+
+    Byte backgroundModeAndCharacterSize;
 
     Byte mainScreenDesignation;
     Byte subscreenDesignation;

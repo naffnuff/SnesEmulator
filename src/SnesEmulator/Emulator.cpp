@@ -75,13 +75,7 @@ void Emulator::initialize()
 
 void Emulator::run()
 {
-    /*std::thread oamRendererThread(
-        [this]() {
-            video.oamRenderer.initialize("OAM viewer");
-            while (running) {
-                video.oamRenderer.update();
-            }
-        });*/
+    Video::OamViewer oamViewer(video);
     /*std::thread vramRendererThread(
         [this]() {
             video.vramRenderer.initialize("VRAM viewer");
@@ -257,8 +251,9 @@ void Emulator::run()
                         ++frame;
                         vCounter = 0;
                         registers.vBlank = false;
+                        oamViewer.update();
                         //video.drawDebugInfo();
-                        video.updateBackgroundViewer();
+                        //video.updateBackgroundViewer();
                     }
                 }
             }
@@ -312,22 +307,22 @@ int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debu
         }
     } catch (OpcodeNotYetImplementedException& e) {
         context.stepMode = true;
-        context.printAddressHistory(error);
         error << e.what() << std::endl;
     } catch (AddressModeNotYetImplementedException& e) {
         state.setProgramAddress(context.getLastKnownAddress());
         context.stepMode = true;
-        context.printAddressHistory(error);
         error << e.what() << std::endl;
     } catch (OperatorNotYetImplementedException& e) {
         state.setProgramAddress(context.getLastKnownAddress());
         context.stepMode = true;
-        context.printAddressHistory(error);
         error << e.what() << std::endl;
     } catch (MemoryLocation::AccessException& e) {
         state.setProgramAddress(context.getLastKnownAddress());
         context.stepMode = true;
-        context.printAddressHistory(error);
+        error << e.what() << std::endl;
+    } catch (Video::NotYetImplementedException& e) {
+        state.setProgramAddress(context.getLastKnownAddress());
+        context.stepMode = true;
         error << e.what() << std::endl;
     }
     return 0;
