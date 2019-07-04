@@ -76,6 +76,19 @@ void Renderer::update()
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
         pause = true;
     }
+
+    buttonStart = glfwGetKey(window, GLFW_KEY_COMMA) == GLFW_PRESS;
+    buttonSelect = glfwGetKey(window, GLFW_KEY_PERIOD) == GLFW_PRESS;
+    buttonA = glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS;
+    buttonB = glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS;
+    buttonX = glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS;
+    buttonY = glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS;
+    buttonL = glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS;
+    buttonR = glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS;
+    buttonUp = glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS;
+    buttonDown = glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS;
+    buttonLeft = glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS;
+    buttonRight = glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS;
 }
 
 bool Renderer::isRunning() const

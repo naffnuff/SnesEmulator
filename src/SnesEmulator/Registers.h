@@ -74,32 +74,37 @@ public:
         memory->setReadOnlyValue(0);
         memory->onRead =
             [this, address, callback, info, debug](Byte& value) {
-            if (debug) {
-                printMemoryRegister(false, value, address, info);
-            }
             if (callback) {
                 callback(value);
+            }
+            if (debug && value) {
+                printMemoryRegister(false, value, address, info);
             }
         };
     };
 
-    void makeReadRegister(Word address, const std::string& info, bool debug, Word& variable)
+    void makeReadRegister(Word address, const std::string& info, bool debug, const Word& variable)
     {
         makeReadRegister(address, info + " low byte", debug, [&variable](Byte& value) { value = variable.getLowByte(); });
         makeReadRegister(address + 1, info + " high byte", debug, [&variable](Byte& value) { value = variable.getHighByte(); });
     }
 
-    void makeReadRegister(Word address, const std::string& info, bool debug, Long& variable)
+    void makeReadRegister(Word address, const std::string& info, bool debug, const Long& variable)
     {
         makeReadRegister(address, info + " low byte", debug, [&variable](Byte& value) { value = variable.getLowByte(); });
         makeReadRegister(address + 1, info + " high byte", debug, [&variable](Byte& value) { value = variable.getHighByte(); });
         makeReadRegister(address + 2, info + " bank byte", debug, [&variable](Byte& value) { value = variable.getBankByte(); });
     }
 
+    void makeReadRegister(Word address, const std::string& info, bool debug, Video::ReadTwiceRegister& variable)
+    {
+        makeReadRegister(address, info, debug, [&variable](Byte& value) { value = variable.read(); });
+    }
+
     void initialize()
     {
         // Registers
-        makeWriteRegister(0x2100, "Screen Display", false);
+        makeWriteRegister(0x2100, "Screen Display", false, video.screenDisplay);
         makeWriteRegister(0x2101, "Object Size and Chr Address", false,
             [this](Byte value) {
                 video.nameBaseSelect = value.getBits(0, 3) << 13;
@@ -110,11 +115,13 @@ public:
 
         makeWriteRegister(0x2102, "OAM Address low byte", false,
             [this](Byte value) {
-                video.oam.address.setLowByte(value);
+                oamStartAddress.setLowByte(value);
+                video.oam.address = oamStartAddress;
             });
         makeWriteRegister(0x2103, "OAM Address high bit and Obj Priority", false,
             [this](Byte value) {
-                video.oam.address.setHighByte(value.getBit(0));
+                oamStartAddress.setHighByte(value.getBit(0));
+                video.oam.address = oamStartAddress;
                 if (value.getBit(7)) {
                     error << "OAM Address high bit and Obj Priority: " << value << std::endl;
                     throw MemoryLocation::AccessException("Priority bit set");
@@ -151,7 +158,7 @@ public:
             makeWriteRegister(0x210e + i * 2, bgName + " Vertical Scroll", false, video.backgrounds[i].verticalScroll);
         }
 
-        makeWriteRegister(0x2115, "Video Port Control", true, videoPortControl);
+        makeWriteRegister(0x2115, "Video Port Control", false, videoPortControl);
 
         makeWriteRegister(0x2116, "VRAM Address", false, video.vram.address);
         makeWriteRegister(0x2118, "VRAM Data Write low byte", false, vramDataWriteLowByte);
@@ -271,6 +278,32 @@ public:
         // , [this](Byte value) {}
 
         makeReadRegister(0x2134, "Multiplication Result", false, m7MultiplicationResult);
+
+        makeReadRegister(0x2137, "Software Latch for H/V Counter", true,
+            [this](Byte) {
+                if (programmableIOPort.getBit(7)) {
+                    horizontalScanlineLocation.value = hCounter;
+                    verticalScanlineLocation.value = vCounter;
+                    externalLatch = true;
+                }
+            });
+
+        makeReadRegister(0x2138, "Data for OAM read", true);
+
+        makeReadRegister(0x213c, "Horizontal Scanline Location", true, horizontalScanlineLocation);
+        makeReadRegister(0x213d, "Vertical Scanline Location", false, verticalScanlineLocation);
+        makeReadRegister(0x213e, "PPU Status Flag and Version", false);
+        makeReadRegister(0x213f, "PPU Status Flag and Version", false, 
+            [this](Byte& byte) {
+                byte = 3;
+                byte.setBit(7, interlaceField);
+                byte.setBit(6, externalLatch);
+                if (programmableIOPort.getBit(7)) {
+                    externalLatch = false;
+                }
+                horizontalScanlineLocation.highByteSelect = false;
+                verticalScanlineLocation.highByteSelect = false;
+            });
         
         //makeWriteRegister(0x4016, "NES-style Joypad Access Port 1", true);
         //makeWriteRegister(0x4017, "NES-style Joypad Access Port 2", true);
@@ -280,7 +313,15 @@ public:
         state.getMemoryLocation(Long(0x4017, 0))->setReadWrite();
         
         makeWriteRegister(0x4200, "Interrupt Enable Flags", true, interruptEnableFlags);
-        makeWriteRegister(0x4201, "Programmable I/O port (out-port)", true);
+        makeWriteRegister(0x4201, "Programmable I/O port (out-port)", true, 
+            [this](Byte value) {
+                if (programmableIOPort.getBit(7) && !value.getBit(7)) { // 1 -> 0
+                    horizontalScanlineLocation.value = hCounter;
+                    verticalScanlineLocation.value = vCounter;
+                    externalLatch = true;
+                }
+                programmableIOPort = value;
+            });
         makeWriteRegister(0x4202, "Multiplicand A", false, multiplicandA);
         makeWriteRegister(0x4203, "Multiplicand B", false,
             [this](Byte multiplicandB) {
@@ -327,8 +368,7 @@ public:
         makeReadRegister(0x4214, "Quotient of Divide Result", false, quotient);
         makeReadRegister(0x4216, "Multiplication Product or Divide Remainder", false, product);
 
-        makeReadRegister(0x4218, "Controller Port 1 Data1 Register low byte", false);
-        makeReadRegister(0x4219, "Controller Port 1 Data1 Register high byte", false);
+        makeReadRegister(0x4218, "Controller Port 1 Data1 Register", false, controllerPort1Data1);
         makeReadRegister(0x421a, "Controller Port 2 Data1 Register low byte", false);
         makeReadRegister(0x421b, "Controller Port 2 Data1 Register high byte", false);
 
@@ -375,8 +415,17 @@ public:
     CPU::State& state;
     Video& video;
 
+    int vCounter = 0;
+    int hCounter = 0;
+    int frame = 0;
+    bool interlaceField = false;
+
     bool vBlank = false;
     bool hBlank = false;
+
+    Word oamStartAddress;
+
+    Word controllerPort1Data1;
 
 private:
     Byte videoPortControl;
@@ -391,4 +440,9 @@ private:
     Word& remainder = product;
     Byte interruptEnableFlags;
     Word vTimer;
+    Byte programmableIOPort = 0xff;
+    bool externalLatch = false;
+    Video::ReadTwiceRegister horizontalScanlineLocation;
+    Video::ReadTwiceRegister verticalScanlineLocation;
+    Byte ppuStatusFlagAndVersion;
 };

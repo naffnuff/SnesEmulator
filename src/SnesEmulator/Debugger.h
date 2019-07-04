@@ -355,6 +355,13 @@ public:
             output << std::endl;
         }
 
+        output << "OAM start address: " << registers.oamStartAddress << std::endl;
+        output << "OAM current address: " << registers.video.oam.address << std::endl;
+        for (int i = 0; i < 4; ++i) {
+            output << "Background " << i + 1 << " vertical scroll: " << registers.video.backgrounds[i].verticalScroll.value;
+            output << "Background " << i + 1 << " horizontal scroll: " << registers.video.backgrounds[i].horizontalScroll.value;
+        }
+
         output << "         0    1    2    3    4    5    6    7" << std::endl;
         output << "         8    9    a    b    c    d    e    f" << std::endl;
         int vramAddress = inspectedVideoMemory & 0xFF80;

@@ -76,9 +76,9 @@ void Emulator::initialize()
 void Emulator::run()
 {
     Video::OamViewer oamViewer(video);
-    Video::BackgroundViewer background1Viewer(video, Video::BackgroundLayer1);
+    //Video::BackgroundViewer background1Viewer(video, Video::BackgroundLayer1);
     Video::BackgroundViewer background2Viewer(video, Video::BackgroundLayer2);
-    Video::BackgroundViewer background3Viewer(video, Video::BackgroundLayer3);
+    //Video::BackgroundViewer background3Viewer(video, Video::BackgroundLayer3);
     //Video::BackgroundViewer background4Viewer(video, Video::BackgroundLayer4);
     /*std::thread vramRendererThread(
         [this]() {
@@ -108,11 +108,9 @@ void Emulator::run()
     uint64_t nextSpc = cycleCount;
     uint64_t cycleCountTarget = cycleCount;
 
-    int hCounter = int(cycleCount);
-    int vCounter = 0;
-    int frame = 0;
+    registers.hCounter = int(cycleCount);
 
-    std::vector<Renderer::Pixel> scanline(256);
+    //std::vector<Renderer::Pixel> scanline(256);
 
     bool nmiRequested = false;
     bool irqRequested = false;
@@ -156,7 +154,7 @@ void Emulator::run()
 
                 if (cpuContext.stepMode) {
                     output << "Cycle count: " << cycleCount << ", Next cpu: " << nextCpu << ", Next spc: " << nextSpc << std::endl;
-                    output << "Frame: " << frame << ", V counter: " << vCounter << ", H counter: " << hCounter << ", V blank: " << registers.vBlank << ", H blank: " << registers.hBlank << ", nmi: " << cpuState.isNmiActive() << ", irq: " << cpuState.isIrqActive() << std::endl;
+                    output << "Frame: " << registers.frame << ", V counter: " << registers.vCounter << ", H counter: " << registers.hCounter << ", V blank: " << registers.vBlank << ", H blank: " << registers.hBlank << ", nmi: " << cpuState.isNmiActive() << ", irq: " << cpuState.isIrqActive() << std::endl;
                     debugger.printBreakpoints(cpuContext, spcContext);
                     debugger.printMemory(cpuState, cpuContext, spcState, spcContext, video);
                 }
@@ -226,39 +224,55 @@ void Emulator::run()
 
             if (increment) {
                 ++cycleCount;
-                ++hCounter;
-                if (hCounter == 1100) {
-                    if (vCounter < 224) {
-                        video.drawScanline(vCounter);
+                ++registers.hCounter;
+                if (registers.hCounter == 1100) {
+                    if (registers.vCounter < 224) {
+                        video.drawScanline(registers.vCounter);
                     }
                     registers.hBlank = true;
                 }
-                else if (hCounter == 1364) {
-                    hCounter = 0;
+                else if (registers.hCounter == 1364) {
+                    registers.hCounter = 0;
                     registers.hBlank = false;
-                    ++vCounter;
-                    if (registers.vCounterIrqEnabled() && registers.getVTimer() == vCounter) {
+                    ++registers.vCounter;
+                    if (registers.vCounterIrqEnabled() && registers.getVTimer() == registers.vCounter) {
                         irqRequested = true;
                     }
-                    if (vCounter == 224) {
+                    if (registers.vCounter == 224) {
                         video.renderer.update();
+
+                        registers.controllerPort1Data1.setBit(4, video.renderer.buttonR);
+                        registers.controllerPort1Data1.setBit(5, video.renderer.buttonL);
+                        registers.controllerPort1Data1.setBit(6, video.renderer.buttonX);
+                        registers.controllerPort1Data1.setBit(7, video.renderer.buttonA);
+                        registers.controllerPort1Data1.setBit(8, video.renderer.buttonRight);
+                        registers.controllerPort1Data1.setBit(9, video.renderer.buttonLeft);
+                        registers.controllerPort1Data1.setBit(10, video.renderer.buttonDown);
+                        registers.controllerPort1Data1.setBit(11, video.renderer.buttonUp);
+                        registers.controllerPort1Data1.setBit(12, video.renderer.buttonStart);
+                        registers.controllerPort1Data1.setBit(13, video.renderer.buttonSelect);
+                        registers.controllerPort1Data1.setBit(14, video.renderer.buttonY);
+                        registers.controllerPort1Data1.setBit(15, video.renderer.buttonB);
+
                         if (video.renderer.pause) {
                             video.renderer.pause = false;
                             cpuContext.stepMode = true;
                         }
                         registers.vBlank = true;
+                        registers.video.oam.address = registers.oamStartAddress;
                         if (registers.nmiEnabled()) {
                             nmiRequested = true;
                         }
                     }
-                    else if (vCounter == 262) {
-                        ++frame;
-                        vCounter = 0;
+                    else if (registers.vCounter == 262) {
+                        ++registers.frame;
+                        registers.vCounter = 0;
+                        registers.interlaceField = !registers.interlaceField;
                         registers.vBlank = false;
                         oamViewer.update();
-                        background1Viewer.update();
+                        //background1Viewer.update();
                         background2Viewer.update();
-                        background3Viewer.update();
+                        //background3Viewer.update();
                         //background4Viewer.update();
                     }
                 }

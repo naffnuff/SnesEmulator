@@ -52,7 +52,7 @@ public:
         if (Byte enabled = dmaEnabled.getValue()) {
             for (int i = 0; i < 7; ++i) {
                 if (enabled.getBit(i)) {
-                    Channel channel = channels[i];
+                    const Channel& channel = channels[i];
                     ss << "Channel " << i << ": ";
                     ss << channel.sourceBank << channel.sourceAddressHighByte << channel.sourceAddressLowByte;
                     ss << " -> ";

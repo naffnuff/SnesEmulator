@@ -136,7 +136,6 @@ class ADC_6F : public AddressMode::AbsoluteLong<Operator::ADC>
     // 4   6-m         long      mm....mm . ADC $FEDBCA
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ADC_6F");
         return 5 + applyOperand();
     }
 
@@ -402,7 +401,6 @@ class AND_2F : public AddressMode::AbsoluteLong<Operator::AND>
     // 4   6-m         long      m.....m. . AND $FEDBCA
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("AND_2F");
         return 5 + applyOperand();
     }
 
@@ -751,7 +749,6 @@ class BIT_89_16Bit : public AddressMode::Immediate16Bit<Operator::BIT<true>>
     // 3-m 3-m         imm       ......m. . BIT #$54
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("BIT_89_16Bit");
         return 2 + applyOperand();
     }
 
@@ -1098,7 +1095,6 @@ class CMP_CF : public AddressMode::AbsoluteLong<Operator::CMP>
     // 4   6-m         long      m.....mm . CMP $FEDBCA
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("CMP_CF");
         return 5 + applyOperand();
     }
 
@@ -2728,7 +2724,6 @@ class ORA_0F : public AddressMode::AbsoluteLong<Operator::ORA>
     // 4   6-m         long      m.....m. . ORA $FEDBCA
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ORA_0F");
         return 5 + applyOperand();
     }
 
@@ -2861,7 +2856,6 @@ class ORA_1F : public AddressMode::AbsoluteLongIndexedX<Operator::ORA>
     // 4   6-m         long,X    m.....m. . ORA $FEDCBA,X
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ORA_1F");
         return 5 + applyOperand();
     }
 
@@ -3305,8 +3299,6 @@ class ROR_7E : public AddressMode::AbsoluteIndexed<Operator::ROR, State::X>
     // §20: TODO manually add exception for 3
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ROR_7E");
-        throw OpcodeNotYetImplementedException("TODO20");
         return 7 + applyOperand();
     }
 
@@ -3620,7 +3612,6 @@ class SBC_FF : public AddressMode::AbsoluteLongIndexedX<Operator::SBC>
     // 4   6-m         long,X    mm....mm . SBC $FEDCBA,X
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("SBC_FF");
         return 5 + applyOperand();
     }
 
@@ -3817,7 +3808,6 @@ class STA_92 : public AddressMode::DirectPageIndirect<Operator::STA>
     // 2   6-m+w       (dir)     ........ . STA ($10)
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("STA_92");
         return 5 + applyOperand();
     }
 
@@ -4242,7 +4232,6 @@ class TSB_0C : public AddressMode::Absolute<Operator::TSB>
     // 3   8-2*m       abs       ......m. . TSB $9876
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("TSB_0C");
         return 6 + applyOperand();
     }
 
@@ -4308,7 +4297,6 @@ class TXS_9A : public AddressMode::Implied<Operator::TXS>
     // 1   2           imp       ........ . TXS
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("TXS_9A");
         return 2 + applyOperand();
     }
 

@@ -88,6 +88,19 @@ public:
 
 public:
     bool pause = false;
+
+    bool buttonStart = false;
+    bool buttonSelect = false;
+    bool buttonA = false;
+    bool buttonB = false;
+    bool buttonX = false;
+    bool buttonY = false;
+    bool buttonL = false;
+    bool buttonR = false;
+    bool buttonUp = false;
+    bool buttonDown = false;
+    bool buttonLeft = false;
+    bool buttonRight = false;
     
     const int width;
     const int height;

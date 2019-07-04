@@ -46,7 +46,11 @@ public:
 
         void writeByte(Byte data, bool highTableSelect, int increment)
         {
-            (highTableSelect ? highTable : lowTable)[address] = data;
+            std::vector<Byte>& table = highTableSelect ? highTable : lowTable;
+            if (address >= table.size()) {
+                throw MemoryLocation::AccessException("Video-memory table out-of-bounds");
+            }
+            table[address] = data;
             address += increment;
         }
 
@@ -75,9 +79,24 @@ public:
         bool verticalFlip = false;
     };
 
-    class WriteTwiceRegister
+    struct ReadTwiceRegister
     {
-    public:
+        Byte read()
+        {
+            if (highByteSelect) {
+                return value.getHighByte();
+            }
+            else {
+                return value.getLowByte();
+            }
+            highByteSelect = !highByteSelect;
+        }
+        Word value;
+        bool highByteSelect = false;
+    };
+
+    struct WriteTwiceRegister
+    {
         void write(Byte byte)
         {
             if (highByteSelect) {
@@ -273,7 +292,7 @@ public:
 #endif
     };
 
-//#define DEBUGBG
+#define DEBUGBG
 
     class BackgroundViewer
     {
@@ -348,7 +367,7 @@ public:
                                         color = video.cgram.readWord(colorAddress);
                                     }
                                     if (tilePriority) {
-                                        color = addColors(color, Word(2108));//0x1084));
+                                        color = addColors(color, Word(0x2108), false);//0x1084));
                                     }
                                     renderer.setPixel(displayRow, displayColumn, color);
                                 }
@@ -421,8 +440,9 @@ public:
 
     void drawScanline(int vCounter)
     {
-        if (colorMathDesignation.getBit(6)) {
-            throw NotYetImplementedException("Half math");
+        if (screenDisplay.getBit(7)) {
+            //renderer.clearDisplay(0);
+            //return;
         }
         if (backgroundModeAndCharacterSize.getBits(4, 4) != 0) {
             throw NotYetImplementedException("16x16 backgrounds");
@@ -499,7 +519,14 @@ public:
                 if (result >= 0) {
                     if (colorMathDesignation.getBit(modeEntry.layer))
                     {
-                        return colorMathDesignation.getBit(7) ? subtractColors(Word(result), addendPixel) : addColors(Word(result), addendPixel);
+                        bool subtract = colorMathDesignation.getBit(7);
+                        bool halfMath = colorMathDesignation.getBit(6);
+                        if (subtract) {
+                            return subtractColors(Word(result), addendPixel, halfMath);
+                        }
+                        else {
+                            return addColors(Word(result), addendPixel, halfMath);
+                        }
                     }
                     else
                     {
@@ -509,7 +536,14 @@ public:
             }
         }
         if (colorMathDesignation.getBit(BackdropLayer)) {
-            return addColors(defaultPixel, addendPixel);
+            bool subtract = colorMathDesignation.getBit(7);
+            bool halfMath = colorMathDesignation.getBit(6);
+            if (subtract) {
+                return subtractColors(Word(defaultPixel), addendPixel, halfMath);
+            }
+            else {
+                return addColors(Word(defaultPixel), addendPixel, halfMath);
+            }
         }
         else
         {
@@ -517,12 +551,17 @@ public:
         }
     }
 
-    static Word addColors(ColorComponents a, ColorComponents b)
+    static Word addColors(ColorComponents a, ColorComponents b, bool halfMath)
     {
         ColorComponents sum;
         sum.red = a.red + b.red;
         sum.green = a.green + b.green;
         sum.blue = a.blue + b.blue;
+        if (halfMath) {
+            sum.red = sum.red / 2;
+            sum.green = sum.green / 2;
+            sum.blue = sum.blue / 2;
+        }
         Byte maxColor = 0x1f;
         sum.red = min(sum.red, maxColor);
         sum.green = min(sum.green, maxColor);
@@ -530,7 +569,7 @@ public:
         return sum;
     }
 
-    static Word subtractColors(ColorComponents a, ColorComponents b)
+    static Word subtractColors(ColorComponents a, ColorComponents b, bool halfMath)
     {
         ColorComponents difference;
         difference.red = b.red < a.red ? a.red - b.red : 0;
@@ -878,7 +917,7 @@ public:
         return result;
     }
 
-    std::array<std::array<uint8_t, 8>, 8> readTile(int tileIndex, int bitsPerPixel)
+    /*std::array<std::array<uint8_t, 8>, 8> readTile(int tileIndex, int bitsPerPixel)
     {
         static const int pixelsPerTile = 8 * 8;
         const int bitsPerTile = pixelsPerTile * bitsPerPixel;
@@ -908,7 +947,7 @@ public:
             ++tileAddress;
         }
         return result;
-    }
+    }*/
 
     std::ostream& output;
 
@@ -920,6 +959,8 @@ public:
     //Renderer vramRenderer;
     //Renderer cgramRenderer;
     //Renderer bgRenderer;
+
+    Byte screenDisplay;
 
     ColorComponents clearColor;
 
