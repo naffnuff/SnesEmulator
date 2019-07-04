@@ -264,7 +264,7 @@ public:
         Video& video;
         bool running = true;
 #else
-        OamViewer(Video& video)
+        OamViewer(Video&)
         {
         }
         void update()
@@ -273,7 +273,7 @@ public:
 #endif
     };
 
-    #define DEBUGBG
+//#define DEBUGBG
 
     class BackgroundViewer
     {
@@ -306,9 +306,9 @@ public:
             Background& background = video.backgrounds[backgroundLayer];
 
             const int tileSize = 8;
-            for (int screenRow = 0; screenRow < 2; ++screenRow)
+            for (int screenRow = 0; screenRow < background.verticalMirroring + 1; ++screenRow)
             {
-                for (int screenColumn = 0; screenColumn < 2; ++screenColumn)
+                for (int screenColumn = 0; screenColumn < background.horizontalMirroring + 1; ++screenColumn)
                 {
                     for (int tileRow = 0; tileRow < 32; ++tileRow) {
                         for (int tileColumn = 0; tileColumn < 32; ++tileColumn) {
@@ -365,7 +365,7 @@ public:
         bool running = true;
         Layer backgroundLayer;
 #else
-        BackgroundViewer(Video& video)
+        BackgroundViewer(Video&, Layer)
         {
         }
         void update()
@@ -452,9 +452,8 @@ public:
             backgrounds[BackgroundLayer1].bitsPerPixel = 4;
             backgrounds[BackgroundLayer2].bitsPerPixel = 4;
             backgrounds[BackgroundLayer3].bitsPerPixel = 2;
-            backgrounds[BackgroundLayer4].bitsPerPixel = 4;
             if (skip) {
-                return;
+                //return;
             }
             drawLayers(mode1e, 3, vCounter);
         }
@@ -564,17 +563,36 @@ public:
     void drawBackgroundLine(ScanlineBuffer& buffer, Background& background, int displayRow, int priority)
     {
         const int tileSize = 8;
-        displayRow += background.verticalScroll.value;
-        while (displayRow < 0) {
-            displayRow += rendererWidth;
-        }
-        while (displayRow >= rendererWidth) {
-            displayRow -= rendererWidth;
-        }
+        int backgroundHeight = tileSize * 32 * (background.verticalMirroring + 1);
+        int verticalScroll = background.verticalScroll.value % backgroundHeight;
+        int backgroundWidth = tileSize * 32 * (background.horizontalMirroring + 1);
+        int horizontalScroll = background.horizontalScroll.value % backgroundWidth;
+        displayRow += verticalScroll;
         int tileRow = displayRow / tileSize;
+        bool screenRow = false;
+        if (tileRow >= 32) {
+            screenRow = background.verticalMirroring;
+            tileRow %= 32;
+        }
         int row = displayRow % tileSize;
-        for (int tileColumn = 0; tileColumn < 32; ++tileColumn) {
-            Word tileData = vram.readWord(background.tilemapAddress + (tileRow << 5) + tileColumn);
+        int columnOffset = horizontalScroll % tileSize;
+        for (int displayColumn = -columnOffset; displayColumn < rendererWidth; displayColumn += tileSize) {
+            int tileColumn = (displayColumn + columnOffset + horizontalScroll) / tileSize;
+            bool screenColumn = false;
+            if (tileColumn >= 32) {
+                screenColumn = background.horizontalMirroring;
+                tileColumn %= 32;
+            }
+            Word tileDataAddress = background.tilemapAddress + (tileRow << 5) + tileColumn;
+            if (screenRow)
+            {
+                tileDataAddress += 0x800;
+            }
+            if (screenColumn)
+            {
+                tileDataAddress += 0x400;
+            }
+            Word tileData = vram.readWord(tileDataAddress);
             int tilePriority = tileData.getBits(13, 1);
             if (priority == tilePriority) {
                 Word tileNumber = tileData.getBits(0, 10);
@@ -582,7 +600,7 @@ public:
                 bool horizontalFlip = tileData.getBit(14);
                 bool verticalFlip = tileData.getBit(15);
                 Word tileAddress = background.characterAddress + (tileNumber * tileSize * background.bitsPerPixel / 2) + (verticalFlip ? tileSize - 1 - row : row);
-                drawTileLine(buffer, tileColumn * tileSize - background.horizontalScroll.value, 0, tileAddress, std::pow(2, background.bitsPerPixel) * palette, tileSize, horizontalFlip, background.bitsPerPixel, true);
+                drawTileLine(buffer, displayColumn, 0, tileAddress, std::pow(2, background.bitsPerPixel) * palette, tileSize, horizontalFlip, background.bitsPerPixel, true);
             }
         }
     }
@@ -622,17 +640,13 @@ public:
 
     void drawTileLine(ScanlineBuffer& buffer, int displayStartColumn, int displayColumnOffset, Word tileAddress, int paletteAddress, int objectSize, bool horizontalFlip, int bitsPerPixel, bool wrap)
     {
-        Byte firstLowByte(vram.lowTable[tileAddress]);
-        Byte firstHighByte(vram.highTable[tileAddress]);
-        Byte secondLowByte(vram.lowTable[tileAddress + 8]);
-        Byte secondHighByte(vram.highTable[tileAddress + 8]);
         for (int column = 0; column < 8; ++column) {
             Byte paletteIndex;
-            paletteIndex.setBit(0, firstLowByte.getBit(7 - column));
-            paletteIndex.setBit(1, firstHighByte.getBit(7 - column));
+            paletteIndex.setBit(0, vram.lowTable[tileAddress].getBit(7 - column));
+            paletteIndex.setBit(1, vram.highTable[tileAddress].getBit(7 - column));
             if (bitsPerPixel >= 4) {
-                paletteIndex.setBit(2, secondLowByte.getBit(7 - column));
-                paletteIndex.setBit(3, secondHighByte.getBit(7 - column));
+                paletteIndex.setBit(2, vram.lowTable[tileAddress + 8].getBit(7 - column));
+                paletteIndex.setBit(3, vram.highTable[tileAddress + 8].getBit(7 - column));
             }
             if (paletteIndex > 0) {
                 Word colorAddress = paletteAddress + paletteIndex;
@@ -645,7 +659,7 @@ public:
                     displayColumn = displayStartColumn + displayColumnOffset + column;
                 }
                 if (displayColumn < 0 || displayColumn >= rendererWidth) {
-                    if (wrap)
+                    /*if (wrap)
                     {
                         while (displayColumn < 0) {
                             displayColumn += rendererWidth;
@@ -654,12 +668,14 @@ public:
                             displayColumn -= rendererWidth;
                         }
                     }
-                    else
+                    else*/
                     {
                         continue;
                     }
                 }
-                buffer.data[displayColumn] = color;
+                if (buffer.data[displayColumn] < 0) {
+                    buffer.data[displayColumn] = color;
+                }
             }
         }
     }
