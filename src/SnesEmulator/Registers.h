@@ -101,6 +101,37 @@ public:
         makeReadRegister(address, info, debug, [&variable](Byte& value) { value = variable.read(); });
     }
 
+    void makeReadWriteRegister(Word address, const std::string& info, bool debug, std::function<void(Byte& value)> readCallback = nullptr, std::function<void(Byte value)> writeCallback = nullptr)
+    {
+        MemoryLocation* memory = state.getMemoryLocation(Long(address, 0));
+        memory->setReadWrite();
+        memory->setValue(0);
+        memory->onRead =
+            [this, address, readCallback, info, debug](Byte& value) {
+            if (readCallback) {
+                readCallback(value);
+            }
+            if (debug && value) {
+                printMemoryRegister(false, value, address, info);
+            }
+        };
+        memory->onWrite =
+            [this, address, writeCallback, info, debug](Byte oldValue, Byte newValue) {
+            if (debug && newValue && oldValue != newValue) {
+                printMemoryRegister(true, newValue, address, info);
+            }
+            if (writeCallback) {
+                writeCallback(newValue);
+            }
+        };
+    };
+
+    void makeReadWriteRegister(Word address, const std::string& info, bool debug, Word& variable)
+    {
+        makeReadWriteRegister(address, info + " low byte", debug, [&variable](Byte& value) { value = variable.getLowByte(); }, [&variable](Byte value) { variable.setLowByte(value); });
+        makeReadWriteRegister(address + 1, info + " high byte", debug, [&variable](Byte& value) { value = variable.getHighByte(); }, [&variable](Byte value) { variable.setHighByte(value); });
+    }
+
     void initialize()
     {
         // Registers
@@ -218,7 +249,7 @@ public:
         makeWriteRegister(0x211f, "Mode 7 Center X", false);
         makeWriteRegister(0x2120, "Mode 7 Center Y", false);
 
-        makeWriteRegister(0x2121, "CGRAM Address", true,
+        makeWriteRegister(0x2121, "CGRAM Address", false,
             [this](Byte value) {
                 video.cgram.address.setLowByte(value);
                 video.cgram.address.setHighByte(0x00);
@@ -253,7 +284,7 @@ public:
         makeWriteRegister(0x212e, "Window Mask Designation for the Main Screen", true);
         makeWriteRegister(0x212f, "Window Mask Designation for the Subscreen", true);
         makeWriteRegister(0x2130, "Color Addition Select", true, video.colorAdditionSelect);
-        makeWriteRegister(0x2131, "Color Math Designation", true, video.colorMathDesignation);
+        makeWriteRegister(0x2131, "Color Math Designation", false, video.colorMathDesignation);
         makeWriteRegister(0x2132, "Fixed Color Data", false,
             [this](Byte value) {
                 switch (value & 0xE0) {
@@ -290,7 +321,7 @@ public:
 
         makeReadRegister(0x2138, "Data for OAM read", true);
 
-        makeReadRegister(0x213c, "Horizontal Scanline Location", true, horizontalScanlineLocation);
+        makeReadRegister(0x213c, "Horizontal Scanline Location", false, horizontalScanlineLocation);
         makeReadRegister(0x213d, "Vertical Scanline Location", false, verticalScanlineLocation);
         makeReadRegister(0x213e, "PPU Status Flag and Version", false);
         makeReadRegister(0x213f, "PPU Status Flag and Version", false, 
@@ -304,13 +335,9 @@ public:
                 horizontalScanlineLocation.highByteSelect = false;
                 verticalScanlineLocation.highByteSelect = false;
             });
-        
-        //makeWriteRegister(0x4016, "NES-style Joypad Access Port 1", true);
-        //makeWriteRegister(0x4017, "NES-style Joypad Access Port 2", true);
-        //makeReadRegister(0x4016, "NES-style Joypad Access Port 1", true);
-        //makeReadRegister(0x4017, "NES-style Joypad Access Port 2", true);
-        state.getMemoryLocation(Long(0x4016, 0))->setReadWrite();
-        state.getMemoryLocation(Long(0x4017, 0))->setReadWrite();
+
+        makeReadWriteRegister(0x4016, "NES-style Joypad Access Port 1", true);
+        makeReadWriteRegister(0x4017, "NES-style Joypad Access Port 2", true);
         
         makeWriteRegister(0x4200, "Interrupt Enable Flags", true, interruptEnableFlags);
         makeWriteRegister(0x4201, "Programmable I/O port (out-port)", true, 
@@ -330,8 +357,7 @@ public:
         
         makeWriteRegister(0x4204, "Dividend C", false, dividend);
         makeWriteRegister(0x4206, "Divisor B", false,
-            [this](Byte value) {
-                Byte divisor = value;
+            [this](Byte divisor) {
                 if (divisor == 0) {
                     quotient = 0xffff;
                     remainder = dividend;
@@ -366,7 +392,7 @@ public:
             });
 
         makeReadRegister(0x4214, "Quotient of Divide Result", false, quotient);
-        makeReadRegister(0x4216, "Multiplication Product or Divide Remainder", false, product);
+        makeReadWriteRegister(0x4216, "Multiplication Product or Divide Remainder", false, product);
 
         makeReadRegister(0x4218, "Controller Port 1 Data1 Register", false, controllerPort1Data1);
         makeReadRegister(0x421a, "Controller Port 2 Data1 Register low byte", false);
@@ -383,6 +409,16 @@ public:
             makeWriteRegister(toDmaAddress(i, 5), "DMA Size/HDMA Indirect Address low byte Channel " + ss.str(), false);
             makeWriteRegister(toDmaAddress(i, 6), "DMA Size/HDMA Indirect Address high byte Channel " + ss.str(), false);
             makeWriteRegister(toDmaAddress(i, 7), "HDMA Indirect Address bank byte Channel " + ss.str(), false);
+        }
+
+        for (int address = 0x2200; address < 0x4016; ++address) {
+            MemoryLocation* memory = state.getMemoryLocation(Long(address, 0));
+            memory->setReadOnlyValue(0xf8);
+        }
+
+        for (int address = 0x4400; address < 0x8000; ++address) {
+            MemoryLocation* memory = state.getMemoryLocation(Long(address, 0));
+            memory->setReadOnlyValue(0xf8);
         }
     }
 
@@ -445,4 +481,5 @@ private:
     Video::ReadTwiceRegister horizontalScanlineLocation;
     Video::ReadTwiceRegister verticalScanlineLocation;
     Byte ppuStatusFlagAndVersion;
+    const Word mysteriousRegister;
 };

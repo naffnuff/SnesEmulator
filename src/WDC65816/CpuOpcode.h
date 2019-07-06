@@ -69,7 +69,6 @@ class ADC_67 : public AddressMode::DirectPageIndirectLong<Operator::ADC>
     // 2   7-m+w       [dir]     mm....mm . ADC [$10]
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ADC_67");
         return 6 + applyOperand();
     }
 
@@ -169,7 +168,6 @@ class ADC_72 : public AddressMode::DirectPageIndirect<Operator::ADC>
     // 2   6-m+w       (dir)     mm....mm . ADC ($10)
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ADC_72");
         return 5 + applyOperand();
     }
 
@@ -616,8 +614,6 @@ class ASL_1E : public AddressMode::AbsoluteIndexed<Operator::ASL, State::X>
     // §20: TODO manually add exception for 3
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ASL_1E");
-        throw OpcodeNotYetImplementedException("TODO20");
         return 7 + applyOperand();
     }
 
@@ -1823,7 +1819,6 @@ class INC_F6 : public AddressMode::DirectPageIndexed<Operator::INC, State::X>
     // 2   8-2*m+w     dir,X     m.....m. . INC $10,X
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("INC_F6");
         return 6 + applyOperand();
     }
 
@@ -2541,8 +2536,6 @@ class LSR_5E : public AddressMode::AbsoluteIndexed<Operator::LSR, State::X>
     // §20: TODO manually add exception for 3
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("LSR_5E");
-        throw OpcodeNotYetImplementedException("TODO20");
         return 7 + applyOperand();
     }
 
@@ -2906,7 +2899,6 @@ class PER_62 : public AddressMode::ProgramCounterRelativeLong<Operator::PER>
     // 3   6           imm       ........ . PER LABEL
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("PER_62");
         return 6 + applyOperand();
     }
 
@@ -4020,7 +4012,6 @@ class STY_94 : public AddressMode::DirectPageIndexed<Operator::ST_<State::Y>, St
     // 2   5-x+w       dir,X     ........ . STY $10,X
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("STY_94");
         return 4 + applyOperand();
     }
 

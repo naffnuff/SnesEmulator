@@ -292,7 +292,7 @@ public:
 #endif
     };
 
-#define DEBUGBG
+//#define DEBUGBG
 
     class BackgroundViewer
     {
@@ -367,7 +367,7 @@ public:
                                         color = video.cgram.readWord(colorAddress);
                                     }
                                     if (tilePriority) {
-                                        color = addColors(color, Word(0x2108), false);//0x1084));
+                                        color = addColors(color, Word(0x1084), false);//0x2108));
                                     }
                                     renderer.setPixel(displayRow, displayColumn, color);
                                 }
@@ -398,7 +398,7 @@ public:
         , vram(0x8000)
         , cgram(0x100)
         , oam(0x110)
-        , renderer(rendererWidth, 224, 3.f, false, output)
+        , renderer(rendererWidth, 224, 3.f, true, output)
         //, vramRenderer(0x200, 0x200, 1.f, true, output)
         //, cgramRenderer(16, 16, 16.f, true, output)
         , backgrounds(4)
@@ -455,7 +455,7 @@ public:
 
         //renderer.clearScanline(vCounter, cgram.readWord(0));
         //mode1e(vCounter);
-        if (backgroundMode == 1 && mode1Extension) {
+        if (backgroundMode == 1) {// && mode1Extension) {
             static const std::vector<ModeEntry> mode1e =
             {
                 { BackgroundLayer3, 1 },
@@ -575,6 +575,12 @@ public:
         difference.red = b.red < a.red ? a.red - b.red : 0;
         difference.green = b.green < a.green ? a.green - b.green : 0;
         difference.blue = b.blue < a.blue ? a.blue - b.blue : 0;
+        if (halfMath) {
+            throw NotYetImplementedException("Subtraction half math");
+            difference.red = difference.red / 2;
+            difference.green = difference.green / 2;
+            difference.blue = difference.blue / 2;
+        }
         return difference;
     }
 
@@ -603,20 +609,18 @@ public:
     {
         const int tileSize = 8;
         int backgroundHeight = tileSize * 32 * (background.verticalMirroring + 1);
-        int verticalScroll = background.verticalScroll.value % backgroundHeight;
         int backgroundWidth = tileSize * 32 * (background.horizontalMirroring + 1);
-        int horizontalScroll = background.horizontalScroll.value % backgroundWidth;
-        displayRow += verticalScroll;
-        int tileRow = displayRow / tileSize;
+        displayRow += background.verticalScroll.value;
+        int tileRow = displayRow % backgroundHeight / tileSize;
         bool screenRow = false;
         if (tileRow >= 32) {
             screenRow = background.verticalMirroring;
             tileRow %= 32;
         }
         int row = displayRow % tileSize;
-        int columnOffset = horizontalScroll % tileSize;
+        int columnOffset = background.horizontalScroll.value % tileSize;
         for (int displayColumn = -columnOffset; displayColumn < rendererWidth; displayColumn += tileSize) {
-            int tileColumn = (displayColumn + columnOffset + horizontalScroll) / tileSize;
+            int tileColumn = (displayColumn + columnOffset + background.horizontalScroll.value) % backgroundWidth / tileSize;
             bool screenColumn = false;
             if (tileColumn >= 32) {
                 screenColumn = background.horizontalMirroring;
@@ -654,6 +658,9 @@ public:
         }
         int row = displayRow - objectY;
         if (row >= 0 && row < objectSize) {
+            if (object.verticalFlip) {
+                row = objectSize - 1 - row;
+            }
             int tileRow = 0;
             while (row >= 8) {
                 ++tileRow;
@@ -692,7 +699,7 @@ public:
                 int color = cgram.readWord(colorAddress);
                 int displayColumn;
                 if (horizontalFlip) {
-                    displayColumn = displayStartColumn + objectSize - 1 - displayColumnOffset - column;
+                    displayColumn = displayStartColumn - displayColumnOffset + objectSize - 1 - column;
                 }
                 else {
                     displayColumn = displayStartColumn + displayColumnOffset + column;

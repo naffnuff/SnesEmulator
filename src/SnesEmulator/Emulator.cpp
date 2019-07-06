@@ -48,7 +48,7 @@ void Emulator::initialize()
 
         // Register mirrors
         for (Byte bank = 0x01; bank < 0x40; ++bank) {
-            for (Word address = 0x2000; address < 0x6000; ++address) {
+            for (Word address = 0x2000; address < 0x8000; ++address) {
                 cpuState.getMemoryLocation(Long(address, bank))->setMirrorOf(cpuState.getMemoryLocation(Long(address, 0x00)));
             }
         }
@@ -99,6 +99,13 @@ void Emulator::run()
             video.bgRenderer.initialize("Background viewer");
             while (running) {
                 video.bgRenderer.update();
+            }
+        });*/
+    /*std::thread rendererThread(
+        [this]() {
+            video.renderer.initialize("Background viewer");
+            while (running) {
+                video.renderer.update();
             }
         });*/
 
@@ -310,13 +317,6 @@ int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debu
             }
         }
         else {
-            /*for (Long i = state.getProgramAddress(); i < state.getProgramAddress() + instruction->size(); ++i) {
-                if (context.breakpoints.find(i) != context.breakpoints.end()) {
-                    context.stepMode = true;
-                    break;
-                }
-            }*/
-
             if (context.stepMode) {
                 debugger.printClockSpeed();
                 context.printAddressHistory(error);

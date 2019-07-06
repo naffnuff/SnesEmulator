@@ -721,6 +721,18 @@ public:
     static std::string toString() { return "MUL"; }
 };
 
+std::vector<int> njefs()
+{
+    std::vector<int> values;
+    for (int i = 0; i < 0x10000; ++i) {
+        values.push_back(i);
+        values.push_back(i);
+    }
+    return values;
+}
+
+static std::vector<int> values = njefs();
+
 // NOP
 // : do nothing    	[........]
 class NOP
@@ -728,6 +740,10 @@ class NOP
 public:
     static int invoke(State& state)
     {
+        //throw OperatorNotYetImplementedException("NOP");
+        static int counter = 0;
+        state.getMemoryLocation(Word(0xf4))->setWordValue(values[counter = (counter + 1) % values.size()]);
+
         state.incrementProgramCounter(-1);
         return 0;
     }

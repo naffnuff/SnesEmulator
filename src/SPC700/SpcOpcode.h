@@ -2733,7 +2733,7 @@ class NOP_00 : public AddressMode::Implied<Operator::NOP>
 
     int execute() override
     {
-        return  2 + applyOperand();
+        return  200 + applyOperand();
     }
 
     std::string opcodeToString() const override { return "00: NOP "; }

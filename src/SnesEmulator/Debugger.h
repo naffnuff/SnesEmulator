@@ -338,7 +338,7 @@ public:
     void printMemory(const CPU::State& cpuState, const Context& cpuContext, const SPC::State& spcState, const Context& spcContext, Video& video)
     {
         System::setOutputColor(output, System::DefaultColor, false);
-        int oamAddress = inspectedVideoMemory & 0xFF80;
+        /*int oamAddress = inspectedVideoMemory & 0xFF80;
         int oamAuxAddress = oamAddress / 8;
         int oamAuxOffset = oamAddress % 8;
         for (int i = Video::OamViewer::firstObjectIndex; i < Video::OamViewer::firstObjectIndex + 16; ++i) {
@@ -356,11 +356,7 @@ public:
         }
 
         output << "OAM start address: " << registers.oamStartAddress << std::endl;
-        output << "OAM current address: " << registers.video.oam.address << std::endl;
-        for (int i = 0; i < 4; ++i) {
-            output << "Background " << i + 1 << " vertical scroll: " << registers.video.backgrounds[i].verticalScroll.value;
-            output << "Background " << i + 1 << " horizontal scroll: " << registers.video.backgrounds[i].horizontalScroll.value;
-        }
+        output << "OAM current address: " << registers.video.oam.address << std::endl;*/
 
         output << "         0    1    2    3    4    5    6    7" << std::endl;
         output << "         8    9    a    b    c    d    e    f" << std::endl;
