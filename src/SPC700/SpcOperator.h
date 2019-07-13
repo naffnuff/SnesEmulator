@@ -740,7 +740,7 @@ class NOP
 public:
     static int invoke(State& state)
     {
-        //throw OperatorNotYetImplementedException("NOP");
+        throw OperatorNotYetImplementedException("NOP");
         static int counter = 0;
         state.getMemoryLocation(Word(0xf4))->setWordValue(values[counter = (counter + 1) % values.size()]);
 

@@ -23,6 +23,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\include\SPC700\SpcInstructionDecoder.h" />
+    <ClInclude Include="..\..\..\src\include\SPC700\Audio.h" />
     <ClInclude Include="..\..\..\src\include\SPC700\SpcState.h" />
     <ClInclude Include="..\..\..\src\SPC700\SpcAddressMode.h" />
     <ClInclude Include="..\..\..\src\SPC700\SpcOpcode.h" />

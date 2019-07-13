@@ -8,6 +8,7 @@
 
 #include "WDC65816/CpuState.h"
 #include "SPC700/SpcState.h"
+#include "SPC700/Audio.h"
 
 #include "WDC65816/CpuInstructionDecoder.h"
 #include "SPC700/SpcInstructionDecoder.h"
@@ -28,8 +29,9 @@ public:
         , video(output)
         , cpuState()
         , spcState()
-        , debugger(output, input, error, registers, cycleCount, running)
         , registers(output, error, cpuState, video)
+        , audio(output, error, spcState)
+        , debugger(output, input, error, registers, audio, masterCycle, running)
         , rom(output)
         , cpuInstructionDecoder(cpuState)
         , spcInstructionDecoder(spcState)
@@ -70,9 +72,10 @@ private:
 
     Video video;
     Registers registers;
+    SPC::Audio audio;
 
     bool running = true;
-    uint64_t cycleCount = 186;
+    uint64_t masterCycle = 186;
 
 };
 

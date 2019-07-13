@@ -141,14 +141,15 @@ public:
 
         ++applicationCount;
 
+        Byte result = value;
         if (onApply) {
-            onApply(value);
+            onApply(result);
         }
         if (breakpoint) {
             breakpoint(Apply);
         }
 
-        return value;
+        return result;
     }
 
     void setWordValue(Word value)
@@ -242,7 +243,7 @@ private:
 public:
     std::function<void(Byte& value)> onRead = nullptr;
     std::function<void(Byte oldValue, Byte newValue)> onWrite = nullptr;
-    std::function<void(Byte value)> onApply = nullptr;
+    std::function<void(Byte& value)> onApply = nullptr;
 
     std::function<void(Operation operation)> breakpoint = nullptr;
 

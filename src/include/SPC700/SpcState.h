@@ -40,20 +40,9 @@ public:
     };
 
     State()
-        : programCounter(0xFFC0)
-        , memory(0x10000, MemoryLocation(0xFF))
+        : programCounter(0xffc0)
+        , memory(0x10000, MemoryLocation(0xff))
     {
-        std::array<Byte, 64> bootRomData = {
-           0xCD, 0xEF, 0xBD, 0xE8, 0x00, 0xC6, 0x1D, 0xD0, 0xFC, 0x8F, 0xAA, 0xF4, 0x8F, 0xBB, 0xF5, 0x78,
-           0xCC, 0xF4, 0xD0, 0xFB, 0x2F, 0x19, 0xEB, 0xF4, 0xD0, 0xFC, 0x7E, 0xF4, 0xD0, 0x0B, 0xE4, 0xF5,
-           0xCB, 0xF4, 0xD7, 0x00, 0xFC, 0xD0, 0xF3, 0xAB, 0x01, 0x10, 0xEF, 0x7E, 0xF4, 0x10, 0xEB, 0xBA,
-           0xF6, 0xDA, 0x00, 0xBA, 0xF4, 0xC4, 0xF4, 0xDD, 0x5D, 0xD0, 0xDB, 0x1F, 0x00, 0x00, 0xC0, 0xFF,
-        };
-
-        for (size_t i = 0; i < bootRomData.size(); ++i) {
-            memory[programCounter + i].setReadOnlyValue(bootRomData[i]);
-        }
-
         for (MemoryLocation& r : registers) {
             r.setReadWrite();
         }
@@ -61,11 +50,11 @@ public:
         for (size_t address = 0; address < 0xf0; ++address) {
             memory[address].setReadWrite();
         }
-        for (size_t address = 0x100; address < 0xFFC0; ++address) {
+        for (size_t address = 0x100; address < 0xffc0; ++address) {
             memory[address].setReadWrite();
         }
 
-        for (size_t address = 0xf1; address < 0xf3; ++address) {
+        /*for (size_t address = 0xf1; address < 0xf3; ++address) {
             memory[address].setWriteOnly();
         }
         for (size_t address = 0xfa; address < 0xfb; ++address) {
@@ -73,13 +62,13 @@ public:
         }
 
         for (size_t address = 0xfd; address < 0xfe; ++address) {
-            memory[address].setReadOnlyValue(0x01);
+            memory[address].setReadOnlyValue(0);
         }
 
         for (size_t address = 0xf3; address < 0xf4; ++address) {
             memory[address].setReadWrite();
             memory[address].setValue(0);
-        }
+        }*/
     }
 
     State(const State&) = delete;
@@ -87,7 +76,7 @@ public:
 
     void reset()
     {
-        programCounter = 0xFFC0;
+        programCounter = 0xffc0;
         for (int i = 0; i < memory.size(); ++i) {
             memory[i].reset();
         }

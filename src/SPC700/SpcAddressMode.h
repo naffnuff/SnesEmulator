@@ -751,8 +751,8 @@ class RegisterDirectIndirectIndexed : public Instruction2Byte
 
     int invokeOperator(Byte lowByte) override
     {
-        Word address = state.getDirectMemoryLocation(lowByte)->getWordValue();
-        return Operator::invoke(state, state.getRegister<FirstRegister>(), state.getMemoryByte(address) + state.getRegisterValue<SecondRegister>());
+        Word indexedAddress = state.getDirectMemoryLocation(lowByte)->getWordValue() + state.getRegisterValue<SecondRegister>();
+        return Operator::invoke(state, state.getRegister<FirstRegister>(), state.getMemoryByte(indexedAddress));
     }
 
     std::string toString() const override

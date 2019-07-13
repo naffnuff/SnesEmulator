@@ -41,10 +41,10 @@
     <ClInclude Include="..\..\..\src\SnesEmulator\Rom.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\SnesEmulator\Registers.h">
+    <ClInclude Include="..\..\..\src\SnesEmulator\Video.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\SnesEmulator\Video.h">
+    <ClInclude Include="..\..\..\src\SnesEmulator\Registers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

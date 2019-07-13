@@ -324,7 +324,7 @@ public:
         makeReadRegister(0x213c, "Horizontal Scanline Location", false, horizontalScanlineLocation);
         makeReadRegister(0x213d, "Vertical Scanline Location", false, verticalScanlineLocation);
         makeReadRegister(0x213e, "PPU Status Flag and Version", false);
-        makeReadRegister(0x213f, "PPU Status Flag and Version", false, 
+        makeReadRegister(0x213f, "PPU Status Flag and Version", false,
             [this](Byte& byte) {
                 byte = 3;
                 byte.setBit(7, interlaceField);
@@ -338,9 +338,9 @@ public:
 
         makeReadWriteRegister(0x4016, "NES-style Joypad Access Port 1", true);
         makeReadWriteRegister(0x4017, "NES-style Joypad Access Port 2", true);
-        
+
         makeWriteRegister(0x4200, "Interrupt Enable Flags", true, interruptEnableFlags);
-        makeWriteRegister(0x4201, "Programmable I/O port (out-port)", true, 
+        makeWriteRegister(0x4201, "Programmable I/O port (out-port)", true,
             [this](Byte value) {
                 if (programmableIOPort.getBit(7) && !value.getBit(7)) { // 1 -> 0
                     horizontalScanlineLocation.value = hCounter;
@@ -354,7 +354,7 @@ public:
             [this](Byte multiplicandB) {
                 product = multiplicandA * multiplicandB;
             });
-        
+
         makeWriteRegister(0x4204, "Dividend C", false, dividend);
         makeWriteRegister(0x4206, "Divisor B", false,
             [this](Byte divisor) {

@@ -12,6 +12,7 @@
 
 void Renderer::initialize(const std::string& windowTitle)
 {
+    //return;
     title = windowTitle;
 
     if (!glfwInit()) {

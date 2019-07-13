@@ -35,5 +35,8 @@
     <ClInclude Include="..\..\..\src\SPC700\SpcOperator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\include\SPC700\Audio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

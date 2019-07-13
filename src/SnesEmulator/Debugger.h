@@ -6,6 +6,7 @@
 
 #include "WDC65816/CpuState.h"
 #include "SPC700/SpcState.h"
+#include "SPC700/Audio.h"
 
 #include "Video.h"
 #include "Registers.h"
@@ -65,11 +66,12 @@ public:
         const Instruction* nextInstruction;
     };
 
-    Debugger(std::ostream& output, std::istream& input, std::ostream& error, Registers& registers, uint64_t& cycleCount, bool& running)
+    Debugger(std::ostream& output, std::istream& input, std::ostream& error, Registers& registers, SPC::Audio& audio, uint64_t& cycleCount, bool& running)
         : output(output)
         , input(input)
         , error(error)
         , registers(registers)
+        , audio(audio)
         , cycleCount(cycleCount)
         , running(running)
     {
@@ -97,12 +99,22 @@ public:
     {
         MemoryLocation* memory = state.getMemoryLocation(breakpoint);
         if (memory->breakpoint == nullptr) {
-            memory->breakpoint = [this, &context, breakpoint](MemoryLocation::Operation operation) {
+            memory->breakpoint = [this, &context, &state, breakpoint](MemoryLocation::Operation operation) {
                 if (operation == MemoryLocation::Apply) {
                     context.stepMode = true;
                     output << "Apply: Breakpoint hit @ " << breakpoint << std::endl;
                 }
-                /*else if (operation == MemoryLocation::Write) {
+                /*else if (operation == MemoryLocation::Read) {
+                    if (!context.stepMode) {
+                        state.setProgramAddress(context.getLastKnownAddress());
+                    }
+                    context.stepMode = true;
+                    output << "Read: Breakpoint hit @ " << breakpoint << std::endl;
+                }
+                else if (operation == MemoryLocation::Write) {
+                    if (!context.stepMode) {
+                        state.setProgramAddress(context.getLastKnownAddress());
+                    }
                     context.stepMode = true;
                     output << "Write: Breakpoint hit @ " << breakpoint << std::endl;
                 }*/
@@ -139,6 +151,7 @@ public:
                 << "r: toggle run context" << std::endl
                 << "rr: run all contexts" << std::endl
                 << "q: soft reset" << std::endl
+                << "qr: soft reset and run" << std::endl
                 << "qq: hard reset" << std::endl
                 << "t: toggle breakpoint at current Program Counter address" << std::endl
                 << "tt: toggle breakpoint at next Program Counter address" << std::endl
@@ -189,6 +202,14 @@ public:
             state.reset();
             otherState.reset();
             registers.reset();
+        }
+        else if (command == "qr") {
+            output << "Soft reset and run" << std::endl;
+            state.reset();
+            otherState.reset();
+            registers.reset();
+            context.stepMode = false;
+            otherContext.stepMode = false;
         }
         else if (command == "qq") {
             output << "Hard reset" << std::endl;
@@ -358,14 +379,16 @@ public:
         output << "OAM start address: " << registers.oamStartAddress << std::endl;
         output << "OAM current address: " << registers.video.oam.address << std::endl;*/
 
-        output << "         0    1    2    3    4    5    6    7" << std::endl;
-        output << "         8    9    a    b    c    d    e    f" << std::endl;
+        output << "            0    1    2    3    4    5    6    7" << std::endl
+            << "            8    9    a    b    c    d    e    f"
+            << "             0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f" << std::endl;
         int vramAddress = inspectedVideoMemory & 0xFF80;
+        int dspAddress = 0;
         for (int i = 0; i < 16; ++i) {
             if (vramAddress < video.vram.lowTable.size()) {
                 uint16_t lowAddress(vramAddress);
                 lowAddress = lowAddress >> 4;
-                output << std::hex << std::setw(3) << std::setfill('0') << lowAddress << "x  " << std::dec;
+                output << "   " << std::hex << std::setw(3) << std::setfill('0') << lowAddress << "x  " << std::dec;
 
                 for (int j = 0; j < 8 && vramAddress < video.vram.lowTable.size(); ++j) {
                     Word memory(video.vram.lowTable[vramAddress], video.vram.highTable[vramAddress]);
@@ -373,8 +396,25 @@ public:
                     ++vramAddress;
                 }
             }
+
+            output << "     ";
+
+            if (dspAddress < audio.dspMemory.size()) {
+                uint16_t lowAddress(dspAddress);
+                lowAddress = lowAddress >> 4;
+                output << std::hex << std::setw(3) << std::setfill('0') << lowAddress << "x  " << std::dec;
+
+                for (int j = 0; j < 16 && dspAddress < audio.dspMemory.size(); ++j) {
+                    Byte memory = audio.dspMemory[dspAddress++];
+                    //setColor(spcState, spcContext, dspAddress++, memory);
+                    output << memory << ' ';
+                    //System::setOutputColor(output, System::DefaultColor, false);
+                }
+            }
+
             output << std::endl;
         }
+        output << std::endl;
 
         Long startCpuAddress = cpuContext.watchMode ? cpuState.getProgramAddress() : cpuContext.inspectedAddress;
         Long startSpcAddress = spcContext.watchMode ? spcState.getProgramAddress() : spcContext.inspectedAddress;
@@ -412,7 +452,12 @@ public:
                 for (int j = 0; j < 16 && spcAddress < spcMemorySize; ++j) {
                     const MemoryLocation& memory = spcState.getMemory(spcAddress);
                     setColor(spcState, spcContext, spcAddress++, memory);
-                    output << memory << ' ';
+                    if (spcAddress >= 0xffc0 && audio.bootRomDataEnabled) {
+                        output << audio.bootRomData[spcAddress - 0xffc0] << ' ';
+                    }
+                    else {
+                        output << memory << ' ';
+                    }
                     System::setOutputColor(output, System::DefaultColor, false);
                 }
             }
@@ -450,6 +495,7 @@ private:
     std::istream& input;
     std::ostream& error;
     Registers& registers;
+    SPC::Audio& audio;
     uint64_t& cycleCount;
     bool& running;
     Word inspectedVideoMemory = 0x0;

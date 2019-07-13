@@ -65,7 +65,6 @@ class ADC_97 : public AddressMode::RegisterDirectIndirectIndexed<Operator::ADC, 
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ADC_97");
         return  6 + applyOperand();
     }
 
@@ -128,7 +127,6 @@ class ADC_85 : public AddressMode::RegisterAbsolute<Operator::ADC, State::A>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ADC_85");
         return  4 + applyOperand();
     }
 
@@ -1030,7 +1028,6 @@ class CLR1_B2 : public AddressMode::Direct<Operator::SET1<5, false>>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("CLR1_B2");
         return  4 + applyOperand();
     }
 
@@ -1523,7 +1520,6 @@ class DEC_8B : public AddressMode::Direct<Operator::DEC>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("DEC_8B");
         return  4 + applyOperand();
     }
 
@@ -2428,7 +2424,6 @@ class MOV_FB : public AddressMode::RegisterDirectIndexed<Operator::MOV_SignedRes
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("MOV_FB");
         return  4 + applyOperand();
     }
 
@@ -2733,7 +2728,7 @@ class NOP_00 : public AddressMode::Implied<Operator::NOP>
 
     int execute() override
     {
-        return  200 + applyOperand();
+        return  2 + applyOperand();
     }
 
     std::string opcodeToString() const override { return "00: NOP "; }
@@ -3418,7 +3413,6 @@ class SBC_B5 : public AddressMode::RegisterAbsoluteIndexed<Operator::SBC, State:
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("SBC_B5");
         return  5 + applyOperand();
     }
 
@@ -3591,7 +3585,6 @@ class SET1_E2 : public AddressMode::Direct<Operator::SET1<7, true>>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("SET1_E2");
         return  4 + applyOperand();
     }
 

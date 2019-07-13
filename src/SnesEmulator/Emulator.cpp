@@ -52,19 +52,24 @@ void Emulator::initialize()
                 cpuState.getMemoryLocation(Long(address, bank))->setMirrorOf(cpuState.getMemoryLocation(Long(address, 0x00)));
             }
         }
-
-        // I/O between the CPU and SPC700
-        for (Word i = 0; i < 4; ++i) {
-            MemoryLocation* cpuMemoryLocation = cpuState.getMemoryLocation(Long(0x2140 + i));
-            MemoryLocation* spcMemoryLocation = spcState.getMemoryLocation(Word(0xf4 + i));
-            cpuMemoryLocation->setMappings(nullptr, spcMemoryLocation, MemoryLocation::ReadWrite);
-            spcMemoryLocation->setMappings(nullptr, cpuMemoryLocation, MemoryLocation::ReadWrite);
-        }
-    } else {
+    }
+    else {
         throw std::runtime_error("Only the low-rom mempory map is supported for now");
     }
 
     video.initialize(rom.gameTitle);
+
+    std::array<MemoryLocation*, 4> cpuToSpcPorts;
+    // I/O between the CPU and SPC700
+    for (Word i = 0; i < 4; ++i) {
+        MemoryLocation* cpuMemoryLocation = cpuState.getMemoryLocation(Long(0x2140 + i));
+        cpuToSpcPorts[i] = cpuMemoryLocation;
+        MemoryLocation* spcMemoryLocation = spcState.getMemoryLocation(Word(0xf4 + i));
+        cpuMemoryLocation->setMappings(nullptr, spcMemoryLocation, MemoryLocation::ReadWrite);
+        spcMemoryLocation->setMappings(nullptr, cpuMemoryLocation, MemoryLocation::ReadWrite);
+    }
+
+    audio.initialize(cpuToSpcPorts);
 
     debugger.loadBreakpoints(cpuContext, cpuState);
     debugger.loadBreakpoints(spcContext, spcState);
@@ -111,13 +116,13 @@ void Emulator::run()
 
     DmaInstruction dmaInstruction(output, error, cpuState);
 
-    uint64_t nextCpu = cycleCount;
-    uint64_t nextSpc = cycleCount;
-    uint64_t cycleCountTarget = cycleCount;
+    uint64_t nextCpu = masterCycle;
+    uint64_t nextSpc = masterCycle;
+    uint64_t cycleCountTarget = masterCycle;
 
-    registers.hCounter = int(cycleCount);
+    uint64_t audioCycle = 0;
 
-    //std::vector<Renderer::Pixel> scanline(256);
+    registers.hCounter = int(masterCycle);
 
     bool nmiRequested = false;
     bool irqRequested = false;
@@ -136,7 +141,7 @@ void Emulator::run()
         uint64_t iteration = 0;
         while (running) {
 
-            if (cycleCount == nextCpu) {
+            if (masterCycle == nextCpu) {
 
                 if (nmiRequested) {
                     nmiRequested = false;
@@ -160,7 +165,7 @@ void Emulator::run()
                 cpuContext.nextInstruction = instruction;
 
                 if (cpuContext.stepMode) {
-                    output << "Cycle count: " << cycleCount << ", Next cpu: " << nextCpu << ", Next spc: " << nextSpc << std::endl;
+                    output << "Cycle count: " << masterCycle << ", Next cpu: " << nextCpu << ", Next spc: " << nextSpc << std::endl;
                     output << "Frame: " << registers.frame << ", V counter: " << registers.vCounter << ", H counter: " << registers.hCounter << ", V blank: " << registers.vBlank << ", H blank: " << registers.hBlank << ", nmi: " << cpuState.isNmiActive() << ", irq: " << cpuState.isIrqActive() << std::endl;
                     debugger.printBreakpoints(cpuContext, spcContext);
                     debugger.printMemory(cpuState, cpuContext, spcState, spcContext, video);
@@ -175,12 +180,12 @@ void Emulator::run()
                 }
             }
 
-            if (cycleCount == nextSpc) {
+            if (masterCycle == nextSpc) {
                 Instruction* instruction = spcInstructionDecoder.readNextInstruction(spcState);
                 spcContext.nextInstruction = instruction;
 
                 if (spcContext.stepMode) {
-                    output << "cycleCount=" << cycleCount << ", nextCpu=" << nextCpu << ", nextSpc=" << nextSpc << std::endl;
+                    output << "cycleCount=" << masterCycle << ", nextCpu=" << nextCpu << ", nextSpc=" << nextSpc << std::endl;
                     debugger.printBreakpoints(cpuContext, spcContext);
                     debugger.printMemory(cpuState, cpuContext, spcState, spcContext, video);
                 }
@@ -230,7 +235,10 @@ void Emulator::run()
             }
 
             if (increment) {
-                ++cycleCount;
+                ++masterCycle;
+                if (masterCycle % 21 == 0) {
+                    audio.tick();
+                }
                 ++registers.hCounter;
                 if (registers.hCounter == 1100) {
                     if (registers.vCounter < 224) {
@@ -316,6 +324,7 @@ int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debu
                 return cycles;
             }
         }
+        // TODO: really an else here?
         else {
             if (context.stepMode) {
                 debugger.printClockSpeed();

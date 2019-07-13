@@ -398,7 +398,7 @@ public:
         , vram(0x8000)
         , cgram(0x100)
         , oam(0x110)
-        , renderer(rendererWidth, 224, 3.f, true, output)
+        , renderer(rendererWidth, 224, 3.f, false, output)
         //, vramRenderer(0x200, 0x200, 1.f, true, output)
         //, cgramRenderer(16, 16, 16.f, true, output)
         , backgrounds(4)
