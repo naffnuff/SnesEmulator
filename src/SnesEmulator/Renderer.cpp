@@ -42,7 +42,7 @@ void Renderer::initialize(const std::string& windowTitle)
         glfwSwapInterval(1);
     }
 
-    glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
     glShadeModel(GL_FLAT);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);

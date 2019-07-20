@@ -47,6 +47,9 @@
     <ClInclude Include="..\..\..\src\SnesEmulator\Registers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\SnesEmulator\HdmaInstruction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="cpu.txt">

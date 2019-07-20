@@ -63,6 +63,13 @@ public:
         makeWriteRegister(address + 1, info + " high byte", debug, [&variable](Byte value) { variable.setHighByte(value); });
     }
 
+    void makeWriteRegister(Word address, const std::string& info, bool debug, Long& variable)
+    {
+        makeWriteRegister(address, info + " low byte", debug, [&variable](Byte value) { variable.setLowByte(value); });
+        makeWriteRegister(address + 1, info + " high byte", debug, [&variable](Byte value) { variable.setHighByte(value); });
+        makeWriteRegister(address + 2, info + " bank byte", debug, [&variable](Byte value) { variable.setBankByte(value); });
+    }
+
     void makeWriteRegister(Word address, const std::string& info, bool debug, Video::WriteTwiceRegister& variable)
     {
         makeWriteRegister(address, info, debug, [&variable](Byte value) { variable.write(value); });
@@ -154,8 +161,8 @@ public:
                 oamStartAddress.setHighByte(value.getBit(0));
                 video.oam.address = oamStartAddress;
                 if (value.getBit(7)) {
-                    error << "OAM Address high bit and Obj Priority: " << value << std::endl;
-                    throw MemoryLocation::AccessException("Priority bit set");
+                    //error << "OAM Address high bit and Obj Priority: " << value << std::endl;
+                    //throw MemoryLocation::AccessException("Priority bit set");
                 }
             });
         makeWriteRegister(0x2104, "OAM Data write", false,
@@ -164,7 +171,7 @@ public:
             }
         );
 
-        makeWriteRegister(0x2105, "BG Mode and Character Size", true, video.backgroundModeAndCharacterSize);
+        makeWriteRegister(0x2105, "BG Mode and Character Size", false, video.backgroundModeAndCharacterSize);
         makeWriteRegister(0x2106, "Screen Pixelation", true);
         for (int i = 0; i < 2; ++i) {
             std::string bgName = "BG";
@@ -179,7 +186,7 @@ public:
         for (int i = 0; i < 4; ++i) {
             std::string bgName = "BG";
             bgName += '1' + i;
-            makeWriteRegister(0x2107 + i, bgName + " Tilemap Address and Size", true,
+            makeWriteRegister(0x2107 + i, bgName + " Tilemap Address and Size", false,
                 [this, i](Byte value) {
                     video.backgrounds[i].horizontalMirroring = value.getBit(0);
                     video.backgrounds[i].verticalMirroring = value.getBit(1);
@@ -270,19 +277,16 @@ public:
             }
         );
 
-        makeWriteRegister(0x2123, "Window Mask Settings for BG1 and BG2", true);
-        makeWriteRegister(0x2124, "Window Mask Settings for BG3 and BG4", true);
-        makeWriteRegister(0x2125, "Window Mask Settings for OBJ and Color Window", true);
-        makeWriteRegister(0x2126, "Window 1 Left Position", true);
-        makeWriteRegister(0x2127, "Window 1 Right Position", true);
-        makeWriteRegister(0x2128, "Window 2 Left Position", true);
-        makeWriteRegister(0x2129, "Window 2 Right Position", true);
-        makeWriteRegister(0x212a, "Window mask logic for BGs", true);
-        makeWriteRegister(0x212b, "Window mask logic for OBJs and Color Window", true);
-        makeWriteRegister(0x212c, "Main Screen Designation", true, video.mainScreenDesignation);
-        makeWriteRegister(0x212d, "Subscreen Designation", true, video.subscreenDesignation);
-        makeWriteRegister(0x212e, "Window Mask Designation for the Main Screen", true);
-        makeWriteRegister(0x212f, "Window Mask Designation for the Subscreen", true);
+        makeWriteRegister(0x2123, "Window Mask Settings", true, video.windowMaskSettings);
+        makeWriteRegister(0x2126, "Window 1 Left Position", false, video.window1Left);
+        makeWriteRegister(0x2127, "Window 1 Right Position", false, video.window1Right);
+        makeWriteRegister(0x2128, "Window 2 Left Position", false, video.window2Left);
+        makeWriteRegister(0x2129, "Window 2 Right Position", false, video.window2Right);
+        makeWriteRegister(0x212a, "Window Mask Logic", true, video.windowMaskLogic);
+        makeWriteRegister(0x212c, "Main Screen Designation", false, video.mainScreenDesignation);
+        makeWriteRegister(0x212d, "Subscreen Designation", false, video.subscreenDesignation);
+        makeWriteRegister(0x212e, "Window Mask Designation for the Main Screen", true, video.mainScreenWindowMaskDesignation);
+        makeWriteRegister(0x212f, "Window Mask Designation for the Subscreen", true, video.subscreenWindowMaskDesignation);
         makeWriteRegister(0x2130, "Color Addition Select", true, video.colorAdditionSelect);
         makeWriteRegister(0x2131, "Color Math Designation", false, video.colorMathDesignation);
         makeWriteRegister(0x2132, "Fixed Color Data", false,
@@ -339,7 +343,7 @@ public:
         makeReadWriteRegister(0x4016, "NES-style Joypad Access Port 1", true);
         makeReadWriteRegister(0x4017, "NES-style Joypad Access Port 2", true);
 
-        makeWriteRegister(0x4200, "Interrupt Enable Flags", true, interruptEnableFlags);
+        makeWriteRegister(0x4200, "Interrupt Enable Flags", false, interruptEnableFlags);
         makeWriteRegister(0x4201, "Programmable I/O port (out-port)", true,
             [this](Byte value) {
                 if (programmableIOPort.getBit(7) && !value.getBit(7)) { // 1 -> 0
@@ -401,24 +405,27 @@ public:
         for (int i = 0; i < 8; ++i) {
             std::stringstream ss;
             ss << i;
-            makeWriteRegister(toDmaAddress(i, 0), "DMA Control Channel " + ss.str(), false);
-            makeWriteRegister(toDmaAddress(i, 1), "DMA Destination Register Channel " + ss.str(), false);
-            makeWriteRegister(toDmaAddress(i, 2), "DMA Source Address low byte Channel " + ss.str(), false);
-            makeWriteRegister(toDmaAddress(i, 3), "DMA Source Address high byte Channel " + ss.str(), false);
-            makeWriteRegister(toDmaAddress(i, 4), "DMA Source Address bank byte Channel " + ss.str(), false);
-            makeWriteRegister(toDmaAddress(i, 5), "DMA Size/HDMA Indirect Address low byte Channel " + ss.str(), false);
-            makeWriteRegister(toDmaAddress(i, 6), "DMA Size/HDMA Indirect Address high byte Channel " + ss.str(), false);
-            makeWriteRegister(toDmaAddress(i, 7), "HDMA Indirect Address bank byte Channel " + ss.str(), false);
+            makeWriteRegister(toDmaAddress(i, 0x0), "DMA Control Channel " + ss.str(), false);
+            makeWriteRegister(toDmaAddress(i, 0x1), "DMA Destination Register Channel " + ss.str(), false);
+            makeWriteRegister(toDmaAddress(i, 0x2), "DMA Source Address low byte Channel " + ss.str(), false);
+            makeWriteRegister(toDmaAddress(i, 0x3), "DMA Source Address high byte Channel " + ss.str(), false);
+            makeWriteRegister(toDmaAddress(i, 0x4), "DMA Source Address bank byte Channel " + ss.str(), false);
+            makeWriteRegister(toDmaAddress(i, 0x5), "DMA Size/HDMA Indirect Address low byte Channel " + ss.str(), false);
+            makeWriteRegister(toDmaAddress(i, 0x6), "DMA Size/HDMA Indirect Address high byte Channel " + ss.str(), false);
+            makeWriteRegister(toDmaAddress(i, 0x7), "HDMA Indirect Address bank byte Channel " + ss.str(), false);
+            makeWriteRegister(toDmaAddress(i, 0x8), "HDMA Table Address low byte Channel " + ss.str(), false);
+            makeWriteRegister(toDmaAddress(i, 0x9), "HDMA Table Address high byte Channel " + ss.str(), false);
+            makeWriteRegister(toDmaAddress(i, 0xa), "HDMA Line Counter Channel " + ss.str(), false);
         }
 
         for (int address = 0x2200; address < 0x4016; ++address) {
             MemoryLocation* memory = state.getMemoryLocation(Long(address, 0));
-            memory->setReadOnlyValue(0xf8);
+            memory->setReadOnlyValue(0x0f);
         }
 
         for (int address = 0x4400; address < 0x8000; ++address) {
             MemoryLocation* memory = state.getMemoryLocation(Long(address, 0));
-            memory->setReadOnlyValue(0xf8);
+            memory->setReadOnlyValue(0x0f);
         }
     }
 
@@ -429,7 +436,28 @@ public:
 
     bool vCounterIrqEnabled() const
     {
+        if (interruptEnableFlags.getBit(6)) {
+            throw Video::NotYetImplementedException("H-Counter IRQ");
+        }
         return interruptEnableFlags.getBit(5);
+    }
+
+    void readControllers()
+    {
+        if (interruptEnableFlags.getBit(0)) {
+            controllerPort1Data1.setBit(4, video.renderer.buttonR);
+            controllerPort1Data1.setBit(5, video.renderer.buttonL);
+            controllerPort1Data1.setBit(6, video.renderer.buttonX);
+            controllerPort1Data1.setBit(7, video.renderer.buttonA);
+            controllerPort1Data1.setBit(8, video.renderer.buttonRight);
+            controllerPort1Data1.setBit(9, video.renderer.buttonLeft);
+            controllerPort1Data1.setBit(10, video.renderer.buttonDown);
+            controllerPort1Data1.setBit(11, video.renderer.buttonUp);
+            controllerPort1Data1.setBit(12, video.renderer.buttonStart);
+            controllerPort1Data1.setBit(13, video.renderer.buttonSelect);
+            controllerPort1Data1.setBit(14, video.renderer.buttonY);
+            controllerPort1Data1.setBit(15, video.renderer.buttonB);
+        }
     }
 
     Word getVTimer() const

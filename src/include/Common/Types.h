@@ -360,9 +360,19 @@ public:
         return copy;
     }
 
+    bool getBit(int bitIndex) const
+    {
+        return value & 1 << bitIndex;
+    }
+
     Byte getLowByte() const
     {
         return Byte(value);
+    }
+
+    void setLowByte(Byte lowByte)
+    {
+        value = lowByte | value & 0xffff00;
     }
 
     Byte getHighByte() const
@@ -370,9 +380,19 @@ public:
         return Byte(value >> 8);
     }
 
+    void setHighByte(Byte highByte)
+    {
+        value = Long(getLowByte(), highByte, getBankByte());
+    }
+
     Byte getBankByte() const
     {
         return Byte(value >> 16);
+    }
+
+    void setBankByte(Byte bankByte)
+    {
+        value = Long(Word(value), bankByte);
     }
 
 private:

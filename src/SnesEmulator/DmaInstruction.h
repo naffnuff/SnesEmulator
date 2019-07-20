@@ -19,6 +19,7 @@ private:
         MemoryLocation sourceBank;
         MemoryLocation dataSizeLowByte;
         MemoryLocation dataSizeHighByte;
+        bool active = false;
     };
 
 public:
@@ -44,13 +45,13 @@ public:
     DmaInstruction(const DmaInstruction&) = delete;
     DmaInstruction& operator=(const DmaInstruction&) = delete;
 
-    virtual std::string toString() const
+    std::string toString() const override
     {
         std::stringstream ss;
         ss << blockedInstruction->toString() << " (blocked by DMA)" << std::endl;
         ss << "DMA ";
         if (Byte enabled = dmaEnabled.getValue()) {
-            for (int i = 0; i < 7; ++i) {
+            for (int i = 0; i < 8; ++i) {
                 if (enabled.getBit(i)) {
                     const Channel& channel = channels[i];
                     ss << "Channel " << i << ": ";
@@ -63,58 +64,65 @@ public:
                 }
             }
         }
+        ss << "Iteration: " << iteration << std::endl;
         return ss.str();
     }
 
-    virtual std::string opcodeToString() const
+    std::string opcodeToString() const override
     {
         return blockedInstruction->opcodeToString();
     }
 
-    virtual int execute()
+    int execute() override
     {
         int cycles = 0;
         if (Byte dmaEnabledValue = dmaEnabled.getValue()) {
-            for (int i = 0; i < 7; ++i) {
-                while (dmaEnabledValue.getBit(i)) {
+            for (int i = 0; i < 8; ++i) {
+                if (dmaEnabledValue.getBit(i)) {
+                    if (iteration++ == 0) {
+                        cycles += 3;
+                    }
+
                     Channel& channel = channels[i];
+                    if (!channel.active) {
+                        channel.active = true;
+                        cycles += 1;
+                    }
 
                     Long registerAddress = 0x2100 | channel.registerAddress.getValue();
                     Word sourceAddress = channel.sourceAddressLowByte.getWordValue();
                     Byte sourceBank = channel.sourceBank.getValue();
                     Word dataSize = channel.dataSizeLowByte.getWordValue();
-                    MemoryLocation* memoryLocation = state.getMemoryLocation(Long(sourceAddress, sourceBank));
+                    MemoryLocation* sourceLocation = state.getMemoryLocation(Long(sourceAddress, sourceBank));
                     MemoryLocation* registerLocation = state.getMemoryLocation(registerAddress);
 
                     Byte dmaControl = channel.dmaControl.getValue();
-                    Byte transferMode = dmaControl.getBits(0, 3);
-                    bool fixedTransfer = dmaControl.getBit(3);
-                    bool increment = dmaControl.getBit(4);
-                    bool hdmaMode = dmaControl.getBit(6);
                     bool direction = dmaControl.getBit(7);
                     if (direction) {
-                        throw OperatorNotYetImplementedException("DMA control direction not implemented");
+                        throw OperatorNotYetImplementedException("DMA direction not implemented");
                     }
                     int byteCount = 0;
-                    if (transferMode == 0x0) {
-                        Byte data = memoryLocation->getValue();
+                    Byte transferMode = dmaControl.getBits(0, 3);
+                    if (transferMode == 0) {
+                        Byte data = sourceLocation->getValue();
                         registerLocation->setValue(data);
 
                         byteCount = 1;
                     }
-                    else if (transferMode == 0x1) {
-                        Word data = memoryLocation->getWordValue();
+                    else if (transferMode == 1) {
+                        Word data = sourceLocation->getWordValue();
                         registerLocation->setWordValue(data);
 
                         byteCount = 2;
                     }
                     else {
                         error << "DMA control: " << dmaControl << std::endl;
-                        throw OperatorNotYetImplementedException("DMA control not implemented");
+                        throw OperatorNotYetImplementedException("DMA transfer mode not implemented");
                     }
 
-                    if (!fixedTransfer)
-                    {
+                    bool fixedTransfer = dmaControl.getBit(3);
+                    bool increment = dmaControl.getBit(4);
+                    if (!fixedTransfer) {
                         channel.sourceAddressLowByte.setWordValue(sourceAddress + (increment ? -byteCount : byteCount));
                     }
                     dataSize -= byteCount;
@@ -125,15 +133,17 @@ public:
                     if (dataSize == 0) {
                         dmaEnabledValue.setBit(i, false);
                         dmaEnabled.setValue(dmaEnabledValue);
-                        return cycles;
+                        channel.active = false;
                     }
+                    return cycles;
                 }
             }
         }
+        iteration = 0;
         return cycles;
     }
 
-    virtual int size() const
+    int size() const override
     {
         return blockedInstruction->size();
     }
@@ -153,4 +163,6 @@ private:
 
     std::ostream& output;
     std::ostream& error;
+
+    int iteration = 0;
 };

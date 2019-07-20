@@ -193,6 +193,15 @@ public:
         Byte blue;
     };
 
+    struct WindowSettings
+    {
+        bool window1Enabled = false;
+        bool window1Inverted = false;
+        bool window2Enabled = false;
+        bool window2Inverted = false;
+        Byte windowOperator;
+    };
+
 //#define DEBUGOAM
 
     class OamViewer
@@ -398,7 +407,7 @@ public:
         , vram(0x8000)
         , cgram(0x100)
         , oam(0x110)
-        , renderer(rendererWidth, 224, 3.f, false, output)
+        , renderer(rendererWidth, 225, 3.f, false, output)
         //, vramRenderer(0x200, 0x200, 1.f, true, output)
         //, cgramRenderer(16, 16, 16.f, true, output)
         , backgrounds(4)
@@ -447,6 +456,9 @@ public:
         if (backgroundModeAndCharacterSize.getBits(4, 4) != 0) {
             throw NotYetImplementedException("16x16 backgrounds");
         }
+        if (colorAdditionSelect.getBit(0)) {
+            throw NotYetImplementedException("Direct color mode for 256-color BGs");
+        }
 
         int backgroundMode = backgroundModeAndCharacterSize.getBits(0, 3);
         bool mode1Extension = backgroundModeAndCharacterSize.getBit(3);
@@ -455,7 +467,7 @@ public:
 
         //renderer.clearScanline(vCounter, cgram.readWord(0));
         //mode1e(vCounter);
-        if (backgroundMode == 1) {// && mode1Extension) {
+        if (backgroundMode == 1 && mode1Extension) {
             static const std::vector<ModeEntry> mode1e =
             {
                 { BackgroundLayer3, 1 },
@@ -492,40 +504,75 @@ public:
         Word backdropColor = cgram.readWord(0);
         Word fixedColor = clearColor;
 
+        std::array<WindowSettings, 5> windowSettings;
+        Byte windowMaskDesignations = mainScreenWindowMaskDesignation | subscreenWindowMaskDesignation;
+        for (int i = 0; i < windowSettings.size(); ++i) {
+            if (windowMaskDesignations.getBit(i)) {
+                windowSettings[i].window1Enabled = windowMaskSettings.getBit(21);
+                windowSettings[i].window1Inverted = windowMaskSettings.getBit(20);
+                windowSettings[i].window2Enabled = windowMaskSettings.getBit(23);
+                windowSettings[i].window2Inverted = windowMaskSettings.getBit(22);
+                windowSettings[i].windowOperator = Byte(windowMaskLogic.getBits(10, 2));
+            }
+        }
+
         ScanlineBuffers mainScreenBackgroundLayers;
-        createLayers(mainScreenBackgroundLayers, layerCount, displayRow, mainScreenDesignation);
+        createLayers(mainScreenBackgroundLayers, layerCount, displayRow, mainScreenDesignation, mainScreenWindowMaskDesignation, windowSettings);
 
         ScanlineBuffers subscreenBackgroundLayers;
-        createLayers(subscreenBackgroundLayers, layerCount, displayRow, subscreenDesignation);
+        createLayers(subscreenBackgroundLayers, layerCount, displayRow, subscreenDesignation, subscreenWindowMaskDesignation, windowSettings);
+
+        int invertedBrightness = 0x1f - (screenDisplay.getBits(0, 4) << 1);
+        //Word invertedBrightnessColor((invertedBrightness | 1) | ((invertedBrightness | 1) << 5) | ((invertedBrightness | 1) << 10));
+        Word invertedBrightnessColor(invertedBrightness | invertedBrightness << 5 | invertedBrightness << 10);
+
+        WindowSettings colorWindowSettings;
+        colorWindowSettings.window1Enabled = windowMaskSettings.getBit(21);
+        colorWindowSettings.window1Inverted = windowMaskSettings.getBit(20);
+        colorWindowSettings.window2Enabled = windowMaskSettings.getBit(23);
+        colorWindowSettings.window2Inverted = windowMaskSettings.getBit(22);
+        colorWindowSettings.windowOperator = Byte(windowMaskLogic.getBits(10, 2));
 
         for (int displayColumn = 0; displayColumn < renderer.width; ++displayColumn) {
             Word addendPixel;
             if (colorAdditionSelect.getBit(1)) {
-                addendPixel = calculatePixel(mode, subscreenBackgroundLayers, subscreenDesignation, displayRow, displayColumn, fixedColor, 0, 0);
+                addendPixel = calculatePixel(mode, subscreenBackgroundLayers, subscreenDesignation, displayRow, displayColumn, fixedColor, 0, 0, colorWindowSettings);
             }
             else {
                 addendPixel = fixedColor;
             }
-            Word mainScreenPixel = calculatePixel(mode, mainScreenBackgroundLayers, mainScreenDesignation, displayRow, displayColumn, backdropColor, addendPixel, colorMathDesignation);
+            Word mainScreenPixel = calculatePixel(mode, mainScreenBackgroundLayers, mainScreenDesignation, displayRow, displayColumn, backdropColor, addendPixel, colorMathDesignation, colorWindowSettings);
+            if (invertedBrightness) {
+                mainScreenPixel = subtractColors(mainScreenPixel, invertedBrightnessColor, false);
+            }
             renderer.setPixel(displayRow, displayColumn, mainScreenPixel);
         }
     }
 
-    Word calculatePixel(const std::vector<ModeEntry>& mode, ScanlineBuffers& buffers, Byte designation, int displayRow, int displayColumn, Word defaultPixel, Word addendPixel, Byte colorMathDesignation)
+    Word calculatePixel(const std::vector<ModeEntry>& mode, ScanlineBuffers& buffers, Byte designation, int displayRow, int displayColumn, Word defaultPixel, Word addendPixel, Byte colorMathDesignation, WindowSettings& colorWindowSettings)
     {
         for (const ModeEntry& modeEntry : mode) {
             if (designation.getBit(modeEntry.layer)) {
                 int result = buffers.getBuffer(modeEntry.layer, modeEntry.priority).data[displayColumn];
                 if (result >= 0) {
-                    if (colorMathDesignation.getBit(modeEntry.layer))
-                    {
-                        bool subtract = colorMathDesignation.getBit(7);
-                        bool halfMath = colorMathDesignation.getBit(6);
-                        if (subtract) {
-                            return subtractColors(Word(result), addendPixel, halfMath);
+                    if (colorMathDesignation.getBit(modeEntry.layer)) {
+                        bool windowed = insideWindow(displayColumn, colorWindowSettings);
+                        if (setColorBlack(windowed)) {
+                            throw NotYetImplementedException("Blacken color");
+                            result = 0;
+                        }
+                        if (preventColorMath(windowed)) {
+                            return result;
                         }
                         else {
-                            return addColors(Word(result), addendPixel, halfMath);
+                            bool subtract = colorMathDesignation.getBit(7);
+                            bool halfMath = colorMathDesignation.getBit(6);
+                            if (subtract) {
+                                return subtractColors(Word(result), addendPixel, halfMath);
+                            }
+                            else {
+                                return addColors(Word(result), addendPixel, halfMath);
+                            }
                         }
                     }
                     else
@@ -548,6 +595,71 @@ public:
         else
         {
             return defaultPixel;
+        }
+    }
+
+    bool insideWindow(int column, WindowSettings& settings)
+    {
+        settings.window1Enabled &= window1Left < window1Right;
+        settings.window2Enabled &= window2Left < window2Right;
+        if (!settings.window1Enabled && !settings.window2Enabled) {
+            return true;
+        }
+        else if (settings.window1Enabled && settings.window2Enabled) {
+            bool inside1 = column >= window1Left && column <= window1Right;
+            bool inside2 = column >= window2Left && column <= window2Right;
+            if (settings.window1Inverted) {
+                inside1 = !inside1;
+            }
+            if (settings.window2Inverted) {
+                inside2 = !inside2;
+            }
+            bool inside = false;
+            if (settings.windowOperator == 0) {
+                inside = inside1 || inside2;
+            }
+            else {
+                std::stringstream ss;
+                ss << "Window operator " << settings.windowOperator;
+                throw NotYetImplementedException(ss.str());
+            }
+            return inside;
+        }
+        else if (settings.window1Enabled) {
+            bool inside = column >= window1Left && column <= window1Right;
+            if (settings.window1Inverted) {
+                inside = !inside;
+            }
+            return inside;
+        }
+        else if (settings.window2Enabled) {
+            bool inside = column >= window2Left && column <= window2Right;
+            if (settings.window2Inverted) {
+                inside = !inside;
+            }
+            return inside;
+        }
+    }
+
+    bool setColorBlack(bool insideColorWindow)
+    {
+        switch (colorAdditionSelect.getBits(6, 2))
+        {
+        case 0: return false;
+        case 1: return !insideColorWindow;
+        case 2: return insideColorWindow;
+        default: return true;
+        }
+    }
+
+    bool preventColorMath(bool insideColorWindow)
+    {
+        switch (colorAdditionSelect.getBits(4, 2))
+        {
+        case 0: return false;
+        case 1: return !insideColorWindow;
+        case 2: return insideColorWindow;
+        default: return true;
         }
     }
 
@@ -584,28 +696,28 @@ public:
         return difference;
     }
 
-    void createLayers(ScanlineBuffers& buffers, int layerCount, int displayRow, Byte screenDesignation)
+    void createLayers(ScanlineBuffers& buffers, int layerCount, int displayRow, Byte screenDesignation, Byte windowMaskDesignation, std::array<WindowSettings, 5>& windowSettings)
     {
         for (int layerIndex = 0; layerIndex < layerCount; ++layerIndex) {
             if (screenDesignation.getBit(layerIndex)) {
                 for (int priority = 0; priority < 2; ++priority) {
                     buffers.getBuffer(Layer(layerIndex), priority).data.fill(-1);
-                    drawBackgroundLine(buffers.getBuffer(Layer(layerIndex), priority), backgrounds[layerIndex], displayRow, priority);
+                    drawBackgroundLine(buffers.getBuffer(Layer(layerIndex), priority), backgrounds[layerIndex], displayRow, priority, windowMaskDesignation.getBit(layerIndex), windowSettings[layerIndex]);
                 }
             }
         }
-        if (screenDesignation) {
+        if (screenDesignation.getBit(ObjectLayer)) {
             for (int priority = 0; priority < 4; ++priority) {
                 buffers.getBuffer(ObjectLayer, priority).data.fill(-1);
             }
             for (int i = 0; i < 128; ++i) {
                 Object object = readObject(i);
-                drawObjectLine(buffers.getBuffer(ObjectLayer, object.priority), object, displayRow);
+                drawObjectLine(buffers.getBuffer(ObjectLayer, object.priority), object, displayRow, windowMaskDesignation.getBit(ObjectLayer), windowSettings[ObjectLayer]);
             }
         }
     }
 
-    void drawBackgroundLine(ScanlineBuffer& buffer, Background& background, int displayRow, int priority)
+    void drawBackgroundLine(ScanlineBuffer& buffer, Background& background, int displayRow, int priority, bool windowEnabled, WindowSettings& windowSettings)
     {
         const int tileSize = 8;
         int backgroundHeight = tileSize * 32 * (background.verticalMirroring + 1);
@@ -643,12 +755,12 @@ public:
                 bool horizontalFlip = tileData.getBit(14);
                 bool verticalFlip = tileData.getBit(15);
                 Word tileAddress = background.characterAddress + (tileNumber * tileSize * background.bitsPerPixel / 2) + (verticalFlip ? tileSize - 1 - row : row);
-                drawTileLine(buffer, displayColumn, 0, tileAddress, std::pow(2, background.bitsPerPixel) * palette, tileSize, horizontalFlip, background.bitsPerPixel, true);
+                drawTileLine(buffer, displayColumn, 0, tileAddress, (1 << background.bitsPerPixel) * palette, tileSize, horizontalFlip, background.bitsPerPixel, windowEnabled, windowSettings);
             }
         }
     }
 
-    void drawObjectLine(ScanlineBuffer& buffer, Object& object, int displayRow)
+    void drawObjectLine(ScanlineBuffer& buffer, Object& object, int displayRow, bool windowEnabled, WindowSettings& windowSettings)
     {
         int objectSize = getObjectSize(object.sizeSelect);
         int objectY = object.y;
@@ -679,12 +791,12 @@ public:
                 }
                 tileAddress += row;
                 const int bitsPerPixel = 4;
-                drawTileLine(buffer, objectX, tileColumn * 8, tileAddress, 0x80 + std::pow(2, bitsPerPixel) * object.palette, objectSize, object.horizontalFlip, bitsPerPixel, false);
+                drawTileLine(buffer, objectX, tileColumn * 8, tileAddress, 0x80 + (1 << bitsPerPixel) * object.palette, objectSize, object.horizontalFlip, bitsPerPixel, windowEnabled, windowSettings);
             }
         }
     }
 
-    void drawTileLine(ScanlineBuffer& buffer, int displayStartColumn, int displayColumnOffset, Word tileAddress, int paletteAddress, int objectSize, bool horizontalFlip, int bitsPerPixel, bool wrap)
+    void drawTileLine(ScanlineBuffer& buffer, int displayStartColumn, int displayColumnOffset, Word tileAddress, int paletteAddress, int objectSize, bool horizontalFlip, int bitsPerPixel, bool windowEnabled, WindowSettings& windowSettings)
     {
         for (int column = 0; column < 8; ++column) {
             Byte paletteIndex;
@@ -704,20 +816,8 @@ public:
                 else {
                     displayColumn = displayStartColumn + displayColumnOffset + column;
                 }
-                if (displayColumn < 0 || displayColumn >= rendererWidth) {
-                    /*if (wrap)
-                    {
-                        while (displayColumn < 0) {
-                            displayColumn += rendererWidth;
-                        }
-                        while (displayColumn >= rendererWidth) {
-                            displayColumn -= rendererWidth;
-                        }
-                    }
-                    else*/
-                    {
-                        continue;
-                    }
+                if (displayColumn < 0 || displayColumn >= rendererWidth || windowEnabled && !insideWindow(displayColumn, windowSettings)) {
+                    continue;
                 }
                 if (buffer.data[displayColumn] < 0) {
                     buffer.data[displayColumn] = color;
@@ -975,6 +1075,8 @@ public:
 
     Byte mainScreenDesignation;
     Byte subscreenDesignation;
+    Byte mainScreenWindowMaskDesignation;
+    Byte subscreenWindowMaskDesignation;
     Byte colorMathDesignation;
     Byte colorAdditionSelect;
 
@@ -983,4 +1085,12 @@ public:
     Word nameBaseSelect;
 
     std::vector<Background> backgrounds;
+
+    Byte window1Left;
+    Byte window1Right;
+    Byte window2Left;
+    Byte window2Right;
+
+    Long windowMaskSettings;
+    Word windowMaskLogic;
 };

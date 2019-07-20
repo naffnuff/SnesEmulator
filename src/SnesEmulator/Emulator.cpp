@@ -7,14 +7,15 @@
 #include "Common/Exception.h"
 
 #include "DmaInstruction.h"
+#include "HdmaInstruction.h"
 
 template<typename State, typename OtherState>
 int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debugger::Context& context, OtherState& otherState, Debugger::Context& otherContext, std::ostream& error);
 
 void Emulator::initialize()
 {
-    //rom.loadFromFile("../../Super Mario World (USA).sfc", cpuState);
-    rom.loadFromFile("../../Legend of Zelda, The - A Link to the Past (U) [!].smc", cpuState);
+    rom.loadFromFile("../../Super Mario World (USA).sfc", cpuState);
+    //rom.loadFromFile("../../Legend of Zelda, The - A Link to the Past (U) [!].smc", cpuState);
     //rom.loadFromFile("../../Super Metroid (Japan, USA) (En,Ja).sfc", cpuState);
     //rom.loadFromFile("../../Super Metroid (JU) [!].smc", cpuState);
     //rom.loadFromFile("../../Megaman X (USA).sfc", cpuState);
@@ -81,46 +82,22 @@ void Emulator::initialize()
 void Emulator::run()
 {
     Video::OamViewer oamViewer(video);
-    //Video::BackgroundViewer background1Viewer(video, Video::BackgroundLayer1);
+    Video::BackgroundViewer background1Viewer(video, Video::BackgroundLayer1);
     Video::BackgroundViewer background2Viewer(video, Video::BackgroundLayer2);
-    //Video::BackgroundViewer background3Viewer(video, Video::BackgroundLayer3);
-    //Video::BackgroundViewer background4Viewer(video, Video::BackgroundLayer4);
-    /*std::thread vramRendererThread(
-        [this]() {
-            video.vramRenderer.initialize("VRAM viewer");
-            while (running) {
-                video.vramRenderer.update();
-            }
-        });
-    std::thread cgramRendererThread(
-        [this]() {
-            video.cgramRenderer.initialize("CGRAM viewer");
-            while (running) {
-                video.cgramRenderer.update();
-            }
-        });*/
-    /*std::thread bgRendererThread(
-        [this]() {
-            video.bgRenderer.initialize("Background viewer");
-            while (running) {
-                video.bgRenderer.update();
-            }
-        });*/
-    /*std::thread rendererThread(
-        [this]() {
-            video.renderer.initialize("Background viewer");
-            while (running) {
-                video.renderer.update();
-            }
-        });*/
+    Video::BackgroundViewer background3Viewer(video, Video::BackgroundLayer3);
+    Video::BackgroundViewer background4Viewer(video, Video::BackgroundLayer4);
 
     DmaInstruction dmaInstruction(output, error, cpuState);
+    HdmaInstruction hdmaInstruction(output, error, cpuState);
 
     uint64_t nextCpu = masterCycle;
     uint64_t nextSpc = masterCycle;
     uint64_t cycleCountTarget = masterCycle;
 
     uint64_t audioCycle = 0;
+
+    int incrementCount = 0;
+    int totalCount = 0;
 
     registers.hCounter = int(masterCycle);
 
@@ -156,10 +133,25 @@ void Emulator::run()
 
                 Instruction* instruction = cpuInstructionDecoder.readNextInstruction(cpuState);
 
-                if (dmaInstruction.enabled()) { // DMA enabled
+                bool dmaPicked = false;
+                if (dmaInstruction.enabled()) {
                     //cpuContext.stepMode = true;
                     dmaInstruction.blockedInstruction = instruction;
                     instruction = static_cast<Instruction*>(&dmaInstruction);
+                    dmaPicked = true;
+                    if (!registers.vBlank) {
+                        //output << "DMA not during V blank" << std::endl;
+                        //cpuContext.stepMode = true;
+                    }
+                }
+                if (hdmaInstruction.active) {
+                    //cpuContext.stepMode = true;
+                    hdmaInstruction.blockedInstruction = instruction;
+                    instruction = static_cast<Instruction*>(&hdmaInstruction);
+                    if (dmaPicked) {
+                        output << "HDMA interrupts DMA" << std::endl;
+                        cpuContext.stepMode = true;
+                    }
                 }
 
                 cpuContext.nextInstruction = instruction;
@@ -172,7 +164,7 @@ void Emulator::run()
                 }
 
                 if (int cycles = executeNext(instruction, cpuState, debugger, cpuContext, spcState, spcContext, error)) {
-                    nextCpu += cycles * 8;
+                    nextCpu += uint64_t(cycles) * 8;
                     cpuContext.nextInstruction = cpuInstructionDecoder.readNextInstruction(cpuState);
                 }
                 else {
@@ -191,7 +183,7 @@ void Emulator::run()
                 }
 
                 if (int cycles = executeNext(instruction, spcState, debugger, spcContext, cpuState, cpuContext, error)) {
-                    nextSpc += cycles * 16;
+                    nextSpc += uint64_t(cycles) * 16;
                     spcContext.nextInstruction = spcInstructionDecoder.readNextInstruction(spcState);
                 }
                 else {
@@ -210,22 +202,17 @@ void Emulator::run()
                 cycleCountDelta = 0;
             }
             else { // run mode continued
-                if (iteration % 100 == 0)
-                {
+                if (iteration % 100 == 0) {
                     double elapsedTime = video.renderer.getTime() - runStartTime;
                     static const double clockSpeedTarget = 1.89e9 / 88.0;
                     cycleCountTarget = uint64_t(elapsedTime * clockSpeedTarget);
                 }
 
-                if (cycleCountTarget > cycleCountDelta)
-                {
+                if (cycleCountTarget > cycleCountDelta) {
                     increment = true;
                 }
 
                 increment = true;
-
-                static int incrementCount = 0;
-                static int totalCount = 0;
 
                 if (increment) {
                     ++incrementCount;
@@ -240,55 +227,57 @@ void Emulator::run()
                     audio.tick();
                 }
                 ++registers.hCounter;
-                if (registers.hCounter == 1100) {
-                    if (registers.vCounter < 224) {
+                if (registers.hCounter == 274) {
+                    if (registers.vCounter <= 224) {
                         video.drawScanline(registers.vCounter);
+                        if (hdmaInstruction.enabled()) {
+                            hdmaInstruction.active = true;
+                        }
+                    }
+                    if (registers.vCounter == 224) {
+                        video.renderer.update();
+
+                        if (video.renderer.pause) {
+                            video.renderer.pause = false;
+                            cpuContext.stepMode = true;
+                        }
                     }
                     registers.hBlank = true;
                 }
-                else if (registers.hCounter == 1364) {
+                else if (registers.hCounter == 1374) {
                     registers.hCounter = 0;
                     registers.hBlank = false;
                     ++registers.vCounter;
                     if (registers.vCounterIrqEnabled() && registers.getVTimer() == registers.vCounter) {
                         irqRequested = true;
                     }
-                    if (registers.vCounter == 224) {
-                        video.renderer.update();
-
-                        registers.controllerPort1Data1.setBit(4, video.renderer.buttonR);
-                        registers.controllerPort1Data1.setBit(5, video.renderer.buttonL);
-                        registers.controllerPort1Data1.setBit(6, video.renderer.buttonX);
-                        registers.controllerPort1Data1.setBit(7, video.renderer.buttonA);
-                        registers.controllerPort1Data1.setBit(8, video.renderer.buttonRight);
-                        registers.controllerPort1Data1.setBit(9, video.renderer.buttonLeft);
-                        registers.controllerPort1Data1.setBit(10, video.renderer.buttonDown);
-                        registers.controllerPort1Data1.setBit(11, video.renderer.buttonUp);
-                        registers.controllerPort1Data1.setBit(12, video.renderer.buttonStart);
-                        registers.controllerPort1Data1.setBit(13, video.renderer.buttonSelect);
-                        registers.controllerPort1Data1.setBit(14, video.renderer.buttonY);
-                        registers.controllerPort1Data1.setBit(15, video.renderer.buttonB);
-
-                        if (video.renderer.pause) {
-                            video.renderer.pause = false;
-                            cpuContext.stepMode = true;
-                        }
+                    if (registers.vCounter == 225) {
+                        hdmaInstruction.active = false;
                         registers.vBlank = true;
                         registers.video.oam.address = registers.oamStartAddress;
                         if (registers.nmiEnabled()) {
                             nmiRequested = true;
                         }
                     }
+                    else if (registers.vCounter == 227) {
+                        registers.readControllers();
+                    }
                     else if (registers.vCounter == 262) {
                         ++registers.frame;
                         registers.vCounter = 0;
                         registers.interlaceField = !registers.interlaceField;
                         registers.vBlank = false;
+
+                        if (hdmaInstruction.enabled()) {
+                            hdmaInstruction.initialize = true;
+                            hdmaInstruction.active = true;
+                        }
+
                         oamViewer.update();
-                        //background1Viewer.update();
+                        background1Viewer.update();
                         background2Viewer.update();
-                        //background3Viewer.update();
-                        //background4Viewer.update();
+                        background3Viewer.update();
+                        background4Viewer.update();
                     }
                 }
             }
@@ -296,16 +285,8 @@ void Emulator::run()
         }
     } catch (const std::exception& e) {
         running = false;
-        //oamRendererThread.join();
-        //vramRendererThread.join();
-        //cgramRendererThread.join();
-        //bgRendererThread.join();
         throw e;
     }
-    //oamRendererThread.join();
-    //vramRendererThread.join();
-    //cgramRendererThread.join();
-    //bgRendererThread.join();
 }
 
 template<typename State, typename OtherState>

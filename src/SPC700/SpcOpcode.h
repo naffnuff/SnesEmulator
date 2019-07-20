@@ -1012,7 +1012,6 @@ class CLR1_92 : public AddressMode::Direct<Operator::SET1<4, false>>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("CLR1_92");
         return  4 + applyOperand();
     }
 
@@ -1213,7 +1212,6 @@ class CMP_74 : public AddressMode::RegisterDirectIndexed<Operator::CMP, State::A
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("CMP_74");
         return  4 + applyOperand();
     }
 
@@ -3539,7 +3537,6 @@ class SET1_82 : public AddressMode::Direct<Operator::SET1<4, true>>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("SET1_82");
         return  4 + applyOperand();
     }
 
@@ -3615,7 +3612,6 @@ class SETP_40 : public AddressMode::Implied<Operator::SET<State::p, true>>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("SETP_40");
         return  2 + applyOperand();
     }
 
