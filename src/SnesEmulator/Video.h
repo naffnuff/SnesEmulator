@@ -288,9 +288,8 @@ public:
         ScanlineBuffers subscreenBackgroundLayers;
         createLayers(subscreenBackgroundLayers, layerCount, displayRow, subscreenDesignation, subscreenWindowMaskDesignation, windowSettings);
 
-        int invertedBrightness = 0x1f - (screenDisplay.getBits(0, 4) << 1);
-        //Word invertedBrightnessColor((invertedBrightness | 1) | ((invertedBrightness | 1) << 5) | ((invertedBrightness | 1) << 10));
-        Word invertedBrightnessColor(invertedBrightness | invertedBrightness << 5 | invertedBrightness << 10);
+        int brightness = screenDisplay.getBits(0, 4);
+        float brightnessFactor = float(brightness) / float(0xf);
 
         WindowSettings colorWindowSettings;
         colorWindowSettings.window1Enabled = windowMaskSettings.getBit(21);
@@ -308,8 +307,8 @@ public:
                 addendPixel = fixedColor;
             }
             Word mainScreenPixel = calculatePixel(mode, mainScreenBackgroundLayers, mainScreenDesignation, displayRow, displayColumn, backdropColor, addendPixel, colorMathDesignation, colorWindowSettings);
-            if (invertedBrightness) {
-                mainScreenPixel = subtractColors(mainScreenPixel, invertedBrightnessColor, false);
+            if (brightness != 0xf) {
+                mainScreenPixel = factorColors(mainScreenPixel, brightnessFactor);
             }
             renderer.setPixel(displayRow, displayColumn, mainScreenPixel);
         }
@@ -317,50 +316,40 @@ public:
 
     Word calculatePixel(const std::vector<ModeEntry>& mode, ScanlineBuffers& buffers, Byte designation, int displayRow, int displayColumn, Word defaultPixel, Word addendPixel, Byte colorMathDesignation, WindowSettings& colorWindowSettings)
     {
+        bool insideColorWindow = insideWindow(displayColumn, colorWindowSettings);
+        bool clipColor = setColorBlack(insideColorWindow) && displayRow % 2 == 0;
+        bool clipMath = preventColorMath(insideColorWindow);
+        bool subtract = colorMathDesignation.getBit(7);
+        bool halfMath = colorMathDesignation.getBit(6);
+
         for (const ModeEntry& modeEntry : mode) {
             if (designation.getBit(modeEntry.layer)) {
                 int result = buffers.getBuffer(modeEntry.layer, modeEntry.priority).data[displayColumn];
                 if (result >= 0) {
-                    if (colorMathDesignation.getBit(modeEntry.layer)) {
-                        bool windowed = insideWindow(displayColumn, colorWindowSettings);
-                        if (setColorBlack(windowed)) {
-                            //result = 0;
-                        }
-                        if (preventColorMath(windowed)) {
-                            return result;
-                        }
-                        else {
-                            bool subtract = colorMathDesignation.getBit(7);
-                            bool halfMath = colorMathDesignation.getBit(6);
-                            if (subtract) {
-                                return subtractColors(Word(result), addendPixel, halfMath);
-                            }
-                            else {
-                                return addColors(Word(result), addendPixel, halfMath);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        return result;
-                    }
+                    return applyColorMath(result, modeEntry.layer, addendPixel, colorMathDesignation, clipColor, clipMath, subtract, halfMath);
                 }
             }
         }
-        if (colorMathDesignation.getBit(BackdropLayer)) {
-            bool subtract = colorMathDesignation.getBit(7);
-            bool halfMath = colorMathDesignation.getBit(6);
-            if (subtract) {
-                return subtractColors(Word(defaultPixel), addendPixel, halfMath);
+        return applyColorMath(defaultPixel, BackdropLayer, addendPixel, colorMathDesignation, clipColor, clipMath, subtract, halfMath);
+    }
+
+    Word applyColorMath(int inputPixel, Layer layer, Word addendPixel, Byte colorMathDesignation, bool clipColor, bool clipMath, bool subtract, bool halfMath)
+    {
+        Word result = inputPixel;
+        if (colorMathDesignation.getBit(layer)) {
+            if (clipColor) {
+                result = 0;
             }
-            else {
-                return addColors(Word(defaultPixel), addendPixel, halfMath);
+            if (!clipMath) {
+                if (subtract) {
+                    return subtractColors(Word(result), addendPixel, halfMath);
+                }
+                else {
+                    return addColors(Word(result), addendPixel, halfMath);
+                }
             }
         }
-        else
-        {
-            return defaultPixel;
-        }
+        return result;
     }
 
     bool insideWindow(int column, WindowSettings& settings)
@@ -428,35 +417,44 @@ public:
 
     static Word addColors(ColorComponents a, ColorComponents b, bool halfMath)
     {
-        ColorComponents sum;
-        sum.red = a.red + b.red;
-        sum.green = a.green + b.green;
-        sum.blue = a.blue + b.blue;
+        ColorComponents c;
+        c.red = a.red + b.red;
+        c.green = a.green + b.green;
+        c.blue = a.blue + b.blue;
         if (halfMath) {
-            sum.red = sum.red / 2;
-            sum.green = sum.green / 2;
-            sum.blue = sum.blue / 2;
+            c.red = c.red / 2;
+            c.green = c.green / 2;
+            c.blue = c.blue / 2;
         }
         Byte maxColor = 0x1f;
-        sum.red = min(sum.red, maxColor);
-        sum.green = min(sum.green, maxColor);
-        sum.blue = min(sum.blue, maxColor);
-        return sum;
+        c.red = min(c.red, maxColor);
+        c.green = min(c.green, maxColor);
+        c.blue = min(c.blue, maxColor);
+        return c;
     }
 
     static Word subtractColors(ColorComponents a, ColorComponents b, bool halfMath)
     {
-        ColorComponents difference;
-        difference.red = b.red < a.red ? a.red - b.red : 0;
-        difference.green = b.green < a.green ? a.green - b.green : 0;
-        difference.blue = b.blue < a.blue ? a.blue - b.blue : 0;
+        ColorComponents c;
+        c.red = b.red < a.red ? a.red - b.red : 0;
+        c.green = b.green < a.green ? a.green - b.green : 0;
+        c.blue = b.blue < a.blue ? a.blue - b.blue : 0;
         if (halfMath) {
             throw NotYetImplementedException("Subtraction half math");
-            difference.red = difference.red / 2;
-            difference.green = difference.green / 2;
-            difference.blue = difference.blue / 2;
+            c.red = c.red / 2;
+            c.green = c.green / 2;
+            c.blue = c.blue / 2;
         }
-        return difference;
+        return c;
+    }
+
+    static Word factorColors(ColorComponents a, float b)
+    {
+        ColorComponents c;
+        c.red = a.red * b;
+        c.green = a.green * b;
+        c.blue = a.blue * b;
+        return c;
     }
 
     void createLayers(ScanlineBuffers& buffers, int layerCount, int displayRow, Byte screenDesignation, Byte windowMaskDesignation, std::array<WindowSettings, 5>& windowSettings)

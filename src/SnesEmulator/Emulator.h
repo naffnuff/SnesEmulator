@@ -30,6 +30,7 @@ private:
 
         void operator()()
         {
+            running = true;
             while (running) {
                 bool save = false;
                 {
@@ -52,7 +53,7 @@ private:
             std::cout << "Done Motherfucker Done Done Done Done!" << std::endl;
         }
 
-        bool running = true;
+        bool running = false;
         bool saveRamModified = false;
         std::mutex mutex;
         std::condition_variable condition;
@@ -84,9 +85,11 @@ public:
 
     ~Emulator()
     {
-        saveRamSaver.running = false;
-        saveRamSaver.condition.notify_one();
-        saveRamSaverThread.join();
+        if (saveRamSaver.running) {
+            saveRamSaver.running = false;
+            saveRamSaver.condition.notify_one();
+            saveRamSaverThread.join();
+        }
     }
 
     void initialize();

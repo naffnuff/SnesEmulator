@@ -3,6 +3,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <filesystem>
 
 #include "Common/Exception.h"
 
@@ -16,11 +17,30 @@ int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debu
 
 void Emulator::initialize()
 {
+    std::vector<std::string> titles;
+    for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(".")) {
+        std::string extension = entry.path().extension().string();
+        if (entry.is_regular_file() && (extension == ".smc" || extension == ".sfc")) {
+            std::string filename = entry.path().filename().string();
+            titles.push_back(filename);
+            output << titles.size() << ". " << filename << std::endl;
+        }
+    }
+    std::string pickedTitle;
+    while (pickedTitle.empty()) {
+        int inputValue = 0;
+        input >> inputValue;
+        --inputValue;
+        if (inputValue >= 0 && inputValue < titles.size()) {
+            pickedTitle = titles[inputValue];
+        }
+    }
+    rom.loadFromFile(pickedTitle, cpuState);
     //rom.loadFromFile("../../Super Mario World (USA).sfc", cpuState);
     //rom.loadFromFile("../../Legend of Zelda, The - A Link to the Past (U) [!].smc", cpuState);
     //rom.loadFromFile("../../Super Metroid (Japan, USA) (En,Ja).sfc", cpuState);
     //rom.loadFromFile("../../Super Metroid (JU) [!].smc", cpuState);
-    rom.loadFromFile("../../Megaman X (USA).sfc", cpuState);
+    //rom.loadFromFile("../../Megaman X (USA).sfc", cpuState);
 
     if (rom.isLowRom()) {
         // RAM
