@@ -74,22 +74,55 @@ void Renderer::update()
     glfwSwapBuffers(window);
     glfwPollEvents();
 
-    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-        pause = true;
+    bool spacePressed = isPressed(GLFW_KEY_SPACE);
+    if (pressPauseTimeout == 0) {
+        if (spacePressed) {
+            pause = true;
+            pressPauseTimeout = 10;
+        }
+    }
+    else {
+        --pressPauseTimeout;
     }
 
-    buttonStart = glfwGetKey(window, GLFW_KEY_COMMA) == GLFW_PRESS;
-    buttonSelect = glfwGetKey(window, GLFW_KEY_PERIOD) == GLFW_PRESS;
-    buttonA = glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS;
-    buttonB = glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS;
-    buttonX = glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS;
-    buttonY = glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS;
-    buttonL = glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS;
-    buttonR = glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS;
-    buttonUp = glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS;
-    buttonDown = glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS;
-    buttonLeft = glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS;
-    buttonRight = glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS;
+    buttonStart = isPressed(GLFW_KEY_COMMA);
+    buttonSelect = isPressed(GLFW_KEY_PERIOD);
+    buttonA = isPressed(GLFW_KEY_L);
+    buttonB = isPressed(GLFW_KEY_K);
+    buttonX = isPressed(GLFW_KEY_I);
+    buttonY = isPressed(GLFW_KEY_J);
+    buttonL = isPressed(GLFW_KEY_U);
+    buttonR = isPressed(GLFW_KEY_O);
+    buttonUp = isPressed(GLFW_KEY_W);
+    buttonDown = isPressed(GLFW_KEY_S);
+    buttonLeft = isPressed(GLFW_KEY_A);
+    buttonRight = isPressed(GLFW_KEY_D);
+
+    for (int i = 0; i < 2; ++i) {
+        if (glfwJoystickIsGamepad(GLFW_JOYSTICK_1 + i))
+        {
+            GLFWgamepadstate state;
+            if (glfwGetGamepadState(GLFW_JOYSTICK_1 + i, &state))
+            {
+                buttonStart |= state.buttons[GLFW_GAMEPAD_BUTTON_START] == GLFW_PRESS;
+                buttonSelect |= state.buttons[GLFW_GAMEPAD_BUTTON_BACK] == GLFW_PRESS;
+                buttonA |= state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_PRESS;
+                buttonB |= state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_PRESS;
+                buttonX |= state.buttons[GLFW_GAMEPAD_BUTTON_Y] == GLFW_PRESS;
+                buttonY |= state.buttons[GLFW_GAMEPAD_BUTTON_X] == GLFW_PRESS;
+                buttonL |= state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_PRESS;
+                buttonR |= state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER] == GLFW_PRESS;
+                buttonUp |= state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_UP] == GLFW_PRESS;
+                buttonDown |= state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_DOWN] == GLFW_PRESS;
+                buttonLeft |= state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_LEFT] == GLFW_PRESS;
+                buttonRight |= state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_RIGHT] == GLFW_PRESS;
+                buttonLeft |= state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -0.25f;
+                buttonRight |= state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] > 0.25f;
+                buttonUp |= state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] < -0.25f;
+                buttonDown |= state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] > 0.25f;
+            }
+        }
+    }
 }
 
 bool Renderer::isRunning() const

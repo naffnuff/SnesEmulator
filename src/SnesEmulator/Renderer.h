@@ -86,6 +86,11 @@ public:
         }
     }
 
+    bool isPressed(int key)
+    {
+        return glfwGetKey(window, key) == GLFW_PRESS;
+    }
+
 public:
     bool pause = false;
 
@@ -116,4 +121,6 @@ private:
     const bool syncUpdate;
 
     std::vector<Pixel> pixelBuffer;
+
+    int pressPauseTimeout = 0;
 };

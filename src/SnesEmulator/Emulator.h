@@ -21,6 +21,44 @@
 
 class Emulator
 {
+private:
+    struct SaveRamSaver {
+        SaveRamSaver(Emulator& emulator)
+            : emulator(emulator)
+        {
+        }
+
+        void operator()()
+        {
+            while (running) {
+                bool save = false;
+                {
+                    std::unique_lock<std::mutex> lock(mutex);
+                    condition.wait(lock, [this]() { return saveRamModified || !running; });
+                    save = saveRamModified;
+                    saveRamModified = false;
+                }
+                if (save) {
+                    std::ofstream file(emulator.rom.gameTitle + ".save");
+                    int saveRamSize = 0;
+                    for (Byte bank = 0x70; bank < 0x78; ++bank) {
+                        for (Word address = 0; address < 0x8000 && saveRamSize < emulator.rom.saveRamSize; ++address, ++saveRamSize) {
+                            file << emulator.cpuState.getMemoryByte(Long(address, bank)) << ' ';
+                        }
+                    }
+                    std::cout << "Baba Ganouch!";
+                }
+            }
+            std::cout << "Done Motherfucker Done Done Done Done!" << std::endl;
+        }
+
+        bool running = true;
+        bool saveRamModified = false;
+        std::mutex mutex;
+        std::condition_variable condition;
+        Emulator& emulator;
+    };
+
 public:
     Emulator(std::ostream& output, std::istream& input, std::ostream& error)
         : output(output)
@@ -37,11 +75,19 @@ public:
         , spcInstructionDecoder(spcState)
         , cpuContext("cpu.txt", System::Green)
         , spcContext("spc.txt", System::Magenta)
+        , saveRamSaver(*this)
     {
     }
 
     Emulator(const Emulator&) = delete;
     Emulator& operator=(const Emulator&) = delete;
+
+    ~Emulator()
+    {
+        saveRamSaver.running = false;
+        saveRamSaver.condition.notify_one();
+        saveRamSaverThread.join();
+    }
 
     void initialize();
     void run();
@@ -77,5 +123,7 @@ private:
     bool running = true;
     uint64_t masterCycle = 186;
 
+    SaveRamSaver saveRamSaver;
+    std::thread saveRamSaverThread;
 };
 

@@ -217,10 +217,10 @@ public:
         return applicationCount;
     }
 
-    void reset()
-    {
-        value = resetValue;
-    }
+    //void reset()
+    //{
+        //value = resetValue;
+    //}
 
 private:
     static void ThrowAccessException(const std::string& function)

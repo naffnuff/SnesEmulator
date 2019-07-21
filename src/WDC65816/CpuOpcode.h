@@ -2029,7 +2029,6 @@ class LDA_A3 : public AddressMode::StackRelative<Operator::LDA>
     // 2   5-m         stk,S     m.....m. . LDA $32,S
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("LDA_A3");
         return 4 + applyOperand();
     }
 
@@ -3206,8 +3205,6 @@ class ROL_3E : public AddressMode::AbsoluteIndexed<Operator::ROL, State::X>
     // §20: TODO manually add exception for 3
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ROL_3E");
-        throw OpcodeNotYetImplementedException("TODO20");
         return 7 + applyOperand();
     }
 
@@ -3702,7 +3699,6 @@ class STA_83 : public AddressMode::StackRelative<Operator::STA>
     // 2   5-m         stk,S     ........ . STA $32,S
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("STA_83");
         return 4 + applyOperand();
     }
 

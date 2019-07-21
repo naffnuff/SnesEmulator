@@ -209,6 +209,12 @@ public:
             memory->onApply = callback;
         }
     }
+    
+    void reset()
+    {
+        bootRomDataEnabled = true;
+        timers = {};
+    }
 
     std::ostream& output;
     std::ostream& error;

@@ -560,14 +560,13 @@ class StackRelative : public Instruction2Byte
 
     int invokeOperator(Byte lowByte) override
     {
-        throw AddressModeNotYetImplementedException("StackRelative");
-        MemoryLocation* memory = nullptr;
+        MemoryLocation* memory = state.getMemoryLocation(Long(state.getStackPointer() + lowByte, 0));
         return Operator::invoke(state, memory);
     }
 
     std::string toString() const override
     {
-        return Operator::toString() + " $" + operandToString() + " TODO";
+        return Operator::toString() + " $" + operandToString() + ",S";
     }
 };
 

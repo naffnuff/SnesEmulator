@@ -418,9 +418,11 @@ public:
             makeWriteRegister(toDmaAddress(i, 0xa), "HDMA Line Counter Channel " + ss.str(), false);
         }
 
-        for (int address = 0x2200; address < 0x4016; ++address) {
-            MemoryLocation* memory = state.getMemoryLocation(Long(address, 0));
-            memory->setReadOnlyValue(0x0f);
+        for (int address = 0x2200; address < 0x4200; ++address) {
+            if (address != 0x4016 && address != 0x4017) {
+                MemoryLocation* memory = state.getMemoryLocation(Long(address, 0));
+                memory->setReadOnlyValue(0x0f);
+            }
         }
 
         for (int address = 0x4400; address < 0x8000; ++address) {

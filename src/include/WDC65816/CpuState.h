@@ -498,7 +498,7 @@ public:
     void reset()
     {
         for (int i = 0; i < memory.size(); ++i) {
-            memory[i].reset();
+            //memory[i].reset();
         }
 
         dataBank = 0;
@@ -513,7 +513,7 @@ public:
         irqActive = false;
 
         for (MemoryLocation& a : accumulator) {
-            a.reset();
+            //a.reset();
         }
 
         for (Word& r : indexRegisters) {

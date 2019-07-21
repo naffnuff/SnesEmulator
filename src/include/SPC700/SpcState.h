@@ -78,7 +78,7 @@ public:
     {
         programCounter = 0xffc0;
         for (int i = 0; i < memory.size(); ++i) {
-            memory[i].reset();
+            //memory[i].reset();
         }
     }
 

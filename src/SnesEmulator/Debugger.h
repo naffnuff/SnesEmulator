@@ -202,12 +202,14 @@ public:
             state.reset();
             otherState.reset();
             registers.reset();
+            audio.reset();
         }
         else if (command == "qr") {
             output << "Soft reset and run" << std::endl;
             state.reset();
             otherState.reset();
             registers.reset();
+            audio.reset();
             context.stepMode = false;
             otherContext.stepMode = false;
         }

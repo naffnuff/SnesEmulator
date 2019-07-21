@@ -122,18 +122,22 @@ private:
 
         cartridgeType = data[0xFFD6 - offset];
 
-        //romSize = 1024 * (int)std::pow(2, (int)data[0xFFD7 - offset]);
         romSize = 0x400 << data[0xFFD7 - offset];
+        if (romSize != 1024 * (int)std::pow(2, (int)data[0xFFD7 - offset])) {
+            throw std::logic_error("ROM size mismatch");
+        }
 
-        //sRamSize = 0x400 << data[0xFFD8 - offset];
-        sRamSize = 1024 * (int)std::pow(2, (int)data[0xFFD8 - offset]);
+        saveRamSize = 0x400 << data[0xFFD8 - offset];
+        if (saveRamSize != 1024 * (int)std::pow(2, (int)data[0xFFD8 - offset])) {
+            throw std::logic_error("Save RAM size mismatch");
+        }
 
         output
             << "Game Title=" << gameTitle << std::endl
             << "Map Mode=" << mapMode << std::endl
             << "Cartridge Type=" << cartridgeType << std::endl
             << "ROM Size=" << romSize << std::endl
-            << "SRAM Size=" << sRamSize << std::endl
+            << "SaveRAM Size=" << saveRamSize << std::endl
             << std::endl;
 
         return true;
@@ -148,5 +152,5 @@ public:
     Byte mapMode;
     Byte cartridgeType;
     int romSize;
-    int sRamSize;
+    int saveRamSize;
 };

@@ -6,6 +6,8 @@
 
 #include "Common/Exception.h"
 
+#include "VideoDebugger.h"
+
 #include "DmaInstruction.h"
 #include "HdmaInstruction.h"
 
@@ -14,8 +16,8 @@ int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debu
 
 void Emulator::initialize()
 {
-    rom.loadFromFile("../../Super Mario World (USA).sfc", cpuState);
-    //rom.loadFromFile("../../Legend of Zelda, The - A Link to the Past (U) [!].smc", cpuState);
+    //rom.loadFromFile("../../Super Mario World (USA).sfc", cpuState);
+    rom.loadFromFile("../../Legend of Zelda, The - A Link to the Past (U) [!].smc", cpuState);
     //rom.loadFromFile("../../Super Metroid (Japan, USA) (En,Ja).sfc", cpuState);
     //rom.loadFromFile("../../Super Metroid (JU) [!].smc", cpuState);
     //rom.loadFromFile("../../Megaman X (USA).sfc", cpuState);
@@ -38,12 +40,34 @@ void Emulator::initialize()
         }
 
         // Save RAM
-        for (Byte bank = 0x70; bank < 0x71/*0x78*/; ++bank) {
-            for (Word address = 0; address < 0x8000; ++address) {
-                cpuState.getMemoryLocation(Long(address, bank))->setReadWrite();
-                cpuState.getMemoryLocation(Long(address, bank))->setValue(0x00);
+        {
+            std::ifstream file(rom.gameTitle + ".save");
+            file >> std::hex;
+            int saveRamSize = 0;
+            for (Byte bank = 0x70; bank < 0x78; ++bank) {
+                for (Word address = 0; address < 0x8000 && saveRamSize < rom.saveRamSize; ++address, ++saveRamSize) {
+                    cpuState.getMemoryLocation(Long(address, bank))->setReadWrite();
+                    Byte byte;
+                    int inputValue;
+                    if (file >> inputValue) {
+                        byte = inputValue;
+                    }
+                    cpuState.getMemoryLocation(Long(address, bank))->setValue(byte);
+                    cpuState.getMemoryLocation(Long(address, bank))->onWrite = [this](Byte, Byte)
+                    {
+                        output << '.';
+                        {
+                            std::lock_guard<std::mutex> lock(saveRamSaver.mutex);
+                            saveRamSaver.saveRamModified = true;
+                        }
+                        saveRamSaver.condition.notify_one();
+                    };
+                }
             }
+            output << "Save RAM size: " << saveRamSize << std::endl;
         }
+
+        saveRamSaverThread = std::thread(std::ref(saveRamSaver));
 
         registers.initialize();
 
@@ -81,11 +105,11 @@ void Emulator::initialize()
 
 void Emulator::run()
 {
-    Video::OamViewer oamViewer(video);
-    Video::BackgroundViewer background1Viewer(video, Video::BackgroundLayer1);
-    Video::BackgroundViewer background2Viewer(video, Video::BackgroundLayer2);
-    Video::BackgroundViewer background3Viewer(video, Video::BackgroundLayer3);
-    Video::BackgroundViewer background4Viewer(video, Video::BackgroundLayer4);
+    OamViewer oamViewer(video);
+    BackgroundViewer background1Viewer(video, BackgroundLayer1);
+    BackgroundViewer background2Viewer(video, BackgroundLayer2);
+    BackgroundViewer background3Viewer(video, BackgroundLayer3);
+    BackgroundViewer background4Viewer(video, BackgroundLayer4);
 
     DmaInstruction dmaInstruction(output, error, cpuState);
     HdmaInstruction hdmaInstruction(output, error, cpuState);
@@ -212,7 +236,7 @@ void Emulator::run()
                     increment = true;
                 }
 
-                increment = true;
+                //increment = true;
 
                 if (increment) {
                     ++incrementCount;

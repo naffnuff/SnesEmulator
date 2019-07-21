@@ -1307,7 +1307,7 @@ class T_A
 public:
     static int invoke(State& state)
     {
-        if (state.is16Bit(State::x)) {
+        if (state.is16Bit(State::m)) {
             state.setAccumulatorC(state.getIndexRegister<Register>());
         }
         else {
