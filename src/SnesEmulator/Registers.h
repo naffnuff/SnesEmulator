@@ -405,17 +405,27 @@ public:
         for (int i = 0; i < 8; ++i) {
             std::stringstream ss;
             ss << i;
-            makeWriteRegister(toDmaAddress(i, 0x0), "DMA Control Channel " + ss.str(), false);
-            makeWriteRegister(toDmaAddress(i, 0x1), "DMA Destination Register Channel " + ss.str(), false);
-            makeWriteRegister(toDmaAddress(i, 0x2), "DMA Source Address low byte Channel " + ss.str(), false);
-            makeWriteRegister(toDmaAddress(i, 0x3), "DMA Source Address high byte Channel " + ss.str(), false);
-            makeWriteRegister(toDmaAddress(i, 0x4), "DMA Source Address bank byte Channel " + ss.str(), false);
-            makeWriteRegister(toDmaAddress(i, 0x5), "DMA Size/HDMA Indirect Address low byte Channel " + ss.str(), false);
-            makeWriteRegister(toDmaAddress(i, 0x6), "DMA Size/HDMA Indirect Address high byte Channel " + ss.str(), false);
-            makeWriteRegister(toDmaAddress(i, 0x7), "HDMA Indirect Address bank byte Channel " + ss.str(), false);
-            makeWriteRegister(toDmaAddress(i, 0x8), "HDMA Table Address low byte Channel " + ss.str(), false);
-            makeWriteRegister(toDmaAddress(i, 0x9), "HDMA Table Address high byte Channel " + ss.str(), false);
-            makeWriteRegister(toDmaAddress(i, 0xa), "HDMA Line Counter Channel " + ss.str(), false);
+            makeReadWriteRegister(toDmaAddress(i, 0x0), "DMA Control Channel " + ss.str(), false);
+            makeReadWriteRegister(toDmaAddress(i, 0x1), "DMA Destination Register Channel " + ss.str(), false);
+            makeReadWriteRegister(toDmaAddress(i, 0x2), "DMA Source Address low byte Channel " + ss.str(), false);
+            makeReadWriteRegister(toDmaAddress(i, 0x3), "DMA Source Address high byte Channel " + ss.str(), false);
+            makeReadWriteRegister(toDmaAddress(i, 0x4), "DMA Source Address bank byte Channel " + ss.str(), false);
+            makeReadWriteRegister(toDmaAddress(i, 0x5), "DMA Size/HDMA Indirect Address low byte Channel " + ss.str(), false);
+            makeReadWriteRegister(toDmaAddress(i, 0x6), "DMA Size/HDMA Indirect Address high byte Channel " + ss.str(), false);
+            makeReadWriteRegister(toDmaAddress(i, 0x7), "HDMA Indirect Address bank byte Channel " + ss.str(), false);
+            makeReadWriteRegister(toDmaAddress(i, 0x8), "HDMA Table Address low byte Channel " + ss.str(), false);
+            makeReadWriteRegister(toDmaAddress(i, 0x9), "HDMA Table Address high byte Channel " + ss.str(), false);
+            makeReadWriteRegister(toDmaAddress(i, 0xa), "HDMA Line Counter Channel " + ss.str(), false);
+        }
+
+        for (int address = 0x2000; address < 0x2100; ++address) {
+            MemoryLocation* memory = state.getMemoryLocation(Long(address, 0));
+            memory->setReadOnlyValue(0x0f);
+        }
+
+        for (int address = 0x2144; address < 0x2180; ++address) {
+            MemoryLocation* memory = state.getMemoryLocation(Long(address, 0));
+            memory->setReadOnlyValue(0x0f);
         }
 
         for (int address = 0x2200; address < 0x4200; ++address) {
@@ -425,7 +435,12 @@ public:
             }
         }
 
-        for (int address = 0x4400; address < 0x8000; ++address) {
+        for (int address = 0x4220; address < 0x4300; ++address) {
+            MemoryLocation* memory = state.getMemoryLocation(Long(address, 0));
+            memory->setReadOnlyValue(0x0f);
+        }
+
+        for (int address = 0x4380; address < 0x8000; ++address) {
             MemoryLocation* memory = state.getMemoryLocation(Long(address, 0));
             memory->setReadOnlyValue(0x0f);
         }

@@ -681,9 +681,9 @@ public:
 class PEA
 {
 public:
-    static int invoke(State& state, const MemoryLocation* memory)
+    static int invoke(State& state, Word address)
     {
-        throw OperatorNotYetImplementedException("PEA");
+        state.pushWordToStack(address);
         return 0;
     }
 

@@ -36,7 +36,6 @@ class ADC_63 : public AddressMode::StackRelative<Operator::ADC>
     // 2   5-m         stk,S     mm....mm . ADC $32,S
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ADC_63");
         return 4 + applyOperand();
     }
 
@@ -1437,7 +1436,6 @@ class DEC_D6 : public AddressMode::DirectPageIndexed<Operator::DEC, State::X>
     // 2   8-2*m+w     dir,X     m.....m. . DEC $10,X
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("DEC_D6");
         return 6 + applyOperand();
     }
 
@@ -2857,14 +2855,13 @@ class ORA_1F : public AddressMode::AbsoluteLongIndexedX<Operator::ORA>
 // PEA Push Effective Absolute Address [Flags affected: none]
 // PEA addr
 // Absolute (3-Byte)
-class PEA_F4 : public AddressMode::Absolute<Operator::PEA>
+class PEA_F4 : public AddressMode::Absolute_ControlFlow<Operator::PEA>
 {
-    using Absolute::Absolute;
+    using Absolute_ControlFlow::Absolute_ControlFlow;
 
     // 3   5           imm       ........ . PEA #$1234
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("PEA_F4");
         return 5 + applyOperand();
     }
 

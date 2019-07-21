@@ -111,7 +111,6 @@ class ADC_94 : public AddressMode::RegisterDirectIndexed<Operator::ADC, State::A
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ADC_94");
         return  4 + applyOperand();
     }
 
@@ -374,7 +373,6 @@ class AND_29 : public AddressMode::DirectDirect<Operator::AND>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("AND_29");
         return  6 + applyOperand();
     }
 
@@ -577,7 +575,6 @@ class BBC_B3 : public AddressMode::DirectProgramCounterRelative<Operator::BB<5, 
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("BBC_B3");
         return 5 + applyOperand();
     }
 
@@ -640,7 +637,6 @@ class BBS_23 : public AddressMode::DirectProgramCounterRelative<Operator::BB<1, 
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("BBS_23");
         return 5 + applyOperand();
     }
 
@@ -704,7 +700,6 @@ class BBS_A3 : public AddressMode::DirectProgramCounterRelative<Operator::BB<5, 
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("BBS_A3");
         return 5 + applyOperand();
     }
 
@@ -948,7 +943,6 @@ class CLR1_12 : public AddressMode::Direct<Operator::SET1<0, false>>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("CLR1_12");
         return  4 + applyOperand();
     }
 
@@ -1395,7 +1389,6 @@ class CMPW_5A : public AddressMode::YAccumulatorDirect<Operator::CMPW>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("CMPW_5A");
         return  4 + applyOperand();
     }
 
@@ -1720,7 +1713,6 @@ class EOR_54 : public AddressMode::RegisterDirectIndexed<Operator::EOR, State::A
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("EOR_54");
         return  4 + applyOperand();
     }
 
@@ -1800,7 +1792,6 @@ class EOR_58 : public AddressMode::DirectImmediate<Operator::EOR>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("EOR_58");
         return  5 + applyOperand();
     }
 
@@ -2452,7 +2443,6 @@ class MOV_FA : public AddressMode::DirectDirect<Operator::MOV>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("MOV_FA");
         return  5 + applyOperand();
     }
 
@@ -2866,7 +2856,6 @@ class OR_14 : public AddressMode::RegisterDirectIndexed<Operator::OR, State::A, 
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("OR_14");
         return  4 + applyOperand();
     }
 
@@ -2897,7 +2886,6 @@ class OR_15 : public AddressMode::RegisterAbsoluteIndexed<Operator::OR, State::A
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("OR_15");
         return  5 + applyOperand();
     }
 
@@ -3023,7 +3011,6 @@ class POP_8E : public AddressMode::Register<Operator::POP, State::PSW>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("POP_8E");
         return  4 + applyOperand();
     }
 
@@ -3084,7 +3071,6 @@ class PUSH_0D : public AddressMode::Register<Operator::PUSH, State::PSW>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("PUSH_0D");
         return  4 + applyOperand();
     }
 
@@ -3489,7 +3475,6 @@ class SET1_22 : public AddressMode::Direct<Operator::SET1<1, true>>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("SET1_22");
         return  4 + applyOperand();
     }
 
