@@ -317,7 +317,7 @@ public:
     Word calculatePixel(const std::vector<ModeEntry>& mode, ScanlineBuffers& buffers, Byte designation, int displayRow, int displayColumn, Word defaultPixel, Word addendPixel, Byte colorMathDesignation, WindowSettings& colorWindowSettings)
     {
         bool insideColorWindow = insideWindow(displayColumn, colorWindowSettings);
-        bool clipColor = setColorBlack(insideColorWindow) && displayRow % 2 == 0;
+        bool clipColor = setColorBlack(insideColorWindow);
         bool clipMath = preventColorMath(insideColorWindow);
         bool subtract = colorMathDesignation.getBit(7);
         bool halfMath = colorMathDesignation.getBit(6);
@@ -355,12 +355,10 @@ public:
     bool insideWindow(int column, WindowSettings& settings)
     {
         bool inside = false;
-        bool window1Enabled = settings.window1Enabled && window1Left < window1Right;
-        bool window2Enabled = settings.window2Enabled && window2Left < window2Right;
-        if (!window1Enabled && !window2Enabled) {
-            inside = true;
+        if (!settings.window1Enabled && !settings.window2Enabled) {
+            inside = false;
         }
-        else if (window1Enabled && window2Enabled) {
+        else if (settings.window1Enabled && settings.window2Enabled) {
             bool inside1 = column >= window1Left && column <= window1Right;
             bool inside2 = column >= window2Left && column <= window2Right;
             if (settings.window1Inverted) {
@@ -378,13 +376,13 @@ public:
                 throw NotYetImplementedException(ss.str());
             }
         }
-        else if (window1Enabled) {
+        else if (settings.window1Enabled) {
             inside = column >= window1Left && column <= window1Right;
             if (settings.window1Inverted) {
                 inside = !inside;
             }
         }
-        else if (window2Enabled) {
+        else if (settings.window2Enabled) {
             inside = column >= window2Left && column <= window2Right;
             if (settings.window2Inverted) {
                 inside = !inside;
@@ -577,7 +575,7 @@ public:
                 else {
                     displayColumn = displayStartColumn + displayColumnOffset + column;
                 }
-                bool masked = windowEnabled && (windowSettings.window1Enabled || windowSettings.window2Enabled) && insideWindow(displayColumn, windowSettings);
+                bool masked = windowEnabled && insideWindow(displayColumn, windowSettings);
                 if (displayColumn < 0 || displayColumn >= rendererWidth || masked) {
                     continue;
                 }
