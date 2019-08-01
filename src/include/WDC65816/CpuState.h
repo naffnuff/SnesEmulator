@@ -53,6 +53,15 @@ public:
         : memory(0x1000000, MemoryLocation(0x55))
     {
         std::cout << "Memory size=" << memory.size() << std::endl;
+
+#ifdef DEBUGMEMORY
+        for (int address = 0; address < memory.size(); ++address) {
+            std::stringstream ss;
+            ss << Long(address);
+            memory[address].debugName = ss.str();
+        }
+#endif
+
         forceRegisters();
 
         for (MemoryLocation& a : accumulator) {

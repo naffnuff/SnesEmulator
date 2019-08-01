@@ -50,10 +50,10 @@
     <ClInclude Include="..\..\..\src\SnesEmulator\HdmaInstruction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\SnesEmulator\BackgroundModes.h">
+    <ClInclude Include="..\..\..\src\SnesEmulator\VideoDebugger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\SnesEmulator\VideoDebugger.h">
+    <ClInclude Include="..\..\..\src\SnesEmulator\VideoModes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

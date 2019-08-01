@@ -1,6 +1,7 @@
 #include <iostream>
 #include <bitset>
 #include <thread>
+#include <filesystem>
 
 #include "Emulator.h"
 #include "Renderer.h"
@@ -52,7 +53,38 @@ int main(int, char**)
 
     try {
         while (true) {
-            Emulator emulator(output, input, error);
+            Rom rom(output);
+
+            output << "Welcome to Naffnuff's SNES emulator!" << std::endl;
+            std::vector<std::string> titles;
+            while (titles.empty()) {
+                for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(".")) {
+                    std::string extension = entry.path().extension().string();
+                    if (entry.is_regular_file() && (extension == ".smc" || extension == ".sfc")) {
+                        std::string filename = entry.path().filename().string();
+                        titles.push_back(filename);
+                        output << titles.size() << ". " << filename << std::endl;
+                    }
+                }
+                if (titles.empty()) {
+                    output << "Put some ROM images in the same folder as the application file and press enter!" << std::endl;
+                    int dummy = std::getchar();
+                }
+            }
+            std::string pickedTitle;
+            while (pickedTitle.empty()) {
+                int inputValue = -1;
+                input >> inputValue;
+                int dummy = std::getchar();
+                output << "Input: " << inputValue << std::endl;
+                --inputValue;
+                if (inputValue >= 0 && inputValue < titles.size()) {
+                    pickedTitle = titles[inputValue];
+                }
+            }
+            rom.loadFromFile(pickedTitle);
+
+            Emulator emulator(output, input, error, rom);
             emulator.initialize();
             emulator.run();
         }

@@ -677,8 +677,9 @@ public:
     static std::string toString() { return "ORA"; }
 };
 
-// PEA Push Effective Absolute Address [Flags affected: none]
-class PEA
+// PEA/I Push Effective Absolute/Indirect Address [Flags affected: none]
+template<char AddressingModeCharacter>
+class PE_
 {
 public:
     static int invoke(State& state, Word address)
@@ -687,20 +688,7 @@ public:
         return 0;
     }
 
-    static std::string toString() { return "PEA"; }
-};
-
-// PEI Push Effective Indirect Address [Flags affected: none]
-class PEI
-{
-public:
-    static int invoke(State& state, const MemoryLocation* memory)
-    {
-        throw OperatorNotYetImplementedException("PEI");
-        return 0;
-    }
-
-    static std::string toString() { return "PEI"; }
+    static std::string toString() { return std::string("PE") + AddressingModeCharacter; }
 };
 
 // PER Push Effective Program Counter Relative Indirect Address [Flags affected: none]
@@ -709,7 +697,7 @@ class PER
 public:
     static int invoke(State& state, int16_t offset)
     {
-        throw OperatorNotYetImplementedException("PER");
+        state.pushWordToStack(state.getProgramCounter(offset));
         return 0;
     }
 
@@ -1233,7 +1221,7 @@ public:
     {
         int cycles = 0;
         if (state.is16Bit(State::m)) {
-            throw OperatorNotYetImplementedException("TRB 16-bit");
+            memory->setWordValue(testAndReset(state, memory->getWordValue(), state.getAccumulatorC()));
             cycles += 2;
         }
         else {

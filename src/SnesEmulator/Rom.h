@@ -21,7 +21,7 @@ public:
     Rom(const Rom&) = delete;
     Rom& operator=(const Rom&) = delete;
 
-    void loadFromFile(const std::string& path, CPU::State& state)
+    void loadFromFile(const std::string& path)
     {
         output << "Reading " << path << std::endl;
 
@@ -43,10 +43,13 @@ public:
         data.resize(rom.size());
         std::transform(rom.begin(), rom.end(), data.begin(), [](char c) { return Byte(c); });
 
-        if (!tryReadHeader(0x8000, state) && !tryReadHeader(0, state)) {
+        if (!tryReadHeader(0x8000) && !tryReadHeader(0)) {
             throw std::runtime_error("Could not read header");
         }
+    }
 
+    void storeToMemory(CPU::State& state) const
+    {
         bool romLoaded = false;
 
         int romIndex = 0;
@@ -103,7 +106,7 @@ public:
     }
 
 private:
-    bool tryReadHeader(Word offset, CPU::State& state)
+    bool tryReadHeader(Word offset)
     {
         output << "Trying to read ROM header assuming address offset " << offset << std::endl;
 

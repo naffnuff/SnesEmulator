@@ -3,7 +3,6 @@
 #include <fstream>
 #include <iostream>
 #include <string>
-#include <filesystem>
 
 #include "Common/Exception.h"
 
@@ -17,34 +16,11 @@ int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debu
 
 void Emulator::initialize()
 {
-    std::vector<std::string> titles;
-    for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(".")) {
-        std::string extension = entry.path().extension().string();
-        if (entry.is_regular_file() && (extension == ".smc" || extension == ".sfc")) {
-            std::string filename = entry.path().filename().string();
-            titles.push_back(filename);
-            output << titles.size() << ". " << filename << std::endl;
-        }
-    }
-    std::string pickedTitle;
-    while (pickedTitle.empty()) {
-        int inputValue = 0;
-        input >> inputValue;
-        --inputValue;
-        if (inputValue >= 0 && inputValue < titles.size()) {
-            pickedTitle = titles[inputValue];
-        }
-    }
-    rom.loadFromFile(pickedTitle, cpuState);
-    //rom.loadFromFile("../../Super Mario World (USA).sfc", cpuState);
-    //rom.loadFromFile("../../Legend of Zelda, The - A Link to the Past (U) [!].smc", cpuState);
-    //rom.loadFromFile("../../Super Metroid (Japan, USA) (En,Ja).sfc", cpuState);
-    //rom.loadFromFile("../../Super Metroid (JU) [!].smc", cpuState);
-    //rom.loadFromFile("../../Megaman X (USA).sfc", cpuState);
+    rom.storeToMemory(cpuState);
 
     if (rom.isLowRom()) {
         // RAM
-        for (Long address = 0x7E0000; address < 0x800000; address++) {
+        for (Long address = 0x7e0000; address < 0x800000; address++) {
             cpuState.getMemoryLocation(address)->setReadWrite();
         }
         // RAM mirrors
@@ -55,7 +31,7 @@ void Emulator::initialize()
         }
 
         // ROM mirrors
-        for (Long address = 0; address < 0x800000; ++address) {
+        for (Long address = 0; address < 0x600000; ++address) {
             cpuState.getMemoryLocation(address + 0x800000)->setMirrorOf(cpuState.getMemoryLocation(address));
         }
 
@@ -63,28 +39,33 @@ void Emulator::initialize()
         {
             std::ifstream file(rom.gameTitle + ".save");
             file >> std::hex;
-            int saveRamSize = 0;
-            for (Byte bank = 0x70; bank < 0x78; ++bank) {
-                for (Word address = 0; address < 0x8000 && saveRamSize < rom.saveRamSize; ++address, ++saveRamSize) {
-                    cpuState.getMemoryLocation(Long(address, bank))->setReadWrite();
+            Long saveRamAddress = 0x700000;
+            for (Long address = saveRamAddress; address < 0x7e0000; ++address, ++saveRamAddress) {
+                if (saveRamAddress == 0x700000 + rom.saveRamSize) {
+                    saveRamAddress = 0x700000;
+                }
+                MemoryLocation* saveRamLocation = cpuState.getMemoryLocation(saveRamAddress);
+                if (address == saveRamAddress) {
                     Byte byte;
                     int inputValue;
                     if (file >> inputValue) {
                         byte = inputValue;
                     }
-                    cpuState.getMemoryLocation(Long(address, bank))->setValue(byte);
-                    cpuState.getMemoryLocation(Long(address, bank))->onWrite = [this](Byte, Byte)
-                    {
-                        output << '.';
-                        {
+                    saveRamLocation->setReadWrite();
+                    saveRamLocation->setValue(byte);
+                    saveRamLocation->onWrite = [this](Byte oldValue, Byte& newValue) {
+                        if (newValue != oldValue) {
                             std::lock_guard<std::mutex> lock(saveRamSaver.mutex);
                             saveRamSaver.saveRamModified = true;
                         }
                         saveRamSaver.condition.notify_one();
                     };
                 }
+                else {
+                    cpuState.getMemoryLocation(address)->setMirrorOf(saveRamLocation);
+                }
             }
-            output << "Save RAM size: " << saveRamSize << std::endl;
+            output << "Save RAM end address: " << saveRamAddress << std::endl;
         }
 
         saveRamSaverThread = std::thread(std::ref(saveRamSaver));
@@ -92,7 +73,7 @@ void Emulator::initialize()
         registers.initialize();
 
         // Register mirrors
-        for (Byte bank = 0x01; bank < 0x40; ++bank) {
+        for (Byte bank = 0x01; bank < 0x60; ++bank) {
             for (Word address = 0x2000; address < 0x8000; ++address) {
                 cpuState.getMemoryLocation(Long(address, bank))->setMirrorOf(cpuState.getMemoryLocation(Long(address, 0x00)));
             }
@@ -130,6 +111,10 @@ void Emulator::run()
     BackgroundViewer background2Viewer(video, BackgroundLayer2);
     BackgroundViewer background3Viewer(video, BackgroundLayer3);
     BackgroundViewer background4Viewer(video, BackgroundLayer4);
+    SpriteLayerViewer spriteLayer1Viewer(video, 0);
+    SpriteLayerViewer spriteLayer2Viewer(video, 1);
+    SpriteLayerViewer spriteLayer3Viewer(video, 2);
+    SpriteLayerViewer spriteLayer4Viewer(video, 3);
 
     DmaInstruction dmaInstruction(output, error, cpuState);
     HdmaInstruction hdmaInstruction(output, error, cpuState);
@@ -256,7 +241,7 @@ void Emulator::run()
                     increment = true;
                 }
 
-                //increment = true;
+                increment = true;
 
                 if (increment) {
                     ++incrementCount;
@@ -322,6 +307,10 @@ void Emulator::run()
                         background2Viewer.update();
                         background3Viewer.update();
                         background4Viewer.update();
+                        spriteLayer1Viewer.update();
+                        spriteLayer2Viewer.update();
+                        spriteLayer3Viewer.update();
+                        spriteLayer4Viewer.update();
                     }
                 }
             }
@@ -349,8 +338,8 @@ int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debu
                 return cycles;
             }
         }
-        // TODO: really an else here?
         else {
+            // TODO: this seems not reachable
             if (context.stepMode) {
                 debugger.printClockSpeed();
                 context.printAddressHistory(error);

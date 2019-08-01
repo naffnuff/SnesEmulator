@@ -2064,7 +2064,6 @@ class MOV_C7 : public AddressMode::DirectIndexedIndirectRegister<Operator::MOV, 
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("MOV_C7");
         return  7 + applyOperand();
     }
 

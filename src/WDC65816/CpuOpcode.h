@@ -726,7 +726,6 @@ class BIT_3C : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::BIT<fals
     // 3   6-m-x+x*p   abs,X     mm....m. . BIT $9876,X
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("BIT_3C");
         return 4 + applyOperand();
     }
 
@@ -1173,7 +1172,6 @@ class CMP_D7 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::CMP>
     // 2   7-m+w       [dir],Y   m.....mm . CMP [$10],Y
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("CMP_D7");
         return 6 + applyOperand();
     }
 
@@ -1686,7 +1684,6 @@ class EOR_55 : public AddressMode::DirectPageIndexed<Operator::EOR, State::X>
     // 2   5-m+w       dir,X     m.....m. . EOR $10,X
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("EOR_55");
         return 4 + applyOperand();
     }
 
@@ -2855,7 +2852,7 @@ class ORA_1F : public AddressMode::AbsoluteLongIndexedX<Operator::ORA>
 // PEA Push Effective Absolute Address [Flags affected: none]
 // PEA addr
 // Absolute (3-Byte)
-class PEA_F4 : public AddressMode::Absolute_ControlFlow<Operator::PEA>
+class PEA_F4 : public AddressMode::Absolute_ControlFlow<Operator::PE_<'A'>>
 {
     using Absolute_ControlFlow::Absolute_ControlFlow;
 
@@ -2871,14 +2868,13 @@ class PEA_F4 : public AddressMode::Absolute_ControlFlow<Operator::PEA>
 // PEI Push Effective Indirect Address [Flags affected: none]
 // PEI (dp)
 // Direct Page Indirect (2-Byte)
-class PEI_D4 : public AddressMode::DirectPageIndirect_NewInstruction<Operator::PEI>
+class PEI_D4 : public AddressMode::DirectPageIndirect_ControlFlow<Operator::PE_<'I'>>
 {
-    using DirectPageIndirect_NewInstruction::DirectPageIndirect_NewInstruction;
+    using DirectPageIndirect_ControlFlow::DirectPageIndirect_ControlFlow;
 
     // 2   6+w         dir       ........ . PEI $12
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("PEI_D4");
         return 6 + applyOperand();
     }
 
@@ -3167,7 +3163,6 @@ class ROL_2E : public AddressMode::Absolute<Operator::ROL>
     // 3   8-2*m       abs       m.....mm . ROL $9876
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ROL_2E");
         return 6 + applyOperand();
     }
 
@@ -4183,7 +4178,6 @@ class TRB_1C : public AddressMode::Absolute<Operator::TRB>
     // 3   8-2*m       abs       ......m. . TRB $9876
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("TRB_1C");
         return 6 + applyOperand();
     }
 

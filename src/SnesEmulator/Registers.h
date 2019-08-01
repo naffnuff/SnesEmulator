@@ -161,8 +161,8 @@ public:
                 oamStartAddress.setHighByte(value.getBit(0));
                 video.oam.address = oamStartAddress;
                 if (value.getBit(7)) {
-                    //error << "OAM Address high bit and Obj Priority: " << value << std::endl;
-                    //throw MemoryLocation::AccessException("Priority bit set");
+                    error << "OAM Address high bit and Obj Priority: " << value << std::endl;
+                    throw MemoryLocation::AccessException("Priority bit set");
                 }
             });
         makeWriteRegister(0x2104, "OAM Data write", false,
@@ -203,7 +203,7 @@ public:
 
         makeWriteRegister(0x2119, "VRAM Data Write high byte", false,
             [this](Byte value) {
-                if (!videoPortControl.getBit(7)) {
+                if (!videoPortControl.getBit(7) || videoPortControl.getBits(2, 2) != 0) {
                     error << "DMA: Video port control: " << videoPortControl << std::endl;
                     throw MemoryLocation::AccessException("DMA: Video port control not implemented");
                 }
@@ -219,21 +219,6 @@ public:
                 }
                 video.vram.writeByte(vramDataWriteLowByte, false, 0);
                 video.vram.writeByte(value, true, increment);
-
-                /*static const int bitsPerPixel = 4;
-                static const int pixelPerTile = 8 * 8;
-                static const int bitPerTile = pixelPerTile * bitsPerPixel;
-                static const int bitsPerWord = 16;
-                static const int wordPerTile = bitPerTile / bitsPerWord;
-                const int tileIndex = vramAddress / wordPerTile;
-                const int tileWordOffset = vramAddress % wordPerTile;
-                if (tileWordOffset == wordPerTile - 1) {
-                    const std::array<std::array<uint8_t, 8>, 8> tile = video.readTile(tileIndex, bitsPerPixel);
-                    static const int tilesPerRow = video.vramRenderer.width / 8;
-                    const int rowIndex = tileIndex / tilesPerRow;
-                    const int columnIndex = tileIndex % tilesPerRow;
-                    video.vramRenderer.setGrayscaleTile(rowIndex * 8, columnIndex * 8, tile, bitsPerPixel);
-                }*/
             }
         );
 
@@ -251,8 +236,8 @@ public:
                 m7MultiplicationResult = m7Multiplicand * int8_t(value);
             }
         );
-        makeWriteRegister(0x211d, "Mode 7 Matrix C", true);
-        makeWriteRegister(0x211e, "Mode 7 Matrix D", true);
+        makeWriteRegister(0x211d, "Mode 7 Matrix C", false);
+        makeWriteRegister(0x211e, "Mode 7 Matrix D", false);
         makeWriteRegister(0x211f, "Mode 7 Center X", false);
         makeWriteRegister(0x2120, "Mode 7 Center Y", false);
 

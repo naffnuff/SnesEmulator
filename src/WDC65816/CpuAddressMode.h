@@ -350,25 +350,24 @@ class DirectPageIndirect : public Instruction2Byte
 // Direct Page Indirect
 // (dp)
 template <typename Operator>
-class DirectPageIndirect_NewInstruction : public Instruction2Byte
+class DirectPageIndirect_ControlFlow : public Instruction2Byte
 {
     using Instruction2Byte::InstructionBase;
 
     // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int invokeOperator(Byte lowByte) override
     {
-        throw AddressModeNotYetImplementedException("DirectPageIndirect_NewInstruction");
         int cycles = 0;
         if ((Byte)state.getDirectPage()) {
             cycles += 1;
         }
-        MemoryLocation* memory = nullptr;
-        return cycles + Operator::invoke(state, memory);
+        Word address(state.getMemoryLocation(Long(Word(state.getDirectPage() + lowByte), 0))->getWordValue());
+        return cycles + Operator::invoke(state, address);
     }
 
     std::string toString() const override
     {
-        return Operator::toString() + " $" + operandToString() + " TODO";
+        return Operator::toString() + " ($" + operandToString() + ")";
     }
 };
 

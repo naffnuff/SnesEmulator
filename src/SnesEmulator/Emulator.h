@@ -41,16 +41,12 @@ private:
                 }
                 if (save) {
                     std::ofstream file(emulator.rom.gameTitle + ".save");
-                    int saveRamSize = 0;
-                    for (Byte bank = 0x70; bank < 0x78; ++bank) {
-                        for (Word address = 0; address < 0x8000 && saveRamSize < emulator.rom.saveRamSize; ++address, ++saveRamSize) {
-                            file << emulator.cpuState.getMemoryByte(Long(address, bank)) << ' ';
-                        }
+                    for (Long address = 0x700000; address < 0x700000 + emulator.rom.saveRamSize; ++address) {
+                        file << emulator.cpuState.getMemoryByte(address) << ' ';
                     }
-                    std::cout << "Baba Ganouch!";
+                    std::cout << "*";
                 }
             }
-            std::cout << "Done Motherfucker Done Done Done Done!" << std::endl;
         }
 
         bool running = false;
@@ -61,17 +57,17 @@ private:
     };
 
 public:
-    Emulator(std::ostream& output, std::istream& input, std::ostream& error)
+    Emulator(std::ostream& output, std::istream& input, std::ostream& error, const Rom& rom)
         : output(output)
         , input(input)
         , error(error)
         , video(output)
+        , rom(rom)
         , cpuState()
         , spcState()
         , registers(output, error, cpuState, video)
         , audio(output, error, spcState)
         , debugger(output, input, error, registers, audio, masterCycle, running)
-        , rom(output)
         , cpuInstructionDecoder(cpuState)
         , spcInstructionDecoder(spcState)
         , cpuContext("cpu.txt", System::Green)
@@ -111,7 +107,7 @@ private:
     std::ostream& error;
 
     Debugger debugger;
-    Rom rom;
+    const Rom& rom;
     CPU::State cpuState;
     SPC::State spcState;
     CPU::InstructionDecoder cpuInstructionDecoder;

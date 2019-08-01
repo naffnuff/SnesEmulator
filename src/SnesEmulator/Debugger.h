@@ -98,8 +98,13 @@ public:
     void toggleBreakpoint(Context& context, State& state, Long breakpoint)
     {
         MemoryLocation* memory = state.getMemoryLocation(breakpoint);
-        if (memory->breakpoint == nullptr) {
-            memory->breakpoint = [this, &context, &state, breakpoint](MemoryLocation::Operation operation) {
+        if (memory->hasBreakpoint()) {
+            memory->setBreakpoint(nullptr);
+            context.breakpoints.erase(breakpoint);
+            output << "Breakpoint removed at address " << breakpoint << std::endl;
+        }
+        else {
+            memory->setBreakpoint([this, &context, &state, breakpoint](MemoryLocation::Operation operation) {
                 if (operation == MemoryLocation::Apply) {
                     context.stepMode = true;
                     output << "Apply: Breakpoint hit @ " << breakpoint << std::endl;
@@ -118,14 +123,9 @@ public:
                     context.stepMode = true;
                     output << "Write: Breakpoint hit @ " << breakpoint << std::endl;
                 }*/
-            };
+            });
             context.breakpoints.insert(breakpoint);
             output << "Breakpoint inserted at address " << breakpoint << std::endl;
-        }
-        else {
-            memory->breakpoint = nullptr;
-            context.breakpoints.erase(breakpoint);
-            output << "Breakpoint removed at address " << breakpoint << std::endl;
         }
     }
 
@@ -212,6 +212,7 @@ public:
             audio.reset();
             context.stepMode = false;
             otherContext.stepMode = false;
+            startTime = clock();
         }
         else if (command == "qq") {
             output << "Hard reset" << std::endl;
@@ -219,7 +220,7 @@ public:
         }
         else if (command == "clear") {
             for (Long address : context.breakpoints) {
-                state.getMemoryLocation(address)->breakpoint = nullptr;
+                state.getMemoryLocation(address)->setBreakpoint(nullptr);
             }
             context.breakpoints.clear();
             output << "Cleared context " << context.fileName << std::endl;
@@ -343,10 +344,10 @@ public:
             color = System::Magenta;
         }
         bool executing = address >= state.getProgramAddress() && address < state.getProgramAddress() + context.nextInstruction->size();
-        if (memory.breakpoint && executing) {
+        if (memory.hasBreakpoint() && executing) {
             color = System::Cyan;
             bright = true;
-        } else if (memory.breakpoint) {
+        } else if (memory.hasBreakpoint()) {
             color = System::Red;
             bright = true;
         } else if (executing) {

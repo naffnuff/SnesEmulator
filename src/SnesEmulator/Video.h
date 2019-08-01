@@ -4,7 +4,7 @@
 
 #include "Common/Types.h"
 
-#include "BackgroundModes.h"
+#include "VideoModes.h"
 #include "Renderer.h"
 
 class Video
@@ -124,6 +124,7 @@ public:
     };
 
     static const int rendererWidth = 256;
+    static const int rendererHeight = 225;
 
     struct ScanlineBuffer
     {
@@ -192,7 +193,7 @@ public:
         , vram(0x8000)
         , cgram(0x100)
         , oam(0x110)
-        , renderer(rendererWidth, 225, 6.f, false, output)
+        , renderer(rendererWidth, rendererHeight, 3.f, false, output)
         //, vramRenderer(0x200, 0x200, 1.f, true, output)
         //, cgramRenderer(16, 16, 16.f, true, output)
         , backgrounds(4)
@@ -258,6 +259,7 @@ public:
         }
         else if (backgroundMode == 7) {
             skip = false;
+            renderer.clearDisplay(0x03ff);
         }
         else if (backgroundMode != 0) {
             output << "BG mode: " << backgroundMode << ", e: " << mode1Extension << std::endl;
@@ -469,9 +471,11 @@ public:
             for (int priority = 0; priority < 4; ++priority) {
                 buffers.getBuffer(ObjectLayer, priority).data.fill(-1);
             }
-            for (int i = 0; i < 128; ++i) {
-                Object object = readObject(i);
-                drawObjectLine(buffers.getBuffer(ObjectLayer, object.priority), object, displayRow, windowMaskDesignation.getBit(ObjectLayer), windowSettings[ObjectLayer]);
+            int firstObjectIndex = 0;
+            std::bitset<rendererWidth> bufferMask;
+            for (int i = firstObjectIndex; i < 128 + firstObjectIndex; ++i) {
+                Object object = readObject(i % 128);
+                drawObjectLine(buffers.getBuffer(ObjectLayer, object.priority), object, displayRow, windowMaskDesignation.getBit(ObjectLayer), windowSettings[ObjectLayer], bufferMask);
             }
         }
     }
@@ -514,12 +518,13 @@ public:
                 bool horizontalFlip = tileData.getBit(14);
                 bool verticalFlip = tileData.getBit(15);
                 Word tileAddress = background.characterAddress + (tileNumber * tileSize * background.bitsPerPixel / 2) + (verticalFlip ? tileSize - 1 - row : row);
-                drawTileLine(buffer, displayColumn, 0, tileAddress, (1 << background.bitsPerPixel) * palette, tileSize, horizontalFlip, background.bitsPerPixel, windowEnabled, windowSettings);
+                std::bitset<rendererWidth> emptyBitset;
+                drawTileLine(buffer, displayColumn, 0, tileAddress, (1 << background.bitsPerPixel) * palette, tileSize, horizontalFlip, background.bitsPerPixel, windowEnabled, windowSettings, emptyBitset);
             }
         }
     }
 
-    void drawObjectLine(ScanlineBuffer& buffer, Object& object, int displayRow, bool windowEnabled, WindowSettings& windowSettings)
+    void drawObjectLine(ScanlineBuffer& buffer, Object& object, int displayRow, bool windowEnabled, WindowSettings& windowSettings, std::bitset<rendererWidth>& bufferMask)
     {
         int objectSize = getObjectSize(object.sizeSelect);
         int objectY = object.y;
@@ -550,14 +555,30 @@ public:
                 }
                 tileAddress += row;
                 const int bitsPerPixel = 4;
-                drawTileLine(buffer, objectX, tileColumn * 8, tileAddress, 0x80 + (1 << bitsPerPixel) * object.palette, objectSize, object.horizontalFlip, bitsPerPixel, windowEnabled, windowSettings);
+                drawTileLine(buffer, objectX, tileColumn * 8, tileAddress, 0x80 + (1 << bitsPerPixel) * object.palette, objectSize, object.horizontalFlip, bitsPerPixel, windowEnabled, windowSettings, bufferMask);
             }
         }
     }
 
-    void drawTileLine(ScanlineBuffer& buffer, int displayStartColumn, int displayColumnOffset, Word tileAddress, int paletteAddress, int objectSize, bool horizontalFlip, int bitsPerPixel, bool windowEnabled, WindowSettings& windowSettings)
+    void drawTileLine(ScanlineBuffer& buffer, int displayStartColumn, int displayColumnOffset, Word tileAddress, int paletteAddress, int objectSize, bool horizontalFlip, int bitsPerPixel, bool windowEnabled, WindowSettings& windowSettings, std::bitset<rendererWidth>& bufferMask)
     {
         for (int column = 0; column < 8; ++column) {
+            int displayColumn;
+            if (horizontalFlip) {
+                displayColumn = displayStartColumn - displayColumnOffset + objectSize - 1 - column;
+            }
+            else {
+                displayColumn = displayStartColumn + displayColumnOffset + column;
+            }
+            if (displayColumn < 0 || displayColumn >= rendererWidth) {
+                continue;
+            }
+            if (buffer.data[displayColumn] >= 0) {
+                continue;
+            }
+            if (bufferMask[displayColumn]) {
+                continue;
+            }
             Byte paletteIndex;
             paletteIndex.setBit(0, vram.lowTable[tileAddress].getBit(7 - column));
             paletteIndex.setBit(1, vram.highTable[tileAddress].getBit(7 - column));
@@ -568,20 +589,12 @@ public:
             if (paletteIndex > 0) {
                 Word colorAddress = paletteAddress + paletteIndex;
                 int color = cgram.readWord(colorAddress);
-                int displayColumn;
-                if (horizontalFlip) {
-                    displayColumn = displayStartColumn - displayColumnOffset + objectSize - 1 - column;
-                }
-                else {
-                    displayColumn = displayStartColumn + displayColumnOffset + column;
-                }
                 bool masked = windowEnabled && insideWindow(displayColumn, windowSettings);
-                if (displayColumn < 0 || displayColumn >= rendererWidth || masked) {
+                if (masked) {
                     continue;
                 }
-                if (buffer.data[displayColumn] < 0) {
-                    buffer.data[displayColumn] = color;
-                }
+                buffer.data[displayColumn] = color;
+                bufferMask[displayColumn] = true;
             }
         }
     }

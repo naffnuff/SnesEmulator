@@ -282,14 +282,14 @@ class DirectIndexedIndirectRegister : public Instruction2Byte
 
     int invokeOperator(Byte lowByte) override
     {
-        throw AddressModeNotYetImplementedException("DirectIndexedIndirectRegister");
-        MemoryLocation* data = nullptr;
-        return Operator::invoke(state, data, 0);
+        Word address = state.getDirectMemoryWord(lowByte + state.getRegisterValue<FirstRegister>());
+        MemoryLocation* memory = state.getMemoryLocation(address);
+        return Operator::invoke(state, memory, state.getRegisterValue<SecondRegister>());
     }
 
     std::string toString() const override
     {
-        return Operator::toString() + " $" + operandToString() + " TODO";
+        return Operator::toString() + " [$" + operandToString() + "+" + State::getRegisterName<FirstRegister>() + "], " + State::getRegisterName<SecondRegister>();
     }
 };
 

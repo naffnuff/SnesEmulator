@@ -140,7 +140,7 @@
     <ClCompile Include="..\..\..\src\SnesEmulator\Renderer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\src\SnesEmulator\BackgroundModes.h" />
+    <ClInclude Include="..\..\..\src\SnesEmulator\VideoModes.h" />
     <ClInclude Include="..\..\..\src\SnesEmulator\Debugger.h" />
     <ClInclude Include="..\..\..\src\SnesEmulator\DmaInstruction.h" />
     <ClInclude Include="..\..\..\src\SnesEmulator\HdmaInstruction.h" />

@@ -5,6 +5,8 @@
 
 #include "Types.h"
 
+//#define DEBUGMEMORY
+
 class MemoryLocation
 {
 public:
@@ -81,24 +83,33 @@ public:
     void setValue(Byte newValue)
     {
         if (mirroredMemory) {
-            mirroredMemory->setValue(newValue);
+            try {
+                mirroredMemory->setValue(newValue);
+            }
+            catch (AccessException& e) {
+                throwAccessException(e.what());
+            }
             return;
         }
 
         if (isWriteProtected()) {
-            ThrowAccessException(__FUNCTION__);
+            throwAccessException(__FUNCTION__);
         }
 
         Byte oldValue;
         if (writeMapping) {
             oldValue = writeMapping->value;
-            writeMapping->value = newValue;
         } else {
             oldValue = value;
-            value = newValue;
         }
         if (onWrite) {
             onWrite(oldValue, newValue);
+        }
+        if (writeMapping) {
+            writeMapping->value = newValue;
+        }
+        else {
+            value = newValue;
         }
         if (breakpoint) {
             breakpoint(Write);
@@ -108,11 +119,16 @@ public:
     Byte getValue() const
     {
         if (mirroredMemory) {
-            return mirroredMemory->getValue();
+            try {
+                return mirroredMemory->getValue();
+            }
+            catch (AccessException& e) {
+                throwAccessException(e.what());
+            }
         }
 
         if (isReadProtected()) {
-            ThrowAccessException(__FUNCTION__);
+            throwAccessException(__FUNCTION__);
         }
 
         Byte result = value;
@@ -132,11 +148,16 @@ public:
     Byte apply()
     {
         if (mirroredMemory) {
-            return mirroredMemory->apply();
+            try {
+                return mirroredMemory->apply();
+            }
+            catch (AccessException& e) {
+                throwAccessException(e.what());
+            }
         }
 
         if (isReadProtected() || readMapping || writeMapping) {
-            ThrowAccessException(__FUNCTION__);
+            throwAccessException(__FUNCTION__);
         }
 
         ++applicationCount;
@@ -166,7 +187,7 @@ public:
     void setMappings(MemoryLocation* readMapping, MemoryLocation* writeMapping, Type type)
     {
         if (this->type != Invalid) {
-            ThrowAccessException(__FUNCTION__);
+            throwAccessException(__FUNCTION__);
         }
         this->readMapping = readMapping;
         this->writeMapping = writeMapping;
@@ -180,8 +201,11 @@ public:
 
     void setMirrorOf(MemoryLocation* memory)
     {
+        if (memory == this) {
+            throwAccessException(std::string("Mirror to this: ") + __FUNCTION__);
+        }
         if (type != Invalid) {
-            ThrowAccessException(__FUNCTION__);
+            throwAccessException(std::string("Invalid memory: ") + __FUNCTION__);
         }
         mirroredMemory = memory;
     }
@@ -189,7 +213,7 @@ public:
     void setReadOnlyValue(Byte byte)
     {
         if (type != Invalid) {
-            ThrowAccessException(__FUNCTION__);
+            throwAccessException(__FUNCTION__);
         }
         type = ReadOnly;
         value = byte;
@@ -199,7 +223,7 @@ public:
     void setReadWrite()
     {
         if (type != Invalid) {
-            ThrowAccessException(__FUNCTION__);
+            throwAccessException(__FUNCTION__);
         }
         type = ReadWrite;
     }
@@ -207,14 +231,19 @@ public:
     void setWriteOnly()
     {
         if (type != Invalid) {
-            ThrowAccessException(__FUNCTION__);
+            throwAccessException(__FUNCTION__);
         }
         type = WriteOnly;
     }
 
     int getApplicationCount() const
     {
-        return applicationCount;
+        if (mirroredMemory) {
+            return mirroredMemory->getApplicationCount();
+        }
+        else {
+            return applicationCount;
+        }
     }
 
     //void reset()
@@ -222,10 +251,34 @@ public:
         //value = resetValue;
     //}
 
-private:
-    static void ThrowAccessException(const std::string& function)
+    void setBreakpoint(std::function<void(Operation operation)> value)
     {
-        throw AccessException(function + ": Bad memory access");
+        if (mirroredMemory) {
+            mirroredMemory->setBreakpoint(value);
+        }
+        else {
+            breakpoint = value;
+        }
+    }
+
+    bool hasBreakpoint() const
+    {
+        if (mirroredMemory) {
+            return mirroredMemory->hasBreakpoint();
+        }
+        else {
+            return breakpoint != nullptr;
+        }
+    }
+
+private:
+    void throwAccessException(const std::string& function) const
+    {
+        throw AccessException(function + ": Bad memory access"
+#ifdef DEBUGMEMORY
+            + " @ " + debugName
+#endif
+        );
     }
 
 private:
@@ -240,20 +293,27 @@ private:
     MemoryLocation* nextInBank = nullptr;
     MemoryLocation* nextInPage = nullptr;
 
+    std::function<void(Operation operation)> breakpoint = nullptr;
+
 public:
     std::function<void(Byte& value)> onRead = nullptr;
-    std::function<void(Byte oldValue, Byte newValue)> onWrite = nullptr;
+    std::function<void(Byte oldValue, Byte& newValue)> onWrite = nullptr;
     std::function<void(Byte& value)> onApply = nullptr;
 
-    std::function<void(Operation operation)> breakpoint = nullptr;
+#ifdef DEBUGMEMORY
+    std::string debugName;
+#endif
 
     friend std::ostream& operator<<(std::ostream&, const MemoryLocation&);
 };
 
 inline std::ostream& operator<<(std::ostream& output, const MemoryLocation& memory)
 {
-    if (memory.mirroredMemory) {
-        return output << memory.mirroredMemory->value << std::dec;
+    if (MemoryLocation* mirroredMemory = memory.mirroredMemory) {
+        while (mirroredMemory->mirroredMemory) {
+            mirroredMemory = mirroredMemory->mirroredMemory;
+        }
+        return output << mirroredMemory->value << std::dec;
     }
     else if (memory.readMapping) {
         return output << memory.readMapping->value << std::dec;

@@ -60,7 +60,7 @@ public:
         ss << blockedInstruction->toString() << " (blocked by HDMA)" << std::endl;
         ss << "HDMA ";
         if (Byte enabled = hdmaEnabled.getValue()) {
-            ss << "Enabled: " << enabled << std::endl;
+            ss << "Enabled: " << std::bitset<8>(enabled) << std::endl;
             ss << "Active: " << active << std::endl;
             ss << "Initialize: " << initialize << std::endl;
             for (int i = 0; i < 8; ++i) {
@@ -102,7 +102,7 @@ public:
                     Byte hdmaControl = channel.hdmaControl.getValue();
                     bool direction = hdmaControl.getBit(7);
                     if (direction) {
-                        error << "DMA control: " << hdmaControl << std::endl;
+                        error << "HDMA control: " << hdmaControl << std::endl;
                         throw OperatorNotYetImplementedException("HDMA direction not implemented");
                     }
 
@@ -127,18 +127,18 @@ public:
 
                         if (channel.doTransfer) {
                             Byte transferMode = hdmaControl.getBits(0, 3);
-                            /*if (transferMode == 0) {
+                            if (transferMode == 0) {
                                 registerLocation->setValue(getNextByte(channel, indirectAddressingMode));
                                 cycles += 1;
                             }
-                            else */if (transferMode == 1) {
+                            else if (transferMode == 1) {
                                 Byte lowByte = getNextByte(channel, indirectAddressingMode);
                                 registerLocation->setWordValue(Word(lowByte, getNextByte(channel, indirectAddressingMode)));
                                 cycles += 2;
                             }
                             else {
-                                error << "DMA control: " << hdmaControl << std::endl;
-                                throw OperatorNotYetImplementedException("DMA transfer mode not implemented");
+                                error << "HDMA control: " << hdmaControl << std::endl;
+                                throw OperatorNotYetImplementedException("HDMA transfer mode not implemented");
                             }
                         }
                         --lineCounter;
