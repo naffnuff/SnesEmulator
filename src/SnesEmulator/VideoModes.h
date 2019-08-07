@@ -8,6 +8,7 @@ enum Layer
     BackgroundLayer2 = 1,
     BackgroundLayer3 = 2,
     BackgroundLayer4 = 3,
+    BackgroundLayerCount = 4,
     ObjectLayer = 4,
     BackdropLayer = 5
 };
@@ -44,4 +45,13 @@ static const std::vector<ModeEntry> mode1e =
     { ObjectLayer, 1 },
     { ObjectLayer, 0 },
     { BackgroundLayer3, 0 }
+};
+
+static const std::vector<ModeEntry> mode7 =
+{
+    { ObjectLayer, 3 },
+    { ObjectLayer, 2 },
+    { ObjectLayer, 1 },
+    { BackgroundLayer1, 0 },
+    { ObjectLayer, 0 }
 };

@@ -160,10 +160,7 @@ public:
             [this](Byte value) {
                 oamStartAddress.setHighByte(value.getBit(0));
                 video.oam.address = oamStartAddress;
-                if (value.getBit(7)) {
-                    error << "OAM Address high bit and Obj Priority: " << value << std::endl;
-                    throw MemoryLocation::AccessException("Priority bit set");
-                }
+                video.objectPriority = value.getBit(7);
             });
         makeWriteRegister(0x2104, "OAM Data write", false,
             [this](Byte value) {
@@ -204,8 +201,8 @@ public:
         makeWriteRegister(0x2119, "VRAM Data Write high byte", false,
             [this](Byte value) {
                 if (!videoPortControl.getBit(7) || videoPortControl.getBits(2, 2) != 0) {
-                    error << "DMA: Video port control: " << videoPortControl << std::endl;
-                    throw MemoryLocation::AccessException("DMA: Video port control not implemented");
+                    error << "Video port control: " << videoPortControl << std::endl;
+                    throw Video::NotYetImplementedException("Video port control not implemented");
                 }
 
                 Word vramAddress = video.vram.address;
@@ -222,7 +219,21 @@ public:
             }
         );
 
-        makeWriteRegister(0x211a, "Mode 7 Settings", true);
+        makeWriteRegister(0x211a, "Mode 7 Settings", true,
+            [this](Byte value) {
+                if (value.getBit(0)) {
+                    throw Video::NotYetImplementedException("Register 211a: Horizontal mirroring");
+                }
+                if (value.getBit(1)) {
+                    throw Video::NotYetImplementedException("Register 211a: Vertical mirroring");
+                }
+                if (value.getBit(6)) {
+                    throw Video::NotYetImplementedException("Register 211a: Empty space fill");
+                }
+                if (value.getBit(7)) {
+                    throw Video::NotYetImplementedException("Register 211a: Playing field size");
+                }
+            });
 
         makeWriteRegister(0x211b, "Mode 7 Matrix A (also multiplicand for MPYx)", false,
             [this](Byte value) {
@@ -272,7 +283,13 @@ public:
         makeWriteRegister(0x212d, "Subscreen Designation", false, video.subscreenDesignation);
         makeWriteRegister(0x212e, "Window Mask Designation for the Main Screen", true, video.mainScreenWindowMaskDesignation);
         makeWriteRegister(0x212f, "Window Mask Designation for the Subscreen", true, video.subscreenWindowMaskDesignation);
-        makeWriteRegister(0x2130, "Color Addition Select", true, video.colorAdditionSelect);
+        makeWriteRegister(0x2130, "Color Addition Select", true,
+            [this](Byte value) {
+                video.directColorMode = value.getBit(0);
+                video.addSubscreen = value.getBit(1);
+                video.clipColorMathMode = Video::ColorWindowMode(int(value.getBits(4, 2)));
+                video.clipColorToBlackMode = Video::ColorWindowMode(int(value.getBits(6, 2)));
+            });
         makeWriteRegister(0x2131, "Color Math Designation", false, video.colorMathDesignation);
         makeWriteRegister(0x2132, "Fixed Color Data", false,
             [this](Byte value) {
@@ -292,7 +309,27 @@ public:
             }
         );
 
-        makeWriteRegister(0x2133, "Screen Mode/Video Select", true);
+        makeWriteRegister(0x2133, "Screen Mode/Video Select", true,
+            [this](Byte value) {
+                if (value.getBit(0)) {
+                    throw Video::NotYetImplementedException("Register 2133: Screen interlace");
+                }
+                if (value.getBit(1)) {
+                    throw Video::NotYetImplementedException("Register 2133: Object interlace");
+                }
+                if (value.getBit(2)) {
+                    throw Video::NotYetImplementedException("Register 2133: Overscan mode");
+                }
+                if (value.getBit(3)) {
+                    throw Video::NotYetImplementedException("Register 2133: Pseudo-hires mode");
+                }
+                if (value.getBit(6)) {
+                    throw Video::NotYetImplementedException("Register 2133: Mode 7 extra bg");
+                }
+                if (value.getBit(7)) {
+                    throw Video::NotYetImplementedException("Register 2133: External sync");
+                }
+            });
 
         // makeRegister(, true, "", true);
         // , [this](Byte value) {}

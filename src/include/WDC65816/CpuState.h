@@ -225,7 +225,7 @@ public:
         return Word(accumulator[0].getValue(), accumulator[1].getValue());
     }
 
-    Word getDirectPage() const
+    Word getDirectPageRegister() const
     {
         return directPage;
     }

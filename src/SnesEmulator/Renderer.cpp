@@ -10,7 +10,7 @@
 
 #include "Common/System.h"
 
-void Renderer::initialize(const std::string& windowTitle)
+void Renderer::initialize(const std::string& windowTitle, int windowXPosition, int windowYPosition)
 {
     //return;
     title = windowTitle;
@@ -29,7 +29,7 @@ void Renderer::initialize(const std::string& windowTitle)
         throw std::runtime_error("Failed to open GLFW window.");
     }
     glfwMakeContextCurrent(window);
-    glfwSetWindowPos(window, 1000, 40);
+    glfwSetWindowPos(window, windowXPosition, windowYPosition);
 
     if (glewInit() != GLEW_OK) {
         glfwTerminate();

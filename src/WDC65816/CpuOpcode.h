@@ -4145,7 +4145,6 @@ class TDC_7B : public AddressMode::Implied<Operator::TDC>
     // 1   2           imp       *.....*. . TDC
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("TDC_7B");
         return 2 + applyOperand();
     }
 

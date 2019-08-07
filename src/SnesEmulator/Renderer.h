@@ -32,7 +32,7 @@ public:
     Renderer(const Renderer&) = delete;
     Renderer& operator=(const Renderer&) = delete;
 
-    void initialize(const std::string& windowTitle);
+    void initialize(const std::string& windowTitle, int windowXPosition, int windowYPosition);
     void update();
     bool isRunning() const;
 

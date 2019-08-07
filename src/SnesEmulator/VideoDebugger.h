@@ -2,9 +2,9 @@
 
 #include "Video.h"
 
-#define DEBUGOAM
+//#define DEBUGOAM
 //#define DEBUGBG
-#define DEBUGSPRITES
+//#define DEBUGSPRITES
 
 class OamViewer
 {
@@ -13,11 +13,11 @@ public:
     static const int spriteSize = 16;
 
 #ifdef DEBUGOAM
-    OamViewer(Video& video)
+    OamViewer(Video& video, int windowXPosition, int windowYPosition)
         : video(video)
         , renderer(0x100, 0x80, 2.f, true, video.output)
     {
-        thread = std::thread([this]() { run(); });
+        thread = std::thread([this, windowXPosition, windowYPosition]() { run(windowXPosition, windowYPosition); });
     }
 
     ~OamViewer()
@@ -26,9 +26,9 @@ public:
         thread.join();
     }
 
-    void run()
+    void run(int windowXPosition, int windowYPosition)
     {
-        renderer.initialize("OAM viewer");
+        renderer.initialize("OAM viewer", windowXPosition, windowYPosition);
         while (running) {
             renderer.update();
         }
@@ -95,7 +95,7 @@ public:
     Video& video;
     bool running = true;
 #else
-    OamViewer(Video&)
+    OamViewer(Video&, int, int)
     {
     }
     void update()
@@ -108,12 +108,12 @@ class BackgroundViewer
 {
 public:
 #ifdef DEBUGBG
-    BackgroundViewer(Video& video, Layer backgroundLayer)
+    BackgroundViewer(Video& video, Layer backgroundLayer, int windowXPosition, int windowYPosition)
         : video(video)
         , backgroundLayer(backgroundLayer)
         , renderer(Video::rendererWidth * 2, Video::rendererWidth * 2, 1.f, true, video.output)
     {
-        thread = std::thread([this]() { run(); });
+        thread = std::thread([this, windowXPosition, windowYPosition]() { run(windowXPosition, windowYPosition); });
     }
 
     ~BackgroundViewer()
@@ -122,9 +122,9 @@ public:
         thread.join();
     }
 
-    void run()
+    void run(int windowXPosition, int windowYPosition)
     {
-        renderer.initialize(std::string("Background ") + char('1' + backgroundLayer) + " viewer");
+        renderer.initialize(std::string("Background ") + char('1' + backgroundLayer) + " viewer", windowXPosition, windowYPosition);
         while (running) {
             renderer.update();
         }
@@ -194,7 +194,7 @@ public:
     bool running = true;
     Layer backgroundLayer;
 #else
-    BackgroundViewer(Video&, Layer)
+    BackgroundViewer(Video&, Layer, int, int)
     {
     }
     void update()
@@ -207,12 +207,12 @@ class SpriteLayerViewer
 {
 public:
 #ifdef DEBUGSPRITES
-    SpriteLayerViewer(Video& video, int priority)
+    SpriteLayerViewer(Video& video, int priority, int windowXPosition, int windowYPosition)
         : video(video)
         , priority(priority)
-        , renderer(Video::rendererWidth, Video::rendererHeight, 2.f, true, video.output)
+        , renderer(Video::rendererWidth, Video::rendererHeight, 1.f, true, video.output)
     {
-        thread = std::thread([this]() { run(); });
+        thread = std::thread([this, windowXPosition, windowYPosition]() { run(windowXPosition, windowYPosition); });
     }
 
     ~SpriteLayerViewer()
@@ -221,9 +221,9 @@ public:
         thread.join();
     }
 
-    void run()
+    void run(int windowXPosition, int windowYPosition)
     {
-        renderer.initialize(std::string("Background ") + char('1' + priority) + " viewer");
+        renderer.initialize(std::string("Sprites prio ") + char('1' + priority) + " viewer", windowXPosition, windowYPosition);
         while (running) {
             renderer.update();
         }
@@ -306,7 +306,7 @@ public:
     bool running = true;
     int priority = 0;
 #else
-    SpriteLayerViewer(Video&, int)
+    SpriteLayerViewer(Video&, int, int, int)
     {
     }
     void update()

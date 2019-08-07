@@ -152,7 +152,7 @@ public:
 
     void initialize(std::array<MemoryLocation*, 4>& cpuToSpcPorts)
     {
-        makeWriteRegister(0xf1, "I/0 and Timer Control", true,
+        makeWriteRegister(0xf1, "I/0 and Timer Control", false,
             [this, cpuToSpcPorts](Byte byte) {
                 for (int i = 0; i < 3; ++i) {
                     timers[i].enabled = byte.getBit(i);

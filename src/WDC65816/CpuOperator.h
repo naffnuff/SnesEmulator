@@ -744,7 +744,7 @@ class PHD
 public:
     static int invoke(State& state)
     {
-        state.pushWordToStack(state.getDirectPage());
+        state.pushWordToStack(state.getDirectPageRegister());
         return 0;
     }
 
@@ -1197,7 +1197,7 @@ class TDC
 public:
     static int invoke(State& state)
     {
-        throw OperatorNotYetImplementedException("TDC");
+        state.setAccumulatorC(state.getDirectPageRegister());
         return 0;
     }
 

@@ -351,7 +351,8 @@ class CMPW
 public:
     static int invoke(State& state, MemoryLocation* leftOperand, Word rightOperand)
     {
-        throw OperatorNotYetImplementedException("CMPW");
+        state.setFlag(State::c, leftOperand->getWordValue() >= rightOperand);
+        state.updateSignFlags(Word(leftOperand->getWordValue() - rightOperand));
         return 0;
     }
 

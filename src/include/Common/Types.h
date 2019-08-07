@@ -154,7 +154,7 @@ public:
 
     Byte getBits(int offset, int count) const
     {
-        return value >> offset & int(std::pow(2, count) - 1);
+        return value >> offset & ((1 << count) - 1);
     }
 
     static int bitCount()

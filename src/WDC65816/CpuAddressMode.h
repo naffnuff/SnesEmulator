@@ -262,7 +262,7 @@ class DirectPage : public Instruction2Byte
     int invokeOperator(Byte lowByte) override
     {
         int cycles = 0;
-        if ((uint8_t)state.getDirectPage()) {
+        if ((uint8_t)state.getDirectPageRegister()) {
             cycles += 1;
         }
         return cycles + Operator::invoke(state, state.getDirectMemoryLocation(lowByte));
@@ -286,7 +286,7 @@ class DirectPageIndexedIndirectX : public Instruction2Byte
     {
         throw AddressModeNotYetImplementedException("DirectPageIndexedIndirectX");
         int cycles = 0;
-        if ((Byte)state.getDirectPage()) {
+        if ((Byte)state.getDirectPageRegister()) {
             cycles += 1;
         }
         MemoryLocation* memory = nullptr;
@@ -310,7 +310,7 @@ class DirectPageIndexed : public Instruction2Byte
     int invokeOperator(Byte lowByte) override
     {
         int cycles = 0;
-        if (Byte(state.getDirectPage())) {
+        if (Byte(state.getDirectPageRegister())) {
             cycles += 1;
         }
         MemoryLocation* memory = state.getDirectMemoryLocation(lowByte, state.getIndexRegister<Register>());
@@ -334,7 +334,7 @@ class DirectPageIndirect : public Instruction2Byte
     int invokeOperator(Byte lowByte) override
     {
         int cycles = 0;
-        if ((Byte)state.getDirectPage()) {
+        if ((Byte)state.getDirectPageRegister()) {
             cycles += 1;
         }
         Long address(state.getDirectMemoryLocation(lowByte)->getWordValue(), state.getDataBank());
@@ -358,10 +358,10 @@ class DirectPageIndirect_ControlFlow : public Instruction2Byte
     int invokeOperator(Byte lowByte) override
     {
         int cycles = 0;
-        if ((Byte)state.getDirectPage()) {
+        if ((Byte)state.getDirectPageRegister()) {
             cycles += 1;
         }
-        Word address(state.getMemoryLocation(Long(Word(state.getDirectPage() + lowByte), 0))->getWordValue());
+        Word address(state.getMemoryLocation(Long(Word(state.getDirectPageRegister() + lowByte), 0))->getWordValue());
         return cycles + Operator::invoke(state, address);
     }
 
@@ -383,7 +383,7 @@ class DirectPageIndirectIndexedY : public Instruction2Byte
     int invokeOperator(Byte lowByte) override
     {
         int cycles = 0;
-        if ((Byte)state.getDirectPage()) {
+        if ((Byte)state.getDirectPageRegister()) {
             cycles += 1;
         }
         Long address(state.getDirectMemoryLocation(lowByte)->getWordValue(), state.getDataBank());
@@ -411,7 +411,7 @@ class DirectPageIndirectLong : public Instruction2Byte
     int invokeOperator(Byte lowByte) override
     {
         int cycles = 0;
-        if ((Byte)state.getDirectPage()) {
+        if ((Byte)state.getDirectPageRegister()) {
             cycles += 1;
         }
         MemoryLocation* directMemory = state.getDirectMemoryLocation(lowByte);
@@ -436,7 +436,7 @@ class DirectPageIndirectLongIndexedY : public Instruction2Byte
     int invokeOperator(Byte lowByte) override
     {
         int cycles = 0;
-        if ((Byte)state.getDirectPage()) {
+        if ((Byte)state.getDirectPageRegister()) {
             cycles += 1;
         }
         MemoryLocation* address = state.getDirectMemoryLocation(lowByte);
