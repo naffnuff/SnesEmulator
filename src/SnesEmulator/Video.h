@@ -10,18 +10,39 @@
 class Video
 {
 public:
-    class NotYetImplementedException : public std::logic_error
+    struct NotYetImplementedException : std::logic_error
     {
-    public:
         NotYetImplementedException(const std::string& name)
             : std::logic_error("Video feature not yet implemented: " + name)
         {
         }
     };
 
-    class Table
+    struct RendererRunner
     {
-    public:
+        RendererRunner(Video& video, std::ostream& output)
+            : video(video)
+            , gameTitle(gameTitle)
+        {
+
+        }
+
+        void operator()()
+        {
+            video.renderer.initialize(gameTitle, 1100, 40);
+            running = true;
+            while (running) {
+                video.renderer.update();
+            }
+        }
+
+        Video& video;
+        bool running = false;
+        std::string gameTitle;
+    };
+
+    struct Table
+    {
         Table(Word size)
             : lowTable(size)
             , highTable(size)
@@ -188,14 +209,21 @@ public:
         Byte windowOperator;
     };
 
+    enum ColorWindowMode
+    {
+        Never,
+        OutsideColorWindowOnly,
+        InsideColorWindowOnly,
+        Always
+    };
+
     Video(std::ostream& output)
         : output(output)
         , vram(0x8000)
         , cgram(0x100)
         , oam(0x110)
-        , renderer(rendererWidth, rendererHeight, 3.f, false, output)
-        //, vramRenderer(0x200, 0x200, 1.f, true, output)
-        //, cgramRenderer(16, 16, 16.f, true, output)
+        , renderer(rendererWidth, rendererHeight, 3.f, true, output)
+        , rendererRunner(*this, output)
         , backgrounds(4)
     {
     }
@@ -210,7 +238,8 @@ public:
 
     void initialize(const std::string& gameTitle)
     {
-        renderer.initialize(gameTitle, 1100, 40);
+        rendererRunner.gameTitle = gameTitle;
+        rendererThread = std::thread(rendererRunner);
     }
 
     int getObjectSize(bool sizeSelect) const
@@ -835,9 +864,8 @@ public:
     bool objectPriority = false;
 
     Renderer renderer;
-    //Renderer vramRenderer;
-    //Renderer cgramRenderer;
-    //Renderer bgRenderer;
+    RendererRunner rendererRunner;
+    std::thread rendererThread;
 
     Byte screenDisplay;
 
@@ -851,13 +879,6 @@ public:
     Byte subscreenWindowMaskDesignation;
     Byte colorMathDesignation;
 
-    enum ColorWindowMode
-    {
-        Never,
-        OutsideColorWindowOnly,
-        InsideColorWindowOnly,
-        Always
-    };
     ColorWindowMode clipColorToBlackMode = Never;
     ColorWindowMode clipColorMathMode = Never;
     bool addSubscreen = false;

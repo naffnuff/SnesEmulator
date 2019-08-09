@@ -4,6 +4,7 @@
 #include <vector>
 #include <array>
 #include <string>
+#include <mutex>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -110,6 +111,8 @@ public:
     const int width;
     const int height;
 
+    std::mutex pixelBufferMutex;
+
 private:
     std::ostream& output;
 
@@ -123,4 +126,5 @@ private:
     std::vector<Pixel> pixelBuffer;
 
     int pressPauseTimeout = 0;
+
 };

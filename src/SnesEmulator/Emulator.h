@@ -62,6 +62,7 @@ public:
         , input(input)
         , error(error)
         , video(output)
+        , rendererLock(video.renderer.pixelBufferMutex)
         , rom(rom)
         , cpuState()
         , spcState()
@@ -124,5 +125,7 @@ private:
 
     SaveRamSaver saveRamSaver;
     std::thread saveRamSaverThread;
+
+    std::unique_lock<std::mutex> rendererLock;
 };
 

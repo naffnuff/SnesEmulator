@@ -264,7 +264,20 @@ void Emulator::run()
                         }
                     }
                     if (registers.vCounter == 224) {
-                        video.renderer.update();
+                        static double previousTime = glfwGetTime();
+                        static int frameCount = 0;
+
+                        double currentTime = glfwGetTime();
+                        frameCount++;
+                        if (currentTime - previousTime >= 1.0) {
+                            output << "E: " << frameCount << std::endl;
+
+                            frameCount = 0;
+                            previousTime = currentTime;
+                        }
+
+                        //video.renderer.update();
+                        rendererLock.unlock();
 
                         oamViewer.update();
                         background1Viewer.update();
@@ -302,6 +315,8 @@ void Emulator::run()
                         registers.readControllers();
                     }
                     else if (registers.vCounter == 262) {
+                        rendererLock.lock();
+
                         ++registers.frame;
                         registers.vCounter = 0;
                         registers.interlaceField = !registers.interlaceField;

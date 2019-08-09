@@ -50,25 +50,28 @@ void Renderer::initialize(const std::string& windowTitle, int windowXPosition, i
 
 void Renderer::update()
 {
-    if (!syncUpdate) {
-        static double previousTime = glfwGetTime();
-        static int frameCount = 0;
-
-        double currentTime = glfwGetTime();
-        frameCount++;
-        if (currentTime - previousTime >= 1.0) {
-            output << frameCount << std::endl;
-
-            frameCount = 0;
-            previousTime = currentTime;
-        }
-    }
-
     glClear(GL_COLOR_BUFFER_BIT);
 
     glRasterPos2i(-1, -1);
     glPixelZoom(scale, scale);
-    glDrawPixels(width, height, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, pixelBuffer.data());
+    {
+        std::lock_guard lock(pixelBufferMutex);
+        glDrawPixels(width, height, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, pixelBuffer.data());
+        if (!syncUpdate)
+        {
+            static double previousTime = glfwGetTime();
+            static int frameCount = 0;
+
+            double currentTime = glfwGetTime();
+            frameCount++;
+            if (currentTime - previousTime >= 1.0) {
+                output << frameCount << std::endl;
+
+                frameCount = 0;
+                previousTime = currentTime;
+            }
+        }
+    }
     glFlush();
 
     glfwSwapBuffers(window);
