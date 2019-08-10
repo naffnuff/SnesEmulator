@@ -115,6 +115,7 @@ void Emulator::run()
     SpriteLayerViewer spriteLayer2Viewer(video, 1, Video::rendererWidth * 2 + 20 + Video::rendererWidth + 20, Video::rendererWidth * 2 + 40);
     SpriteLayerViewer spriteLayer3Viewer(video, 2, Video::rendererWidth * 2 + 20, Video::rendererWidth * 2 + 40 + Video::rendererWidth);
     SpriteLayerViewer spriteLayer4Viewer(video, 3, Video::rendererWidth * 2 + 20 + Video::rendererWidth + 20, Video::rendererWidth * 2 + 40 + Video::rendererWidth);
+    Mode7Viewer mode7Viewer(video, 0, 40);
 
     DmaInstruction dmaInstruction(output, error, cpuState);
     HdmaInstruction hdmaInstruction(output, error, cpuState);
@@ -145,6 +146,7 @@ void Emulator::run()
 
     try {
         uint64_t iteration = 0;
+        bool dmaActive = false;
         while (running) {
 
             if (masterCycle == nextCpu) {
@@ -173,6 +175,7 @@ void Emulator::run()
                         //cpuContext.stepMode = true;
                     }
                 }
+
                 if (hdmaInstruction.active) {
                     //cpuContext.stepMode = true;
                     hdmaInstruction.blockedInstruction = instruction;
@@ -241,7 +244,7 @@ void Emulator::run()
                     increment = true;
                 }
 
-                increment = true;
+                //increment = true;
 
                 if (increment) {
                     ++incrementCount;
@@ -257,7 +260,7 @@ void Emulator::run()
                 }
                 ++registers.hCounter;
                 if (registers.hCounter == 274) {
-                    if (registers.vCounter <= 224) {
+                    if (registers.vCounter <= 224 && registers.vCounter > 0) {
                         video.drawScanline(registers.vCounter);
                         if (hdmaInstruction.enabled()) {
                             hdmaInstruction.active = true;
@@ -288,6 +291,7 @@ void Emulator::run()
                         spriteLayer2Viewer.update();
                         spriteLayer3Viewer.update();
                         spriteLayer4Viewer.update();
+                        mode7Viewer.update();
 
                         if (video.renderer.pause) {
                             video.renderer.pause = false;
@@ -307,6 +311,7 @@ void Emulator::run()
                         hdmaInstruction.active = false;
                         registers.vBlank = true;
                         registers.video.oam.address = registers.oamStartAddress;
+                        //registers.video.vram.address = registers.vramStartAddress;
                         if (registers.nmiEnabled()) {
                             nmiRequested = true;
                         }

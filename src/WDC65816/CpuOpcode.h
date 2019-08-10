@@ -3245,7 +3245,6 @@ class ROR_6E : public AddressMode::Absolute<Operator::ROR>
     // 3   8-2*m       abs       m.....m* . ROR $9876
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ROR_6E");
         return 6 + applyOperand();
     }
 

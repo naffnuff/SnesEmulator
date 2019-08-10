@@ -10,11 +10,8 @@
 
 #include "Common/System.h"
 
-void Renderer::initialize(const std::string& windowTitle, int windowXPosition, int windowYPosition)
+void Renderer::initialize(int windowXPosition, int windowYPosition, bool fullscreen)
 {
-    //return;
-    title = windowTitle;
-
     if (!glfwInit()) {
         throw std::runtime_error("Failed to initialize GLFW");
     }
@@ -23,7 +20,24 @@ void Renderer::initialize(const std::string& windowTitle, int windowXPosition, i
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
 
-    window = glfwCreateWindow(width * int(scale), height * int(scale), windowTitle.c_str(), NULL, NULL);
+    float aspectCorrection = (7.0 / 8.0) * (4.0 / 3.0);
+    //float aspectCorrection = 1.0;
+    if (fullscreen) {
+        GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+        const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+        glfwWindowHint(GLFW_RED_BITS, mode->redBits);
+        glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
+        glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
+        glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
+        window = glfwCreateWindow(mode->width, mode->height, title.c_str(), monitor, NULL);
+        yScale = float(mode->height) / float(height);
+        xScale = yScale * aspectCorrection;
+    }
+    else {
+        xScale = yScale * aspectCorrection;
+        window = glfwCreateWindow(int(float(width) * xScale + 0.5), int(float(height) * yScale + 0.5), title.c_str(), NULL, NULL);
+    }
+
     if (window == nullptr) {
         glfwTerminate();
         throw std::runtime_error("Failed to open GLFW window.");
@@ -53,7 +67,7 @@ void Renderer::update()
     glClear(GL_COLOR_BUFFER_BIT);
 
     glRasterPos2i(-1, -1);
-    glPixelZoom(scale, scale);
+    glPixelZoom(xScale, yScale);
     {
         std::lock_guard lock(pixelBufferMutex);
         glDrawPixels(width, height, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, pixelBuffer.data());

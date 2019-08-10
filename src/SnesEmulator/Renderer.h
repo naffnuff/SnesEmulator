@@ -17,10 +17,12 @@ public:
     Renderer(int width, int height, float scale, bool syncUpdate, std::ostream& output)
         : width(width)
         , height(height)
-        , scale(scale)
+        , xScale(scale)
+        , yScale(scale)
         , syncUpdate(syncUpdate)
         , pixelBuffer(height * width)
         , output(output)
+        , title("SNES Emulator")
     {
     }
 
@@ -33,7 +35,7 @@ public:
     Renderer(const Renderer&) = delete;
     Renderer& operator=(const Renderer&) = delete;
 
-    void initialize(const std::string& windowTitle, int windowXPosition, int windowYPosition);
+    void initialize(int windowXPosition, int windowYPosition, bool fullscreen = false);
     void update();
     bool isRunning() const;
 
@@ -111,19 +113,18 @@ public:
     const int width;
     const int height;
 
+    std::vector<Pixel> pixelBuffer;
     std::mutex pixelBufferMutex;
 
-private:
     std::ostream& output;
 
     GLFWwindow* window;
 
     std::string title;
 
-    const float scale;
+    float xScale;
+    float yScale;
     const bool syncUpdate;
-
-    std::vector<Pixel> pixelBuffer;
 
     int pressPauseTimeout = 0;
 

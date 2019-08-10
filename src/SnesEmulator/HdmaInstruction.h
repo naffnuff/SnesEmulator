@@ -136,8 +136,14 @@ public:
                                 registerLocation->setWordValue(Word(lowByte, getNextByte(channel, indirectAddressingMode)));
                                 cycles += 2;
                             }
+                            else if (transferMode == 2) {
+                                registerLocation->setValue(getNextByte(channel, indirectAddressingMode));
+                                registerLocation->setValue(getNextByte(channel, indirectAddressingMode));
+                                cycles += 2;
+                            }
                             else {
                                 error << "HDMA control: " << hdmaControl << std::endl;
+                                error << "HDMA transfer mode: " << transferMode << std::endl;
                                 throw OperatorNotYetImplementedException("HDMA transfer mode not implemented");
                             }
                         }

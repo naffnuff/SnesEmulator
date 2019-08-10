@@ -5,6 +5,7 @@
 //#define DEBUGOAM
 //#define DEBUGBG
 //#define DEBUGSPRITES
+//#define DEBUGMODE7
 
 class OamViewer
 {
@@ -29,13 +30,15 @@ public:
     void run(int windowXPosition, int windowYPosition)
     {
         renderer.initialize("OAM viewer", windowXPosition, windowYPosition);
-        while (running) {
+        while (running && renderer.isRunning()) {
             renderer.update();
         }
     }
 
     void update()
     {
+        std::lock_guard lock(renderer.pixelBufferMutex);
+
         renderer.clearDisplay(0);
 
         int rowOffset = 0;
@@ -125,13 +128,15 @@ public:
     void run(int windowXPosition, int windowYPosition)
     {
         renderer.initialize(std::string("Background ") + char('1' + backgroundLayer) + " viewer", windowXPosition, windowYPosition);
-        while (running) {
+        while (running && renderer.isRunning()) {
             renderer.update();
         }
     }
 
     void update()
     {
+        std::lock_guard lock(renderer.pixelBufferMutex);
+
         Video::Background& background = video.backgrounds[backgroundLayer];
 
         const int tileSize = 8;
@@ -224,13 +229,14 @@ public:
     void run(int windowXPosition, int windowYPosition)
     {
         renderer.initialize(std::string("Sprites prio ") + char('1' + priority) + " viewer", windowXPosition, windowYPosition);
-        while (running) {
+        while (running && renderer.isRunning()) {
             renderer.update();
         }
     }
 
     void update()
     {
+        std::lock_guard lock(renderer.pixelBufferMutex);
         renderer.clearDisplay(0);
         for (int i = 127; i >= 0; --i) {
             Video::Object object = video.readObject(i);
@@ -307,6 +313,67 @@ public:
     int priority = 0;
 #else
     SpriteLayerViewer(Video&, int, int, int)
+    {
+    }
+    void update()
+    {
+    }
+#endif
+};
+
+class Mode7Viewer
+{
+public:
+#ifdef DEBUGMODE7
+    Mode7Viewer(Video& video, int windowXPosition, int windowYPosition)
+        : video(video)
+        , renderer(1024, 1024, 1.f, true, video.output)
+    {
+        thread = std::thread([this, windowXPosition, windowYPosition]() { run(windowXPosition, windowYPosition); });
+    }
+
+    ~Mode7Viewer()
+    {
+        running = false;
+        thread.join();
+    }
+
+    void run(int windowXPosition, int windowYPosition)
+    {
+        renderer.initialize("Mode 7 viewer", windowXPosition, windowYPosition);
+        while (running && renderer.isRunning()) {
+            renderer.update();
+        }
+    }
+
+    void update()
+    {
+        std::lock_guard lock(renderer.pixelBufferMutex);
+        renderer.clearDisplay(0);
+        int tileDataAddress = 0;
+        int i = 0;
+        for (int tileRow = 0; tileRow < 128; ++tileRow) {
+            for (int tileColumn = 0; tileColumn < 128; ++tileColumn) {
+                Byte tileData = video.vram.lowTable[tileDataAddress];
+                for (int row = 0; row < 8; ++row) {
+                    for (int column = 0; column < 8; ++column) {
+                        int pixelDataAddress = tileData * 8 * 8 + row * 8 + column;
+                        Byte pixelData = video.vram.highTable[pixelDataAddress];
+                        Word pixel = video.cgram.readWord(Word(pixelData));
+                        renderer.setPixel(tileRow * 8 + row, tileColumn * 8 + column, pixel);
+                    }
+                }
+                ++tileDataAddress;
+            }
+        }
+    }
+
+    std::thread thread;
+    Renderer renderer;
+    Video& video;
+    bool running = true;
+#else
+    Mode7Viewer(Video&, int, int)
     {
     }
     void update()

@@ -104,7 +104,7 @@ public:
             output << "Breakpoint removed at address " << breakpoint << std::endl;
         }
         else {
-            memory->setBreakpoint([this, &context, &state, breakpoint](MemoryLocation::Operation operation) {
+            memory->setBreakpoint([this, &context, &state, breakpoint, memory](MemoryLocation::Operation operation) {
                 if (operation == MemoryLocation::Apply) {
                     context.stepMode = true;
                     output << "Apply: Breakpoint hit @ " << breakpoint << std::endl;
@@ -115,8 +115,8 @@ public:
                     }
                     context.stepMode = true;
                     output << "Read: Breakpoint hit @ " << breakpoint << std::endl;
-                }
-                else if (operation == MemoryLocation::Write) {
+                }*/
+                /*else if (operation == MemoryLocation::Write && registers.video.backgroundModeAndCharacterSize.getBits(0, 3) == 7 && registers.vramStartAddress == 0) {
                     if (!context.stepMode) {
                         state.setProgramAddress(context.getLastKnownAddress());
                     }
@@ -381,6 +381,9 @@ public:
 
         output << "OAM start address: " << registers.oamStartAddress << std::endl;
         output << "OAM current address: " << registers.video.oam.address << std::endl;*/
+        output << "Video port control: " << registers.videoPortControl << std::endl;
+        output << "VRAM start address: " << registers.vramStartAddress << std::endl;
+        output << "VRAM current address: " << registers.video.vram.address << std::endl;
 
         output << "            0    1    2    3    4    5    6    7" << std::endl
             << "            8    9    a    b    c    d    e    f"

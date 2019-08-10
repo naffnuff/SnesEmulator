@@ -193,29 +193,34 @@ public:
             makeWriteRegister(0x210e + i * 2, bgName + " Vertical Scroll", false, video.backgrounds[i].verticalScroll);
         }
 
-        makeWriteRegister(0x2115, "Video Port Control", false, videoPortControl);
+        makeWriteRegister(0x2115, "Video Port Control", false,
+            [this](Byte value) {
+                videoPortControl = value;
+                incrementVramOnHighByte = value.getBit(7);
+            });
 
-        makeWriteRegister(0x2116, "VRAM Address", false, video.vram.address);
-        makeWriteRegister(0x2118, "VRAM Data Write low byte", false, vramDataWriteLowByte);
+        //makeWriteRegister(0x2116, "VRAM Address", false, video.vram.address);
+
+        makeWriteRegister(0x2116, "VRAM Address low byte", false,
+            [this](Byte value) {
+                vramStartAddress.setLowByte(value);
+                video.vram.address = vramStartAddress;
+            });
+        makeWriteRegister(0x2117, "VRAM Address high byte", false,
+            [this](Byte value) {
+                vramStartAddress.setHighByte(value);
+                video.vram.address = vramStartAddress;
+            });
+
+        makeWriteRegister(0x2118, "VRAM Data Write low byte", false,
+            [this](Byte value) {
+                writeToVram(value, false, !incrementVramOnHighByte);
+            }
+        );
 
         makeWriteRegister(0x2119, "VRAM Data Write high byte", false,
             [this](Byte value) {
-                if (!videoPortControl.getBit(7) || videoPortControl.getBits(2, 2) != 0) {
-                    error << "Video port control: " << videoPortControl << std::endl;
-                    throw Video::NotYetImplementedException("Video port control not implemented");
-                }
-
-                Word vramAddress = video.vram.address;
-
-                int increment = 1;
-                if (videoPortControl.getBit(1)) {
-                    increment = 128;
-                }
-                else if (videoPortControl.getBit(0)) {
-                    increment = 32;
-                }
-                video.vram.writeByte(vramDataWriteLowByte, false, 0);
-                video.vram.writeByte(value, true, increment);
+                writeToVram(value, true, incrementVramOnHighByte);
             }
         );
 
@@ -230,9 +235,7 @@ public:
                 if (value.getBit(6)) {
                     throw Video::NotYetImplementedException("Register 211a: Empty space fill");
                 }
-                if (value.getBit(7)) {
-                    throw Video::NotYetImplementedException("Register 211a: Playing field size");
-                }
+                video.playingFieldSize = value.getBit(7);
             });
 
         makeWriteRegister(0x211b, "Mode 7 Matrix A (also multiplicand for MPYx)", false,
@@ -499,6 +502,29 @@ public:
         }
     }
 
+    void writeToVram(Byte value, bool highByte, bool increment)
+    {
+        if (videoPortControl.getBits(2, 2) != 0) {
+            throw Video::NotYetImplementedException("Video port control address mapping");
+        }
+        if (increment) {
+            if (videoPortControl.getBits(0, 2) == 2) {
+                throw Video::NotYetImplementedException("Video port control: unsure of increment 2");
+            }
+            int increment = 1;
+            if (videoPortControl.getBit(1)) {
+                increment = 128;
+            }
+            else if (videoPortControl.getBit(0)) {
+                increment = 32;
+            }
+            video.vram.writeByte(value, highByte, increment);
+        }
+        else {
+            video.vram.writeByte(value, highByte, 0);
+        }
+    }
+
     Word getVTimer() const
     {
         return vTimer;
@@ -527,12 +553,12 @@ public:
     bool hBlank = false;
 
     Word oamStartAddress;
+    Word vramStartAddress;
 
     Word controllerPort1Data1;
 
-private:
     Byte videoPortControl;
-    Byte vramDataWriteLowByte;
+    bool incrementVramOnHighByte = false;
     Byte m7Buffer;
     int16_t m7Multiplicand = 0;
     Long m7MultiplicationResult;
