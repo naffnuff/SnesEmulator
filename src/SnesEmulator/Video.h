@@ -378,18 +378,27 @@ public:
 
     void drawMode7Background(ScanlineBuffer& buffer, int displayRow)
     {
-        int tileRow = displayRow >> 3;
-        int row = displayRow & 7;
+        const float vectorElement2 = displayRow + mode7VerticalScroll - mode7CenterY;
         for (int displayColumn = 0; displayColumn < rendererWidth; ++displayColumn) {
             if (buffer.data[displayColumn] < 0) {
-                int tileColumn = displayColumn >> 3;
-                Word tileDataAddress = (tileRow << 7) + tileColumn;
-                Byte tileData = vram.lowTable[tileDataAddress];
-                int column = displayColumn & 7;
-                Word pixelDataAddress = (tileData << 6) + (row << 3) + column;
-                Byte pixelData = vram.highTable[pixelDataAddress];
-                int color = cgram.readWord(Word(pixelData));
-                buffer.data[displayColumn] = color;
+                const float vectorElement1 = displayColumn + mode7HorizontalScroll - mode7CenterX;
+                const int fieldRow = mode7MatrixC * vectorElement1 + mode7MatrixD * vectorElement2 + mode7CenterY;
+                const int tileRow = fieldRow >> 3;
+                const int row = fieldRow & 7;
+                const int fieldColumn = mode7MatrixA * vectorElement1 + mode7MatrixB * vectorElement2 + mode7CenterX;
+                const int tileColumn = fieldColumn >> 3;
+                const int column = fieldColumn & 7;
+                if ((fieldRow >= 0 || fieldRow < 1024) && (fieldColumn >= 0 || fieldColumn < 1024)) {
+                    const Word tileDataAddress = (tileRow << 7) + tileColumn;
+                    const Byte tileData = vram.lowTable[tileDataAddress];
+                    const Word pixelDataAddress = (tileData << 6) + (row << 3) + column;
+                    const Byte pixelData = vram.highTable[pixelDataAddress];
+                    const int color = cgram.readWord(Word(pixelData));
+                    buffer.data[displayColumn] = color;
+                }
+                else {
+                    buffer.data[displayColumn] = 0x5555; // TODO
+                }
             }
         }
     }
@@ -616,9 +625,9 @@ public:
         c.green = a.green + b.green;
         c.blue = a.blue + b.blue;
         if (halfMath) {
-            c.red = c.red / 2;
-            c.green = c.green / 2;
-            c.blue = c.blue / 2;
+            c.red = c.red >> 1;
+            c.green = c.green >> 1;
+            c.blue = c.blue >> 1;
         }
         Byte maxColor = 0x1f;
         c.red = min(c.red, maxColor);
@@ -635,9 +644,9 @@ public:
         c.blue = b.blue < a.blue ? a.blue - b.blue : 0;
         if (halfMath) {
             throw NotYetImplementedException("Subtraction half math");
-            c.red = c.red / 2;
-            c.green = c.green / 2;
-            c.blue = c.blue / 2;
+            c.red = c.red >> 1;
+            c.green = c.green >> 1;
+            c.blue = c.blue >> 1;
         }
         return c;
     }
@@ -924,5 +933,13 @@ public:
     Long windowMaskSettings;
     Word windowMaskLogic;
 
-    bool playingFieldSize = false;
+    bool mode7PlayingFieldSize = false;
+    int16_t mode7HorizontalScroll = 0;
+    int16_t mode7VerticalScroll = 0;
+    float mode7MatrixA = 0.f;
+    float mode7MatrixB = 0.f;
+    float mode7MatrixC = 0.f;
+    float mode7MatrixD = 0.f;
+    int16_t mode7CenterX = 0;
+    int16_t mode7CenterY = 0;
 };

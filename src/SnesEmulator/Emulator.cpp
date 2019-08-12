@@ -260,8 +260,11 @@ void Emulator::run()
                 }
                 ++registers.hCounter;
                 if (registers.hCounter == 274) {
-                    if (registers.vCounter <= 224 && registers.vCounter > 0) {
-                        video.drawScanline(registers.vCounter);
+                    if (registers.vCounter <= 224) {
+                        if (registers.vCounter > 0)
+                        {
+                            video.drawScanline(registers.vCounter);
+                        }
                         if (hdmaInstruction.enabled()) {
                             hdmaInstruction.active = true;
                         }

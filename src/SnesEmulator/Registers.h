@@ -189,9 +189,22 @@ public:
                     video.backgrounds[i].verticalMirroring = value.getBit(1);
                     video.backgrounds[i].tilemapAddress = value.getBits(2, 6) << 10;
                 });
-            makeWriteRegister(0x210d + i * 2, bgName + " Horizontal Scroll", false, video.backgrounds[i].horizontalScroll);
-            makeWriteRegister(0x210e + i * 2, bgName + " Vertical Scroll", false, video.backgrounds[i].verticalScroll);
+            if (i > 0) {
+                makeWriteRegister(0x210d + i * 2, bgName + " Horizontal Scroll", false, video.backgrounds[i].horizontalScroll);
+                makeWriteRegister(0x210e + i * 2, bgName + " Vertical Scroll", false, video.backgrounds[i].verticalScroll);
+            }
         }
+
+        makeWriteRegister(0x210d, "BG1 and Mode 7 Horizontal Scroll", false,
+            [this](Byte value) {
+                video.backgrounds[BackgroundLayer1].horizontalScroll.write(value);
+                video.mode7HorizontalScroll = to13Bit2sComplement(getMode7WordValue(value));
+            });
+        makeWriteRegister(0x210e, "BG1 and Mode 7 Vertical Scroll", false,
+            [this](Byte value) {
+                video.backgrounds[BackgroundLayer1].verticalScroll.write(value);
+                video.mode7VerticalScroll = to13Bit2sComplement(getMode7WordValue(value));
+            });
 
         makeWriteRegister(0x2115, "Video Port Control", false,
             [this](Byte value) {
@@ -235,25 +248,37 @@ public:
                 if (value.getBit(6)) {
                     throw Video::NotYetImplementedException("Register 211a: Empty space fill");
                 }
-                video.playingFieldSize = value.getBit(7);
+                video.mode7PlayingFieldSize = value.getBit(7);
             });
 
         makeWriteRegister(0x211b, "Mode 7 Matrix A (also multiplicand for MPYx)", false,
             [this](Byte value) {
-                m7Multiplicand = value << 8 | m7Buffer;
-                m7Buffer = value;
+                mode7Multiplicand = getMode7WordValue(value);
+                video.mode7MatrixA = float(mode7Multiplicand) / 256.0f;
             }
         );
         makeWriteRegister(0x211c, "Mode 7 Matrix B (also multiplier for MPYx)", false,
             [this](Byte value) {
-                m7Buffer = value;
-                m7MultiplicationResult = m7Multiplicand * int8_t(value);
+                multiplicationResult = mode7Multiplicand * int8_t(value);
+                video.mode7MatrixB = float(getMode7WordValue(value)) / 256.0f;
             }
         );
-        makeWriteRegister(0x211d, "Mode 7 Matrix C", false);
-        makeWriteRegister(0x211e, "Mode 7 Matrix D", false);
-        makeWriteRegister(0x211f, "Mode 7 Center X", false);
-        makeWriteRegister(0x2120, "Mode 7 Center Y", false);
+        makeWriteRegister(0x211d, "Mode 7 Matrix C", false,
+            [this](Byte value) {
+                video.mode7MatrixC = float(getMode7WordValue(value)) / 256.0f;
+            });
+        makeWriteRegister(0x211e, "Mode 7 Matrix D", false,
+            [this](Byte value) {
+                video.mode7MatrixD = float(getMode7WordValue(value)) / 256.0f;
+            });
+        makeWriteRegister(0x211f, "Mode 7 Center X", false,
+            [this](Byte value) {
+                video.mode7CenterX = to13Bit2sComplement(getMode7WordValue(value));
+            });
+        makeWriteRegister(0x2120, "Mode 7 Center Y", false,
+            [this](Byte value) {
+                video.mode7CenterY = to13Bit2sComplement(getMode7WordValue(value));
+            });
 
         makeWriteRegister(0x2121, "CGRAM Address", false,
             [this](Byte value) {
@@ -337,7 +362,7 @@ public:
         // makeRegister(, true, "", true);
         // , [this](Byte value) {}
 
-        makeReadRegister(0x2134, "Multiplication Result", false, m7MultiplicationResult);
+        makeReadRegister(0x2134, "Multiplication Result", false, multiplicationResult);
 
         makeReadRegister(0x2137, "Software Latch for H/V Counter", true,
             [this](Byte) {
@@ -471,6 +496,25 @@ public:
         }
     }
 
+    Word getMode7WordValue(Byte value)
+    {
+        Word result = value << 8 | mode7Buffer;
+        mode7Buffer = value;
+        return result;
+    }
+
+    int16_t to13Bit2sComplement(Word value)
+    {
+        bool isNegative = value.getBit(12);
+        for (int i = 13; i < Word::bitCount(); ++i) {
+            value.setBit(i, isNegative);
+        }
+        //if (result != value) {
+            //output << "to13Bit2sComplement: " << value << " (" << std::bitset<16>(value) << ", " << int16_t(value) << ") -> " << result << " (" << std::bitset<16>(result) << ", " << int16_t(result) << ")" << std::endl;
+        //}
+        return value;
+    }
+
     bool nmiEnabled() const
     {
         return interruptEnableFlags.getBit(7);
@@ -535,8 +579,8 @@ public:
         vBlank = false;
         hBlank = false;
 
-        m7Buffer = 0;
-        m7Multiplicand = 0;
+        mode7Buffer = 0;
+        mode7Multiplicand = 0;
     }
 
     std::ostream& output;
@@ -559,9 +603,9 @@ public:
 
     Byte videoPortControl;
     bool incrementVramOnHighByte = false;
-    Byte m7Buffer;
-    int16_t m7Multiplicand = 0;
-    Long m7MultiplicationResult;
+    Byte mode7Buffer;
+    int16_t mode7Multiplicand = 0;
+    Long multiplicationResult;
     Byte multiplicandA;
     Word dividend;
     Word quotient;

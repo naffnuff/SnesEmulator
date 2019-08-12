@@ -124,6 +124,7 @@ public:
 
     float xScale;
     float yScale;
+    float xScreenCoverage;
     const bool syncUpdate;
 
     int pressPauseTimeout = 0;

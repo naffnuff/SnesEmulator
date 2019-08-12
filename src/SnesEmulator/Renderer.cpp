@@ -20,7 +20,7 @@ void Renderer::initialize(int windowXPosition, int windowYPosition, bool fullscr
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
 
-    float aspectCorrection = (7.0 / 8.0) * (4.0 / 3.0);
+    float aspectCorrection = (float(height) / float(width)) * (4.0 / 3.0);
     //float aspectCorrection = 1.0;
     if (fullscreen) {
         GLFWmonitor* monitor = glfwGetPrimaryMonitor();
@@ -32,6 +32,8 @@ void Renderer::initialize(int windowXPosition, int windowYPosition, bool fullscr
         window = glfwCreateWindow(mode->width, mode->height, title.c_str(), monitor, NULL);
         yScale = float(mode->height) / float(height);
         xScale = yScale * aspectCorrection;
+        float correctedWidth = float(width) * xScale;
+        xScreenCoverage = correctedWidth / float(mode->width);
     }
     else {
         xScale = yScale * aspectCorrection;
@@ -56,7 +58,7 @@ void Renderer::initialize(int windowXPosition, int windowYPosition, bool fullscr
         glfwSwapInterval(1);
     }
 
-    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
     glShadeModel(GL_FLAT);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -66,7 +68,7 @@ void Renderer::update()
 {
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glRasterPos2i(-1, -1);
+    glRasterPos2f(-xScreenCoverage, -1.0);
     glPixelZoom(xScale, yScale);
     {
         std::lock_guard lock(pixelBufferMutex);
