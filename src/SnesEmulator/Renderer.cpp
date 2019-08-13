@@ -10,7 +10,7 @@
 
 #include "Common/System.h"
 
-void Renderer::initialize(int windowXPosition, int windowYPosition, bool fullscreen)
+void Renderer::initialize(int windowXPosition, int windowYPosition, bool fullscreen, bool aspectCorrection)
 {
     if (!glfwInit()) {
         throw std::runtime_error("Failed to initialize GLFW");
@@ -20,8 +20,7 @@ void Renderer::initialize(int windowXPosition, int windowYPosition, bool fullscr
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
 
-    float aspectCorrection = (float(height) / float(width)) * (4.0 / 3.0);
-    //float aspectCorrection = 1.0;
+    float aspectCorrectionFactor = aspectCorrection ? (float(height) / float(width)) * (4.0 / 3.0) : 1.0;
     if (fullscreen) {
         GLFWmonitor* monitor = glfwGetPrimaryMonitor();
         const GLFWvidmode* mode = glfwGetVideoMode(monitor);
@@ -31,14 +30,17 @@ void Renderer::initialize(int windowXPosition, int windowYPosition, bool fullscr
         glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
         window = glfwCreateWindow(mode->width, mode->height, title.c_str(), monitor, NULL);
         yScale = float(mode->height) / float(height);
-        xScale = yScale * aspectCorrection;
+        xScale = yScale * aspectCorrectionFactor;
         float correctedWidth = float(width) * xScale;
         xScreenCoverage = correctedWidth / float(mode->width);
     }
     else {
-        xScale = yScale * aspectCorrection;
+        xScale = yScale * aspectCorrectionFactor;
         window = glfwCreateWindow(int(float(width) * xScale + 0.5), int(float(height) * yScale + 0.5), title.c_str(), NULL, NULL);
+        xScreenCoverage = 1.0;
     }
+
+    output << "Created renderer with dimensions " << int(float(width) * xScale + 0.5) << ":" << int(float(height) * yScale + 0.5) << std::endl;
 
     if (window == nullptr) {
         glfwTerminate();
@@ -146,5 +148,5 @@ void Renderer::update()
 
 bool Renderer::isRunning() const
 {
-    return glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(window) == 0;
+    return glfwWindowShouldClose(window) == 0;
 }

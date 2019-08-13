@@ -30,9 +30,9 @@ public:
         void operator()()
         {
             video.renderer.title = gameTitle;
-            video.renderer.initialize(1100, 40, true);
+            video.renderer.initialize(1000, 40, true, true);
             running = true;
-            while (running){// && video.renderer.isRunning()) {
+            while (running && video.renderer.isRunning()) {
                 video.renderer.update();
             }
         }
@@ -396,8 +396,8 @@ public:
                     const int color = cgram.readWord(Word(pixelData));
                     buffer.data[displayColumn] = color;
                 }
-                else {
-                    buffer.data[displayColumn] = 0x5555; // TODO
+                else {//if (mode7PlayingFieldSize == 0) {
+                    throw Video::NotYetImplementedException("Mode 7 wraparound");
                 }
             }
         }

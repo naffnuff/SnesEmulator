@@ -35,7 +35,7 @@ public:
     Renderer(const Renderer&) = delete;
     Renderer& operator=(const Renderer&) = delete;
 
-    void initialize(int windowXPosition, int windowYPosition, bool fullscreen = false);
+    void initialize(int windowXPosition, int windowYPosition, bool fullscreen = false, bool aspectCorrection = false);
     void update();
     bool isRunning() const;
 
