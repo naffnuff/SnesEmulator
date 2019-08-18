@@ -168,8 +168,23 @@ public:
             }
         );
 
-        makeWriteRegister(0x2105, "BG Mode and Character Size", false, video.backgroundModeAndCharacterSize);
+        makeWriteRegister(0x2105, "BG Mode and Character Size", false,
+            [this](Byte value) {
+                video.backgroundMode = value.getBits(0, 3);
+                video.mode1Extension = value.getBit(3);
+                video.characterSize = value.getBits(4, 4);
+                if (video.backgroundMode == 1) {
+                    video.backgrounds[BackgroundLayer1].bitsPerPixel = 4;
+                    video.backgrounds[BackgroundLayer2].bitsPerPixel = 4;
+                    video.backgrounds[BackgroundLayer3].bitsPerPixel = 2;
+                }
+                else if (video.backgroundMode == 7) {
+                    video.backgrounds[BackgroundLayer1].bitsPerPixel = 8;
+                }
+            });
+
         makeWriteRegister(0x2106, "Screen Pixelation", true);
+
         for (int i = 0; i < 2; ++i) {
             std::string bgName = "BG";
             std::string bgName1 = bgName + char('1' + i * 2);
@@ -212,18 +227,18 @@ public:
                 incrementVramOnHighByte = value.getBit(7);
             });
 
-        //makeWriteRegister(0x2116, "VRAM Address", false, video.vram.address);
+        makeWriteRegister(0x2116, "VRAM Address", false, video.vram.address);
 
-        makeWriteRegister(0x2116, "VRAM Address low byte", false,
+        /*makeWriteRegister(0x2116, "VRAM Address low byte", false,
             [this](Byte value) {
-                vramStartAddress.setLowByte(value);
-                video.vram.address = vramStartAddress;
+                video.vram.address.setLowByte(value);
+                vramBuffer = video.vram.readWord(video.vram.address);
             });
         makeWriteRegister(0x2117, "VRAM Address high byte", false,
             [this](Byte value) {
-                vramStartAddress.setHighByte(value);
-                video.vram.address = vramStartAddress;
-            });
+                video.vram.address.setHighByte(value);
+                vramBuffer = video.vram.readWord(video.vram.address);
+            });*/
 
         makeWriteRegister(0x2118, "VRAM Data Write low byte", false,
             [this](Byte value) {
@@ -375,6 +390,15 @@ public:
 
         makeReadRegister(0x2138, "Data for OAM read", true);
 
+        makeReadRegister(0x2139, "VRAM Data read low byte", false,
+            [this](Byte& value) {
+                value = readFromVram(false, !incrementVramOnHighByte);
+            });
+        makeReadRegister(0x213a, "VRAM Data read high byte", false,
+            [this](Byte& value) {
+                value = readFromVram(true, incrementVramOnHighByte);
+            });
+
         makeReadRegister(0x213c, "Horizontal Scanline Location", false, horizontalScanlineLocation);
         makeReadRegister(0x213d, "Vertical Scanline Location", false, verticalScanlineLocation);
         makeReadRegister(0x213e, "PPU Status Flag and Version", false);
@@ -390,10 +414,18 @@ public:
                 verticalScanlineLocation.highByteSelect = false;
             });
 
+        makeWriteRegister(0x2181, "WRAM Address", false, wramAddress);
+
         makeReadWriteRegister(0x4016, "NES-style Joypad Access Port 1", true);
         makeReadWriteRegister(0x4017, "NES-style Joypad Access Port 2", true);
 
-        makeWriteRegister(0x4200, "Interrupt Enable Flags", false, interruptEnableFlags);
+        makeWriteRegister(0x4200, "Interrupt Enable Flags", false,
+            [this](Byte value) {
+                autoJoypadReadEnabled = value.getBit(0);
+                irqMode = IrqMode(int(value.getBits(4, 2)));
+                nmiEnabled = value.getBit(7);
+            });
+
         makeWriteRegister(0x4201, "Programmable I/O port (out-port)", true,
             [this](Byte value) {
                 if (programmableIOPort.getBit(7) && !value.getBit(7)) { // 1 -> 0
@@ -423,11 +455,15 @@ public:
             }
         );
 
-        makeWriteRegister(0x4207, "H Timer low byte", true);
-        makeWriteRegister(0x4208, "H Timer high byte", true);
+        makeWriteRegister(0x4207, "H Timer", false, hTimer);
         makeWriteRegister(0x4209, "V Timer", false, vTimer);
         makeWriteRegister(0x420b, "DMA Enable", false);
-        makeWriteRegister(0x420c, "HDMA Enable", false);
+        makeWriteRegister(0x420c, "HDMA Enable", false,
+            [this](Byte value) {
+                /*std::stringstream ss;
+                ss << "HDMA Enable " << "vCounter=" << vCounter << ", hCounter=" << hCounter << std::endl;
+                printMemoryRegister(true, value, 0x420c, ss.str());*/
+            });
         makeWriteRegister(0x420d, "ROM Access Speed", true);
 
         makeReadRegister(0x4210, "NMI Flag and 5A22 Version", false,
@@ -453,19 +489,18 @@ public:
         makeReadRegister(0x421b, "Controller Port 2 Data1 Register high byte", false);
 
         for (int i = 0; i < 8; ++i) {
-            std::stringstream ss;
-            ss << i;
-            makeReadWriteRegister(toDmaAddress(i, 0x0), "DMA Control Channel " + ss.str(), false);
-            makeReadWriteRegister(toDmaAddress(i, 0x1), "DMA Destination Register Channel " + ss.str(), false);
-            makeReadWriteRegister(toDmaAddress(i, 0x2), "DMA Source Address low byte Channel " + ss.str(), false);
-            makeReadWriteRegister(toDmaAddress(i, 0x3), "DMA Source Address high byte Channel " + ss.str(), false);
-            makeReadWriteRegister(toDmaAddress(i, 0x4), "DMA Source Address bank byte Channel " + ss.str(), false);
-            makeReadWriteRegister(toDmaAddress(i, 0x5), "DMA Size/HDMA Indirect Address low byte Channel " + ss.str(), false);
-            makeReadWriteRegister(toDmaAddress(i, 0x6), "DMA Size/HDMA Indirect Address high byte Channel " + ss.str(), false);
-            makeReadWriteRegister(toDmaAddress(i, 0x7), "HDMA Indirect Address bank byte Channel " + ss.str(), false);
-            makeReadWriteRegister(toDmaAddress(i, 0x8), "HDMA Table Address low byte Channel " + ss.str(), false);
-            makeReadWriteRegister(toDmaAddress(i, 0x9), "HDMA Table Address high byte Channel " + ss.str(), false);
-            makeReadWriteRegister(toDmaAddress(i, 0xa), "HDMA Line Counter Channel " + ss.str(), false);
+            std::string channel = Util::toString(i);
+            makeReadWriteRegister(toDmaAddress(i, 0x0), "DMA Control Channel " + channel, false);
+            makeReadWriteRegister(toDmaAddress(i, 0x1), "DMA Destination Register Channel " + channel, false);
+            makeReadWriteRegister(toDmaAddress(i, 0x2), "DMA Source Address low byte Channel " + channel, false);
+            makeReadWriteRegister(toDmaAddress(i, 0x3), "DMA Source Address high byte Channel " + channel, false);
+            makeReadWriteRegister(toDmaAddress(i, 0x4), "DMA Source Address bank byte Channel " + channel, false);
+            makeReadWriteRegister(toDmaAddress(i, 0x5), "DMA Size/HDMA Indirect Address low byte Channel " + channel, false);
+            makeReadWriteRegister(toDmaAddress(i, 0x6), "DMA Size/HDMA Indirect Address high byte Channel " + channel, false);
+            makeReadWriteRegister(toDmaAddress(i, 0x7), "HDMA Indirect Address bank byte Channel " + channel, false);
+            makeReadWriteRegister(toDmaAddress(i, 0x8), "HDMA Table Address low byte Channel " + channel, false);
+            makeReadWriteRegister(toDmaAddress(i, 0x9), "HDMA Table Address high byte Channel " + channel, false);
+            makeReadWriteRegister(toDmaAddress(i, 0xa), "HDMA Line Counter Channel " + channel, false);
         }
 
         for (int address = 0x2000; address < 0x2100; ++address) {
@@ -515,22 +550,9 @@ public:
         return value;
     }
 
-    bool nmiEnabled() const
-    {
-        return interruptEnableFlags.getBit(7);
-    }
-
-    bool vCounterIrqEnabled() const
-    {
-        if (interruptEnableFlags.getBit(6)) {
-            throw Video::NotYetImplementedException("H-Counter IRQ");
-        }
-        return interruptEnableFlags.getBit(5);
-    }
-
     void readControllers()
     {
-        if (interruptEnableFlags.getBit(0)) {
+        if (autoJoypadReadEnabled) {
             controllerPort1Data1.setBit(4, video.renderer.buttonR);
             controllerPort1Data1.setBit(5, video.renderer.buttonL);
             controllerPort1Data1.setBit(6, video.renderer.buttonX);
@@ -552,26 +574,44 @@ public:
             throw Video::NotYetImplementedException("Video port control address mapping");
         }
         if (increment) {
-            if (videoPortControl.getBits(0, 2) == 2) {
-                throw Video::NotYetImplementedException("Video port control: unsure of increment 2");
-            }
-            int increment = 1;
-            if (videoPortControl.getBit(1)) {
-                increment = 128;
-            }
-            else if (videoPortControl.getBit(0)) {
-                increment = 32;
-            }
-            video.vram.writeByte(value, highByte, increment);
+            video.vram.writeByte(value, highByte, getVramIncrement());
         }
         else {
             video.vram.writeByte(value, highByte, 0);
         }
     }
 
-    Word getVTimer() const
+    Byte readFromVram(bool highByte, bool increment)
     {
-        return vTimer;
+        if (videoPortControl.getBits(2, 2) != 0) {
+            throw Video::NotYetImplementedException("Video port control address mapping");
+        }
+        Byte result;
+        if (highByte) {
+            result = vramBuffer.getHighByte();
+        }
+        else {
+            result = vramBuffer.getLowByte();
+        }
+        if (increment) {
+            vramBuffer = video.vram.readNextWord(getVramIncrement());
+        }
+        return result;
+    }
+
+    int getVramIncrement()
+    {
+        if (videoPortControl.getBits(0, 2) == 2) {
+            throw Video::NotYetImplementedException("Video port control: unsure of increment 2");
+        }
+        int increment = 1;
+        if (videoPortControl.getBit(1)) {
+            increment = 128;
+        }
+        else if (videoPortControl.getBit(0)) {
+            increment = 32;
+        }
+        return increment;
     }
 
     void reset()
@@ -597,7 +637,10 @@ public:
     bool hBlank = false;
 
     Word oamStartAddress;
-    Word vramStartAddress;
+
+    Word vramBuffer;
+
+    Long wramAddress;
 
     Word controllerPort1Data1;
 
@@ -611,7 +654,17 @@ public:
     Word quotient;
     Word product;
     Word& remainder = product;
-    Byte interruptEnableFlags;
+    bool nmiEnabled = false;
+    enum IrqMode
+    {
+        NoIrq = 0,
+        HCounterIrq = 1,
+        VCounterIrq = 2,
+        HAndVCounterIrq = 3
+    };
+    IrqMode irqMode;
+    bool autoJoypadReadEnabled = false;
+    Word hTimer;
     Word vTimer;
     Byte programmableIOPort = 0xff;
     bool externalLatch = false;

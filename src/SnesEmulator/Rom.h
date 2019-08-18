@@ -126,14 +126,8 @@ private:
         cartridgeType = data[0xFFD6 - offset];
 
         romSize = 0x400 << data[0xFFD7 - offset];
-        if (romSize != 1024 * (int)std::pow(2, (int)data[0xFFD7 - offset])) {
-            throw std::logic_error("ROM size mismatch");
-        }
 
         saveRamSize = 0x400 << data[0xFFD8 - offset];
-        if (saveRamSize != 1024 * (int)std::pow(2, (int)data[0xFFD8 - offset])) {
-            throw std::logic_error("Save RAM size mismatch");
-        }
 
         output
             << "Game Title=" << gameTitle << std::endl

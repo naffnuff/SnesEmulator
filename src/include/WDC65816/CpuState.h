@@ -235,6 +235,11 @@ public:
         return memory[address].getValue();
     }
 
+    Word getMemoryWord(Long address) const
+    {
+        return memory[address].getWordValue();
+    }
+
     const MemoryLocation& getMemory(Long address) const
     {
         return memory[address];

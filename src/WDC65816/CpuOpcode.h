@@ -150,7 +150,6 @@ class ADC_71 : public AddressMode::DirectPageIndirectIndexedY<Operator::ADC>
     // 2   7-m+w-x+x*p (dir),Y   mm....mm . ADC ($10),Y
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ADC_71");
         return 5 + applyOperand();
     }
 
@@ -216,7 +215,6 @@ class ADC_77 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::ADC>
     // 2   7-m+w       [dir],Y   mm....mm . ADC [$10],Y
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ADC_77");
         return 6 + applyOperand();
     }
 
@@ -595,7 +593,6 @@ class ASL_16 : public AddressMode::DirectPageIndexed<Operator::ASL, State::X>
     // 2   8-2*m+w     dir,X     m.....mm . ASL $10,X
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ASL_16");
         return 6 + applyOperand();
     }
 
@@ -709,7 +706,6 @@ class BIT_34 : public AddressMode::DirectPageIndexed<Operator::BIT<false>, State
     // 2   5-m+w       dir,X     mm....m. . BIT $10,X
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("BIT_34");
         return 4 + applyOperand();
     }
 
@@ -1022,7 +1018,6 @@ class CMP_C7 : public AddressMode::DirectPageIndirectLong<Operator::CMP>
     // 2   7-m+w       [dir]     m.....mm . CMP [$10]
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("CMP_C7");
         return 6 + applyOperand();
     }
 
@@ -2170,7 +2165,6 @@ class LDA_B3 : public AddressMode::StackRelativeIndirectIndexedY<Operator::LDA>
     // 2   8-m         (stk,S),Y m.....m. . LDA ($32,S),Y
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("LDA_B3");
         return 7 + applyOperand();
     }
 
@@ -2495,7 +2489,6 @@ class LSR_4E : public AddressMode::Absolute<Operator::LSR>
     // 3   8-2*m       abs       0.....m* . LSR $9876
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("LSR_4E");
         return 6 + applyOperand();
     }
 
@@ -2612,7 +2605,6 @@ class ORA_03 : public AddressMode::StackRelative<Operator::ORA>
     // 2   5-m         stk,S     m.....m. . ORA $32,S
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ORA_03");
         return 4 + applyOperand();
     }
 
@@ -3261,7 +3253,6 @@ class ROR_76 : public AddressMode::DirectPageIndexed<Operator::ROR, State::X>
     // 2   8-2*m+w     dir,X     m.....m* . ROR $10,X
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ROR_76");
         return 6 + applyOperand();
     }
 
@@ -3360,7 +3351,6 @@ class SBC_E3 : public AddressMode::StackRelative<Operator::SBC>
     // 2   5-m         stk,S     mm....mm . SBC $32,S
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("SBC_E3");
         return 4 + applyOperand();
     }
 

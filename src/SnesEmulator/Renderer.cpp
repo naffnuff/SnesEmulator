@@ -10,7 +10,7 @@
 
 #include "Common/System.h"
 
-void Renderer::initialize(int windowXPosition, int windowYPosition, bool fullscreen, bool aspectCorrection)
+void Renderer::initialize(bool fullscreen, bool aspectCorrection)
 {
     if (!glfwInit()) {
         throw std::runtime_error("Failed to initialize GLFW");
@@ -20,7 +20,7 @@ void Renderer::initialize(int windowXPosition, int windowYPosition, bool fullscr
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
 
-    float aspectCorrectionFactor = aspectCorrection ? (float(height) / float(width)) * (4.0 / 3.0) : 1.0;
+    const float aspectCorrectionFactor = aspectCorrection ? (float(height) / float(width)) * (4.0 / 3.0) : 1.0;
     if (fullscreen) {
         GLFWmonitor* monitor = glfwGetPrimaryMonitor();
         const GLFWvidmode* mode = glfwGetVideoMode(monitor);
@@ -28,15 +28,17 @@ void Renderer::initialize(int windowXPosition, int windowYPosition, bool fullscr
         glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
         glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
         glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
-        window = glfwCreateWindow(mode->width, mode->height, title.c_str(), monitor, NULL);
+        window = glfwCreateWindow(mode->width, mode->height, title.c_str(), monitor, nullptr);
         yScale = float(mode->height) / float(height);
         xScale = yScale * aspectCorrectionFactor;
         float correctedWidth = float(width) * xScale;
         xScreenCoverage = correctedWidth / float(mode->width);
     }
     else {
+        yScale = scale;
         xScale = yScale * aspectCorrectionFactor;
-        window = glfwCreateWindow(int(float(width) * xScale + 0.5), int(float(height) * yScale + 0.5), title.c_str(), NULL, NULL);
+        window = glfwCreateWindow(int(float(width) * xScale + 0.5), int(float(height) * yScale + 0.5), title.c_str(), nullptr, nullptr);
+        glfwSetWindowPos(window, windowXPosition, windowYPosition);
         xScreenCoverage = 1.0;
     }
 
@@ -47,7 +49,6 @@ void Renderer::initialize(int windowXPosition, int windowYPosition, bool fullscr
         throw std::runtime_error("Failed to open GLFW window.");
     }
     glfwMakeContextCurrent(window);
-    glfwSetWindowPos(window, windowXPosition, windowYPosition);
 
     if (glewInit() != GLEW_OK) {
         glfwTerminate();
@@ -64,6 +65,20 @@ void Renderer::initialize(int windowXPosition, int windowYPosition, bool fullscr
 
     glShadeModel(GL_FLAT);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+}
+
+void Renderer::setWindowProperties(bool fullscreen, bool aspectRatioCorrection)
+{
+    if (fullscreen) {
+
+    }
+    else {
+        yScale = scale;
+        const float aspectCorrectionFactor = aspectRatioCorrection ? (float(height) / float(width)) * (4.0 / 3.0) : 1.0;
+        xScale = yScale * aspectCorrectionFactor;
+        xScreenCoverage = 1.0;
+        glfwSetWindowMonitor(window, nullptr, windowXPosition, windowYPosition, int(float(width) * xScale + 0.5), int(float(height) * yScale + 0.5), 0);
+    }
 }
 
 void Renderer::update()
@@ -96,14 +111,19 @@ void Renderer::update()
     glfwPollEvents();
 
     bool spacePressed = isPressed(GLFW_KEY_SPACE);
-    if (pressPauseTimeout == 0) {
+    bool escapePressed = isPressed(GLFW_KEY_ESCAPE);
+    if (pressKeyTimeout == 0) {
+        if (escapePressed) {
+            pauseRequested = true;
+            pressKeyTimeout = 60;
+        }
         if (spacePressed) {
-            pause = true;
-            pressPauseTimeout = 10;
+            toggleFullscreenRequested = true;
+            pressKeyTimeout = 60;
         }
     }
     else {
-        --pressPauseTimeout;
+        --pressKeyTimeout;
     }
 
     buttonStart = isPressed(GLFW_KEY_COMMA);
@@ -119,11 +139,11 @@ void Renderer::update()
     buttonLeft = isPressed(GLFW_KEY_A);
     buttonRight = isPressed(GLFW_KEY_D);
 
-    for (int i = 0; i < 2; ++i) {
-        if (glfwJoystickIsGamepad(GLFW_JOYSTICK_1 + i))
+    for (int joystick = GLFW_JOYSTICK_1; joystick <= GLFW_JOYSTICK_LAST; ++joystick) {
+        if (glfwJoystickIsGamepad(joystick))
         {
             GLFWgamepadstate state;
-            if (glfwGetGamepadState(GLFW_JOYSTICK_1 + i, &state))
+            if (glfwGetGamepadState(joystick, &state))
             {
                 buttonStart |= state.buttons[GLFW_GAMEPAD_BUTTON_START] == GLFW_PRESS;
                 buttonSelect |= state.buttons[GLFW_GAMEPAD_BUTTON_BACK] == GLFW_PRESS;
@@ -137,10 +157,29 @@ void Renderer::update()
                 buttonDown |= state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_DOWN] == GLFW_PRESS;
                 buttonLeft |= state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_LEFT] == GLFW_PRESS;
                 buttonRight |= state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_RIGHT] == GLFW_PRESS;
-                buttonLeft |= state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -0.25f;
-                buttonRight |= state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] > 0.25f;
-                buttonUp |= state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] < -0.25f;
-                buttonDown |= state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] > 0.25f;
+
+                float axisX = state.axes[GLFW_GAMEPAD_AXIS_LEFT_X];
+                float axisY = state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
+
+                static const float thresholdSquared = .25f * .25f;
+                if (axisX * axisX + axisY * axisY > thresholdSquared) {
+                    float angle = std::atan2f(axisY, axisX);
+                    static const float pi8 = std::atanf(1.f) / 2.f;
+                    
+                    if (angle > pi8 * 5 || angle < -pi8 * 5) {
+                        buttonLeft = true;
+                    }
+                    else if (angle > -pi8 * 3 && angle < pi8 * 3) {
+                        buttonRight = true;
+                    }
+
+                    if (angle > -pi8 * 7 && angle < -pi8) {
+                        buttonUp = true;
+                    }
+                    else if (angle > pi8 && angle < pi8 * 7) {
+                        buttonDown = true;
+                    }
+                }
             }
         }
     }

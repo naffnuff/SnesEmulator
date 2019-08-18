@@ -17,9 +17,10 @@ public:
     class Context
     {
     public:
-        Context(std::string fileName, System::Color debugColor)
+        Context(std::string fileName, System::Color debugColor, Debugger& debugger)
             : fileName(fileName)
             , debugColor(debugColor)
+            , debugger(debugger)
         {
         }
         
@@ -54,16 +55,42 @@ public:
             }
         }
 
+        void setPaused(bool paused)
+        {
+            stepMode = paused;
+            if (paused) {
+                if (debugger.registers.video.rendererLock.owns_lock()) {
+                    debugger.registers.video.rendererLock.unlock();
+                    unlockedMutex = true;
+                }
+                if (debugger.registers.video.rendererRunner.fullscreen) {
+                    debugger.registers.video.renderer.toggleFullscreenRequested = true;
+                }
+            }
+            else if (unlockedMutex) {
+                debugger.registers.video.rendererLock.lock();
+                unlockedMutex = false;
+            }
+        }
+
+        bool isPaused() const
+        {
+            return stepMode;
+        }
+
         std::array<Long, 0x100> knownAddresses;
         Byte lastKnownAddressIndex = 0;
 
+        Debugger& debugger;
         std::string fileName;
         Long inspectedAddress = 0;
         bool watchMode = true;
-        bool stepMode = false;
         System::Color debugColor;
         std::set<Long> breakpoints;
         const Instruction* nextInstruction;
+    private:
+        bool stepMode = false;
+        bool unlockedMutex = false;
     };
 
     Debugger(std::ostream& output, std::istream& input, std::ostream& error, Registers& registers, SPC::Audio& audio, uint64_t& cycleCount, bool& running)
@@ -106,7 +133,7 @@ public:
         else {
             memory->setBreakpoint([this, &context, &state, breakpoint, memory](MemoryLocation::Operation operation) {
                 if (operation == MemoryLocation::Apply) {
-                    context.stepMode = true;
+                    context.setPaused(true);
                     output << "Apply: Breakpoint hit @ " << breakpoint << std::endl;
                 }
                 /*else if (operation == MemoryLocation::Read) {
@@ -175,24 +202,24 @@ public:
         }
         else if (command[0] == 'r') {
             if (command == "rr") {
-                context.stepMode = false;
-                otherContext.stepMode = false;
+                context.setPaused(false);
+                otherContext.setPaused(false);
             }
             else {
-                context.stepMode = !context.stepMode;
-                if (context.stepMode) {
+                context.setPaused(!context.isPaused());
+                if (context.isPaused()) {
                     output << "Step mode" << std::endl;
                 }
                 else {
                     output << "Run mode" << std::endl;
                 }
             }
-            if (!context.stepMode && !otherContext.stepMode) {
+            if (!context.isPaused() && !otherContext.isPaused()) {
                 output << "All running" << std::endl;
                 output << "Snip" << std::endl;
                 startTime = clock();
             }
-            return !context.stepMode;
+            return !context.isPaused();
         }
         else if (command == "i") {
             output << "Inspect not implemented" << std::endl;
@@ -210,8 +237,8 @@ public:
             otherState.reset();
             registers.reset();
             audio.reset();
-            context.stepMode = false;
-            otherContext.stepMode = false;
+            context.setPaused(false);
+            otherContext.setPaused(false);
             startTime = clock();
         }
         else if (command == "qq") {
@@ -311,7 +338,7 @@ public:
     template<typename State>
     void printState(const State& state, Context& context)
     {
-        System::setOutputColor(output, context.stepMode ? context.debugColor : System::Red, true);
+        System::setOutputColor(output, context.isPaused() ? context.debugColor : System::Red, true);
         state.printRegisters(output) << std::endl;
         output << context.nextInstruction->opcodeToString() << std::endl;
         output << state.readProgramByte() << ": ";
@@ -382,7 +409,7 @@ public:
         output << "OAM start address: " << registers.oamStartAddress << std::endl;
         output << "OAM current address: " << registers.video.oam.address << std::endl;*/
         output << "Video port control: " << registers.videoPortControl << std::endl;
-        output << "VRAM start address: " << registers.vramStartAddress << std::endl;
+        //output << "VRAM start address: " << registers.vramStartAddress << std::endl;
         output << "VRAM current address: " << registers.video.vram.address << std::endl;
 
         output << "            0    1    2    3    4    5    6    7" << std::endl

@@ -14,13 +14,14 @@ class Renderer
 public:
     typedef uint16_t Pixel;
 
-    Renderer(int width, int height, float scale, bool syncUpdate, std::ostream& output)
-        : width(width)
+    Renderer(int windowXPosition, int windowYPosition, int width, int height, float scale, bool syncUpdate, std::ostream& output)
+        : windowXPosition(windowXPosition)
+        , windowYPosition(windowYPosition)
+        , width(width)
         , height(height)
-        , xScale(scale)
-        , yScale(scale)
+        , scale(scale)
         , syncUpdate(syncUpdate)
-        , pixelBuffer(height * width)
+        , pixelBuffer(height* width)
         , output(output)
         , title("SNES Emulator")
     {
@@ -35,7 +36,8 @@ public:
     Renderer(const Renderer&) = delete;
     Renderer& operator=(const Renderer&) = delete;
 
-    void initialize(int windowXPosition, int windowYPosition, bool fullscreen = false, bool aspectCorrection = false);
+    void initialize(bool fullscreen = false, bool aspectCorrection = false);
+    void setWindowProperties(bool fullscreen, bool aspectCorrection);
     void update();
     bool isRunning() const;
 
@@ -95,7 +97,8 @@ public:
     }
 
 public:
-    bool pause = false;
+    bool pauseRequested = false;
+    bool toggleFullscreenRequested = false;
 
     bool buttonStart = false;
     bool buttonSelect = false;
@@ -109,6 +112,9 @@ public:
     bool buttonDown = false;
     bool buttonLeft = false;
     bool buttonRight = false;
+
+    int windowXPosition;
+    int windowYPosition;
     
     const int width;
     const int height;
@@ -122,11 +128,11 @@ public:
 
     std::string title;
 
+    float scale;
     float xScale;
     float yScale;
     float xScreenCoverage;
     const bool syncUpdate;
 
-    int pressPauseTimeout = 0;
-
+    int pressKeyTimeout = 0;
 };

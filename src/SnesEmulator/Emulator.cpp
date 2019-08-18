@@ -136,7 +136,7 @@ void Emulator::run()
 
     double runStartTime = 0.0;
     uint64_t cycleCountDelta = 0;
-    bool stepMode = cpuContext.stepMode || spcContext.stepMode;
+    bool stepMode = cpuContext.isPaused() || spcContext.isPaused();
     if (!stepMode) {
         output << "Snip" << std::endl;
         debugger.startTime = clock();
@@ -176,19 +176,21 @@ void Emulator::run()
                     }
                 }
 
-                if (hdmaInstruction.active) {
-                    //cpuContext.stepMode = true;
+                if (hdmaInstruction.isActive()) {
+                    if (hdmaInstruction.hdmaEnabled.getValue().getBit(7)) {
+                    //    cpuContext.setPaused(true);
+                    }
                     hdmaInstruction.blockedInstruction = instruction;
                     instruction = static_cast<Instruction*>(&hdmaInstruction);
                     if (dmaPicked) {
                         output << "HDMA interrupts DMA" << std::endl;
-                        cpuContext.stepMode = true;
+                        cpuContext.setPaused(true);
                     }
                 }
 
                 cpuContext.nextInstruction = instruction;
 
-                if (cpuContext.stepMode) {
+                if (cpuContext.isPaused()) {
                     output << "Cycle count: " << masterCycle << ", Next cpu: " << nextCpu << ", Next spc: " << nextSpc << std::endl;
                     output << "Frame: " << registers.frame << ", V counter: " << registers.vCounter << ", H counter: " << registers.hCounter << ", V blank: " << registers.vBlank << ", H blank: " << registers.hBlank << ", nmi: " << cpuState.isNmiActive() << ", irq: " << cpuState.isIrqActive() << std::endl;
                     debugger.printBreakpoints(cpuContext, spcContext);
@@ -196,7 +198,7 @@ void Emulator::run()
                 }
 
                 if (int cycles = executeNext(instruction, cpuState, debugger, cpuContext, spcState, spcContext, error)) {
-                    nextCpu += uint64_t(cycles) * 8;
+                    nextCpu += uint64_t(cycles) * 6;
                     cpuContext.nextInstruction = cpuInstructionDecoder.readNextInstruction(cpuState);
                 }
                 else {
@@ -208,7 +210,7 @@ void Emulator::run()
                 Instruction* instruction = spcInstructionDecoder.readNextInstruction(spcState);
                 spcContext.nextInstruction = instruction;
 
-                if (spcContext.stepMode) {
+                if (spcContext.isPaused()) {
                     output << "cycleCount=" << masterCycle << ", nextCpu=" << nextCpu << ", nextSpc=" << nextSpc << std::endl;
                     debugger.printBreakpoints(cpuContext, spcContext);
                     debugger.printMemory(cpuState, cpuContext, spcState, spcContext, video);
@@ -224,7 +226,7 @@ void Emulator::run()
             }
 
             bool increment = false;
-            if (cpuContext.stepMode || spcContext.stepMode) { // step mode
+            if (cpuContext.isPaused() || spcContext.isPaused()) { // step mode
                 increment = true;
                 stepMode = true;
             }
@@ -265,8 +267,8 @@ void Emulator::run()
                         {
                             video.drawScanline(registers.vCounter);
                         }
-                        if (hdmaInstruction.enabled()) {
-                            hdmaInstruction.active = true;
+                        if (hdmaInstruction.enabled() && !hdmaInstruction.isActive()) {
+                            hdmaInstruction.setActive(true);
                         }
                     }
                     if (registers.vCounter == 224) {
@@ -283,7 +285,7 @@ void Emulator::run()
                         }
 
                         //video.renderer.update();
-                        rendererLock.unlock();
+                        video.rendererLock.unlock();
 
                         oamViewer.update();
                         background1Viewer.update();
@@ -296,10 +298,6 @@ void Emulator::run()
                         spriteLayer4Viewer.update();
                         mode7Viewer.update();
 
-                        if (video.renderer.pause) {
-                            video.renderer.pause = false;
-                            cpuContext.stepMode = true;
-                        }
                     }
                     registers.hBlank = true;
                 }
@@ -307,15 +305,15 @@ void Emulator::run()
                     registers.hCounter = 0;
                     registers.hBlank = false;
                     ++registers.vCounter;
-                    if (registers.vCounterIrqEnabled() && registers.getVTimer() == registers.vCounter) {
+                    if (registers.irqMode == Registers::VCounterIrq && registers.vTimer == registers.vCounter) {
                         irqRequested = true;
                     }
                     if (registers.vCounter == 225) {
-                        hdmaInstruction.active = false;
+                        hdmaInstruction.setActive(false);
                         registers.vBlank = true;
                         registers.video.oam.address = registers.oamStartAddress;
                         //registers.video.vram.address = registers.vramStartAddress;
-                        if (registers.nmiEnabled()) {
+                        if (registers.nmiEnabled) {
                             nmiRequested = true;
                         }
                     }
@@ -323,7 +321,12 @@ void Emulator::run()
                         registers.readControllers();
                     }
                     else if (registers.vCounter == 262) {
-                        rendererLock.lock();
+                        video.rendererLock.lock();
+
+                        if (video.renderer.pauseRequested) {
+                            video.renderer.pauseRequested = false;
+                            cpuContext.setPaused(true);
+                        }
 
                         ++registers.frame;
                         registers.vCounter = 0;
@@ -331,9 +334,13 @@ void Emulator::run()
                         registers.vBlank = false;
 
                         if (hdmaInstruction.enabled()) {
-                            hdmaInstruction.initialize = true;
-                            hdmaInstruction.active = true;
+                            hdmaInstruction.setActive(true, true);
                         }
+                    }
+                }
+                if (registers.hTimer == registers.hCounter) {
+                    if (registers.irqMode == Registers::HCounterIrq || registers.irqMode == Registers::HAndVCounterIrq && registers.vTimer == registers.vCounter) {
+                        irqRequested = true;
                     }
                 }
             }
@@ -350,12 +357,12 @@ int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debu
 {
     context.addKnownAddress(state.getProgramAddress());
     try {
-        if (context.stepMode) {
+        if (context.isPaused()) {
             debugger.printState(state, context);
 
             if (debugger.awaitCommand(context, state, otherContext, otherState)) {
                 int cycles = instruction->execute();
-                if (context.stepMode) {
+                if (context.isPaused()) {
                     debugger.printRegisters(state, context);
                 }
                 return cycles;
@@ -363,7 +370,7 @@ int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debu
         }
         else {
             // TODO: this seems not reachable
-            if (context.stepMode) {
+            if (context.isPaused()) {
                 debugger.printClockSpeed();
                 context.printAddressHistory(error);
             }
@@ -372,23 +379,23 @@ int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debu
             }
         }
     } catch (OpcodeNotYetImplementedException& e) {
-        context.stepMode = true;
+        context.setPaused(true);
         error << e.what() << std::endl;
     } catch (AddressModeNotYetImplementedException& e) {
         state.setProgramAddress(context.getLastKnownAddress());
-        context.stepMode = true;
+        context.setPaused(true);
         error << e.what() << std::endl;
     } catch (OperatorNotYetImplementedException& e) {
         state.setProgramAddress(context.getLastKnownAddress());
-        context.stepMode = true;
+        context.setPaused(true);
         error << e.what() << std::endl;
     } catch (MemoryLocation::AccessException& e) {
         state.setProgramAddress(context.getLastKnownAddress());
-        context.stepMode = true;
+        context.setPaused(true);
         error << e.what() << std::endl;
     } catch (Video::NotYetImplementedException& e) {
         state.setProgramAddress(context.getLastKnownAddress());
-        context.stepMode = true;
+        context.setPaused(true);
         error << e.what() << std::endl;
     }
     return 0;

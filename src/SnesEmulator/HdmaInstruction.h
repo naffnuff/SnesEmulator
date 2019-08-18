@@ -62,9 +62,11 @@ public:
         if (Byte enabled = hdmaEnabled.getValue()) {
             ss << "Enabled: " << std::bitset<8>(enabled) << std::endl;
             ss << "Active: " << active << std::endl;
-            ss << "Initialize: " << initialize << std::endl;
+            ss << "Initialization requested: " << initializationRequested << std::endl;
+            ss << "Iteration: " << iteration << std::endl;
             for (int i = 0; i < 8; ++i) {
                 if (enabled.getBit(i)) {
+                    ss << "*" << std::endl;
                     const Channel& channel = channels[i];
                     ss << "Channel " << i << std::endl;
                     ss << "Start address: " << channel.startAddressBankByte << channel.startAddressHighByte << channel.startAddressLowByte << std::endl;
@@ -94,6 +96,8 @@ public:
             cycles += 2;
             for (int i = 0; i < 8; ++i) {
                 if (hdmaEnabledValue.getBit(i)) {
+                    ++iteration;
+
                     dmaEnabledValue.setBit(i, false);
                     cycles += 1;
 
@@ -108,7 +112,7 @@ public:
 
                     bool indirectAddressingMode = hdmaControl.getBit(6);
 
-                    if (initialize) {
+                    if (initializationRequested) {
                         channel.addressLowByte.setWordValue(channel.startAddressLowByte.getWordValue());
                         channel.lineCounter.setValue(getNextByte(channel, false));
                         if (indirectAddressingMode) {
@@ -141,6 +145,13 @@ public:
                                 registerLocation->setValue(getNextByte(channel, indirectAddressingMode));
                                 cycles += 2;
                             }
+                            else if (transferMode == 3) {
+                                registerLocation->setValue(getNextByte(channel, indirectAddressingMode));
+                                registerLocation->setValue(getNextByte(channel, indirectAddressingMode));
+                                registerLocation->nextInMemory->setValue(getNextByte(channel, indirectAddressingMode));
+                                registerLocation->nextInMemory->setValue(getNextByte(channel, indirectAddressingMode));
+                                cycles += 4;
+                            }
                             else {
                                 error << "HDMA control: " << hdmaControl << std::endl;
                                 error << "HDMA transfer mode: " << transferMode << std::endl;
@@ -164,7 +175,7 @@ public:
             }
             dmaEnabled.setValue(dmaEnabledValue);
         }
-        initialize = false;
+        initializationRequested = false;
         active = false;
         return cycles;
     }
@@ -193,15 +204,30 @@ public:
         return hdmaEnabled.getValue();
     }
 
+    void setActive(bool value, bool requestInitialization = false)
+    {
+        if (value && requestInitialization) {
+            initializationRequested = true;
+            iteration = -1;
+        }
+        active = value;
+    }
+
+    bool isActive() const
+    {
+        return active;
+    }
+
 public:
     Instruction* blockedInstruction = nullptr;
-    bool active = false;
-    bool initialize = false;
+    MemoryLocation hdmaEnabled;
 
 private:
+    bool active = false;
+    bool initializationRequested = false;
+    int iteration = -1;
     CPU::State& state;
     MemoryLocation dmaEnabled;
-    MemoryLocation hdmaEnabled;
     std::vector<Channel> channels;
 
     std::ostream& output;

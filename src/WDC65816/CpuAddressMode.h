@@ -578,14 +578,14 @@ class StackRelativeIndirectIndexedY : public Instruction2Byte
 
     int invokeOperator(Byte lowByte) override
     {
-        throw AddressModeNotYetImplementedException("StackRelativeIndirectIndexedY");
-        MemoryLocation* memory = nullptr;
+        Word address = state.getMemoryWord(Long(state.getStackPointer() + lowByte, 0));
+        MemoryLocation* memory = state.getMemoryLocation(Long(address + state.getIndexRegister<State::Y>(), state.getDataBank()));
         return Operator::invoke(state, memory);
     }
 
     std::string toString() const override
     {
-        return Operator::toString() + " $" + operandToString() + " TODO";
+        return Operator::toString() + " ($" + operandToString() + ",S), Y";
     }
 };
 

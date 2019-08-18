@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "Common/Types.h"
+#include "Common/Util.h"
 
 #include "VideoModes.h"
 #include "Renderer.h"
@@ -29,17 +30,25 @@ public:
 
         void operator()()
         {
-            video.renderer.title = gameTitle;
-            video.renderer.initialize(1000, 40, true, true);
             running = true;
+            video.renderer.title = gameTitle;
+            video.renderer.initialize(fullscreen, aspectRatioCorrection);
             while (running && video.renderer.isRunning()) {
+                if (video.renderer.toggleFullscreenRequested) {
+                    video.renderer.toggleFullscreenRequested = false;
+                    fullscreen = !fullscreen;
+                    video.renderer.setWindowProperties(fullscreen, aspectRatioCorrection);
+                }
                 video.renderer.update();
             }
+            glfwTerminate();
         }
 
         Video& video;
         bool running = false;
         std::string gameTitle;
+        bool fullscreen = false;
+        bool aspectRatioCorrection = true;
     };
 
     struct Table
@@ -57,11 +66,27 @@ public:
 
         Word readWord(Word address) const
         {
+            if (address >= lowTable.size()) {
+                throw MemoryLocation::AccessException("Video::Table::readWord: Video-memory table out-of-bounds @ " + Util::toString(+address) + ", size=" + Util::toString(lowTable.size()));
+            }
             return Word(lowTable[address], highTable[address]);
+        }
+
+        Word readNextWord(int increment)
+        {
+            if (address >= lowTable.size()) {
+                throw MemoryLocation::AccessException("Video::Table::readNextWord: Video-memory table out-of-bounds @ " + Util::toString(+address) + ", size=" + Util::toString(lowTable.size()));
+            }
+            Word result = Word(lowTable[address], highTable[address]);
+            address += increment;
+            return result;
         }
 
         void writeWord(Word data)
         {
+            if (address >= lowTable.size()) {
+                throw MemoryLocation::AccessException("Video::Table::writeWord: Video-memory table out-of-bounds @ " + Util::toString(+address) + ", size=" + Util::toString(lowTable.size()));
+            }
             lowTable[address] = data.getLowByte();
             highTable[address] = data.getHighByte();
             ++address;
@@ -71,7 +96,7 @@ public:
         {
             std::vector<Byte>& table = highTableSelect ? highTable : lowTable;
             if (address >= table.size()) {
-                throw MemoryLocation::AccessException("Video-memory table out-of-bounds");
+                throw MemoryLocation::AccessException("Video::Table::writeByte: Video-memory table out-of-bounds @ " + Util::toString(+address) + ", size=" + Util::toString(table.size()));
             }
             table[address] = data;
             address += increment;
@@ -223,16 +248,20 @@ public:
         , vram(0x8000)
         , cgram(0x100)
         , oam(0x110)
-        , renderer(rendererWidth, rendererHeight, 3.f, true, output)
+        , renderer(1000, 40, rendererWidth, rendererHeight, 3.f, true, output)
         , rendererRunner(*this, output)
         , backgrounds(4)
+        , rendererLock(renderer.pixelBufferMutex)
+        , rendererThread(std::ref(rendererRunner))
     {
-        rendererThread = std::thread(rendererRunner);
     }
 
     ~Video()
     {
         rendererRunner.running = false;
+        if (rendererLock.owns_lock()) {
+            rendererLock.unlock();
+        }
         rendererThread.join();
     }
 
@@ -267,27 +296,20 @@ public:
     void drawScanline(int vCounter)
     {
         if (screenDisplay.getBit(7)) {
-            //renderer.clearDisplay(0);
-            //return;
+            renderer.clearScanline(vCounter, 0);
+            return;
         }
-        if (backgroundModeAndCharacterSize.getBits(4, 4) != 0) {
+        if (characterSize.getBits(4, 4) != 0) {
             throw NotYetImplementedException("16x16 backgrounds");
         }
         if (directColorMode) {
             throw NotYetImplementedException("Direct color mode for 256-color BGs");
         }
 
-        int backgroundMode = backgroundModeAndCharacterSize.getBits(0, 3);
-        bool mode1Extension = backgroundModeAndCharacterSize.getBit(3);
-
         if (backgroundMode == 1) {
-            backgrounds[BackgroundLayer1].bitsPerPixel = 4;
-            backgrounds[BackgroundLayer2].bitsPerPixel = 4;
-            backgrounds[BackgroundLayer3].bitsPerPixel = 2;
             drawMode(mode1Extension ? mode1e : mode1, vCounter);
         }
         else if (backgroundMode == 7) {
-            backgrounds[BackgroundLayer1].bitsPerPixel = 8;
             drawMode(mode7, vCounter, true);
         }
         else if (backgroundMode != 0) {
@@ -321,6 +343,9 @@ public:
 
         int brightness = screenDisplay.getBits(0, 4);
         float brightnessFactor = float(brightness) / float(0xf);
+        if (displayRow == 1) {
+            //output << "Brightness=" << brightness << ", brightnessFactor=" << brightnessFactor << std::endl;
+        }
 
         WindowSettings colorWindowSettings;
         colorWindowSettings.window1Enabled = windowMaskSettings.getBit(21);
@@ -378,14 +403,14 @@ public:
 
     void drawMode7Background(ScanlineBuffer& buffer, int displayRow)
     {
-        const float vectorElement2 = displayRow + mode7VerticalScroll - mode7CenterY;
+        const float vectorElement2 = float(displayRow + mode7VerticalScroll - mode7CenterY);
         for (int displayColumn = 0; displayColumn < rendererWidth; ++displayColumn) {
             if (buffer.data[displayColumn] < 0) {
-                const float vectorElement1 = displayColumn + mode7HorizontalScroll - mode7CenterX;
-                const int fieldRow = mode7MatrixC * vectorElement1 + mode7MatrixD * vectorElement2 + mode7CenterY;
+                const float vectorElement1 = float(displayColumn + mode7HorizontalScroll - mode7CenterX);
+                const int fieldRow = int(mode7MatrixC * vectorElement1 + mode7MatrixD * vectorElement2 + mode7CenterY + .5f);
                 const int tileRow = fieldRow >> 3;
                 const int row = fieldRow & 7;
-                const int fieldColumn = mode7MatrixA * vectorElement1 + mode7MatrixB * vectorElement2 + mode7CenterX;
+                const int fieldColumn = int(mode7MatrixA * vectorElement1 + mode7MatrixB * vectorElement2 + mode7CenterX + .5f);
                 const int tileColumn = fieldColumn >> 3;
                 const int column = fieldColumn & 7;
                 if ((fieldRow >= 0 || fieldRow < 1024) && (fieldColumn >= 0 || fieldColumn < 1024)) {
@@ -557,9 +582,7 @@ public:
                 inside = inside1 || inside2;
             }
             else {
-                std::stringstream ss;
-                ss << "Window operator " << settings.windowOperator;
-                throw NotYetImplementedException(ss.str());
+                throw NotYetImplementedException("Window operator " + Util::toString(settings.windowOperator));
             }
         }
         else if (settings.window1Enabled) {
@@ -654,9 +677,9 @@ public:
     static Word factorColors(ColorComponents a, float b)
     {
         ColorComponents c;
-        c.red = a.red * b;
-        c.green = a.green * b;
-        c.blue = a.blue * b;
+        c.red = int(a.red * b);
+        c.green = int(a.green * b);
+        c.blue = int(a.blue * b);
         return c;
     }
 
@@ -731,7 +754,7 @@ public:
             paletteIndex |= secondLowBitValue | secondHighBitValue;
         }
         if (paletteIndex > 0) {
-            Word colorAddress = (spritePalette ? 0x80 : 0) + std::pow(2, bpp) * palette + paletteIndex;
+            Word colorAddress = (spritePalette ? 0x80 : 0) + (1 << bpp) * palette + paletteIndex;
             result = cgram.readWord(colorAddress);
             return true;
         }
@@ -906,7 +929,9 @@ public:
 
     ColorComponents clearColor;
 
-    Byte backgroundModeAndCharacterSize;
+    Byte backgroundMode;
+    bool mode1Extension = false;
+    Byte characterSize;
 
     Byte mainScreenDesignation;
     Byte subscreenDesignation;
@@ -942,4 +967,6 @@ public:
     float mode7MatrixD = 0.f;
     int16_t mode7CenterX = 0;
     int16_t mode7CenterY = 0;
+
+    std::unique_lock<std::mutex> rendererLock;
 };

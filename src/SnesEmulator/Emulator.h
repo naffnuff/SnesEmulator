@@ -41,7 +41,7 @@ private:
                 }
                 if (save) {
                     std::ofstream file(emulator.rom.gameTitle + ".save");
-                    for (Long address = 0x700000; address < 0x700000 + emulator.rom.saveRamSize; ++address) {
+                    for (int address = 0x700000; address < 0x700000 + emulator.rom.saveRamSize; ++address) {
                         file << emulator.cpuState.getMemoryByte(address) << ' ';
                     }
                     std::cout << "*";
@@ -62,7 +62,6 @@ public:
         , input(input)
         , error(error)
         , video(output)
-        , rendererLock(video.renderer.pixelBufferMutex)
         , rom(rom)
         , cpuState()
         , spcState()
@@ -71,8 +70,8 @@ public:
         , debugger(output, input, error, registers, audio, masterCycle, running)
         , cpuInstructionDecoder(cpuState)
         , spcInstructionDecoder(spcState)
-        , cpuContext("cpu.txt", System::Green)
-        , spcContext("spc.txt", System::Magenta)
+        , cpuContext("cpu.txt", System::Green, debugger)
+        , spcContext("spc.txt", System::Magenta, debugger)
         , saveRamSaver(*this)
     {
     }
@@ -99,7 +98,7 @@ public:
 
     void pause()
     {
-        cpuContext.stepMode = true;
+        cpuContext.setPaused(true);
     }
 
 private:
@@ -125,7 +124,5 @@ private:
 
     SaveRamSaver saveRamSaver;
     std::thread saveRamSaverThread;
-
-    std::unique_lock<std::mutex> rendererLock;
 };
 

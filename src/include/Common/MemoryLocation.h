@@ -181,7 +181,9 @@ public:
 
     Word getWordValue() const
     {
-        return Word(this[0].getValue(), this[1].getValue());
+        Byte lowByte = this[0].getValue();
+        Byte highByte = this[1].getValue();
+        return Word(lowByte, highByte);
     }
 
     void setMappings(MemoryLocation* readMapping, MemoryLocation* writeMapping, Type type)
@@ -289,13 +291,14 @@ private:
     MemoryLocation* mirroredMemory = nullptr;
     Type type = Invalid;
     int applicationCount = 0;
-    MemoryLocation* nextInMemory = nullptr;
-    MemoryLocation* nextInBank = nullptr;
-    MemoryLocation* nextInPage = nullptr;
 
     std::function<void(Operation operation)> breakpoint = nullptr;
 
 public:
+    MemoryLocation* nextInMemory = nullptr;
+    MemoryLocation* nextInBank = nullptr;
+    MemoryLocation* nextInPage = nullptr;
+
     std::function<void(Byte& value)> onRead = nullptr;
     std::function<void(Byte oldValue, Byte& newValue)> onWrite = nullptr;
     std::function<void(Byte& value)> onApply = nullptr;

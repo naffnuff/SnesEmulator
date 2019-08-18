@@ -16,9 +16,9 @@ public:
 #ifdef DEBUGOAM
     OamViewer(Video& video, int windowXPosition, int windowYPosition)
         : video(video)
-        , renderer(0x100, 0x80, 2.f, true, video.output)
+        , renderer(windowXPosition, windowYPosition, 0x100, 0x80, 2.f, true, video.output)
     {
-        thread = std::thread([this, windowXPosition, windowYPosition]() { run(windowXPosition, windowYPosition); });
+        thread = std::thread(std::ref(*this));
     }
 
     ~OamViewer()
@@ -27,9 +27,10 @@ public:
         thread.join();
     }
 
-    void run(int windowXPosition, int windowYPosition)
+    void operator()()
     {
-        renderer.initialize("OAM viewer", windowXPosition, windowYPosition);
+        renderer.title = "OAM viewer";
+        renderer.initialize();
         while (running && renderer.isRunning()) {
             renderer.update();
         }
@@ -72,7 +73,7 @@ public:
                                 paletteIndex.setBit(3, secondHighByte.getBit(7 - column));
                             }
                             if (paletteIndex > 0) {
-                                Word colorAddress = 0x80 + std::pow(2, bpp) * object.palette + paletteIndex;
+                                Word colorAddress = 0x80 + (1 << bpp) * object.palette + paletteIndex;
                                 Word color = video.cgram.readWord(colorAddress);
                                 if (object.horizontalFlip) {
                                     renderer.setPixel(displayRow, columnOffset + objectSize - 1 - displayColumnOffset - column, color);
@@ -114,9 +115,9 @@ public:
     BackgroundViewer(Video& video, Layer backgroundLayer, int windowXPosition, int windowYPosition)
         : video(video)
         , backgroundLayer(backgroundLayer)
-        , renderer(Video::rendererWidth * 2, Video::rendererWidth * 2, 1.f, true, video.output)
+        , renderer(windowXPosition, windowYPosition, Video::rendererWidth * 2, Video::rendererWidth * 2, 1.f, true, video.output)
     {
-        thread = std::thread([this, windowXPosition, windowYPosition]() { run(windowXPosition, windowYPosition); });
+        thread = std::thread(std::ref(*this));
     }
 
     ~BackgroundViewer()
@@ -125,9 +126,10 @@ public:
         thread.join();
     }
 
-    void run(int windowXPosition, int windowYPosition)
+    void operator()()
     {
-        renderer.initialize(std::string("Background ") + char('1' + backgroundLayer) + " viewer", windowXPosition, windowYPosition);
+        renderer.title = std::string("Background ") + char('1' + backgroundLayer) + " viewer";
+        renderer.initialize();
         while (running && renderer.isRunning()) {
             renderer.update();
         }
@@ -136,6 +138,14 @@ public:
     void update()
     {
         std::lock_guard lock(renderer.pixelBufferMutex);
+
+        if (backgroundLayer == BackgroundLayer1 && video.backgroundMode == 7) {
+            renderer.clearDisplay(0x3ff);
+            return;
+        }
+        else {
+            renderer.clearDisplay(0);
+        }
 
         Video::Background& background = video.backgrounds[backgroundLayer];
 
@@ -160,7 +170,7 @@ public:
                         bool horizontalFlip = tileData.getBit(14);
                         bool verticalFlip = tileData.getBit(15);
                         Word tileAddress = background.characterAddress + (tileNumber * tileSize * background.bitsPerPixel / 2);
-                        int paletteAddress = std::pow(2, background.bitsPerPixel) * palette;
+                        int paletteAddress = (1 << background.bitsPerPixel) * palette;
                         for (int row = 0; row < 8; ++row) {
                             Byte firstLowByte(video.vram.lowTable[tileAddress + row]);
                             Byte firstHighByte(video.vram.highTable[tileAddress + row]);
@@ -215,9 +225,9 @@ public:
     SpriteLayerViewer(Video& video, int priority, int windowXPosition, int windowYPosition)
         : video(video)
         , priority(priority)
-        , renderer(Video::rendererWidth, Video::rendererHeight, 1.f, true, video.output)
+        , renderer(windowXPosition, windowYPosition, Video::rendererWidth, Video::rendererHeight, 1.f, true, video.output)
     {
-        thread = std::thread([this, windowXPosition, windowYPosition]() { run(windowXPosition, windowYPosition); });
+        thread = std::thread(std::ref(*this));
     }
 
     ~SpriteLayerViewer()
@@ -226,9 +236,10 @@ public:
         thread.join();
     }
 
-    void run(int windowXPosition, int windowYPosition)
+    void operator()()
     {
-        renderer.initialize(std::string("Sprites prio ") + char('1' + priority) + " viewer", windowXPosition, windowYPosition);
+        renderer.title = std::string("Sprites prio ") + char('1' + priority) + " viewer";
+        renderer.initialize();
         while (running && renderer.isRunning()) {
             renderer.update();
         }
@@ -327,9 +338,9 @@ public:
 #ifdef DEBUGMODE7
     Mode7Viewer(Video& video, int windowXPosition, int windowYPosition)
         : video(video)
-        , renderer(1024, 1024, 1.f, true, video.output)
+        , renderer(windowXPosition, windowYPosition, 1024, 1024, 1.f, true, video.output)
     {
-        thread = std::thread([this, windowXPosition, windowYPosition]() { run(windowXPosition, windowYPosition); });
+        thread = std::thread(std::ref(*this));
     }
 
     ~Mode7Viewer()
@@ -338,9 +349,10 @@ public:
         thread.join();
     }
 
-    void run(int windowXPosition, int windowYPosition)
+    void operator()()
     {
-        renderer.initialize("Mode 7 viewer", windowXPosition, windowYPosition);
+        renderer.title = "Mode 7 viewer";
+        renderer.initialize();
         while (running && renderer.isRunning()) {
             renderer.update();
         }

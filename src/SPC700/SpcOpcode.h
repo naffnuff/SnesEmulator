@@ -3504,7 +3504,6 @@ class SET1_62 : public AddressMode::Direct<Operator::SET1<3, true>>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("SET1_62");
         return  4 + applyOperand();
     }
 

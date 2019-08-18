@@ -110,10 +110,12 @@ public:
                         byteCount = 1;
                     }
                     else if (transferMode == 1) {
-                        Word data = sourceLocation->getWordValue();
-                        registerLocation->setWordValue(data);
-
-                        byteCount = 2;
+                        registerLocation->setValue(sourceLocation->getValue());
+                        byteCount = 1;
+                        if (dataSize > 1) {
+                            registerLocation->nextInMemory->setValue(sourceLocation->nextInBank->getValue());
+                            byteCount = 2;
+                        }
                     }
                     else {
                         error << "DMA control: " << dmaControl << std::endl;
@@ -139,7 +141,6 @@ public:
                 }
             }
         }
-        iteration = 0;
         return cycles;
     }
 
@@ -148,9 +149,15 @@ public:
         return blockedInstruction->size();
     }
 
-    bool enabled() const
+    bool enabled()
     {
-        return dmaEnabled.getValue();
+        if (dmaEnabled.getValue()) {
+            return true;
+        }
+        else {
+            iteration = 0;
+            return false;
+        }
     }
 
 public:
