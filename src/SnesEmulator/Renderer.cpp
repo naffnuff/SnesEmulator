@@ -20,7 +20,7 @@ void Renderer::initialize(bool fullscreen, bool aspectCorrection)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
 
-    const float aspectCorrectionFactor = aspectCorrection ? (float(height) / float(width)) * (4.0 / 3.0) : 1.0;
+    const float aspectCorrectionFactor = aspectCorrection ? (float(height) / float(width)) * (4.f / 3.f) : 1.f;
     if (fullscreen) {
         GLFWmonitor* monitor = glfwGetPrimaryMonitor();
         const GLFWvidmode* mode = glfwGetVideoMode(monitor);
@@ -74,10 +74,10 @@ void Renderer::setWindowProperties(bool fullscreen, bool aspectRatioCorrection)
     }
     else {
         yScale = scale;
-        const float aspectCorrectionFactor = aspectRatioCorrection ? (float(height) / float(width)) * (4.0 / 3.0) : 1.0;
+        const float aspectCorrectionFactor = aspectRatioCorrection ? (float(height) / float(width)) * (4.f / 3.f) : 1.f;
         xScale = yScale * aspectCorrectionFactor;
         xScreenCoverage = 1.0;
-        glfwSetWindowMonitor(window, nullptr, windowXPosition, windowYPosition, int(float(width) * xScale + 0.5), int(float(height) * yScale + 0.5), 0);
+        glfwSetWindowMonitor(window, nullptr, windowXPosition, windowYPosition, int(float(width) * xScale + .5f), int(float(height) * yScale + .5f), 0);
     }
 }
 

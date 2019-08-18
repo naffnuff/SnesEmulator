@@ -254,15 +254,9 @@ public:
 
         makeWriteRegister(0x211a, "Mode 7 Settings", true,
             [this](Byte value) {
-                if (value.getBit(0)) {
-                    throw Video::NotYetImplementedException("Register 211a: Horizontal mirroring");
-                }
-                if (value.getBit(1)) {
-                    throw Video::NotYetImplementedException("Register 211a: Vertical mirroring");
-                }
-                if (value.getBit(6)) {
-                    throw Video::NotYetImplementedException("Register 211a: Empty space fill");
-                }
+                video.mode7HorizontalMirroring = value.getBit(0);
+                video.mode7VerticalMirroring = value.getBit(1);
+                video.mode7EmptySpaceFill = value.getBit(6);
                 video.mode7PlayingFieldSize = value.getBit(7);
             });
 
