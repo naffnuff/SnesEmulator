@@ -483,7 +483,7 @@ public:
         if (distanceFromTop >= 0 && distanceFromTop < objectSize) {
             objectY -= rendererWidth;
         }
-        int row = displayRow - objectY;
+        int row = displayRow - objectY - 1;
         if (row >= 0 && row < objectSize) {
             if (object.verticalFlip) {
                 row = objectSize - 1 - row;
