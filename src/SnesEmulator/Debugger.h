@@ -131,7 +131,7 @@ public:
             output << "Breakpoint removed at address " << breakpoint << std::endl;
         }
         else {
-            memory->setBreakpoint([this, &context, &state, breakpoint, memory](MemoryLocation::Operation operation) {
+            memory->setBreakpoint([this, &context, &state, breakpoint](MemoryLocation::Operation operation, Byte value) {
                 if (operation == MemoryLocation::Apply) {
                     context.setPaused(true);
                     output << "Apply: Breakpoint hit @ " << breakpoint << std::endl;
@@ -143,11 +143,8 @@ public:
                     context.stepMode = true;
                     output << "Read: Breakpoint hit @ " << breakpoint << std::endl;
                 }*/
-                /*else if (operation == MemoryLocation::Write && registers.video.backgroundModeAndCharacterSize.getBits(0, 3) == 7 && registers.vramStartAddress == 0) {
-                    if (!context.stepMode) {
-                        state.setProgramAddress(context.getLastKnownAddress());
-                    }
-                    context.stepMode = true;
+                /*else if (operation == MemoryLocation::Write && registers.video.vram.address == 0x7ee1 && (value == 0 || value == 0xdf)) {
+                    context.setPaused(true);
                     output << "Write: Breakpoint hit @ " << breakpoint << std::endl;
                 }*/
             });
@@ -418,13 +415,13 @@ public:
         int vramAddress = inspectedVideoMemory & 0xFF80;
         int dspAddress = 0;
         for (int i = 0; i < 16; ++i) {
-            if (vramAddress < video.vram.lowTable.size()) {
+            if (vramAddress < video.vram.size) {
                 uint16_t lowAddress(vramAddress);
                 lowAddress = lowAddress >> 4;
                 output << "   " << std::hex << std::setw(3) << std::setfill('0') << lowAddress << "x  " << std::dec;
 
-                for (int j = 0; j < 8 && vramAddress < video.vram.lowTable.size(); ++j) {
-                    Word memory(video.vram.lowTable[vramAddress], video.vram.highTable[vramAddress]);
+                for (int j = 0; j < 8 && vramAddress < video.vram.size; ++j) {
+                    Word memory = video.vram.getWord(vramAddress);
                     output << memory << ' ';
                     ++vramAddress;
                 }

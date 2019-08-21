@@ -298,7 +298,6 @@ public:
         makeWriteRegister(0x2122, "CGRAM Data Write", false,
             [this](Byte value) {
                 Word cgramAddress = video.cgram.address;
-                bool cgramHighTable = video.cgram.highTableSelect;
 
                 video.cgram.writeByte(value);
 

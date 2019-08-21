@@ -54,28 +54,41 @@ public:
     struct Table
     {
         Table(Word size)
-            : lowTable(size)
+            : size(size)
+            , lowTable(size)
             , highTable(size)
         {
         }
+
+        Table(const Table&) = delete;
+        Table& operator=(const Table&) = delete;
 
         void setAddress(Word value)
         {
             address = value;
         }
 
-        Word readWord(Word address) const
+        Byte getByte(Word address, bool highTableSelect) const
         {
-            if (address >= lowTable.size()) {
-                throw MemoryLocation::AccessException("Video::Table::readWord: Video-memory table out-of-bounds @ " + Util::toString(+address) + ", size=" + Util::toString(lowTable.size()));
+            const std::vector<Byte>& table = highTableSelect ? highTable : lowTable;
+            if (address >= size) {
+                throw MemoryLocation::AccessException("Video::Table::getByte: Video-memory table out-of-bounds @ " + Util::toString(address) + ", size=" + Util::toString(size));
+            }
+            return table[address];
+        }
+
+        Word getWord(Word address) const
+        {
+            if (address >= size) {
+                throw MemoryLocation::AccessException("Video::Table::getWord: Video-memory table out-of-bounds @ " + Util::toString(address) + ", size=" + Util::toString(size));
             }
             return Word(lowTable[address], highTable[address]);
         }
 
         Word readNextWord(int increment)
         {
-            if (address >= lowTable.size()) {
-                throw MemoryLocation::AccessException("Video::Table::readNextWord: Video-memory table out-of-bounds @ " + Util::toString(+address) + ", size=" + Util::toString(lowTable.size()));
+            if (address >= size) {
+                throw MemoryLocation::AccessException("Video::Table::readNextWord: Video-memory table out-of-bounds @ " + Util::toString(address) + ", size=" + Util::toString(size));
             }
             Word result = Word(lowTable[address], highTable[address]);
             address += increment;
@@ -84,8 +97,16 @@ public:
 
         void writeWord(Word data)
         {
-            if (address >= lowTable.size()) {
-                throw MemoryLocation::AccessException("Video::Table::writeWord: Video-memory table out-of-bounds @ " + Util::toString(+address) + ", size=" + Util::toString(lowTable.size()));
+            /*if (address == 0x7ee0) {
+                if (data == 0xdf20) {
+                    std::cout << "Video::Table::writeWord: " << "Nice" << std::endl;
+                }
+                else if (data == 0x0020) {
+                    std::cout << "Video::Table::writeWord: " << "BOOM!" << std::endl;
+                }
+            }*/
+            if (address >= size) {
+                throw MemoryLocation::AccessException("Video::Table::writeWord: Video-memory table out-of-bounds @ " + Util::toString(address) + ", size=" + Util::toString(size));
             }
             lowTable[address] = data.getLowByte();
             highTable[address] = data.getHighByte();
@@ -94,9 +115,17 @@ public:
 
         void writeByte(Byte data, bool highTableSelect, int increment)
         {
+            /*if (address == 0x7ee0 && highTableSelect && lowTable[0x7ee0] == 0x20) {
+                if (data == 0xdf) {
+                    std::cout << "Video::Table::writeByte: " << "Snajs" << std::endl;
+                }
+                else if (data == 0x00) {
+                    std::cout << "Video::Table::writeByte: " << "BOOMIO!" << std::endl;
+                }
+            }*/
             std::vector<Byte>& table = highTableSelect ? highTable : lowTable;
-            if (address >= table.size()) {
-                throw MemoryLocation::AccessException("Video::Table::writeByte: Video-memory table out-of-bounds @ " + Util::toString(+address) + ", size=" + Util::toString(table.size()));
+            if (address >= size) {
+                throw MemoryLocation::AccessException("Video::Table::writeByte: Video-memory table out-of-bounds @ " + Util::toString(address) + ", size=" + Util::toString(size));
             }
             table[address] = data;
             address += increment;
@@ -108,9 +137,11 @@ public:
             highTableSelect = !highTableSelect;
         }
 
+        const Word size = 0;
+        Word address = 0;
+    private:
         std::vector<Byte> lowTable;
         std::vector<Byte> highTable;
-        Word address = 0;
         bool highTableSelect = false;
     };
 
@@ -329,7 +360,7 @@ public:
 
     void drawMode(const std::vector<ModeEntry>& modeEntries, int displayRow, bool mode7 = false)
     {
-        Word backdropColor = cgram.readWord(0);
+        Word backdropColor = cgram.getWord(0);
         Word fixedColor = clearColor;
 
         std::array<WindowSettings, 5> windowSettings;
@@ -422,9 +453,9 @@ public:
                 const int column = fieldColumn & 7;
                 if ((fieldRow >= 0 || fieldRow < 1024) && (fieldColumn >= 0 || fieldColumn < 1024)) {
                     const Word tileDataAddress = (tileRow << 7) + tileColumn;
-                    const Byte tileData = vram.lowTable[tileDataAddress];
+                    const Byte tileData = vram.getByte(tileDataAddress, false);
                     const Word pixelDataAddress = (tileData << 6) + (row << 3) + column;
-                    const Byte pixelData = vram.highTable[pixelDataAddress];
+                    const Byte pixelData = vram.getByte(pixelDataAddress, true);
                     buffer.data[displayColumn] = pixelData;
                 }
                 else {//if (mode7PlayingFieldSize == 0) {
@@ -462,7 +493,7 @@ public:
             if (screenColumn) {
                 tileDataAddress += 0x400;
             }
-            Word tileData = vram.readWord(tileDataAddress);
+            Word tileData = vram.getWord(tileDataAddress);
             int tilePriority = tileData.getBits(13, 1);
             if (priority == tilePriority) {
                 Word tileNumber = tileData.getBits(0, 10);
@@ -531,11 +562,11 @@ public:
                 continue;
             }
             Byte paletteIndex;
-            paletteIndex.setBit(0, vram.lowTable[tileAddress].getBit(7 - column));
-            paletteIndex.setBit(1, vram.highTable[tileAddress].getBit(7 - column));
+            paletteIndex.setBit(0, vram.getByte(tileAddress, false).getBit(7 - column));
+            paletteIndex.setBit(1, vram.getByte(tileAddress, true).getBit(7 - column));
             if (bitsPerPixel >= 4) {
-                paletteIndex.setBit(2, vram.lowTable[tileAddress + 8].getBit(7 - column));
-                paletteIndex.setBit(3, vram.highTable[tileAddress + 8].getBit(7 - column));
+                paletteIndex.setBit(2, vram.getByte(tileAddress + 8, false).getBit(7 - column));
+                paletteIndex.setBit(3, vram.getByte(tileAddress + 8, true).getBit(7 - column));
             }
             if (paletteIndex > 0) {
                 Byte colorAddress = paletteAddress + paletteIndex;
@@ -562,7 +593,7 @@ public:
             if (designation.getBit(modeEntry.layer)) {
                 Byte colorIndex = buffers.getBuffer(modeEntry.layer, modeEntry.priority).data[displayColumn];
                 if (colorIndex > 0) {
-                    Word color = cgram.readWord(Word(colorIndex));
+                    Word color = cgram.getWord(Word(colorIndex));
                     if (modeEntry.layer == ObjectLayer && colorIndex > 0x80 && colorIndex < 0xc0) {
                         return color;
                     }
@@ -619,7 +650,7 @@ public:
         case Never: return false;
         case OutsideColorWindowOnly: return !insideColorWindow;
         case InsideColorWindowOnly: return insideColorWindow;
-        case Always: return true;
+        default: return true;
         }
     }
 
@@ -630,7 +661,7 @@ public:
         case Never: return false;
         case OutsideColorWindowOnly: return !insideColorWindow;
         case InsideColorWindowOnly: return insideColorWindow;
-        case Always: return true;
+        default: return true;
         }
     }
 
@@ -874,12 +905,12 @@ public:
 
     Object readObject(int index) const
     {
-        Byte lowAddress = index * 2;
-        Byte highAddress = index / 8;
+        Word lowAddress = index * 2;
+        Word highAddress = index / 8;
         Byte highTableOffset = index % 8;
-        Word firstWord(oam.lowTable[lowAddress], oam.highTable[lowAddress]);
-        Word secondWord(oam.lowTable[lowAddress + 1], oam.highTable[lowAddress + 1]);
-        Word thirdWord(oam.lowTable[0x100 | highAddress], oam.highTable[0x100 | highAddress]);
+        Word firstWord = oam.getWord(lowAddress);
+        Word secondWord = oam.getWord(lowAddress + 1);
+        Word thirdWord = oam.getWord(0x100 | highAddress);
         Object result;
         result.sizeSelect = thirdWord.getBit(highTableOffset * 2 + 1);
         result.x = thirdWord.getBit(highTableOffset * 2) << 8 | firstWord.getLowByte();

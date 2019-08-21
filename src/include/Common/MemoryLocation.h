@@ -112,7 +112,7 @@ public:
             value = newValue;
         }
         if (breakpoint) {
-            breakpoint(Write);
+            breakpoint(Write, newValue);
         }
     }
 
@@ -139,7 +139,7 @@ public:
             onRead(result);
         }
         if (breakpoint) {
-            breakpoint(Read);
+            breakpoint(Read, result);
         }
 
         return result;
@@ -167,7 +167,7 @@ public:
             onApply(result);
         }
         if (breakpoint) {
-            breakpoint(Apply);
+            breakpoint(Apply, result);
         }
 
         return result;
@@ -253,7 +253,7 @@ public:
         //value = resetValue;
     //}
 
-    void setBreakpoint(std::function<void(Operation operation)> value)
+    void setBreakpoint(std::function<void(Operation operation, Byte value)> value)
     {
         if (mirroredMemory) {
             mirroredMemory->setBreakpoint(value);
@@ -292,7 +292,7 @@ private:
     Type type = Invalid;
     int applicationCount = 0;
 
-    std::function<void(Operation operation)> breakpoint = nullptr;
+    std::function<void(Operation operation, Byte value)> breakpoint = nullptr;
 
 public:
     MemoryLocation* nextInMemory = nullptr;

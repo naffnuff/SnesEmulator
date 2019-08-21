@@ -40,7 +40,7 @@ public:
     {
         std::lock_guard lock(renderer.pixelBufferMutex);
 
-        renderer.clearDisplay(0);
+        renderer.clearDisplay(0x7c1f);
 
         int rowOffset = 0;
         int columnOffset = 0;
@@ -248,9 +248,13 @@ public:
     void update()
     {
         std::lock_guard lock(renderer.pixelBufferMutex);
-        renderer.clearDisplay(0);
+        renderer.clearDisplay(0x7c1f);
+        int firstObjectIndex = 0;
+        if (video.objectPriority) {
+            firstObjectIndex = video.oam.address * 2;
+        }
         for (int i = 127; i >= 0; --i) {
-            Video::Object object = video.readObject(i);
+            Video::Object object = video.readObject((i + firstObjectIndex) % 128);
             if (object.priority != priority) {
                 continue;
             }
