@@ -97,14 +97,6 @@ public:
 
         void writeWord(Word data)
         {
-            /*if (address == 0x7ee0) {
-                if (data == 0xdf20) {
-                    std::cout << "Video::Table::writeWord: " << "Nice" << std::endl;
-                }
-                else if (data == 0x0020) {
-                    std::cout << "Video::Table::writeWord: " << "BOOM!" << std::endl;
-                }
-            }*/
             if (address >= size) {
                 throw MemoryLocation::AccessException("Video::Table::writeWord: Video-memory table out-of-bounds @ " + Util::toString(address) + ", size=" + Util::toString(size));
             }
@@ -115,14 +107,6 @@ public:
 
         void writeByte(Byte data, bool highTableSelect, int increment)
         {
-            /*if (address == 0x7ee0 && highTableSelect && lowTable[0x7ee0] == 0x20) {
-                if (data == 0xdf) {
-                    std::cout << "Video::Table::writeByte: " << "Snajs" << std::endl;
-                }
-                else if (data == 0x00) {
-                    std::cout << "Video::Table::writeByte: " << "BOOMIO!" << std::endl;
-                }
-            }*/
             std::vector<Byte>& table = highTableSelect ? highTable : lowTable;
             if (address >= size) {
                 throw MemoryLocation::AccessException("Video::Table::writeByte: Video-memory table out-of-bounds @ " + Util::toString(address) + ", size=" + Util::toString(size));
@@ -327,7 +311,7 @@ public:
     void drawScanline(int vCounter)
     {
         if (screenDisplay.getBit(7)) {
-            renderer.clearScanline(vCounter, 0);
+            renderer.clearScanline(vCounter - 1, 0);
             return;
         }
         if (characterSize.getBits(4, 4) != 0) {

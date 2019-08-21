@@ -56,7 +56,11 @@ public:
     void setPixel(int row, int column, Pixel pixel)
     {
         row = height - 1 - row;
-        pixelBuffer[row * width + column] = pixel;
+        int index = row * width + column;
+        if (index < 0 || index >= pixelBuffer.size()) {
+            throw std::logic_error("Renderer: Index out of bounds in pixel buffer");
+        }
+        pixelBuffer[index] = pixel;
     }
 
     void setGrayscalePixel(int row, int column, uint8_t white)
