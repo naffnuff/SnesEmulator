@@ -985,7 +985,6 @@ class CMP_C3 : public AddressMode::StackRelative<Operator::CMP>
     // 2   5-m         stk,S     m.....mm . CMP $32,S
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("CMP_C3");
         return 4 + applyOperand();
     }
 

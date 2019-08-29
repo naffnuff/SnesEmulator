@@ -16,7 +16,7 @@ public:
 #ifdef DEBUGOAM
     OamViewer(Video& video, int windowXPosition, int windowYPosition)
         : video(video)
-        , renderer(windowXPosition, windowYPosition, 0x100, 0x80, 2.f, true, video.output)
+        , renderer(windowXPosition, windowYPosition, 0x80, 0x100, 2.f, true, video.output)
     {
         thread = std::thread(std::ref(*this));
     }
@@ -74,7 +74,7 @@ public:
                             }
                             if (paletteIndex > 0) {
                                 Word colorAddress = 0x80 + (1 << bpp) * object.palette + paletteIndex;
-                                Word color = video.cgram.readWord(colorAddress);
+                                Word color = video.cgram.getWord(colorAddress);
                                 if (object.horizontalFlip) {
                                     renderer.setPixel(displayRow, columnOffset + objectSize - 1 - displayColumnOffset - column, color);
                                 }
@@ -311,7 +311,7 @@ public:
                             }
                             if (paletteIndex > 0) {
                                 Word colorAddress = paletteAddress + paletteIndex;
-                                int color = video.cgram.readWord(colorAddress);
+                                int color = video.cgram.getWord(colorAddress);
                                 renderer.setPixel(displayRow, displayColumn, color);
                             }
                         }

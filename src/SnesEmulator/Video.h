@@ -19,6 +19,14 @@ public:
         }
     };
 
+    struct MemoryAccessException : std::logic_error
+    {
+        MemoryAccessException(const std::string& message)
+            : std::logic_error("Bad video memory access: " + message)
+        {
+        }
+    };
+
     struct RendererRunner
     {
         RendererRunner(Video& video, std::ostream& output)
@@ -47,7 +55,7 @@ public:
         Video& video;
         bool running = false;
         std::string gameTitle;
-        bool fullscreen = false;
+        bool fullscreen = true;
         bool aspectRatioCorrection = true;
     };
 
@@ -72,7 +80,7 @@ public:
         {
             const std::vector<Byte>& table = highTableSelect ? highTable : lowTable;
             if (address >= size) {
-                throw MemoryLocation::AccessException("Video::Table::getByte: Video-memory table out-of-bounds @ " + Util::toString(address) + ", size=" + Util::toString(size));
+                throw MemoryAccessException("Video::Table::getByte: Video-memory table out-of-bounds @ " + Util::toString(address) + ", size=" + Util::toString(size));
             }
             return table[address];
         }
@@ -80,7 +88,7 @@ public:
         Word getWord(Word address) const
         {
             if (address >= size) {
-                throw MemoryLocation::AccessException("Video::Table::getWord: Video-memory table out-of-bounds @ " + Util::toString(address) + ", size=" + Util::toString(size));
+                throw MemoryAccessException("Video::Table::getWord: Video-memory table out-of-bounds @ " + Util::toString(address) + ", size=" + Util::toString(size));
             }
             return Word(lowTable[address], highTable[address]);
         }
@@ -88,7 +96,7 @@ public:
         Word readNextWord(int increment)
         {
             if (address >= size) {
-                throw MemoryLocation::AccessException("Video::Table::readNextWord: Video-memory table out-of-bounds @ " + Util::toString(address) + ", size=" + Util::toString(size));
+                throw MemoryAccessException("Video::Table::readNextWord: Video-memory table out-of-bounds @ " + Util::toString(address) + ", size=" + Util::toString(size));
             }
             Word result = Word(lowTable[address], highTable[address]);
             address += increment;
@@ -98,7 +106,7 @@ public:
         void writeWord(Word data)
         {
             if (address >= size) {
-                throw MemoryLocation::AccessException("Video::Table::writeWord: Video-memory table out-of-bounds @ " + Util::toString(address) + ", size=" + Util::toString(size));
+                throw MemoryAccessException("Video::Table::writeWord: Video-memory table out-of-bounds @ " + Util::toString(address) + ", size=" + Util::toString(size));
             }
             lowTable[address] = data.getLowByte();
             highTable[address] = data.getHighByte();
@@ -109,7 +117,7 @@ public:
         {
             std::vector<Byte>& table = highTableSelect ? highTable : lowTable;
             if (address >= size) {
-                throw MemoryLocation::AccessException("Video::Table::writeByte: Video-memory table out-of-bounds @ " + Util::toString(address) + ", size=" + Util::toString(size));
+                throw MemoryAccessException("Video::Table::writeByte: Video-memory table out-of-bounds @ " + Util::toString(address) + ", size=" + Util::toString(size));
             }
             table[address] = data;
             address += increment;
@@ -123,7 +131,6 @@ public:
 
         const Word size = 0;
         Word address = 0;
-    private:
         std::vector<Byte> lowTable;
         std::vector<Byte> highTable;
         bool highTableSelect = false;
@@ -435,14 +442,14 @@ public:
                 const int fieldColumn = int(mode7MatrixA * vectorElement1 + mode7MatrixB * vectorElement2 + mode7CenterX + .5f);
                 const int tileColumn = fieldColumn >> 3;
                 const int column = fieldColumn & 7;
-                if ((fieldRow >= 0 || fieldRow < 1024) && (fieldColumn >= 0 || fieldColumn < 1024)) {
+                if (fieldRow >= 0 && fieldRow < 1024 && fieldColumn >= 0 && fieldColumn < 1024) {
                     const Word tileDataAddress = (tileRow << 7) + tileColumn;
                     const Byte tileData = vram.getByte(tileDataAddress, false);
                     const Word pixelDataAddress = (tileData << 6) + (row << 3) + column;
                     const Byte pixelData = vram.getByte(pixelDataAddress, true);
                     buffer.data[displayColumn] = pixelData;
                 }
-                else {//if (mode7PlayingFieldSize == 0) {
+                else if (mode7PlayingFieldSize == 0) {
                     throw Video::NotYetImplementedException("Mode 7 wraparound");
                 }
             }

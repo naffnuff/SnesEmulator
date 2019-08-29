@@ -1,4 +1,7 @@
 #include "System.h"
+#include "MemoryLocation.h"
+
+uint64_t MemoryLocation::maxApplicationCount;
 
 namespace System {
 
@@ -10,6 +13,13 @@ void setOutputColor(std::ostream&, Color color, bool bright)
         effectiveColor |= FOREGROUND_INTENSITY;
     }
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), effectiveColor);
+}
+
+void focusConsoleWindow()
+{
+    if (HWND window = GetConsoleWindow()) {
+        SetForegroundWindow(window);
+    }
 }
 #else
 void setOutputColor(std::ostream& output, Color color, bool bright)

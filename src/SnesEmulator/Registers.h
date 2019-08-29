@@ -227,7 +227,15 @@ public:
                 incrementVramOnHighByte = value.getBit(7);
             });
 
-        makeWriteRegister(0x2116, "VRAM Address", false, video.vram.address);
+        makeWriteRegister(0x2116, "VRAM Address low byte", false, 
+            [this](Byte value) {
+                video.vram.address.setLowByte(value);
+            });
+
+        makeWriteRegister(0x2117, "VRAM Address high byte", false,
+            [this](Byte value) {
+                video.vram.address.setHighByte(value & 0x7f);
+            });
 
         /*makeWriteRegister(0x2116, "VRAM Address low byte", false,
             [this](Byte value) {
@@ -319,7 +327,7 @@ public:
         makeWriteRegister(0x212d, "Subscreen Designation", false, video.subscreenDesignation);
         makeWriteRegister(0x212e, "Window Mask Designation for the Main Screen", true, video.mainScreenWindowMaskDesignation);
         makeWriteRegister(0x212f, "Window Mask Designation for the Subscreen", true, video.subscreenWindowMaskDesignation);
-        makeWriteRegister(0x2130, "Color Addition Select", true,
+        makeWriteRegister(0x2130, "Color Addition Select", false,
             [this](Byte value) {
                 video.directColorMode = value.getBit(0);
                 video.addSubscreen = value.getBit(1);
@@ -409,8 +417,13 @@ public:
 
         makeWriteRegister(0x2181, "WRAM Address", false, wramAddress);
 
-        makeReadWriteRegister(0x4016, "NES-style Joypad Access Port 1", true);
-        makeReadWriteRegister(0x4017, "NES-style Joypad Access Port 2", true);
+        makeWriteRegister(0x4016, "NES-style Joypad Access Port 1", true,
+            [this](Byte value) {
+                if (value > 0) {
+                    throw Video::NotYetImplementedException("Register 4016: Latch on");
+                }
+            });
+        makeWriteRegister(0x4017, "NES-style Joypad Access Port 2", true);
 
         makeWriteRegister(0x4200, "Interrupt Enable Flags", false,
             [this](Byte value) {
@@ -425,6 +438,9 @@ public:
                     horizontalScanlineLocation.value = hCounter;
                     verticalScanlineLocation.value = vCounter;
                     externalLatch = true;
+                }
+                if (value.getBit(6)) {
+                    throw Video::NotYetImplementedException("Register 4201: bit 6");
                 }
                 programmableIOPort = value;
             });
@@ -472,6 +488,7 @@ public:
             [this](Byte& value) {
                 value.setBit(7, vBlank);
                 value.setBit(6, hBlank);
+                value.setBit(0, autoJoypadReadEnabled && vCounter >= 225 && vCounter < 228);
             });
 
         makeReadRegister(0x4214, "Quotient of Divide Result", false, quotient);
@@ -614,6 +631,8 @@ public:
 
         mode7Buffer = 0;
         mode7Multiplicand = 0;
+
+        video.vram.address = 0;
     }
 
     std::ostream& output;

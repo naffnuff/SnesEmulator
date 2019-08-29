@@ -358,13 +358,18 @@ public:
     {
         getIndexRegister<Register>() = value;
         forceRegisters();
-        updateSignFlags(value);
+        if (getFlag(x)) {
+            updateSignFlags(Byte(value));
+        }
+        else {
+            updateSignFlags(value);
+        }
     }
 
     template<IndexRegister Register>
     void setIndexRegister(Byte value)
     {
-        getIndexRegister<Register>() = Word(value);
+        getIndexRegister<Register>() = Word(value, 0);
         updateSignFlags(value);
     }
 
@@ -512,7 +517,7 @@ public:
     void reset()
     {
         for (int i = 0; i < memory.size(); ++i) {
-            //memory[i].reset();
+            memory[i].reset();
         }
 
         dataBank = 0;

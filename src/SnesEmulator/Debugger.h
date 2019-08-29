@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <algorithm>
 
 #include "Common/System.h"
 
@@ -9,7 +10,32 @@
 #include "SPC700/Audio.h"
 
 #include "Video.h"
+#include "VideoDebugger.h"
 #include "Registers.h"
+
+struct Breakpoint
+{
+    Long address;
+    uint64_t applicationCount = 0;
+    int argumentValue = -1;
+
+    bool operator<(const Breakpoint& breakpoint) const
+    {
+        return address < breakpoint.address;
+    }
+};
+
+inline std::ostream& operator<<(std::ostream& o, const Breakpoint& b)
+{
+    o << "@" << b.address;
+    if (b.applicationCount > 0) {
+        o << "#" << b.applicationCount;
+    }
+    if (b.argumentValue >= 0) {
+        o << ":" << Byte(b.argumentValue);
+    }
+    return o;
+}
 
 class Debugger
 {
@@ -66,10 +92,14 @@ public:
                 if (debugger.registers.video.rendererRunner.fullscreen) {
                     debugger.registers.video.renderer.toggleFullscreenRequested = true;
                 }
+                System::focusConsoleWindow();
             }
-            else if (unlockedMutex) {
-                debugger.registers.video.rendererLock.lock();
-                unlockedMutex = false;
+            else {
+                if (unlockedMutex) {
+                    debugger.registers.video.rendererLock.lock();
+                    unlockedMutex = false;
+                }
+                debugger.registers.video.renderer.focusWindow();
             }
         }
 
@@ -86,7 +116,7 @@ public:
         Long inspectedAddress = 0;
         bool watchMode = true;
         System::Color debugColor;
-        std::set<Long> breakpoints;
+        std::set<Breakpoint> breakpoints;
         const Instruction* nextInstruction;
     private:
         bool stepMode = false;
@@ -114,27 +144,37 @@ public:
         if (contextFile) {
             std::string breakpointString;
             while (std::getline(contextFile, breakpointString, ' ')) {
-                Long breakpoint = std::stoi(breakpointString, 0, 16);
+                int applicationCountIndex = int(breakpointString.find('#'));
+                int argumentValueIndex = int(breakpointString.find(':'));
+                Breakpoint breakpoint;
+                int index = min(applicationCountIndex, argumentValueIndex) - 1;
+                breakpoint.address = std::stoul(breakpointString.substr(1, index), 0, 16);
+                if (applicationCountIndex >= 0) {
+                    breakpoint.applicationCount = std::stoull(breakpointString.substr(applicationCountIndex + 1));
+                }
+                if (argumentValueIndex >= 0) {
+                    breakpoint.argumentValue = std::stoi(breakpointString.substr(argumentValueIndex + 1), 0, 16);
+                }
                 output << "Read breakpoint: " << breakpoint << " from " << context.fileName << std::endl;
-                toggleBreakpoint(context, state, breakpoint);
+                MemoryLocation* memory = state.getMemoryLocation(breakpoint.address);
+                toggleBreakpoint(context, memory, breakpoint);
             }
         }
     }
 
-    template<typename State>
-    void toggleBreakpoint(Context& context, State& state, Long breakpoint)
+    void toggleBreakpoint(Context& context, MemoryLocation* memory, const Breakpoint& breakpoint)
     {
-        MemoryLocation* memory = state.getMemoryLocation(breakpoint);
         if (memory->hasBreakpoint()) {
             memory->setBreakpoint(nullptr);
             context.breakpoints.erase(breakpoint);
-            output << "Breakpoint removed at address " << breakpoint << std::endl;
+            output << "Breakpoint removed at address " << breakpoint.address << std::endl;
         }
         else {
-            memory->setBreakpoint([this, &context, &state, breakpoint](MemoryLocation::Operation operation, Byte value) {
-                if (operation == MemoryLocation::Apply) {
+            memory->setBreakpoint([this, &context, breakpoint](MemoryLocation::Operation operation, Byte value, uint64_t applicationCount) {
+                if (operation == MemoryLocation::Apply && (breakpoint.applicationCount == 0 || breakpoint.applicationCount == applicationCount)) {
+                    //output << "Frame: " << registers.frame << ", V counter: " << registers.vCounter << ", H counter: " << registers.hCounter << ", V blank: " << registers.vBlank << ", H blank: " << registers.hBlank << std::endl;
                     context.setPaused(true);
-                    output << "Apply: Breakpoint hit @ " << breakpoint << std::endl;
+                    output << "Apply: Breakpoint hit " << breakpoint << std::endl;
                 }
                 /*else if (operation == MemoryLocation::Read) {
                     if (!context.stepMode) {
@@ -143,13 +183,14 @@ public:
                     context.stepMode = true;
                     output << "Read: Breakpoint hit @ " << breakpoint << std::endl;
                 }*/
-                /*else if (operation == MemoryLocation::Write && registers.video.vram.address == 0x7ee1 && (value == 0 || value == 0xdf)) {
+                else if (operation == MemoryLocation::Write && (breakpoint.argumentValue == -1 || breakpoint.argumentValue == value)) {
                     context.setPaused(true);
-                    output << "Write: Breakpoint hit @ " << breakpoint << std::endl;
-                }*/
+                    output << "Write: Breakpoint hit " << breakpoint << ":" << value << std::endl;
+                    //output << value << std::endl;
+                }
             });
             context.breakpoints.insert(breakpoint);
-            output << "Breakpoint inserted at address " << breakpoint << std::endl;
+            output << "Breakpoint inserted: " << breakpoint << std::endl;
         }
     }
 
@@ -243,33 +284,40 @@ public:
             running = false;
         }
         else if (command == "clear") {
-            for (Long address : context.breakpoints) {
-                state.getMemoryLocation(address)->setBreakpoint(nullptr);
+            for (const Breakpoint& breakpoint : context.breakpoints) {
+                state.getMemoryLocation(breakpoint.address)->setBreakpoint(nullptr);
             }
             context.breakpoints.clear();
             output << "Cleared context " << context.fileName << std::endl;
             std::ofstream file(context.fileName);
         }
         else if (command[0] == 't') {
-            Long breakpoint = state.getProgramAddress();
+            Breakpoint breakpoint;
+            breakpoint.address = state.getProgramAddress();
+            MemoryLocation* memory = state.getMemoryLocation(breakpoint.address);
             if (command.substr(0, 3) == "ttt") {
-                breakpoint = context.getPreviousAddress(breakpoint);
+                breakpoint.address = context.getPreviousAddress(breakpoint.address);
+                memory = state.getMemoryLocation(breakpoint.address);
+                breakpoint.applicationCount = memory->getApplicationCount();
             }
             else if (command.substr(0, 2) == "tt") {
-                breakpoint += context.nextInstruction->size();
+                breakpoint.address += context.nextInstruction->size();
+                memory = state.getMemoryLocation(breakpoint.address);
+                breakpoint.applicationCount = memory->getApplicationCount();
             }
             else if (command.substr(0, 2) == "t ") {
                 try {
-                    breakpoint = stoi(command.substr(2), 0, 16);
+                    breakpoint.address = stoi(command.substr(2), 0, 16);
+                    memory = state.getMemoryLocation(breakpoint.address);
                 } catch (std::exception& e) {
                     std::cerr << "Not a valid value: " << e.what() << std::endl;
                 }
             }
-            toggleBreakpoint(context, state, breakpoint);
+            toggleBreakpoint(context, memory, breakpoint);
             std::ofstream file(context.fileName);
             if (file) {
-                for (Long breakpoint : context.breakpoints) {
-                    file << breakpoint << " ";
+                for (const Breakpoint& breakpoint : context.breakpoints) {
+                    file << breakpoint << ' ';
                 }
             }
         }
@@ -339,7 +387,8 @@ public:
         state.printRegisters(output) << std::endl;
         output << context.nextInstruction->opcodeToString() << std::endl;
         output << state.readProgramByte() << ": ";
-        output << context.nextInstruction->toString() << std::endl;
+        output << context.nextInstruction->toString();
+        output << " #" << state.getMemory(state.getProgramAddress()).getApplicationCount() << std::endl;
         System::setOutputColor(output, System::DefaultColor, false);
     }
 
@@ -386,15 +435,16 @@ public:
     void printMemory(const CPU::State& cpuState, const Context& cpuContext, const SPC::State& spcState, const Context& spcContext, Video& video)
     {
         System::setOutputColor(output, System::DefaultColor, false);
-        /*int oamAddress = inspectedVideoMemory & 0xFF80;
+        int oamAddress = inspectedVideoMemory & 0xFF80;
         int oamAuxAddress = oamAddress / 8;
         int oamAuxOffset = oamAddress % 8;
-        for (int i = Video::OamViewer::firstObjectIndex; i < Video::OamViewer::firstObjectIndex + 16; ++i) {
+        for (int i = OamViewer::firstObjectIndex; i < OamViewer::firstObjectIndex + 32; ++i) {
             Video::Object object = video.readObject(i);
-            output << "size: " << video.getObjectSize(object.sizeSelect);
+            output << i << ": ";
+            output << " size: " << video.getObjectSize(object.sizeSelect);
             output << ", x: " << object.x;
             output << ", y: " << object.y;
-            output << ", tile: " << object.tileIndex;
+            output << ", tile: " << Byte(object.tileIndex);
             output << ", name: " << object.nameTable;
             output << ", palette: " << object.palette;
             output << ", priority: " << object.priority;
@@ -404,10 +454,11 @@ public:
         }
 
         output << "OAM start address: " << registers.oamStartAddress << std::endl;
-        output << "OAM current address: " << registers.video.oam.address << std::endl;*/
+        output << "OAM current address: " << registers.video.oam.address << std::endl;
         output << "Video port control: " << registers.videoPortControl << std::endl;
         //output << "VRAM start address: " << registers.vramStartAddress << std::endl;
         output << "VRAM current address: " << registers.video.vram.address << std::endl;
+        output << "maxApplicationCount: " << MemoryLocation::maxApplicationCount << std::endl;
 
         output << "            0    1    2    3    4    5    6    7" << std::endl
             << "            8    9    a    b    c    d    e    f"
@@ -501,8 +552,8 @@ public:
         for (const Debugger::Context* context : { &cpuContext, &spcContext }) {
             if (!context->breakpoints.empty()) {
                 output << "Breakpoints:";
-                for (Long breakpoint : context->breakpoints) {
-                    output << " " << breakpoint;
+                for (const Breakpoint& breakpoint : context->breakpoints) {
+                    output << " " << breakpoint ;
                 }
                 output << std::endl;
             }

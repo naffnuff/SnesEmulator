@@ -134,6 +134,8 @@ void Emulator::run()
     bool nmiRequested = false;
     bool irqRequested = false;
 
+    //cpuContext.setPaused(true);
+
     double runStartTime = 0.0;
     uint64_t cycleCountDelta = 0;
     bool stepMode = cpuContext.isPaused() || spcContext.isPaused();
@@ -148,203 +150,207 @@ void Emulator::run()
         uint64_t iteration = 0;
         bool dmaActive = false;
         while (running) {
+            try {
+                if (masterCycle == nextCpu) {
 
-            if (masterCycle == nextCpu) {
+                    if (nmiRequested) {
+                        nmiRequested = false;
+                        cpuState.startInterrupt(true);
+                        nextCpu += 9 * 8; // TODO: check the correct cycles for interrupt
+                    }
+                    else if (irqRequested && !cpuState.getFlag(CPU::State::i) && !cpuState.isNmiActive()) {
+                        irqRequested = false;
+                        cpuState.startInterrupt(false);
+                        nextCpu += 9 * 8; // TODO: check the correct cycles for interrupt
+                    }
 
-                if (nmiRequested) {
-                    nmiRequested = false;
-                    cpuState.startInterrupt(true);
-                    nextCpu += 9 * 8; // TODO: check the correct cycles for interrupt
-                }
-                else if (irqRequested && !cpuState.getFlag(CPU::State::i) && !cpuState.isNmiActive()) {
-                    irqRequested = false;
-                    cpuState.startInterrupt(false);
-                    nextCpu += 9 * 8; // TODO: check the correct cycles for interrupt
-                }
+                    Instruction* instruction = cpuInstructionDecoder.applyNextInstruction(cpuState);
 
-                Instruction* instruction = cpuInstructionDecoder.readNextInstruction(cpuState);
-
-                bool dmaPicked = false;
-                if (dmaInstruction.enabled()) {
-                    //cpuContext.stepMode = true;
-                    dmaInstruction.blockedInstruction = instruction;
-                    instruction = static_cast<Instruction*>(&dmaInstruction);
-                    dmaPicked = true;
-                    if (!registers.vBlank) {
-                        //output << "DMA not during V blank" << std::endl;
+                    bool dmaPicked = false;
+                    if (dmaInstruction.enabled()) {
                         //cpuContext.stepMode = true;
-                    }
-                }
-
-                if (hdmaInstruction.isActive()) {
-                    if (hdmaInstruction.hdmaEnabled.getValue().getBit(7)) {
-                    //    cpuContext.setPaused(true);
-                    }
-                    hdmaInstruction.blockedInstruction = instruction;
-                    instruction = static_cast<Instruction*>(&hdmaInstruction);
-                    if (dmaPicked) {
-                        output << "HDMA interrupts DMA" << std::endl;
-                        cpuContext.setPaused(true);
-                    }
-                }
-
-                cpuContext.nextInstruction = instruction;
-
-                if (cpuContext.isPaused()) {
-                    output << "Cycle count: " << masterCycle << ", Next cpu: " << nextCpu << ", Next spc: " << nextSpc << std::endl;
-                    output << "Frame: " << registers.frame << ", V counter: " << registers.vCounter << ", H counter: " << registers.hCounter << ", V blank: " << registers.vBlank << ", H blank: " << registers.hBlank << ", nmi: " << cpuState.isNmiActive() << ", irq: " << cpuState.isIrqActive() << std::endl;
-                    debugger.printBreakpoints(cpuContext, spcContext);
-                    debugger.printMemory(cpuState, cpuContext, spcState, spcContext, video);
-                }
-
-                if (int cycles = executeNext(instruction, cpuState, debugger, cpuContext, spcState, spcContext, error)) {
-                    nextCpu += uint64_t(cycles) * 6;
-                    cpuContext.nextInstruction = cpuInstructionDecoder.readNextInstruction(cpuState);
-                }
-                else {
-                    continue;
-                }
-            }
-
-            if (masterCycle == nextSpc) {
-                Instruction* instruction = spcInstructionDecoder.readNextInstruction(spcState);
-                spcContext.nextInstruction = instruction;
-
-                if (spcContext.isPaused()) {
-                    output << "cycleCount=" << masterCycle << ", nextCpu=" << nextCpu << ", nextSpc=" << nextSpc << std::endl;
-                    debugger.printBreakpoints(cpuContext, spcContext);
-                    debugger.printMemory(cpuState, cpuContext, spcState, spcContext, video);
-                }
-
-                if (int cycles = executeNext(instruction, spcState, debugger, spcContext, cpuState, cpuContext, error)) {
-                    nextSpc += uint64_t(cycles) * 16;
-                    spcContext.nextInstruction = spcInstructionDecoder.readNextInstruction(spcState);
-                }
-                else {
-                    continue;
-                }
-            }
-
-            bool increment = false;
-            if (cpuContext.isPaused() || spcContext.isPaused()) { // step mode
-                increment = true;
-                stepMode = true;
-            }
-            else if (stepMode) { // run mode initiated
-                stepMode = false;
-                runStartTime = video.renderer.getTime();
-                cycleCountDelta = 0;
-            }
-            else { // run mode continued
-                if (iteration % 100 == 0) {
-                    double elapsedTime = video.renderer.getTime() - runStartTime;
-                    static const double clockSpeedTarget = 1.89e9 / 88.0;
-                    cycleCountTarget = uint64_t(elapsedTime * clockSpeedTarget);
-                }
-
-                if (cycleCountTarget > cycleCountDelta) {
-                    increment = true;
-                }
-
-                increment = true;
-
-                if (increment) {
-                    ++incrementCount;
-                    ++cycleCountDelta;
-                }
-                ++totalCount;
-            }
-
-            if (increment) {
-                ++masterCycle;
-                if (masterCycle % 21 == 0) {
-                    audio.tick();
-                }
-                ++registers.hCounter;
-                if (registers.hCounter == 274) {
-                    if (registers.vCounter <= 224) {
-                        if (registers.vCounter > 0)
-                        {
-                            video.drawScanline(registers.vCounter);
-                        }
-                        if (hdmaInstruction.enabled() && !hdmaInstruction.isActive()) {
-                            hdmaInstruction.setActive(true);
+                        dmaInstruction.blockedInstruction = instruction;
+                        instruction = static_cast<Instruction*>(&dmaInstruction);
+                        dmaPicked = true;
+                        if (!registers.vBlank) {
+                            //output << "DMA not during V blank" << std::endl;
+                            //cpuContext.stepMode = true;
                         }
                     }
-                    if (registers.vCounter == 224) {
-                        static double previousTime = glfwGetTime();
-                        static int frameCount = 0;
 
-                        double currentTime = glfwGetTime();
-                        frameCount++;
-                        if (currentTime - previousTime >= 1.0) {
-                            output << "E: " << frameCount << std::endl;
-
-                            frameCount = 0;
-                            previousTime = currentTime;
+                    if (hdmaInstruction.isActive()) {
+                        if (hdmaInstruction.hdmaEnabled.getValue().getBit(7)) {
+                            //    cpuContext.setPaused(true);
                         }
-
-                        //video.renderer.update();
-                        video.rendererLock.unlock();
-
-                        oamViewer.update();
-                        background1Viewer.update();
-                        background2Viewer.update();
-                        background3Viewer.update();
-                        //background4Viewer.update();
-                        spriteLayer1Viewer.update();
-                        spriteLayer2Viewer.update();
-                        spriteLayer3Viewer.update();
-                        spriteLayer4Viewer.update();
-                        mode7Viewer.update();
-
-                    }
-                    registers.hBlank = true;
-                }
-                else if (registers.hCounter == 1374) {
-                    registers.hCounter = 0;
-                    registers.hBlank = false;
-                    ++registers.vCounter;
-                    if (registers.irqMode == Registers::VCounterIrq && registers.vTimer == registers.vCounter) {
-                        irqRequested = true;
-                    }
-                    if (registers.vCounter == 225) {
-                        hdmaInstruction.setActive(false);
-                        registers.vBlank = true;
-                        registers.video.oam.address = registers.oamStartAddress;
-                        //registers.video.vram.address = registers.vramStartAddress;
-                        if (registers.nmiEnabled) {
-                            nmiRequested = true;
-                        }
-                    }
-                    else if (registers.vCounter == 227) {
-                        registers.readControllers();
-                    }
-                    else if (registers.vCounter == 262) {
-                        video.rendererLock.lock();
-
-                        if (video.renderer.pauseRequested) {
-                            video.renderer.pauseRequested = false;
+                        hdmaInstruction.blockedInstruction = instruction;
+                        instruction = static_cast<Instruction*>(&hdmaInstruction);
+                        if (dmaPicked) {
+                            output << "HDMA interrupts DMA" << std::endl;
                             cpuContext.setPaused(true);
                         }
+                    }
 
-                        ++registers.frame;
-                        registers.vCounter = 0;
-                        registers.interlaceField = !registers.interlaceField;
-                        registers.vBlank = false;
+                    cpuContext.nextInstruction = instruction;
 
-                        if (hdmaInstruction.enabled()) {
-                            hdmaInstruction.setActive(true, true);
+                    if (cpuContext.isPaused()) {
+                        output << "Cycle count: " << masterCycle << ", Next cpu: " << nextCpu << ", Next spc: " << nextSpc << std::endl;
+                        output << "Frame: " << registers.frame << ", V counter: " << registers.vCounter << ", H counter: " << registers.hCounter << ", V blank: " << registers.vBlank << ", H blank: " << registers.hBlank << ", nmi: " << cpuState.isNmiActive() << ", irq: " << cpuState.isIrqActive() << std::endl;
+                        debugger.printBreakpoints(cpuContext, spcContext);
+                        debugger.printMemory(cpuState, cpuContext, spcState, spcContext, video);
+                    }
+
+                    if (int cycles = executeNext(instruction, cpuState, debugger, cpuContext, spcState, spcContext, error)) {
+                        nextCpu += uint64_t(cycles) * 6;
+                        cpuContext.nextInstruction = cpuInstructionDecoder.readNextInstruction(cpuState);
+                    }
+                    else {
+                        continue;
+                    }
+                }
+
+                if (masterCycle == nextSpc) {
+                    Instruction* instruction = spcInstructionDecoder.applyNextInstruction(spcState);
+                    spcContext.nextInstruction = instruction;
+
+                    if (spcContext.isPaused()) {
+                        output << "cycleCount=" << masterCycle << ", nextCpu=" << nextCpu << ", nextSpc=" << nextSpc << std::endl;
+                        debugger.printBreakpoints(cpuContext, spcContext);
+                        debugger.printMemory(cpuState, cpuContext, spcState, spcContext, video);
+                    }
+
+                    if (int cycles = executeNext(instruction, spcState, debugger, spcContext, cpuState, cpuContext, error)) {
+                        nextSpc += uint64_t(cycles) * 16;
+                        spcContext.nextInstruction = spcInstructionDecoder.readNextInstruction(spcState);
+                    }
+                    else {
+                        continue;
+                    }
+                }
+
+                bool increment = false;
+                if (cpuContext.isPaused() || spcContext.isPaused()) { // step mode
+                    increment = true;
+                    stepMode = true;
+                }
+                else if (stepMode) { // run mode initiated
+                    stepMode = false;
+                    runStartTime = video.renderer.getTime();
+                    cycleCountDelta = 0;
+                }
+                else { // run mode continued
+                    if (iteration % 100 == 0) {
+                        double elapsedTime = video.renderer.getTime() - runStartTime;
+                        static const double clockSpeedTarget = 1.89e9 / 88.0;
+                        cycleCountTarget = uint64_t(elapsedTime * clockSpeedTarget);
+                    }
+
+                    if (cycleCountTarget > cycleCountDelta) {
+                        increment = true;
+                    }
+
+                    //increment = true;
+
+                    if (increment) {
+                        ++incrementCount;
+                        ++cycleCountDelta;
+                    }
+                    ++totalCount;
+                }
+
+                if (increment) {
+                    ++masterCycle;
+                    if (masterCycle % 21 == 0) {
+                        audio.tick();
+                    }
+                    ++registers.hCounter;
+                    if (registers.hCounter == 274) {
+                        if (registers.vCounter <= 224) {
+                            if (registers.vCounter > 0) {
+                                video.drawScanline(registers.vCounter);
+                            }
+                            if (hdmaInstruction.enabled() && !hdmaInstruction.isActive()) {
+                                hdmaInstruction.setActive(true);
+                            }
+                        }
+                        if (registers.vCounter == 224) {
+                            static double previousTime = glfwGetTime();
+                            static int frameCount = 0;
+
+                            double currentTime = glfwGetTime();
+                            frameCount++;
+                            if (currentTime - previousTime >= 1.0) {
+                                output << "E: " << frameCount << std::endl;
+
+                                frameCount = 0;
+                                previousTime = currentTime;
+                            }
+
+                            //video.renderer.update();
+                            video.rendererLock.unlock();
+
+                            oamViewer.update();
+                            background1Viewer.update();
+                            background2Viewer.update();
+                            background3Viewer.update();
+                            //background4Viewer.update();
+                            spriteLayer1Viewer.update();
+                            spriteLayer2Viewer.update();
+                            spriteLayer3Viewer.update();
+                            spriteLayer4Viewer.update();
+                            mode7Viewer.update();
+
+                        }
+                        registers.hBlank = true;
+                    }
+                    else if (registers.hCounter == 1374) {
+                        registers.hCounter = 0;
+                        registers.hBlank = false;
+                        ++registers.vCounter;
+                        if (registers.irqMode == Registers::VCounterIrq && registers.vTimer == registers.vCounter) {
+                            irqRequested = true;
+                        }
+                        if (registers.vCounter == 225) {
+                            hdmaInstruction.setActive(false);
+                            registers.vBlank = true;
+                            registers.video.oam.address = registers.oamStartAddress;
+                            //registers.video.vram.address = registers.vramStartAddress;
+                            if (registers.nmiEnabled) {
+                                nmiRequested = true;
+                            }
+                        }
+                        else if (registers.vCounter == 227) {
+                            registers.readControllers();
+                        }
+                        else if (registers.vCounter == 262) {
+                            video.rendererLock.lock();
+
+                            if (video.renderer.pauseRequested) {
+                                video.renderer.pauseRequested = false;
+                                cpuContext.setPaused(true);
+                            }
+
+                            ++registers.frame;
+                            registers.vCounter = 0;
+                            registers.interlaceField = !registers.interlaceField;
+                            registers.vBlank = false;
+
+                            if (hdmaInstruction.enabled()) {
+                                hdmaInstruction.setActive(true, true);
+                            }
+                        }
+                    }
+                    if (registers.hTimer == registers.hCounter) {
+                        if (registers.irqMode == Registers::HCounterIrq || registers.irqMode == Registers::HAndVCounterIrq && registers.vTimer == registers.vCounter) {
+                            irqRequested = true;
                         }
                     }
                 }
-                if (registers.hTimer == registers.hCounter) {
-                    if (registers.irqMode == Registers::HCounterIrq || registers.irqMode == Registers::HAndVCounterIrq && registers.vTimer == registers.vCounter) {
-                        irqRequested = true;
-                    }
-                }
+                ++iteration;
+            } catch (Video::MemoryAccessException& e) {
+                //cpuState.setProgramAddress(cpuState.getLastKnownAddress());
+                cpuContext.setPaused(true);
+                error << e.what() << std::endl;
             }
-            ++iteration;
         }
     } catch (const std::exception& e) {
         running = false;

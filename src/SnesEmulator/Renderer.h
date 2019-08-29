@@ -41,7 +41,7 @@ public:
     void update();
     bool isRunning() const;
 
-    double getTime()
+    double getTime() const
     {
         return glfwGetTime();
     }
@@ -95,9 +95,14 @@ public:
         }
     }
 
-    bool isPressed(int key)
+    bool isPressed(int key) const
     {
         return glfwGetKey(window, key) == GLFW_PRESS;
+    }
+
+    void focusWindow() const
+    {
+        glfwFocusWindow(window);
     }
 
 public:

@@ -36,5 +36,6 @@ enum Color
 #endif
 
 void setOutputColor(std::ostream& output, Color color, bool bright);
+void focusConsoleWindow();
 
 }

@@ -10,9 +10,9 @@
 class MemoryLocation
 {
 public:
-    class AccessException : public std::runtime_error
+    class AccessException : public std::logic_error
     {
-        using std::runtime_error::runtime_error;
+        using std::logic_error::logic_error;
     };
 
     enum Type
@@ -39,7 +39,7 @@ public:
 
     MemoryLocation(Byte value)
         : value(value)
-        , resetValue(value)
+        //, resetValue(value)
         , nextInMemory(&this[1])
         , nextInBank(&this[1])
         , nextInPage(&this[1])
@@ -112,7 +112,7 @@ public:
             value = newValue;
         }
         if (breakpoint) {
-            breakpoint(Write, newValue);
+            breakpoint(Write, newValue, applicationCount);
         }
     }
 
@@ -139,11 +139,13 @@ public:
             onRead(result);
         }
         if (breakpoint) {
-            breakpoint(Read, result);
+            breakpoint(Read, result, applicationCount);
         }
 
         return result;
     }
+
+    static uint64_t maxApplicationCount;
 
     Byte apply()
     {
@@ -161,13 +163,16 @@ public:
         }
 
         ++applicationCount;
+        if (applicationCount > maxApplicationCount) {
+            maxApplicationCount = applicationCount;
+        }
 
         Byte result = value;
         if (onApply) {
             onApply(result);
         }
         if (breakpoint) {
-            breakpoint(Apply, result);
+            breakpoint(Apply, result, applicationCount);
         }
 
         return result;
@@ -219,7 +224,7 @@ public:
         }
         type = ReadOnly;
         value = byte;
-        resetValue = value;
+        //resetValue = value;
     }
 
     void setReadWrite()
@@ -238,7 +243,7 @@ public:
         type = WriteOnly;
     }
 
-    int getApplicationCount() const
+    uint64_t getApplicationCount() const
     {
         if (mirroredMemory) {
             return mirroredMemory->getApplicationCount();
@@ -248,12 +253,12 @@ public:
         }
     }
 
-    //void reset()
-    //{
-        //value = resetValue;
-    //}
+    void reset()
+    {
+        applicationCount = 0;
+    }
 
-    void setBreakpoint(std::function<void(Operation operation, Byte value)> value)
+    void setBreakpoint(std::function<void(Operation operation, Byte value, uint64_t applicationCount)> value)
     {
         if (mirroredMemory) {
             mirroredMemory->setBreakpoint(value);
@@ -285,14 +290,14 @@ private:
 
 private:
     Byte value = 0;
-    Byte resetValue = 0;
+    //Byte resetValue = 0;
     MemoryLocation* readMapping = nullptr;
     MemoryLocation* writeMapping = nullptr;
     MemoryLocation* mirroredMemory = nullptr;
     Type type = Invalid;
-    int applicationCount = 0;
+    uint64_t applicationCount = 0;
 
-    std::function<void(Operation operation, Byte value)> breakpoint = nullptr;
+    std::function<void(Operation operation, Byte value, uint64_t applicationCount)> breakpoint = nullptr;
 
 public:
     MemoryLocation* nextInMemory = nullptr;

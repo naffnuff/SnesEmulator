@@ -319,7 +319,7 @@ class DirectPageIndexed : public Instruction2Byte
 
     std::string toString() const override
     {
-        return Operator::toString() + " $" + operandToString() + ",X";
+        return Operator::toString() + " $" + operandToString() + "," + State::getIndexRegisterName<Register>();
     }
 };
 
