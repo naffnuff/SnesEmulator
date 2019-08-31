@@ -1281,7 +1281,6 @@ class CMP_3E : public AddressMode::RegisterDirect<Operator::CMP, State::X>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("CMP_3E");
         return  3 + applyOperand();
     }
 

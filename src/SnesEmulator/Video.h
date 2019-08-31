@@ -55,7 +55,7 @@ public:
         Video& video;
         bool running = false;
         std::string gameTitle;
-        bool fullscreen = true;
+        bool fullscreen = false;
         bool aspectRatioCorrection = true;
     };
 
@@ -117,9 +117,12 @@ public:
         {
             std::vector<Byte>& table = highTableSelect ? highTable : lowTable;
             if (address >= size) {
-                throw MemoryAccessException("Video::Table::writeByte: Video-memory table out-of-bounds @ " + Util::toString(address) + ", size=" + Util::toString(size));
+                //throw MemoryAccessException("Video::Table::writeByte: Video-memory table out-of-bounds @ " + Util::toString(address) + ", size=" + Util::toString(size));
+                table[address & 0x7fff] = 0;
             }
-            table[address] = data;
+            else {
+                table[address] = data;
+            }
             address += increment;
         }
 
@@ -383,14 +386,19 @@ public:
         colorWindowSettings.windowOperator = Byte(windowMaskLogic.getBits(10, 2));
 
         for (int displayColumn = 0; displayColumn < rendererWidth; ++displayColumn) {
-            Word addendPixel;
+            Byte addendPixelIndex;
+            Word addendPixel = fixedColor;
+            bool disableHalfMath = false;
             if (addSubscreen) {
-                addendPixel = calculatePixel(modeEntries, subscreenBackgroundLayers, subscreenDesignation, displayRow, displayColumn, fixedColor, 0, 0, colorWindowSettings);
+                addendPixelIndex = calculateSubscreenPixel(modeEntries, subscreenBackgroundLayers, subscreenDesignation, displayRow, displayColumn);
+                if (addendPixelIndex > 0) {
+                    addendPixel = cgram.getWord(Word(addendPixelIndex));
+                }
+                else {
+                    disableHalfMath = true;
+                }
             }
-            else {
-                addendPixel = fixedColor;
-            }
-            Word mainScreenPixel = calculatePixel(modeEntries, mainScreenBackgroundLayers, mainScreenDesignation, displayRow, displayColumn, backdropColor, addendPixel, colorMathDesignation, colorWindowSettings);
+            Word mainScreenPixel = calculateMainScreenPixel(modeEntries, mainScreenBackgroundLayers, mainScreenDesignation, displayRow, displayColumn, backdropColor, addendPixel, colorMathDesignation, colorWindowSettings, disableHalfMath);
             if (brightness != 0xf) {
                 mainScreenPixel = factorColors(mainScreenPixel, brightnessFactor);
             }
@@ -572,13 +580,26 @@ public:
         }
     }
 
-    Word calculatePixel(const std::vector<ModeEntry>& mode, ScanlineBuffers& buffers, Byte designation, int displayRow, int displayColumn, Word defaultPixel, Word addendPixel, Byte colorMathDesignation, WindowSettings& colorWindowSettings)
+    Byte calculateSubscreenPixel(const std::vector<ModeEntry>& mode, ScanlineBuffers& buffers, Byte designation, int displayRow, int displayColumn)
+    {
+        for (const ModeEntry& modeEntry : mode) {
+            if (designation.getBit(modeEntry.layer)) {
+                Byte colorIndex = buffers.getBuffer(modeEntry.layer, modeEntry.priority).data[displayColumn];
+                if (colorIndex > 0) {
+                    return colorIndex;
+                }
+            }
+        }
+        return 0;
+    }
+
+    Word calculateMainScreenPixel(const std::vector<ModeEntry>& mode, ScanlineBuffers& buffers, Byte designation, int displayRow, int displayColumn, Word defaultPixel, Word addendPixel, Byte colorMathDesignation, WindowSettings& colorWindowSettings, bool disableHalfMath)
     {
         bool insideColorWindow = insideWindow(displayColumn, colorWindowSettings);
         bool clipColor = setColorBlack(insideColorWindow);
         bool clipMath = preventColorMath(insideColorWindow);
         bool subtract = colorMathDesignation.getBit(7);
-        bool halfMath = colorMathDesignation.getBit(6);
+        bool halfMath = colorMathDesignation.getBit(6) && !clipColor && !disableHalfMath;
 
         for (const ModeEntry& modeEntry : mode) {
             if (designation.getBit(modeEntry.layer)) {

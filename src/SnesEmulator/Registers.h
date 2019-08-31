@@ -227,7 +227,7 @@ public:
                 incrementVramOnHighByte = value.getBit(7);
             });
 
-        makeWriteRegister(0x2116, "VRAM Address low byte", false, 
+        /*makeWriteRegister(0x2116, "VRAM Address low byte", false, 
             [this](Byte value) {
                 video.vram.address.setLowByte(value);
             });
@@ -235,18 +235,8 @@ public:
         makeWriteRegister(0x2117, "VRAM Address high byte", false,
             [this](Byte value) {
                 video.vram.address.setHighByte(value & 0x7f);
-            });
-
-        /*makeWriteRegister(0x2116, "VRAM Address low byte", false,
-            [this](Byte value) {
-                video.vram.address.setLowByte(value);
-                vramBuffer = video.vram.readWord(video.vram.address);
-            });
-        makeWriteRegister(0x2117, "VRAM Address high byte", false,
-            [this](Byte value) {
-                video.vram.address.setHighByte(value);
-                vramBuffer = video.vram.readWord(video.vram.address);
             });*/
+        makeWriteRegister(0x2116, "VRAM Address", false, video.vram.address);
 
         makeWriteRegister(0x2118, "VRAM Data Write low byte", false,
             [this](Byte value) {
@@ -327,14 +317,17 @@ public:
         makeWriteRegister(0x212d, "Subscreen Designation", false, video.subscreenDesignation);
         makeWriteRegister(0x212e, "Window Mask Designation for the Main Screen", true, video.mainScreenWindowMaskDesignation);
         makeWriteRegister(0x212f, "Window Mask Designation for the Subscreen", true, video.subscreenWindowMaskDesignation);
-        makeWriteRegister(0x2130, "Color Addition Select", false,
+        makeWriteRegister(0x2130, "Color Addition Select", true,
             [this](Byte value) {
                 video.directColorMode = value.getBit(0);
                 video.addSubscreen = value.getBit(1);
                 video.clipColorMathMode = Video::ColorWindowMode(int(value.getBits(4, 2)));
                 video.clipColorToBlackMode = Video::ColorWindowMode(int(value.getBits(6, 2)));
             });
-        makeWriteRegister(0x2131, "Color Math Designation", false, video.colorMathDesignation);
+        makeWriteRegister(0x2131, "Color Math Designation", true,
+            [this](Byte value) {
+                video.colorMathDesignation = value;
+            });
         makeWriteRegister(0x2132, "Fixed Color Data", false,
             [this](Byte value) {
                 switch (value & 0xE0) {
@@ -440,7 +433,7 @@ public:
                     externalLatch = true;
                 }
                 if (value.getBit(6)) {
-                    throw Video::NotYetImplementedException("Register 4201: bit 6");
+                    //throw Video::NotYetImplementedException("Register 4201: bit 6");
                 }
                 programmableIOPort = value;
             });
@@ -535,7 +528,7 @@ public:
             memory->setReadOnlyValue(0x0f);
         }
 
-        for (int address = 0x4380; address < 0x8000; ++address) {
+        for (int address = 0x437b; address < 0x8000; ++address) {
             MemoryLocation* memory = state.getMemoryLocation(Long(address, 0));
             memory->setReadOnlyValue(0x0f);
         }

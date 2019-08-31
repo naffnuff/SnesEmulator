@@ -163,7 +163,7 @@ public:
                         if (screenColumn) {
                             tileDataAddress += 0x400;
                         }
-                        Word tileData = video.vram.readWord(tileDataAddress);
+                        Word tileData = video.vram.getWord(tileDataAddress);
                         int tilePriority = tileData.getBits(13, 1);
                         Word tileNumber = tileData.getBits(0, 10);
                         int palette = tileData.getBits(10, 3);
@@ -189,7 +189,7 @@ public:
                                 int displayColumn = tileColumn * tileSize + screenColumn * Video::rendererWidth + (horizontalFlip ? tileSize - 1 - column : column);
                                 if (paletteIndex > 0) {
                                     Word colorAddress = paletteAddress + paletteIndex;
-                                    color = video.cgram.readWord(colorAddress);
+                                    color = video.cgram.getWord(colorAddress);
                                 }
                                 if (tilePriority) {
                                     color = Video::addColors(color, Word(0x1084), false);//0x2108));
@@ -375,7 +375,7 @@ public:
                     for (int column = 0; column < 8; ++column) {
                         int pixelDataAddress = tileData * 8 * 8 + row * 8 + column;
                         Byte pixelData = video.vram.highTable[pixelDataAddress];
-                        Word pixel = video.cgram.readWord(Word(pixelData));
+                        Word pixel = video.cgram.getWord(Word(pixelData));
                         renderer.setPixel(tileRow * 8 + row, tileColumn * 8 + column, pixel);
                     }
                 }
