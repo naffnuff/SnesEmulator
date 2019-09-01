@@ -55,7 +55,7 @@ public:
         Video& video;
         bool running = false;
         std::string gameTitle;
-        bool fullscreen = false;
+        bool fullscreen = true;
         bool aspectRatioCorrection = true;
     };
 
@@ -599,7 +599,7 @@ public:
         bool clipColor = setColorBlack(insideColorWindow);
         bool clipMath = preventColorMath(insideColorWindow);
         bool subtract = colorMathDesignation.getBit(7);
-        bool halfMath = colorMathDesignation.getBit(6) && !clipColor && !disableHalfMath;
+        bool halfMath = !disableHalfMath && !clipColor && colorMathDesignation.getBit(6);
 
         for (const ModeEntry& modeEntry : mode) {
             if (designation.getBit(modeEntry.layer)) {

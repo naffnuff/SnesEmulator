@@ -1554,7 +1554,6 @@ class DECW_1A : public AddressMode::Direct<Operator::DECW>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("DECW_1A");
         return  6 + applyOperand();
     }
 

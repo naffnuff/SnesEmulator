@@ -432,7 +432,9 @@ class DECW
 public:
     static int invoke(State& state, MemoryLocation* operand)
     {
-        throw OperatorNotYetImplementedException("DECW");
+        Word value = operand->getWordValue() - 1;
+        operand->setWordValue(value);
+        state.updateSignFlags(value);
         return 0;
     }
 

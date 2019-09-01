@@ -317,17 +317,14 @@ public:
         makeWriteRegister(0x212d, "Subscreen Designation", false, video.subscreenDesignation);
         makeWriteRegister(0x212e, "Window Mask Designation for the Main Screen", true, video.mainScreenWindowMaskDesignation);
         makeWriteRegister(0x212f, "Window Mask Designation for the Subscreen", true, video.subscreenWindowMaskDesignation);
-        makeWriteRegister(0x2130, "Color Addition Select", true,
+        makeWriteRegister(0x2130, "Color Addition Select", false,
             [this](Byte value) {
                 video.directColorMode = value.getBit(0);
                 video.addSubscreen = value.getBit(1);
                 video.clipColorMathMode = Video::ColorWindowMode(int(value.getBits(4, 2)));
                 video.clipColorToBlackMode = Video::ColorWindowMode(int(value.getBits(6, 2)));
             });
-        makeWriteRegister(0x2131, "Color Math Designation", true,
-            [this](Byte value) {
-                video.colorMathDesignation = value;
-            });
+        makeWriteRegister(0x2131, "Color Math Designation", false, video.colorMathDesignation);
         makeWriteRegister(0x2132, "Fixed Color Data", false,
             [this](Byte value) {
                 switch (value & 0xE0) {
@@ -410,13 +407,24 @@ public:
 
         makeWriteRegister(0x2181, "WRAM Address", false, wramAddress);
 
-        makeWriteRegister(0x4016, "NES-style Joypad Access Port 1", true,
+        makeReadWriteRegister(0x4016, "NES-style Joypad Access Port 1", true,
+            [this](Byte& value) {
+                printMemoryRegister(false, value, 0x4016, "NES-style Joypad Access Port 1");
+            },
             [this](Byte value) {
                 if (value > 0) {
                     throw Video::NotYetImplementedException("Register 4016: Latch on");
                 }
             });
-        makeWriteRegister(0x4017, "NES-style Joypad Access Port 2", true);
+        makeReadWriteRegister(0x4017, "NES-style Joypad Access Port 2", true,
+            [this](Byte& value) {
+                printMemoryRegister(false, value, 0x4017, "NES-style Joypad Access Port 2");
+            },
+            [this](Byte value) {
+                if (value > 0) {
+                    throw Video::NotYetImplementedException("Register 4017: Latch on");
+                }
+            });
 
         makeWriteRegister(0x4200, "Interrupt Enable Flags", false,
             [this](Byte value) {
