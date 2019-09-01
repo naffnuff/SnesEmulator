@@ -989,7 +989,6 @@ class CLR1_72 : public AddressMode::Direct<Operator::SET1<3, false>>
 
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("CLR1_72");
         return  4 + applyOperand();
     }
 

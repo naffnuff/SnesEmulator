@@ -261,22 +261,22 @@ public:
         makeWriteRegister(0x211b, "Mode 7 Matrix A (also multiplicand for MPYx)", false,
             [this](Byte value) {
                 mode7Multiplicand = getMode7WordValue(value);
-                video.mode7MatrixA = float(mode7Multiplicand) / 256.0f;
+                video.mode7MatrixA = mode7Multiplicand;
             }
         );
         makeWriteRegister(0x211c, "Mode 7 Matrix B (also multiplier for MPYx)", false,
             [this](Byte value) {
                 multiplicationResult = mode7Multiplicand * int8_t(value);
-                video.mode7MatrixB = float(getMode7WordValue(value)) / 256.0f;
+                video.mode7MatrixB = getMode7WordValue(value);
             }
         );
         makeWriteRegister(0x211d, "Mode 7 Matrix C", false,
             [this](Byte value) {
-                video.mode7MatrixC = float(getMode7WordValue(value)) / 256.0f;
+                video.mode7MatrixC = getMode7WordValue(value);
             });
         makeWriteRegister(0x211e, "Mode 7 Matrix D", false,
             [this](Byte value) {
-                video.mode7MatrixD = float(getMode7WordValue(value)) / 256.0f;
+                video.mode7MatrixD = getMode7WordValue(value);
             });
         makeWriteRegister(0x211f, "Mode 7 Center X", false,
             [this](Byte value) {

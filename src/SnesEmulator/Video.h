@@ -439,13 +439,20 @@ public:
 
     void drawMode7Background(ScanlineBuffer& buffer, int displayRow)
     {
-        float vectorElement2 = float(displayRow + mode7VerticalScroll - mode7CenterY);
+        int vectorElement2 = displayRow + mode7VerticalScroll - mode7CenterY;
         for (int displayColumn = 0; displayColumn < rendererWidth; ++displayColumn) {
-            float vectorElement1 = float(displayColumn + mode7HorizontalScroll - mode7CenterX);
-            Word fieldRow(mode7MatrixC * vectorElement1 + mode7MatrixD * vectorElement2 + mode7CenterY);
-            Word fieldColumn(mode7MatrixA * vectorElement1 + mode7MatrixB * vectorElement2 + mode7CenterX);
+            int vectorElement1 = displayColumn + mode7HorizontalScroll - mode7CenterX;
+            int fieldColumn = ((mode7MatrixA * vectorElement1))
+                + ((mode7MatrixB * vectorElement2))
+                + (mode7CenterX << 8);
+            int fieldRow = ((mode7MatrixC * vectorElement1))
+                + ((mode7MatrixD * vectorElement2))
+                + (mode7CenterY << 8);
+            fieldRow >>= 8;
+            fieldColumn >>= 8;
             bool calculateTile = true;
-            if (fieldRow >= 1024 || fieldColumn >= 1024) {
+            bool zeroPixel = false;
+            if (fieldRow < 0 || fieldRow >= 1024 || fieldColumn < 0 || fieldColumn >= 1024) {
                 fieldRow &= 1023;
                 fieldColumn &= 1023;
                 if (mode7PlayingFieldSize) {
@@ -453,23 +460,27 @@ public:
                         calculateTile = false;
                     }
                     else {
-                        buffer.data[displayColumn] = 0;
-                        continue;
+                        zeroPixel = true;
                     }
                 }
             }
-            Byte tileData;
-            if (calculateTile) {
-                Word tileRow = fieldRow >> 3;
-                Word tileColumn = fieldColumn >> 3;
-                Word tileDataAddress = (tileRow << 7) + tileColumn;
-                tileData = vram.getByte(tileDataAddress, false);
+            if (zeroPixel) {
+                buffer.data[displayColumn] = 0;
             }
-            Word row = fieldRow & 7;
-            Word column = fieldColumn & 7;
-            Word pixelDataAddress = (tileData << 6) + (row << 3) + column;
-            Byte pixelData = vram.getByte(pixelDataAddress, true);
-            buffer.data[displayColumn] = pixelData;
+            else {
+                Byte tileData;
+                if (calculateTile) {
+                    Word tileRow = fieldRow >> 3;
+                    Word tileColumn = fieldColumn >> 3;
+                    Word tileDataAddress = (tileRow << 7) + tileColumn;
+                    tileData = vram.getByte(tileDataAddress, false);
+                }
+                Word row = fieldRow & 7;
+                Word column = fieldColumn & 7;
+                Word pixelDataAddress = (tileData << 6) + (row << 3) + column;
+                Byte pixelData = vram.getByte(pixelDataAddress, true);
+                buffer.data[displayColumn] = pixelData;
+            }
         }
     }
 
@@ -535,7 +546,7 @@ public:
         return result;
     }
 
-    void drawObject(ScanlineBuffer& buffer, Object& object, int displayRow, bool windowEnabled, WindowSettings& windowSettings, std::bitset<rendererWidth>& bufferMask)
+    void drawObject(ScanlineBuffer& buffer, const Object& object, int displayRow, bool windowEnabled, WindowSettings& windowSettings, std::bitset<rendererWidth>& bufferMask)
     {
         int objectSize = getObjectSize(object.sizeSelect);
         int objectY = object.y;
@@ -816,10 +827,10 @@ public:
     bool mode7PlayingFieldSize = false;
     int16_t mode7HorizontalScroll = 0;
     int16_t mode7VerticalScroll = 0;
-    float mode7MatrixA = 0.f;
-    float mode7MatrixB = 0.f;
-    float mode7MatrixC = 0.f;
-    float mode7MatrixD = 0.f;
+    int16_t mode7MatrixA = 0;
+    int16_t mode7MatrixB = 0;
+    int16_t mode7MatrixC = 0;
+    int16_t mode7MatrixD = 0;
     int16_t mode7CenterX = 0;
     int16_t mode7CenterY = 0;
     bool mode7HorizontalMirroring = false;
