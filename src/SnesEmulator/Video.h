@@ -439,28 +439,37 @@ public:
 
     void drawMode7Background(ScanlineBuffer& buffer, int displayRow)
     {
-        const float vectorElement2 = float(displayRow + mode7VerticalScroll - mode7CenterY);
+        float vectorElement2 = float(displayRow + mode7VerticalScroll - mode7CenterY);
         for (int displayColumn = 0; displayColumn < rendererWidth; ++displayColumn) {
-            //if (buffer.data[displayColumn] == 0)
-            {
-                const float vectorElement1 = float(displayColumn + mode7HorizontalScroll - mode7CenterX);
-                const int fieldRow = int(mode7MatrixC * vectorElement1 + mode7MatrixD * vectorElement2 + mode7CenterY + .5f);
-                const int tileRow = fieldRow >> 3;
-                const int row = fieldRow & 7;
-                const int fieldColumn = int(mode7MatrixA * vectorElement1 + mode7MatrixB * vectorElement2 + mode7CenterX + .5f);
-                const int tileColumn = fieldColumn >> 3;
-                const int column = fieldColumn & 7;
-                if (fieldRow >= 0 && fieldRow < 1024 && fieldColumn >= 0 && fieldColumn < 1024) {
-                    const Word tileDataAddress = (tileRow << 7) + tileColumn;
-                    const Byte tileData = vram.getByte(tileDataAddress, false);
-                    const Word pixelDataAddress = (tileData << 6) + (row << 3) + column;
-                    const Byte pixelData = vram.getByte(pixelDataAddress, true);
-                    buffer.data[displayColumn] = pixelData;
-                }
-                else if (mode7PlayingFieldSize == 0) {
-                    throw Video::NotYetImplementedException("Mode 7 wraparound");
+            float vectorElement1 = float(displayColumn + mode7HorizontalScroll - mode7CenterX);
+            Word fieldRow(mode7MatrixC * vectorElement1 + mode7MatrixD * vectorElement2 + mode7CenterY);
+            Word fieldColumn(mode7MatrixA * vectorElement1 + mode7MatrixB * vectorElement2 + mode7CenterX);
+            bool calculateTile = true;
+            if (fieldRow >= 1024 || fieldColumn >= 1024) {
+                fieldRow &= 1023;
+                fieldColumn &= 1023;
+                if (mode7PlayingFieldSize) {
+                    if (mode7EmptySpaceFill) {
+                        calculateTile = false;
+                    }
+                    else {
+                        buffer.data[displayColumn] = 0;
+                        continue;
+                    }
                 }
             }
+            Byte tileData;
+            if (calculateTile) {
+                Word tileRow = fieldRow >> 3;
+                Word tileColumn = fieldColumn >> 3;
+                Word tileDataAddress = (tileRow << 7) + tileColumn;
+                tileData = vram.getByte(tileDataAddress, false);
+            }
+            Word row = fieldRow & 7;
+            Word column = fieldColumn & 7;
+            Word pixelDataAddress = (tileData << 6) + (row << 3) + column;
+            Byte pixelData = vram.getByte(pixelDataAddress, true);
+            buffer.data[displayColumn] = pixelData;
         }
     }
 
@@ -503,6 +512,27 @@ public:
                 drawTile(buffer, displayColumn, 0, tileAddress, (1 << background.bitsPerPixel) * palette, tileSize, horizontalFlip, background.bitsPerPixel, windowEnabled, windowSettings, bufferMask);
             }
         }
+    }
+
+    Object readObject(int index) const
+    {
+        Word lowAddress = index * 2;
+        Word highAddress = index / 8;
+        Byte highTableOffset = index % 8;
+        Word firstWord = oam.getWord(lowAddress);
+        Word secondWord = oam.getWord(lowAddress + 1);
+        Word thirdWord = oam.getWord(0x100 | highAddress);
+        Object result;
+        result.sizeSelect = thirdWord.getBit(highTableOffset * 2 + 1);
+        result.x = thirdWord.getBit(highTableOffset * 2) << 8 | firstWord.getLowByte();
+        result.y = firstWord.getHighByte();
+        result.tileIndex = secondWord.getLowByte();
+        result.nameTable = secondWord.getHighByte().getBit(0);
+        result.palette = secondWord.getHighByte().getBits(1, 3);
+        result.priority = secondWord.getHighByte().getBits(4, 2);
+        result.horizontalFlip = secondWord.getHighByte().getBit(6);
+        result.verticalFlip = secondWord.getHighByte().getBit(7);
+        return result;
     }
 
     void drawObject(ScanlineBuffer& buffer, Object& object, int displayRow, bool windowEnabled, WindowSettings& windowSettings, std::bitset<rendererWidth>& bufferMask)
@@ -737,236 +767,6 @@ public:
         c.blue = int(a.blue * b);
         return c;
     }
-
-    /*bool getObjectPixel(const Object& object, int displayRow, int displayColumn, Word& result)
-    {
-        int objectSize = getObjectSize(object.sizeSelect);
-        int row = displayRow - object.y;
-        if (row >= 0 && row < objectSize) {
-            int column = displayColumn - object.x;
-            if (column >= 0 && column < objectSize) {
-                int tileRow = 0;
-                while (row >= 8) {
-                    ++tileRow;
-                    row -= 8;
-                }
-                int tileColumn = 0;
-                while (column >= 8) {
-                    ++tileColumn;
-                    column -= 8;
-                }
-                int tileIndex = object.tileIndex + tileRow * 0x10 + tileColumn;
-                Word tileAddress = nameBaseSelect + (tileIndex << 4);
-                if (object.nameTable) {
-                    tileAddress += nameSelect;
-                }
-                tileAddress += row;
-                const int bpp = 4;
-                return getTilePixel(tileAddress, column, object.palette, true, objectSize, bpp, result);
-            }
-        }
-        return false;
-    }*/
-
-    /*bool getBackgroundPixel(const Background& background, int displayRow, int displayColumn, int priority, int bitsPerPixel, Word& result)
-    {
-        static const int tileSize = 8;
-        const int tileRow = displayRow / tileSize;
-        const int tileColumn = displayColumn / tileSize;
-        Word tileData = vram.readWord(background.tilemapAddress + (tileRow << 5) + tileColumn);
-        int tilePriority = tileData.getBits(13, 1);
-        if (priority == tilePriority) {
-            Word tileNumber = tileData.getBits(0, 10);
-            int palette = tileData.getBits(10, 3);
-            bool horizontalFlip = tileData.getBit(14);
-            bool verticalFlip = tileData.getBit(15);
-            int row = displayRow % tileSize;
-            if (verticalFlip) {
-                row = tileSize - 1 - row;
-            }
-            int column = displayColumn % tileSize;
-            if (horizontalFlip) {
-                column = tileSize - 1 - column;
-            }
-            Word tileAddress = background.characterAddress + tileNumber * tileSize * bitsPerPixel / 2 + row;
-            return getTilePixel(tileAddress, column, palette, false, tileSize, bitsPerPixel, result);
-        }
-    }
-
-    bool getTilePixel(Word tileAddress, int column, int palette, bool spritePalette, int objectSize, int bpp, Word& result)
-    {
-        std::bitset<8> firstLowByte(vram.lowTable[tileAddress]);
-        std::bitset<8> firstHighByte(vram.highTable[tileAddress]);
-        std::bitset<8> secondLowByte(vram.lowTable[tileAddress + 8]);
-        std::bitset<8> secondHighByte(vram.highTable[tileAddress + 8]);
-        Byte paletteIndex;
-        int firstLowBitValue = firstLowByte[7 - column] ? 1 : 0;
-        int firstHighBitValue = firstHighByte[7 - column] ? 2 : 0;
-        paletteIndex = firstLowBitValue | firstHighBitValue;
-        if (bpp >= 4) {
-            int secondLowBitValue = secondLowByte[7 - column] ? 4 : 0;
-            int secondHighBitValue = secondHighByte[7 - column] ? 8 : 0;
-            paletteIndex |= secondLowBitValue | secondHighBitValue;
-        }
-        if (paletteIndex > 0) {
-            Word colorAddress = (spritePalette ? 0x80 : 0) + (1 << bpp) * palette + paletteIndex;
-            result = cgram.readWord(colorAddress);
-            return true;
-        }
-        return false;
-    }*/
-
-    /*void mode1e(int displayRow)
-    {
-        if (mainScreenDesignation.getBit(2)) {
-            drawBackgroundLine(backgrounds[2], displayRow, 2, 0);
-        }
-        if (mainScreenDesignation.getBit(4)) {
-            for (int i = 0; i < 128; ++i) {
-                Object object = readObject(i);
-                if (object.priority == 0) {
-                    drawObjectLine(object, displayRow);
-                }
-            }
-            for (int i = 0; i < 128; ++i) {
-                Object object = readObject(i);
-                if (object.priority == 1) {
-                    drawObjectLine(object, displayRow);
-                }
-            }
-        }
-        if (mainScreenDesignation.getBit(1)) {
-            drawBackgroundLine(backgrounds[1], displayRow, 4, 0);
-        }
-        if (mainScreenDesignation.getBit(0)) {
-            drawBackgroundLine(backgrounds[0], displayRow, 4, 0);
-        }
-        if (mainScreenDesignation.getBit(4)) {
-            for (int i = 0; i < 128; ++i) {
-                Object object = readObject(i);
-                if (object.priority == 2) {
-                    drawObjectLine(object, displayRow);
-                }
-            }
-        }
-        if (mainScreenDesignation.getBit(1)) {
-            drawBackgroundLine(backgrounds[1], displayRow, 4, 1);
-        }
-        if (mainScreenDesignation.getBit(0)) {
-            drawBackgroundLine(backgrounds[0], displayRow, 4, 1);
-        }
-        if (mainScreenDesignation.getBit(4)) {
-            for (int i = 0; i < 128; ++i) {
-                Object object = readObject(i);
-                if (object.priority == 3) {
-                    drawObjectLine(object, displayRow);
-                }
-            }
-        }
-        if (mainScreenDesignation.getBit(2)) {
-            drawBackgroundLine(backgrounds[2], displayRow, 2, 1);
-        }
-
-    }
-
-    void drawBackgroundLine(Background& background, int displayRow, int bpp, int priority)
-    {
-        const int tileSize = 8;
-        for (int i = 0, tileRow = 0; tileRow < 32; ++tileRow) {
-            int row = displayRow - tileRow * tileSize + background.verticalScroll.value;
-            if (row >= 0 && row < tileSize) {
-                for (int tileColumn = 0; tileColumn < 32; ++tileColumn) {
-                    Word tileData = vram.readWord(background.tilemapAddress + (tileRow << 5) + tileColumn);
-                    int tilePriority = tileData.getBits(13, 1);
-                    if (priority == tilePriority) {
-                        Word tileNumber = tileData.getBits(0, 10);
-                        int palette = tileData.getBits(10, 3);
-                        bool horizontalFlip = tileData.getBit(14);
-                        bool verticalFlip = tileData.getBit(15);
-                        Word tileAddress = background.characterAddress + (tileNumber * tileSize * bpp / 2) + (verticalFlip ? tileSize - 1 - row : row);
-                        drawTileLine(renderer, displayRow, tileColumn * tileSize + background.horizontalScroll.value, 0, tileAddress, palette, false, tileSize, horizontalFlip, bpp);
-                    }
-                }
-            }
-        }
-    }
-
-    void drawObjectLine(Object& object, int displayRow)
-    {
-        int objectSize = getObjectSize(object.sizeSelect);
-        int row = displayRow - object.y;
-        if (row >= 0 && row < objectSize) {
-            int tileRow = 0;
-            while (row >= 8) {
-                ++tileRow;
-                row -= 8;
-            }
-            int objectTileSize = objectSize / 8;
-            for (int tileColumn = 0; tileColumn < objectTileSize; ++tileColumn) {
-                int tileIndex = object.tileIndex + tileRow * 0x10 + tileColumn;
-                Word tileAddress = nameBaseSelect + (tileIndex << 4);
-                if (object.nameTable) {
-                    tileAddress += nameSelect;
-                }
-                tileAddress += row;
-                const int bpp = 4;
-                drawTileLine(renderer, displayRow, object.x, tileColumn * 8, tileAddress, object.palette, true, objectSize, object.horizontalFlip, bpp);
-            }
-        }
-    }*/
-
-    Object readObject(int index) const
-    {
-        Word lowAddress = index * 2;
-        Word highAddress = index / 8;
-        Byte highTableOffset = index % 8;
-        Word firstWord = oam.getWord(lowAddress);
-        Word secondWord = oam.getWord(lowAddress + 1);
-        Word thirdWord = oam.getWord(0x100 | highAddress);
-        Object result;
-        result.sizeSelect = thirdWord.getBit(highTableOffset * 2 + 1);
-        result.x = thirdWord.getBit(highTableOffset * 2) << 8 | firstWord.getLowByte();
-        result.y = firstWord.getHighByte();
-        result.tileIndex = secondWord.getLowByte();
-        result.nameTable = secondWord.getHighByte().getBit(0);
-        result.palette = secondWord.getHighByte().getBits(1, 3);
-        result.priority = secondWord.getHighByte().getBits(4, 2);
-        result.horizontalFlip = secondWord.getHighByte().getBit(6);
-        result.verticalFlip = secondWord.getHighByte().getBit(7);
-        return result;
-    }
-
-    /*std::array<std::array<uint8_t, 8>, 8> readTile(int tileIndex, int bitsPerPixel)
-    {
-        static const int pixelsPerTile = 8 * 8;
-        const int bitsPerTile = pixelsPerTile * bitsPerPixel;
-        static const int bitsPerWord = 16;
-        static const int tileWordCount = bitsPerTile / bitsPerWord;
-        int tileAddress = tileIndex * tileWordCount;
-        std::array<std::array<uint8_t, 8>, 8> result;
-        for (int row = 0; row < 8; ++row) {
-            std::bitset<8> firstLowByte(vram.lowTable[tileAddress]);
-            std::bitset<8> firstHighByte(vram.highTable[tileAddress]);
-            std::bitset<8> secondLowByte(vram.lowTable[tileAddress + tileWordCount / 2]);
-            std::bitset<8> secondHighByte(vram.highTable[tileAddress + tileWordCount / 2]);
-            for (int column = 0; column < 8; ++column) {
-                Byte pixel;
-                if (bitsPerPixel >= 2) {
-                    int firstLowBitValue = firstLowByte[7 - column] ? 1 : 0;
-                    int firstHighBitValue = firstHighByte[7 - column] ? 2 : 0;
-                    pixel = firstLowBitValue + firstHighBitValue;
-                }
-                if (bitsPerPixel >= 4) {
-                    int secondLowBitValue = secondLowByte[7 - column] ? 4 : 0;
-                    int secondHighBitValue = secondHighByte[7 - column] ? 8 : 0;
-                    pixel += secondLowBitValue + secondHighBitValue;
-                }
-                result[row][column] = pixel * 85;
-            }
-            ++tileAddress;
-        }
-        return result;
-    }*/
 
     std::ostream& output;
 

@@ -210,6 +210,12 @@ public:
         return *this;
     }
 
+    Word& operator&=(Word operand)
+    {
+        value &= operand;
+        return *this;
+    }
+
     template<typename T>
     Word& operator|=(T operand)
     {
