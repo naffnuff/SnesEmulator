@@ -92,6 +92,7 @@ public:
                 if (debugger.registers.video.rendererRunner.fullscreen) {
                     debugger.registers.video.renderer.toggleFullscreenRequested = true;
                 }
+                debugger.registers.video.renderer.focusWindow(false);
                 System::focusConsoleWindow();
             }
             else {
@@ -99,7 +100,7 @@ public:
                     debugger.registers.video.rendererLock.lock();
                     unlockedMutex = false;
                 }
-                debugger.registers.video.renderer.focusWindow();
+                debugger.registers.video.renderer.focusWindow(true);
             }
         }
 
@@ -438,7 +439,7 @@ public:
         int oamAddress = inspectedVideoMemory & 0xFF80;
         int oamAuxAddress = oamAddress / 8;
         int oamAuxOffset = oamAddress % 8;
-        for (int i = OamViewer::firstObjectIndex; i < OamViewer::firstObjectIndex + 32; ++i) {
+        /*for (int i = OamViewer::firstObjectIndex; i < OamViewer::firstObjectIndex + 32; ++i) {
             Video::Object object = video.readObject(i);
             output << i << ": ";
             output << " size: " << video.getObjectSize(object.sizeSelect);
@@ -451,7 +452,7 @@ public:
             output << ", horizontalFlip: " << object.horizontalFlip;
             output << ", verticalFlip: " << object.verticalFlip;
             output << std::endl;
-        }
+        }*/
 
         output << "OAM start address: " << registers.oamStartAddress << std::endl;
         output << "OAM current address: " << registers.video.oam.address << std::endl;
@@ -532,13 +533,14 @@ public:
 
                 for (int j = 0; j < 16 && spcAddress < spcMemorySize; ++j) {
                     const MemoryLocation& memory = spcState.getMemory(spcAddress);
-                    setColor(spcState, spcContext, spcAddress++, memory);
+                    setColor(spcState, spcContext, spcAddress, memory);
                     if (spcAddress >= 0xffc0 && audio.bootRomDataEnabled) {
                         output << audio.bootRomData[spcAddress - 0xffc0] << ' ';
                     }
                     else {
                         output << memory << ' ';
                     }
+                    ++spcAddress;
                     System::setOutputColor(output, System::DefaultColor, false);
                 }
             }

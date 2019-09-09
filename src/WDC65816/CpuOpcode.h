@@ -918,7 +918,6 @@ class CLD_D8 : public AddressMode::Implied<Operator::SE_<State::d, false>>
     // 1   2           imp       ....0... . CLD
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("CLD_D8");
         return 2 + applyOperand();
     }
 
@@ -3613,7 +3612,6 @@ class SED_F8 : public AddressMode::Implied<Operator::SE_<State::d, true>>
     // 1   2           imp       ....1... . SED
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("SED_F8");
         return 2 + applyOperand();
     }
 

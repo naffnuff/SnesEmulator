@@ -10,25 +10,37 @@ namespace Operator {
 // ADC Add With Carry [Flags affected: n,v,z,c]
 class ADC
 {
+private:
+    template<typename T>
+    static T add(State& state, T accumulator, T memory)
+    {
+        T result;
+        bool carry = state.getFlag(State::c);
+        bool overflow = false;
+        if (state.getFlag(State::d)) {
+            result = Types::decimalAdd(accumulator, memory, carry, overflow);
+        }
+        else {
+            bool dummy = false;
+            result = Types::binaryAdd(accumulator, memory, carry, overflow, dummy);
+        }
+        state.setFlag(State::c, carry);
+        state.setFlag(State::v, overflow);
+        return result;
+    }
+
 public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, const MemoryLocation* memory)
     {
         int cycles = 0;
-        bool carry = state.getFlag(State::c);
-        bool overflow = false;
-        bool dummy = false;
         if (state.is16Bit(State::m)) {
             cycles += 1;
-            Word result = Types::binaryAdd(state.getAccumulatorC(), memory->getWordValue(), carry, overflow, dummy);
-            state.setAccumulatorC(result);
+            state.setAccumulatorC(add(state, state.getAccumulatorC(), memory->getWordValue()));
         }
         else {
-            Byte result = Types::binaryAdd(state.getAccumulatorA(), memory->getValue(), carry, overflow, dummy);
-            state.setAccumulatorA(result);
+            state.setAccumulatorA(add(state, state.getAccumulatorA(), memory->getValue()));
         }
-        state.setFlag(State::c, carry);
-        state.setFlag(State::v, overflow);
         return cycles;
     }
 
@@ -97,7 +109,6 @@ static int branchIf(bool condition, State& state, int offset)
             Byte programPage = state.getProgramCounter() >> 8;
             Byte newAddressPage = newAddress >> 8;
             if (programPage != newAddressPage) {
-                throw OperatorNotYetImplementedException("TODO08");
                 cycles += 1;
             }
         }
@@ -1008,25 +1019,37 @@ public:
 // SBC Subtract with Borrow from Accumulator [Flags affected: n,v,z,c]
 class SBC
 {
+private:
+    template<typename T>
+    static T subtract(State& state, T accumulator, T memory)
+    {
+        T result;
+        bool carry = state.getFlag(State::c);
+        bool overflow = false;
+        if (state.getFlag(State::d)) {
+            result = Types::decimalSubtract(accumulator, memory, carry, overflow);
+        }
+        else {
+            bool dummy = false;
+            result = Types::binarySubtract(accumulator, memory, carry, overflow, dummy);
+        }
+        state.setFlag(State::c, carry);
+        state.setFlag(State::v, overflow);
+        return result;
+    }
+
 public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, const MemoryLocation* memory)
     {
         int cycles = 0;
-        bool carry = state.getFlag(State::c);
-        bool overflow = false;
-        bool dummy = false;
         if (state.is16Bit(State::m)) {
             cycles += 1;
-            Word result = Types::binarySubtract(state.getAccumulatorC(), memory->getWordValue(), carry, overflow, dummy);
-            state.setAccumulatorC(result);
+            state.setAccumulatorC(subtract(state, state.getAccumulatorC(), memory->getWordValue()));
         }
         else {
-            Byte result = Types::binarySubtract(state.getAccumulatorA(), memory->getValue(), carry, overflow, dummy);
-            state.setAccumulatorA(result);
+            state.setAccumulatorA(subtract(state, state.getAccumulatorA(), memory->getValue()));
         }
-        state.setFlag(State::c, carry);
-        state.setFlag(State::v, overflow);
         return cycles;
     }
 

@@ -100,9 +100,9 @@ public:
         return glfwGetKey(window, key) == GLFW_PRESS;
     }
 
-    void focusWindow() const
+    void focusWindow(bool value)
     {
-        glfwFocusWindow(window);
+        focusWindowRequested = value;
     }
 
 public:
@@ -144,4 +144,6 @@ public:
     const bool syncUpdate;
 
     int pressKeyTimeout = 0;
+
+    bool focusWindowRequested = false;
 };

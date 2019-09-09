@@ -525,14 +525,14 @@ public:
         stackPointer = 0;
         programBank = 0;
         programCounter = emulationVectors.Reset;
-        flags = 0;
+        flags = i;
         emulationMode = true;
 
         nmiActive = false;
         irqActive = false;
 
         for (MemoryLocation& a : accumulator) {
-            //a.reset();
+            a.reset();
         }
 
         for (Word& r : indexRegisters) {
@@ -549,7 +549,7 @@ private:
     Byte programBank = 0;
     Word programCounter = 0;
 
-    Byte flags = 0;
+    Byte flags = i;
     bool emulationMode = true;
 
     std::vector<MemoryLocation> memory;

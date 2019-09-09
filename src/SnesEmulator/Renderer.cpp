@@ -83,6 +83,11 @@ void Renderer::setWindowProperties(bool fullscreen, bool aspectRatioCorrection)
 
 void Renderer::update()
 {
+    if (focusWindowRequested) {
+        glfwFocusWindow(window);
+        focusWindowRequested = false;
+    }
+
     glClear(GL_COLOR_BUFFER_BIT);
 
     glRasterPos2f(-xScreenCoverage, -1.0);

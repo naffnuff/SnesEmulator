@@ -407,18 +407,18 @@ public:
 
         makeWriteRegister(0x2181, "WRAM Address", false, wramAddress);
 
-        makeReadWriteRegister(0x4016, "NES-style Joypad Access Port 1", true,
+        makeReadWriteRegister(0x4016, "NES-style Joypad Access Port 1", false,
             [this](Byte& value) {
-                printMemoryRegister(false, value, 0x4016, "NES-style Joypad Access Port 1");
+                //printMemoryRegister(false, value, 0x4016, "NES-style Joypad Access Port 1");
             },
             [this](Byte value) {
                 if (value > 0) {
                     throw Video::NotYetImplementedException("Register 4016: Latch on");
                 }
             });
-        makeReadWriteRegister(0x4017, "NES-style Joypad Access Port 2", true,
+        makeReadWriteRegister(0x4017, "NES-style Joypad Access Port 2", false,
             [this](Byte& value) {
-                printMemoryRegister(false, value, 0x4017, "NES-style Joypad Access Port 2");
+                //printMemoryRegister(false, value, 0x4017, "NES-style Joypad Access Port 2");
             },
             [this](Byte value) {
                 if (value > 0) {

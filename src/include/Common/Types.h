@@ -4,6 +4,8 @@
 #include <iostream>
 #include <iomanip>
 
+#include "Exception.h"
+
 namespace Types {
 
 template<typename T>
@@ -27,6 +29,18 @@ template<typename T>
 T binarySubtract(T minuhend, T subtrahend, bool& invertedUnsignedBorrow, bool& signedOverflow, bool& halfCarry)
 {
     return binaryAdd(minuhend, T(~subtrahend), invertedUnsignedBorrow, signedOverflow, halfCarry);
+}
+
+template<typename T>
+T decimalAdd(T augend, T addend, bool& unsignedCarry, bool& signedOverflow)
+{
+    return T::decimalAdd(augend, addend, unsignedCarry, signedOverflow);
+}
+
+template<typename T>
+T decimalSubtract(T minuhend, T subtrahend, bool& invertedUnsignedBorrow, bool& signedOverflow)
+{
+    return T::decimalSubtract(minuhend, subtrahend, invertedUnsignedBorrow, signedOverflow);
 }
 
 }
@@ -167,6 +181,37 @@ public:
         return getBit(7);
     }
 
+    static Byte decimalAdd(Byte augend, Byte addend, bool& unsignedCarry, bool& signedOverflow)
+    {
+        int sumLow = (augend & 0x0f) + (addend & 0x0f) + unsignedCarry;
+        if (sumLow >= 0x0a) {
+            sumLow = ((sumLow + 0x06) & 0x0f) + 0x10;
+        }
+        int sum = (augend & 0xf0) + (addend & 0xf0) + sumLow;
+        if (sum >= 0xa0) {
+            sum += 0x60;
+        }
+        unsignedCarry = sum >= 0x100;
+        int signedSum = int8_t(augend & 0xf0) + int8_t(addend & 0xf0) + int8_t(sumLow);
+        signedOverflow = signedSum < -128 || signedSum > 127;
+        return sum;
+    }
+
+    static Byte decimalSubtract(Byte minuhend, Byte subtrahend, bool& invertedUnsignedBorrow, bool& signedOverflow)
+    {
+        int differenceLow = (minuhend & 0x0f) - (subtrahend & 0x0f) + invertedUnsignedBorrow - 1;
+        if (differenceLow < 0) {
+            differenceLow = ((differenceLow - 0x06) & 0x0f) - 0x10;
+        }
+        int difference = (minuhend & 0xf0) - (subtrahend & 0xf0) + differenceLow;
+        if (difference < 0) {
+            difference -= 0x60;
+        }
+        bool dummy = false;
+        Types::binarySubtract(minuhend, subtrahend, invertedUnsignedBorrow, signedOverflow, dummy);
+        return difference;
+    }
+
 private:
     uint8_t value;
 
@@ -303,6 +348,18 @@ public:
     void setHighByte(Byte highByte)
     {
         value = Word(Byte(value), highByte);
+    }
+
+    static Word decimalAdd(Word augend, Word addend, bool& unsignedCarry, bool& signedOverflow)
+    {
+        throw OperatorNotYetImplementedException("Decimal addition for Word");
+        return 0;
+    }
+
+    static Word decimalSubtract(Word minuhend, Word subtrahend, bool& invertedUnsignedBorrow, bool& signedOverflow)
+    {
+        throw OperatorNotYetImplementedException("Decimal subtraction for Word");
+        return 0;
     }
 
 private:

@@ -55,7 +55,7 @@ public:
         Video& video;
         bool running = false;
         std::string gameTitle;
-        bool fullscreen = true;
+        bool fullscreen = false;
         bool aspectRatioCorrection = true;
     };
 
@@ -118,9 +118,11 @@ public:
             std::vector<Byte>& table = highTableSelect ? highTable : lowTable;
             if (address >= size) {
                 //throw MemoryAccessException("Video::Table::writeByte: Video-memory table out-of-bounds @ " + Util::toString(address) + ", size=" + Util::toString(size));
-                table[address & 0x7fff] = 0;
+                //table[address & 0x7fff] = 0;
+                address &= size - 1;
             }
-            else {
+            //else
+            {
                 table[address] = data;
             }
             address += increment;
@@ -437,8 +439,25 @@ public:
         }
     }
 
+#define CLIP(a) (((a)&0x2000)?((a)|~0x3ff):((a)&0x3ff))
+
     void drawMode7Background(ScanlineBuffer& buffer, int displayRow)
     {
+        /*int A = mode7MatrixA;
+        int B = mode7MatrixB;
+        int C = mode7MatrixC;
+        int D = mode7MatrixD;
+        int CX = mode7CenterX;
+        int CY = mode7CenterY;
+        int HOFS = mode7HorizontalScroll;
+        int VOFS = mode7VerticalScroll;
+        int y = displayRow;
+        int X = ((A * CLIP(HOFS - CX)) & ~63)
+            + ((B * y) & ~63) + ((B * CLIP(VOFS - CY)) & ~63)
+            + (CX << 8);
+        int Y = ((C * CLIP(HOFS - CX)) & ~63)
+            + ((D * y) & ~63) + ((D * CLIP(VOFS - CY)) & ~63)
+            + (CY << 8);*/
         int vectorElement2 = displayRow + mode7VerticalScroll - mode7CenterY;
         for (int displayColumn = 0; displayColumn < rendererWidth; ++displayColumn) {
             int vectorElement1 = displayColumn + mode7HorizontalScroll - mode7CenterX;
@@ -481,6 +500,8 @@ public:
                 Byte pixelData = vram.getByte(pixelDataAddress, true);
                 buffer.data[displayColumn] = pixelData;
             }
+            //X += A;
+            //Y += C;
         }
     }
 
