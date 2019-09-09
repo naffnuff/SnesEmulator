@@ -19,18 +19,18 @@ In order to build the source you will need a compiler capable of C++17. Visual S
 ## Sources and acknowledgements
 I read a lot to get me going with this project. So far I have found that the following documents contain all the information I needed to write this emulator. Without them, I don't think I could have done it.
 ### WDC 65816
-## Table of opcodes
+# Table of opcodes
 http://www.defence-force.org/computing/oric/coding/annexe_2/index.htm
-## Description of opcodes
+# Description of opcodes
 http://www.6502.org/tutorials/65c816opcodes.html
-## Data sheet
+# Data sheet
 http://www.westerndesigncenter.com/wdc/documentation/w65c816s.pdf
-## Decimal mode
+# Decimal mode
 http://www.6502.org/tutorials/decimal_mode.html
 ### SPC-700
-## Table of opcodes, register descriptions, and boot ROM
+# Table of opcodes, register descriptions, and boot ROM
 https://github.com/gilligan/snesdev/blob/master/docs/spc700.txt
-## Full description of the sound module
+# Full description of the sound module
 https://web.archive.org/web/20090106230547/http://www.alpha-ii.com/snesmusic/files/spc700_apu_manual.txt
 ### SNES registers
 http://folk.uio.no/sigurdkn/snes/registers.txt
