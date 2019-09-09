@@ -17,7 +17,7 @@ In order to build the source you will need a compiler capable of C++17. Visual S
 * OpenGL (I worked with v4.5, but the renderer creates a v3.1 context, so that is probably the requirement)
 
 ## Sources and acknowledgements
-I read a lot to get me going with this project. So far I have found that the following documents contain all the information I needed to write this emulator. Without them, I don't think I could have done it.
+I read a lot to get me going with this project. So far I have found that the following documents contain all the information I needed to write this emulator. Most of them are a product of the work of other enthusiasts who often had to reverse engineer the hardware themselves. Without them, this would have been a much harder task.
 ### WDC 65816
 #### Table of opcodes
 http://www.defence-force.org/computing/oric/coding/annexe_2/index.htm
@@ -43,4 +43,5 @@ http://folk.uio.no/sigurdkn/snes/transparency.txt
 
 I did not in any way reverse engineer the SNES myself (I have never even ownded one!). In addition to relying on said documents I spent countless hours stepping through the debuggers of two emulators, Bsnes Classic plus (v073u1) and SnesX9 (v1.51.ep10r2 with Geiger's debugger), comparing their emulation state with mine and analyzing the behaviours I had an extra hard time understanding. The former is known for it's fidelity to the SNES hardware and has a very user-friendly debugger, whereas the latter was mainly useful to me for analyzing (H)DMA.
 
-To get me started with the renderer I also took and modified some code from tutorial #1 in these [turorials](https://github.com/opengl-tutorials/ogl).
+To get me started with the renderer I also took and modified some code from tutorial #1 in these turorials:
+https://github.com/opengl-tutorials/ogl
