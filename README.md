@@ -12,9 +12,8 @@ As of now, there is no audio.
 
 ## Requirements
 In order to build the source you will need a compiler capable of C++17. Visual Studio 2019 Community is the main tool I used, but I have also worked to keep compability with GCC (v7.3.1) and CMake (v3.10). You will also need
-* GLEW (v2.1.0)
 * GLFW (v3.3)
-* OpenGL (I worked with v4.5, but the renderer creates a v3.1 context, so that is probably the requirement)
+* OpenGL (v3.2)
 
 ## Sources and acknowledgements
 I read a lot to get me going with this project. So far I have found that the following documents contain all the information I needed to write this emulator. Without them, I don't think I could have done it.

@@ -55,7 +55,7 @@ public:
         Video& video;
         bool running = false;
         std::string gameTitle;
-        bool fullscreen = false;
+        bool fullscreen = true;
         bool aspectRatioCorrection = true;
     };
 
@@ -118,13 +118,9 @@ public:
             std::vector<Byte>& table = highTableSelect ? highTable : lowTable;
             if (address >= size) {
                 //throw MemoryAccessException("Video::Table::writeByte: Video-memory table out-of-bounds @ " + Util::toString(address) + ", size=" + Util::toString(size));
-                //table[address & 0x7fff] = 0;
                 address &= size - 1;
             }
-            //else
-            {
-                table[address] = data;
-            }
+            table[address] = data;
             address += increment;
         }
 

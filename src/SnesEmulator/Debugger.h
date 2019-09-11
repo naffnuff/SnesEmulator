@@ -461,20 +461,26 @@ public:
         output << "VRAM current address: " << registers.video.vram.address << std::endl;
         output << "maxApplicationCount: " << MemoryLocation::maxApplicationCount << std::endl;
 
-        output << "            0    1    2    3    4    5    6    7" << std::endl
-            << "            8    9    a    b    c    d    e    f"
-            << "             0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f" << std::endl;
+        output << "          0     1     2     3     4     5     6     7" << std::endl
+            << "          8     9     a     b     c     d     e     f"
+            << "                0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f" << std::endl;
+        int lastVramLowAddress = -1;
         int vramAddress = inspectedVideoMemory & 0xFF80;
         int dspAddress = 0;
         for (int i = 0; i < 16; ++i) {
             if (vramAddress < video.vram.size) {
                 uint16_t lowAddress(vramAddress);
                 lowAddress = lowAddress >> 4;
-                output << "   " << std::hex << std::setw(3) << std::setfill('0') << lowAddress << "x  " << std::dec;
+                if (lastVramLowAddress != lowAddress) {
+                    output << "   " << std::hex << std::setw(3) << std::setfill('0') << lowAddress << "x  " << std::dec;
+                }
+                else {
+                    output << "         ";
+                }
+                lastVramLowAddress = lowAddress;
 
                 for (int j = 0; j < 8 && vramAddress < video.vram.size; ++j) {
-                    Word memory = video.vram.getWord(vramAddress);
-                    output << memory << ' ';
+                    output << video.vram.getByte(vramAddress, false) << ' ' << video.vram.getByte(vramAddress, true) << ' ';
                     ++vramAddress;
                 }
             }

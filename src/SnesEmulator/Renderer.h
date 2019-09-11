@@ -6,7 +6,10 @@
 #include <string>
 #include <mutex>
 
-#include <GL/glew.h>
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 #include <GLFW/glfw3.h>
 
 class Renderer

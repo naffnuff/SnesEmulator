@@ -10,6 +10,10 @@
 
 #include "Common/System.h"
 
+#ifndef GL_UNSIGNED_SHORT_1_5_5_5_REV
+#define GL_UNSIGNED_SHORT_1_5_5_5_REV 0x8366
+#endif
+
 void Renderer::initialize(bool fullscreen, bool aspectCorrection)
 {
     if (!glfwInit()) {
@@ -49,11 +53,6 @@ void Renderer::initialize(bool fullscreen, bool aspectCorrection)
         throw std::runtime_error("Failed to open GLFW window.");
     }
     glfwMakeContextCurrent(window);
-
-    if (glewInit() != GLEW_OK) {
-        glfwTerminate();
-        throw std::runtime_error("Failed to initialize GLEW");
-    }
 
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 
