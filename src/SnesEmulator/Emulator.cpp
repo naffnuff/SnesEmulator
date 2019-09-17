@@ -16,6 +16,8 @@ int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debu
 
 void Emulator::initialize()
 {
+    registers.initialize();
+
     rom.storeToMemory(cpuState);
 
     if (rom.isLowRom()) {
@@ -69,8 +71,6 @@ void Emulator::initialize()
         }
 
         saveRamSaverThread = std::thread(std::ref(saveRamSaver));
-
-        registers.initialize();
 
         // Register mirrors
         for (Byte bank = 0x01; bank < 0x60; ++bank) {
@@ -273,10 +273,10 @@ void Emulator::run()
                             }
                         }
                         if (registers.vCounter == 224) {
-                            static double previousTime = glfwGetTime();
+                            static double previousTime = video.renderer.getTime();
                             static int frameCount = 0;
 
-                            double currentTime = glfwGetTime();
+                            double currentTime = video.renderer.getTime();
                             frameCount++;
                             if (currentTime - previousTime >= 1.0) {
                                 output << "E: " << frameCount << std::endl;

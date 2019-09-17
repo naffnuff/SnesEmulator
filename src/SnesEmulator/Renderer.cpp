@@ -8,11 +8,23 @@
 #include <array>
 #include <vector>
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
+#include <GLFW/glfw3.h>
+
 #include "Common/System.h"
 
 #ifndef GL_UNSIGNED_SHORT_1_5_5_5_REV
 #define GL_UNSIGNED_SHORT_1_5_5_5_REV 0x8366
 #endif
+
+Renderer::~Renderer()
+{
+    output << "Renderer " << title << " destructor" << std::endl;
+    terminate();
+}
 
 void Renderer::initialize(bool fullscreen, bool aspectCorrection)
 {
@@ -66,14 +78,43 @@ void Renderer::initialize(bool fullscreen, bool aspectCorrection)
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 }
 
+void Renderer::terminate()
+{
+    glfwTerminate();
+}
+
 void Renderer::setWindowProperties(bool fullscreen, bool aspectRatioCorrection)
 {
+    const float aspectCorrectionFactor = aspectRatioCorrection ? (float(height) / float(width)) * (4.f / 3.f) : 1.f;
     if (fullscreen) {
+        GLFWmonitor* fullscreenMonitor = glfwGetPrimaryMonitor();
 
+        glfwGetWindowPos(window, &windowXPosition, &windowYPosition);
+        int left, top, right, bottom;
+        glfwGetWindowFrameSize(window, &left, &top, &right, &bottom);
+        int monitorCount;
+        GLFWmonitor** monitors = glfwGetMonitors(&monitorCount);
+        for (int i = 0; i < monitorCount; ++i) {
+            GLFWmonitor* monitor = monitors[i];
+            int monitorX, monitorY;
+            glfwGetMonitorPos(monitor, &monitorX, &monitorY);
+            const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+            int relativeX = windowXPosition - left - monitorX;
+            int relativeY = windowYPosition - top - monitorY;
+            if (relativeX >= 0 && relativeX < mode->width && relativeY >= 0 && relativeY < mode->height) {
+                fullscreenMonitor = monitor;
+            }
+        }
+
+        const GLFWvidmode* mode = glfwGetVideoMode(fullscreenMonitor);
+        yScale = float(mode->height) / float(height);
+        xScale = yScale * aspectCorrectionFactor;
+        float correctedWidth = float(width) * xScale;
+        xScreenCoverage = correctedWidth / float(mode->width);
+        glfwSetWindowMonitor(window, fullscreenMonitor, 0, 0, mode->width, mode->height, mode->refreshRate);
     }
     else {
         yScale = scale;
-        const float aspectCorrectionFactor = aspectRatioCorrection ? (float(height) / float(width)) * (4.f / 3.f) : 1.f;
         xScale = yScale * aspectCorrectionFactor;
         xScreenCoverage = 1.0;
         glfwSetWindowMonitor(window, nullptr, windowXPosition, windowYPosition, int(float(width) * xScale + .5f), int(float(height) * yScale + .5f), 0);
@@ -119,11 +160,11 @@ void Renderer::update()
     if (pressKeyTimeout == 0) {
         if (escapePressed) {
             pauseRequested = true;
-            pressKeyTimeout = 60;
+            pressKeyTimeout = 30;
         }
         if (spacePressed) {
             toggleFullscreenRequested = true;
-            pressKeyTimeout = 60;
+            pressKeyTimeout = 30;
         }
     }
     else {
@@ -192,4 +233,68 @@ void Renderer::update()
 bool Renderer::isRunning() const
 {
     return glfwWindowShouldClose(window) == 0;
+}
+
+double Renderer::getTime() const
+{
+    return glfwGetTime();
+}
+
+void Renderer::setScanline(int lineIndex, const std::vector<Pixel>& pixels)
+{
+    for (int i = 0; i < pixels.size(); ++i) {
+        setPixel(lineIndex, i, pixels[i]);
+    }
+}
+
+void Renderer::setPixel(int row, int column, Pixel pixel)
+{
+    row = height - 1 - row;
+    int index = row * width + column;
+    if (index < 0 || index >= pixelBuffer.size()) {
+        throw std::logic_error("Renderer: Index out of bounds in pixel buffer");
+    }
+    pixelBuffer[index] = pixel;
+}
+
+void Renderer::setGrayscalePixel(int row, int column, uint8_t white)
+{
+    uint8_t white5Bit = white >> 3;
+    Pixel pixel = white5Bit << 0 | white5Bit << 5 | white5Bit << 10;
+    setPixel(row, column, pixel);
+}
+
+void Renderer::setGrayscaleTile(int startRow, int startColumn, const std::array<std::array<uint8_t, 8>, 8> & tile, int bitsPerPixel)
+{
+    for (int row = 0; row < 8; ++row) {
+        for (int column = 0; column < 8; ++column) {
+            setGrayscalePixel(startRow + row, startColumn + column, tile[row][column] * (bitsPerPixel == 2 ? 85 : 17));
+        }
+    }
+}
+
+void Renderer::clearDisplay(uint16_t clearColor)
+{
+    for (int row = 0; row < height; ++row) {
+        for (int column = 0; column < width; ++column) {
+            setPixel(row, column, clearColor);
+        }
+    }
+}
+
+void Renderer::clearScanline(int vCounter, uint16_t clearColor)
+{
+    for (int column = 0; column < width; ++column) {
+        setPixel(vCounter, column, clearColor);
+    }
+}
+
+bool Renderer::isPressed(int key) const
+{
+    return glfwGetKey(window, key) == GLFW_PRESS;
+}
+
+void Renderer::focusWindow(bool value)
+{
+    focusWindowRequested = value;
 }

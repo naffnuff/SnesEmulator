@@ -49,7 +49,7 @@ public:
                 }
                 video.renderer.update();
             }
-            glfwTerminate();
+            video.renderer.terminate();
         }
 
         Video& video;
@@ -120,6 +120,9 @@ public:
                 //throw MemoryAccessException("Video::Table::writeByte: Video-memory table out-of-bounds @ " + Util::toString(address) + ", size=" + Util::toString(size));
                 address &= size - 1;
             }
+            /*if (address == 0x4800 && (highTableSelect && data == 0xff || !highTableSelect && data == 0xaa)) {
+                throw MemoryAccessException("DAMN!");
+            }*/
             table[address] = data;
             address += increment;
         }
@@ -524,7 +527,12 @@ public:
             }
             Word tileDataAddress = background.tilemapAddress + (tileRow << 5) + tileColumn;
             if (screenRow) {
-                tileDataAddress += 0x800;
+                if (background.horizontalMirroring) {
+                    tileDataAddress += 0x800;
+                }
+                else {
+                    tileDataAddress += 0x400;
+                }
             }
             if (screenColumn) {
                 tileDataAddress += 0x400;
