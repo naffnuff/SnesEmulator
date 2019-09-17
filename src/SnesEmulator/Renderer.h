@@ -6,9 +6,6 @@
 #include <string>
 #include <mutex>
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-
 class Renderer
 {
 public:
@@ -21,89 +18,33 @@ public:
         , height(height)
         , scale(scale)
         , syncUpdate(syncUpdate)
-        , pixelBuffer(height* width)
+        , pixelBuffer(size_t(height * width))
         , output(output)
         , title("SNES Emulator")
     {
     }
 
-    ~Renderer()
-    {
-        output << "Renderer " << title << " destructor" << std::endl;
-        glfwTerminate();
-    }
-
     Renderer(const Renderer&) = delete;
     Renderer& operator=(const Renderer&) = delete;
 
+    ~Renderer();
+
     void initialize(bool fullscreen = false, bool aspectCorrection = false);
+    void terminate();
     void setWindowProperties(bool fullscreen, bool aspectCorrection);
     void update();
     bool isRunning() const;
+    double getTime() const;
+    void setScanline(int lineIndex, const std::vector<Pixel>& pixels);
+    void setPixel(int row, int column, Pixel pixel);
+    void setGrayscalePixel(int row, int column, uint8_t white);
+    void setGrayscaleTile(int startRow, int startColumn, const std::array<std::array<uint8_t, 8>, 8> & tile, int bitsPerPixel);
+    void clearDisplay(uint16_t clearColor);
+    void clearScanline(int vCounter, uint16_t clearColor);
+    bool isPressed(int key) const;
+    void focusWindow(bool value);
 
-    double getTime() const
-    {
-        return glfwGetTime();
-    }
 
-    void setScanline(int lineIndex, const std::vector<Pixel>& pixels)
-    {
-        for (int i = 0; i < pixels.size(); ++i) {
-            setPixel(lineIndex, i, pixels[i]);
-        }
-    }
-
-    void setPixel(int row, int column, Pixel pixel)
-    {
-        row = height - 1 - row;
-        int index = row * width + column;
-        if (index < 0 || index >= pixelBuffer.size()) {
-            throw std::logic_error("Renderer: Index out of bounds in pixel buffer");
-        }
-        pixelBuffer[index] = pixel;
-    }
-
-    void setGrayscalePixel(int row, int column, uint8_t white)
-    {
-        uint8_t white5Bit = white >> 3;
-        Pixel pixel = white5Bit << 0 | white5Bit << 5 | white5Bit << 10;
-        setPixel(row, column, pixel);
-    }
-
-    void setGrayscaleTile(int startRow, int startColumn, const std::array<std::array<uint8_t, 8>, 8>& tile, int bitsPerPixel)
-    {
-        for (int row = 0; row < 8; ++row) {
-            for (int column = 0; column < 8; ++column) {
-                setGrayscalePixel(startRow + row, startColumn + column, tile[row][column] * (bitsPerPixel == 2 ? 85 : 17));
-            }
-        }
-    }
-
-    void clearDisplay(uint16_t clearColor)
-    {
-        for (int row = 0; row < height; ++row) {
-            for (int column = 0; column < width; ++column) {
-                setPixel(row, column, clearColor);
-            }
-        }
-    }
-
-    void clearScanline(int vCounter, uint16_t clearColor)
-    {
-        for (int column = 0; column < width; ++column) {
-            setPixel(vCounter, column, clearColor);
-        }
-    }
-
-    bool isPressed(int key) const
-    {
-        return glfwGetKey(window, key) == GLFW_PRESS;
-    }
-
-    void focusWindow(bool value)
-    {
-        focusWindowRequested = value;
-    }
 
 public:
     bool pauseRequested = false;
@@ -133,7 +74,7 @@ public:
 
     std::ostream& output;
 
-    GLFWwindow* window;
+    struct GLFWwindow* window = nullptr;
 
     std::string title;
 

@@ -227,16 +227,18 @@ public:
                 incrementVramOnHighByte = value.getBit(7);
             });
 
-        /*makeWriteRegister(0x2116, "VRAM Address low byte", false, 
+        makeWriteRegister(0x2116, "VRAM Address low byte", false, 
             [this](Byte value) {
                 video.vram.address.setLowByte(value);
+                //vramBuffer = video.vram.readNextWord(0);
             });
 
         makeWriteRegister(0x2117, "VRAM Address high byte", false,
             [this](Byte value) {
                 video.vram.address.setHighByte(value & 0x7f);
-            });*/
-        makeWriteRegister(0x2116, "VRAM Address", false, video.vram.address);
+                vramBuffer = video.vram.readNextWord(0);
+            });
+        //makeWriteRegister(0x2116, "VRAM Address", false, video.vram.address);
 
         makeWriteRegister(0x2118, "VRAM Data Write low byte", false,
             [this](Byte value) {
@@ -394,10 +396,10 @@ public:
         makeReadRegister(0x213d, "Vertical Scanline Location", false, verticalScanlineLocation);
         makeReadRegister(0x213e, "PPU Status Flag and Version", false);
         makeReadRegister(0x213f, "PPU Status Flag and Version", false,
-            [this](Byte& byte) {
-                byte = 3;
-                byte.setBit(7, interlaceField);
-                byte.setBit(6, externalLatch);
+            [this](Byte& value) {
+                value = 3;
+                value.setBit(7, interlaceField);
+                value.setBit(6, externalLatch);
                 if (programmableIOPort.getBit(7)) {
                     externalLatch = false;
                 }
@@ -405,6 +407,10 @@ public:
                 verticalScanlineLocation.highByteSelect = false;
             });
 
+        makeWriteRegister(0x2180, "WRAM Data read/write", false,
+            [this](Byte value) {
+                state.getMemoryLocation(wramAddress++)->setValue(value);
+            });
         makeWriteRegister(0x2181, "WRAM Address", false, wramAddress);
 
         makeReadWriteRegister(0x4016, "NES-style Joypad Access Port 1", false,

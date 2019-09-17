@@ -158,7 +158,12 @@ public:
                     for (int tileColumn = 0; tileColumn < 32; ++tileColumn) {
                         Word tileDataAddress = background.tilemapAddress + (tileRow << 5) + tileColumn;
                         if (screenRow) {
-                            tileDataAddress += 0x800;
+                            if (background.horizontalMirroring) {
+                                tileDataAddress += 0x800;
+                            }
+                            else {
+                                tileDataAddress += 0x400;
+                            }
                         }
                         if (screenColumn) {
                             tileDataAddress += 0x400;

@@ -16,6 +16,8 @@ int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debu
 
 void Emulator::initialize()
 {
+    registers.initialize();
+
     rom.storeToMemory(cpuState);
 
     if (rom.isLowRom()) {
@@ -70,8 +72,6 @@ void Emulator::initialize()
 
         saveRamSaverThread = std::thread(std::ref(saveRamSaver));
 
-        registers.initialize();
-
         // Register mirrors
         for (Byte bank = 0x01; bank < 0x60; ++bank) {
             for (Word address = 0x2000; address < 0x8000; ++address) {
@@ -110,7 +110,7 @@ void Emulator::run()
     BackgroundViewer background1Viewer(video, BackgroundLayer1, 0, 10);
     BackgroundViewer background2Viewer(video, BackgroundLayer2, Video::rendererWidth * 2 + 20, 10);
     BackgroundViewer background3Viewer(video, BackgroundLayer3, 0, Video::rendererWidth * 2 + 20);
-    //BackgroundViewer background4Viewer(video, BackgroundLayer4, Video::rendererWidth * 2, Video::rendererWidth * 2 + 20);
+    BackgroundViewer background4Viewer(video, BackgroundLayer4, Video::rendererWidth * 2, Video::rendererWidth * 2 + 20);
     SpriteLayerViewer spriteLayer1Viewer(video, 0, Video::rendererWidth * 2 + 20, Video::rendererWidth * 2 + 40);
     SpriteLayerViewer spriteLayer2Viewer(video, 1, Video::rendererWidth * 2 + 20 + Video::rendererWidth + 20, Video::rendererWidth * 2 + 40);
     SpriteLayerViewer spriteLayer3Viewer(video, 2, Video::rendererWidth * 2 + 20, Video::rendererWidth * 2 + 40 + Video::rendererWidth);
@@ -273,10 +273,10 @@ void Emulator::run()
                             }
                         }
                         if (registers.vCounter == 224) {
-                            static double previousTime = glfwGetTime();
+                            static double previousTime = video.renderer.getTime();
                             static int frameCount = 0;
 
-                            double currentTime = glfwGetTime();
+                            double currentTime = video.renderer.getTime();
                             frameCount++;
                             if (currentTime - previousTime >= 1.0) {
                                 output << "E: " << frameCount << std::endl;
@@ -292,7 +292,7 @@ void Emulator::run()
                             background1Viewer.update();
                             background2Viewer.update();
                             background3Viewer.update();
-                            //background4Viewer.update();
+                            background4Viewer.update();
                             spriteLayer1Viewer.update();
                             spriteLayer2Viewer.update();
                             spriteLayer3Viewer.update();

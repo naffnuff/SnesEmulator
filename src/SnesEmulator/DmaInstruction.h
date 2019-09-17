@@ -98,23 +98,15 @@ public:
 
                     Byte dmaControl = channel.dmaControl.getValue();
                     bool direction = dmaControl.getBit(7);
-                    if (direction) {
-                        throw OperatorNotYetImplementedException("DMA direction not implemented");
-                    }
                     int byteCount = 0;
                     Byte transferMode = dmaControl.getBits(0, 3);
                     if (transferMode == 0) {
-                        Byte data = sourceLocation->getValue();
-                        registerLocation->setValue(data);
-
-                        byteCount = 1;
+                        transferByte(sourceLocation, registerLocation, direction, byteCount);
                     }
                     else if (transferMode == 1) {
-                        registerLocation->setValue(sourceLocation->getValue());
-                        byteCount = 1;
+                        transferByte(sourceLocation, registerLocation, direction, byteCount);
                         if (dataSize > 1) {
-                            registerLocation->nextInMemory->setValue(sourceLocation->nextInBank->getValue());
-                            byteCount = 2;
+                            transferByte(sourceLocation->nextInBank, registerLocation->nextInMemory, direction, byteCount);
                         }
                     }
                     else {
@@ -142,6 +134,17 @@ public:
             }
         }
         return cycles;
+    }
+
+    static void transferByte(MemoryLocation* sourceLocation, MemoryLocation* registerLocation, bool direction, int& byteCount)
+    {
+        if (direction) {
+            sourceLocation->setValue(registerLocation->getValue());
+        }
+        else {
+            registerLocation->setValue(sourceLocation->getValue());
+        }
+        ++byteCount;
     }
 
     int size() const override

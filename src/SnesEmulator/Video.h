@@ -49,13 +49,13 @@ public:
                 }
                 video.renderer.update();
             }
-            glfwTerminate();
+            video.renderer.terminate();
         }
 
         Video& video;
         bool running = false;
         std::string gameTitle;
-        bool fullscreen = false;
+        bool fullscreen = true;
         bool aspectRatioCorrection = true;
     };
 
@@ -118,13 +118,12 @@ public:
             std::vector<Byte>& table = highTableSelect ? highTable : lowTable;
             if (address >= size) {
                 //throw MemoryAccessException("Video::Table::writeByte: Video-memory table out-of-bounds @ " + Util::toString(address) + ", size=" + Util::toString(size));
-                //table[address & 0x7fff] = 0;
                 address &= size - 1;
             }
-            //else
-            {
-                table[address] = data;
-            }
+            /*if (address == 0x4800 && (highTableSelect && data == 0xff || !highTableSelect && data == 0xaa)) {
+                throw MemoryAccessException("DAMN!");
+            }*/
+            table[address] = data;
             address += increment;
         }
 
@@ -528,7 +527,12 @@ public:
             }
             Word tileDataAddress = background.tilemapAddress + (tileRow << 5) + tileColumn;
             if (screenRow) {
-                tileDataAddress += 0x800;
+                if (background.horizontalMirroring) {
+                    tileDataAddress += 0x800;
+                }
+                else {
+                    tileDataAddress += 0x400;
+                }
             }
             if (screenColumn) {
                 tileDataAddress += 0x400;

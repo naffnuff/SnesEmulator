@@ -50,11 +50,9 @@ public:
             for (int i = 0; i < 3; ++i) {
                 if (timers[i].enabled && (timers[i].highPrecision || audioCycle % 128 == 0)) {
                     ++timers[i].tick;
-                    //output << "Timer " << (i + 1) << ": " << timers[i].tick << " (" << timers[i].target << ")" << std::endl;
                     if (timers[i].tick == timers[i].target) {
                         timers[i].tick = 0;
                         timers[i].counter = (timers[i].counter + 1) % 0x10;
-                        //output << "Bang! " << timers[i].counter << std::endl;
                     }
                 }
             }
@@ -155,6 +153,10 @@ public:
         makeWriteRegister(0xf1, "I/0 and Timer Control", false,
             [this, cpuToSpcPorts](Byte byte) {
                 for (int i = 0; i < 3; ++i) {
+                    if (!timers[i].enabled && byte.getBit(i)) {
+                        timers[i].tick = 0;
+                        timers[i].counter = 0;
+                    }
                     timers[i].enabled = byte.getBit(i);
                 }
                 if (byte.getBit(4)) {
@@ -184,14 +186,12 @@ public:
         for (int i = 0; i < 3; ++i) {
             makeWriteRegister(0xfa + i, std::string("Timer ") + char('1' + i) + " Scaling Target", true,
                 [this, i](Byte value) {
-                    timers[i].target = value;
-                    if (timers[i].target == 0) {
-                        timers[i].target = 0x100;
-                    }
+                    timers[i].target = value == 0 ? 0x100 : int(value);
                 });
             makeReadRegister(0xfd + i, std::string("Timer ") + char('1' + i) + " Output", false,
                 [this, i](Byte& value) {
                     value = timers[i].counter;
+                    timers[i].counter = 0;
                 });
         }
 

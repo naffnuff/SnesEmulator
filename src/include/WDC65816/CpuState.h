@@ -531,6 +531,11 @@ public:
         nmiActive = false;
         irqActive = false;
 
+        // DMA Enable
+        memory[0x420b].setValue(0);
+        // HDMA Enable
+        memory[0x420c].setValue(0);
+
         for (MemoryLocation& a : accumulator) {
             a.reset();
         }
