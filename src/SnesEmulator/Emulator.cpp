@@ -126,9 +126,6 @@ void Emulator::run()
 
     uint64_t audioCycle = 0;
 
-    int incrementCount = 0;
-    int totalCount = 0;
-
     registers.hCounter = int(masterCycle);
 
     bool nmiRequested = false;
@@ -251,10 +248,8 @@ void Emulator::run()
                     //increment = true;
 
                     if (increment) {
-                        ++incrementCount;
                         ++cycleCountDelta;
                     }
-                    ++totalCount;
                 }
 
                 if (increment) {
@@ -274,15 +269,30 @@ void Emulator::run()
                         }
                         if (registers.vCounter == 224) {
                             static double previousTime = video.renderer.getTime();
-                            static int frameCount = 0;
+                            static uint32_t frameCount = 0;
+                            static uint32_t totalFrameCount = 0;
 
                             double currentTime = video.renderer.getTime();
-                            frameCount++;
+                            ++frameCount;
+                            ++totalFrameCount;
+                            static uint32_t minFrameCount = -1;
+                            static uint32_t maxFrameCount = 0;
+                            static int printOuts = 0;
                             if (currentTime - previousTime >= 1.0) {
-                                output << "E: " << frameCount << std::endl;
+                                minFrameCount = min(minFrameCount, frameCount);
+                                maxFrameCount = max(maxFrameCount, frameCount);
+
+                                output << "FPS: " << frameCount << std::endl;
 
                                 frameCount = 0;
                                 previousTime = currentTime;
+
+                                if (++printOuts % 10 == 0) {
+                                    double elapsedTime = video.renderer.getTime() - runStartTime;
+                                    output << "Avg. FPS: " << (totalFrameCount / elapsedTime) << std::endl;
+                                    output << "Min. FPS: " << minFrameCount << std::endl;
+                                    output << "Max. FPS: " << maxFrameCount << std::endl;
+                                }
                             }
 
                             //video.renderer.update();
