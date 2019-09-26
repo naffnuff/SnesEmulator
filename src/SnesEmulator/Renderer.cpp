@@ -20,6 +20,66 @@
 #define GL_UNSIGNED_SHORT_1_5_5_5_REV 0x8366
 #endif
 
+namespace {
+
+void getConsoleWindowPosition(int& left, int& top, int& right, int& bottom);
+
+GLFWmonitor* getMonitorForPoint(int x, int y)
+{
+    int monitorCount;
+    GLFWmonitor** monitors = glfwGetMonitors(&monitorCount);
+    GLFWmonitor* result = nullptr;
+    for (int i = 0; i < monitorCount; ++i) {
+        GLFWmonitor* monitor = monitors[i];
+        int monitorX, monitorY;
+        glfwGetMonitorPos(monitor, &monitorX, &monitorY);
+        const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+        int relativeX = x - monitorX;
+        int relativeY = y - monitorY;
+        if (relativeX >= 0 && relativeX < mode->width && relativeY >= 0 && relativeY < mode->height) {
+            result = monitor;
+        }
+    }
+    return result;
+}
+
+void getWindowPosition(GLFWwindow* window, int& x, int& y)
+{
+    glfwGetWindowPos(window, &x, &y);
+    int left, top, right, bottom;
+    glfwGetWindowFrameSize(window, &left, &top, &right, &bottom);
+    x -= left;
+    y -= top;
+}
+
+#ifdef _WIN32
+void getConsoleWindowPosition(int& left, int& top, int& right, int& bottom)
+{
+    if (HWND window = GetConsoleWindow()) {
+        RECT rect;
+        GetWindowRect(window, &rect);
+        left = rect.left;
+        top = rect.top;
+        right = rect.right;
+        bottom = rect.bottom;
+    }
+    else {
+        left = 0;
+        top = 0;
+        right = 0;
+        bottom = 0;
+    }
+}
+#else
+void getConsoleWindowPosition(int& x, int& y)
+{
+    x = 0;
+    y = 0;
+}
+#endif
+
+}
+
 Renderer::~Renderer()
 {
     output << "Renderer " << title << " destructor" << std::endl;
@@ -37,8 +97,14 @@ void Renderer::initialize(bool fullscreen, bool aspectCorrection)
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
 
     const float aspectCorrectionFactor = aspectCorrection ? (float(height) / float(width)) * (4.f / 3.f) : 1.f;
+
+    int left, top, right, bottom;
+    getConsoleWindowPosition(left, top, right, bottom);
+    windowXPosition = right;
+    windowYPosition = top;
+
     if (fullscreen) {
-        GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+        GLFWmonitor* monitor = getMonitorForPoint(left, top);
         const GLFWvidmode* mode = glfwGetVideoMode(monitor);
         glfwWindowHint(GLFW_RED_BITS, mode->redBits);
         glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
@@ -87,25 +153,12 @@ void Renderer::setWindowProperties(bool fullscreen, bool aspectRatioCorrection)
 {
     const float aspectCorrectionFactor = aspectRatioCorrection ? (float(height) / float(width)) * (4.f / 3.f) : 1.f;
     if (fullscreen) {
-        GLFWmonitor* fullscreenMonitor = glfwGetPrimaryMonitor();
-
-        glfwGetWindowPos(window, &windowXPosition, &windowYPosition);
-        int left, top, right, bottom;
-        glfwGetWindowFrameSize(window, &left, &top, &right, &bottom);
-        int monitorCount;
-        GLFWmonitor** monitors = glfwGetMonitors(&monitorCount);
-        for (int i = 0; i < monitorCount; ++i) {
-            GLFWmonitor* monitor = monitors[i];
-            int monitorX, monitorY;
-            glfwGetMonitorPos(monitor, &monitorX, &monitorY);
-            const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-            int relativeX = windowXPosition - left - monitorX;
-            int relativeY = windowYPosition - top - monitorY;
-            if (relativeX >= 0 && relativeX < mode->width && relativeY >= 0 && relativeY < mode->height) {
-                fullscreenMonitor = monitor;
-            }
+        int x, y;
+        getWindowPosition(window, x, y);
+        GLFWmonitor* fullscreenMonitor = getMonitorForPoint(x, y);
+        if (!fullscreenMonitor) {
+            fullscreenMonitor = glfwGetPrimaryMonitor();
         }
-
         const GLFWvidmode* mode = glfwGetVideoMode(fullscreenMonitor);
         yScale = float(mode->height) / float(height);
         xScale = yScale * aspectCorrectionFactor;

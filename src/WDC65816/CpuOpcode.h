@@ -1509,7 +1509,6 @@ class EOR_43 : public AddressMode::StackRelative<Operator::EOR>
     // 2   5-m         stk,S     m.....m. . EOR $32,S
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("EOR_43");
         return 4 + applyOperand();
     }
 
