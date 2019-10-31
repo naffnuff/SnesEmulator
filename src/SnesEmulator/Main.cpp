@@ -71,15 +71,42 @@ int main(int, char**)
                     int dummy = std::getchar();
                 }
             }
+            output << std::endl;
             std::string pickedTitle;
             while (pickedTitle.empty()) {
-                int inputValue = -1;
-                input >> inputValue;
-                int dummy = std::getchar();
-                output << "Input: " << inputValue << std::endl;
-                --inputValue;
-                if (inputValue >= 0 && inputValue < titles.size()) {
-                    pickedTitle = titles[inputValue];
+                output << "Enter command or game index (h for help): ";
+                std::string command;
+                std::getline(input, command);
+                try {
+                    if (command.empty()) {
+                    }
+                    else if (command == "h") {
+                        output << "Keyboard controls:" << std::endl;
+                        output << "Toggle fullscreen: Space" << std::endl;
+                        output << "Up: W" << std::endl;
+                        output << "Left: A" << std::endl;
+                        output << "Down: S" << std::endl;
+                        output << "Right: D" << std::endl;
+                        output << "A: L" << std::endl;
+                        output << "B: K" << std::endl;
+                        output << "X: I" << std::endl;
+                        output << "Y: J" << std::endl;
+                        output << "L: U" << std::endl;
+                        output << "R: O" << std::endl;
+                        output << "Start: ," << std::endl;
+                        output << "Select: ." << std::endl;
+                        output << "Or connect a controller!" << std::endl;
+                    }
+                    else {
+                        int inputValue = stoi(command);
+                        --inputValue;
+                        if (inputValue >= 0 && inputValue < titles.size()) {
+                            pickedTitle = titles[inputValue];
+                        }
+                    }
+                }
+                catch (const std::exception& e) {
+                    error << "Bad input: " << e.what() << std::endl;
                 }
             }
             rom.loadFromFile(pickedTitle);

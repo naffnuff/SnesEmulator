@@ -50,7 +50,7 @@ public:
     //static const size_t spcRegisterCount = 4;
 
     State()
-        : memory(0x1000000, MemoryLocation(0x55))
+        : memory(0x1000000, MemoryLocation(0x55, std::bind(&State::debugNameQuery, this, std::placeholders::_1)))
     {
         std::cout << "Memory size=" << memory.size() << std::endl;
 
@@ -71,6 +71,18 @@ public:
 
     State(const State&) = delete;
     State& operator=(const State&) = delete;
+
+    std::string debugNameQuery(const MemoryLocation* memoryLocation)
+    {
+        std::stringstream ss;
+        for (int i = 0; i < memory.size(); ++i) {
+            if (&memory[i] == memoryLocation) {
+                ss << Long(i);
+                break;
+            }
+        }
+        return ss.str();
+    }
 
     void loadInterruptVectors()
     {
@@ -558,7 +570,10 @@ private:
     bool emulationMode = true;
 
     std::vector<MemoryLocation> memory;
-    std::array<MemoryLocation, 2> accumulator;
+    std::array<MemoryLocation, 2> accumulator = {
+        MemoryLocation(0, [](const MemoryLocation*) { return "CPU State Accumulator low byte"; }),
+        MemoryLocation(0, [](const MemoryLocation*) { return "CPU State Accumulator high byte"; })
+    };
     std::array<Word, IndexRegisterCount> indexRegisters;
 
     InterruptVectors nativeVectors;

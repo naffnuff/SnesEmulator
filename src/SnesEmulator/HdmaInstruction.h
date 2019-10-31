@@ -12,6 +12,21 @@ class HdmaInstruction : public Instruction
 private:
     struct Channel
     {
+        Channel()
+            : hdmaControl(0, [](const MemoryLocation*) { return "HdmaInstruction: HDMA Control"; })
+            , registerAddress(0, [](const MemoryLocation*) { return "HdmaInstruction: Registe Address"; })
+            , startAddressLowByte(0, [](const MemoryLocation*) { return "HdmaInstruction: Start Address low byte"; })
+            , startAddressHighByte(0, [](const MemoryLocation*) { return "HdmaInstruction: Start Address high byte"; })
+            , startAddressBankByte(0, [](const MemoryLocation*) { return "HdmaInstruction: Start Address bank byte"; })
+            , indirectAddressLowByte(0, [](const MemoryLocation*) { return "HdmaInstruction: Indirect Address low byte"; })
+            , indirectAddressHighByte(0, [](const MemoryLocation*) { return "HdmaInstruction: Indirect Address high byte"; })
+            , indirectAddressBankByte(0, [](const MemoryLocation*) { return "HdmaInstruction: Indirect Address bank byte"; })
+            , addressLowByte(0, [](const MemoryLocation*) { return "HdmaInstruction: Address low byte"; })
+            , addressHighByte(0, [](const MemoryLocation*) { return "HdmaInstruction: Address high byte"; })
+            , lineCounter(0, [](const MemoryLocation*) { return "HdmaInstruction: Line Counter"; })
+        {
+        }
+
         MemoryLocation hdmaControl;
         MemoryLocation registerAddress;
         MemoryLocation startAddressLowByte;
@@ -32,6 +47,8 @@ public:
         , error(error)
         , state(state)
         , channels(8)
+        , hdmaEnabled(0, [](const MemoryLocation*) { return "HdmaInstruction: HDMA Enabled"; })
+        , dmaEnabled(0, [](const MemoryLocation*) { return "HdmaInstruction: DMA Enabled"; })
     {
         dmaEnabled.setMappings(state.getMemoryLocation(0x420b));
         hdmaEnabled.setMappings(state.getMemoryLocation(0x420c));

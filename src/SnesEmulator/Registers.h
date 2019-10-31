@@ -524,7 +524,7 @@ public:
             makeReadWriteRegister(toDmaAddress(i, 0xa), "HDMA Line Counter Channel " + channel, false);
         }
 
-        for (int address = 0x2000; address < 0x2100; ++address) {
+        /*for (int address = 0x2000; address < 0x2100; ++address) {
             MemoryLocation* memory = state.getMemoryLocation(Long(address, 0));
             memory->setReadOnlyValue(0x0f);
         }
@@ -549,7 +549,7 @@ public:
         for (int address = 0x437b; address < 0x8000; ++address) {
             MemoryLocation* memory = state.getMemoryLocation(Long(address, 0));
             memory->setReadOnlyValue(0x0f);
-        }
+        }*/
     }
 
     Word getMode7WordValue(Byte value)
