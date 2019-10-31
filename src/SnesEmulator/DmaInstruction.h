@@ -12,6 +12,17 @@ class DmaInstruction : public Instruction
 private:
     struct Channel
     {
+        Channel()
+            : dmaControl(0, [](const MemoryLocation*) { return "DmaInstruction: DMA Control"; })
+            , registerAddress(0, [](const MemoryLocation*) { return "DmaInstruction: Register Address"; })
+            , sourceAddressLowByte(0, [](const MemoryLocation*) { return "DmaInstruction: Source Address low byte"; })
+            , sourceAddressHighByte(0, [](const MemoryLocation*) { return "DmaInstruction: Source Address high byte"; })
+            , sourceBank(0, [](const MemoryLocation*) { return "DmaInstruction: Source Bank"; })
+            , dataSizeLowByte(0, [](const MemoryLocation*) { return "DmaInstruction: Data Size low byte"; })
+            , dataSizeHighByte(0, [](const MemoryLocation*) { return "DmaInstruction: Data Size high byte"; })
+        {
+        }
+
         MemoryLocation dmaControl;
         MemoryLocation registerAddress;
         MemoryLocation sourceAddressLowByte;
@@ -28,6 +39,7 @@ public:
         , error(error)
         , state(state)
         , channels(8)
+        , dmaEnabled(0, [](const MemoryLocation*) { return "DmaInstruction: DMA Enabled"; })
     {
         dmaEnabled.setMappings(state.getMemoryLocation(0x420b));
         for (int i = 0; i < channels.size(); ++i) {

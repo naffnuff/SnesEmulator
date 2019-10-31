@@ -459,8 +459,7 @@ class Immediate : public Instruction2Byte
 
     int invokeOperator(Byte lowByte) override
     {
-        MemoryLocation memory;
-        memory.setReadOnlyValue(lowByte);
+        MemoryLocation memory(MemoryLocation::ReadOnly, lowByte, [](const MemoryLocation*) { return "AddressMode::Immediate: local memory"; });
         return Operator::invoke(state, &memory);
     }
 
@@ -479,9 +478,10 @@ class Immediate16Bit : public Instruction3Byte
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
-        std::array<MemoryLocation, 2> memory;
-        memory[0].setReadOnlyValue(lowByte);
-        memory[1].setReadOnlyValue(highByte);
+        std::array<MemoryLocation, 2> memory = {
+            MemoryLocation(MemoryLocation::ReadOnly, lowByte, [](const MemoryLocation*) { return "AddressMode::Immediate16Bit: local memory low byte"; }),
+            MemoryLocation(MemoryLocation::ReadOnly, highByte, [](const MemoryLocation*) { return "AddressMode::Immediate16Bit: local memory high byte"; })
+        };
         return Operator::invoke(state, memory.data());
     }
 

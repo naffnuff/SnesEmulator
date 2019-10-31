@@ -30,24 +30,37 @@ public:
         Apply
     };
 
-    MemoryLocation()
+    typedef std::function<std::string(const MemoryLocation*)> DebugNameQuery;
+
+    /*MemoryLocation()
         : nextInMemory(&this[1])
         , nextInBank(&this[1])
         , nextInPage(&this[1])
     {
-    }
+    }*/
 
-    MemoryLocation(Byte value)
+    MemoryLocation(Byte value, DebugNameQuery debugNameQuery)
         : value(value)
-        //, resetValue(value)
+        , debugNameQuery(debugNameQuery)
         , nextInMemory(&this[1])
         , nextInBank(&this[1])
         , nextInPage(&this[1])
     {
     }
 
-    MemoryLocation(const MemoryLocation&)
-        : nextInMemory(&this[1])
+    MemoryLocation(Type type, Byte value, DebugNameQuery debugNameQuery)
+        : type(type)
+        , value(value)
+        , debugNameQuery(debugNameQuery)
+        , nextInMemory(&this[1])
+        , nextInBank(&this[1])
+        , nextInPage(&this[1])
+    {
+    }
+
+    MemoryLocation(const MemoryLocation& other)
+        : debugNameQuery(other.debugNameQuery)
+        , nextInMemory(&this[1])
         , nextInBank(&this[1])
         , nextInPage(&this[1])
     {
@@ -281,11 +294,7 @@ public:
 private:
     void throwAccessException(const std::string& function) const
     {
-        throw AccessException(function + ": Bad memory access"
-#ifdef DEBUGMEMORY
-            + " @ " + debugName
-#endif
-        );
+        throw AccessException(function + ": Bad memory access @ " + debugNameQuery(this));
     }
 
 private:
@@ -299,6 +308,8 @@ private:
 
     std::function<void(Operation operation, Byte value, uint64_t applicationCount)> breakpoint = nullptr;
 
+    DebugNameQuery debugNameQuery = nullptr;
+
 public:
     MemoryLocation* nextInMemory = nullptr;
     MemoryLocation* nextInBank = nullptr;
@@ -307,10 +318,6 @@ public:
     std::function<void(Byte& value)> onRead = nullptr;
     std::function<void(Byte oldValue, Byte& newValue)> onWrite = nullptr;
     std::function<void(Byte& value)> onApply = nullptr;
-
-#ifdef DEBUGMEMORY
-    std::string debugName;
-#endif
 
     friend std::ostream& operator<<(std::ostream&, const MemoryLocation&);
 };

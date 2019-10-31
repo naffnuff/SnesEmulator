@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include <sstream>
 #include <iostream>
 #include <vector>
 #include <array>
@@ -41,7 +41,7 @@ public:
 
     State()
         : programCounter(0xffc0)
-        , memory(0x10000, MemoryLocation(0xff))
+        , memory(0x10000, MemoryLocation(0xff, std::bind(&State::debugNameQuery, this, std::placeholders::_1)))
     {
         for (MemoryLocation& r : registers) {
             r.setReadWrite();
@@ -73,6 +73,18 @@ public:
 
     State(const State&) = delete;
     State& operator=(const State&) = delete;
+
+    std::string debugNameQuery(const MemoryLocation* memoryLocation)
+    {
+        std::stringstream ss;
+        for (int i = 0; i < memory.size(); ++i) {
+            if (&memory[i] == memoryLocation) {
+                ss << Long(i);
+                break;
+            }
+        }
+        return ss.str();
+    }
 
     void reset()
     {
@@ -334,7 +346,13 @@ private:
     Word programCounter;
 
     std::vector<MemoryLocation> memory;
-    std::array<MemoryLocation, RegisterCount> registers;
+    std::array<MemoryLocation, RegisterCount> registers = {
+        MemoryLocation(0, [](const MemoryLocation*) { return "SPC State Accumulator"; }),
+        MemoryLocation(0, [](const MemoryLocation*) { return "SPC State Index Register Y"; }),
+        MemoryLocation(0, [](const MemoryLocation*) { return "SPC State Index Register X"; }),
+        MemoryLocation(0, [](const MemoryLocation*) { return "SPC State Stack Pointer"; }),
+        MemoryLocation(0, [](const MemoryLocation*) { return "SPC State Flags"; })
+    };
 };
 
 }
