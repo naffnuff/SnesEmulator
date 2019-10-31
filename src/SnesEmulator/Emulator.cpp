@@ -245,7 +245,7 @@ void Emulator::run()
                         increment = true;
                     }
 
-                    //increment = true;
+                    increment = true;
 
                     if (increment) {
                         ++cycleCountDelta;

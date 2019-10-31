@@ -55,7 +55,7 @@ public:
         Video& video;
         bool running = false;
         std::string gameTitle;
-        bool fullscreen = true;
+        bool fullscreen = false;
         bool aspectRatioCorrection = true;
     };
 
