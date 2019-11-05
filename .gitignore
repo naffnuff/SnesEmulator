@@ -268,4 +268,6 @@ __pycache__/
 /build/vs2017/SnesEmulator/spc.txt
 /build/vs2017/SnesEmulator/cpu.txt
 *.save
+
+# CMake build output
 /build/cmake/SnesEmulator/out
