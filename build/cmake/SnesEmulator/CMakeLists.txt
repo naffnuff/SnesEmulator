@@ -10,6 +10,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Include sub-projects.
-add_subdirectory ("WDC65816")
+add_subdirectory ("Common")
 add_subdirectory ("SPC700")
+add_subdirectory ("WDC65816")
 add_subdirectory ("SnesEmulator")
