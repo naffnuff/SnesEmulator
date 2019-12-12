@@ -10,6 +10,7 @@
 
 #include "Types.h"
 #include "MemoryLocation.h"
+#include "Memory.h"
 #include "Util.h"
 
 namespace CPU {
@@ -17,6 +18,9 @@ namespace CPU {
 class State
 {
 public:
+    typedef Long AddressType;
+    typedef Memory<AddressType> MemoryType;
+
     struct InterruptVectors
     {
         Word Coprocessor;
@@ -47,10 +51,49 @@ public:
         IndexRegisterCount
     };
 
+private:
+    class Accumulator : public Access
+    {
+    public:        
+        Byte readByte() const override
+        {
+            return accumulatorA;
+        }
+
+        Word readWord() const override
+        {
+            return Word(accumulatorA, accumulatorB);
+        }
+
+        void writeByte(Byte value) override
+        {
+            accumulatorA = value;
+        }
+        
+        void writeWord(Word value) override
+        {
+            accumulatorA = value.getLowByte();
+            accumulatorB = value.getHighByte();
+        }
+
+        void swap()
+        {
+            Byte newAccumulatorA = accumulatorB;
+            accumulatorB = accumulatorA;
+            accumulatorA = newAccumulatorA;
+        }
+
+    private:
+        Byte accumulatorA;
+        Byte accumulatorB;
+    };
+
+public:
+
     //static const size_t spcRegisterCount = 4;
 
     State()
-        : memory(0x1000000, MemoryLocation(0x55, std::bind(&State::debugNameQuery, this, std::placeholders::_1)))
+        : memory()
     {
         std::cout << "Memory size=" << memory.size() << std::endl;
 
@@ -63,42 +106,26 @@ public:
 #endif
 
         forceRegisters();
-
-        for (MemoryLocation& a : accumulator) {
-            a.setReadWrite();
-        }
     }
 
     State(const State&) = delete;
     State& operator=(const State&) = delete;
 
-    std::string debugNameQuery(const MemoryLocation* memoryLocation)
-    {
-        std::stringstream ss;
-        for (int i = 0; i < memory.size(); ++i) {
-            if (&memory[i] == memoryLocation) {
-                ss << Long(i);
-                break;
-            }
-        }
-        return ss.str();
-    }
-
     void loadInterruptVectors()
     {
-        nativeVectors.Coprocessor = memory[0xFFE4].getWordValue();
-        nativeVectors.Break = memory[0xFFE6].getWordValue();
-        nativeVectors.Abort = memory[0xFFE8].getWordValue();
-        nativeVectors.Nmi = memory[0xFFEA].getWordValue();
-        nativeVectors.Reset = memory[0xFFEC].getWordValue();
-        nativeVectors.Irq = memory[0xFFEE].getWordValue();
+        nativeVectors.Coprocessor = memory.readWord<MemoryType::Bank>(0xFFE4);
+        nativeVectors.Break = memory.readWord<MemoryType::Bank>(0xFFE6);
+        nativeVectors.Abort = memory.readWord<MemoryType::Bank>(0xFFE8);
+        nativeVectors.Nmi = memory.readWord<MemoryType::Bank>(0xFFEA);
+        nativeVectors.Reset = memory.readWord<MemoryType::Bank>(0xFFEC);
+        nativeVectors.Irq = memory.readWord<MemoryType::Bank>(0xFFEE);
 
-        emulationVectors.Coprocessor = memory[0xFFF4].getWordValue();
-        emulationVectors.Break = memory[0xFFF6].getWordValue();
-        emulationVectors.Abort = memory[0xFFF8].getWordValue();
-        emulationVectors.Nmi = memory[0xFFFA].getWordValue();
-        emulationVectors.Reset = memory[0xFFFC].getWordValue();
-        emulationVectors.Irq = memory[0xFFFE].getWordValue();
+        emulationVectors.Coprocessor = memory.readWord<MemoryType::Bank>(0xFFF4);
+        emulationVectors.Break = memory.readWord<MemoryType::Bank>(0xFFF6);
+        emulationVectors.Abort = memory.readWord<MemoryType::Bank>(0xFFF8);
+        emulationVectors.Nmi = memory.readWord<MemoryType::Bank>(0xFFFA);
+        emulationVectors.Reset = memory.readWord<MemoryType::Bank>(0xFFFC);
+        emulationVectors.Irq = memory.readWord<MemoryType::Bank>(0xFFFE);
     }
 
     size_t getMemorySize() const
@@ -177,12 +204,12 @@ public:
 
     Byte readProgramByte(int offset = 0) const
     {
-        return memory[getProgramAddress(offset)].getValue();
+        return memory.readByte(getProgramAddress(offset));
     }
 
     Byte applyProgramByte(int offset = 0)
     {
-        return memory[getProgramAddress(offset)].apply();
+        return memory.applyByte(getProgramAddress(offset));
     }
 
     void incrementProgramCounter(Word increment)
@@ -205,36 +232,37 @@ public:
         return programBank;
     }
 
-    MemoryLocation* getAccumulatorPointer()
+    Access& getAccumulatorAccess()
     {
-        return accumulator.data();
+        return static_cast<Access&>(accumulator);
     }
 
     Byte getAccumulatorA() const
     {
-        return accumulator[0].getValue();
+        return accumulator.readByte();
     }
 
-    Byte getAccumulatorB() const
+    Word getAccumulatorC() const
     {
-        return accumulator[1].getValue();
+        return accumulator.readWord();
     }
 
     void setAccumulatorA(Byte value)
     {
-        accumulator[0].setValue(value);
+        accumulator.writeByte(value);
         updateSignFlags(value);
     }
 
     void setAccumulatorC(Word value)
     {
-        accumulator[0].setWordValue(value);
+        accumulator.writeWord(value);
         updateSignFlags(value);
     }
 
-    Word getAccumulatorC() const
+    void swapAccumulators()
     {
-        return Word(accumulator[0].getValue(), accumulator[1].getValue());
+        accumulator.swap();
+        updateSignFlags(accumulator.readByte());
     }
 
     Word getDirectPageRegister() const
@@ -242,43 +270,74 @@ public:
         return directPage;
     }
 
-    Byte getMemoryByte(Long address) const
+    template<typename LocationType, typename... Args>
+    void createMemoryLocation(Long address, Args... args)
     {
-        return memory[address].getValue();
+        memory.createLocation<LocationType, Args...>(address, args...);
     }
 
-    Word getMemoryWord(Long address) const
+    Byte readMemoryByte(Long address) const
     {
-        return memory[address].getWordValue();
+        return memory.readByte(address);
     }
 
-    const MemoryLocation& getMemory(Long address) const
+    void writeMemoryByte(Byte value, Long address)
     {
-        return memory[address];
+        memory.writeByte(value, address);
     }
 
-    MemoryLocation* getMemoryLocation(Long address)
+    template<MemoryType::WrappingMask Wrapping = MemoryType::Full>
+    Word readMemoryWord(Long address) const
     {
-        return &memory[address];
+        return memory.readWord<Wrapping>(address);
     }
 
-    MemoryLocation* getMemoryLocation(Byte lowByte, Byte highByte, Byte bankByte, Word offset = 0)
+    template<MemoryType::WrappingMask Wrapping = MemoryType::Full>
+    Long readMemoryLong(Long address) const
     {
-        return getMemoryLocation(Long(Long(lowByte, highByte, bankByte) + offset));
+        return memory.readLong<Wrapping>(address);
     }
 
-    MemoryLocation* getMemoryLocation(Byte lowByte, Byte highByte)
+    MemoryType& getMemory()
     {
-        return getMemoryLocation(lowByte, highByte, dataBank);
+        return memory;
     }
 
-    MemoryLocation* getDirectMemoryLocation(Byte lowByte, Word offset = 0)
+    const MemoryType& getMemory() const
+    {
+        return memory;
+    }
+
+    LocationAccess& getLocationAccess(Long address)
+    {
+        return memory.getAccess<MemoryType::Full, LocationAccess>(address);
+    }
+
+    template<MemoryType::WrappingMask Wrapping = MemoryType::Full>
+    Access& getMemoryAccess(Long address, Word offset = 0)
+    {
+        return memory.getAccess<Wrapping>(Long(address + offset));
+    }
+
+    template<MemoryType::WrappingMask Wrapping  = MemoryType::Full>
+    Access& getMemoryAccess(Byte lowByte, Byte highByte, Byte bankByte, Word offset = 0)
+    {
+        return getMemoryAccess<Wrapping>(Long(lowByte, highByte, bankByte), offset);
+    }
+
+    template<MemoryType::WrappingMask Wrapping = MemoryType::Full>
+    Access& getMemoryAccess(Byte lowByte, Byte highByte)
+    {
+        return getMemoryAccess<Wrapping>(lowByte, highByte, dataBank);
+    }
+
+    Access& getDirectMemoryAccess(Byte lowByte, Word offset = 0)
     {
         if (emulationMode && directPage.getLowByte() == 0) {
-            return getMemoryLocation(Long(lowByte + offset, directPage.getHighByte(), 0));
+            return getMemoryAccess<MemoryType::Page>(lowByte + offset, directPage.getHighByte(), 0);
         }
         else {
-            return getMemoryLocation(Long(Word(directPage + lowByte + offset), 0));
+            return getMemoryAccess<MemoryType::Bank>(Long(Word(directPage + lowByte + offset), 0));
         }
     }
 
@@ -312,9 +371,10 @@ public:
         setFlag(State::n, value.isNegative());
     }
 
-    void pushToStack(Byte byte)
+    void pushToStack(Byte value)
     {
-        memory[stackPointer--].setValue(byte);
+        memory.writeByte(value, Long(stackPointer, 0));
+        --stackPointer;
         forceRegisters();
     }
 
@@ -328,7 +388,7 @@ public:
     {
         ++stackPointer;
         forceRegisters();
-        return memory[stackPointer].getValue();
+        return memory.readByte(Long(stackPointer, 0));
     }
 
     Word pullWordFromStack()
@@ -521,15 +581,10 @@ public:
         }
     }
 
-    std::vector<MemoryLocation>& accessMemory()
-    {
-        return memory;
-    }
-
     void reset()
     {
-        for (int i = 0; i < memory.size(); ++i) {
-            memory[i].reset();
+        for (Long i = 0; i < memory.size(); ++i) {
+            memory.reset(i);
         }
 
         dataBank = 0;
@@ -544,17 +599,9 @@ public:
         irqActive = false;
 
         // DMA Enable
-        memory[0x420b].setValue(0);
+        memory.writeByte(0, 0x420b);
         // HDMA Enable
-        memory[0x420c].setValue(0);
-
-        for (MemoryLocation& a : accumulator) {
-            a.reset();
-        }
-
-        for (Word& r : indexRegisters) {
-            r = 0;
-        }
+        memory.writeByte(0, 0x420c);
 
         forceRegisters();
     }
@@ -569,11 +616,9 @@ private:
     Byte flags = i;
     bool emulationMode = true;
 
-    std::vector<MemoryLocation> memory;
-    std::array<MemoryLocation, 2> accumulator = {
-        MemoryLocation(0, [](const MemoryLocation*) { return "CPU State Accumulator low byte"; }),
-        MemoryLocation(0, [](const MemoryLocation*) { return "CPU State Accumulator high byte"; })
-    };
+    MemoryType memory;
+    Accumulator accumulator;
+
     std::array<Word, IndexRegisterCount> indexRegisters;
 
     InterruptVectors nativeVectors;

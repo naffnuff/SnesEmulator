@@ -31,15 +31,15 @@ private:
 
 public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, const MemoryLocation* memory)
+    static int invoke(State& state, const Access& access)
     {
         int cycles = 0;
         if (state.is16Bit(State::m)) {
             cycles += 1;
-            state.setAccumulatorC(add(state, state.getAccumulatorC(), memory->getWordValue()));
+            state.setAccumulatorC(add(state, state.getAccumulatorC(), access.readWord()));
         }
         else {
-            state.setAccumulatorA(add(state, state.getAccumulatorA(), memory->getValue()));
+            state.setAccumulatorA(add(state, state.getAccumulatorA(), access.readByte()));
         }
         return cycles;
     }
@@ -52,15 +52,15 @@ class AND
 {
 public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, const MemoryLocation* memory)
+    static int invoke(State& state, const Access& access)
     {
         int cycles = 0;
         if (state.is16Bit(State::m)) {
             cycles += 1;
-            state.setAccumulatorC(state.getAccumulatorC() & memory->getWordValue());
+            state.setAccumulatorC(state.getAccumulatorC() & access.readWord());
         }
         else {
-            state.setAccumulatorA(state.getAccumulatorA() & memory->getValue());
+            state.setAccumulatorA(state.getAccumulatorA() & access.readByte());
         }
         return cycles;
     }
@@ -83,15 +83,15 @@ private:
 
 public:
     // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, MemoryLocation* memory)
+    static int invoke(State& state, Access& access)
     {
         int cycles = 0;
         if (state.is16Bit(State::m)) {
             cycles += 2;
-            memory->setWordValue(arithmeticShiftLeft(state, memory->getWordValue()));
+            access.writeWord(arithmeticShiftLeft(state, access.readWord()));
         }
         else {
-            memory->setValue(arithmeticShiftLeft(state, memory->getValue()));
+            access.writeByte(arithmeticShiftLeft(state, access.readByte()));
         }
         return cycles;
     }
@@ -165,7 +165,7 @@ class BIT
 {
 public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, const MemoryLocation* memory)
+    static int invoke(State& state, const Access& access)
     {
         int cycles = 0;
         bool zFlag = false;
@@ -173,13 +173,13 @@ public:
         bool vFlag = false;
         if (state.is16Bit(State::m)) {
             cycles += 1;
-            Word data = memory->getWordValue();
+            Word data = access.readWord();
             nFlag = data.isNegative();
             vFlag = data.getBit(14);
             zFlag = (state.getAccumulatorC() & data) == 0;
         }
         else {
-            Byte data = memory->getValue();
+            Byte data = access.readByte();
             nFlag = data.isNegative();
             vFlag = data.getBit(6);
             zFlag = (state.getAccumulatorA() & data) == 0;
@@ -255,7 +255,7 @@ class BRK
 {
 public:
     // §9: Add 1 cycle for 65816 native mode (e=0)
-    static int invoke(State& state, const MemoryLocation* memory)
+    static int invoke(State& state, const Access& access)
     {
         throw OperatorNotYetImplementedException("BRK");
         int cycles = 0;
@@ -314,18 +314,18 @@ class CMP
 {
 public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, const MemoryLocation* memory)
+    static int invoke(State& state, const Access& access)
     {
         int cycles = 0;
         if (state.is16Bit(State::m)) {
             cycles += 1;
             Word accumulator = state.getAccumulatorC();
-            Word data = memory->getWordValue();
+            Word data = access.readWord();
             state.setFlag(State::c, accumulator >= data);
             state.updateSignFlags(Word(accumulator - data));
         } else {
             Byte accumulator = state.getAccumulatorA();
-            Byte data = memory->getValue();
+            Byte data = access.readByte();
             state.setFlag(State::c, accumulator >= data);
             state.updateSignFlags(Byte(accumulator - data));
         }
@@ -340,7 +340,7 @@ class COP
 {
 public:
     // §9: Add 1 cycle for 65816 native mode (e=0)
-    static int invoke(State& state, const MemoryLocation* memory)
+    static int invoke(State& state, const Access& access)
     {
         throw OperatorNotYetImplementedException("COP");
         int cycles = 0;
@@ -359,19 +359,19 @@ class CP_
 {
 public:
     // §10: Add 1 cycle if x=0 (16-bit index registers)
-    static int invoke(State& state, const MemoryLocation* memory)
+    static int invoke(State& state, const Access& access)
     {
         int cycles = 0;
         if (state.is16Bit(State::x)) {
             cycles += 1;
             Word indexRegister = state.getIndexRegister<Register>();
-            Word data = memory->getWordValue();
+            Word data = access.readWord();
             state.setFlag(State::c, indexRegister >= data);
             state.updateSignFlags(Word(indexRegister - data));
         }
         else {
             Byte indexRegister(state.getIndexRegister<Register>());
-            Byte data = memory->getValue();
+            Byte data = access.readByte();
             state.setFlag(State::c, indexRegister >= data);
             state.updateSignFlags(Byte(indexRegister - data));
         }
@@ -386,18 +386,18 @@ class DEC
 {
 public:
     // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, MemoryLocation* memory)
+    static int invoke(State& state, Access& access)
     {
         int cycles = 0;
         if (state.is16Bit(State::m)) {
             cycles += 2;
-            Word value = memory->getWordValue() - 1;
-            memory->setWordValue(value);
+            Word value = access.readWord() - 1;
+            access.writeWord(value);
             state.updateSignFlags(value);
         }
         else {
-            Byte value = memory->getValue() - 1;
-            memory->setValue(value);
+            Byte value = access.readByte() - 1;
+            access.writeByte(value);
             state.updateSignFlags(value);
         }
         return cycles;
@@ -434,15 +434,15 @@ class EOR
 {
 public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, const MemoryLocation* memory)
+    static int invoke(State& state, const Access& access)
     {
         int cycles = 0;
         if (state.is16Bit(State::m)) {
             cycles += 1;
-            state.setAccumulatorC(state.getAccumulatorC() ^ memory->getWordValue());
+            state.setAccumulatorC(state.getAccumulatorC() ^ access.readWord());
         }
         else {
-            state.setAccumulatorA(state.getAccumulatorA() ^ memory->getValue());
+            state.setAccumulatorA(state.getAccumulatorA() ^ access.readByte());
         }
         return cycles;
     }
@@ -455,18 +455,18 @@ class INC
 {
 public:
     // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, MemoryLocation* memory)
+    static int invoke(State& state, Access& access)
     {
         int cycles = 0;
         if (state.is16Bit(State::m)) {
             cycles += 2;
-            Word value = memory->getWordValue() + 1;
-            memory->setWordValue(value);
+            Word value = access.readWord() + 1;
+            access.writeWord(value);
             state.updateSignFlags(value);
         }
         else {
-            Byte value = memory->getValue() + 1;
-            memory->setValue(value);
+            Byte value = access.readByte() + 1;
+            access.writeByte(value);
             state.updateSignFlags(value);
         }
         return cycles;
@@ -555,14 +555,14 @@ class LDA
 {
 public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, const MemoryLocation* memory)
+    static int invoke(State& state, const Access& access)
     {
         int cycles = 0;
         if (state.is16Bit(State::m)) {
             cycles += 1;
-            state.setAccumulatorC(memory->getWordValue());
+            state.setAccumulatorC(access.readWord());
         } else {
-            state.setAccumulatorA(memory->getValue());
+            state.setAccumulatorA(access.readByte());
         }
         return cycles;
     }
@@ -576,14 +576,14 @@ class LD_
 {
 public:
     // §10: Add 1 cycle if x=0 (16-bit index registers)
-    static int invoke(State& state, const MemoryLocation* memory)
+    static int invoke(State& state, const Access& access)
     {
         int cycles = 0;
         if (state.is16Bit(State::x)) {
-            state.setIndexRegister<Register>(memory->getWordValue());
+            state.setIndexRegister<Register>(access.readWord());
             cycles += 1;
         } else {
-            state.setIndexRegister<Register>(memory->getValue());
+            state.setIndexRegister<Register>(access.readByte());
         }
         return cycles;
     }
@@ -606,14 +606,14 @@ private:
 
 public:
     // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, MemoryLocation* memory)
+    static int invoke(State& state, Access& access)
     {
         int cycles = 0;
         if (state.is16Bit(State::m)) {
             cycles += 2;
-            memory->setWordValue(logicalShiftLeft(state, memory->getWordValue()));
+            access.writeWord(logicalShiftLeft(state, access.readWord()));
         } else {
-            memory->setValue(logicalShiftLeft(state, memory->getValue()));
+            access.writeByte(logicalShiftLeft(state, access.readByte()));
         }
         return cycles;
     }
@@ -631,7 +631,8 @@ public:
         Word sourceAddress = state.getIndexRegister<State::X>();
         Word destinationAddress = state.getIndexRegister<State::Y>();
         
-        state.getMemoryLocation(Long(destinationAddress, destinationBank))->setValue(state.getMemoryByte(Long(sourceAddress, sourceBank)));
+        Byte value = state.readMemoryByte(Long(sourceAddress, sourceBank));
+        state.writeMemoryByte(value, Long(destinationAddress, destinationBank));
 
         state.setIndexRegister<State::X>(Word(sourceAddress + 1));
         state.setIndexRegister<State::Y>(Word(destinationAddress + 1));
@@ -672,15 +673,15 @@ class ORA
 {
 public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, const MemoryLocation* memory)
+    static int invoke(State& state, const Access& access)
     {
         int cycles = 0;
         if (state.is16Bit(State::m)) {
             cycles += 1;
-            state.setAccumulatorC(state.getAccumulatorC() | memory->getWordValue());
+            state.setAccumulatorC(state.getAccumulatorC() | access.readWord());
         }
         else {
-            state.setAccumulatorA(state.getAccumulatorA() | memory->getValue());
+            state.setAccumulatorA(state.getAccumulatorA() | access.readByte());
         }
         return cycles;
     }
@@ -896,9 +897,9 @@ public:
 class REP
 {
 public:
-    static int invoke(State& state, const MemoryLocation* memory)
+    static int invoke(State& state, const Access& access)
     {
-        state.setFlag(memory->getValue(), false);
+        state.setFlag(access.readByte(), false);
         return 0;
     }
 
@@ -922,15 +923,15 @@ private:
 
 public:
     // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, MemoryLocation* memory)
+    static int invoke(State& state, Access& access)
     {
         int cycles = 0;
         if (state.is16Bit(State::m)) {
             cycles += 2;
-            memory->setWordValue(rotateLeft(state, memory->getWordValue()));
+            access.writeWord(rotateLeft(state, access.readWord()));
         }
         else {
-            memory->setValue(rotateLeft(state, memory->getValue()));
+            access.writeByte(rotateLeft(state, access.readByte()));
         }
         return cycles;
     }
@@ -947,7 +948,7 @@ private:
     {
         bool carry = value.getBit(0);
         value >>= 1;
-        value.setBit(T::bitCount() - 1, state.getFlag(State::c));
+        value.setBit(T::bitCount - 1, state.getFlag(State::c));
         state.setFlag(State::c, carry);
         state.updateSignFlags(value);
         return value;
@@ -955,14 +956,14 @@ private:
 
 public:
     // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, MemoryLocation* memory)
+    static int invoke(State& state, Access& access)
     {
         int cycles = 0;
         if (state.is16Bit(State::m)) {
             cycles += 2;
-            memory->setWordValue(rotateRight(state, memory->getWordValue()));
+            access.writeWord(rotateRight(state, access.readWord()));
         } else {
-            memory->setValue(rotateRight(state, memory->getValue()));
+            access.writeByte(rotateRight(state, access.readByte()));
         }
         return cycles;
     }
@@ -1040,15 +1041,15 @@ private:
 
 public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, const MemoryLocation* memory)
+    static int invoke(State& state, const Access& access)
     {
         int cycles = 0;
         if (state.is16Bit(State::m)) {
             cycles += 1;
-            state.setAccumulatorC(subtract(state, state.getAccumulatorC(), memory->getWordValue()));
+            state.setAccumulatorC(subtract(state, state.getAccumulatorC(), access.readWord()));
         }
         else {
-            state.setAccumulatorA(subtract(state, state.getAccumulatorA(), memory->getValue()));
+            state.setAccumulatorA(subtract(state, state.getAccumulatorA(), access.readByte()));
         }
         return cycles;
     }
@@ -1080,9 +1081,9 @@ public:
 class SEP
 {
 public:
-    static int invoke(State& state, const MemoryLocation* memory)
+    static int invoke(State& state, const Access& access)
     {
-        state.setFlag(memory->getValue(), true);
+        state.setFlag(access.readByte(), true);
         return 0;
     }
 
@@ -1094,15 +1095,15 @@ class STA
 {
 public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, MemoryLocation* memory)
+    static int invoke(State& state, Access& access)
     {
         int cycles = 0;
         if (state.is16Bit(State::m)) {
             cycles += 1;
-            memory->setWordValue(state.getAccumulatorC());
+            access.writeWord(state.getAccumulatorC());
         }
         else {
-            memory->setValue(state.getAccumulatorA());
+            access.writeByte(state.getAccumulatorA());
         }
         return cycles;
     }
@@ -1130,15 +1131,15 @@ class ST_
 {
 public:
     // §10: Add 1 cycle if x=0 (16-bit index registers)
-    static int invoke(State& state, MemoryLocation* memory)
+    static int invoke(State& state, Access& access)
     {
         int cycles = 0;
         if (state.is16Bit(State::x)) {
             cycles += 1;
-            memory->setWordValue(state.getIndexRegister<Register>());
+            access.writeWord(state.getIndexRegister<Register>());
         }
         else {
-            memory->setValue(Byte(state.getIndexRegister<Register>()));
+            access.writeByte(Byte(state.getIndexRegister<Register>()));
         }
         return cycles;
     }
@@ -1151,16 +1152,16 @@ class STZ
 {
 public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, MemoryLocation* memory)
+    static int invoke(State& state, Access& access)
     {
         int cycles = 0;
 
         if (state.is16Bit(State::m)) {
             cycles += 1;
-            memory->setWordValue(0);
+            access.writeWord(0);
         }
         else {
-            memory->setValue(0);
+            access.writeByte(0);
         }
 
         return cycles;
@@ -1240,15 +1241,15 @@ private:
 
 public:
     // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, MemoryLocation* memory)
+    static int invoke(State& state, Access& access)
     {
         int cycles = 0;
         if (state.is16Bit(State::m)) {
-            memory->setWordValue(testAndReset(state, memory->getWordValue(), state.getAccumulatorC()));
+            access.writeWord(testAndReset(state, access.readWord(), state.getAccumulatorC()));
             cycles += 2;
         }
         else {
-            memory->setValue(testAndReset(state, memory->getValue(), state.getAccumulatorA()));
+            access.writeByte(testAndReset(state, access.readByte(), state.getAccumulatorA()));
         }
         return cycles;
     }
@@ -1269,15 +1270,15 @@ private:
 
 public:
     // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, MemoryLocation* memory)
+    static int invoke(State& state, Access& access)
     {
         int cycles = 0;
         if (state.is16Bit(State::m)) {
-            memory->setWordValue(testAndSet(state, memory->getWordValue(), state.getAccumulatorC()));
+            access.writeWord(testAndSet(state, access.readWord(), state.getAccumulatorC()));
             cycles += 2;
         }
         else {
-            memory->setValue(testAndSet(state, memory->getValue(), state.getAccumulatorA()));
+            access.writeByte(testAndSet(state, access.readByte(), state.getAccumulatorA()));
         }
         return cycles;
     }
@@ -1376,7 +1377,7 @@ class WDM
 {
 public:
     // §16: Byte and cycle counts subject to change in future processors which expand WDM into 2-byte opcode portions of instructions of varying lengths
-    static int invoke(State& state, const MemoryLocation* memory)
+    static int invoke(State& state, const Access& access)
     {
         throw OperatorNotYetImplementedException("WDM");
         return 0;
@@ -1391,10 +1392,7 @@ class XBA
 public:
     static int invoke(State& state)
     {
-        Byte accumulatorB = state.getAccumulatorB();
-        MemoryLocation* accumulator = state.getAccumulatorPointer();
-        accumulator[1].setValue(accumulator[0].getValue());
-        state.setAccumulatorA(accumulatorB);
+        state.swapAccumulators();
         return 0;
     }
 

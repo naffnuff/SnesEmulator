@@ -41,7 +41,7 @@ public:
 
     State()
         : programCounter(0xffc0)
-        , memory(0x10000, MemoryLocation(0xff, std::bind(&State::debugNameQuery, this, std::placeholders::_1)))
+        , memory(Word::spaceSize, MemoryLocation(0xff, std::bind(&State::debugNameQuery, this, std::placeholders::_1)))
     {
         for (MemoryLocation& r : registers) {
             r.setReadWrite();

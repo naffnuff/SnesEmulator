@@ -20,54 +20,67 @@ void Emulator::initialize()
 
     rom.storeToMemory(cpuState);
 
+    CPU::State::MemoryType& memory = cpuState.getMemory();
+
     if (rom.isLowRom()) {
         // RAM
         for (Long address = 0x7e0000; address < 0x800000; address++) {
-            cpuState.getMemoryLocation(address)->setReadWrite();
+            memory.createLocation<ReadWriteMemory>(address, 0x55);
         }
         // RAM mirrors
         for (Byte bank = 0; bank < 0x40; ++bank) {
             for (Word address = 0; address < 0x2000; ++address) {
-                cpuState.getMemoryLocation(Long(address, bank))->setMirrorOf(cpuState.getMemoryLocation(Long(address, 0x7E)));
+                memory.createMirror(Long(address, bank), Long(address, 0x7E));
             }
         }
 
         // ROM mirrors
         for (Long address = 0; address < 0x600000; ++address) {
-            cpuState.getMemoryLocation(address + 0x800000)->setMirrorOf(cpuState.getMemoryLocation(address));
+            memory.createMirror(address + 0x800000, address);
         }
 
         // Save RAM
         {
-            std::ifstream file(rom.gameTitle + ".save");
-            file >> std::hex;
-            Long saveRamAddress = 0x700000;
-            for (Long address = saveRamAddress; address < 0x7e0000; ++address, ++saveRamAddress) {
-                if (saveRamAddress == 0x700000 + rom.saveRamSize) {
-                    saveRamAddress = 0x700000;
-                }
-                MemoryLocation* saveRamLocation = cpuState.getMemoryLocation(saveRamAddress);
-                if (address == saveRamAddress) {
-                    Byte byte;
-                    int inputValue;
-                    if (file >> inputValue) {
-                        byte = inputValue;
+            if (rom.saveRamSize > 0) {
+                std::ifstream file(rom.gameTitle + ".save");
+                file >> std::hex;
+                Long saveRamAddress = 0x700000;
+                for (Long address = saveRamAddress; address < 0x7e0000; ++address, ++saveRamAddress) {
+                    if (saveRamAddress == 0x700000 + rom.saveRamSize) {
+                        saveRamAddress = 0x700000;
                     }
-                    saveRamLocation->setReadWrite();
-                    saveRamLocation->setValue(byte);
-                    saveRamLocation->onWrite = [this](Byte oldValue, Byte& newValue) {
-                        if (newValue != oldValue) {
-                            std::lock_guard<std::mutex> lock(saveRamSaver.mutex);
-                            saveRamSaver.saveRamModified = true;
+                    if (address == saveRamAddress) {
+                        Byte byte;
+                        int inputValue;
+                        if (file >> inputValue) {
+                            byte = inputValue;
                         }
-                        saveRamSaver.condition.notify_one();
-                    };
+                        saveRamSaver.saveRam[address] = byte;
+                        memory.createLocation<ReadWriteRegister>(address,
+                            [this, address](Byte& value) {
+                                return saveRamSaver.saveRam[address];
+                            },
+                            [this, address](Byte oldValue, Byte newValue) {
+                                if (oldValue != saveRamSaver.saveRam[address]) {
+                                    std::stringstream ss;
+                                    ss << __FUNCTION__ << ": ";
+                                    ss << "oldValue=" << oldValue << " != saveRamSaver.saveRam[address]=" << saveRamSaver.saveRam[address];
+                                    ss << " @" << address << std::endl;
+                                    throw std::logic_error(ss.str());
+                                }
+                                saveRamSaver.saveRam[address] = newValue;
+                                if (newValue != oldValue) {
+                                    std::lock_guard<std::mutex> lock(saveRamSaver.mutex);
+                                    saveRamSaver.saveRamModified = true;
+                                }
+                                saveRamSaver.condition.notify_one();
+                            });
+                    } else {
+                        memory.createMirror(address, saveRamAddress);
+                    }
                 }
-                else {
-                    cpuState.getMemoryLocation(address)->setMirrorOf(saveRamLocation);
-                }
+                output << "Save RAM end address: " << saveRamAddress << std::endl;
             }
-            output << "Save RAM end address: " << saveRamAddress << std::endl;
         }
 
         saveRamSaverThread = std::thread(std::ref(saveRamSaver));
@@ -75,7 +88,7 @@ void Emulator::initialize()
         // Register mirrors
         for (Byte bank = 0x01; bank < 0x60; ++bank) {
             for (Word address = 0x2000; address < 0x8000; ++address) {
-                cpuState.getMemoryLocation(Long(address, bank))->setMirrorOf(cpuState.getMemoryLocation(Long(address, 0x00)));
+                memory.createMirror(Long(address, bank), Long(address, 0x00));
             }
         }
     }
@@ -83,19 +96,30 @@ void Emulator::initialize()
         throw std::runtime_error("Only the low-rom mempory map is supported for now");
     }
 
+    cpuState.reset();
+
     video.initialize(rom.gameTitle);
 
-    std::array<MemoryLocation*, 4> cpuToSpcPorts;
     // I/O between the CPU and SPC700
     for (Word i = 0; i < 4; ++i) {
-        MemoryLocation* cpuMemoryLocation = cpuState.getMemoryLocation(Long(0x2140 + i));
-        cpuToSpcPorts[i] = cpuMemoryLocation;
+        memory.createLocation<ReadWriteRegister>(Long(0x2140 + i),
+            [this, i](Byte& value) {
+                value = spcToCpuBuffers[i];
+            },
+            [this, i](Byte, Byte newValue) {
+                cpuToSpcBuffers[i] = newValue;
+            });
         MemoryLocation* spcMemoryLocation = spcState.getMemoryLocation(Word(0xf4 + i));
-        cpuMemoryLocation->setMappings(nullptr, spcMemoryLocation, MemoryLocation::ReadWrite);
-        spcMemoryLocation->setMappings(nullptr, cpuMemoryLocation, MemoryLocation::ReadWrite);
+        spcMemoryLocation->setReadWrite();
+        spcMemoryLocation->onRead = [this, i](Byte& value) {
+            value = cpuToSpcBuffers[i];
+        };
+        spcMemoryLocation->onWrite = [this, i](Byte, Byte newValue) {
+            spcToCpuBuffers[i] = newValue;
+        };
     }
 
-    audio.initialize(cpuToSpcPorts);
+    audio.initialize(memory);
 
     debugger.loadBreakpoints(cpuContext, cpuState);
     debugger.loadBreakpoints(spcContext, spcState);
@@ -176,7 +200,7 @@ void Emulator::run()
                     }
 
                     if (hdmaInstruction.isActive()) {
-                        if (hdmaInstruction.hdmaEnabled.getValue().getBit(7)) {
+                        if (cpuState.readMemoryByte(hdmaInstruction.hdmaEnabledAddress).getBit(7)) {
                             //    cpuContext.setPaused(true);
                         }
                         hdmaInstruction.blockedInstruction = instruction;

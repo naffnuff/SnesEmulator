@@ -53,10 +53,10 @@ public:
         bool romLoaded = false;
 
         int romIndex = 0;
-        for (int bank = 0; bank < 1 << 8; ++bank) {
-            for (int address = 0x8000; address < 1 << 16; ++address) {
+        for (int bank = 0; bank < Byte::spaceSize; ++bank) {
+            for (int address = 0x8000; address < Word::spaceSize; ++address) {
                 Long longAddress(address, bank);
-                state.getMemoryLocation(longAddress)->setReadOnlyValue(data[romIndex++]);
+                state.createMemoryLocation<ReadOnlyMemory>(longAddress, data[romIndex++]);
                 if (romIndex >= (int)data.size()) {
                     output << "ROM ends at " << longAddress << std::endl << std::endl;
                     romLoaded = true;
@@ -92,8 +92,6 @@ public:
             << "Emulation Reset=" << emulationVectors.Reset << std::endl
             << "Emulation IRQ=" << emulationVectors.Irq << std::endl
             << std::endl;
-
-        state.reset();
 
         output << "Success reading header" << std::endl;
 

@@ -38,18 +38,16 @@ public:
 
     void makeWriteRegister(Word address, const std::string& info, bool debug, std::function<void(Byte value)> callback = nullptr)
     {
-        MemoryLocation* memory = state.getMemoryLocation(Long(address, 0));
-        memory->setWriteOnly();
-        memory->setValue(0);
-        memory->onWrite =
+        state.createMemoryLocation<WriteRegister>(Long(address, 0),
             [this, address, callback, info, debug](Byte oldValue, Byte newValue) {
-            if (debug && newValue && oldValue != newValue) {
-                printMemoryRegister(true, newValue, address, info);
+                if (debug && newValue && oldValue != newValue) {
+                    printMemoryRegister(true, newValue, address, info);
+                }
+                if (callback) {
+                    callback(newValue);
+                }
             }
-            if (callback) {
-                callback(newValue);
-            }
-        };
+        );
     }
 
     void makeWriteRegister(Word address, const std::string& info, bool debug, Byte& variable)
@@ -77,17 +75,16 @@ public:
 
     void makeReadRegister(Word address, const std::string& info, bool debug, std::function<void(Byte& value)> callback = nullptr)
     {
-        MemoryLocation* memory = state.getMemoryLocation(Long(address, 0));
-        memory->setReadOnlyValue(0);
-        memory->onRead =
+        state.createMemoryLocation<ReadRegister>(Long(address, 0),
             [this, address, callback, info, debug](Byte& value) {
-            if (callback) {
-                callback(value);
+                if (callback) {
+                    callback(value);
+                }
+                if (debug && value) {
+                    printMemoryRegister(false, value, address, info);
+                }
             }
-            if (debug && value) {
-                printMemoryRegister(false, value, address, info);
-            }
-        };
+        );
     };
 
     void makeReadRegister(Word address, const std::string& info, bool debug, const Word& variable)
@@ -110,27 +107,24 @@ public:
 
     void makeReadWriteRegister(Word address, const std::string& info, bool debug, std::function<void(Byte& value)> readCallback = nullptr, std::function<void(Byte value)> writeCallback = nullptr)
     {
-        MemoryLocation* memory = state.getMemoryLocation(Long(address, 0));
-        memory->setReadWrite();
-        memory->setValue(0);
-        memory->onRead =
+        state.createMemoryLocation<ReadWriteRegister>(Long(address, 0),
             [this, address, readCallback, info, debug](Byte& value) {
-            if (readCallback) {
-                readCallback(value);
-            }
-            if (debug && value) {
-                printMemoryRegister(false, value, address, info);
-            }
-        };
-        memory->onWrite =
+                if (readCallback) {
+                    readCallback(value);
+                }
+                if (debug && value) {
+                    printMemoryRegister(false, value, address, info);
+                }
+            },
             [this, address, writeCallback, info, debug](Byte oldValue, Byte newValue) {
-            if (debug && newValue && oldValue != newValue) {
-                printMemoryRegister(true, newValue, address, info);
+                if (debug && newValue && oldValue != newValue) {
+                    printMemoryRegister(true, newValue, address, info);
+                }
+                if (writeCallback) {
+                    writeCallback(newValue);
+                }
             }
-            if (writeCallback) {
-                writeCallback(newValue);
-            }
-        };
+        );
     };
 
     void makeReadWriteRegister(Word address, const std::string& info, bool debug, Word& variable)
@@ -409,7 +403,7 @@ public:
 
         makeWriteRegister(0x2180, "WRAM Data read/write", false,
             [this](Byte value) {
-                state.getMemoryLocation(wramAddress++)->setValue(value);
+                state.writeMemoryByte(value, wramAddress++);
             });
         makeWriteRegister(0x2181, "WRAM Address", false, wramAddress);
 
@@ -525,30 +519,30 @@ public:
         }
 
         for (int address = 0x2000; address < 0x2100; ++address) {
-            MemoryLocation* memory = state.getMemoryLocation(Long(address, 0));
-            memory->setReadOnlyValue(0x0f);
+            //MemoryLocation* memory = state.getMemoryLocation(Long(address, 0));
+            //memory->setReadOnlyValue(0x0f);
         }
 
         for (int address = 0x2144; address < 0x2180; ++address) {
-            MemoryLocation* memory = state.getMemoryLocation(Long(address, 0));
-            memory->setReadOnlyValue(0x0f);
+            //MemoryLocation* memory = state.getMemoryLocation(Long(address, 0));
+            //memory->setReadOnlyValue(0x0f);
         }
 
         for (int address = 0x2200; address < 0x4200; ++address) {
             if (address != 0x4016 && address != 0x4017) {
-                MemoryLocation* memory = state.getMemoryLocation(Long(address, 0));
-                memory->setReadOnlyValue(0x0f);
+                //MemoryLocation* memory = state.getMemoryLocation(Long(address, 0));
+                //memory->setReadOnlyValue(0x0f);
             }
         }
 
         for (int address = 0x4220; address < 0x4300; ++address) {
-            MemoryLocation* memory = state.getMemoryLocation(Long(address, 0));
-            memory->setReadOnlyValue(0x0f);
+            //MemoryLocation* memory = state.getMemoryLocation(Long(address, 0));
+            //memory->setReadOnlyValue(0x0f);
         }
 
         for (int address = 0x437b; address < 0x8000; ++address) {
-            MemoryLocation* memory = state.getMemoryLocation(Long(address, 0));
-            memory->setReadOnlyValue(0x0f);
+            //MemoryLocation* memory = state.getMemoryLocation(Long(address, 0));
+            //memory->setReadOnlyValue(0x0f);
         }
     }
 
@@ -562,7 +556,7 @@ public:
     int16_t to13Bit2sComplement(Word value)
     {
         bool isNegative = value.getBit(12);
-        for (int i = 13; i < Word::bitCount(); ++i) {
+        for (int i = 13; i < Word::bitCount; ++i) {
             value.setBit(i, isNegative);
         }
         //if (result != value) {

@@ -35,21 +35,46 @@ void test(std::ostream& output)
         << "Signed:   " << std::bitset<8>(c >> 8) << " " << std::bitset<8>(c) << std::endl;
 }
 
+struct A
+{
+    A()
+    {
+        std::cout << "A" << std::endl;
+    }
+    A(const A& a)
+    {
+        std::cout << "A&" << std::endl;
+    }
+};
+struct B
+{
+    B()
+    {
+        std::cout << "B" << std::endl;
+    }
+    B(const B& b)
+    {
+        std::cout << "B&" << std::endl;
+    }
+};
+struct Snuffe
+{
+    Snuffe(const A& a, const B& b)
+        : a(a)
+        , b(b)
+    {
+
+    }
+
+    A a;
+    B b;
+};
+
 int main(int, char**)
 {
     std::ostream& output = std::cout;
     std::istream& input = std::cin;
     std::ostream& error = std::cerr;
-
-    /*for (int i = 0; i < 256; i += 32) {
-        for (int j = 0; j < 256; j += 32) {
-            Byte a(i);
-            Byte b(j);
-            bool carry = false;
-            bool overflow = false;
-            output << +char(a) << " + " << +char(b) << " = " << +char(Types::binaryAdd(a, b, carry, overflow)) << ", carry=" << carry << ", overflow=" << overflow << std::endl;
-        }
-    }*/
 
     try {
         while (true) {
