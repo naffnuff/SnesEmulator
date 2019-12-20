@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <functional>
 
 #include "System.h"
 #include "MemoryLocation.h"
@@ -198,7 +199,7 @@ public:
             MemoryLocation* memory = state.getMemoryLocation(address);
             memory->setReadWrite();
             memory->setValue(0);
-            std::function callback = [this, i](Byte& value) {
+            std::function<void(Byte&)> callback = [this, i](Byte& value) {
                 if (bootRomDataEnabled) {
                     value = bootRomData[i];
                 }

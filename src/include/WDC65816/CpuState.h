@@ -583,7 +583,7 @@ public:
 
     void reset()
     {
-        for (Long i = 0; i < memory.size(); ++i) {
+        for (uint32_t i = 0; i < memory.size(); ++i) {
             memory.reset(i);
         }
 

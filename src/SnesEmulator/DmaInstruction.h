@@ -3,43 +3,21 @@
 #include <vector>
 
 #include "Common/Instruction.h"
-#include "Common/MemoryLocation.h"
+#include "Common/Memory.h"
 
 #include "WDC65816/CpuState.h"
 
+#include "Registers.h"
+
 class DmaInstruction : public Instruction
 {
-private:
-    struct Channel
-    {
-        Long dmaControlAddress;
-        Long registerAddressAddress;
-        Long sourceAddressLowByteAddress;
-        //Long sourceAddressHighByteAddress;
-        //Long sourceBankAddress;
-        Long dataSizeLowByteAddress;
-        //Long dataSizeHighByteAddress;
-        bool active = false;
-    };
-
 public:
-    DmaInstruction(std::ostream& output, std::ostream& error, CPU::State& state)
+    DmaInstruction(std::ostream& output, std::ostream& error, CPU::State& state, Registers& registers)
         : output(output)
         , error(error)
         , memory(state.getMemory())
-        , channels(8)
+        , registers(registers)
     {
-        dmaEnabledAddress = 0x420b;
-        for (int i = 0; i < channels.size(); ++i) {
-            Long baseAddress = 0x4300 | i << 4;
-            channels[i].dmaControlAddress = baseAddress;
-            channels[i].registerAddressAddress = baseAddress | 1;
-            channels[i].sourceAddressLowByteAddress = baseAddress | 2;
-            //channels[i].sourceAddressHighByteAddress = baseAddress | 3;
-            //channels[i].sourceBankAddress = baseAddress | 4;
-            channels[i].dataSizeLowByteAddress = baseAddress | 5;
-            //channels[i].dataSizeHighByteAddress = baseAddress | 6;
-        }
     }
 
     DmaInstruction(const DmaInstruction&) = delete;
@@ -49,17 +27,18 @@ public:
     {
         std::stringstream ss;
         ss << blockedInstruction->toString() << " (blocked by DMA)" << std::endl;
+        ss << "Enabled: " << std::bitset<8>(registers.dmaEnabled) << std::endl;
         ss << "DMA ";
-        if (Byte enabled = memory.readByte(dmaEnabledAddress)) {
+        if (registers.dmaEnabled) {
             for (int i = 0; i < 8; ++i) {
-                if (enabled.getBit(i)) {
-                    const Channel& channel = channels[i];
+                if (registers.dmaEnabled.getBit(i)) {
+                    const Registers::DmaChannel& channel = registers.dmaChannels[i];
                     ss << "Channel " << i << ": ";
-                    ss << memory.readLong(channel.sourceAddressLowByteAddress);
+                    ss << channel.sourceAddress;
                     ss << " -> ";
-                    ss << "21" << memory.readByte(channel.registerAddressAddress) << std::endl;
-                    ss << "Bytes left: " << memory.readWord(channel.dataSizeLowByteAddress) << std::endl;
-                    ss << "DMA control: " << memory.readByte(channel.dmaControlAddress) << std::endl;
+                    ss << "21" << channel.destinationRegister << std::endl;
+                    ss << "Bytes left: " << channel.dataSize << std::endl;
+                    ss << "DMA control: " << channel.control << std::endl;
                     break;
                 }
             }
@@ -76,52 +55,46 @@ public:
     int execute() override
     {
         int cycles = 0;
-        if (Byte dmaEnabledValue = memory.readByte(dmaEnabledAddress)) {
+        if (registers.dmaEnabled) {
             for (int i = 0; i < 8; ++i) {
-                if (dmaEnabledValue.getBit(i)) {
+                if (registers.dmaEnabled.getBit(i)) {
                     if (iteration++ == 0) {
                         cycles += 3;
                     }
 
-                    Channel& channel = channels[i];
-                    if (!channel.active) {
-                        channel.active = true;
+                    Registers::DmaChannel& channel = registers.dmaChannels[i];
+                    if (!channel.dmaActive) {
+                        channel.dmaActive = true;
                         cycles += 1;
                     }
 
-                    Long registerAddress = 0x2100 | memory.readByte(channel.registerAddressAddress);
-                    Long sourceAddress = memory.readLong(channel.sourceAddressLowByteAddress);
-                    Word dataSize = memory.readWord(channel.dataSizeLowByteAddress);
+                    Long registerAddress = 0x2100 | channel.destinationRegister;
 
-                    Byte dmaControl = memory.readByte(channel.dmaControlAddress);
-                    bool direction = dmaControl.getBit(7);
+                    bool direction = channel.control.getBit(7);
                     int byteCount = 0;
-                    Byte transferMode = dmaControl.getBits(0, 3);
+                    Byte transferMode = channel.control.getBits(0, 3);
                     if (transferMode == 0) {
-                        transfer(sourceAddress, registerAddress, direction, false, byteCount);
+                        transfer(channel.sourceAddress, registerAddress, direction, false, byteCount);
                     }
                     else if (transferMode == 1) {
-                        transfer(sourceAddress, registerAddress, direction, dataSize > 1, byteCount);
+                        transfer(channel.sourceAddress, registerAddress, direction, channel.dataSize > 1, byteCount);
                     }
                     else {
-                        error << "DMA control: " << dmaControl << std::endl;
+                        error << "DMA control: " << channel.control << std::endl;
                         throw OperatorNotYetImplementedException("DMA transfer mode not implemented");
                     }
 
-                    bool fixedTransfer = dmaControl.getBit(3);
-                    bool increment = dmaControl.getBit(4);
+                    bool fixedTransfer = channel.control.getBit(3);
+                    bool increment = channel.control.getBit(4);
                     if (!fixedTransfer) {
-                        memory.writeWord(sourceAddress + (increment ? -byteCount : byteCount), channel.sourceAddressLowByteAddress);
+                        channel.sourceAddress += (increment ? -byteCount : byteCount);
                     }
-                    dataSize -= byteCount;
+                    channel.dataSize -= byteCount;
                     cycles += byteCount;
 
-                    memory.writeWord(dataSize, channel.dataSizeLowByteAddress);
-
-                    if (dataSize == 0) {
-                        dmaEnabledValue.setBit(i, false);
-                        memory.writeByte(dmaEnabledValue, dmaEnabledAddress);
-                        channel.active = false;
+                    if (channel.dataSize == 0) {
+                        registers.dmaEnabled.setBit(i, false);
+                        channel.dmaActive = false;
                     }
                     return cycles;
                 }
@@ -160,7 +133,7 @@ public:
 
     bool enabled()
     {
-        if (memory.readByte(dmaEnabledAddress)) {
+        if (registers.dmaEnabled) {
             return true;
         }
         else {
@@ -174,8 +147,7 @@ public:
 
 private:
     CPU::State::MemoryType& memory;
-    Long dmaEnabledAddress;
-    std::vector<Channel> channels;
+    Registers& registers;
 
     std::ostream& output;
     std::ostream& error;

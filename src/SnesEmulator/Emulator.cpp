@@ -5,6 +5,7 @@
 #include <string>
 
 #include "Common/Exception.h"
+#include "Common/Memory.h"
 
 #include "VideoDebugger.h"
 
@@ -55,20 +56,21 @@ void Emulator::initialize()
                         if (file >> inputValue) {
                             byte = inputValue;
                         }
-                        saveRamSaver.saveRam[address] = byte;
+                        Long localAddress = address - 0x700000;
+                        saveRamSaver.saveRam[localAddress] = byte;
                         memory.createLocation<ReadWriteRegister>(address,
-                            [this, address](Byte& value) {
-                                return saveRamSaver.saveRam[address];
+                            [this, localAddress](Byte& value) {
+                                value = saveRamSaver.saveRam[localAddress];
                             },
-                            [this, address](Byte oldValue, Byte newValue) {
-                                if (oldValue != saveRamSaver.saveRam[address]) {
+                            [this, localAddress](Byte oldValue, Byte newValue) {
+                                if (oldValue != saveRamSaver.saveRam[localAddress]) {
                                     std::stringstream ss;
                                     ss << __FUNCTION__ << ": ";
-                                    ss << "oldValue=" << oldValue << " != saveRamSaver.saveRam[address]=" << saveRamSaver.saveRam[address];
-                                    ss << " @" << address << std::endl;
+                                    ss << "oldValue=" << oldValue << " != saveRamSaver.saveRam[address]=" << saveRamSaver.saveRam[localAddress];
+                                    ss << " @" << localAddress << std::endl;
                                     throw std::logic_error(ss.str());
                                 }
-                                saveRamSaver.saveRam[address] = newValue;
+                                saveRamSaver.saveRam[localAddress] = newValue;
                                 if (newValue != oldValue) {
                                     std::lock_guard<std::mutex> lock(saveRamSaver.mutex);
                                     saveRamSaver.saveRamModified = true;
@@ -141,8 +143,8 @@ void Emulator::run()
     SpriteLayerViewer spriteLayer4Viewer(video, 3, Video::rendererWidth * 2 + 20 + Video::rendererWidth + 20, Video::rendererWidth * 2 + 40 + Video::rendererWidth);
     Mode7Viewer mode7Viewer(video, 0, 40);
 
-    DmaInstruction dmaInstruction(output, error, cpuState);
-    HdmaInstruction hdmaInstruction(output, error, cpuState);
+    DmaInstruction dmaInstruction(output, error, cpuState, registers);
+    HdmaInstruction hdmaInstruction(output, error, cpuState, registers);
 
     uint64_t nextCpu = masterCycle;
     uint64_t nextSpc = masterCycle;
@@ -189,7 +191,7 @@ void Emulator::run()
 
                     bool dmaPicked = false;
                     if (dmaInstruction.enabled()) {
-                        //cpuContext.stepMode = true;
+                        //cpuContext.setPaused(true);
                         dmaInstruction.blockedInstruction = instruction;
                         instruction = static_cast<Instruction*>(&dmaInstruction);
                         dmaPicked = true;
@@ -200,9 +202,6 @@ void Emulator::run()
                     }
 
                     if (hdmaInstruction.isActive()) {
-                        if (cpuState.readMemoryByte(hdmaInstruction.hdmaEnabledAddress).getBit(7)) {
-                            //    cpuContext.setPaused(true);
-                        }
                         hdmaInstruction.blockedInstruction = instruction;
                         instruction = static_cast<Instruction*>(&hdmaInstruction);
                         if (dmaPicked) {

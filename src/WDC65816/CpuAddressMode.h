@@ -474,7 +474,7 @@ class Immediate16Bit : public Instruction3Byte
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
-        Memory<Byte> memory(1);
+        Memory<Byte> memory(2);
         memory.createLocation<ReadOnlyMemory>(0, lowByte);
         memory.createLocation<ReadOnlyMemory>(1, highByte);
         return Operator::invoke(state, memory.getAccess(0));

@@ -50,7 +50,7 @@ protected:
 
     virtual void reset()
     {
-        throwAccessException(__FUNCTION__, "reset not allowed");
+        //throwAccessException(__FUNCTION__, "reset not allowed");
     }
 
 private:
@@ -375,8 +375,9 @@ public:
     void createMirror(AddressType mirror, AddressType origin)
     {
         checkIsInitialized(mirror, false, __FUNCTION__);
-        checkIsInitialized(origin, true, __FUNCTION__);
-        memory[mirror] = memory[origin];
+        if (std::shared_ptr<Location> location = memory[origin]) {
+            memory[mirror] = location;
+        }
     }
 
     template<WrappingMask Wrapping = Full, typename AccessType = Access>

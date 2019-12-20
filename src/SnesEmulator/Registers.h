@@ -6,7 +6,6 @@
 #include "Common/MemoryLocation.h"
 
 #include "Video.h"
-#include "Debugger.h"
 #include "Renderer.h"
 
 class Registers
@@ -105,7 +104,7 @@ public:
         makeReadRegister(address, info, debug, [&variable](Byte& value) { value = variable.read(); });
     }
 
-    void makeReadWriteRegister(Word address, const std::string& info, bool debug, std::function<void(Byte& value)> readCallback = nullptr, std::function<void(Byte value)> writeCallback = nullptr)
+    void makeReadWriteRegister(Word address, const std::string& info, bool debug, std::function<void(Byte& value)> readCallback, std::function<void(Byte value)> writeCallback)
     {
         state.createMemoryLocation<ReadWriteRegister>(Long(address, 0),
             [this, address, readCallback, info, debug](Byte& value) {
@@ -127,10 +126,22 @@ public:
         );
     };
 
+    void makeReadWriteRegister(Word address, const std::string& info, bool debug, Byte& variable)
+    {
+        makeReadWriteRegister(address, info, debug, [&variable](Byte& value) { value = variable; }, [&variable](Byte value) { variable = value; });
+    }
+
     void makeReadWriteRegister(Word address, const std::string& info, bool debug, Word& variable)
     {
         makeReadWriteRegister(address, info + " low byte", debug, [&variable](Byte& value) { value = variable.getLowByte(); }, [&variable](Byte value) { variable.setLowByte(value); });
         makeReadWriteRegister(address + 1, info + " high byte", debug, [&variable](Byte& value) { value = variable.getHighByte(); }, [&variable](Byte value) { variable.setHighByte(value); });
+    }
+
+    void makeReadWriteRegister(Word address, const std::string& info, bool debug, Long& variable)
+    {
+        makeReadWriteRegister(address, info + " low byte", debug, [&variable](Byte& value) { value = variable.getLowByte(); }, [&variable](Byte value) { variable.setLowByte(value); });
+        makeReadWriteRegister(address + 1, info + " high byte", debug, [&variable](Byte& value) { value = variable.getHighByte(); }, [&variable](Byte value) { variable.setHighByte(value); });
+        makeReadWriteRegister(address + 2, info + " bank byte", debug, [&variable](Byte& value) { value = variable.getBankByte(); }, [&variable](Byte value) { variable.setBankByte(value); });
     }
 
     void initialize()
@@ -471,13 +482,8 @@ public:
 
         makeWriteRegister(0x4207, "H Timer", false, hTimer);
         makeWriteRegister(0x4209, "V Timer", false, vTimer);
-        makeWriteRegister(0x420b, "DMA Enable", false);
-        makeWriteRegister(0x420c, "HDMA Enable", false,
-            [this](Byte value) {
-                /*std::stringstream ss;
-                ss << "HDMA Enable " << "vCounter=" << vCounter << ", hCounter=" << hCounter << std::endl;
-                printMemoryRegister(true, value, 0x420c, ss.str());*/
-            });
+        makeWriteRegister(0x420b, "DMA Enable", false, dmaEnabled);
+        makeWriteRegister(0x420c, "HDMA Enable", false, hdmaEnabled);
         makeWriteRegister(0x420d, "ROM Access Speed", true);
 
         makeReadRegister(0x4210, "NMI Flag and 5A22 Version", false,
@@ -497,25 +503,21 @@ public:
             });
 
         makeReadRegister(0x4214, "Quotient of Divide Result", false, quotient);
-        makeReadWriteRegister(0x4216, "Multiplication Product or Divide Remainder", false, product);
+        makeReadRegister(0x4216, "Multiplication Product or Divide Remainder", false, product);
 
         makeReadRegister(0x4218, "Controller Port 1 Data1 Register", false, controllerPort1Data1);
         makeReadRegister(0x421a, "Controller Port 2 Data1 Register low byte", false);
         makeReadRegister(0x421b, "Controller Port 2 Data1 Register high byte", false);
 
-        for (int i = 0; i < 8; ++i) {
+        for (int i = 0; i < dmaChannels.size(); ++i) {
             std::string channel = Util::toString(i);
-            makeReadWriteRegister(toDmaAddress(i, 0x0), "DMA Control Channel " + channel, false);
-            makeReadWriteRegister(toDmaAddress(i, 0x1), "DMA Destination Register Channel " + channel, false);
-            makeReadWriteRegister(toDmaAddress(i, 0x2), "DMA Source Address low byte Channel " + channel, false);
-            makeReadWriteRegister(toDmaAddress(i, 0x3), "DMA Source Address high byte Channel " + channel, false);
-            makeReadWriteRegister(toDmaAddress(i, 0x4), "DMA Source Address bank byte Channel " + channel, false);
-            makeReadWriteRegister(toDmaAddress(i, 0x5), "DMA Size/HDMA Indirect Address low byte Channel " + channel, false);
-            makeReadWriteRegister(toDmaAddress(i, 0x6), "DMA Size/HDMA Indirect Address high byte Channel " + channel, false);
-            makeReadWriteRegister(toDmaAddress(i, 0x7), "HDMA Indirect Address bank byte Channel " + channel, false);
-            makeReadWriteRegister(toDmaAddress(i, 0x8), "HDMA Table Address low byte Channel " + channel, false);
-            makeReadWriteRegister(toDmaAddress(i, 0x9), "HDMA Table Address high byte Channel " + channel, false);
-            makeReadWriteRegister(toDmaAddress(i, 0xa), "HDMA Line Counter Channel " + channel, false);
+            makeReadWriteRegister(toDmaAddress(i, 0x0), "DMA Control Channel " + channel, false, dmaChannels[i].control);
+            makeReadWriteRegister(toDmaAddress(i, 0x1), "DMA Destination Register Channel " + channel, false, dmaChannels[i].destinationRegister);
+            makeReadWriteRegister(toDmaAddress(i, 0x2), "DMA Source Address Channel " + channel, false, dmaChannels[i].sourceAddress);
+            makeReadWriteRegister(toDmaAddress(i, 0x5), "DMA Size/HDMA Indirect Address Channel " + channel, false, dmaChannels[i].dataSize);
+            makeReadWriteRegister(toDmaAddress(i, 0x7), "HDMA Indirect Address bank byte Channel " + channel, false, dmaChannels[i].indirectAddressBankByte);
+            makeReadWriteRegister(toDmaAddress(i, 0x8), "HDMA Table Address Channel " + channel, false, dmaChannels[i].tableAddress);
+            makeReadWriteRegister(toDmaAddress(i, 0xa), "HDMA Line Counter Channel " + channel, false, dmaChannels[i].lineCounter);
         }
 
         for (int address = 0x2000; address < 0x2100; ++address) {
@@ -689,4 +691,23 @@ public:
     Video::ReadTwiceRegister verticalScanlineLocation;
     Byte ppuStatusFlagAndVersion;
     const Word mysteriousRegister;
+
+    Byte dmaEnabled;
+    Byte hdmaEnabled;
+
+    struct DmaChannel
+    {
+        Byte control;
+        Byte destinationRegister;
+        Long sourceAddress;
+        Word dataSize;
+        Word& indirectAddress = dataSize;
+        Byte indirectAddressBankByte;
+        Word tableAddress;
+        Byte lineCounter;
+        bool dmaActive = false;
+        bool hdmaDoTransfer = false;
+    };
+
+    std::array<DmaChannel, 8> dmaChannels;
 };

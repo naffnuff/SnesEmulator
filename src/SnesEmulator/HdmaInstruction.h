@@ -9,46 +9,13 @@
 
 class HdmaInstruction : public Instruction
 {
-private:
-    struct Channel
-    {
-        Long hdmaControlAddress;
-        Long registerAddressAddress;
-        Long startAddressLowByteAddress;
-        Long startAddressHighByteAddress;
-        Long startAddressBankByteAddress;
-        Long indirectAddressLowByteAddress;
-        Long indirectAddressHighByteAddress;
-        Long indirectAddressBankByteAddress;
-        Long addressLowByteAddress;
-        Long addressHighByteAddress;
-        Long lineCounterAddress;
-        bool doTransfer = false;
-    };
-
 public:
-    HdmaInstruction(std::ostream& output, std::ostream& error, CPU::State& state)
+    HdmaInstruction(std::ostream& output, std::ostream& error, CPU::State& state, Registers& registers)
         : output(output)
         , error(error)
         , memory(state.getMemory())
-        , channels(8)
+        , registers(registers)
     {
-        dmaEnabledAddress = 0x420b;
-        hdmaEnabledAddress = 0x420c;
-        for (int i = 0; i < channels.size(); ++i) {
-            Long baseAddress = 0x4300 | i << 4;
-            channels[i].hdmaControlAddress = baseAddress;
-            channels[i].registerAddressAddress = baseAddress | 0x1;
-            channels[i].startAddressLowByteAddress = baseAddress | 0x2;
-            channels[i].startAddressHighByteAddress = baseAddress | 0x3;
-            channels[i].startAddressBankByteAddress = baseAddress | 0x4;
-            channels[i].indirectAddressLowByteAddress = baseAddress | 0x5;
-            channels[i].indirectAddressHighByteAddress = baseAddress | 0x6;
-            channels[i].indirectAddressBankByteAddress = baseAddress | 0x7;
-            channels[i].addressLowByteAddress = baseAddress | 0x8;
-            channels[i].addressHighByteAddress = baseAddress | 0x9;
-            channels[i].lineCounterAddress = baseAddress | 0xa;
-        }
     }
 
     HdmaInstruction(const HdmaInstruction&) = delete;
@@ -59,24 +26,24 @@ public:
         std::stringstream ss;
         ss << blockedInstruction->toString() << " (blocked by HDMA)" << std::endl;
         ss << "HDMA ";
-        if (Byte enabled = memory.readByte(hdmaEnabledAddress)) {
-            ss << "Enabled: " << std::bitset<8>(enabled) << std::endl;
+        if (registers.hdmaEnabled) {
+            ss << "Enabled: " << std::bitset<8>(registers.hdmaEnabled) << std::endl;
             ss << "Active: " << active << std::endl;
             ss << "Initialization requested: " << initializationRequested << std::endl;
             ss << "Iteration: " << iteration << std::endl;
             for (int i = 0; i < 8; ++i) {
-                if (enabled.getBit(i)) {
+                if (registers.hdmaEnabled.getBit(i)) {
                     ss << "*" << std::endl;
-                    const Channel& channel = channels[i];
+                    const Registers::DmaChannel& channel = registers.dmaChannels[i];
                     ss << "Channel " << i << std::endl;
-                    ss << "Start address: " << memory.readLong(channel.startAddressLowByteAddress) << std::endl;
-                    ss << "Indirect address: " << memory.readLong(channel.indirectAddressLowByteAddress) << std::endl;
-                    ss << "Address: " << memory.readWord(channel.addressLowByteAddress) << std::endl;
-                    ss << "Register: 21" << memory.readByte(channel.registerAddressAddress) << std::endl;
-                    ss << "Line counter: " << memory.readByte(channel.lineCounterAddress).getBits(0, 7) << std::endl;
-                    ss << "Repeat: " << memory.readByte(channel.lineCounterAddress).getBit(7) << std::endl;
-                    ss << "Do transfer: " << channel.doTransfer << std::endl;
-                    ss << "HDMA control: " << memory.readByte(channel.hdmaControlAddress) << std::endl;
+                    ss << "Start address: " << channel.sourceAddress << std::endl;
+                    ss << "Indirect address: " << Long(channel.indirectAddress, channel.indirectAddressBankByte) << std::endl;
+                    ss << "Address: " << channel.tableAddress << std::endl;
+                    ss << "Register: 21" << channel.destinationRegister << std::endl;
+                    ss << "Line counter: " << channel.lineCounter.getBits(0, 7) << std::endl;
+                    ss << "Repeat: " << channel.lineCounter.getBit(7) << std::endl;
+                    ss << "Do transfer: " << channel.hdmaDoTransfer << std::endl;
+                    ss << "HDMA control: " << channel.control << std::endl;
                 }
             }
         }
@@ -91,45 +58,43 @@ public:
     int execute() override
     {
         int cycles = 0;
-        if (const Byte hdmaEnabledValue = memory.readByte(hdmaEnabledAddress)) {
-            Byte dmaEnabledValue = memory.readByte(dmaEnabledAddress);
+        if (registers.hdmaEnabled) {
             cycles += 2;
             for (int i = 0; i < 8; ++i) {
-                if (hdmaEnabledValue.getBit(i)) {
+                if (registers.hdmaEnabled.getBit(i)) {
                     ++iteration;
 
-                    dmaEnabledValue.setBit(i, false);
+                    registers.dmaEnabled.setBit(i, false);
                     cycles += 1;
 
-                    Channel& channel = channels[i];
+                    Registers::DmaChannel& channel = registers.dmaChannels[i];
 
-                    Byte hdmaControl = memory.readByte(channel.hdmaControlAddress);
-                    bool direction = hdmaControl.getBit(7);
+                    bool direction = channel.control.getBit(7);
                     if (direction) {
-                        error << "HDMA control: " << hdmaControl << std::endl;
+                        error << "HDMA control: " << channel.control << std::endl;
                         throw OperatorNotYetImplementedException("HDMA direction not implemented");
                     }
 
-                    bool indirectAddressingMode = hdmaControl.getBit(6);
+                    bool indirectAddressingMode = channel.control.getBit(6);
 
                     if (initializationRequested) {
-                        memory.writeWord(memory.readWord(channel.startAddressLowByteAddress), channel.addressLowByteAddress);
-                        memory.writeByte(getNextByte(channel, false), channel.lineCounterAddress);
+                        channel.tableAddress = Word(channel.sourceAddress);
+                        channel.lineCounter = getNextByte(channel, false);
                         if (indirectAddressingMode) {
-                            memory.writeByte(getNextByte(channel, false), channel.indirectAddressLowByteAddress);
-                            memory.writeByte(getNextByte(channel, false), channel.indirectAddressLowByteAddress + 1);
+                            Byte lowByte = getNextByte(channel, false);
+                            channel.indirectAddress = Word(lowByte, getNextByte(channel, false));
                             cycles += 2;
                         }
-                        channel.doTransfer = true;
+                        channel.hdmaDoTransfer = true;
                     }
-                    else if (Byte lineCounter = memory.readByte(channel.lineCounterAddress))
+                    else if (channel.lineCounter)
                     {
                         //Byte lineCounter = channel.lineCounter.getValue();
 
-                        Long registerAddress = 0x2100 | memory.readByte(channel.registerAddressAddress);
+                        Long registerAddress = 0x2100 | channel.destinationRegister;
 
-                        if (channel.doTransfer) {
-                            Byte transferMode = hdmaControl.getBits(0, 3);
+                        if (channel.hdmaDoTransfer) {
+                            Byte transferMode = channel.control.getBits(0, 3);
                             if (transferMode == 0) {
                                 memory.writeByte(getNextByte(channel, indirectAddressingMode), registerAddress);
                                 cycles += 1;
@@ -152,45 +117,42 @@ public:
                                 cycles += 4;
                             }
                             else {
-                                error << "HDMA control: " << hdmaControl << std::endl;
+                                error << "HDMA control: " << channel.control << std::endl;
                                 error << "HDMA transfer mode: " << transferMode << std::endl;
                                 throw OperatorNotYetImplementedException("HDMA transfer mode not implemented");
                             }
                         }
-                        --lineCounter;
-                        channel.doTransfer = lineCounter.getBit(7);
-                        if (lineCounter.getBits(0, 7) == 0) {
-                            lineCounter = getNextByte(channel, false);
+                        --channel.lineCounter;
+                        channel.hdmaDoTransfer = channel.lineCounter.getBit(7);
+                        if (channel.lineCounter.getBits(0, 7) == 0) {
+                            channel.lineCounter = getNextByte(channel, false);
                             if (indirectAddressingMode) {
                                 Byte lowByte = getNextByte(channel, false);
-                                memory.writeByte(getNextByte(channel, false), channel.indirectAddressLowByteAddress);
-                                memory.writeByte(getNextByte(channel, false), channel.indirectAddressLowByteAddress + 1);
+                                channel.indirectAddress = Word(lowByte, getNextByte(channel, false));
                                 cycles += 2;
                             }
-                            channel.doTransfer = true;
+                            channel.hdmaDoTransfer = true;
                         }
-                        memory.writeByte(lineCounter, channel.lineCounterAddress);
                     }
                 }
             }
-            memory.writeByte(dmaEnabledValue, dmaEnabledAddress);
         }
         initializationRequested = false;
         active = false;
         return cycles;
     }
 
-    Byte getNextByte(Channel& channel, bool indirect)
+    Byte getNextByte(Registers::DmaChannel& channel, bool indirect)
     {
         if (indirect) {
-            Long address = memory.readLong(channel.indirectAddressLowByteAddress);
-            memory.writeWord(address + 1, channel.indirectAddressLowByteAddress);
+            Long address(channel.indirectAddress, channel.indirectAddressBankByte);
+            ++channel.indirectAddress;
             return memory.readByte(address);
         }
         else {
-            Word address = memory.readWord(channel.addressLowByteAddress);
-            memory.writeWord(address + 1, channel.addressLowByteAddress);
-            return memory.readByte(Long(address, memory.readByte(channel.startAddressBankByteAddress)));
+            Long address(channel.tableAddress, channel.sourceAddress.getBankByte());
+            ++channel.tableAddress;
+            return memory.readByte(address);
         }
     }
 
@@ -201,7 +163,7 @@ public:
 
     bool enabled() const
     {
-        return memory.readByte(hdmaEnabledAddress);
+        return registers.hdmaEnabled;
     }
 
     void setActive(bool value, bool requestInitialization = false)
@@ -220,15 +182,13 @@ public:
 
 public:
     Instruction* blockedInstruction = nullptr;
-    Long hdmaEnabledAddress;
 
 private:
     CPU::State::MemoryType& memory;
+    Registers& registers;
     bool active = false;
     bool initializationRequested = false;
     int iteration = -1;
-    Long dmaEnabledAddress;
-    std::vector<Channel> channels;
 
     std::ostream& output;
     std::ostream& error;
