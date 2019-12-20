@@ -118,7 +118,7 @@ public:
 
         if (transferWord) {
             memory.writeWord<CPU::State::MemoryType::Bank>(memory.readWord<CPU::State::MemoryType::Bank>(sourceAddress), destinationAddress);
-            ++byteCount;
+            byteCount += 2;
         }
         else {
             memory.writeByte(memory.readByte(sourceAddress), destinationAddress);
