@@ -31,7 +31,7 @@ private:
 
 public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, const Access& access)
+    static int invoke(State& state, Access& access)
     {
         int cycles = 0;
         if (state.is16Bit(State::m)) {
@@ -52,7 +52,7 @@ class AND
 {
 public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, const Access& access)
+    static int invoke(State& state, Access& access)
     {
         int cycles = 0;
         if (state.is16Bit(State::m)) {
@@ -165,7 +165,7 @@ class BIT
 {
 public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, const Access& access)
+    static int invoke(State& state, Access& access)
     {
         int cycles = 0;
         bool zFlag = false;
@@ -314,7 +314,7 @@ class CMP
 {
 public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, const Access& access)
+    static int invoke(State& state, Access& access)
     {
         int cycles = 0;
         if (state.is16Bit(State::m)) {
@@ -359,7 +359,7 @@ class CP_
 {
 public:
     // §10: Add 1 cycle if x=0 (16-bit index registers)
-    static int invoke(State& state, const Access& access)
+    static int invoke(State& state, Access& access)
     {
         int cycles = 0;
         if (state.is16Bit(State::x)) {
@@ -434,7 +434,7 @@ class EOR
 {
 public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, const Access& access)
+    static int invoke(State& state, Access& access)
     {
         int cycles = 0;
         if (state.is16Bit(State::m)) {
@@ -555,7 +555,7 @@ class LDA
 {
 public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, const Access& access)
+    static int invoke(State& state, Access& access)
     {
         int cycles = 0;
         if (state.is16Bit(State::m)) {
@@ -576,7 +576,7 @@ class LD_
 {
 public:
     // §10: Add 1 cycle if x=0 (16-bit index registers)
-    static int invoke(State& state, const Access& access)
+    static int invoke(State& state, Access& access)
     {
         int cycles = 0;
         if (state.is16Bit(State::x)) {
@@ -673,7 +673,7 @@ class ORA
 {
 public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, const Access& access)
+    static int invoke(State& state, Access& access)
     {
         int cycles = 0;
         if (state.is16Bit(State::m)) {
@@ -897,7 +897,7 @@ public:
 class REP
 {
 public:
-    static int invoke(State& state, const Access& access)
+    static int invoke(State& state, Access& access)
     {
         state.setFlag(access.readByte(), false);
         return 0;
@@ -1041,7 +1041,7 @@ private:
 
 public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
-    static int invoke(State& state, const Access& access)
+    static int invoke(State& state, Access& access)
     {
         int cycles = 0;
         if (state.is16Bit(State::m)) {
@@ -1081,7 +1081,7 @@ public:
 class SEP
 {
 public:
-    static int invoke(State& state, const Access& access)
+    static int invoke(State& state, Access& access)
     {
         state.setFlag(access.readByte(), true);
         return 0;

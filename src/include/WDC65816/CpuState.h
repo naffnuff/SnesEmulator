@@ -55,14 +55,14 @@ private:
     class Accumulator : public Access
     {
     public:        
-        Byte readByte() const override
+        Byte readByte() override
         {
             return accumulatorA;
         }
 
-        Word readWord() const override
+        Word readWord() override
         {
-            return Word(accumulatorA, accumulatorB);
+            return getAccumulatorC();
         }
 
         void writeByte(Byte value) override
@@ -81,6 +81,16 @@ private:
             Byte newAccumulatorA = accumulatorB;
             accumulatorB = accumulatorA;
             accumulatorA = newAccumulatorA;
+        }
+
+        Byte getAccumulatorA() const
+        {
+            return accumulatorA;
+        }
+
+        Word getAccumulatorC() const
+        {
+            return Word(accumulatorA, accumulatorB);
         }
 
     private:
@@ -202,7 +212,7 @@ public:
         return isNativeMode() && !getFlag(flag);
     }
 
-    Byte readProgramByte(int offset = 0) const
+    Byte readProgramByte(int offset = 0)
     {
         return memory.readByte(getProgramAddress(offset));
     }
@@ -239,12 +249,12 @@ public:
 
     Byte getAccumulatorA() const
     {
-        return accumulator.readByte();
+        return accumulator.getAccumulatorA();
     }
 
     Word getAccumulatorC() const
     {
-        return accumulator.readWord();
+        return accumulator.getAccumulatorC();
     }
 
     void setAccumulatorA(Byte value)
@@ -276,7 +286,7 @@ public:
         memory.createLocation<LocationType, Args...>(address, args...);
     }
 
-    Byte readMemoryByte(Long address) const
+    Byte readMemoryByte(Long address)
     {
         return memory.readByte(address);
     }
@@ -287,13 +297,13 @@ public:
     }
 
     template<MemoryType::WrappingMask Wrapping = MemoryType::Full>
-    Word readMemoryWord(Long address) const
+    Word readMemoryWord(Long address)
     {
         return memory.readWord<Wrapping>(address);
     }
 
     template<MemoryType::WrappingMask Wrapping = MemoryType::Full>
-    Long readMemoryLong(Long address) const
+    Long readMemoryLong(Long address)
     {
         return memory.readLong<Wrapping>(address);
     }

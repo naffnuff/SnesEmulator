@@ -28,10 +28,37 @@ void Emulator::initialize()
         for (Long address = 0x7e0000; address < 0x800000; address++) {
             memory.createLocation<ReadWriteMemory>(address, 0x55);
         }
+
         // RAM mirrors
         for (Byte bank = 0; bank < 0x40; ++bank) {
             for (Word address = 0; address < 0x2000; ++address) {
                 memory.createMirror(Long(address, bank), Long(address, 0x7E));
+            }
+        }
+
+        // I/O between the CPU and SPC700
+        for (Word i = 0; i < 4; ++i) {
+            memory.createLocation<ReadWriteRegister>(Long(0x2140 + i),
+                [this, i](Byte& value) {
+                    value = spcToCpuBuffers[i];
+                },
+                [this, i](Byte, Byte newValue) {
+                    cpuToSpcBuffers[i] = newValue;
+                });
+            MemoryLocation* spcMemoryLocation = spcState.getMemoryLocation(Word(0xf4 + i));
+            spcMemoryLocation->setReadWrite();
+            spcMemoryLocation->onRead = [this, i](Byte& value) {
+                value = cpuToSpcBuffers[i];
+            };
+            spcMemoryLocation->onWrite = [this, i](Byte, Byte newValue) {
+                spcToCpuBuffers[i] = newValue;
+            };
+        }
+
+        // Register mirrors
+        for (Byte bank = 0x01; bank < 0x60; ++bank) {
+            for (Word address = 0x2000; address < 0x8000; ++address) {
+                memory.createMirror(Long(address, bank), Long(address, 0x00));
             }
         }
 
@@ -70,13 +97,14 @@ void Emulator::initialize()
                                     ss << " @" << localAddress << std::endl;
                                     throw std::logic_error(ss.str());
                                 }
-                                saveRamSaver.saveRam[localAddress] = newValue;
-                                if (newValue != oldValue) {
+                                if (newValue != saveRamSaver.saveRam[localAddress]) {
+                                    saveRamSaver.saveRam[localAddress] = newValue;
                                     std::lock_guard<std::mutex> lock(saveRamSaver.mutex);
                                     saveRamSaver.saveRamModified = true;
                                 }
                                 saveRamSaver.condition.notify_one();
-                            });
+                            },
+                            byte);
                     } else {
                         memory.createMirror(address, saveRamAddress);
                     }
@@ -86,42 +114,18 @@ void Emulator::initialize()
         }
 
         saveRamSaverThread = std::thread(std::ref(saveRamSaver));
-
-        // Register mirrors
-        for (Byte bank = 0x01; bank < 0x60; ++bank) {
-            for (Word address = 0x2000; address < 0x8000; ++address) {
-                memory.createMirror(Long(address, bank), Long(address, 0x00));
-            }
-        }
     }
     else {
         throw std::runtime_error("Only the low-rom mempory map is supported for now");
     }
 
-    cpuState.reset();
-
     video.initialize(rom.gameTitle);
 
-    // I/O between the CPU and SPC700
-    for (Word i = 0; i < 4; ++i) {
-        memory.createLocation<ReadWriteRegister>(Long(0x2140 + i),
-            [this, i](Byte& value) {
-                value = spcToCpuBuffers[i];
-            },
-            [this, i](Byte, Byte newValue) {
-                cpuToSpcBuffers[i] = newValue;
-            });
-        MemoryLocation* spcMemoryLocation = spcState.getMemoryLocation(Word(0xf4 + i));
-        spcMemoryLocation->setReadWrite();
-        spcMemoryLocation->onRead = [this, i](Byte& value) {
-            value = cpuToSpcBuffers[i];
-        };
-        spcMemoryLocation->onWrite = [this, i](Byte, Byte newValue) {
-            spcToCpuBuffers[i] = newValue;
-        };
-    }
-
     audio.initialize(memory);
+
+    memory.finalize();
+
+    cpuState.reset();
 
     debugger.loadBreakpoints(cpuContext, cpuState);
     debugger.loadBreakpoints(spcContext, spcState);
@@ -429,6 +433,10 @@ int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debu
         context.setPaused(true);
         error << e.what() << std::endl;
     } catch (MemoryLocation::AccessException& e) {
+        state.setProgramAddress(context.getLastKnownAddress());
+        context.setPaused(true);
+        error << e.what() << std::endl;
+    } catch (MemoryAccessException& e) {
         state.setProgramAddress(context.getLastKnownAddress());
         context.setPaused(true);
         error << e.what() << std::endl;

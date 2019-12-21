@@ -7,9 +7,15 @@
 
 #include "Types.h"
 
+class MemoryAccessException : public std::logic_error
+{
+    using std::logic_error::logic_error;
+};
+
 class LocationVisitor
 {
 public:
+    virtual void visit(const class Location&) = 0;
     virtual void visit(const class ReadOnlyMemory&) = 0;
     virtual void visit(const class ReadWriteMemory&) = 0;
     virtual void visit(const class ReadRegister&) = 0;
@@ -20,11 +26,6 @@ public:
 class Location
 {
 public:
-    class AccessException : public std::logic_error
-    {
-        using std::logic_error::logic_error;
-    };
-
     Location() = default;
 
     Location(const Location&) = delete;
@@ -36,7 +37,7 @@ protected:
         throwAccessException(__FUNCTION__, "writing not allowed");
     }
 
-    virtual Byte read() const
+    virtual Byte read()
     {
         throwAccessException(__FUNCTION__, "reading not allowed");
         return Byte();
@@ -54,7 +55,15 @@ protected:
     }
 
 private:
-    virtual void accept(LocationVisitor&) const = 0;
+    virtual void accept(LocationVisitor& visitor) const
+    {
+        visitor.visit(*this);
+    }
+
+    virtual void print(std::ostream& out) const
+    {
+        out << "--";
+    }
 
     virtual int getApplicationCount() const
     {
@@ -64,7 +73,7 @@ private:
 
     void throwAccessException(const std::string& function, const std::string& message) const
     {
-        throw AccessException(std::string(typeid(this).name()) + ": " + function + ": Bad memory access: " + message);
+        throw MemoryAccessException(std::string(typeid(this).name()) + ": " + function + ": Bad memory access: " + message);
     }
 
     friend class LocationAccess;
@@ -84,7 +93,7 @@ public:
     }
 
 private:
-    Byte read() const override
+    Byte read() override
     {
         return value;
     }
@@ -95,14 +104,19 @@ private:
         return value;
     }
 
-    void reset()
+    void reset() override
     {
         applicationCount = 0;
     }
 
-    void accept(LocationVisitor& visitor) const
+    void accept(LocationVisitor& visitor) const override
     {
         visitor.visit(*this);
+    }
+
+    void print(std::ostream& out) const override
+    {
+        out << value;
     }
 
 private:
@@ -129,7 +143,7 @@ private:
         value = newValue;
     }
 
-    Byte read() const override
+    Byte read() override
     {
         return value;
     }
@@ -140,14 +154,19 @@ private:
         return value;
     }
 
-    void reset()
+    void reset() override
     {
         applicationCount = 0;
     }
 
-    void accept(LocationVisitor& visitor) const
+    void accept(LocationVisitor& visitor) const override
     {
         visitor.visit(*this);
+    }
+
+    void print(std::ostream& out) const override
+    {
+        out << value;
     }
 
 private:
@@ -172,24 +191,29 @@ public:
     }
 
 private:
-    Byte read() const override
+    Byte read() override
     {
         if (onRead == nullptr) {
             return Register::read();
         } else {
-            Byte value;
-            onRead(value);
-            return value;
+            onRead(lastValue);
+            return lastValue;
         }
     }
 
-    void accept(LocationVisitor& visitor) const
+    void accept(LocationVisitor& visitor) const override
     {
         visitor.visit(*this);
     }
 
+    void print(std::ostream& out) const override
+    {
+        out << lastValue;
+    }
+
 private:
     std::function<void(Byte&)> onRead;
+    Byte lastValue;
 };
 
 class WriteRegister : public Register
@@ -211,9 +235,14 @@ private:
         }
     }
 
-    void accept(LocationVisitor& visitor) const
+    void accept(LocationVisitor& visitor) const override
     {
         visitor.visit(*this);
+    }
+
+    void print(std::ostream& out) const override
+    {
+        out << lastValue;
     }
 
 private:
@@ -224,14 +253,21 @@ private:
 class ReadWriteRegister : public Register
 {
 public:
-    ReadWriteRegister(std::function<void(Byte&)> onRead, std::function<void(Byte, Byte)> onWrite)
+    ReadWriteRegister(std::function<void(Byte&)> onRead, std::function<void(Byte, Byte)> onWrite, Byte lastValue = Byte())
         : onRead(onRead)
         , onWrite(onWrite)
+        , lastValue(lastValue)
     {
     }
 
+    /*ReadWriteRegister(std::function<void(Byte&)> onRead, std::function<void(Byte, Byte)> onWrite)
+        : onRead(onRead)
+        , onWrite(onWrite)
+    {
+    }*/
+
 private:
-    Byte read() const override
+    Byte read() override
     {
         if (onRead == nullptr) {
             return Register::read();
@@ -252,9 +288,14 @@ private:
         }
     }
 
-    void accept(LocationVisitor& visitor) const
+    void accept(LocationVisitor& visitor) const override
     {
         visitor.visit(*this);
+    }
+
+    void print(std::ostream& out) const override
+    {
+        out << lastValue;
     }
 
 private:
@@ -271,11 +312,11 @@ public:
     Access(const Access&) = delete;
     Access& operator=(const Access&) = delete;
 
-    virtual Byte readByte() const = 0;
-    virtual Word readWord() const = 0;
-    virtual Long readLong() const
+    virtual Byte readByte() = 0;
+    virtual Word readWord() = 0;
+    virtual Long readLong()
     {
-        throw Location::AccessException("Long read access is not implemented");
+        throw MemoryAccessException("Long read access is not implemented");
     }
 
     virtual void writeByte(Byte value) = 0;
@@ -296,6 +337,8 @@ public:
 
     virtual void accept(LocationVisitor& visitor) const = 0;
 
+    virtual void print(std::ostream& out) const = 0;
+
     bool hasBreakpoint() const
     {
         return false;
@@ -312,7 +355,7 @@ protected:
         location->write(newValue);
     }
 
-    Byte readLocation(const Location* location) const
+    Byte readLocation(Location* location) const
     {
         return location->read();
     }
@@ -336,7 +379,18 @@ protected:
     {
         location->accept(visitor);
     }
+
+    void printLocation(Location* location, std::ostream& out) const
+    {
+        return location->print(out);
+    }
 };
+
+inline std::ostream& operator<<(std::ostream& out, const LocationAccess& access)
+{
+    access.print(out);
+    return out;
+}
 
 template<typename AddressType>
 class Memory : private LocationAccess
@@ -380,6 +434,15 @@ public:
         }
     }
 
+    void finalize()
+    {
+        for (std::shared_ptr<Location>& location : memory) {
+            if (location.get() == nullptr) {
+                location = std::make_shared<Location>();
+            }
+        }
+    }
+
     template<WrappingMask Wrapping = Full, typename AccessType = Access>
     AccessType& getAccess(AddressType address)
     {
@@ -388,26 +451,25 @@ public:
         return static_cast<AccessType&>(*this);
     }
 
-    Byte readByte(AddressType address) const
+    Byte readByte(AddressType address)
     {
         Byte result;
         checkIsInitialized(address, true, __FUNCTION__);
-        const Location* location = memory[address].get();
         try {
-            result = readLocation(location);
-        } catch (const Location::AccessException& e) {
-            handleAccessException(e, location);
+            result = readLocation(memory[address].get());
+        } catch (const MemoryAccessException& e) {
+            handleAccessException(e, address);
         }
         return result;
     }
 
     template<WrappingMask Wrapping = Full>
-    Word readWord(AddressType address) const
+    Word readWord(AddressType address)
     {
         return readWord(address, Wrapping);
     }
 
-    Word readWord(AddressType lowAddress, uint32_t wrappingMask) const
+    Word readWord(AddressType lowAddress, uint32_t wrappingMask)
     {
         Byte lowByte = readByte(lowAddress);
         AddressType highAddress = getNextAddress(lowAddress, wrappingMask);
@@ -416,12 +478,12 @@ public:
     }
 
     template<WrappingMask Wrapping = Full>
-    Long readLong(AddressType address) const
+    Long readLong(AddressType address)
     {
         return readLong(address, Wrapping);
     }
 
-    Long readLong(AddressType lowAddress, uint32_t wrappingMask) const
+    Long readLong(AddressType lowAddress, uint32_t wrappingMask)
     {
         Byte lowByte = readByte(lowAddress);
         AddressType highAddress = getNextAddress(lowAddress, wrappingMask);
@@ -434,12 +496,11 @@ public:
     void writeByte(Byte value, AddressType address)
     {
         checkIsInitialized(address, true, __FUNCTION__);
-        Location* location = memory[address].get();
         try {
-            return writeLocation(location, value);
+            return writeLocation(memory[address].get(), value);
         }
-        catch (const Location::AccessException& e) {
-            handleAccessException(e, location);
+        catch (const MemoryAccessException& e) {
+            handleAccessException(e, address);
         }
     }
 
@@ -460,27 +521,22 @@ public:
     {
         Byte result;
         checkIsInitialized(address, true, __FUNCTION__);
-        Location* location = memory[address].get();
         try {
-            result = applyLocation(location);
-        } catch (const Location::AccessException& e) {
-            handleAccessException(e, location);
+            result = applyLocation(memory[address].get());
+        } catch (const MemoryAccessException& e) {
+            handleAccessException(e, address);
         }
         return result;
     }
 
     void reset(AddressType address)
     {
-        if (Location * location = memory[address].get()) {
-            return resetLocation(location);
-        }
-        /*checkIsInitialized(address, true, __FUNCTION__);
-        Location* location = memory[address].get();
+        checkIsInitialized(address, true, __FUNCTION__);
         try {
-            return resetLocation(location);
-        } catch (const Location::AccessException& e) {
-            handleAccessException(e, location);
-        }*/
+            return resetLocation(memory[address].get());
+        } catch (const MemoryAccessException& e) {
+            handleAccessException(e, address);
+        }
     }
 
     int getApplicationCount(AddressType address) const
@@ -495,17 +551,17 @@ private:
         return (address & ~wrappingMask) + ((address + 1) & wrappingMask);
     }
 
-    Byte readByte() const override
+    Byte readByte() override
     {
         return readByte(currentAddress);
     }
 
-    Word readWord() const override
+    Word readWord() override
     {
         return readWord(currentAddress, currentWrappingMask);
     }
 
-    Long readLong() const override
+    Long readLong() override
     {
         return readLong(currentAddress, currentWrappingMask);
     }
@@ -526,13 +582,19 @@ private:
         acceptLocation(memory[currentAddress].get(), visitor);
     }
 
+    void print(std::ostream& out) const override
+    {
+        checkIsInitialized(currentAddress, true, __FUNCTION__);
+        printLocation(memory[currentAddress].get(), out);
+    }
+
     void checkBounds(AddressType address, const char* operation) const
     {
         if (address >= memorySize) {
             std::ostringstream ss;
             ss << operation << ": ";
             ss << address << " is out of bounds, memory size is " << memorySize;
-            throw Location::AccessException(ss.str());
+            throw MemoryAccessException(ss.str());
         }
     }
 
@@ -550,19 +612,15 @@ private:
             else {
                 ss << "is not initialized";
             }
-            throw Location::AccessException(ss.str());
+            throw MemoryAccessException(ss.str());
         }
     }
 
-    void handleAccessException(const Location::AccessException& e, const Location* location) const
+    void handleAccessException(const MemoryAccessException& e, AddressType address) const
     {
         std::ostringstream ss;
-        for (AddressType i = 0; i < memorySize; ++i) {
-            if (memory[i].get() == location) {
-                ss << " @" << i;
-            }
-        }
-        throw Location::AccessException(e.what() + ss.str());
+        ss << " @" << address;
+        throw MemoryAccessException(e.what() + ss.str());
     }
 
 private:

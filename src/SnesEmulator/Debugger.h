@@ -46,6 +46,11 @@ private:
     class OutputColorVisitor : public LocationVisitor
     {
     public:
+        void visit(const Location&) override
+        {
+            color = System::DefaultColor;
+        }
+
         void visit(const ReadOnlyMemory& location) override
         {
             color = location.getApplicationCount() > 0 ? System::Cyan : System::Blue;
@@ -63,12 +68,12 @@ private:
 
         void visit(const WriteRegister&) override
         {
-            color = System::Magenta;
+            color = System::Green;
         }
 
         void visit(const ReadWriteRegister&) override
         {
-            color = System::Magenta;
+            color = System::Yellow;
         }
 
         System::Color color = System::DefaultColor;
@@ -634,7 +639,7 @@ public:
         System::setOutputColor(output, System::DefaultColor, false);
     }
 
-    void printState(const CPU::State& state, Context& context)
+    void printState(CPU::State& state, Context& context)
     {
         System::setOutputColor(output, context.isPaused() ? context.debugColor : System::Red, true);
         state.printRegisters(output) << std::endl;
@@ -799,7 +804,7 @@ public:
                 for (int j = 0; j < 16 && cpuAddress < cpuMemorySize; ++j) {
                     const LocationAccess& access = cpuState.getLocationAccess(cpuAddress);
                     setColor(cpuState, cpuContext, cpuAddress++, access);
-                    output << access.readByte() << ' ';
+                    output << access << ' ';
                     System::setOutputColor(output, System::DefaultColor, false);
                 }
             }
