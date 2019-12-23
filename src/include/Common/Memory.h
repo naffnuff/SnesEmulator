@@ -26,6 +26,15 @@ public:
 class Location
 {
 public:
+    enum Operation
+    {
+        Read,
+        Write,
+        Apply
+    };
+
+    typedef std::function<void(Operation operation, Byte value, uint64_t applicationCount)> BreakpointCallback;
+
     Location() = default;
 
     Location(const Location&) = delete;
@@ -71,10 +80,22 @@ private:
         return 0;
     }
 
+    bool hasBreakpoint() const
+    {
+        return breakpoint.operator bool();
+    }
+
+    void setBreakpoint(BreakpointCallback callback)
+    {
+        breakpoint = callback;
+    }
+
     void throwAccessException(const std::string& function, const std::string& message) const
     {
         throw MemoryAccessException(std::string(typeid(this).name()) + ": " + function + ": Bad memory access: " + message);
     }
+
+    BreakpointCallback breakpoint;
 
     friend class LocationAccess;
 };
@@ -326,28 +347,13 @@ public:
 class LocationAccess : public Access
 {
 public:
-    enum Operation
-    {
-        Read,
-        Write,
-        Apply
-    };
-
-    typedef std::function<void(Operation operation, Byte value, uint64_t applicationCount)> BreakpointCallback;
-
     virtual void accept(LocationVisitor& visitor) const = 0;
 
     virtual void print(std::ostream& out) const = 0;
 
-    bool hasBreakpoint() const
-    {
-        return false;
-    }
+    virtual bool hasBreakpoint() const = 0;
 
-    void setBreakpoint(BreakpointCallback value)
-    {
-
-    }
+    virtual void setBreakpoint(Location::BreakpointCallback callback) = 0;
 
 protected:
     void writeLocation(Location* location, Byte newValue) const
@@ -373,6 +379,16 @@ protected:
     void resetLocation(Location* location) const
     {
         location->reset();
+    }
+
+    bool locationHasBreakpoint(Location* location) const
+    {
+        return location->hasBreakpoint();
+    }
+
+    void setLocationBreakpoint(Location* location, Location::BreakpointCallback callback)
+    {
+        location->setBreakpoint(callback);
     }
 
     void acceptLocation(Location* location, LocationVisitor& visitor) const
@@ -576,6 +592,18 @@ private:
         writeWord(value, currentAddress, currentWrappingMask);
     }
 
+    bool hasBreakpoint() const override
+    {
+        checkIsInitialized(currentAddress, true, __FUNCTION__);
+        return locationHasBreakpoint(memory[currentAddress].get());
+    }
+
+    void setBreakpoint(Location::BreakpointCallback callback) override
+    {
+        checkIsInitialized(currentAddress, true, __FUNCTION__);
+        setLocationBreakpoint(memory[currentAddress].get(), callback);
+    }
+
     void accept(LocationVisitor& visitor) const override
     {
         checkIsInitialized(currentAddress, true, __FUNCTION__);
@@ -600,6 +628,9 @@ private:
 
     void checkIsInitialized(AddressType address, bool shouldBeInitialized, const char* operation) const
     {
+        if (shouldBeInitialized) {
+            return;
+        }
         checkBounds(address, operation);
         bool isInitialized = memory[address].get() != nullptr;
         if (isInitialized != shouldBeInitialized) {

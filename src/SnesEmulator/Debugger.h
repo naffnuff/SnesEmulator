@@ -233,8 +233,8 @@ public:
             context.breakpoints.erase(breakpoint);
             output << "Breakpoint removed at address " << breakpoint.address << std::endl;
         } else {
-            access.setBreakpoint([this, &context, breakpoint](LocationAccess::Operation operation, Byte value, uint64_t applicationCount) {
-                if (operation == LocationAccess::Apply && (breakpoint.applicationCount == 0 || breakpoint.applicationCount == applicationCount)) {
+            access.setBreakpoint([this, &context, breakpoint](Location::Operation operation, Byte value, uint64_t applicationCount) {
+                if (operation == Location::Apply && (breakpoint.applicationCount == 0 || breakpoint.applicationCount == applicationCount)) {
                     //output << "Frame: " << registers.frame << ", V counter: " << registers.vCounter << ", H counter: " << registers.hCounter << ", V blank: " << registers.vBlank << ", H blank: " << registers.hBlank << std::endl;
                     context.setPaused(true);
                     output << "Apply: Breakpoint hit " << breakpoint << std::endl;
@@ -246,7 +246,7 @@ public:
                     context.stepMode = true;
                     output << "Read: Breakpoint hit @ " << breakpoint << std::endl;
                 }*/
-                else if (operation == LocationAccess::Write && (breakpoint.argumentValue == -1 || breakpoint.argumentValue == value)) {
+                else if (operation == Location::Write && (breakpoint.argumentValue == -1 || breakpoint.argumentValue == value)) {
                     context.setPaused(true);
                     output << "Write: Breakpoint hit " << breakpoint << ":" << value << std::endl;
                     //output << value << std::endl;
