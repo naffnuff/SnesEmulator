@@ -232,6 +232,11 @@ void Emulator::run()
                     }
                 }
 
+                if (registers.pauseRequested) {
+                    cpuContext.setPaused(true);
+                    registers.pauseRequested = false;
+                }
+
                 if (masterCycle == nextSpc) {
                     Instruction* instruction = spcInstructionDecoder.applyNextInstruction(spcState);
                     spcContext.nextInstruction = instruction;

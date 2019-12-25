@@ -123,6 +123,9 @@ public:
 
         void setPaused(bool paused)
         {
+            if (paused == stepMode) {
+                return;
+            }
             stepMode = paused;
             if (paused) {
                 if (debugger.registers.video.rendererLock.owns_lock()) {
@@ -747,6 +750,7 @@ public:
         //output << "VRAM start address: " << registers.vramStartAddress << std::endl;
         output << "VRAM current address: " << registers.video.vram.address << std::endl;
         output << "maxApplicationCount: " << MemoryLocation::maxApplicationCount << std::endl;
+        output << "CPU bus: " << cpuState.getMemory().bus << std::endl;
 
         output << "          0     1     2     3     4     5     6     7" << std::endl
             << "          8     9     a     b     c     d     e     f"

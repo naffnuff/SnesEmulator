@@ -35,52 +35,68 @@ public:
 
     typedef std::function<void(Operation operation, Byte value, uint64_t applicationCount)> BreakpointCallback;
 
-    Location() = default;
+    Location() = delete;
+
+    Location(Byte& bus)
+        : bus(bus)
+    {
+    }
 
     Location(const Location&) = delete;
     Location& operator=(const Location&) = delete;
 
-protected:
+public:
+    Byte read()
+    {
+        return bus = readImpl();
+    }
+
+    Byte apply()
+    {
+        ++applicationCount;
+        bus = readImpl();
+        if (breakpoint) {
+            breakpoint(Apply, bus, applicationCount);
+        }
+        return bus;
+    }
+
+    int getApplicationCount() const
+    {
+        return applicationCount;
+    }
+
+    void reset()
+    {
+        applicationCount = 0;
+    }
+
+    bool hasBreakpoint() const
+    {
+        return breakpoint.operator bool();
+    }
+
+    bool setBreakpoint(BreakpointCallback callback)
+    {
+        breakpoint = callback;
+        return true;
+    }
+
     virtual void write(Byte)
     {
         throwAccessException(__FUNCTION__, "writing not allowed");
     }
 
-    virtual Byte read()
-    {
-        throwAccessException(__FUNCTION__, "reading not allowed");
-        return Byte();
-    }
-
-    virtual Byte apply()
-    {
-        throwAccessException(__FUNCTION__, "application not allowed");
-        return Byte();
-    }
-
-    virtual void reset()
-    {
-        //throwAccessException(__FUNCTION__, "reset not allowed");
-    }
-
-private:
     virtual void accept(LocationVisitor& visitor) const = 0;
     virtual void print(std::ostream& out) const = 0;
 
-    virtual int getApplicationCount() const
+private:
+    virtual Byte readImpl()
     {
-        throwAccessException(__FUNCTION__, "no application count");
-        return 0;
-    }
-
-    virtual bool hasBreakpoint() const
-    {
-        return false;
-    }
-
-    virtual bool setBreakpoint(BreakpointCallback callback)
-    {
-        return false;
+        std::stringstream ss;
+        ss << "reading not allowed, bus value=" << bus;
+        throwAccessException(__FUNCTION__, ss.str());
+        return bus;
     }
 
     void throwAccessException(const std::string& function, const std::string& message) const
@@ -88,11 +104,20 @@ private:
         throw MemoryAccessException(std::string(typeid(this).name()) + ": " + function + ": Bad memory access: " + message);
     }
 
-    friend class LocationAccess;
+private:
+    Byte& bus;
+    int applicationCount = 0;
+    BreakpointCallback breakpoint;
 };
 
 class InvalidLocation : public Location
 {
+public:
+    InvalidLocation(Byte& bus)
+        : Location(bus)
+    {
+    }
+
 private:
     void accept(LocationVisitor& visitor) const override
     {
@@ -110,28 +135,15 @@ private:
 class MemoryLocationX : public Location
 {
 public:
-    MemoryLocationX(Byte value)
-        : value(value)
+    MemoryLocationX(Byte& bus, Byte value)
+        : Location(bus)
+        , value(value)
     {
-    }
-
-    int getApplicationCount() const override
-    {
-        return applicationCount;
     }
 
 private:
-    Byte read() override
+    Byte readImpl() override
     {
-        return value;
-    }
-
-    Byte apply() override
-    {
-        ++applicationCount;
-        if (breakpoint) {
-            breakpoint(Apply, value, applicationCount);
-        }
         return value;
     }
 
@@ -140,35 +152,15 @@ private:
         out << value;
     }
 
-    void reset() override
-    {
-        applicationCount = 0;
-    }
-
-    bool hasBreakpoint() const override
-    {
-        return breakpoint.operator bool();
-    }
-
-    bool setBreakpoint(BreakpointCallback callback) override
-    {
-        breakpoint = callback;
-        return true;
-    }
-
 protected:
     Byte value;
-
-private:
-    int applicationCount = 0;
-    BreakpointCallback breakpoint;
 };
 
 class ReadOnlyMemory : public MemoryLocationX
 {
 public:
-    ReadOnlyMemory(Byte value)
-        : MemoryLocationX(value)
+    ReadOnlyMemory(Byte& bus, Byte value)
+        : MemoryLocationX(bus, value)
     {
     }
 
@@ -182,8 +174,8 @@ private:
 class ReadWriteMemory : public MemoryLocationX
 {
 public:
-    ReadWriteMemory(Byte value)
-        : MemoryLocationX(value)
+    ReadWriteMemory(Byte& bus, Byte value)
+        : MemoryLocationX(bus, value)
     {
     }
 
@@ -204,7 +196,8 @@ private:
 class Register : public Location
 {
 protected:
-    Register()
+    Register(Byte& bus)
+        : Location(bus)
     {
     }
 };
@@ -212,13 +205,14 @@ protected:
 class ReadRegister : public Register
 {
 public:
-    ReadRegister(std::function<void(Byte&)> onRead)
-        : onRead(onRead)
+    ReadRegister(Byte& bus, std::function<void(Byte&)> onRead)
+        : Register(bus)
+        , onRead(onRead)
     {
     }
 
 private:
-    Byte read() override
+    Byte readImpl() override
     {
         if (onRead == nullptr) {
             return Register::read();
@@ -246,8 +240,9 @@ private:
 class WriteRegister : public Register
 {
 public:
-    WriteRegister(std::function<void(Byte, Byte)> onWrite)
-        : onWrite(onWrite)
+    WriteRegister(Byte& bus, std::function<void(Byte, Byte)> onWrite)
+        : Register(bus)
+        , onWrite(onWrite)
     {
     }
 
@@ -280,8 +275,9 @@ private:
 class ReadWriteRegister : public Register
 {
 public:
-    ReadWriteRegister(std::function<void(Byte&)> onRead, std::function<void(Byte, Byte)> onWrite, Byte lastValue = Byte())
-        : onRead(onRead)
+    ReadWriteRegister(Byte& bus, std::function<void(Byte&)> onRead, std::function<void(Byte, Byte)> onWrite, Byte lastValue = Byte())
+        : Register(bus)
+        , onRead(onRead)
         , onWrite(onWrite)
         , lastValue(lastValue)
     {
@@ -294,7 +290,7 @@ public:
     }*/
 
 private:
-    Byte read() override
+    Byte readImpl() override
     {
         if (onRead == nullptr) {
             return Register::read();
@@ -357,52 +353,6 @@ public:
     virtual void print(std::ostream& out) const = 0;
     virtual bool hasBreakpoint() const = 0;
     virtual bool setBreakpoint(Location::BreakpointCallback callback) = 0;
-
-protected:
-    void writeLocation(Location* location, Byte newValue) const
-    {
-        location->write(newValue);
-    }
-
-    Byte readLocation(Location* location) const
-    {
-        return location->read();
-    }
-
-    Byte applyLocation(Location* location) const
-    {
-        return location->apply();
-    }
-
-    int getLocationApplicationCount(Location* location) const
-    {
-        return location->getApplicationCount();
-    }
-
-    void resetLocation(Location* location) const
-    {
-        location->reset();
-    }
-
-    bool locationHasBreakpoint(Location* location) const
-    {
-        return location->hasBreakpoint();
-    }
-
-    bool setLocationBreakpoint(Location* location, Location::BreakpointCallback callback)
-    {
-        return location->setBreakpoint(callback);
-    }
-
-    void acceptLocation(Location* location, LocationVisitor& visitor) const
-    {
-        location->accept(visitor);
-    }
-
-    void printLocation(Location* location, std::ostream& out) const
-    {
-        return location->print(out);
-    }
 };
 
 inline std::ostream& operator<<(std::ostream& out, const LocationAccess& access)
@@ -442,7 +392,7 @@ public:
     void createLocation(AddressType address, Args... args)
     {
         checkIsInitialized(address, false, __FUNCTION__);
-        memory[address] = std::make_shared<LocationType>(args...);
+        memory[address] = std::make_shared<LocationType>(bus, args...);
     }
 
     void createMirror(AddressType mirror, AddressType origin)
@@ -457,7 +407,7 @@ public:
     {
         for (std::shared_ptr<Location>& location : memory) {
             if (location.get() == nullptr) {
-                location = std::make_shared<InvalidLocation>();
+                location = std::make_shared<InvalidLocation>(bus);
             }
         }
     }
@@ -475,7 +425,7 @@ public:
         Byte result;
         checkIsInitialized(address, true, __FUNCTION__);
         try {
-            result = readLocation(memory[address].get());
+            result = memory[address]->read();
         } catch (const MemoryAccessException& e) {
             handleAccessException(e, address);
         }
@@ -516,7 +466,7 @@ public:
     {
         checkIsInitialized(address, true, __FUNCTION__);
         try {
-            return writeLocation(memory[address].get(), value);
+            return memory[address]->write(value);
         }
         catch (const MemoryAccessException& e) {
             handleAccessException(e, address);
@@ -541,7 +491,7 @@ public:
         Byte result;
         checkIsInitialized(address, true, __FUNCTION__);
         try {
-            result = applyLocation(memory[address].get());
+            result = memory[address]->apply();
         } catch (const MemoryAccessException& e) {
             handleAccessException(e, address);
         }
@@ -552,7 +502,7 @@ public:
     {
         checkIsInitialized(address, true, __FUNCTION__);
         try {
-            return resetLocation(memory[address].get());
+            return memory[address]->reset();
         } catch (const MemoryAccessException& e) {
             handleAccessException(e, address);
         }
@@ -561,7 +511,7 @@ public:
     int getApplicationCount(AddressType address) const
     {
         checkIsInitialized(address, true, __FUNCTION__);
-        return getLocationApplicationCount(memory[address].get());
+        return memory[address]->getApplicationCount();
     }
 
 private:
@@ -598,25 +548,25 @@ private:
     bool hasBreakpoint() const override
     {
         checkIsInitialized(currentAddress, true, __FUNCTION__);
-        return locationHasBreakpoint(memory[currentAddress].get());
+        return memory[currentAddress]->hasBreakpoint();
     }
 
     bool setBreakpoint(Location::BreakpointCallback callback) override
     {
         checkIsInitialized(currentAddress, true, __FUNCTION__);
-        return setLocationBreakpoint(memory[currentAddress].get(), callback);
+        return memory[currentAddress]->setBreakpoint(callback);
     }
 
     void accept(LocationVisitor& visitor) const override
     {
         checkIsInitialized(currentAddress, true, __FUNCTION__);
-        acceptLocation(memory[currentAddress].get(), visitor);
+        memory[currentAddress]->accept(visitor);
     }
 
     void print(std::ostream& out) const override
     {
         checkIsInitialized(currentAddress, true, __FUNCTION__);
-        printLocation(memory[currentAddress].get(), out);
+        memory[currentAddress]->print(out);
     }
 
     void checkBounds(AddressType address, const char* operation) const
@@ -656,6 +606,9 @@ private:
         ss << " @" << address;
         throw MemoryAccessException(e.what() + ss.str());
     }
+    
+public:
+    Byte bus;
 
 private:
     std::vector<std::shared_ptr<Location>> memory;

@@ -520,31 +520,23 @@ public:
             makeReadWriteRegister(toDmaAddress(i, 0xa), "HDMA Line Counter Channel " + channel, false, dmaChannels[i].lineCounter);
         }
 
-        for (int address = 0x2000; address < 0x2100; ++address) {
-            //MemoryLocation* memory = state.getMemoryLocation(Long(address, 0));
-            //memory->setReadOnlyValue(0x0f);
-        }
+        std::vector<std::pair<Word, Word>> invalidRanges = {
+        { 0x2000, 0x2100 },
+        { 0x2144, 0x2180 },
+        { 0x2200, 0x4016 },
+        { 0x4018, 0x4200 },
+        { 0x4220, 0x4300 },
+        { 0x437b, 0x8000 }
+        };
 
-        for (int address = 0x2144; address < 0x2180; ++address) {
-            //MemoryLocation* memory = state.getMemoryLocation(Long(address, 0));
-            //memory->setReadOnlyValue(0x0f);
-        }
-
-        for (int address = 0x2200; address < 0x4200; ++address) {
-            if (address != 0x4016 && address != 0x4017) {
-                //MemoryLocation* memory = state.getMemoryLocation(Long(address, 0));
-                //memory->setReadOnlyValue(0x0f);
+        for (const std::pair<Word, Word>& range : invalidRanges) {
+            for (Word address = range.first; address < range.second; ++address) {
+                makeReadRegister(address, "Invalid register", true,
+                    [this](Byte& value) {
+                        pauseRequested = true;
+                        value = state.getMemory().bus;
+                    });
             }
-        }
-
-        for (int address = 0x4220; address < 0x4300; ++address) {
-            //MemoryLocation* memory = state.getMemoryLocation(Long(address, 0));
-            //memory->setReadOnlyValue(0x0f);
-        }
-
-        for (int address = 0x437b; address < 0x8000; ++address) {
-            //MemoryLocation* memory = state.getMemoryLocation(Long(address, 0));
-            //memory->setReadOnlyValue(0x0f);
         }
     }
 
@@ -647,6 +639,8 @@ public:
     CPU::State& state;
     Video& video;
 
+    bool pauseRequested = false;
+
     int vCounter = 0;
     int hCounter = 0;
     int frame = 0;
@@ -690,7 +684,6 @@ public:
     Video::ReadTwiceRegister horizontalScanlineLocation;
     Video::ReadTwiceRegister verticalScanlineLocation;
     Byte ppuStatusFlagAndVersion;
-    const Word mysteriousRegister;
 
     Byte dmaEnabled;
     Byte hdmaEnabled;
