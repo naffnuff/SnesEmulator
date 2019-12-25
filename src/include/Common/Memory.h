@@ -15,7 +15,7 @@ class MemoryAccessException : public std::logic_error
 class LocationVisitor
 {
 public:
-    virtual void visit(const class Location&) = 0;
+    virtual void visit(const class InvalidLocation&) = 0;
     virtual void visit(const class ReadOnlyMemory&) = 0;
     virtual void visit(const class ReadWriteMemory&) = 0;
     virtual void visit(const class ReadRegister&) = 0;
@@ -64,15 +64,8 @@ protected:
     }
 
 private:
-    virtual void accept(LocationVisitor& visitor) const
-    {
-        visitor.visit(*this);
-    }
-
-    virtual void print(std::ostream& out) const
-    {
-        out << "--";
-    }
+    virtual void accept(LocationVisitor& visitor) const = 0;
+    virtual void print(std::ostream& out) const = 0;
 
     virtual int getApplicationCount() const
     {
@@ -80,14 +73,14 @@ private:
         return 0;
     }
 
-    bool hasBreakpoint() const
+    virtual bool hasBreakpoint() const
     {
-        return breakpoint.operator bool();
+        return false;
     }
 
-    void setBreakpoint(BreakpointCallback callback)
+    virtual bool setBreakpoint(BreakpointCallback callback)
     {
-        breakpoint = callback;
+        return false;
     }
 
     void throwAccessException(const std::string& function, const std::string& message) const
@@ -95,15 +88,29 @@ private:
         throw MemoryAccessException(std::string(typeid(this).name()) + ": " + function + ": Bad memory access: " + message);
     }
 
-    BreakpointCallback breakpoint;
-
     friend class LocationAccess;
 };
 
-class ReadOnlyMemory : public Location
+class InvalidLocation : public Location
+{
+private:
+    void accept(LocationVisitor& visitor) const override
+    {
+        visitor.visit(*this);
+    }
+
+    void print(std::ostream& out) const override
+    {
+        out << "--";
+    }
+};
+
+// Memory
+
+class MemoryLocationX : public Location
 {
 public:
-    ReadOnlyMemory(Byte value)
+    MemoryLocationX(Byte value)
         : value(value)
     {
     }
@@ -122,17 +129,10 @@ private:
     Byte apply() override
     {
         ++applicationCount;
+        if (breakpoint) {
+            breakpoint(Apply, value, applicationCount);
+        }
         return value;
-    }
-
-    void reset() override
-    {
-        applicationCount = 0;
-    }
-
-    void accept(LocationVisitor& visitor) const override
-    {
-        visitor.visit(*this);
     }
 
     void print(std::ostream& out) const override
@@ -140,22 +140,51 @@ private:
         out << value;
     }
 
+    void reset() override
+    {
+        applicationCount = 0;
+    }
+
+    bool hasBreakpoint() const override
+    {
+        return breakpoint.operator bool();
+    }
+
+    bool setBreakpoint(BreakpointCallback callback) override
+    {
+        breakpoint = callback;
+        return true;
+    }
+
+protected:
+    Byte value;
+
 private:
-    const Byte value;
     int applicationCount = 0;
+    BreakpointCallback breakpoint;
 };
 
-class ReadWriteMemory : public Location
+class ReadOnlyMemory : public MemoryLocationX
 {
 public:
-    ReadWriteMemory(Byte value)
-        : value(value)
+    ReadOnlyMemory(Byte value)
+        : MemoryLocationX(value)
     {
     }
 
-    int getApplicationCount() const override
+private:
+    void accept(LocationVisitor& visitor) const override
     {
-        return applicationCount;
+        visitor.visit(*this);
+    }
+};
+
+class ReadWriteMemory : public MemoryLocationX
+{
+public:
+    ReadWriteMemory(Byte value)
+        : MemoryLocationX(value)
+    {
     }
 
 private:
@@ -164,36 +193,13 @@ private:
         value = newValue;
     }
 
-    Byte read() override
-    {
-        return value;
-    }
-
-    Byte apply() override
-    {
-        ++applicationCount;
-        return value;
-    }
-
-    void reset() override
-    {
-        applicationCount = 0;
-    }
-
     void accept(LocationVisitor& visitor) const override
     {
         visitor.visit(*this);
     }
-
-    void print(std::ostream& out) const override
-    {
-        out << value;
-    }
-
-private:
-    Byte value;
-    int applicationCount = 0;
 };
+
+// Registers
 
 class Register : public Location
 {
@@ -348,12 +354,9 @@ class LocationAccess : public Access
 {
 public:
     virtual void accept(LocationVisitor& visitor) const = 0;
-
     virtual void print(std::ostream& out) const = 0;
-
     virtual bool hasBreakpoint() const = 0;
-
-    virtual void setBreakpoint(Location::BreakpointCallback callback) = 0;
+    virtual bool setBreakpoint(Location::BreakpointCallback callback) = 0;
 
 protected:
     void writeLocation(Location* location, Byte newValue) const
@@ -386,9 +389,9 @@ protected:
         return location->hasBreakpoint();
     }
 
-    void setLocationBreakpoint(Location* location, Location::BreakpointCallback callback)
+    bool setLocationBreakpoint(Location* location, Location::BreakpointCallback callback)
     {
-        location->setBreakpoint(callback);
+        return location->setBreakpoint(callback);
     }
 
     void acceptLocation(Location* location, LocationVisitor& visitor) const
@@ -454,7 +457,7 @@ public:
     {
         for (std::shared_ptr<Location>& location : memory) {
             if (location.get() == nullptr) {
-                location = std::make_shared<Location>();
+                location = std::make_shared<InvalidLocation>();
             }
         }
     }
@@ -598,10 +601,10 @@ private:
         return locationHasBreakpoint(memory[currentAddress].get());
     }
 
-    void setBreakpoint(Location::BreakpointCallback callback) override
+    bool setBreakpoint(Location::BreakpointCallback callback) override
     {
         checkIsInitialized(currentAddress, true, __FUNCTION__);
-        setLocationBreakpoint(memory[currentAddress].get(), callback);
+        return setLocationBreakpoint(memory[currentAddress].get(), callback);
     }
 
     void accept(LocationVisitor& visitor) const override

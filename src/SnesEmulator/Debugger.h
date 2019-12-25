@@ -46,7 +46,7 @@ private:
     class OutputColorVisitor : public LocationVisitor
     {
     public:
-        void visit(const Location&) override
+        void visit(const InvalidLocation&) override
         {
             color = System::DefaultColor;
         }
@@ -229,11 +229,15 @@ public:
     void toggleBreakpoint(Context& context, LocationAccess& access, const Breakpoint& breakpoint)
     {
         if (access.hasBreakpoint()) {
-            access.setBreakpoint(nullptr);
-            context.breakpoints.erase(breakpoint);
-            output << "Breakpoint removed at address " << breakpoint.address << std::endl;
+            if (access.setBreakpoint(nullptr)) {
+                context.breakpoints.erase(breakpoint);
+                output << "Breakpoint removed at address " << breakpoint.address << std::endl;
+            }
+            else {
+                output << "Breakpoint not allowed at address " << breakpoint.address << std::endl;
+            }
         } else {
-            access.setBreakpoint([this, &context, breakpoint](Location::Operation operation, Byte value, uint64_t applicationCount) {
+            if (access.setBreakpoint([this, &context, breakpoint](Location::Operation operation, Byte value, uint64_t applicationCount) {
                 if (operation == Location::Apply && (breakpoint.applicationCount == 0 || breakpoint.applicationCount == applicationCount)) {
                     //output << "Frame: " << registers.frame << ", V counter: " << registers.vCounter << ", H counter: " << registers.hCounter << ", V blank: " << registers.vBlank << ", H blank: " << registers.hBlank << std::endl;
                     context.setPaused(true);
@@ -251,9 +255,13 @@ public:
                     output << "Write: Breakpoint hit " << breakpoint << ":" << value << std::endl;
                     //output << value << std::endl;
                 }
-                });
-            context.breakpoints.insert(breakpoint);
-            output << "Breakpoint inserted: " << breakpoint << std::endl;
+                })) {
+                context.breakpoints.insert(breakpoint);
+                output << "Breakpoint inserted: " << breakpoint << std::endl;
+            }
+            else {
+                    output << "Breakpoint not allowed at address " << breakpoint.address << std::endl;
+                }
         }
     }
 
