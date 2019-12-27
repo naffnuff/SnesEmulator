@@ -146,9 +146,9 @@ public:
         return memory[getProgramAddress(offset)].getValue();
     }
 
-    Byte applyProgramByte(int offset = 0)
+    Byte applyProgramByte()
     {
-        return memory[getProgramAddress(offset)].apply();
+        return memory[programCounter++].apply();
     }
     
     void incrementProgramCounter(Word increment)

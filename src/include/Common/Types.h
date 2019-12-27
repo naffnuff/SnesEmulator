@@ -303,6 +303,13 @@ public:
         return *this;
     }
 
+    Word operator++(int)
+    {
+        Word copy(value);
+        ++value;
+        return copy;
+    }
+
     Word& operator--()
     {
         --value;

@@ -33,16 +33,15 @@ protected:
 
     int applyOperand()
     {
-        state.incrementProgramCounter(size());
-        int offset = -1;
-        return invokeOperator(applyByte<Bytes>(offset)...);
+        applyByte<Byte>();
+        return applyArguments({ applyByte<Bytes>()... }, std::index_sequence_for<Bytes...>());
     }
 
     std::string operandToString() const
     {
         std::ostringstream ss;
         int offset = size() - 1;
-        ((ss << readByte<Bytes>(offset)), ...);
+        ((ss << readByte<Bytes>(--offset)), ...);
         return ss.str();
     }
 
@@ -55,14 +54,20 @@ protected:
 
 private:
     template <typename Byte>
-    Byte applyByte(int& offset)
+    Byte applyByte()
     {
-        return state.applyProgramByte(offset--);
+        return state.applyProgramByte();
+    }
+
+    template<std::size_t... Indices>
+    int applyArguments(const std::tuple<Bytes...>& args, std::index_sequence<Indices...>)
+    {
+        return invokeOperator(std::get<Indices>(args)...);
     }
 
     template <typename Byte>
-    Byte readByte(int& offset) const
+    Byte readByte(int offset) const
     {
-        return state.readProgramByte(offset--);
+        return state.readProgramByte(offset);
     }
 };

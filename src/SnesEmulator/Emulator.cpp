@@ -161,7 +161,7 @@ void Emulator::run()
     bool nmiRequested = false;
     bool irqRequested = false;
 
-    //cpuContext.setPaused(true);
+    cpuContext.setPaused(true);
 
     double runStartTime = 0.0;
     uint64_t cycleCountDelta = 0;
@@ -191,7 +191,7 @@ void Emulator::run()
                         nextCpu += 9 * 8; // TODO: check the correct cycles for interrupt
                     }
 
-                    Instruction* instruction = cpuInstructionDecoder.applyNextInstruction(cpuState);
+                    Instruction* instruction = cpuInstructionDecoder.readNextInstruction(cpuState);
 
                     bool dmaPicked = false;
                     if (dmaInstruction.enabled()) {
@@ -238,7 +238,7 @@ void Emulator::run()
                 }
 
                 if (masterCycle == nextSpc) {
-                    Instruction* instruction = spcInstructionDecoder.applyNextInstruction(spcState);
+                    Instruction* instruction = spcInstructionDecoder.readNextInstruction(spcState);
                     spcContext.nextInstruction = instruction;
 
                     if (spcContext.isPaused()) {

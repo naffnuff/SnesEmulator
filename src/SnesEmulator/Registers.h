@@ -11,11 +11,27 @@
 class Registers
 {
 public:
-
-    static int toDmaAddress(int channel, int function)
+    enum IrqMode
     {
-        return 0x4300 | channel << 4 | function;
-    }
+        NoIrq = 0,
+        HCounterIrq = 1,
+        VCounterIrq = 2,
+        HAndVCounterIrq = 3
+    };
+
+    struct DmaChannel
+    {
+        Byte control;
+        Byte destinationRegister;
+        Long sourceAddress;
+        Word dataSize;
+        Word& indirectAddress = dataSize;
+        Byte indirectAddressBankByte;
+        Word tableAddress;
+        Byte lineCounter;
+        bool dmaActive = false;
+        bool hdmaDoTransfer = false;
+    };
 
     Registers(std::ostream& output, std::ostream& error, CPU::State& state, Video& video)
         : output(output)
@@ -521,12 +537,12 @@ public:
         }
 
         std::vector<std::pair<Word, Word>> invalidRanges = {
-        { 0x2000, 0x2100 },
-        { 0x2144, 0x2180 },
-        { 0x2200, 0x4016 },
-        { 0x4018, 0x4200 },
-        { 0x4220, 0x4300 },
-        { 0x437b, 0x8000 }
+        //{ 0x2000, 0x2100 },
+        //{ 0x2144, 0x2180 },
+        //{ 0x2200, 0x4016 },
+        //{ 0x4018, 0x4200 },
+        //{ 0x4220, 0x4300 },
+        //{ 0x437b, 0x8000 }
         };
 
         for (const std::pair<Word, Word>& range : invalidRanges) {
@@ -538,6 +554,11 @@ public:
                     });
             }
         }
+    }
+
+    static int toDmaAddress(int channel, int function)
+    {
+        return 0x4300 | channel << 4 | function;
     }
 
     Word getMode7WordValue(Byte value)
@@ -668,13 +689,7 @@ public:
     Word product;
     Word& remainder = product;
     bool nmiEnabled = false;
-    enum IrqMode
-    {
-        NoIrq = 0,
-        HCounterIrq = 1,
-        VCounterIrq = 2,
-        HAndVCounterIrq = 3
-    };
+
     IrqMode irqMode;
     bool autoJoypadReadEnabled = false;
     Word hTimer;
@@ -687,20 +702,6 @@ public:
 
     Byte dmaEnabled;
     Byte hdmaEnabled;
-
-    struct DmaChannel
-    {
-        Byte control;
-        Byte destinationRegister;
-        Long sourceAddress;
-        Word dataSize;
-        Word& indirectAddress = dataSize;
-        Byte indirectAddressBankByte;
-        Word tableAddress;
-        Byte lineCounter;
-        bool dmaActive = false;
-        bool hdmaDoTransfer = false;
-    };
 
     std::array<DmaChannel, 8> dmaChannels;
 };

@@ -217,9 +217,9 @@ public:
         return memory.readByte(getProgramAddress(offset));
     }
 
-    Byte applyProgramByte(int offset = 0)
+    Byte applyProgramByte()
     {
-        return memory.applyByte(getProgramAddress(offset));
+        return memory.applyByte(Long(programCounter++, programBank));
     }
 
     void incrementProgramCounter(Word increment)
