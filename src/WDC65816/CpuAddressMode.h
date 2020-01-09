@@ -519,7 +519,7 @@ class ProgramCounterRelative : public Instruction2Byte
     {
         std::ostringstream ss;
         ss << Operator::toString() + " $";
-        ss << state.getProgramCounter(int((int8_t)size() + (int8_t)state.inspectProgramByte(1)));
+        ss << state.getProgramCounter(int((int8_t)size() + (int8_t)state.readProgramByte(1)));
         return ss.str();
     }
 };
@@ -540,7 +540,7 @@ class ProgramCounterRelativeLong : public Instruction3Byte
     {
         std::ostringstream ss;
         ss << Operator::toString() + " $";
-        ss << state.getProgramCounter(int((int8_t)size() + int16_t(state.inspectProgramByte(2) << 8 | state.inspectProgramByte(1))));
+        ss << state.getProgramCounter(int((int8_t)size() + int16_t(state.readProgramByte(2) << 8 | state.readProgramByte(1))));
         return ss.str();
     }
 };

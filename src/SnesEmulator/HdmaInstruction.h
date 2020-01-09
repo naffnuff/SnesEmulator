@@ -180,11 +180,6 @@ public:
         return active;
     }
 
-    bool hasBreakpoint() const override
-    {
-        return false;
-    }
-
 public:
     Instruction* blockedInstruction = nullptr;
 

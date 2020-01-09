@@ -212,29 +212,14 @@ public:
         return isNativeMode() && !getFlag(flag);
     }
 
-    Byte inspectProgramByte(int offset = 0)
+    Byte readProgramByte(int offset = 0)
     {
-        return memory.inspect(getProgramAddress(offset));
-    }
-
-    bool hasBreakpoint(int offset)
-    {
-        return memory.hasBreakpoint(getProgramAddress(offset));
-    }
-
-    void incrementProgramApplicationCount(int offset)
-    {
-        memory.incrementApplicationCount(getProgramAddress(offset));
+        return memory.readByte(getProgramAddress(offset));
     }
 
     Byte applyProgramByte()
     {
         return memory.applyByte(Long(programCounter++, programBank));
-    }
-
-    void printProgramByte(int offset, std::ostream& out) const
-    {
-        memory.print(getProgramAddress(offset), out);
     }
 
     void incrementProgramCounter(Word increment)

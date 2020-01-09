@@ -240,28 +240,29 @@ public:
                 output << "Breakpoint not allowed at address " << breakpoint.address << std::endl;
             }
         } else {
-            bool success = access.setBreakpoint([this, &context, breakpoint](Location::Operation operation, Byte value, uint64_t applicationCount) {
-                if (context.isPaused()) {
-                    return false;
-                }
-                else if (operation == Location::Apply && (breakpoint.applicationCount == 0 || breakpoint.applicationCount == applicationCount)) {
+            if (access.setBreakpoint([this, &context, breakpoint](Location::Operation operation, Byte value, uint64_t applicationCount) {
+                if (operation == Location::Apply && (breakpoint.applicationCount == 0 || breakpoint.applicationCount == applicationCount)) {
+                    //output << "Frame: " << registers.frame << ", V counter: " << registers.vCounter << ", H counter: " << registers.hCounter << ", V blank: " << registers.vBlank << ", H blank: " << registers.hBlank << std::endl;
+                    context.setPaused(true);
                     output << "Apply: Breakpoint hit " << breakpoint << std::endl;
-                    return true;
                 }
-                else if (operation == MemoryLocation::Read) {
+                /*else if (operation == MemoryLocation::Read) {
+                    if (!context.stepMode) {
+                        state.setProgramAddress(context.getLastKnownAddress());
+                    }
+                    context.stepMode = true;
                     output << "Read: Breakpoint hit @ " << breakpoint << std::endl;
-                    return true;
-                }
+                }*/
                 else if (operation == Location::Write && (breakpoint.argumentValue == -1 || breakpoint.argumentValue == value)) {
+                    context.setPaused(true);
                     output << "Write: Breakpoint hit " << breakpoint << ":" << value << std::endl;
-                    return true;
+                    //output << value << std::endl;
                 }
-                return false;
-            });
-            if (success) {
+                })) {
                 context.breakpoints.insert(breakpoint);
                 output << "Breakpoint inserted: " << breakpoint << std::endl;
-            } else {
+            }
+            else {
                     output << "Breakpoint not allowed at address " << breakpoint.address << std::endl;
                 }
         }
@@ -643,7 +644,7 @@ public:
         System::setOutputColor(output, context.isPaused() ? context.debugColor : System::Red, true);
         state.printRegisters(output) << std::endl;
         output << context.nextInstruction->opcodeToString() << std::endl;
-        output << state.inspectProgramByte() << ": ";
+        output << state.readProgramByte() << ": ";
         output << context.nextInstruction->toString();
         output << " #" << state.getMemory(state.getProgramAddress()).getApplicationCount() << std::endl;
         System::setOutputColor(output, System::DefaultColor, false);
@@ -654,7 +655,7 @@ public:
         System::setOutputColor(output, context.isPaused() ? context.debugColor : System::Red, true);
         state.printRegisters(output) << std::endl;
         output << context.nextInstruction->opcodeToString() << std::endl;
-        output << state.inspectProgramByte() << ": ";
+        output << state.readProgramByte() << ": ";
         output << context.nextInstruction->toString();
         output << " #" << state.getMemory().getApplicationCount(state.getProgramAddress()) << std::endl;
         System::setOutputColor(output, System::DefaultColor, false);

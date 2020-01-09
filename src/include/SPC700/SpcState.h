@@ -141,7 +141,7 @@ public:
         setProgramCounter(Word(address));
     }
 
-    Byte inspectProgramByte(int offset = 0) const
+    Byte readProgramByte(int offset = 0) const
     {
         return memory[getProgramAddress(offset)].getValue();
     }
@@ -149,21 +149,6 @@ public:
     Byte applyProgramByte()
     {
         return memory[programCounter++].apply();
-    }
-
-    bool hasBreakpoint(int offset) const
-    {
-        return memory[getProgramAddress(offset)].hasBreakpoint();
-    }
-
-    void incrementProgramApplicationCount(int offset)
-    {
-        // Dummy
-    }
-
-    void printProgramByte(int offset, std::ostream& out) const
-    {
-        out << memory[getProgramAddress(offset)];
     }
     
     void incrementProgramCounter(Word increment)

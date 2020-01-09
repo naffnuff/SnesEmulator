@@ -12,11 +12,6 @@ class MemoryAccessException : public std::logic_error
     using std::logic_error::logic_error;
 };
 
-class BreakpointException : public std::runtime_error
-{
-    using std::runtime_error::runtime_error;
-};
-
 class LocationVisitor
 {
 public:
@@ -38,7 +33,7 @@ public:
         Apply
     };
 
-    typedef std::function<bool(Operation operation, Byte value, uint64_t applicationCount)> BreakpointCallback;
+    typedef std::function<void(Operation operation, Byte value, uint64_t applicationCount)> BreakpointCallback;
 
     Location() = delete;
 
@@ -53,36 +48,20 @@ public:
 public:
     Byte read()
     {
-        if (breakpoint && breakpoint(Read, 0, 0)) {
-            throw BreakpointException("Breakpoint hit: Read");
-        }
-        readImpl(bus);
-        return bus;
+        return bus = readImpl();
     }
 
     Byte apply()
     {
-        if (breakpoint && breakpoint(Apply, 0, applicationCount + 1)) {
-            throw BreakpointException("Breakpoint hit: Apply");
+        ++applicationCount;
+        bus = readImpl();
+        if (breakpoint) {
+            breakpoint(Apply, bus, applicationCount);
         }
-        readImpl(bus);
         return bus;
     }
 
-    void write(Byte value)
-    {
-        if (breakpoint && breakpoint(Write, value, 0)) {
-            throw BreakpointException("Breakpoint hit: Write");
-        }
-        writeImpl(value);
-    }
-
-    void incrementApplicationCount()
-    {
-        ++applicationCount;
-    }
-
-    uint64_t getApplicationCount() const
+    int getApplicationCount() const
     {
         return applicationCount;
     }
@@ -103,26 +82,21 @@ public:
         return true;
     }
 
-    virtual Byte inspect() const
+    virtual void write(Byte)
     {
-        throwAccessException(__FUNCTION__, "inspection not allowed");
-        return Byte();
+        throwAccessException(__FUNCTION__, "writing not allowed");
     }
 
     virtual void accept(LocationVisitor& visitor) const = 0;
     virtual void print(std::ostream& out) const = 0;
 
-protected:
-    virtual void readImpl(Byte& bus)
+private:
+    virtual Byte readImpl()
     {
         std::stringstream ss;
         ss << "reading not allowed, bus value=" << bus;
         throwAccessException(__FUNCTION__, ss.str());
-    }
-
-    virtual void writeImpl(Byte)
-    {
-        throwAccessException(__FUNCTION__, "writing not allowed");
+        return bus;
     }
 
     void throwAccessException(const std::string& function, const std::string& message) const
@@ -132,7 +106,7 @@ protected:
 
 private:
     Byte& bus;
-    uint64_t applicationCount = 0;
+    int applicationCount = 0;
     BreakpointCallback breakpoint;
 };
 
@@ -168,12 +142,7 @@ public:
     }
 
 private:
-    void readImpl(Byte& bus) override
-    {
-        bus = value;
-    }
-
-    Byte inspect() const override
+    Byte readImpl() override
     {
         return value;
     }
@@ -211,7 +180,7 @@ public:
     }
 
 private:
-    void writeImpl(Byte newValue) override
+    void write(Byte newValue) override
     {
         value = newValue;
     }
@@ -243,14 +212,14 @@ public:
     }
 
 private:
-    void readImpl(Byte& bus) override
+    Byte readImpl() override
     {
         if (onRead == nullptr) {
-            Register::readImpl(bus);
+            return Register::read();
         } else {
-            onRead(bus);
+            onRead(lastValue);
+            return lastValue;
         }
-        lastValue = bus;
     }
 
     void accept(LocationVisitor& visitor) const override
@@ -278,14 +247,14 @@ public:
     }
 
 private:
-    void writeImpl(Byte value) override
+    void write(Byte value) override
     {
         if (onWrite == nullptr) {
-            Register::writeImpl(value);
+            Register::write(value);
         } else {
             onWrite(lastValue, value);
+            lastValue = value;
         }
-        lastValue = value;
     }
 
     void accept(LocationVisitor& visitor) const override
@@ -301,29 +270,6 @@ private:
 private:
     std::function<void(Byte, Byte)> onWrite;
     Byte lastValue;
-};
-
-class OpenBusWriteRegister : public WriteRegister
-{
-    using WriteRegister::WriteRegister;
-
-private:
-    void readImpl(Byte&) override
-    {
-    }
-};
-
-class VideoOpenBusWriteRegister : public WriteRegister
-{
-    using WriteRegister::WriteRegister;
-
-private:
-    void readImpl(Byte& bus) override
-    {
-        std::stringstream ss;
-        ss << "VIDEO OPEN BUS REGISTER, bus value=" << bus;
-        throwAccessException(__FUNCTION__, ss.str());
-    }
 };
 
 class ReadWriteRegister : public Register
@@ -344,19 +290,21 @@ public:
     }*/
 
 private:
-    void readImpl(Byte& bus) override
+    Byte readImpl() override
     {
         if (onRead == nullptr) {
-            Register::readImpl(bus);
+            return Register::read();
         } else {
-            onRead(bus);
+            Byte value;
+            onRead(value);
+            return value;
         }
     }
 
-    void writeImpl(Byte value) override
+    void write(Byte value) override
     {
         if (onWrite == nullptr) {
-            Register::writeImpl(value);
+            Register::write(value);
         } else {
             onWrite(lastValue, value);
             lastValue = value;
@@ -560,40 +508,10 @@ public:
         }
     }
 
-    uint64_t getApplicationCount(AddressType address) const
+    int getApplicationCount(AddressType address) const
     {
         checkIsInitialized(address, true, __FUNCTION__);
         return memory[address]->getApplicationCount();
-    }
-
-    bool hasBreakpoint(AddressType address) const
-    {
-        checkIsInitialized(address, true, __FUNCTION__);
-        return memory[address]->hasBreakpoint();
-    }
-
-    void incrementApplicationCount(AddressType address)
-    {
-        checkIsInitialized(address, true, __FUNCTION__);
-        return memory[address]->incrementApplicationCount();
-    }
-
-    Byte inspect(AddressType address)
-    {
-        Byte result;
-        checkIsInitialized(address, true, __FUNCTION__);
-        try {
-            result = memory[address]->inspect();
-        } catch (const MemoryAccessException& e) {
-            handleAccessException(e, address);
-        }
-        return result;
-    }
-
-    void print(AddressType address, std::ostream& out) const
-    {
-        checkIsInitialized(address, true, __FUNCTION__);
-        memory[address]->print(out);
     }
 
 private:
@@ -629,7 +547,8 @@ private:
 
     bool hasBreakpoint() const override
     {
-        return hasBreakpoint(currentAddress);
+        checkIsInitialized(currentAddress, true, __FUNCTION__);
+        return memory[currentAddress]->hasBreakpoint();
     }
 
     bool setBreakpoint(Location::BreakpointCallback callback) override
@@ -646,7 +565,8 @@ private:
 
     void print(std::ostream& out) const override
     {
-        print(currentAddress, out);
+        checkIsInitialized(currentAddress, true, __FUNCTION__);
+        memory[currentAddress]->print(out);
     }
 
     void checkBounds(AddressType address, const char* operation) const

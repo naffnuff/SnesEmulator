@@ -309,8 +309,8 @@ class DirectIndexedProgramCounterRelative : public Instruction3Byte
     {
         std::ostringstream ss;
         ss << Operator::toString() + " $";
-        ss << state.inspectProgramByte(1) << "+X, $";
-        ss << state.getProgramCounter(int((int8_t)size() + (int8_t)state.inspectProgramByte(2)));
+        ss << state.readProgramByte(1) << "+X, $";
+        ss << state.getProgramCounter(int((int8_t)size() + (int8_t)state.readProgramByte(2)));
         return ss.str();
     }
 };
@@ -388,8 +388,8 @@ class DirectProgramCounterRelative : public Instruction3Byte
     {
         std::ostringstream ss;
         ss << Operator::toString() + " $";
-        ss << state.inspectProgramByte(1) << ", $";
-        ss << state.getProgramCounter(int((int8_t)size() + (int8_t)state.inspectProgramByte(2)));
+        ss << state.readProgramByte(1) << ", $";
+        ss << state.getProgramCounter(int((int8_t)size() + (int8_t)state.readProgramByte(2)));
         return ss.str();
     }
 };
@@ -552,7 +552,7 @@ class ProgramCounterRelative : public Instruction2Byte
     {
         std::ostringstream ss;
         ss << Operator::toString() + " $";
-        ss << state.getProgramCounter(int((int8_t)size() + (int8_t)state.inspectProgramByte(1)));
+        ss << state.getProgramCounter(int((int8_t)size() + (int8_t)state.readProgramByte(1)));
         return ss.str();
     }
 };
@@ -846,7 +846,7 @@ class RegisterProgramCounterRelative : public Instruction2Byte
     {
         std::ostringstream ss;
         ss << Operator::toString() + " " + State::getRegisterName<RegisterIndex>() + ", $";
-        ss << state.getProgramCounter(int((int8_t)size() + (int8_t)state.inspectProgramByte(1)));
+        ss << state.getProgramCounter(int((int8_t)size() + (int8_t)state.readProgramByte(1)));
         return ss.str();
     }
 };
