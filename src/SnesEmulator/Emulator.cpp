@@ -130,8 +130,8 @@ void Emulator::initialize()
     debugger.loadBreakpoints(cpuContext, cpuState);
     debugger.loadBreakpoints(spcContext, spcState);
 
-    cpuContext.nextInstruction = cpuInstructionDecoder.readNextInstruction(cpuState);
-    spcContext.nextInstruction = spcInstructionDecoder.readNextInstruction(spcState);
+    cpuContext.nextInstruction = cpuInstructionDecoder.getNextInstruction(cpuState);
+    spcContext.nextInstruction = spcInstructionDecoder.getNextInstruction(spcState);
 }
 
 void Emulator::run()
@@ -161,7 +161,7 @@ void Emulator::run()
     bool nmiRequested = false;
     bool irqRequested = false;
 
-    cpuContext.setPaused(true);
+    //cpuContext.setPaused(true);
 
     double runStartTime = 0.0;
     uint64_t cycleCountDelta = 0;
@@ -191,7 +191,7 @@ void Emulator::run()
                         nextCpu += 9 * 8; // TODO: check the correct cycles for interrupt
                     }
 
-                    Instruction* instruction = cpuInstructionDecoder.readNextInstruction(cpuState);
+                    Instruction* instruction = cpuInstructionDecoder.getNextInstruction(cpuState);
 
                     bool dmaPicked = false;
                     if (dmaInstruction.enabled()) {
@@ -216,6 +216,10 @@ void Emulator::run()
 
                     cpuContext.nextInstruction = instruction;
 
+                    /*if (instruction->hasBreakpoint()) {
+                        cpuContext.setPaused(true);
+                    }*/
+
                     if (cpuContext.isPaused()) {
                         output << "Cycle count: " << masterCycle << ", Next cpu: " << nextCpu << ", Next spc: " << nextSpc << std::endl;
                         output << "Frame: " << registers.frame << ", V counter: " << registers.vCounter << ", H counter: " << registers.hCounter << ", V blank: " << registers.vBlank << ", H blank: " << registers.hBlank << ", nmi: " << cpuState.isNmiActive() << ", irq: " << cpuState.isIrqActive() << std::endl;
@@ -225,7 +229,7 @@ void Emulator::run()
 
                     if (int cycles = executeNext(instruction, cpuState, debugger, cpuContext, spcState, spcContext, error)) {
                         nextCpu += uint64_t(cycles) * 6;
-                        cpuContext.nextInstruction = cpuInstructionDecoder.readNextInstruction(cpuState);
+                        cpuContext.nextInstruction = cpuInstructionDecoder.getNextInstruction(cpuState);
                     }
                     else {
                         continue;
@@ -238,7 +242,7 @@ void Emulator::run()
                 }
 
                 if (masterCycle == nextSpc) {
-                    Instruction* instruction = spcInstructionDecoder.readNextInstruction(spcState);
+                    Instruction* instruction = spcInstructionDecoder.getNextInstruction(spcState);
                     spcContext.nextInstruction = instruction;
 
                     if (spcContext.isPaused()) {
@@ -249,7 +253,7 @@ void Emulator::run()
 
                     if (int cycles = executeNext(instruction, spcState, debugger, spcContext, cpuState, cpuContext, error)) {
                         nextSpc += uint64_t(cycles) * 16;
-                        spcContext.nextInstruction = spcInstructionDecoder.readNextInstruction(spcState);
+                        spcContext.nextInstruction = spcInstructionDecoder.getNextInstruction(spcState);
                     }
                     else {
                         continue;
@@ -417,14 +421,7 @@ int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debu
             }
         }
         else {
-            // TODO: this seems not reachable
-            if (context.isPaused()) {
-                debugger.printClockSpeed();
-                context.printAddressHistory(error);
-            }
-            else {
-                return instruction->execute();
-            }
+            return instruction->execute();
         }
     } catch (OpcodeNotYetImplementedException& e) {
         context.setPaused(true);
@@ -446,6 +443,10 @@ int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debu
         context.setPaused(true);
         error << e.what() << std::endl;
     } catch (Video::NotYetImplementedException& e) {
+        state.setProgramAddress(context.getLastKnownAddress());
+        context.setPaused(true);
+        error << e.what() << std::endl;
+    } catch (BreakpointException& e) {
         state.setProgramAddress(context.getLastKnownAddress());
         context.setPaused(true);
         error << e.what() << std::endl;

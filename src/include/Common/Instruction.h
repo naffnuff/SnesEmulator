@@ -12,6 +12,7 @@ class Instruction
 public:
     virtual std::string toString() const = 0;
     virtual std::string opcodeToString() const = 0;
+    virtual bool hasBreakpoint() const = 0;
     virtual int execute() = 0;
     virtual int size() const = 0;
 };
@@ -33,15 +34,22 @@ protected:
 
     int applyOperand()
     {
+        int offset = 0;
         applyByte<Byte>();
-        return applyArguments({ applyByte<Bytes>()... }, std::index_sequence_for<Bytes...>());
+        int cycles = 0;
+        cycles = applyArguments({ applyByte<Bytes>()... }, std::index_sequence_for<Bytes...>());
+        for (int i = -size(); i < 0; ++i) {
+            state.incrementProgramApplicationCount(i);
+        }
+        return cycles;
     }
 
     std::string operandToString() const
     {
         std::ostringstream ss;
-        int offset = size() - 1;
-        ((ss << readByte<Bytes>(--offset)), ...);
+        for (int i = size() - 1; i > 0; --i) {
+            state.printProgramByte(i, ss);
+        }
         return ss.str();
     }
 
@@ -53,6 +61,16 @@ protected:
     State& state;
 
 private:
+    bool hasBreakpoint() const override
+    {
+        for (int i = 0; i < size(); ++i) {
+            if (state.hasBreakpoint(i)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     template <typename Byte>
     Byte applyByte()
     {
@@ -60,14 +78,8 @@ private:
     }
 
     template<std::size_t... Indices>
-    int applyArguments(const std::tuple<Bytes...>& args, std::index_sequence<Indices...>)
+    int applyArguments(const std::tuple<Bytes...>& arguments, std::index_sequence<Indices...>)
     {
-        return invokeOperator(std::get<Indices>(args)...);
-    }
-
-    template <typename Byte>
-    Byte readByte(int offset) const
-    {
-        return state.readProgramByte(offset);
+        return invokeOperator(std::get<Indices>(arguments)...);
     }
 };
