@@ -51,44 +51,48 @@ public:
         System::setOutputColor(output, System::DefaultColor, false);
     }
 
-    void makeWriteRegister(Word address, const std::string& info, bool debug, std::function<void(Byte value)> callback = nullptr)
+    void makeWriteRegister(Word address, const std::string& info, bool debug, std::function<void(Byte)> callback = nullptr, bool openBus = false)
     {
-        state.createMemoryLocation<WriteRegister>(Long(address, 0),
-            [this, address, callback, info, debug](Byte oldValue, Byte newValue) {
-                if (debug && newValue && oldValue != newValue) {
-                    printMemoryRegister(true, newValue, address, info);
-                }
-                if (callback) {
-                    callback(newValue);
-                }
+        std::function<void(Byte, Byte)> onWrite = [this, address, callback, info, debug](Byte oldValue, Byte newValue) {
+            if (debug && newValue && oldValue != newValue) {
+                printMemoryRegister(true, newValue, address, info);
             }
-        );
+            if (callback) {
+                callback(newValue);
+            }
+        };
+        if (openBus) {
+            state.createMemoryLocation<OpenBusWriteRegister>(Long(address, 0), onWrite);
+        }
+        else {
+            state.createMemoryLocation<WriteRegister>(Long(address, 0), onWrite);
+        }
     }
 
-    void makeWriteRegister(Word address, const std::string& info, bool debug, Byte& variable)
+    void makeWriteRegister(Word address, const std::string& info, bool debug, Byte& variable, bool openBus = false)
     {
-        makeWriteRegister(address, info, debug, [&variable](Byte value) { variable = value; });
+        makeWriteRegister(address, info, debug, [&variable](Byte value) { variable = value; }, openBus);
     }
 
-    void makeWriteRegister(Word address, const std::string& info, bool debug, Word& variable)
+    void makeWriteRegister(Word address, const std::string& info, bool debug, Word& variable, bool openBus = false)
     {
-        makeWriteRegister(address, info + " low byte", debug, [&variable](Byte value) { variable.setLowByte(value); });
-        makeWriteRegister(address + 1, info + " high byte", debug, [&variable](Byte value) { variable.setHighByte(value); });
+        makeWriteRegister(address, info + " low byte", debug, [&variable](Byte value) { variable.setLowByte(value); }, openBus);
+        makeWriteRegister(address + 1, info + " high byte", debug, [&variable](Byte value) { variable.setHighByte(value); }, openBus);
     }
 
-    void makeWriteRegister(Word address, const std::string& info, bool debug, Long& variable)
+    void makeWriteRegister(Word address, const std::string& info, bool debug, Long& variable, bool openBus = false)
     {
-        makeWriteRegister(address, info + " low byte", debug, [&variable](Byte value) { variable.setLowByte(value); });
-        makeWriteRegister(address + 1, info + " high byte", debug, [&variable](Byte value) { variable.setHighByte(value); });
-        makeWriteRegister(address + 2, info + " bank byte", debug, [&variable](Byte value) { variable.setBankByte(value); });
+        makeWriteRegister(address, info + " low byte", debug, [&variable](Byte value) { variable.setLowByte(value); }, openBus);
+        makeWriteRegister(address + 1, info + " high byte", debug, [&variable](Byte value) { variable.setHighByte(value); }, openBus);
+        makeWriteRegister(address + 2, info + " bank byte", debug, [&variable](Byte value) { variable.setBankByte(value); }, openBus);
     }
 
-    void makeWriteRegister(Word address, const std::string& info, bool debug, Video::WriteTwiceRegister& variable)
+    void makeWriteRegister(Word address, const std::string& info, bool debug, Video::WriteTwiceRegister& variable, bool openBus = false)
     {
-        makeWriteRegister(address, info, debug, [&variable](Byte value) { variable.write(value); });
+        makeWriteRegister(address, info, debug, [&variable](Byte value) { variable.write(value); }, openBus);
     }
 
-    void makeReadRegister(Word address, const std::string& info, bool debug, std::function<void(Byte& value)> callback = nullptr)
+    void makeReadRegister(Word address, const std::string& info, bool debug, std::function<void(Byte&)> callback = nullptr)
     {
         state.createMemoryLocation<ReadRegister>(Long(address, 0),
             [this, address, callback, info, debug](Byte& value) {
@@ -120,7 +124,7 @@ public:
         makeReadRegister(address, info, debug, [&variable](Byte& value) { value = variable.read(); });
     }
 
-    void makeReadWriteRegister(Word address, const std::string& info, bool debug, std::function<void(Byte& value)> readCallback, std::function<void(Byte value)> writeCallback)
+    void makeReadWriteRegister(Word address, const std::string& info, bool debug, std::function<void(Byte&)> readCallback, std::function<void(Byte)> writeCallback)
     {
         state.createMemoryLocation<ReadWriteRegister>(Long(address, 0),
             [this, address, readCallback, info, debug](Byte& value) {
@@ -226,8 +230,8 @@ public:
                     video.backgrounds[i].tilemapAddress = value.getBits(2, 6) << 10;
                 });
             if (i > 0) {
-                makeWriteRegister(0x210d + i * 2, bgName + " Horizontal Scroll", false, video.backgrounds[i].horizontalScroll);
-                makeWriteRegister(0x210e + i * 2, bgName + " Vertical Scroll", false, video.backgrounds[i].verticalScroll);
+                makeWriteRegister(0x210d + i * 2, bgName + " Horizontal Scroll", false, video.backgrounds[i].horizontalScroll, true);
+                makeWriteRegister(0x210e + i * 2, bgName + " Vertical Scroll", false, video.backgrounds[i].verticalScroll, true);
             }
         }
 
@@ -393,7 +397,7 @@ public:
 
         makeReadRegister(0x2134, "Multiplication Result", false, multiplicationResult);
 
-        makeReadRegister(0x2137, "Software Latch for H/V Counter", true,
+        makeReadRegister(0x2137, "Software Latch for H/V Counter", false,
             [this](Byte) {
                 if (programmableIOPort.getBit(7)) {
                     horizontalScanlineLocation.value = hCounter;
@@ -402,7 +406,7 @@ public:
                 }
             });
 
-        makeReadRegister(0x2138, "Data for OAM read", true);
+        makeReadRegister(0x2138, "Data for OAM read", false);
 
         makeReadRegister(0x2139, "VRAM Data read low byte", false,
             [this](Byte& value) {
@@ -537,23 +541,53 @@ public:
         }
 
         std::vector<std::pair<Word, Word>> invalidRanges = {
-        //{ 0x2000, 0x2100 },
-        //{ 0x2144, 0x2180 },
-        //{ 0x2200, 0x4016 },
-        //{ 0x4018, 0x4200 },
-        //{ 0x4220, 0x4300 },
-        //{ 0x437b, 0x8000 }
+            { 0x2000, 0x2100 },
+            { 0x2144, 0x2180 },
+            { 0x2200, 0x4016 },
+            { 0x4018, 0x4200 },
+            { 0x4220, 0x4300 },
+            { 0x437b, 0x8000 }
         };
 
         for (const std::pair<Word, Word>& range : invalidRanges) {
             for (Word address = range.first; address < range.second; ++address) {
                 makeReadRegister(address, "Invalid register", true,
                     [this](Byte& value) {
-                        pauseRequested = true;
+                        //pauseRequested = true;
                         value = state.getMemory().bus;
                     });
             }
         }
+
+        /*std::vector<Word> invalidAddresses = {
+            0x4000,
+            0x7000,
+            0x59f8,
+            0x37f8,
+            0x77f8,
+            0x47e0,
+            0x69d0,
+            0x78a0,
+            0x3810,
+            0x47f0,
+            0x4678,
+            0x33b8,
+            0x3a10,
+            0x5b20,
+            0x4bf0,
+            0x41f8,
+            0x27f8
+        };
+
+        for (Word startAddress : invalidAddresses) {
+            for (Word address = startAddress; address < startAddress + 8; ++address) {
+                makeReadRegister(address, "Invalid register", true,
+                    [this](Byte& value) {
+                        //pauseRequested = true;
+                        value = state.getMemory().bus;
+                    });
+            }
+        }*/
     }
 
     static int toDmaAddress(int channel, int function)
