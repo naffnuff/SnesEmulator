@@ -5,6 +5,7 @@
 #include <string>
 
 #include "Common/Exception.h"
+#include "Common/Memory.h"
 
 #include "VideoDebugger.h"
 
@@ -20,64 +21,99 @@ void Emulator::initialize()
 
     rom.storeToMemory(cpuState);
 
+    CPU::State::MemoryType& memory = cpuState.getMemory();
+
     if (rom.isLowRom()) {
         // RAM
         for (Long address = 0x7e0000; address < 0x800000; address++) {
-            cpuState.getMemoryLocation(address)->setReadWrite();
+            memory.createLocation<ReadWriteMemory>(address, 0x55);
         }
+
         // RAM mirrors
         for (Byte bank = 0; bank < 0x40; ++bank) {
             for (Word address = 0; address < 0x2000; ++address) {
-                cpuState.getMemoryLocation(Long(address, bank))->setMirrorOf(cpuState.getMemoryLocation(Long(address, 0x7E)));
+                memory.createMirror(Long(address, bank), Long(address, 0x7E));
+            }
+        }
+
+        // I/O between the CPU and SPC700
+        for (Word i = 0; i < 4; ++i) {
+            memory.createLocation<ReadWriteRegister>(Long(0x2140 + i),
+                [this, i](Byte& value) {
+                    value = spcToCpuBuffers[i];
+                },
+                [this, i](Byte, Byte newValue) {
+                    cpuToSpcBuffers[i] = newValue;
+                });
+            MemoryLocation* spcMemoryLocation = spcState.getMemoryLocation(Word(0xf4 + i));
+            spcMemoryLocation->setReadWrite();
+            spcMemoryLocation->onRead = [this, i](Byte& value) {
+                value = cpuToSpcBuffers[i];
+            };
+            spcMemoryLocation->onWrite = [this, i](Byte, Byte newValue) {
+                spcToCpuBuffers[i] = newValue;
+            };
+        }
+
+        // Register mirrors
+        for (Byte bank = 0x01; bank < 0x60; ++bank) {
+            for (Word address = 0x2000; address < 0x8000; ++address) {
+                memory.createMirror(Long(address, bank), Long(address, 0x00));
             }
         }
 
         // ROM mirrors
         for (Long address = 0; address < 0x600000; ++address) {
-            cpuState.getMemoryLocation(address + 0x800000)->setMirrorOf(cpuState.getMemoryLocation(address));
+            memory.createMirror(address + 0x800000, address);
         }
 
         // Save RAM
         {
-            std::ifstream file(rom.gameTitle + ".save");
-            file >> std::hex;
-            Long saveRamAddress = 0x700000;
-            for (Long address = saveRamAddress; address < 0x7e0000; ++address, ++saveRamAddress) {
-                if (saveRamAddress == 0x700000 + rom.saveRamSize) {
-                    saveRamAddress = 0x700000;
-                }
-                MemoryLocation* saveRamLocation = cpuState.getMemoryLocation(saveRamAddress);
-                if (address == saveRamAddress) {
-                    Byte byte;
-                    int inputValue;
-                    if (file >> inputValue) {
-                        byte = inputValue;
+            if (rom.saveRamSize > 0) {
+                std::ifstream file(rom.gameTitle + ".save");
+                file >> std::hex;
+                Long saveRamAddress = 0x700000;
+                for (Long address = saveRamAddress; address < 0x7e0000; ++address, ++saveRamAddress) {
+                    if (saveRamAddress == 0x700000 + rom.saveRamSize) {
+                        saveRamAddress = 0x700000;
                     }
-                    saveRamLocation->setReadWrite();
-                    saveRamLocation->setValue(byte);
-                    saveRamLocation->onWrite = [this](Byte oldValue, Byte& newValue) {
-                        if (newValue != oldValue) {
-                            std::lock_guard<std::mutex> lock(saveRamSaver.mutex);
-                            saveRamSaver.saveRamModified = true;
+                    if (address == saveRamAddress) {
+                        Byte byte;
+                        int inputValue;
+                        if (file >> inputValue) {
+                            byte = inputValue;
                         }
-                        saveRamSaver.condition.notify_one();
-                    };
+                        Long localAddress = address - 0x700000;
+                        saveRamSaver.saveRam[localAddress] = byte;
+                        memory.createLocation<ReadWriteRegister>(address,
+                            [this, localAddress](Byte& value) {
+                                value = saveRamSaver.saveRam[localAddress];
+                            },
+                            [this, localAddress](Byte oldValue, Byte newValue) {
+                                if (oldValue != saveRamSaver.saveRam[localAddress]) {
+                                    std::stringstream ss;
+                                    ss << __FUNCTION__ << ": ";
+                                    ss << "oldValue=" << oldValue << " != saveRamSaver.saveRam[address]=" << saveRamSaver.saveRam[localAddress];
+                                    ss << " @" << localAddress << std::endl;
+                                    throw std::logic_error(ss.str());
+                                }
+                                if (newValue != saveRamSaver.saveRam[localAddress]) {
+                                    saveRamSaver.saveRam[localAddress] = newValue;
+                                    std::lock_guard<std::mutex> lock(saveRamSaver.mutex);
+                                    saveRamSaver.saveRamModified = true;
+                                }
+                                saveRamSaver.condition.notify_one();
+                            },
+                            byte);
+                    } else {
+                        memory.createMirror(address, saveRamAddress);
+                    }
                 }
-                else {
-                    cpuState.getMemoryLocation(address)->setMirrorOf(saveRamLocation);
-                }
+                output << "Save RAM end address: " << saveRamAddress << std::endl;
             }
-            output << "Save RAM end address: " << saveRamAddress << std::endl;
         }
 
         saveRamSaverThread = std::thread(std::ref(saveRamSaver));
-
-        // Register mirrors
-        for (Byte bank = 0x01; bank < 0x60; ++bank) {
-            for (Word address = 0x2000; address < 0x8000; ++address) {
-                cpuState.getMemoryLocation(Long(address, bank))->setMirrorOf(cpuState.getMemoryLocation(Long(address, 0x00)));
-            }
-        }
     }
     else {
         throw std::runtime_error("Only the low-rom mempory map is supported for now");
@@ -85,23 +121,17 @@ void Emulator::initialize()
 
     video.initialize(rom.gameTitle);
 
-    std::array<MemoryLocation*, 4> cpuToSpcPorts;
-    // I/O between the CPU and SPC700
-    for (Word i = 0; i < 4; ++i) {
-        MemoryLocation* cpuMemoryLocation = cpuState.getMemoryLocation(Long(0x2140 + i));
-        cpuToSpcPorts[i] = cpuMemoryLocation;
-        MemoryLocation* spcMemoryLocation = spcState.getMemoryLocation(Word(0xf4 + i));
-        cpuMemoryLocation->setMappings(nullptr, spcMemoryLocation, MemoryLocation::ReadWrite);
-        spcMemoryLocation->setMappings(nullptr, cpuMemoryLocation, MemoryLocation::ReadWrite);
-    }
+    audio.initialize(memory);
 
-    audio.initialize(cpuToSpcPorts);
+    memory.finalize();
+
+    cpuState.reset();
 
     debugger.loadBreakpoints(cpuContext, cpuState);
     debugger.loadBreakpoints(spcContext, spcState);
 
-    cpuContext.nextInstruction = cpuInstructionDecoder.readNextInstruction(cpuState);
-    spcContext.nextInstruction = spcInstructionDecoder.readNextInstruction(spcState);
+    cpuContext.nextInstruction = cpuInstructionDecoder.getNextInstruction(cpuState);
+    spcContext.nextInstruction = spcInstructionDecoder.getNextInstruction(spcState);
 }
 
 void Emulator::run()
@@ -117,8 +147,8 @@ void Emulator::run()
     SpriteLayerViewer spriteLayer4Viewer(video, 3, Video::rendererWidth * 2 + 20 + Video::rendererWidth + 20, Video::rendererWidth * 2 + 40 + Video::rendererWidth);
     Mode7Viewer mode7Viewer(video, 0, 40);
 
-    DmaInstruction dmaInstruction(output, error, cpuState);
-    HdmaInstruction hdmaInstruction(output, error, cpuState);
+    DmaInstruction dmaInstruction(output, error, cpuState, registers);
+    HdmaInstruction hdmaInstruction(output, error, cpuState, registers);
 
     uint64_t nextCpu = masterCycle;
     uint64_t nextSpc = masterCycle;
@@ -161,11 +191,11 @@ void Emulator::run()
                         nextCpu += 9 * 8; // TODO: check the correct cycles for interrupt
                     }
 
-                    Instruction* instruction = cpuInstructionDecoder.applyNextInstruction(cpuState);
+                    Instruction* instruction = cpuInstructionDecoder.getNextInstruction(cpuState);
 
                     bool dmaPicked = false;
                     if (dmaInstruction.enabled()) {
-                        //cpuContext.stepMode = true;
+                        //cpuContext.setPaused(true);
                         dmaInstruction.blockedInstruction = instruction;
                         instruction = static_cast<Instruction*>(&dmaInstruction);
                         dmaPicked = true;
@@ -176,9 +206,6 @@ void Emulator::run()
                     }
 
                     if (hdmaInstruction.isActive()) {
-                        if (hdmaInstruction.hdmaEnabled.getValue().getBit(7)) {
-                            //    cpuContext.setPaused(true);
-                        }
                         hdmaInstruction.blockedInstruction = instruction;
                         instruction = static_cast<Instruction*>(&hdmaInstruction);
                         if (dmaPicked) {
@@ -189,6 +216,8 @@ void Emulator::run()
 
                     cpuContext.nextInstruction = instruction;
 
+                    instruction->applyBreakpoints();
+
                     if (cpuContext.isPaused()) {
                         output << "Cycle count: " << masterCycle << ", Next cpu: " << nextCpu << ", Next spc: " << nextSpc << std::endl;
                         output << "Frame: " << registers.frame << ", V counter: " << registers.vCounter << ", H counter: " << registers.hCounter << ", V blank: " << registers.vBlank << ", H blank: " << registers.hBlank << ", nmi: " << cpuState.isNmiActive() << ", irq: " << cpuState.isIrqActive() << std::endl;
@@ -198,15 +227,20 @@ void Emulator::run()
 
                     if (int cycles = executeNext(instruction, cpuState, debugger, cpuContext, spcState, spcContext, error)) {
                         nextCpu += uint64_t(cycles) * 6;
-                        cpuContext.nextInstruction = cpuInstructionDecoder.readNextInstruction(cpuState);
+                        cpuContext.nextInstruction = cpuInstructionDecoder.getNextInstruction(cpuState);
                     }
                     else {
                         continue;
                     }
                 }
 
+                if (registers.pauseRequested) {
+                    cpuContext.setPaused(true);
+                    registers.pauseRequested = false;
+                }
+
                 if (masterCycle == nextSpc) {
-                    Instruction* instruction = spcInstructionDecoder.applyNextInstruction(spcState);
+                    Instruction* instruction = spcInstructionDecoder.getNextInstruction(spcState);
                     spcContext.nextInstruction = instruction;
 
                     if (spcContext.isPaused()) {
@@ -217,7 +251,7 @@ void Emulator::run()
 
                     if (int cycles = executeNext(instruction, spcState, debugger, spcContext, cpuState, cpuContext, error)) {
                         nextSpc += uint64_t(cycles) * 16;
-                        spcContext.nextInstruction = spcInstructionDecoder.readNextInstruction(spcState);
+                        spcContext.nextInstruction = spcInstructionDecoder.getNextInstruction(spcState);
                     }
                     else {
                         continue;
@@ -245,7 +279,7 @@ void Emulator::run()
                         increment = true;
                     }
 
-                    //increment = true;
+                    increment = true;
 
                     if (increment) {
                         ++cycleCountDelta;
@@ -371,7 +405,7 @@ void Emulator::run()
 template<typename State, typename OtherState>
 int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debugger::Context& context, OtherState& otherState, Debugger::Context& otherContext, std::ostream& error)
 {
-    context.addKnownAddress(state.getProgramAddress());
+    context.addKnownAddress(Long(state.getProgramAddress()));
     try {
         if (context.isPaused()) {
             debugger.printState(state, context);
@@ -385,14 +419,7 @@ int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debu
             }
         }
         else {
-            // TODO: this seems not reachable
-            if (context.isPaused()) {
-                debugger.printClockSpeed();
-                context.printAddressHistory(error);
-            }
-            else {
-                return instruction->execute();
-            }
+            return instruction->execute();
         }
     } catch (OpcodeNotYetImplementedException& e) {
         context.setPaused(true);
@@ -406,6 +433,10 @@ int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debu
         context.setPaused(true);
         error << e.what() << std::endl;
     } catch (MemoryLocation::AccessException& e) {
+        state.setProgramAddress(context.getLastKnownAddress());
+        context.setPaused(true);
+        error << e.what() << std::endl;
+    } catch (MemoryAccessException& e) {
         state.setProgramAddress(context.getLastKnownAddress());
         context.setPaused(true);
         error << e.what() << std::endl;
