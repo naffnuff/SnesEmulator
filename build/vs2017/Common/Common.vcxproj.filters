@@ -33,6 +33,9 @@
     <ClInclude Include="..\..\..\src\include\Common\MemoryLocation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\include\Common\Memory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\Common\System.cpp">

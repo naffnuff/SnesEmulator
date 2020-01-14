@@ -6,17 +6,32 @@
 #include "Common/MemoryLocation.h"
 
 #include "Video.h"
-#include "Debugger.h"
 #include "Renderer.h"
 
 class Registers
 {
 public:
-
-    static int toDmaAddress(int channel, int function)
+    enum IrqMode
     {
-        return 0x4300 | channel << 4 | function;
-    }
+        NoIrq = 0,
+        HCounterIrq = 1,
+        VCounterIrq = 2,
+        HAndVCounterIrq = 3
+    };
+
+    struct DmaChannel
+    {
+        Byte control;
+        Byte destinationRegister;
+        Long sourceAddress;
+        Word dataSize;
+        Word& indirectAddress = dataSize;
+        Byte indirectAddressBankByte;
+        Word tableAddress;
+        Byte lineCounter;
+        bool dmaActive = false;
+        bool hdmaDoTransfer = false;
+    };
 
     Registers(std::ostream& output, std::ostream& error, CPU::State& state, Video& video)
         : output(output)
@@ -36,13 +51,9 @@ public:
         System::setOutputColor(output, System::DefaultColor, false);
     }
 
-    void makeWriteRegister(Word address, const std::string& info, bool debug, std::function<void(Byte value)> callback = nullptr)
+    void makeWriteRegister(Word address, const std::string& info, bool debug, std::function<void(Byte)> callback = nullptr, bool openBus = false)
     {
-        MemoryLocation* memory = state.getMemoryLocation(Long(address, 0));
-        memory->setWriteOnly();
-        memory->setValue(0);
-        memory->onWrite =
-            [this, address, callback, info, debug](Byte oldValue, Byte newValue) {
+        std::function<void(Byte, Byte)> onWrite = [this, address, callback, info, debug](Byte oldValue, Byte newValue) {
             if (debug && newValue && oldValue != newValue) {
                 printMemoryRegister(true, newValue, address, info);
             }
@@ -50,44 +61,49 @@ public:
                 callback(newValue);
             }
         };
+        if (openBus) {
+            state.createMemoryLocation<OpenBusWriteRegister>(Long(address, 0), onWrite);
+        }
+        else {
+            state.createMemoryLocation<WriteRegister>(Long(address, 0), onWrite);
+        }
     }
 
-    void makeWriteRegister(Word address, const std::string& info, bool debug, Byte& variable)
+    void makeWriteRegister(Word address, const std::string& info, bool debug, Byte& variable, bool openBus = false)
     {
-        makeWriteRegister(address, info, debug, [&variable](Byte value) { variable = value; });
+        makeWriteRegister(address, info, debug, [&variable](Byte value) { variable = value; }, openBus);
     }
 
-    void makeWriteRegister(Word address, const std::string& info, bool debug, Word& variable)
+    void makeWriteRegister(Word address, const std::string& info, bool debug, Word& variable, bool openBus = false)
     {
-        makeWriteRegister(address, info + " low byte", debug, [&variable](Byte value) { variable.setLowByte(value); });
-        makeWriteRegister(address + 1, info + " high byte", debug, [&variable](Byte value) { variable.setHighByte(value); });
+        makeWriteRegister(address, info + " low byte", debug, [&variable](Byte value) { variable.setLowByte(value); }, openBus);
+        makeWriteRegister(address + 1, info + " high byte", debug, [&variable](Byte value) { variable.setHighByte(value); }, openBus);
     }
 
-    void makeWriteRegister(Word address, const std::string& info, bool debug, Long& variable)
+    void makeWriteRegister(Word address, const std::string& info, bool debug, Long& variable, bool openBus = false)
     {
-        makeWriteRegister(address, info + " low byte", debug, [&variable](Byte value) { variable.setLowByte(value); });
-        makeWriteRegister(address + 1, info + " high byte", debug, [&variable](Byte value) { variable.setHighByte(value); });
-        makeWriteRegister(address + 2, info + " bank byte", debug, [&variable](Byte value) { variable.setBankByte(value); });
+        makeWriteRegister(address, info + " low byte", debug, [&variable](Byte value) { variable.setLowByte(value); }, openBus);
+        makeWriteRegister(address + 1, info + " high byte", debug, [&variable](Byte value) { variable.setHighByte(value); }, openBus);
+        makeWriteRegister(address + 2, info + " bank byte", debug, [&variable](Byte value) { variable.setBankByte(value); }, openBus);
     }
 
-    void makeWriteRegister(Word address, const std::string& info, bool debug, Video::WriteTwiceRegister& variable)
+    void makeWriteRegister(Word address, const std::string& info, bool debug, Video::WriteTwiceRegister& variable, bool openBus = false)
     {
-        makeWriteRegister(address, info, debug, [&variable](Byte value) { variable.write(value); });
+        makeWriteRegister(address, info, debug, [&variable](Byte value) { variable.write(value); }, openBus);
     }
 
-    void makeReadRegister(Word address, const std::string& info, bool debug, std::function<void(Byte& value)> callback = nullptr)
+    void makeReadRegister(Word address, const std::string& info, bool debug, std::function<void(Byte&)> callback = nullptr)
     {
-        MemoryLocation* memory = state.getMemoryLocation(Long(address, 0));
-        memory->setReadOnlyValue(0);
-        memory->onRead =
+        state.createMemoryLocation<ReadRegister>(Long(address, 0),
             [this, address, callback, info, debug](Byte& value) {
-            if (callback) {
-                callback(value);
+                if (callback) {
+                    callback(value);
+                }
+                if (debug && value) {
+                    printMemoryRegister(false, value, address, info);
+                }
             }
-            if (debug && value) {
-                printMemoryRegister(false, value, address, info);
-            }
-        };
+        );
     };
 
     void makeReadRegister(Word address, const std::string& info, bool debug, const Word& variable)
@@ -108,35 +124,44 @@ public:
         makeReadRegister(address, info, debug, [&variable](Byte& value) { value = variable.read(); });
     }
 
-    void makeReadWriteRegister(Word address, const std::string& info, bool debug, std::function<void(Byte& value)> readCallback = nullptr, std::function<void(Byte value)> writeCallback = nullptr)
+    void makeReadWriteRegister(Word address, const std::string& info, bool debug, std::function<void(Byte&)> readCallback, std::function<void(Byte)> writeCallback)
     {
-        MemoryLocation* memory = state.getMemoryLocation(Long(address, 0));
-        memory->setReadWrite();
-        memory->setValue(0);
-        memory->onRead =
+        state.createMemoryLocation<ReadWriteRegister>(Long(address, 0),
             [this, address, readCallback, info, debug](Byte& value) {
-            if (readCallback) {
-                readCallback(value);
-            }
-            if (debug && value) {
-                printMemoryRegister(false, value, address, info);
-            }
-        };
-        memory->onWrite =
+                if (readCallback) {
+                    readCallback(value);
+                }
+                if (debug && value) {
+                    printMemoryRegister(false, value, address, info);
+                }
+            },
             [this, address, writeCallback, info, debug](Byte oldValue, Byte newValue) {
-            if (debug && newValue && oldValue != newValue) {
-                printMemoryRegister(true, newValue, address, info);
+                if (debug && newValue && oldValue != newValue) {
+                    printMemoryRegister(true, newValue, address, info);
+                }
+                if (writeCallback) {
+                    writeCallback(newValue);
+                }
             }
-            if (writeCallback) {
-                writeCallback(newValue);
-            }
-        };
+        );
     };
+
+    void makeReadWriteRegister(Word address, const std::string& info, bool debug, Byte& variable)
+    {
+        makeReadWriteRegister(address, info, debug, [&variable](Byte& value) { value = variable; }, [&variable](Byte value) { variable = value; });
+    }
 
     void makeReadWriteRegister(Word address, const std::string& info, bool debug, Word& variable)
     {
         makeReadWriteRegister(address, info + " low byte", debug, [&variable](Byte& value) { value = variable.getLowByte(); }, [&variable](Byte value) { variable.setLowByte(value); });
         makeReadWriteRegister(address + 1, info + " high byte", debug, [&variable](Byte& value) { value = variable.getHighByte(); }, [&variable](Byte value) { variable.setHighByte(value); });
+    }
+
+    void makeReadWriteRegister(Word address, const std::string& info, bool debug, Long& variable)
+    {
+        makeReadWriteRegister(address, info + " low byte", debug, [&variable](Byte& value) { value = variable.getLowByte(); }, [&variable](Byte value) { variable.setLowByte(value); });
+        makeReadWriteRegister(address + 1, info + " high byte", debug, [&variable](Byte& value) { value = variable.getHighByte(); }, [&variable](Byte value) { variable.setHighByte(value); });
+        makeReadWriteRegister(address + 2, info + " bank byte", debug, [&variable](Byte& value) { value = variable.getBankByte(); }, [&variable](Byte value) { variable.setBankByte(value); });
     }
 
     void initialize()
@@ -205,8 +230,8 @@ public:
                     video.backgrounds[i].tilemapAddress = value.getBits(2, 6) << 10;
                 });
             if (i > 0) {
-                makeWriteRegister(0x210d + i * 2, bgName + " Horizontal Scroll", false, video.backgrounds[i].horizontalScroll);
-                makeWriteRegister(0x210e + i * 2, bgName + " Vertical Scroll", false, video.backgrounds[i].verticalScroll);
+                makeWriteRegister(0x210d + i * 2, bgName + " Horizontal Scroll", false, video.backgrounds[i].horizontalScroll, true);
+                makeWriteRegister(0x210e + i * 2, bgName + " Vertical Scroll", false, video.backgrounds[i].verticalScroll, true);
             }
         }
 
@@ -372,7 +397,7 @@ public:
 
         makeReadRegister(0x2134, "Multiplication Result", false, multiplicationResult);
 
-        makeReadRegister(0x2137, "Software Latch for H/V Counter", true,
+        makeReadRegister(0x2137, "Software Latch for H/V Counter", false,
             [this](Byte) {
                 if (programmableIOPort.getBit(7)) {
                     horizontalScanlineLocation.value = hCounter;
@@ -381,7 +406,7 @@ public:
                 }
             });
 
-        makeReadRegister(0x2138, "Data for OAM read", true);
+        makeReadRegister(0x2138, "Data for OAM read", false);
 
         makeReadRegister(0x2139, "VRAM Data read low byte", false,
             [this](Byte& value) {
@@ -409,7 +434,7 @@ public:
 
         makeWriteRegister(0x2180, "WRAM Data read/write", false,
             [this](Byte value) {
-                state.getMemoryLocation(wramAddress++)->setValue(value);
+                state.writeMemoryByte(value, wramAddress++);
             });
         makeWriteRegister(0x2181, "WRAM Address", false, wramAddress);
 
@@ -477,13 +502,8 @@ public:
 
         makeWriteRegister(0x4207, "H Timer", false, hTimer);
         makeWriteRegister(0x4209, "V Timer", false, vTimer);
-        makeWriteRegister(0x420b, "DMA Enable", false);
-        makeWriteRegister(0x420c, "HDMA Enable", false,
-            [this](Byte value) {
-                /*std::stringstream ss;
-                ss << "HDMA Enable " << "vCounter=" << vCounter << ", hCounter=" << hCounter << std::endl;
-                printMemoryRegister(true, value, 0x420c, ss.str());*/
-            });
+        makeWriteRegister(0x420b, "DMA Enable", false, dmaEnabled);
+        makeWriteRegister(0x420c, "HDMA Enable", false, hdmaEnabled);
         makeWriteRegister(0x420d, "ROM Access Speed", true);
 
         makeReadRegister(0x4210, "NMI Flag and 5A22 Version", false,
@@ -503,53 +523,76 @@ public:
             });
 
         makeReadRegister(0x4214, "Quotient of Divide Result", false, quotient);
-        makeReadWriteRegister(0x4216, "Multiplication Product or Divide Remainder", false, product);
+        makeReadRegister(0x4216, "Multiplication Product or Divide Remainder", false, product);
 
         makeReadRegister(0x4218, "Controller Port 1 Data1 Register", false, controllerPort1Data1);
         makeReadRegister(0x421a, "Controller Port 2 Data1 Register low byte", false);
         makeReadRegister(0x421b, "Controller Port 2 Data1 Register high byte", false);
 
-        for (int i = 0; i < 8; ++i) {
+        for (int i = 0; i < dmaChannels.size(); ++i) {
             std::string channel = Util::toString(i);
-            makeReadWriteRegister(toDmaAddress(i, 0x0), "DMA Control Channel " + channel, false);
-            makeReadWriteRegister(toDmaAddress(i, 0x1), "DMA Destination Register Channel " + channel, false);
-            makeReadWriteRegister(toDmaAddress(i, 0x2), "DMA Source Address low byte Channel " + channel, false);
-            makeReadWriteRegister(toDmaAddress(i, 0x3), "DMA Source Address high byte Channel " + channel, false);
-            makeReadWriteRegister(toDmaAddress(i, 0x4), "DMA Source Address bank byte Channel " + channel, false);
-            makeReadWriteRegister(toDmaAddress(i, 0x5), "DMA Size/HDMA Indirect Address low byte Channel " + channel, false);
-            makeReadWriteRegister(toDmaAddress(i, 0x6), "DMA Size/HDMA Indirect Address high byte Channel " + channel, false);
-            makeReadWriteRegister(toDmaAddress(i, 0x7), "HDMA Indirect Address bank byte Channel " + channel, false);
-            makeReadWriteRegister(toDmaAddress(i, 0x8), "HDMA Table Address low byte Channel " + channel, false);
-            makeReadWriteRegister(toDmaAddress(i, 0x9), "HDMA Table Address high byte Channel " + channel, false);
-            makeReadWriteRegister(toDmaAddress(i, 0xa), "HDMA Line Counter Channel " + channel, false);
+            makeReadWriteRegister(toDmaAddress(i, 0x0), "DMA Control Channel " + channel, false, dmaChannels[i].control);
+            makeReadWriteRegister(toDmaAddress(i, 0x1), "DMA Destination Register Channel " + channel, false, dmaChannels[i].destinationRegister);
+            makeReadWriteRegister(toDmaAddress(i, 0x2), "DMA Source Address Channel " + channel, false, dmaChannels[i].sourceAddress);
+            makeReadWriteRegister(toDmaAddress(i, 0x5), "DMA Size/HDMA Indirect Address Channel " + channel, false, dmaChannels[i].dataSize);
+            makeReadWriteRegister(toDmaAddress(i, 0x7), "HDMA Indirect Address bank byte Channel " + channel, false, dmaChannels[i].indirectAddressBankByte);
+            makeReadWriteRegister(toDmaAddress(i, 0x8), "HDMA Table Address Channel " + channel, false, dmaChannels[i].tableAddress);
+            makeReadWriteRegister(toDmaAddress(i, 0xa), "HDMA Line Counter Channel " + channel, false, dmaChannels[i].lineCounter);
         }
 
-        for (int address = 0x2000; address < 0x2100; ++address) {
-            MemoryLocation* memory = state.getMemoryLocation(Long(address, 0));
-            memory->setReadOnlyValue(0x0f);
-        }
+        std::vector<std::pair<Word, Word>> invalidRanges = {
+            { 0x2000, 0x2100 },
+            { 0x2144, 0x2180 },
+            { 0x2200, 0x4016 },
+            { 0x4018, 0x4200 },
+            { 0x4220, 0x4300 },
+            { 0x437b, 0x8000 }
+        };
 
-        for (int address = 0x2144; address < 0x2180; ++address) {
-            MemoryLocation* memory = state.getMemoryLocation(Long(address, 0));
-            memory->setReadOnlyValue(0x0f);
-        }
-
-        for (int address = 0x2200; address < 0x4200; ++address) {
-            if (address != 0x4016 && address != 0x4017) {
-                MemoryLocation* memory = state.getMemoryLocation(Long(address, 0));
-                memory->setReadOnlyValue(0x0f);
+        for (const std::pair<Word, Word>& range : invalidRanges) {
+            for (Word address = range.first; address < range.second; ++address) {
+                makeReadRegister(address, "Invalid register", true,
+                    [this](Byte& value) {
+                        //pauseRequested = true;
+                        value = state.getMemory().bus;
+                    });
             }
         }
 
-        for (int address = 0x4220; address < 0x4300; ++address) {
-            MemoryLocation* memory = state.getMemoryLocation(Long(address, 0));
-            memory->setReadOnlyValue(0x0f);
-        }
+        /*std::vector<Word> invalidAddresses = {
+            0x4000,
+            0x7000,
+            0x59f8,
+            0x37f8,
+            0x77f8,
+            0x47e0,
+            0x69d0,
+            0x78a0,
+            0x3810,
+            0x47f0,
+            0x4678,
+            0x33b8,
+            0x3a10,
+            0x5b20,
+            0x4bf0,
+            0x41f8,
+            0x27f8
+        };
 
-        for (int address = 0x437b; address < 0x8000; ++address) {
-            MemoryLocation* memory = state.getMemoryLocation(Long(address, 0));
-            memory->setReadOnlyValue(0x0f);
-        }
+        for (Word startAddress : invalidAddresses) {
+            for (Word address = startAddress; address < startAddress + 8; ++address) {
+                makeReadRegister(address, "Invalid register", true,
+                    [this](Byte& value) {
+                        //pauseRequested = true;
+                        value = state.getMemory().bus;
+                    });
+            }
+        }*/
+    }
+
+    static int toDmaAddress(int channel, int function)
+    {
+        return 0x4300 | channel << 4 | function;
     }
 
     Word getMode7WordValue(Byte value)
@@ -562,7 +605,7 @@ public:
     int16_t to13Bit2sComplement(Word value)
     {
         bool isNegative = value.getBit(12);
-        for (int i = 13; i < Word::bitCount(); ++i) {
+        for (int i = 13; i < Word::bitCount; ++i) {
             value.setBit(i, isNegative);
         }
         //if (result != value) {
@@ -651,6 +694,8 @@ public:
     CPU::State& state;
     Video& video;
 
+    bool pauseRequested = false;
+
     int vCounter = 0;
     int hCounter = 0;
     int frame = 0;
@@ -678,13 +723,7 @@ public:
     Word product;
     Word& remainder = product;
     bool nmiEnabled = false;
-    enum IrqMode
-    {
-        NoIrq = 0,
-        HCounterIrq = 1,
-        VCounterIrq = 2,
-        HAndVCounterIrq = 3
-    };
+
     IrqMode irqMode;
     bool autoJoypadReadEnabled = false;
     Word hTimer;
@@ -694,5 +733,9 @@ public:
     Video::ReadTwiceRegister horizontalScanlineLocation;
     Video::ReadTwiceRegister verticalScanlineLocation;
     Byte ppuStatusFlagAndVersion;
-    const Word mysteriousRegister;
+
+    Byte dmaEnabled;
+    Byte hdmaEnabled;
+
+    std::array<DmaChannel, 8> dmaChannels;
 };

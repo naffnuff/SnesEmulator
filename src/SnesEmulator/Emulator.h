@@ -24,7 +24,8 @@ class Emulator
 private:
     struct SaveRamSaver {
         SaveRamSaver(Emulator& emulator)
-            : emulator(emulator)
+            : saveRam(emulator.rom.romSize)
+            , rom(emulator.rom)
         {
         }
 
@@ -40,9 +41,9 @@ private:
                     saveRamModified = false;
                 }
                 if (save) {
-                    std::ofstream file(emulator.rom.gameTitle + ".save");
-                    for (int address = 0x700000; address < 0x700000 + emulator.rom.saveRamSize; ++address) {
-                        file << emulator.cpuState.getMemoryByte(address) << ' ';
+                    std::ofstream file(rom.gameTitle + ".save");
+                    for (int address = 0; address < rom.saveRamSize; ++address) {
+                        file << saveRam[address] << ' ';
                     }
                     std::cout << "*";
                 }
@@ -53,7 +54,8 @@ private:
         bool saveRamModified = false;
         std::mutex mutex;
         std::condition_variable condition;
-        Emulator& emulator;
+        const Rom& rom;
+        std::vector<Byte> saveRam;
     };
 
 public:
@@ -124,5 +126,8 @@ private:
 
     SaveRamSaver saveRamSaver;
     std::thread saveRamSaverThread;
+
+    std::array<Byte, 4> cpuToSpcBuffers;
+    std::array<Byte, 4> spcToCpuBuffers;
 };
 

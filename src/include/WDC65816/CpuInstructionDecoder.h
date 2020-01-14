@@ -17,14 +17,9 @@ public:
     InstructionDecoder(const InstructionDecoder&) = delete;
     InstructionDecoder& operator=(const InstructionDecoder&) = delete;
 
-    const Instruction* readNextInstruction(State& state) const
+    Instruction* getNextInstruction(State& state) const
     {
-        return getInstruction(state, state.applyProgramByte());
-    }
-
-    Instruction* applyNextInstruction(State& state) const
-    {
-        return getInstruction(state, state.readProgramByte());
+        return getInstruction(state, state.inspectProgramByte());
     }
 
     Instruction* getInstruction(const State& state, Byte opcode) const
@@ -41,9 +36,9 @@ public:
     }
 
 private:
-    std::array<std::unique_ptr<Instruction>, 1 << 8> instructions;
-    std::array<std::unique_ptr<Instruction>, 1 << 8> instructions16BitM;
-    std::array<std::unique_ptr<Instruction>, 1 << 8> instructions16BitX;
+    std::array<std::unique_ptr<Instruction>, Byte::spaceSize> instructions;
+    std::array<std::unique_ptr<Instruction>, Byte::spaceSize> instructions16BitM;
+    std::array<std::unique_ptr<Instruction>, Byte::spaceSize> instructions16BitX;
 };
 
 }

@@ -9,18 +9,30 @@
 namespace Types {
 
 template<typename T>
+struct SpaceSize
+{
+    static constexpr uint32_t value = 1 << T::bitCount;
+};
+
+template<typename T>
+struct BitMask
+{
+    static constexpr uint32_t value = T::spaceSize - 1;
+};
+
+template<typename T>
 T binaryAdd(T augend, T addend, bool& unsignedCarry, bool& signedOverflow, bool& halfCarry)
 {
     uint32_t sum = uint32_t(augend) + uint32_t(addend) + unsignedCarry;
     T result(sum);
-    T halfCarryHighBitMask = 1 << (T::bitCount() - 4);
+    T halfCarryHighBitMask = 1 << (T::bitCount - 4);
     T halfCarryLowBitsMask = halfCarryHighBitMask - 1;
     halfCarry = ((augend & halfCarryLowBitsMask) + (addend & halfCarryLowBitsMask) + unsignedCarry) & halfCarryHighBitMask;
     bool halfCarryAlt = (augend ^ addend ^ result) & halfCarryHighBitMask;
     if (halfCarry != halfCarryAlt) {
         throw std::logic_error(__FUNCTION__ + std::string(" bad half-carry calculation"));
     }
-    unsignedCarry = sum & 1 << T::bitCount();
+    unsignedCarry = sum & 1 << T::bitCount;
     signedOverflow = augend.isNegative() == addend.isNegative() && addend.isNegative() != result.isNegative();
     return result;
 }
@@ -49,6 +61,10 @@ T decimalSubtract(T minuhend, T subtrahend, bool& invertedUnsignedBorrow, bool& 
 class Byte
 {
 public:
+    static constexpr int bitCount = 8;
+    static constexpr uint32_t spaceSize = Types::SpaceSize<Byte>::value;
+    static constexpr uint32_t bitMask = Types::BitMask<Byte>::value;
+
     Byte()
         : value(0)
     {
@@ -171,11 +187,6 @@ public:
         return value >> offset & ((1 << count) - 1);
     }
 
-    static int bitCount()
-    {
-        return 8;
-    }
-
     bool isNegative() const
     {
         return getBit(7);
@@ -221,6 +232,10 @@ private:
 class Word
 {
 public:
+    static constexpr int bitCount = 16;
+    static constexpr uint32_t spaceSize = Types::SpaceSize<Word>::value;
+    static constexpr uint32_t bitMask = Types::BitMask<Word>::value;
+
     Word()
         : value(0)
     {
@@ -288,6 +303,13 @@ public:
         return *this;
     }
 
+    Word operator++(int)
+    {
+        Word copy(value);
+        ++value;
+        return copy;
+    }
+
     Word& operator--()
     {
         --value;
@@ -299,11 +321,6 @@ public:
         Word copy(value);
         --value;
         return copy;
-    }
-
-    static int bitCount()
-    {
-        return 16;
     }
 
     bool isNegative() const
@@ -371,6 +388,10 @@ private:
 class Long
 {
 public:
+    static constexpr int bitCount = 24;
+    static constexpr uint32_t spaceSize = Types::SpaceSize<Long>::value;
+    static constexpr uint32_t bitMask = Types::BitMask<Long>::value;
+
     Long()
         : value(0)
     {
@@ -396,10 +417,17 @@ public:
         return value;
     }
 
+    void wrapValue()
+    {
+        constexpr uint32_t bitMask = (1 << bitCount) - 1;
+        value = value & bitMask;
+    }
+
     template<typename T>
     Long& operator+=(T operand)
     {
         value += operand;
+        wrapValue();
         return *this;
     }
 
@@ -407,12 +435,14 @@ public:
     Long& operator-=(T operand)
     {
         value -= operand;
+        wrapValue();
         return *this;
     }
 
     Long& operator++()
     {
         ++value;
+        wrapValue();
         return *this;
     }
 
@@ -420,6 +450,7 @@ public:
     {
         Long copy(value);
         ++value;
+        wrapValue();
         return copy;
     }
 

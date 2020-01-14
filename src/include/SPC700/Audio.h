@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <functional>
 
 #include "System.h"
 #include "MemoryLocation.h"
@@ -148,10 +149,10 @@ public:
         makeReadWriteRegister(address + 1, info + " high byte", debug, [&variable](Byte& value) { value = variable.getHighByte(); }, [&variable](Byte value) { variable.setHighByte(value); });
     }
 
-    void initialize(std::array<MemoryLocation*, 4>& cpuToSpcPorts)
+    void initialize(CPU::State::MemoryType& cpuMemory)
     {
         makeWriteRegister(0xf1, "I/0 and Timer Control", false,
-            [this, cpuToSpcPorts](Byte byte) {
+            [this, &cpuMemory](Byte byte) {
                 for (int i = 0; i < 3; ++i) {
                     if (!timers[i].enabled && byte.getBit(i)) {
                         timers[i].tick = 0;
@@ -160,12 +161,10 @@ public:
                     timers[i].enabled = byte.getBit(i);
                 }
                 if (byte.getBit(4)) {
-                    cpuToSpcPorts[0]->setValue(0);
-                    cpuToSpcPorts[1]->setValue(0);
+                    cpuMemory.writeWord(0, 0x2140);
                 }
                 if (byte.getBit(5)) {
-                    cpuToSpcPorts[2]->setValue(0);
-                    cpuToSpcPorts[3]->setValue(0);
+                    cpuMemory.writeWord(0, 0x2142);
                 }
                 bootRomDataEnabled = byte.getBit(7);
             });
@@ -200,7 +199,7 @@ public:
             MemoryLocation* memory = state.getMemoryLocation(address);
             memory->setReadWrite();
             memory->setValue(0);
-            std::function callback = [this, i](Byte& value) {
+            std::function<void(Byte&)> callback = [this, i](Byte& value) {
                 if (bootRomDataEnabled) {
                     value = bootRomData[i];
                 }

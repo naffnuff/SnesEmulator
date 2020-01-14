@@ -1,0 +1,44 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558 
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "build SnesEmulator.exe",
+            "command": "cl.exe",
+            "args": [
+                "/Zi",
+                "/EHsc",
+                "/std:c++17",
+                "/I",
+                "../../src/include",
+                "/I",
+                "../../src/include/Common",
+                "/I",
+                "../../src/include/SPC700",
+                "/I",
+                "../../src/include/WDC65816",
+                "/Fe:",
+                "SnesEmulator.exe",
+                "../../src/SnesEmulator/Main.cpp",
+                "../../src/SnesEmulator/Emulator.cpp",
+                "../../src/SnesEmulator/Renderer.cpp",
+                "../../src/SPC700/SpcInstructionDecoder.cpp",
+                "../../src/WDC65816/CpuInstructionDecoder.cpp",
+                "../../src/Common/System.cpp",
+                "/link",
+                "${env:LIB}",
+                "/MACHINE:X64",
+                "\"glfw3.lib\""
+            ],
+            "problemMatcher": [
+                "$msCompile"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}

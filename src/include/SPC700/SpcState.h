@@ -17,6 +17,8 @@ namespace SPC {
 class State
 {
 public:
+    typedef Word AddressType;
+
     enum Flag
     {
         c = 1 << 0, // Carry
@@ -41,7 +43,7 @@ public:
 
     State()
         : programCounter(0xffc0)
-        , memory(0x10000, MemoryLocation(0xff, std::bind(&State::debugNameQuery, this, std::placeholders::_1)))
+        , memory(Word::spaceSize, MemoryLocation(0xff, std::bind(&State::debugNameQuery, this, std::placeholders::_1)))
     {
         for (MemoryLocation& r : registers) {
             r.setReadWrite();
@@ -121,9 +123,9 @@ public:
             << ", flags=" << flagSet << " (" << flagsString << ", $" << getRegisterValue<PSW>() << ")";
     }
 
-    Long getProgramAddress(int offset = 0) const
+    Word getProgramAddress(int offset = 0) const
     {
-        return programCounter + offset;
+        return getProgramCounter(offset);
     }
 
     Word getProgramCounter(int offset = 0) const
@@ -141,14 +143,29 @@ public:
         setProgramCounter(Word(address));
     }
 
-    Byte readProgramByte(int offset = 0) const
+    Byte inspectProgramByte(int offset = 0) const
     {
         return memory[getProgramAddress(offset)].getValue();
     }
 
-    Byte applyProgramByte(int offset = 0)
+    Byte applyProgramByte()
     {
-        return memory[getProgramAddress(offset)].apply();
+        return memory[programCounter++].apply();
+    }
+
+    bool hasBreakpoint(int offset) const
+    {
+        return memory[getProgramAddress(offset)].hasBreakpoint();
+    }
+
+    void applyBreakpoint(int offset) const
+    {
+        // Dummy
+    }
+
+    void printProgramByte(int offset, std::ostream& out) const
+    {
+        out << memory[getProgramAddress(offset)];
     }
     
     void incrementProgramCounter(Word increment)
@@ -221,7 +238,7 @@ public:
         return getMemoryLocation(getDirectAddress(address));
     }
 
-    const MemoryLocation& getMemory(Long address) const
+    const MemoryLocation& getMemory(Word address) const
     {
         return memory[address];
     }

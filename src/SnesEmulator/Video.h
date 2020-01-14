@@ -55,7 +55,7 @@ public:
         Video& video;
         bool running = false;
         std::string gameTitle;
-        bool fullscreen = true;
+        bool fullscreen = false;
         bool aspectRatioCorrection = true;
     };
 
@@ -334,13 +334,13 @@ public:
         }
         else if (backgroundMode == 7) {
             if (mode7HorizontalMirroring) {
-                throw Video::NotYetImplementedException("Register 211a: Horizontal mirroring");
+                throw NotYetImplementedException("Register 211a: Horizontal mirroring");
             }
             if (mode7VerticalMirroring) {
-                throw Video::NotYetImplementedException("Register 211a: Vertical mirroring");
+                throw NotYetImplementedException("Register 211a: Vertical mirroring");
             }
             if (mode7EmptySpaceFill) {
-                throw Video::NotYetImplementedException("Register 211a: Empty space fill");
+                throw NotYetImplementedException("Register 211a: Empty space fill");
             }
             if (directColorMode) {
                 throw NotYetImplementedException("Direct color mode for 256-color BGs");

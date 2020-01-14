@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\src\include\Common\Exception.h" />
     <ClInclude Include="..\..\..\src\include\Common\Instruction.h" />
+    <ClInclude Include="..\..\..\src\include\Common\Memory.h" />
     <ClInclude Include="..\..\..\src\include\Common\MemoryLocation.h" />
     <ClInclude Include="..\..\..\src\include\Common\System.h" />
     <ClInclude Include="..\..\..\src\include\Common\Types.h" />

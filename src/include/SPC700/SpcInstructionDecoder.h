@@ -17,14 +17,9 @@ public:
     InstructionDecoder(const InstructionDecoder&) = delete;
     InstructionDecoder& operator=(const InstructionDecoder&) = delete;
 
-    const Instruction* readNextInstruction(State& state) const
+    Instruction* getNextInstruction(State& state) const
     {
-        return instructions[state.readProgramByte()].get();
-    }
-
-    Instruction* applyNextInstruction(State& state) const
-    {
-        return instructions[state.applyProgramByte()].get();
+        return instructions[state.inspectProgramByte()].get();
     }
 
 private:
