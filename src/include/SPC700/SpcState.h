@@ -17,6 +17,8 @@ namespace SPC {
 class State
 {
 public:
+    typedef Word AddressType;
+
     enum Flag
     {
         c = 1 << 0, // Carry
@@ -121,9 +123,9 @@ public:
             << ", flags=" << flagSet << " (" << flagsString << ", $" << getRegisterValue<PSW>() << ")";
     }
 
-    Long getProgramAddress(int offset = 0) const
+    Word getProgramAddress(int offset = 0) const
     {
-        return programCounter + offset;
+        return getProgramCounter(offset);
     }
 
     Word getProgramCounter(int offset = 0) const
@@ -156,7 +158,7 @@ public:
         return memory[getProgramAddress(offset)].hasBreakpoint();
     }
 
-    void incrementProgramApplicationCount(int offset)
+    void applyBreakpoint(int offset) const
     {
         // Dummy
     }
@@ -236,7 +238,7 @@ public:
         return getMemoryLocation(getDirectAddress(address));
     }
 
-    const MemoryLocation& getMemory(Long address) const
+    const MemoryLocation& getMemory(Word address) const
     {
         return memory[address];
     }

@@ -200,7 +200,7 @@ public:
                 }
                 output << "Read breakpoint: " << breakpoint << " from " << context.fileName << std::endl;
                 LocationAccess& access = state.getLocationAccess(breakpoint.address);
-                toggleBreakpoint(context, access, breakpoint);
+                toggleBreakpoint(context, state, access, breakpoint);
             }
         }
     }
@@ -229,7 +229,7 @@ public:
         }
     }
 
-    void toggleBreakpoint(Context& context, LocationAccess& access, const Breakpoint& breakpoint)
+    void toggleBreakpoint(Context& context, CPU::State& state, LocationAccess& access, const Breakpoint& breakpoint)
     {
         if (access.hasBreakpoint()) {
             if (access.setBreakpoint(nullptr)) {
@@ -240,23 +240,31 @@ public:
                 output << "Breakpoint not allowed at address " << breakpoint.address << std::endl;
             }
         } else {
-            bool success = access.setBreakpoint([this, &context, breakpoint](Location::Operation operation, Byte value, uint64_t applicationCount) {
-                if (context.isPaused()) {
-                    return false;
-                }
-                else if (operation == Location::Apply && (breakpoint.applicationCount == 0 || breakpoint.applicationCount == applicationCount)) {
-                    output << "Apply: Breakpoint hit " << breakpoint << std::endl;
-                    return true;
-                }
-                else if (operation == MemoryLocation::Read) {
-                    output << "Read: Breakpoint hit @ " << breakpoint << std::endl;
-                    return true;
+            bool success = access.setBreakpoint([this, &context, &state, breakpoint](Location::Operation operation, Byte value, uint64_t applicationCount) {
+                bool printInstruction = false;
+                if (operation == Location::Apply && (breakpoint.applicationCount == 0 || breakpoint.applicationCount == applicationCount)) {
+                    output << "Apply: Breakpoint hit " << breakpoint << "#" << applicationCount << std::endl;
+                    context.setPaused(true);
+                } else if (operation == Location::Read && (breakpoint.argumentValue == -1 || breakpoint.argumentValue == value)) {
+                    output << "Read: Breakpoint hit @ " << breakpoint << ":" << value;
+                    context.setPaused(true);
+                    printInstruction = true;
                 }
                 else if (operation == Location::Write && (breakpoint.argumentValue == -1 || breakpoint.argumentValue == value)) {
-                    output << "Write: Breakpoint hit " << breakpoint << ":" << value << std::endl;
-                    return true;
+                    output << "Write: Breakpoint hit " << breakpoint << ":" << value;
+                    context.setPaused(true);
+                    printInstruction = true;
                 }
-                return false;
+                if (printInstruction) {
+                    Long programAddress = state.getProgramAddress();
+                    state.setProgramAddress(context.getLastKnownAddress());
+                    output << " while executing ";
+                    System::setOutputColor(output, context.isPaused() ? context.debugColor : System::Red, true);
+                    output << context.nextInstruction->toString();
+                    System::setOutputColor(output, System::DefaultColor, false);
+                    output << " @" << context.getLastKnownAddress() << std::endl;
+                    state.setProgramAddress(programAddress);
+                }
             });
             if (success) {
                 context.breakpoints.insert(breakpoint);
@@ -414,7 +422,7 @@ public:
                 }
             }
             LocationAccess& access = state.getLocationAccess(breakpoint.address);
-            toggleBreakpoint(context, access, breakpoint);
+            toggleBreakpoint(context, state, access, breakpoint);
             std::ofstream file(context.fileName);
             if (file) {
                 for (const Breakpoint& breakpoint : context.breakpoints) {
@@ -559,7 +567,7 @@ public:
             std::ofstream file(context.fileName);
         } else if (command[0] == 't') {
             Breakpoint breakpoint;
-            breakpoint.address = state.getProgramAddress();
+            breakpoint.address = Long(state.getProgramAddress());
             MemoryLocation* memory = state.getMemoryLocation(breakpoint.address);
             if (command.substr(0, 3) == "ttt") {
                 breakpoint.address = context.getPreviousAddress(breakpoint.address);
@@ -661,7 +669,7 @@ public:
     }
 
     template<typename State>
-    void setColor(const State& state, const Context& context, Long address, const LocationAccess& access)
+    void setColor(const State& state, const Context& context, typename State::AddressType address, const LocationAccess& access)
     {
         System::Color color = System::DefaultColor;
         bool bright = false;
@@ -686,7 +694,7 @@ public:
     }
 
     template<typename State>
-    void setColor(const State& state, const Context& context, Long address, const MemoryLocation& memory)
+    void setColor(const State& state, const Context& context, typename State::AddressType address, const MemoryLocation& memory)
     {
         System::Color color = System::DefaultColor;
         bool bright = false;
@@ -803,7 +811,7 @@ public:
         output << "          0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f"
             << "             0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f" << std::endl;
         Long cpuAddress = startCpuAddress & 0xFFFF00;
-        Long spcAddress = startSpcAddress & 0xFFFF00;
+        Word spcAddress = startSpcAddress & 0xFFFF00;
 
         for (int i = 0; i < 16; ++i) {
             if (cpuAddress < cpuMemorySize) {

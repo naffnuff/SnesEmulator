@@ -216,9 +216,7 @@ void Emulator::run()
 
                     cpuContext.nextInstruction = instruction;
 
-                    /*if (instruction->hasBreakpoint()) {
-                        cpuContext.setPaused(true);
-                    }*/
+                    instruction->applyBreakpoints();
 
                     if (cpuContext.isPaused()) {
                         output << "Cycle count: " << masterCycle << ", Next cpu: " << nextCpu << ", Next spc: " << nextSpc << std::endl;
@@ -407,7 +405,7 @@ void Emulator::run()
 template<typename State, typename OtherState>
 int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debugger::Context& context, OtherState& otherState, Debugger::Context& otherContext, std::ostream& error)
 {
-    context.addKnownAddress(state.getProgramAddress());
+    context.addKnownAddress(Long(state.getProgramAddress()));
     try {
         if (context.isPaused()) {
             debugger.printState(state, context);
@@ -443,10 +441,6 @@ int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debu
         context.setPaused(true);
         error << e.what() << std::endl;
     } catch (Video::NotYetImplementedException& e) {
-        state.setProgramAddress(context.getLastKnownAddress());
-        context.setPaused(true);
-        error << e.what() << std::endl;
-    } catch (BreakpointException& e) {
         state.setProgramAddress(context.getLastKnownAddress());
         context.setPaused(true);
         error << e.what() << std::endl;

@@ -180,9 +180,8 @@ public:
         return active;
     }
 
-    bool hasBreakpoint() const override
+    void applyBreakpoints() const override
     {
-        return false;
     }
 
 public:

@@ -217,14 +217,14 @@ public:
         return memory.inspect(getProgramAddress(offset));
     }
 
-    bool hasBreakpoint(int offset)
+    bool hasBreakpoint(int offset) const
     {
         return memory.hasBreakpoint(getProgramAddress(offset));
     }
 
-    void incrementProgramApplicationCount(int offset)
+    void applyBreakpoint(int offset) const
     {
-        memory.incrementApplicationCount(getProgramAddress(offset));
+        memory.applyBreakpoint(getProgramAddress(offset));
     }
 
     Byte applyProgramByte()

@@ -12,7 +12,7 @@ class Instruction
 public:
     virtual std::string toString() const = 0;
     virtual std::string opcodeToString() const = 0;
-    virtual bool hasBreakpoint() const = 0;
+    virtual void applyBreakpoints() const = 0;
     virtual int execute() = 0;
     virtual int size() const = 0;
 };
@@ -34,13 +34,8 @@ protected:
 
     int applyOperand()
     {
-        int offset = 0;
         applyByte<Byte>();
-        int cycles = 0;
-        cycles = applyArguments({ applyByte<Bytes>()... }, std::index_sequence_for<Bytes...>());
-        for (int i = -size(); i < 0; ++i) {
-            state.incrementProgramApplicationCount(i);
-        }
+        int cycles = applyArguments({ applyByte<Bytes>()... }, std::index_sequence_for<Bytes...>());
         return cycles;
     }
 
@@ -61,14 +56,11 @@ protected:
     State& state;
 
 private:
-    bool hasBreakpoint() const override
+    void applyBreakpoints() const override
     {
         for (int i = 0; i < size(); ++i) {
-            if (state.hasBreakpoint(i)) {
-                return true;
-            }
+            state.applyBreakpoint(i);
         }
-        return false;
     }
 
     template <typename Byte>

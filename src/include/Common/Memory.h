@@ -12,11 +12,6 @@ class MemoryAccessException : public std::logic_error
     using std::logic_error::logic_error;
 };
 
-class BreakpointException : public std::runtime_error
-{
-    using std::runtime_error::runtime_error;
-};
-
 class LocationVisitor
 {
 public:
@@ -38,7 +33,7 @@ public:
         Apply
     };
 
-    typedef std::function<bool(Operation operation, Byte value, uint64_t applicationCount)> BreakpointCallback;
+    typedef std::function<void(Operation operation, Byte value, uint64_t applicationCount)> BreakpointCallback;
 
     Location() = delete;
 
@@ -53,33 +48,26 @@ public:
 public:
     Byte read()
     {
-        if (breakpoint && breakpoint(Read, 0, 0)) {
-            throw BreakpointException("Breakpoint hit: Read");
-        }
         readImpl(bus);
+        if (breakpoint) {
+            breakpoint(Read, bus, 0);
+        }
         return bus;
     }
 
     Byte apply()
     {
-        if (breakpoint && breakpoint(Apply, 0, applicationCount + 1)) {
-            throw BreakpointException("Breakpoint hit: Apply");
-        }
         readImpl(bus);
+        ++applicationCount;
         return bus;
     }
 
     void write(Byte value)
     {
-        if (breakpoint && breakpoint(Write, value, 0)) {
-            throw BreakpointException("Breakpoint hit: Write");
-        }
         writeImpl(value);
-    }
-
-    void incrementApplicationCount()
-    {
-        ++applicationCount;
+        if (breakpoint) {
+            breakpoint(Write, value, 0);
+        }
     }
 
     uint64_t getApplicationCount() const
@@ -95,6 +83,13 @@ public:
     bool hasBreakpoint() const
     {
         return breakpoint.operator bool();
+    }
+
+    void applyBreakpoint() const
+    {
+        if (breakpoint) {
+            breakpoint(Apply, 0, applicationCount + 1);
+        }
     }
 
     bool setBreakpoint(BreakpointCallback callback)
@@ -572,10 +567,10 @@ public:
         return memory[address]->hasBreakpoint();
     }
 
-    void incrementApplicationCount(AddressType address)
+    void applyBreakpoint(AddressType address) const
     {
         checkIsInitialized(address, true, __FUNCTION__);
-        return memory[address]->incrementApplicationCount();
+        return memory[address]->applyBreakpoint();
     }
 
     Byte inspect(AddressType address)
