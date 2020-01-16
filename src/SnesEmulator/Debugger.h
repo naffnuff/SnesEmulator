@@ -199,7 +199,7 @@ public:
                     breakpoint.argumentValue = std::stoi(breakpointString.substr(argumentValueIndex + 1), 0, 16);
                 }
                 output << "Read breakpoint: " << breakpoint << " from " << context.fileName << std::endl;
-                LocationAccess& access = state.getLocationAccess(breakpoint.address);
+                CPU::State::MemoryAccessType access = state.getMemoryAccess(breakpoint.address);
                 toggleBreakpoint(context, state, access, breakpoint);
             }
         }
@@ -397,7 +397,7 @@ public:
         }
         else if (command == "clear") {
             for (const Breakpoint& breakpoint : context.breakpoints) {
-                state.getLocationAccess(breakpoint.address).setBreakpoint(nullptr);
+                state.getMemoryAccess(breakpoint.address).setBreakpoint(nullptr);
             }
             context.breakpoints.clear();
             output << "Cleared context " << context.fileName << std::endl;
@@ -421,7 +421,7 @@ public:
                     std::cerr << "Not a valid value: " << e.what() << std::endl;
                 }
             }
-            LocationAccess& access = state.getLocationAccess(breakpoint.address);
+            MemoryAccess access = state.getMemoryAccess(breakpoint.address);
             toggleBreakpoint(context, state, access, breakpoint);
             std::ofstream file(context.fileName);
             if (file) {
@@ -821,7 +821,7 @@ public:
                 output << bank << ':' << std::hex << std::setw(3) << std::setfill('0') << lowAddress << "x  " << std::dec;
 
                 for (int j = 0; j < 16 && cpuAddress < cpuMemorySize; ++j) {
-                    const LocationAccess& access = cpuState.getLocationAccess(cpuAddress);
+                    MemoryAccess access = cpuState.getMemoryAccess(cpuAddress);
                     setColor(cpuState, cpuContext, cpuAddress++, access);
                     output << access << ' ';
                     System::setOutputColor(output, System::DefaultColor, false);

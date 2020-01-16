@@ -409,9 +409,11 @@ inline std::ostream& operator<<(std::ostream& out, const LocationAccess& access)
 }
 
 template<typename AddressType>
-class Memory : private LocationAccess
+class Memory
 {
 public:
+    typedef AddressType AddressType;
+
     enum WrappingMask
     {
         Page = Byte::bitMask,
@@ -457,14 +459,6 @@ public:
                 location = std::make_shared<InvalidLocation>(bus);
             }
         }
-    }
-
-    template<WrappingMask Wrapping = Full, typename AccessType = Access>
-    AccessType& getAccess(AddressType address)
-    {
-        currentWrappingMask = Wrapping;
-        currentAddress = address;
-        return static_cast<AccessType&>(*this);
     }
 
     Byte readByte(AddressType address)
@@ -585,6 +579,18 @@ public:
         return result;
     }
 
+    bool setBreakpoint(AddressType address, Location::BreakpointCallback callback)
+    {
+        checkIsInitialized(address, true, __FUNCTION__);
+        return memory[address]->setBreakpoint(callback);
+    }
+
+    void accept(AddressType address, LocationVisitor& visitor) const
+    {
+        checkIsInitialized(address, true, __FUNCTION__);
+        memory[address]->accept(visitor);
+    }
+
     void print(AddressType address, std::ostream& out) const
     {
         checkIsInitialized(address, true, __FUNCTION__);
@@ -595,53 +601,6 @@ private:
     static AddressType getNextAddress(AddressType address, uint32_t wrappingMask)
     {
         return (address & ~wrappingMask) + ((address + 1) & wrappingMask);
-    }
-
-    Byte readByte() override
-    {
-        return readByte(currentAddress);
-    }
-
-    Word readWord() override
-    {
-        return readWord(currentAddress, currentWrappingMask);
-    }
-
-    Long readLong() override
-    {
-        return readLong(currentAddress, currentWrappingMask);
-    }
-
-    void writeByte(Byte value) override
-    {
-        writeByte(value, currentAddress);
-    }
-
-    void writeWord(Word value) override
-    {
-        writeWord(value, currentAddress, currentWrappingMask);
-    }
-
-    bool hasBreakpoint() const override
-    {
-        return hasBreakpoint(currentAddress);
-    }
-
-    bool setBreakpoint(Location::BreakpointCallback callback) override
-    {
-        checkIsInitialized(currentAddress, true, __FUNCTION__);
-        return memory[currentAddress]->setBreakpoint(callback);
-    }
-
-    void accept(LocationVisitor& visitor) const override
-    {
-        checkIsInitialized(currentAddress, true, __FUNCTION__);
-        memory[currentAddress]->accept(visitor);
-    }
-
-    void print(std::ostream& out) const override
-    {
-        print(currentAddress, out);
     }
 
     void checkBounds(AddressType address, const char* operation) const
@@ -688,6 +647,72 @@ public:
 private:
     std::vector<std::shared_ptr<Location>> memory;
     uint32_t memorySize;
-    AddressType currentAddress;
-    uint32_t currentWrappingMask = 0;
+};
+
+template<typename Memory>
+class MemoryAccess : public LocationAccess
+{
+public:
+    typedef typename Memory::AddressType AddressType;
+    typedef typename Memory::WrappingMask WrappingMask;
+
+    MemoryAccess(Memory& memory, AddressType address, WrappingMask wrapping = Memory::Full)
+        : memory(memory)
+        , address(address)
+        , wrapping(wrapping)
+    {
+    }
+    MemoryAccess() = delete;
+    MemoryAccess(const MemoryAccess&) = delete;
+    MemoryAccess& operator=(const MemoryAccess&) = delete;
+
+    Byte readByte() override
+    {
+        return memory.readByte(address);
+    }
+
+    Word readWord() override
+    {
+        return memory.readWord(address, wrapping);
+    }
+
+    Long readLong() override
+    {
+        return memory.readLong(address, wrapping);
+    }
+
+    void writeByte(Byte value) override
+    {
+        memory.writeByte(value, address);
+    }
+
+    void writeWord(Word value) override
+    {
+        memory.writeWord(value, address, wrapping);
+    }
+
+    bool hasBreakpoint() const override
+    {
+        return memory.hasBreakpoint(address);
+    }
+
+    bool setBreakpoint(Location::BreakpointCallback callback) override
+    {
+        return memory.setBreakpoint(address, callback);
+    }
+
+    void accept(LocationVisitor& visitor) const override
+    {
+        memory.accept(address, visitor);
+    }
+
+    void print(std::ostream& out) const override
+    {
+        memory.print(address, out);
+    }
+
+private:
+    Memory& memory;
+    const AddressType address;
+    const WrappingMask wrapping;
 };

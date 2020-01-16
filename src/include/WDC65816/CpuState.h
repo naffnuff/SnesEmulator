@@ -19,6 +19,7 @@ class State
 public:
     typedef Long AddressType;
     typedef Memory<AddressType> MemoryType;
+    typedef MemoryAccess<MemoryType> MemoryAccessType;
 
     struct InterruptVectors
     {
@@ -332,30 +333,25 @@ public:
         return memory;
     }
 
-    LocationAccess& getLocationAccess(Long address)
-    {
-        return memory.getAccess<MemoryType::Full, LocationAccess>(address);
-    }
-
     template<MemoryType::WrappingMask Wrapping = MemoryType::Full>
-    Access& getMemoryAccess(Long address, Word offset = 0)
+    MemoryAccessType getMemoryAccess(Long address, Word offset = 0)
     {
-        return memory.getAccess<Wrapping>(Long(address + offset));
+        return MemoryAccess(memory, Long(address + offset), Wrapping);
     }
 
     template<MemoryType::WrappingMask Wrapping  = MemoryType::Full>
-    Access& getMemoryAccess(Byte lowByte, Byte highByte, Byte bankByte, Word offset = 0)
+    MemoryAccessType getMemoryAccess(Byte lowByte, Byte highByte, Byte bankByte, Word offset = 0)
     {
         return getMemoryAccess<Wrapping>(Long(lowByte, highByte, bankByte), offset);
     }
 
     template<MemoryType::WrappingMask Wrapping = MemoryType::Full>
-    Access& getMemoryAccess(Byte lowByte, Byte highByte)
+    MemoryAccessType getMemoryAccess(Byte lowByte, Byte highByte)
     {
         return getMemoryAccess<Wrapping>(lowByte, highByte, dataBank);
     }
 
-    Access& getDirectMemoryAccess(Byte lowByte, Word offset = 0)
+    MemoryAccessType getDirectMemoryAccess(Byte lowByte, Word offset = 0)
     {
         if (emulationMode && directPage.getLowByte() == 0) {
             return getMemoryAccess<MemoryType::Page>(lowByte + offset, directPage.getHighByte(), 0);
