@@ -432,6 +432,9 @@ public:
     {
     }
 
+    Memory(const Memory&) = delete;
+    Memory& operator=(const Memory&) = delete;
+
     uint32_t size() const
     {
         return memorySize;
@@ -656,15 +659,14 @@ public:
     typedef typename Memory::AddressType AddressType;
     typedef typename Memory::WrappingMask WrappingMask;
 
+    MemoryAccess() = delete;
+
     MemoryAccess(Memory& memory, AddressType address, WrappingMask wrapping = Memory::Full)
         : memory(memory)
         , address(address)
         , wrapping(wrapping)
     {
     }
-    MemoryAccess() = delete;
-    MemoryAccess(const MemoryAccess&) = delete;
-    MemoryAccess& operator=(const MemoryAccess&) = delete;
 
     Byte readByte() override
     {

@@ -199,7 +199,7 @@ public:
                     breakpoint.argumentValue = std::stoi(breakpointString.substr(argumentValueIndex + 1), 0, 16);
                 }
                 output << "Read breakpoint: " << breakpoint << " from " << context.fileName << std::endl;
-                CPU::State::MemoryAccessType access = state.getMemoryAccess(breakpoint.address);
+                MemoryAccess access = state.getMemoryAccess(breakpoint.address);
                 toggleBreakpoint(context, state, access, breakpoint);
             }
         }

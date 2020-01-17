@@ -52,25 +52,29 @@ public:
     };
 
 private:
-    class Accumulator : public Access
+    class Accumulator
     {
-    public:        
-        Byte readByte() override
+    public:
+        Accumulator() = default;
+        Accumulator(const Accumulator&) = delete;
+        Accumulator& operator=(const Accumulator&) = delete;
+
+        Byte readByte()
         {
             return accumulatorA;
         }
 
-        Word readWord() override
+        Word readWord()
         {
             return getAccumulatorC();
         }
 
-        void writeByte(Byte value) override
+        void writeByte(Byte value)
         {
             accumulatorA = value;
         }
         
-        void writeWord(Word value) override
+        void writeWord(Word value)
         {
             accumulatorA = value.getLowByte();
             accumulatorB = value.getHighByte();
@@ -99,6 +103,37 @@ private:
     };
 
 public:
+    class AccumulatorAccess : public Access
+    {
+    public:
+        AccumulatorAccess(Accumulator& accumulator)
+            : accumulator(accumulator)
+        {
+        }
+
+        Byte readByte() override
+        {
+            return accumulator.readByte();
+        }
+
+        Word readWord() override
+        {
+            return accumulator.readWord();
+        }
+
+        void writeByte(Byte value) override
+        {
+            accumulator.writeByte(value);
+        }
+
+        void writeWord(Word value) override
+        {
+            accumulator.writeWord(value);
+        }
+
+    private:
+        Accumulator& accumulator;
+    };
 
     //static const size_t spcRegisterCount = 4;
 
@@ -257,9 +292,9 @@ public:
         return programBank;
     }
 
-    Access& getAccumulatorAccess()
+    AccumulatorAccess getAccumulatorAccess()
     {
-        return static_cast<Access&>(accumulator);
+        return AccumulatorAccess(accumulator);
     }
 
     Byte getAccumulatorA() const

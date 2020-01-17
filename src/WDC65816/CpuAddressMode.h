@@ -217,7 +217,8 @@ class Accumulator : public Instruction1Byte
         if (state.is16Bit(State::m)) {
             cycles -= 2;
         }
-        return cycles + Operator::invoke(state, state.getAccumulatorAccess());
+        State::AccumulatorAccess accumulatorAccess = state.getAccumulatorAccess();
+        return cycles + Operator::invoke(state, accumulatorAccess);
     }
 
     std::string toString() const override
