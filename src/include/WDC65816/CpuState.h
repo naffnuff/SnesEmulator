@@ -8,7 +8,6 @@
 #include <iomanip>
 
 #include "Types.h"
-#include "MemoryLocation.h"
 #include "Memory.h"
 #include "Util.h"
 
@@ -138,7 +137,6 @@ public:
     //static const size_t spcRegisterCount = 4;
 
     State()
-        : memory()
     {
         std::cout << "Memory size=" << memory.size() << std::endl;
 
@@ -247,7 +245,7 @@ public:
         return isNativeMode() && !getFlag(flag);
     }
 
-    Byte inspectProgramByte(int offset = 0)
+    Byte inspectProgramByte(int offset = 0) const
     {
         return memory.inspect(getProgramAddress(offset));
     }

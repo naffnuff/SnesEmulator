@@ -3,14 +3,15 @@
 #include <vector>
 #include <functional>
 
+#include "RegisterManager.h"
 #include "System.h"
-#include "MemoryLocation.h"
+#include "Memory.h"
 
 #include "SpcState.h"
 
 namespace SPC {
 
-class Audio
+class Audio : public RegisterManager<State, System::Blue>
 {
 public:
     class NotYetImplementedException : public std::logic_error
@@ -33,9 +34,9 @@ public:
     };
 
     Audio(std::ostream& output, std::ostream& error, State& state)
-        : output(output)
+        : RegisterManager(output, error, state)
+        , output(output)
         , error(error)
-        , state(state)
         , dspMemory(0x100)
     {
         timers[2].highPrecision = true;
@@ -60,96 +61,7 @@ public:
         }
     }
 
-    void printMemoryRegister(bool write, Byte value, Word address, const std::string& info)
-    {
-        System::setOutputColor(output, System::Blue, true);
-        output << (write ? "Write " : "Read ") << value << " (" << std::bitset<8>(value) << ") @ " << address << " (" << info << "), " << std::endl;
-        System::setOutputColor(output, System::DefaultColor, false);
-    }
-
-    void makeWriteRegister(Word address, const std::string& info, bool debug, std::function<void(Byte value)> callback = nullptr)
-    {
-        MemoryLocation* memory = state.getMemoryLocation(address);
-        memory->setWriteOnly();
-        memory->setValue(0);
-        memory->onWrite = [this, address, callback, info, debug](Byte oldValue, Byte newValue) {
-            if (debug) {
-                printMemoryRegister(true, newValue, address, info);
-            }
-            if (callback) {
-                callback(newValue);
-            }
-        };
-    }
-
-    void makeWriteRegister(Word address, const std::string& info, bool debug, Byte& variable)
-    {
-        makeWriteRegister(address, info, debug, [&variable](Byte value) { variable = value; });
-    }
-
-    void makeWriteRegister(Word address, const std::string& info, bool debug, Word& variable)
-    {
-        makeWriteRegister(address, info + " low byte", debug, [&variable](Byte value) { variable.setLowByte(value); });
-        makeWriteRegister(address + 1, info + " high byte", debug, [&variable](Byte value) { variable.setHighByte(value); });
-    }
-
-    void makeReadRegister(Word address, const std::string& info, bool debug, std::function<void(Byte& value)> callback = nullptr)
-    {
-        MemoryLocation* memory = state.getMemoryLocation(Long(address, 0));
-        memory->setReadOnlyValue(0);
-        memory->onRead = [this, address, callback, info, debug](Byte& value) {
-            if (callback) {
-                callback(value);
-            }
-            if (debug) {
-                printMemoryRegister(false, value, address, info);
-            }
-        };
-    };
-
-    void makeReadRegister(Word address, const std::string& info, bool debug, const Word& variable)
-    {
-        makeReadRegister(address, info + " low byte", debug, [&variable](Byte& value) { value = variable.getLowByte(); });
-        makeReadRegister(address + 1, info + " high byte", debug, [&variable](Byte& value) { value = variable.getHighByte(); });
-    }
-
-    void makeReadRegister(Word address, const std::string& info, bool debug, const Long& variable)
-    {
-        makeReadRegister(address, info + " low byte", debug, [&variable](Byte& value) { value = variable.getLowByte(); });
-        makeReadRegister(address + 1, info + " high byte", debug, [&variable](Byte& value) { value = variable.getHighByte(); });
-        makeReadRegister(address + 2, info + " bank byte", debug, [&variable](Byte& value) { value = variable.getBankByte(); });
-    }
-
-    void makeReadWriteRegister(Word address, const std::string& info, bool debug, std::function<void(Byte& value)> readCallback = nullptr, std::function<void(Byte value)> writeCallback = nullptr)
-    {
-        MemoryLocation* memory = state.getMemoryLocation(address);
-        memory->setReadWrite();
-        memory->setValue(0);
-        memory->onRead = [this, address, readCallback, info, debug](Byte& value) {
-            if (readCallback) {
-                readCallback(value);
-            }
-            if (debug) {
-                printMemoryRegister(false, value, address, info);
-            }
-        };
-        memory->onWrite = [this, address, writeCallback, info, debug](Byte oldValue, Byte newValue) {
-            if (debug) {
-                printMemoryRegister(true, newValue, address, info);
-            }
-            if (writeCallback) {
-                writeCallback(newValue);
-            }
-        };
-    };
-
-    void makeReadWriteRegister(Word address, const std::string& info, bool debug, Word& variable)
-    {
-        makeReadWriteRegister(address, info + " low byte", debug, [&variable](Byte& value) { value = variable.getLowByte(); }, [&variable](Byte value) { variable.setLowByte(value); });
-        makeReadWriteRegister(address + 1, info + " high byte", debug, [&variable](Byte& value) { value = variable.getHighByte(); }, [&variable](Byte value) { variable.setHighByte(value); });
-    }
-
-    void initialize(CPU::State::MemoryType& cpuMemory)
+    void initialize(Memory<Long>& cpuMemory)
     {
         makeWriteRegister(0xf1, "I/0 and Timer Control", false,
             [this, &cpuMemory](Byte byte) {
@@ -196,16 +108,7 @@ public:
 
         for (int i = 0; i < bootRomData.size(); ++i) {
             Word address = 0xffc0 + i;
-            MemoryLocation* memory = state.getMemoryLocation(address);
-            memory->setReadWrite();
-            memory->setValue(0);
-            std::function<void(Byte&)> callback = [this, i](Byte& value) {
-                if (bootRomDataEnabled) {
-                    value = bootRomData[i];
-                }
-            };
-            memory->onRead = callback;
-            memory->onApply = callback;
+            state.createMemoryLocation<BootRomLocation>(address, 0xff, bootRomData[i], bootRomDataEnabled);
         }
     }
     
@@ -217,7 +120,6 @@ public:
 
     std::ostream& output;
     std::ostream& error;
-    State& state;
 
     uint64_t audioCycle = 0;
 

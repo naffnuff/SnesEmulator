@@ -3,12 +3,13 @@
 #include <vector>
 
 #include "Common/System.h"
-#include "Common/MemoryLocation.h"
+#include "Common/Memory.h"
+#include "Common/RegisterManager.h"
 
 #include "Video.h"
 #include "Renderer.h"
 
-class Registers
+class Registers : public RegisterManager<CPU::State, System::Yellow>
 {
 public:
     enum IrqMode
@@ -34,9 +35,9 @@ public:
     };
 
     Registers(std::ostream& output, std::ostream& error, CPU::State& state, Video& video)
-        : output(output)
+        : RegisterManager(output, error, state)
+        , output(output)
         , error(error)
-        , state(state)
         , video(video)
     {
     }
@@ -44,124 +45,14 @@ public:
     Registers(const Registers&) = delete;
     Registers& operator=(const Registers&) = delete;
 
-    void printMemoryRegister(bool write, Byte value, Word address, const std::string& info)
-    {
-        System::setOutputColor(output, System::Yellow, true);
-        output << (write ? "Write " : "Read ") << value << " (" << std::bitset<8>(value) << ") @ " << address << " (" << info << "), " << std::endl;
-        System::setOutputColor(output, System::DefaultColor, false);
-    }
-
-    void makeWriteRegister(Word address, const std::string& info, bool debug, std::function<void(Byte)> callback = nullptr, bool openBus = false)
-    {
-        std::function<void(Byte, Byte)> onWrite = [this, address, callback, info, debug](Byte oldValue, Byte newValue) {
-            if (debug && newValue && oldValue != newValue) {
-                printMemoryRegister(true, newValue, address, info);
-            }
-            if (callback) {
-                callback(newValue);
-            }
-        };
-        if (openBus) {
-            state.createMemoryLocation<OpenBusWriteRegister>(Long(address, 0), onWrite);
-        }
-        else {
-            state.createMemoryLocation<WriteRegister>(Long(address, 0), onWrite);
-        }
-    }
-
-    void makeWriteRegister(Word address, const std::string& info, bool debug, Byte& variable, bool openBus = false)
-    {
-        makeWriteRegister(address, info, debug, [&variable](Byte value) { variable = value; }, openBus);
-    }
-
-    void makeWriteRegister(Word address, const std::string& info, bool debug, Word& variable, bool openBus = false)
-    {
-        makeWriteRegister(address, info + " low byte", debug, [&variable](Byte value) { variable.setLowByte(value); }, openBus);
-        makeWriteRegister(address + 1, info + " high byte", debug, [&variable](Byte value) { variable.setHighByte(value); }, openBus);
-    }
-
-    void makeWriteRegister(Word address, const std::string& info, bool debug, Long& variable, bool openBus = false)
-    {
-        makeWriteRegister(address, info + " low byte", debug, [&variable](Byte value) { variable.setLowByte(value); }, openBus);
-        makeWriteRegister(address + 1, info + " high byte", debug, [&variable](Byte value) { variable.setHighByte(value); }, openBus);
-        makeWriteRegister(address + 2, info + " bank byte", debug, [&variable](Byte value) { variable.setBankByte(value); }, openBus);
-    }
-
-    void makeWriteRegister(Word address, const std::string& info, bool debug, Video::WriteTwiceRegister& variable, bool openBus = false)
+    void makeWriteTwiceRegister(Word address, const std::string& info, bool debug, Video::WriteTwiceRegister& variable, bool openBus = false)
     {
         makeWriteRegister(address, info, debug, [&variable](Byte value) { variable.write(value); }, openBus);
     }
 
-    void makeReadRegister(Word address, const std::string& info, bool debug, std::function<void(Byte&)> callback = nullptr)
-    {
-        state.createMemoryLocation<ReadRegister>(Long(address, 0),
-            [this, address, callback, info, debug](Byte& value) {
-                if (callback) {
-                    callback(value);
-                }
-                if (debug && value) {
-                    printMemoryRegister(false, value, address, info);
-                }
-            }
-        );
-    };
-
-    void makeReadRegister(Word address, const std::string& info, bool debug, const Word& variable)
-    {
-        makeReadRegister(address, info + " low byte", debug, [&variable](Byte& value) { value = variable.getLowByte(); });
-        makeReadRegister(address + 1, info + " high byte", debug, [&variable](Byte& value) { value = variable.getHighByte(); });
-    }
-
-    void makeReadRegister(Word address, const std::string& info, bool debug, const Long& variable)
-    {
-        makeReadRegister(address, info + " low byte", debug, [&variable](Byte& value) { value = variable.getLowByte(); });
-        makeReadRegister(address + 1, info + " high byte", debug, [&variable](Byte& value) { value = variable.getHighByte(); });
-        makeReadRegister(address + 2, info + " bank byte", debug, [&variable](Byte& value) { value = variable.getBankByte(); });
-    }
-
-    void makeReadRegister(Word address, const std::string& info, bool debug, Video::ReadTwiceRegister& variable)
+    void makeReadTwiceRegister(Word address, const std::string& info, bool debug, Video::ReadTwiceRegister& variable)
     {
         makeReadRegister(address, info, debug, [&variable](Byte& value) { value = variable.read(); });
-    }
-
-    void makeReadWriteRegister(Word address, const std::string& info, bool debug, std::function<void(Byte&)> readCallback, std::function<void(Byte)> writeCallback)
-    {
-        state.createMemoryLocation<ReadWriteRegister>(Long(address, 0),
-            [this, address, readCallback, info, debug](Byte& value) {
-                if (readCallback) {
-                    readCallback(value);
-                }
-                if (debug && value) {
-                    printMemoryRegister(false, value, address, info);
-                }
-            },
-            [this, address, writeCallback, info, debug](Byte oldValue, Byte newValue) {
-                if (debug && newValue && oldValue != newValue) {
-                    printMemoryRegister(true, newValue, address, info);
-                }
-                if (writeCallback) {
-                    writeCallback(newValue);
-                }
-            }
-        );
-    };
-
-    void makeReadWriteRegister(Word address, const std::string& info, bool debug, Byte& variable)
-    {
-        makeReadWriteRegister(address, info, debug, [&variable](Byte& value) { value = variable; }, [&variable](Byte value) { variable = value; });
-    }
-
-    void makeReadWriteRegister(Word address, const std::string& info, bool debug, Word& variable)
-    {
-        makeReadWriteRegister(address, info + " low byte", debug, [&variable](Byte& value) { value = variable.getLowByte(); }, [&variable](Byte value) { variable.setLowByte(value); });
-        makeReadWriteRegister(address + 1, info + " high byte", debug, [&variable](Byte& value) { value = variable.getHighByte(); }, [&variable](Byte value) { variable.setHighByte(value); });
-    }
-
-    void makeReadWriteRegister(Word address, const std::string& info, bool debug, Long& variable)
-    {
-        makeReadWriteRegister(address, info + " low byte", debug, [&variable](Byte& value) { value = variable.getLowByte(); }, [&variable](Byte value) { variable.setLowByte(value); });
-        makeReadWriteRegister(address + 1, info + " high byte", debug, [&variable](Byte& value) { value = variable.getHighByte(); }, [&variable](Byte value) { variable.setHighByte(value); });
-        makeReadWriteRegister(address + 2, info + " bank byte", debug, [&variable](Byte& value) { value = variable.getBankByte(); }, [&variable](Byte value) { variable.setBankByte(value); });
     }
 
     void initialize()
@@ -230,8 +121,8 @@ public:
                     video.backgrounds[i].tilemapAddress = value.getBits(2, 6) << 10;
                 });
             if (i > 0) {
-                makeWriteRegister(0x210d + i * 2, bgName + " Horizontal Scroll", false, video.backgrounds[i].horizontalScroll, true);
-                makeWriteRegister(0x210e + i * 2, bgName + " Vertical Scroll", false, video.backgrounds[i].verticalScroll, true);
+                makeWriteTwiceRegister(0x210d + i * 2, bgName + " Horizontal Scroll", false, video.backgrounds[i].horizontalScroll, true);
+                makeWriteTwiceRegister(0x210e + i * 2, bgName + " Vertical Scroll", false, video.backgrounds[i].verticalScroll, true);
             }
         }
 
@@ -417,8 +308,8 @@ public:
                 value = readFromVram(true, incrementVramOnHighByte);
             });
 
-        makeReadRegister(0x213c, "Horizontal Scanline Location", false, horizontalScanlineLocation);
-        makeReadRegister(0x213d, "Vertical Scanline Location", false, verticalScanlineLocation);
+        makeReadTwiceRegister(0x213c, "Horizontal Scanline Location", false, horizontalScanlineLocation);
+        makeReadTwiceRegister(0x213d, "Vertical Scanline Location", false, verticalScanlineLocation);
         makeReadRegister(0x213e, "PPU Status Flag and Version", false);
         makeReadRegister(0x213f, "PPU Status Flag and Version", false,
             [this](Byte& value) {
@@ -691,7 +582,6 @@ public:
 
     std::ostream& output;
     std::ostream& error;
-    CPU::State& state;
     Video& video;
 
     bool pauseRequested = false;

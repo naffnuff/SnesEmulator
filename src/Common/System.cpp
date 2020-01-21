@@ -1,7 +1,4 @@
 #include "System.h"
-#include "MemoryLocation.h"
-
-uint64_t MemoryLocation::maxApplicationCount;
 
 namespace System {
 

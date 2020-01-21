@@ -23,6 +23,7 @@
     <ClInclude Include="..\..\..\src\include\Common\Instruction.h" />
     <ClInclude Include="..\..\..\src\include\Common\Memory.h" />
     <ClInclude Include="..\..\..\src\include\Common\MemoryLocation.h" />
+    <ClInclude Include="..\..\..\src\include\Common\RegisterManager.h" />
     <ClInclude Include="..\..\..\src\include\Common\System.h" />
     <ClInclude Include="..\..\..\src\include\Common\Types.h" />
     <ClInclude Include="..\..\..\src\include\Common\Util.h" />

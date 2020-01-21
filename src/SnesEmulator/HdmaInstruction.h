@@ -3,7 +3,7 @@
 #include <vector>
 
 #include "Common/Instruction.h"
-#include "Common/MemoryLocation.h"
+#include "Common/Memory.h"
 
 #include "WDC65816/CpuState.h"
 

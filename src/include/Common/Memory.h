@@ -21,6 +21,7 @@ public:
     virtual void visit(const class ReadRegister&) = 0;
     virtual void visit(const class WriteRegister&) = 0;
     virtual void visit(const class ReadWriteRegister&) = 0;
+    virtual void visit(const class BootRomLocation&) = 0;
 };
 
 class Location
@@ -153,10 +154,10 @@ private:
 
 // Memory
 
-class MemoryLocationX : public Location
+class MemoryLocation : public Location
 {
 public:
-    MemoryLocationX(Byte& bus, Byte value)
+    MemoryLocation(Byte& bus, Byte value)
         : Location(bus)
         , value(value)
     {
@@ -182,11 +183,11 @@ protected:
     Byte value;
 };
 
-class ReadOnlyMemory : public MemoryLocationX
+class ReadOnlyMemory : public MemoryLocation
 {
 public:
     ReadOnlyMemory(Byte& bus, Byte value)
-        : MemoryLocationX(bus, value)
+        : MemoryLocation(bus, value)
     {
     }
 
@@ -197,11 +198,11 @@ private:
     }
 };
 
-class ReadWriteMemory : public MemoryLocationX
+class ReadWriteMemory : public MemoryLocation
 {
 public:
     ReadWriteMemory(Byte& bus, Byte value)
-        : MemoryLocationX(bus, value)
+        : MemoryLocation(bus, value)
     {
     }
 
@@ -332,12 +333,6 @@ public:
     {
     }
 
-    /*ReadWriteRegister(std::function<void(Byte&)> onRead, std::function<void(Byte, Byte)> onWrite)
-        : onRead(onRead)
-        , onWrite(onWrite)
-    {
-    }*/
-
 private:
     void readImpl(Byte& bus) override
     {
@@ -372,6 +367,62 @@ private:
     std::function<void(Byte&)> onRead;
     std::function<void(Byte, Byte)> onWrite;
     Byte lastValue;
+};
+
+class BootRomLocation : public Location
+{
+public:
+    BootRomLocation(Byte& bus, Byte ramValue, Byte bootRomValue, bool& bootRomDataEnabled)
+        : Location(bus)
+        , ramValue(ramValue)
+        , bootRomValue(bootRomValue)
+        , bootRomDataEnabled(bootRomDataEnabled)
+    {
+    }
+
+private:
+    void readImpl(Byte& bus) override
+    {
+        if (bootRomDataEnabled) {
+            bus = bootRomValue;
+        } else {
+            bus = ramValue;
+        }
+    }
+
+    void writeImpl(Byte newValue) override
+    {
+        ramValue = newValue;
+    }
+
+    Byte inspect() const override
+    {
+        if (bootRomDataEnabled) {
+            return bootRomValue;
+        } else {
+            return ramValue;
+        }
+    }
+
+    void accept(LocationVisitor& visitor) const override
+    {
+        visitor.visit(*this);
+    }
+
+    void print(std::ostream& out) const override
+    {
+        if (bootRomDataEnabled) {
+            out << bootRomValue;
+        } else {
+            out << ramValue;
+        }
+    }
+
+public:
+    bool& bootRomDataEnabled;
+private:
+    Byte bootRomValue;
+    Byte ramValue;
 };
 
 class Access
@@ -570,7 +621,7 @@ public:
         return memory[address]->applyBreakpoint();
     }
 
-    Byte inspect(AddressType address)
+    Byte inspect(AddressType address) const
     {
         Byte result;
         checkIsInitialized(address, true, __FUNCTION__);

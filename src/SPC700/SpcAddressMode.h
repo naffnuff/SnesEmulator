@@ -28,7 +28,8 @@ class Absolute : public Instruction3Byte
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
-        return Operator::invoke(state, state.getMemoryLocation(lowByte, highByte));
+        MemoryAccess access = state.getMemoryAccess(lowByte, highByte);
+        return Operator::invoke(state, access);
     }
 
     std::string toString() const override
@@ -65,8 +66,8 @@ class AbsoluteIndexedIndirect : public Instruction3Byte
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
         Word address(lowByte, highByte);
-        address += Word(state.getRegisterValue<State::X>());
-        return Operator::invoke(state, state.getMemoryWord(address));
+        address += Word(state.readRegister<State::X>());
+        return Operator::invoke(state, state.readMemoryWord(address));
     }
 
     std::string toString() const override
@@ -85,8 +86,8 @@ class AbsoluteIndexedRegister : public Instruction3Byte
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
-        MemoryLocation* memory = state.getMemoryLocation(Word(Word(lowByte, highByte) + state.getRegisterValue<FirstRegister>()));
-        return Operator::invoke(state, memory, state.getRegisterValue<SecondRegister>());
+        MemoryAccess access = state.getMemoryAccess(Word(Word(lowByte, highByte) + state.readRegister<FirstRegister>()));
+        return Operator::invoke(state, access, state.readRegister<SecondRegister>());
     }
 
     std::string toString() const override
@@ -106,7 +107,8 @@ class AbsoluteRegister : public Instruction3Byte
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
-        return Operator::invoke(state, state.getMemoryLocation(lowByte, highByte), state.getRegisterValue<RegisterIndex>());
+        MemoryAccess access = state.getMemoryAccess(lowByte, highByte);
+        return Operator::invoke(state, access, state.readRegister<RegisterIndex>());
     }
 
     std::string toString() const override
@@ -128,8 +130,8 @@ class CarryMemoryBit : public Instruction3Byte
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
         throw AddressModeNotYetImplementedException("CarryMemoryBit");
-        MemoryLocation* data = nullptr;
-        return Operator::invoke(state, data, 0);
+        MemoryAccess access = state.getMemoryAccess(0);
+        return Operator::invoke(state, access, 0);
     }
 
     std::string toString() const override
@@ -149,8 +151,8 @@ class CarryNegatedMemoryBit : public Instruction3Byte
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
         throw AddressModeNotYetImplementedException("CarryNegatedMemoryBit");
-        MemoryLocation* data = nullptr;
-        return Operator::invoke(state, data, 0);
+        MemoryAccess access = state.getMemoryAccess(0);
+        return Operator::invoke(state, access, 0);
     }
 
     std::string toString() const override
@@ -191,7 +193,8 @@ class Direct : public Instruction2Byte
 
     int invokeOperator(Byte lowByte) override
     {
-        return Operator::invoke(state, state.getDirectMemoryLocation(lowByte));
+        MemoryAccess access = state.getDirectMemoryAccess(lowByte);
+        return Operator::invoke(state, access);
     }
 
     std::string toString() const override
@@ -215,7 +218,8 @@ class DirectDirect : public Instruction3Byte
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
-        return Operator::invoke(state, state.getDirectMemoryLocation(highByte), state.getDirectMemoryByte(lowByte));
+        MemoryAccess access = state.getDirectMemoryAccess(highByte);
+        return Operator::invoke(state, access, state.readDirectMemoryByte(lowByte));
     }
 
     std::string toString() const override
@@ -240,7 +244,8 @@ class DirectImmediate : public Instruction3Byte
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
-        return Operator::invoke(state, state.getDirectMemoryLocation(highByte), lowByte);
+        MemoryAccess access = state.getDirectMemoryAccess(highByte);
+        return Operator::invoke(state, access, lowByte);
     }
 
     std::string toString() const override
@@ -264,7 +269,8 @@ class DirectIndexed : public Instruction2Byte
 
     int invokeOperator(Byte lowByte) override
     {
-        return Operator::invoke(state, state.getDirectMemoryLocation(lowByte + state.getRegisterValue<RegisterIndex>()));
+        MemoryAccess access = state.getDirectMemoryAccess(lowByte + state.readRegister<RegisterIndex>());
+        return Operator::invoke(state, access);
     }
 
     std::string toString() const override
@@ -282,9 +288,9 @@ class DirectIndexedIndirectRegister : public Instruction2Byte
 
     int invokeOperator(Byte lowByte) override
     {
-        Word address = state.getDirectMemoryWord(lowByte + state.getRegisterValue<FirstRegister>());
-        MemoryLocation* memory = state.getMemoryLocation(address);
-        return Operator::invoke(state, memory, state.getRegisterValue<SecondRegister>());
+        Word address = state.readDirectMemoryWord(lowByte + state.readRegister<FirstRegister>());
+        MemoryAccess access = state.getMemoryAccess(address);
+        return Operator::invoke(state, access, state.readRegister<SecondRegister>());
     }
 
     std::string toString() const override
@@ -302,7 +308,8 @@ class DirectIndexedProgramCounterRelative : public Instruction3Byte
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
-        return Operator::invoke(state, state.getDirectMemoryLocation(lowByte + state.getRegisterValue<RegisterIndex>()), highByte);
+        MemoryAccess access = state.getDirectMemoryAccess(lowByte + state.readRegister<RegisterIndex>());
+        return Operator::invoke(state, access, highByte);
     }
 
     std::string toString() const override
@@ -326,7 +333,8 @@ class DirectIndexedRegister : public Instruction2Byte
 
     int invokeOperator(Byte lowByte) override
     {
-        return Operator::invoke(state, state.getDirectMemoryLocation(lowByte + state.getRegisterValue<FirstRegister>()), state.getRegisterValue<SecondRegister>());
+        MemoryAccess access = state.getDirectMemoryAccess(lowByte + state.readRegister<FirstRegister>());
+        return Operator::invoke(state, access, state.readRegister<SecondRegister>());
     }
 
     std::string toString() const override
@@ -344,9 +352,9 @@ class DirectIndirectIndexedRegister : public Instruction2Byte
 
     int invokeOperator(Byte lowByte) override
     {
-        Word address = state.getDirectMemoryWord(lowByte) + state.getRegisterValue<FirstRegister>();
-        MemoryLocation* memory = state.getMemoryLocation(address);
-        return Operator::invoke(state, memory, state.getRegisterValue<SecondRegister>());
+        Word address = state.readDirectMemoryWord(lowByte) + state.readRegister<FirstRegister>();
+        MemoryAccess access = state.getMemoryAccess(address);
+        return Operator::invoke(state, access, state.readRegister<SecondRegister>());
     }
 
     std::string toString() const override
@@ -381,7 +389,8 @@ class DirectProgramCounterRelative : public Instruction3Byte
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
-        return Operator::invoke(state, state.getDirectMemoryLocation(lowByte), highByte);
+        MemoryAccess access = state.getDirectMemoryAccess(lowByte);
+        return Operator::invoke(state, access, highByte);
     }
 
     std::string toString() const override
@@ -405,7 +414,8 @@ class DirectRegister : public Instruction2Byte
 
     int invokeOperator(Byte lowByte) override
     {
-        return Operator::invoke(state, state.getDirectMemoryLocation(lowByte), state.getRegisterValue<RegisterIndex>());
+        MemoryAccess access = state.getDirectMemoryAccess(lowByte);
+        return Operator::invoke(state, access, state.readRegister<RegisterIndex>());
     }
 
     std::string toString() const override
@@ -423,7 +433,8 @@ class DirectYAccumulator : public Instruction2Byte
 
     int invokeOperator(Byte lowByte) override
     {
-        return Operator::invoke(state, state.getDirectMemoryLocation(lowByte), state.getYAccumulator());
+        MemoryAccess access = state.getDirectMemoryAccess(lowByte);
+        return Operator::invoke(state, access, state.getYAccumulator());
     }
 
     std::string toString() const override
@@ -478,8 +489,8 @@ class IndirectIndirect : public Instruction1Byte
     int invokeOperator() override
     {
         throw AddressModeNotYetImplementedException("IndirectIndirect");
-        MemoryLocation* data = nullptr;
-        return Operator::invoke(state, data, 0);
+        MemoryAccess access = state.getMemoryAccess(0);
+        return Operator::invoke(state, access, 0);
     }
 
     std::string toString() const override
@@ -498,8 +509,8 @@ class MemoryBit : public Instruction3Byte
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
         throw AddressModeNotYetImplementedException("MemoryBit");
-        MemoryLocation* data = nullptr;
-        return Operator::invoke(state, data, 0);
+        MemoryAccess access = state.getMemoryAccess(0);
+        return Operator::invoke(state, access, 0);
     }
 
     std::string toString() const override
@@ -518,8 +529,8 @@ class MemoryBitCarry : public Instruction3Byte
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
         throw AddressModeNotYetImplementedException("MemoryBitCarry");
-        MemoryLocation* data = nullptr;
-        return Operator::invoke(state, data, 0);
+        MemoryAccess access = state.getMemoryAccess(0);
+        return Operator::invoke(state, access, 0);
     }
 
     std::string toString() const override
@@ -586,7 +597,8 @@ class Register : public Instruction1Byte
 
     int invokeOperator() override
     {
-        return Operator::invoke(state, state.getRegister<RegisterIndex>());
+        State::RegisterAccess access = state.getRegisterAccess<RegisterIndex>();
+        return Operator::invoke(state, access);
     }
 
     std::string toString() const override
@@ -614,7 +626,8 @@ class RegisterAbsolute : public Instruction3Byte
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
-        return Operator::invoke(state, state.getRegister<RegisterIndex>(), state.getMemoryByte(lowByte, highByte));
+        State::RegisterAccess registerAccess = state.getRegisterAccess<RegisterIndex>();
+        return Operator::invoke(state, registerAccess, state.readMemoryByte(lowByte, highByte));
     }
 
     std::string toString() const override
@@ -645,9 +658,10 @@ class RegisterAbsoluteIndexed : public Instruction3Byte
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
+        State::RegisterAccess registerAccess = state.getRegisterAccess<FirstRegister>();
         Word address(lowByte, highByte);
-        address += Word(state.getRegisterValue<SecondRegister>());
-        return Operator::invoke(state, state.getRegister<FirstRegister>(), state.getMemoryByte(address));
+        address += Word(state.readRegister<SecondRegister>());
+        return Operator::invoke(state, registerAccess, state.readMemoryByte(address));
     }
 
     std::string toString() const override
@@ -675,7 +689,8 @@ class RegisterDirect : public Instruction2Byte
 
     int invokeOperator(Byte lowByte) override
     {
-        return Operator::invoke(state, state.getRegister<RegisterIndex>(), state.getDirectMemoryByte(lowByte));
+        State::RegisterAccess registerAccess = state.getRegisterAccess<RegisterIndex>();
+        return Operator::invoke(state, registerAccess, state.readDirectMemoryByte(lowByte));
     }
 
     std::string toString() const override
@@ -701,7 +716,8 @@ class RegisterDirectIndexed : public Instruction2Byte
 
     int invokeOperator(Byte lowByte) override
     {
-        return Operator::invoke(state, state.getRegister<FirstRegister>(), state.getDirectMemoryByte(lowByte + state.getRegisterValue<SecondRegister>()));
+        State::RegisterAccess registerAccess = state.getRegisterAccess<FirstRegister>();
+        return Operator::invoke(state, registerAccess, state.readDirectMemoryByte(lowByte + state.readRegister<SecondRegister>()));
     }
 
     std::string toString() const override
@@ -725,9 +741,9 @@ class RegisterDirectIndexedIndirect : public Instruction2Byte
 
     int invokeOperator(Byte lowByte) override
     {
-        Word address = state.getDirectMemoryWord(lowByte + state.getRegisterValue<SecondRegister>());
-        MemoryLocation* memory = state.getMemoryLocation(address);
-        return Operator::invoke(state, state.getRegister<FirstRegister>(), memory->getValue());
+        State::RegisterAccess registerAccess = state.getRegisterAccess<FirstRegister>();
+        Word address = state.readDirectMemoryWord(lowByte + state.readRegister<SecondRegister>());
+        return Operator::invoke(state, registerAccess, state.readMemoryByte(address));
     }
 
     std::string toString() const override
@@ -751,8 +767,9 @@ class RegisterDirectIndirectIndexed : public Instruction2Byte
 
     int invokeOperator(Byte lowByte) override
     {
-        Word indexedAddress = state.getDirectMemoryLocation(lowByte)->getWordValue() + state.getRegisterValue<SecondRegister>();
-        return Operator::invoke(state, state.getRegister<FirstRegister>(), state.getMemoryByte(indexedAddress));
+        State::RegisterAccess registerAccess = state.getRegisterAccess<FirstRegister>();
+        Word indexedAddress = state.readDirectMemoryWord(lowByte) + state.readRegister<SecondRegister>();
+        return Operator::invoke(state, registerAccess, state.readMemoryByte(indexedAddress));
     }
 
     std::string toString() const override
@@ -780,7 +797,8 @@ class RegisterImmediate : public Instruction2Byte
 
     int invokeOperator(Byte lowByte) override
     {
-        return Operator::invoke(state, state.getRegister<RegisterIndex>(), lowByte);
+        State::RegisterAccess registerAccess = state.getRegisterAccess<RegisterIndex>();
+        return Operator::invoke(state, registerAccess, lowByte);
     }
 
     std::string toString() const override
@@ -798,11 +816,11 @@ class RegisterIndirectIncrementRegister : public Instruction1Byte
 
     int invokeOperator() override
     {
-        MemoryLocation* firstRegister = state.getRegister<FirstRegister>();
-        Byte firstRegisterValue = firstRegister->getValue();
-        MemoryLocation* memory = state.getDirectMemoryLocation(firstRegisterValue);
-        firstRegister->setValue(firstRegisterValue + 1);
-        return Operator::invoke(state, memory, state.getRegisterValue<SecondRegister>());
+        State::RegisterAccess registerAccess = state.getRegisterAccess<FirstRegister>();
+        Byte firstRegisterValue = registerAccess.readByte();
+        MemoryAccess access = state.getDirectMemoryAccess(firstRegisterValue);
+        registerAccess.writeByte(firstRegisterValue + 1);
+        return Operator::invoke(state, access, state.readRegister<SecondRegister>());
     }
 
     std::string toString() const override
@@ -820,8 +838,8 @@ class RegisterIndirectRegister : public Instruction1Byte
 
     int invokeOperator() override
     {
-        MemoryLocation* memory = state.getDirectMemoryLocation(state.getRegisterValue<FirstRegister>());
-        return Operator::invoke(state, memory, state.getRegisterValue<SecondRegister>());
+        MemoryAccess access = state.getDirectMemoryAccess(state.readRegister<FirstRegister>());
+        return Operator::invoke(state, access, state.readRegister<SecondRegister>());
     }
 
     std::string toString() const override
@@ -839,7 +857,8 @@ class RegisterProgramCounterRelative : public Instruction2Byte
 
     int invokeOperator(Byte lowByte) override
     {
-        return Operator::invoke(state, state.getRegister<RegisterIndex>(), lowByte);
+        State::RegisterAccess registerAccess = state.getRegisterAccess<RegisterIndex>();
+        return Operator::invoke(state, registerAccess, lowByte);
     }
 
     std::string toString() const override
@@ -865,7 +884,8 @@ class RegisterRegister : public Instruction1Byte
 
     int invokeOperator() override
     {
-        return Operator::invoke(state, state.getRegister<FirstRegister>(), state.getRegisterValue<SecondRegister>());
+        State::RegisterAccess registerAccess = state.getRegisterAccess<FirstRegister>();
+        return Operator::invoke(state, registerAccess, state.readRegister<SecondRegister>());
     }
 
     std::string toString() const override
@@ -889,8 +909,9 @@ class RegisterRegisterIndirect : public Instruction1Byte
 
     int invokeOperator() override
     {
-        MemoryLocation* memory = state.getDirectMemoryLocation(state.getRegisterValue<SecondRegister>());
-        return Operator::invoke(state, state.getRegister<FirstRegister>(), memory->getValue());
+        State::RegisterAccess registerAccess = state.getRegisterAccess<FirstRegister>();
+        Byte value = state.readDirectMemoryByte(state.readRegister<SecondRegister>());
+        return Operator::invoke(state, registerAccess, value);
     }
 
     std::string toString() const override
@@ -909,8 +930,8 @@ class RegisterRegisterIndirectIncrement : public Instruction1Byte
     int invokeOperator() override
     {
         throw AddressModeNotYetImplementedException("RegisterRegisterIndirectIncrement");
-        MemoryLocation* data = nullptr;
-        return Operator::invoke(state, data, 0);
+        MemoryAccess access = state.getMemoryAccess(0);
+        return Operator::invoke(state, access, 0);
     }
 
     std::string toString() const override
@@ -944,8 +965,8 @@ class Table : public Instruction1Byte
     int invokeOperator() override
     {
         throw AddressModeNotYetImplementedException("Table");
-        MemoryLocation* data = nullptr;
-        return Operator::invoke(state, data, 0);
+        MemoryAccess access = state.getMemoryAccess(0);
+        return Operator::invoke(state, access, 0);
     }
 
     std::string toString() const override
@@ -964,8 +985,8 @@ class UPage : public Instruction2Byte
     int invokeOperator(Byte lowByte) override
     {
         throw AddressModeNotYetImplementedException("UPage");
-        MemoryLocation* data = nullptr;
-        return Operator::invoke(state, data, 0);
+        MemoryAccess access = state.getMemoryAccess(0);
+        return Operator::invoke(state, access, 0);
     }
 
     std::string toString() const override
@@ -983,7 +1004,9 @@ class YAccumulator : public Instruction1Byte
 
     int invokeOperator() override
     {
-        return Operator::invoke(state, state.getRegister<State::A>(), state.getRegister<State::Y>());
+        State::RegisterAccess firstRegisterAccess = state.getRegisterAccess<State::A>();
+        State::RegisterAccess secondRegisterAccess = state.getRegisterAccess<State::Y>();
+        return Operator::invoke(state, firstRegisterAccess, secondRegisterAccess);
     }
 
     std::string toString() const override
@@ -1004,7 +1027,8 @@ class YAccumulatorDirect : public Instruction2Byte
 
     int invokeOperator(Byte lowByte) override
     {
-        return Operator::invoke(state, state.getRegister<State::A>(), state.getDirectMemoryWord(lowByte));
+        State::RegisterAccess access = state.getRegisterAccess<State::A>();
+        return Operator::invoke(state, access, state.readDirectMemoryWord(lowByte));
     }
 
     std::string toString() const override
@@ -1022,7 +1046,8 @@ class YAccumulatorRegister : public Instruction1Byte
 
     int invokeOperator() override
     {
-        return Operator::invoke(state, state.getRegister<State::A>(), state.getRegisterValue<RegisterIndex>());
+        State::RegisterAccess access = state.getRegisterAccess<State::A>();
+        return Operator::invoke(state, access, state.readRegister<RegisterIndex>());
     }
 
     std::string toString() const override

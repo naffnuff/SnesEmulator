@@ -114,8 +114,8 @@ private:
     SPC::State spcState;
     CPU::InstructionDecoder cpuInstructionDecoder;
     SPC::InstructionDecoder spcInstructionDecoder;
-    Debugger::Context cpuContext;
-    Debugger::Context spcContext;
+    Debugger::Context<CPU::State> cpuContext;
+    Debugger::Context<SPC::State> spcContext;
 
     Video video;
     Registers registers;

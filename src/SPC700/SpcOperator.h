@@ -23,16 +23,16 @@ namespace Operator {
 class ADC
 {
 public:
-    static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
+    static int invoke(State& state, Access& leftOperand, Byte rightOperand)
     {
         bool carry = state.getFlag(State::c);
         bool overflow = false;
         bool halfCarry = false;
-        Byte result = Types::binaryAdd(leftOperand->getValue(), rightOperand, carry, overflow, halfCarry);
+        Byte result = Types::binaryAdd(leftOperand.readByte(), rightOperand, carry, overflow, halfCarry);
         state.setFlag(State::c, carry);
         state.setFlag(State::v, overflow);
         state.setFlag(State::h, halfCarry);
-        leftOperand->setValue(result);
+        leftOperand.writeByte(result);
         state.updateSignFlags(result);
         return 0;
     }
@@ -45,16 +45,16 @@ public:
 class ADDW
 {
 public:
-    static int invoke(State& state, MemoryLocation* leftOperand, Word rightOperand)
+    static int invoke(State& state, Access& leftOperand, Word rightOperand)
     {
         bool carry = false;
         bool overflow = false;
         bool halfCarry = false;
-        Word result = Types::binaryAdd(leftOperand->getWordValue(), rightOperand, carry, overflow, halfCarry);
+        Word result = Types::binaryAdd(leftOperand.readWord(), rightOperand, carry, overflow, halfCarry);
         state.setFlag(State::c, carry);
         state.setFlag(State::v, overflow);
         state.setFlag(State::h, halfCarry);
-        leftOperand->setWordValue(result);
+        leftOperand.writeWord(result);
         state.updateSignFlags(result);
         return 0;
     }
@@ -78,10 +78,10 @@ public:
 class AND
 {
 public:
-    static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
+    static int invoke(State& state, Access& leftOperand, Byte rightOperand)
     {
-        Byte value = leftOperand->getValue() & rightOperand;
-        leftOperand->setValue(value);
+        Byte value = leftOperand.readByte() & rightOperand;
+        leftOperand.writeByte(value);
         state.updateSignFlags(value);
         return 0;
     }
@@ -95,7 +95,7 @@ public:
 class AND1
 {
 public:
-    static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
+    static int invoke(State& state, Access& leftOperand, Byte rightOperand)
     {
         throw OperatorNotYetImplementedException("AND1");
         return 0;
@@ -112,12 +112,12 @@ public:
 class ASL
 {
 public:
-    static int invoke(State& state, MemoryLocation* operand)
+    static int invoke(State& state, Access& operand)
     {
-        Byte value = operand->getValue();
+        Byte value = operand.readByte();
         state.setFlag(State::c, value.isNegative());
         value <<= 1;
-        operand->setValue(value);
+        operand.writeByte(value);
         state.updateSignFlags(value);
         return 0;
     }
@@ -157,9 +157,9 @@ class BB
 {
 public:
     // §1: Add 1 cycle if branch is taken
-    static int invoke(State& state, MemoryLocation* operand, int8_t offset)
+    static int invoke(State& state, Access& operand, int8_t offset)
     {
-        return branchIf(operand->getValue().getBit(BitIndex) == BitValue, state, offset);
+        return branchIf(operand.readByte().getBit(BitIndex) == BitValue, state, offset);
     }
 
     static std::string toString() {
@@ -290,9 +290,9 @@ class CBNE
 {
 public:
     // §1: Add 1 cycle if branch is taken
-    static int invoke(State& state, const MemoryLocation* memory, int8_t offset)
+    static int invoke(State& state, Access& access, int8_t offset)
     {
-        return branchIf(state.getRegisterValue<State::A>() != memory->getValue(), state, offset);
+        return branchIf(state.readRegister<State::A>() != access.readByte(), state, offset);
     }
 
     static std::string toString() { return "CBNE"; }
@@ -334,10 +334,10 @@ public:
 class CMP
 {
 public:
-    static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
+    static int invoke(State& state, Access& leftOperand, Byte rightOperand)
     {
-        state.setFlag(State::c, leftOperand->getValue() >= rightOperand);
-        state.updateSignFlags(Byte(leftOperand->getValue() - rightOperand));
+        state.setFlag(State::c, leftOperand.readByte() >= rightOperand);
+        state.updateSignFlags(Byte(leftOperand.readByte() - rightOperand));
         return 0;
     }
 
@@ -349,10 +349,10 @@ public:
 class CMPW
 {
 public:
-    static int invoke(State& state, MemoryLocation* leftOperand, Word rightOperand)
+    static int invoke(State& state, Access& leftOperand, Word rightOperand)
     {
-        state.setFlag(State::c, leftOperand->getWordValue() >= rightOperand);
-        state.updateSignFlags(Word(leftOperand->getWordValue() - rightOperand));
+        state.setFlag(State::c, leftOperand.readWord() >= rightOperand);
+        state.updateSignFlags(Word(leftOperand.readWord() - rightOperand));
         return 0;
     }
 
@@ -364,7 +364,7 @@ public:
 class DAA
 {
 public:
-    static int invoke(State& state, MemoryLocation* operand)
+    static int invoke(State& state, Access& operand)
     {
         throw OperatorNotYetImplementedException("DAA");
         return 0;
@@ -378,7 +378,7 @@ public:
 class DAS
 {
 public:
-    static int invoke(State& state, MemoryLocation* operand)
+    static int invoke(State& state, Access& operand)
     {
         throw OperatorNotYetImplementedException("DAS");
         return 0;
@@ -394,10 +394,10 @@ class DBNZ
 {
 public:
     // §1: Add 1 cycle if branch is taken
-    static int invoke(State& state, MemoryLocation* memory, int8_t offset)
+    static int invoke(State& state, Access& access, int8_t offset)
     {
-        Byte value = memory->getValue() - 1;
-        memory->setValue(value);
+        Byte value = access.readByte() - 1;
+        access.writeByte(value);
         return branchIf(value != 0, state, offset);
     }
 
@@ -414,10 +414,10 @@ public:
 class DEC
 {
 public:
-    static int invoke(State& state, MemoryLocation* operand)
+    static int invoke(State& state, Access& operand)
     {
-        Byte value = operand->getValue() - 1;
-        operand->setValue(value);
+        Byte value = operand.readByte() - 1;
+        operand.writeByte(value);
         state.updateSignFlags(value);
         return 0;
     }
@@ -430,10 +430,10 @@ public:
 class DECW
 {
 public:
-    static int invoke(State& state, MemoryLocation* operand)
+    static int invoke(State& state, Access& operand)
     {
-        Word value = operand->getWordValue() - 1;
-        operand->setWordValue(value);
+        Word value = operand.readWord() - 1;
+        operand.writeWord(value);
         state.updateSignFlags(value);
         return 0;
     }
@@ -460,15 +460,14 @@ public:
 class DIV
 {
 public:
-    static int invoke(State& state, MemoryLocation* memory, Byte divisor)
+    static int invoke(State& state, Access& access, Byte divisor)
     {
-        Word dividend = memory->getWordValue();
+        Word dividend = access.readWord();
         Byte quotient = dividend / divisor;
         Byte remainder = dividend % divisor;
         state.setFlag(State::v, divisor <= dividend.getHighByte());
         state.setFlag(State::h, (divisor & 0xf) <= (dividend.getHighByte() & 0xf));
-        memory[0].setValue(quotient);
-        memory[1].setValue(remainder);
+        access.writeWord(Word(quotient, remainder));
         state.updateSignFlags(quotient);
         return 0;
     }
@@ -506,10 +505,10 @@ public:
 class EOR
 {
 public:
-    static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
+    static int invoke(State& state, Access& leftOperand, Byte rightOperand)
     {
-        Byte value = leftOperand->getValue() ^ rightOperand;
-        leftOperand->setValue(value);
+        Byte value = leftOperand.readByte() ^ rightOperand;
+        leftOperand.writeByte(value);
         state.updateSignFlags(value);
         return 0;
     }
@@ -522,7 +521,7 @@ public:
 class EOR1
 {
 public:
-    static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
+    static int invoke(State& state, Access& leftOperand, Byte rightOperand)
     {
         throw OperatorNotYetImplementedException("EOR1");
         return 0;
@@ -541,10 +540,10 @@ public:
 class INC
 {
 public:
-    static int invoke(State& state, MemoryLocation* operand)
+    static int invoke(State& state, Access& operand)
     {
-        Byte value = operand->getValue() + 1;
-        operand->setValue(value);
+        Byte value = operand.readByte() + 1;
+        operand.writeByte(value);
         state.updateSignFlags(value);
         return 0;
     }
@@ -557,10 +556,10 @@ public:
 class INCW
 {
 public:
-    static int invoke(State& state, MemoryLocation* operand)
+    static int invoke(State& state, Access& operand)
     {
-        Word value = operand->getWordValue() + 1;
-        operand->setWordValue(value);
+        Word value = operand.readWord() + 1;
+        operand.writeWord(value);
         state.updateSignFlags(value);
         return 0;
     }
@@ -591,12 +590,12 @@ public:
 class LSR
 {
 public:
-    static int invoke(State& state, MemoryLocation* operand)
+    static int invoke(State& state, Access& operand)
     {
-        Byte value = operand->getValue();
+        Byte value = operand.readByte();
         state.setFlag(State::c, value.getBit(0));
         value >>= 1;
-        operand->setValue(value);
+        operand.writeByte(value);
         state.updateSignFlags(value);
         return 0;
     }
@@ -626,9 +625,9 @@ public:
 class MOV
 {
 public:
-    static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
+    static int invoke(State& state, Access& leftOperand, Byte rightOperand)
     {
-        leftOperand->setValue(rightOperand);
+        leftOperand.writeByte(rightOperand);
         return 0;
     }
 
@@ -662,7 +661,7 @@ public:
 class MOV_SignedResult : public MOV
 {
 public:
-    static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
+    static int invoke(State& state, Access& leftOperand, Byte rightOperand)
     {
         state.updateSignFlags(rightOperand);
         return MOV::invoke(state, leftOperand, rightOperand);
@@ -675,7 +674,7 @@ public:
 class MOV1
 {
 public:
-    static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
+    static int invoke(State& state, Access& leftOperand, Byte rightOperand)
     {
         throw OperatorNotYetImplementedException("MOV1");
         return 0;
@@ -689,9 +688,9 @@ public:
 class MOVW
 {
 public:
-    static int invoke(State& state, MemoryLocation* leftOperand, Word rightOperand)
+    static int invoke(State& state, Access& leftOperand, Word rightOperand)
     {
-        leftOperand->setWordValue(rightOperand);
+        leftOperand.writeWord(rightOperand);
         return 0;
     }
 
@@ -702,7 +701,7 @@ public:
 class MOVW_SignedResult : public MOVW
 {
 public:
-    static int invoke(State& state, MemoryLocation* leftOperand, Word rightOperand)
+    static int invoke(State& state, Access& leftOperand, Word rightOperand)
     {
         state.updateSignFlags(rightOperand);
         return MOVW::invoke(state, leftOperand, rightOperand);
@@ -714,10 +713,10 @@ public:
 class MUL
 {
 public:
-    static int invoke(State& state, MemoryLocation* accumulator, const MemoryLocation* yRegister)
+    static int invoke(State& state, Access& accumulator, Access& yRegister)
     {
-        accumulator->setWordValue(yRegister->getValue() * accumulator->getValue());
-        state.updateSignFlags(yRegister->getValue());
+        accumulator.writeWord(yRegister.readByte() * accumulator.readByte());
+        state.updateSignFlags(yRegister.readByte());
         return 0;
     }
 
@@ -752,7 +751,7 @@ public:
 class NOT1
 {
 public:
-    static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
+    static int invoke(State& state, Access& leftOperand, Byte rightOperand)
     {
         throw OperatorNotYetImplementedException("NOT1");
         return 0;
@@ -791,10 +790,10 @@ public:
 class OR
 {
 public:
-    static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
+    static int invoke(State& state, Access& leftOperand, Byte rightOperand)
     {
-        Byte value = leftOperand->getValue() | rightOperand;
-        leftOperand->setValue(value);
+        Byte value = leftOperand.readByte() | rightOperand;
+        leftOperand.writeByte(value);
         state.updateSignFlags(value);
         return 0;
     }
@@ -808,7 +807,7 @@ public:
 class OR1
 {
 public:
-    static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
+    static int invoke(State& state, Access& leftOperand, Byte rightOperand)
     {
         throw OperatorNotYetImplementedException("OR1");
         return 0;
@@ -822,7 +821,7 @@ public:
 class PCALL
 {
 public:
-    static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
+    static int invoke(State& state, Access& leftOperand, Byte rightOperand)
     {
         throw OperatorNotYetImplementedException("PCALL");
         return 0;
@@ -839,9 +838,9 @@ public:
 class POP
 {
 public:
-    static int invoke(State& state, MemoryLocation* operand)
+    static int invoke(State& state, Access& operand)
     {
-        operand->setValue(state.pullFromStack());
+        operand.writeByte(state.pullFromStack());
         return 0;
     }
 
@@ -856,9 +855,9 @@ public:
 class PUSH
 {
 public:
-    static int invoke(State& state, MemoryLocation* operand)
+    static int invoke(State& state, Access& operand)
     {
-        state.pushToStack(operand->getValue());
+        state.pushToStack(operand.readByte());
         return 0;
     }
 
@@ -901,14 +900,14 @@ public:
 class ROL
 {
 public:
-    static int invoke(State& state, MemoryLocation* operand)
+    static int invoke(State& state, Access& operand)
     {
-        Byte value = operand->getValue();
+        Byte value = operand.readByte();
         bool carry = state.getFlag(State::c);
         state.setFlag(State::c, value.getBit(7));
         value <<= 1;
         value.setBit(0, carry);
-        operand->setValue(value);
+        operand.writeByte(value);
         state.updateSignFlags(value);
         return 0;
     }
@@ -924,14 +923,14 @@ public:
 class ROR
 {
 public:
-    static int invoke(State& state, MemoryLocation* operand)
+    static int invoke(State& state, Access& operand)
     {
-        Byte value = operand->getValue();
+        Byte value = operand.readByte();
         bool carry = state.getFlag(State::c);
         state.setFlag(State::c, value.getBit(0));
         value >>= 1;
         value.setBit(7, carry);
-        operand->setValue(value);
+        operand.writeByte(value);
         state.updateSignFlags(value);
         return 0;
     }
@@ -955,16 +954,16 @@ public:
 class SBC
 {
 public:
-    static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
+    static int invoke(State& state, Access& leftOperand, Byte rightOperand)
     {
         bool carry = state.getFlag(State::c);
         bool overflow = false;
         bool halfCarry = false;
-        Byte result = Types::binarySubtract(leftOperand->getValue(), rightOperand, carry, overflow, halfCarry);
+        Byte result = Types::binarySubtract(leftOperand.readByte(), rightOperand, carry, overflow, halfCarry);
         state.setFlag(State::c, carry);
         state.setFlag(State::v, overflow);
         state.setFlag(State::h, halfCarry);
-        leftOperand->setValue(result);
+        leftOperand.writeByte(result);
         state.updateSignFlags(result);
         return 0;
     }
@@ -993,11 +992,11 @@ template <int BitIndex, bool BitValue>
 class SET1
 {
 public:
-    static int invoke(State& state, MemoryLocation* operand)
+    static int invoke(State& state, Access& operand)
     {
-        Byte value = operand->getValue();
+        Byte value = operand.readByte();
         value.setBit(BitIndex, BitValue);
-        operand->setValue(value);
+        operand.writeByte(value);
         return 0;
     }
 
@@ -1066,16 +1065,16 @@ public:
 class SUBW
 {
 public:
-    static int invoke(State& state, MemoryLocation* leftOperand, Word rightOperand)
+    static int invoke(State& state, Access& leftOperand, Word rightOperand)
     {
         bool carry = true;
         bool overflow = false;
         bool halfCarry = false;
-        Word result = Types::binarySubtract(leftOperand->getWordValue(), rightOperand, carry, overflow, halfCarry);
+        Word result = Types::binarySubtract(leftOperand.readWord(), rightOperand, carry, overflow, halfCarry);
         state.setFlag(State::c, carry);
         state.setFlag(State::v, overflow);
         state.setFlag(State::h, halfCarry);
-        leftOperand->setWordValue(result);
+        leftOperand.writeWord(result);
         state.updateSignFlags(result);
         return 0;
     }
@@ -1103,7 +1102,7 @@ public:
 class TCALL
 {
 public:
-    static int invoke(State& state, MemoryLocation* leftOperand, Byte rightOperand)
+    static int invoke(State& state, Access& leftOperand, Byte rightOperand)
     {
         throw OperatorNotYetImplementedException("TCALL");
         return 0;
@@ -1117,12 +1116,12 @@ public:
 class TCLR1
 {
 public:
-    static int invoke(State& state, MemoryLocation* operand)
+    static int invoke(State& state, Access& operand)
     {
-        Byte accumulator = state.getRegisterValue<State::A>();
-        Byte data = operand->getValue();
+        Byte accumulator = state.readRegister<State::A>();
+        Byte data = operand.readByte();
         state.updateSignFlags(Byte(accumulator - data));
-        operand->setValue(data & ~accumulator);
+        operand.writeByte(data & ~accumulator);
         return 0;
     }
 
@@ -1134,12 +1133,12 @@ public:
 class TSET1
 {
 public:
-    static int invoke(State& state, MemoryLocation* operand)
+    static int invoke(State& state, Access& operand)
     {
-        Byte accumulator = state.getRegisterValue<State::A>();
-        Byte data = operand->getValue();
+        Byte accumulator = state.readRegister<State::A>();
+        Byte data = operand.readByte();
         state.updateSignFlags(Byte(accumulator - data));
-        operand->setValue(data | accumulator);
+        operand.writeByte(data | accumulator);
         return 0;
     }
 
@@ -1151,11 +1150,11 @@ public:
 class XCN
 {
 public:
-    static int invoke(State& state, MemoryLocation* operand)
+    static int invoke(State& state, Access& operand)
     {
-        Byte value = operand->getValue();
+        Byte value = operand.readByte();
         Byte result = value >> 4 | value << 4;
-        operand->setValue(result);
+        operand.writeByte(result);
         state.updateSignFlags(result);
         return 0;
     }

@@ -13,7 +13,7 @@
 #include "HdmaInstruction.h"
 
 template<typename State, typename OtherState>
-int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debugger::Context& context, OtherState& otherState, Debugger::Context& otherContext, std::ostream& error);
+int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debugger::Context<State>& context, OtherState& otherState, Debugger::Context<OtherState>& otherContext, std::ostream& error);
 
 void Emulator::initialize()
 {
@@ -21,50 +21,52 @@ void Emulator::initialize()
 
     rom.storeToMemory(cpuState);
 
-    CPU::State::MemoryType& memory = cpuState.getMemory();
+    CPU::State::MemoryType& cpuMemory = cpuState.getMemory();
+    SPC::State::MemoryType& spcMemory = spcState.getMemory();
 
     if (rom.isLowRom()) {
         // RAM
         for (Long address = 0x7e0000; address < 0x800000; address++) {
-            memory.createLocation<ReadWriteMemory>(address, 0x55);
+            cpuMemory.createLocation<ReadWriteMemory>(address, 0x55);
         }
 
         // RAM mirrors
         for (Byte bank = 0; bank < 0x40; ++bank) {
             for (Word address = 0; address < 0x2000; ++address) {
-                memory.createMirror(Long(address, bank), Long(address, 0x7E));
+                cpuMemory.createMirror(Long(address, bank), Long(address, 0x7E));
             }
         }
 
         // I/O between the CPU and SPC700
         for (Word i = 0; i < 4; ++i) {
-            memory.createLocation<ReadWriteRegister>(Long(0x2140 + i),
+            cpuMemory.createLocation<ReadWriteRegister>(Long(0x2140 + i),
                 [this, i](Byte& value) {
                     value = spcToCpuBuffers[i];
                 },
                 [this, i](Byte, Byte newValue) {
                     cpuToSpcBuffers[i] = newValue;
-                });
-            MemoryLocation* spcMemoryLocation = spcState.getMemoryLocation(Word(0xf4 + i));
-            spcMemoryLocation->setReadWrite();
-            spcMemoryLocation->onRead = [this, i](Byte& value) {
-                value = cpuToSpcBuffers[i];
-            };
-            spcMemoryLocation->onWrite = [this, i](Byte, Byte newValue) {
-                spcToCpuBuffers[i] = newValue;
-            };
+                }
+            );
+            spcMemory.createLocation<ReadWriteRegister>(Word(0xf4 + i),
+                [this, i](Byte& value) {
+                    value = cpuToSpcBuffers[i];
+                },
+                [this, i](Byte, Byte newValue) {
+                    spcToCpuBuffers[i] = newValue;
+                }
+            );
         }
 
         // Register mirrors
         for (Byte bank = 0x01; bank < 0x60; ++bank) {
             for (Word address = 0x2000; address < 0x8000; ++address) {
-                memory.createMirror(Long(address, bank), Long(address, 0x00));
+                cpuMemory.createMirror(Long(address, bank), Long(address, 0x00));
             }
         }
 
         // ROM mirrors
         for (Long address = 0; address < 0x600000; ++address) {
-            memory.createMirror(address + 0x800000, address);
+            cpuMemory.createMirror(address + 0x800000, address);
         }
 
         // Save RAM
@@ -85,7 +87,7 @@ void Emulator::initialize()
                         }
                         Long localAddress = address - 0x700000;
                         saveRamSaver.saveRam[localAddress] = byte;
-                        memory.createLocation<ReadWriteRegister>(address,
+                        cpuMemory.createLocation<ReadWriteRegister>(address,
                             [this, localAddress](Byte& value) {
                                 value = saveRamSaver.saveRam[localAddress];
                             },
@@ -106,7 +108,7 @@ void Emulator::initialize()
                             },
                             byte);
                     } else {
-                        memory.createMirror(address, saveRamAddress);
+                        cpuMemory.createMirror(address, saveRamAddress);
                     }
                 }
                 output << "Save RAM end address: " << saveRamAddress << std::endl;
@@ -121,9 +123,10 @@ void Emulator::initialize()
 
     video.initialize(rom.gameTitle);
 
-    audio.initialize(memory);
+    audio.initialize(cpuMemory);
 
-    memory.finalize();
+    cpuMemory.finalize();
+    spcMemory.finalize();
 
     cpuState.reset();
 
@@ -242,6 +245,8 @@ void Emulator::run()
                 if (masterCycle == nextSpc) {
                     Instruction* instruction = spcInstructionDecoder.getNextInstruction(spcState);
                     spcContext.nextInstruction = instruction;
+
+                    instruction->applyBreakpoints();
 
                     if (spcContext.isPaused()) {
                         output << "cycleCount=" << masterCycle << ", nextCpu=" << nextCpu << ", nextSpc=" << nextSpc << std::endl;
@@ -403,9 +408,9 @@ void Emulator::run()
 }
 
 template<typename State, typename OtherState>
-int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debugger::Context& context, OtherState& otherState, Debugger::Context& otherContext, std::ostream& error)
+int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debugger::Context<State>& context, OtherState& otherState, Debugger::Context<OtherState>& otherContext, std::ostream& error)
 {
-    context.addKnownAddress(Long(state.getProgramAddress()));
+    context.addKnownAddress(state.getProgramAddress());
     try {
         if (context.isPaused()) {
             debugger.printState(state, context);
@@ -429,10 +434,6 @@ int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debu
         context.setPaused(true);
         error << e.what() << std::endl;
     } catch (OperatorNotYetImplementedException& e) {
-        state.setProgramAddress(context.getLastKnownAddress());
-        context.setPaused(true);
-        error << e.what() << std::endl;
-    } catch (MemoryLocation::AccessException& e) {
         state.setProgramAddress(context.getLastKnownAddress());
         context.setPaused(true);
         error << e.what() << std::endl;
