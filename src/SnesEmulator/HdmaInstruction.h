@@ -10,7 +10,7 @@
 class HdmaInstruction : public Instruction
 {
 public:
-    HdmaInstruction(std::ostream& output, std::ostream& error, CPU::State& state, Registers& registers)
+    HdmaInstruction(std::ostream& output, std::ostream& error, CPU::State& state, Video::Registers& registers)
         : output(output)
         , error(error)
         , memory(state.getMemory())
@@ -34,7 +34,7 @@ public:
             for (int i = 0; i < 8; ++i) {
                 if (registers.hdmaEnabled.getBit(i)) {
                     ss << "*" << std::endl;
-                    const Registers::DmaChannel& channel = registers.dmaChannels[i];
+                    const Video::Registers::DmaChannel& channel = registers.dmaChannels[i];
                     ss << "Channel " << i << std::endl;
                     ss << "Start address: " << channel.sourceAddress << std::endl;
                     ss << "Indirect address: " << Long(channel.indirectAddress, channel.indirectAddressBankByte) << std::endl;
@@ -67,7 +67,7 @@ public:
                     registers.dmaEnabled.setBit(i, false);
                     cycles += 1;
 
-                    Registers::DmaChannel& channel = registers.dmaChannels[i];
+                    Video::Registers::DmaChannel& channel = registers.dmaChannels[i];
 
                     bool direction = channel.control.getBit(7);
                     if (direction) {
@@ -142,7 +142,7 @@ public:
         return cycles;
     }
 
-    Byte getNextByte(Registers::DmaChannel& channel, bool indirect)
+    Byte getNextByte(Video::Registers::DmaChannel& channel, bool indirect)
     {
         if (indirect) {
             Long address(channel.indirectAddress, channel.indirectAddressBankByte);
@@ -189,7 +189,7 @@ public:
 
 private:
     CPU::State::MemoryType& memory;
-    Registers& registers;
+    Video::Registers& registers;
     bool active = false;
     bool initializationRequested = false;
     int iteration = -1;

@@ -1,11 +1,13 @@
 #pragma once
 
-#include "Video.h"
+#include "VideoProcessor.h"
 
 //#define DEBUGOAM
 //#define DEBUGBG
 //#define DEBUGSPRITES
 //#define DEBUGMODE7
+
+namespace Video {
 
 class OamViewer
 {
@@ -77,8 +79,7 @@ public:
                                 Word color = video.cgram.getWord(colorAddress);
                                 if (object.horizontalFlip) {
                                     renderer.setPixel(displayRow, columnOffset + objectSize - 1 - displayColumnOffset - column, color);
-                                }
-                                else {
+                                } else {
                                     renderer.setPixel(displayRow, columnOffset + displayColumnOffset + column, color);
                                 }
                             }
@@ -99,7 +100,7 @@ public:
     Video& video;
     bool running = true;
 #else
-    OamViewer(Video&, int, int)
+    OamViewer(Processor&, int, int)
     {
     }
     void update()
@@ -142,26 +143,22 @@ public:
         if (backgroundLayer == BackgroundLayer1 && video.backgroundMode == 7) {
             renderer.clearDisplay(0x3ff);
             return;
-        }
-        else {
+        } else {
             renderer.clearDisplay(0);
         }
 
         Video::Background& background = video.backgrounds[backgroundLayer];
 
         const int tileSize = 8;
-        for (int screenRow = 0; screenRow < background.verticalMirroring + 1; ++screenRow)
-        {
-            for (int screenColumn = 0; screenColumn < background.horizontalMirroring + 1; ++screenColumn)
-            {
+        for (int screenRow = 0; screenRow < background.verticalMirroring + 1; ++screenRow) {
+            for (int screenColumn = 0; screenColumn < background.horizontalMirroring + 1; ++screenColumn) {
                 for (int tileRow = 0; tileRow < 32; ++tileRow) {
                     for (int tileColumn = 0; tileColumn < 32; ++tileColumn) {
                         Word tileDataAddress = background.tilemapAddress + (tileRow << 5) + tileColumn;
                         if (screenRow) {
                             if (background.horizontalMirroring) {
                                 tileDataAddress += 0x800;
-                            }
-                            else {
+                            } else {
                                 tileDataAddress += 0x400;
                             }
                         }
@@ -214,7 +211,7 @@ public:
     bool running = true;
     Layer backgroundLayer;
 #else
-    BackgroundViewer(Video&, Layer, int, int)
+    BackgroundViewer(Processor&, Layer, int, int)
     {
     }
     void update()
@@ -297,8 +294,7 @@ public:
                             int displayRow = 0;
                             if (object.verticalFlip) {
                                 displayRow = object.y + objectSize - 1 - (tileRow * 8 + row);
-                            }
-                            else {
+                            } else {
                                 displayRow = object.y + tileRow * 8 + row;
                             }
                             if (displayRow < 0 || displayRow >= Video::rendererHeight) {
@@ -307,8 +303,7 @@ public:
                             int displayColumn = 0;
                             if (object.horizontalFlip) {
                                 displayColumn = object.x + objectSize - 1 - (tileColumn * 8 + column);
-                            }
-                            else {
+                            } else {
                                 displayColumn = object.x + tileColumn * 8 + column;
                             }
                             if (displayColumn < 0 || displayColumn >= Video::rendererWidth) {
@@ -332,7 +327,7 @@ public:
     bool running = true;
     int priority = 0;
 #else
-    SpriteLayerViewer(Video&, int, int, int)
+    SpriteLayerViewer(Processor&, int, int, int)
     {
     }
     void update()
@@ -394,7 +389,7 @@ public:
     Video& video;
     bool running = true;
 #else
-    Mode7Viewer(Video&, int, int)
+    Mode7Viewer(Processor&, int, int)
     {
     }
     void update()
@@ -402,3 +397,5 @@ public:
     }
 #endif
 };
+
+}

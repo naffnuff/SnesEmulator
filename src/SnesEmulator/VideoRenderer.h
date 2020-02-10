@@ -6,20 +6,26 @@
 #include <string>
 #include <mutex>
 
+struct GLFWwindow;
+struct GLFWvidmode;
+
+namespace Video {
+
 class Renderer
 {
 public:
     typedef uint16_t Pixel;
 
-    Renderer(int windowXPosition, int windowYPosition, int width, int height, float scale, bool syncUpdate, std::ostream& output)
-        : windowXPosition(windowXPosition)
+    Renderer(int windowXPosition, int windowYPosition, int width, int height, float scale, bool syncUpdate, std::ostream& output, std::ostream& error)
+        : output(output)
+        , error(error)
+        , windowXPosition(windowXPosition)
         , windowYPosition(windowYPosition)
         , width(width)
         , height(height)
         , scale(scale)
         , syncUpdate(syncUpdate)
-        , pixelBuffer(size_t(height * width))
-        , output(output)
+        , pixelBuffer(size_t(height* width))
         , title("SNES Emulator")
     {
     }
@@ -31,6 +37,8 @@ public:
 
     void initialize(bool fullscreen = false, bool aspectCorrection = false);
     void terminate();
+    float getAspectCorrectionFactor(bool aspectCorrection) const;
+    void calculateScale(const GLFWvidmode* mode, bool aspectCorrection);
     void setWindowProperties(bool fullscreen, bool aspectCorrection);
     void update();
     bool isRunning() const;
@@ -65,7 +73,7 @@ public:
 
     int windowXPosition;
     int windowYPosition;
-    
+
     const int width;
     const int height;
 
@@ -73,8 +81,9 @@ public:
     std::mutex pixelBufferMutex;
 
     std::ostream& output;
+    std::ostream& error;
 
-    struct GLFWwindow* window = nullptr;
+    GLFWwindow* window = nullptr;
 
     std::string title;
 
@@ -82,9 +91,12 @@ public:
     float xScale;
     float yScale;
     float xScreenCoverage;
+    float yScreenCoverage;
     const bool syncUpdate;
 
     int pressKeyTimeout = 0;
 
     bool focusWindowRequested = false;
 };
+
+}

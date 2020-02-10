@@ -5,31 +5,17 @@
 #include "Common/Types.h"
 #include "Common/Util.h"
 
-#include "VideoModes.h"
-#include "Renderer.h"
+#include "VideoData.h"
+#include "VideoRenderer.h"
 
-class Video
+namespace Video {
+
+class Processor
 {
 public:
-    struct NotYetImplementedException : std::logic_error
-    {
-        NotYetImplementedException(const std::string& name)
-            : std::logic_error("Video feature not yet implemented: " + name)
-        {
-        }
-    };
-
-    struct MemoryAccessException : std::logic_error
-    {
-        MemoryAccessException(const std::string& message)
-            : std::logic_error("Bad video memory access: " + message)
-        {
-        }
-    };
-
     struct RendererRunner
     {
-        RendererRunner(Video& video, std::ostream& output)
+        RendererRunner(Processor& video, std::ostream& output)
             : video(video)
             , gameTitle(gameTitle)
         {
@@ -38,10 +24,9 @@ public:
 
         void operator()()
         {
-            running = true;
             video.renderer.title = gameTitle;
             video.renderer.initialize(fullscreen, aspectRatioCorrection);
-            while (running && video.renderer.isRunning()) {
+            while (run && video.renderer.isRunning()) {
                 if (video.renderer.toggleFullscreenRequested) {
                     video.renderer.toggleFullscreenRequested = false;
                     fullscreen = !fullscreen;
@@ -52,8 +37,8 @@ public:
             video.renderer.terminate();
         }
 
-        Video& video;
-        bool running = false;
+        Processor& video;
+        bool run = true;
         std::string gameTitle;
         bool fullscreen = false;
         bool aspectRatioCorrection = true;
@@ -80,7 +65,7 @@ public:
         {
             const std::vector<Byte>& table = highTableSelect ? highTable : lowTable;
             if (address >= size) {
-                throw MemoryAccessException("Video::Table::getByte: Video-memory table out-of-bounds @ " + Util::toString(address) + ", size=" + Util::toString(size));
+                throw MemoryAccessException("Processor::Table::getByte: Processor-memory table out-of-bounds @ " + Util::toString(address) + ", size=" + Util::toString(size));
             }
             return table[address];
         }
@@ -88,7 +73,7 @@ public:
         Word getWord(Word address) const
         {
             if (address >= size) {
-                throw MemoryAccessException("Video::Table::getWord: Video-memory table out-of-bounds @ " + Util::toString(address) + ", size=" + Util::toString(size));
+                throw MemoryAccessException("Processor::Table::getWord: Processor-memory table out-of-bounds @ " + Util::toString(address) + ", size=" + Util::toString(size));
             }
             return Word(lowTable[address], highTable[address]);
         }
@@ -96,7 +81,7 @@ public:
         Word readNextWord(int increment)
         {
             if (address >= size) {
-                throw MemoryAccessException("Video::Table::readNextWord: Video-memory table out-of-bounds @ " + Util::toString(address) + ", size=" + Util::toString(size));
+                throw MemoryAccessException("Processor::Table::readNextWord: Processor-memory table out-of-bounds @ " + Util::toString(address) + ", size=" + Util::toString(size));
             }
             Word result = Word(lowTable[address], highTable[address]);
             address += increment;
@@ -106,7 +91,7 @@ public:
         void writeWord(Word data)
         {
             if (address >= size) {
-                throw MemoryAccessException("Video::Table::writeWord: Video-memory table out-of-bounds @ " + Util::toString(address) + ", size=" + Util::toString(size));
+                throw MemoryAccessException("Processor::Table::writeWord: Processor-memory table out-of-bounds @ " + Util::toString(address) + ", size=" + Util::toString(size));
             }
             lowTable[address] = data.getLowByte();
             highTable[address] = data.getHighByte();
@@ -117,7 +102,7 @@ public:
         {
             std::vector<Byte>& table = highTableSelect ? highTable : lowTable;
             if (address >= size) {
-                //throw MemoryAccessException("Video::Table::writeByte: Video-memory table out-of-bounds @ " + Util::toString(address) + ", size=" + Util::toString(size));
+                //throw MemoryAccessException("Processor::Table::writeByte: Processor-memory table out-of-bounds @ " + Util::toString(address) + ", size=" + Util::toString(size));
                 address &= size - 1;
             }
             /*if (address == 0x4800 && (highTableSelect && data == 0xff || !highTableSelect && data == 0xaa)) {
@@ -140,141 +125,13 @@ public:
         bool highTableSelect = false;
     };
 
-    struct Object
-    {
-        bool sizeSelect = false;
-        int x = 0;
-        int y = 0;
-        int tileIndex = 0;
-        bool nameTable = false;
-        int palette = 0;
-        int priority = 0;
-        bool horizontalFlip = false;
-        bool verticalFlip = false;
-    };
-
-    struct ReadTwiceRegister
-    {
-        Byte read()
-        {
-            if (highByteSelect) {
-                return value.getHighByte();
-            }
-            else {
-                return value.getLowByte();
-            }
-            highByteSelect = !highByteSelect;
-        }
-        Word value;
-        bool highByteSelect = false;
-    };
-
-    struct WriteTwiceRegister
-    {
-        void write(Byte byte)
-        {
-            if (highByteSelect) {
-                value.setHighByte(byte);
-            }
-            else {
-                value.setLowByte(byte);
-            }
-            highByteSelect = !highByteSelect;
-        }
-        Word value;
-        bool highByteSelect = false;
-    };
-
-    struct Background
-    {
-        Word tilemapAddress;
-        bool horizontalMirroring;
-        bool verticalMirroring;
-        Word characterAddress;
-        WriteTwiceRegister horizontalScroll;
-        WriteTwiceRegister verticalScroll;
-        int bitsPerPixel;
-    };
-
-    static const int rendererWidth = 256;
-    static const int rendererHeight = 224;
-
-    struct ScanlineBuffer
-    {
-        std::array<Byte, rendererWidth> data;
-    };
-
-    struct ScanlineBuffers
-    {
-        struct BackgroundBuffer
-        {
-            std::array<ScanlineBuffer, 2> priorities;
-        };
-        struct ObjectsBuffer
-        {
-            std::array<ScanlineBuffer, 4> priorities;
-        };
-
-        ScanlineBuffer& getBuffer(Layer layer, int priority)
-        {
-            if (layer == ObjectLayer) {
-                return objectsBuffer.priorities[priority];
-            }
-            else {
-                return backgroundBuffers[layer].priorities[priority];
-            }
-        }
-
-        std::array<BackgroundBuffer, 4> backgroundBuffers;
-        ObjectsBuffer objectsBuffer;
-    };
-
-    struct ColorComponents
-    {
-        ColorComponents()
-        {
-        }
-
-        ColorComponents(Word color)
-        {
-            red = color & 0x1f;
-            green = color >> 5 & 0x1f;
-            blue = color >> 10 & 0x1f;
-        }
-
-        operator Word() const
-        {
-            return blue << 10 | green << 5 | red;
-        }
-
-        Byte red;
-        Byte green;
-        Byte blue;
-    };
-
-    struct WindowSettings
-    {
-        bool window1Enabled = false;
-        bool window1Inverted = false;
-        bool window2Enabled = false;
-        bool window2Inverted = false;
-        Byte windowOperator;
-    };
-
-    enum ColorWindowMode
-    {
-        Never,
-        OutsideColorWindowOnly,
-        InsideColorWindowOnly,
-        Always
-    };
-
-    Video(std::ostream& output)
+    Processor(std::ostream& output, std::ostream& error)
         : output(output)
+        , error(error)
         , vram(0x8000)
         , cgram(0x100)
         , oam(0x110)
-        , renderer(1000, 40, rendererWidth, rendererHeight, 3.f, true, output)
+        , renderer(1000, 40, rendererWidth, rendererHeight, 3.f, true, output, error)
         , rendererRunner(*this, output)
         , backgrounds(4)
         , rendererLock(renderer.pixelBufferMutex)
@@ -282,17 +139,17 @@ public:
     {
     }
 
-    ~Video()
+    ~Processor()
     {
-        rendererRunner.running = false;
+        rendererRunner.run = false;
         if (rendererLock.owns_lock()) {
             rendererLock.unlock();
         }
         rendererThread.join();
     }
 
-    Video(const Video&) = delete;
-    Video& operator=(const Video&) = delete;
+    Processor(const Processor&) = delete;
+    Processor& operator=(const Processor&) = delete;
 
     void initialize(const std::string& gameTitle)
     {
@@ -331,8 +188,7 @@ public:
 
         if (backgroundMode == 1) {
             drawMode(mode1Extension ? mode1e : mode1, vCounter);
-        }
-        else if (backgroundMode == 7) {
+        } else if (backgroundMode == 7) {
             if (mode7HorizontalMirroring) {
                 throw NotYetImplementedException("Register 211a: Horizontal mirroring");
             }
@@ -346,8 +202,7 @@ public:
                 throw NotYetImplementedException("Direct color mode for 256-color BGs");
             }
             drawMode(mode7, vCounter, true);
-        }
-        else if (backgroundMode != 0) {
+        } else if (backgroundMode != 0) {
             output << "BG mode: " << backgroundMode << ", e: " << mode1Extension << std::endl;
             throw NotYetImplementedException("bg mode");
         }
@@ -394,8 +249,7 @@ public:
                 addendPixelIndex = calculateSubscreenPixel(modeEntries, subscreenBackgroundLayers, subscreenDesignation, displayRow, displayColumn);
                 if (addendPixelIndex > 0) {
                     addendPixel = cgram.getWord(Word(addendPixelIndex));
-                }
-                else {
+                } else {
                     disableHalfMath = true;
                 }
             }
@@ -416,8 +270,7 @@ public:
                 //buffer.data.fill(0);
                 if (mode7) {
                     drawMode7Background(buffer, displayRow);
-                }
-                else {
+                } else {
                     drawBackground(buffer, backgrounds[modeEntry.layer], displayRow, modeEntry.priority, windowMaskDesignation.getBit(modeEntry.layer), windowSettings[modeEntry.layer], backgroundsBufferMask);
                 }
             }
@@ -476,16 +329,14 @@ public:
                 if (mode7PlayingFieldSize) {
                     if (mode7EmptySpaceFill) {
                         calculateTile = false;
-                    }
-                    else {
+                    } else {
                         zeroPixel = true;
                     }
                 }
             }
             if (zeroPixel) {
                 buffer.data[displayColumn] = 0;
-            }
-            else {
+            } else {
                 Byte tileData;
                 if (calculateTile) {
                     Word tileRow = fieldRow >> 3;
@@ -529,8 +380,7 @@ public:
             if (screenRow) {
                 if (background.horizontalMirroring) {
                     tileDataAddress += 0x800;
-                }
-                else {
+                } else {
                     tileDataAddress += 0x400;
                 }
             }
@@ -613,8 +463,7 @@ public:
             int displayColumn;
             if (horizontalFlip) {
                 displayColumn = displayStartColumn - displayColumnOffset + objectSize - 1 - column;
-            }
-            else {
+            } else {
                 displayColumn = displayStartColumn + displayColumnOffset + column;
             }
             if (displayColumn < 0 || displayColumn >= rendererWidth) {
@@ -674,8 +523,7 @@ public:
                     Word color = cgram.getWord(Word(colorIndex));
                     if (modeEntry.layer == ObjectLayer && colorIndex > 0x80 && colorIndex < 0xc0) {
                         return color;
-                    }
-                    else {
+                    } else {
                         return applyColorMath(color, modeEntry.layer, addendPixel, colorMathDesignation, clipColor, clipMath, subtract, halfMath);
                     }
                 }
@@ -689,8 +537,7 @@ public:
         bool inside = false;
         if (!settings.window1Enabled && !settings.window2Enabled) {
             inside = false;
-        }
-        else if (settings.window1Enabled && settings.window2Enabled) {
+        } else if (settings.window1Enabled && settings.window2Enabled) {
             bool inside1 = column >= window1Left && column <= window1Right;
             bool inside2 = column >= window2Left && column <= window2Right;
             if (settings.window1Inverted) {
@@ -701,18 +548,15 @@ public:
             }
             if (settings.windowOperator == 0) {
                 inside = inside1 || inside2;
-            }
-            else {
+            } else {
                 throw NotYetImplementedException("Window operator " + Util::toString(settings.windowOperator));
             }
-        }
-        else if (settings.window1Enabled) {
+        } else if (settings.window1Enabled) {
             inside = column >= window1Left && column <= window1Right;
             if (settings.window1Inverted) {
                 inside = !inside;
             }
-        }
-        else if (settings.window2Enabled) {
+        } else if (settings.window2Enabled) {
             inside = column >= window2Left && column <= window2Right;
             if (settings.window2Inverted) {
                 inside = !inside;
@@ -723,8 +567,7 @@ public:
 
     bool setColorBlack(bool insideColorWindow)
     {
-        switch (clipColorToBlackMode)
-        {
+        switch (clipColorToBlackMode) {
         case Never: return false;
         case OutsideColorWindowOnly: return !insideColorWindow;
         case InsideColorWindowOnly: return insideColorWindow;
@@ -734,8 +577,7 @@ public:
 
     bool preventColorMath(bool insideColorWindow)
     {
-        switch (clipColorMathMode)
-        {
+        switch (clipColorMathMode) {
         case Never: return false;
         case OutsideColorWindowOnly: return !insideColorWindow;
         case InsideColorWindowOnly: return insideColorWindow;
@@ -753,8 +595,7 @@ public:
             if (!clipMath) {
                 if (subtract) {
                     return subtractColors(Word(result), addendPixel, halfMath);
-                }
-                else {
+                } else {
                     return addColors(Word(result), addendPixel, halfMath);
                 }
             }
@@ -805,6 +646,7 @@ public:
     }
 
     std::ostream& output;
+    std::ostream& error;
 
     Table vram;
     Table cgram;
@@ -864,3 +706,5 @@ public:
 
     std::unique_lock<std::mutex> rendererLock;
 };
+
+}

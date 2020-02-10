@@ -9,12 +9,14 @@
 
 #include "WDC65816/CpuState.h"
 #include "SPC700/SpcState.h"
-#include "SPC700/Audio.h"
 
-#include "Video.h"
-#include "VideoDebugger.h"
-#include "Registers.h"
 #include "Instruction.h"
+
+#include "VideoProcessor.h"
+#include "VideoRegisters.h"
+#include "VideoDebugger.h"
+
+#include "AudioRegisters.h"
 
 template<typename State>
 struct Breakpoint
@@ -107,6 +109,10 @@ public:
         ContextBase(const ContextBase&) = delete;
         ContextBase& operator=(const ContextBase&) = delete;
 
+        virtual ~ContextBase()
+        {
+        }
+
         void setPaused(bool paused)
         {
             if (paused == stepMode) {
@@ -114,22 +120,22 @@ public:
             }
             stepMode = paused;
             if (paused) {
-                if (debugger.registers.video.rendererLock.owns_lock()) {
-                    debugger.registers.video.rendererLock.unlock();
+                if (debugger.videoProcessor.rendererLock.owns_lock()) {
+                    debugger.videoProcessor.rendererLock.unlock();
                     unlockedMutex = true;
                 }
-                if (debugger.registers.video.rendererRunner.fullscreen) {
-                    debugger.registers.video.renderer.toggleFullscreenRequested = true;
+                if (debugger.videoProcessor.rendererRunner.fullscreen) {
+                    debugger.videoProcessor.renderer.toggleFullscreenRequested = true;
                 }
-                debugger.registers.video.renderer.focusWindow(false);
+                debugger.videoProcessor.renderer.focusWindow(false);
                 System::focusConsoleWindow();
             }
             else {
                 if (unlockedMutex) {
-                    debugger.registers.video.rendererLock.lock();
+                    debugger.videoProcessor.rendererLock.lock();
                     unlockedMutex = false;
                 }
-                debugger.registers.video.renderer.focusWindow(true);
+                debugger.videoProcessor.renderer.focusWindow(true);
             }
         }
 
@@ -156,6 +162,10 @@ public:
         using ContextBase::ContextBase;
 
         typedef typename State::AddressType AddressType;
+
+        ~Context() override
+        {
+        }
 
         void addKnownAddress(AddressType address)
         {
@@ -190,12 +200,14 @@ public:
         std::set<Breakpoint<State>> breakpoints;
     };
 
-    Debugger(std::ostream& output, std::istream& input, std::ostream& error, Registers& registers, SPC::Audio& audio, uint64_t& cycleCount, bool& running)
+    Debugger(std::ostream& output, std::istream& input, std::ostream& error, Video::Registers& videoRegisters, Audio::Registers& audioRegisters, uint64_t& cycleCount, bool& running)
         : output(output)
         , input(input)
         , error(error)
-        , registers(registers)
-        , audio(audio)
+        , videoRegisters(videoRegisters)
+        , videoProcessor(videoRegisters.processor)
+        , audioRegisters(audioRegisters)
+        , audioProcessor(audioRegisters.processor)
         , cycleCount(cycleCount)
         , running(running)
     {
@@ -307,7 +319,7 @@ public:
                 << "clear: clear all breakpoints" << std::endl
                 << "w: watch executing program memory" << std::endl
                 << "[hex]: inspect memory page containing address [hex]" << std::endl
-                << "v [hex]: inspect video memory containing address [hex]" << std::endl
+                << "v [hex]: inspect videoProcessor memory containing address [hex]" << std::endl
                 << "[p|s|a|x|y|d|f]=[hex]: set register to [hex]" << std::endl
                 << "[a]=[hex]: set address [a] to [hex]" << std::endl
                 << "s: switch contexts" << std::endl;
@@ -336,7 +348,6 @@ public:
             }
             if (!context.isPaused() && !otherContext.isPaused()) {
                 output << "All running" << std::endl;
-                output << "Snip" << std::endl;
                 startTime = clock();
             }
             return !context.isPaused();
@@ -348,15 +359,15 @@ public:
             output << "Soft reset" << std::endl;
             state.reset();
             otherState.reset();
-            registers.reset();
-            audio.reset();
+            videoRegisters.reset();
+            audioRegisters.reset();
         }
         else if (command == "qr") {
             output << "Soft reset and run" << std::endl;
             state.reset();
             otherState.reset();
-            registers.reset();
-            audio.reset();
+            videoRegisters.reset();
+            audioRegisters.reset();
             context.setPaused(false);
             otherContext.setPaused(false);
             startTime = clock();
@@ -496,16 +507,16 @@ public:
         }
     }
 
-    void printMemory(CPU::State& cpuState, const Context<CPU::State>& cpuContext, SPC::State& spcState, const Context<SPC::State>& spcContext, Video& video)
+    void printMemory(CPU::State& cpuState, const Context<CPU::State>& cpuContext, SPC::State& spcState, const Context<SPC::State>& spcContext, Video::Processor& videoProcessor)
     {
         System::setOutputColor(output, System::DefaultColor, false);
         int oamAddress = inspectedVideoMemory & 0xFF80;
         int oamAuxAddress = oamAddress / 8;
         int oamAuxOffset = oamAddress % 8;
         /*for (int i = OamViewer::firstObjectIndex; i < OamViewer::firstObjectIndex + 32; ++i) {
-            Video::Object object = video.readObject(i);
+            Video::Object object = videoProcessor.readObject(i);
             output << i << ": ";
-            output << " size: " << video.getObjectSize(object.sizeSelect);
+            output << " size: " << videoProcessor.getObjectSize(object.sizeSelect);
             output << ", x: " << object.x;
             output << ", y: " << object.y;
             output << ", tile: " << Byte(object.tileIndex);
@@ -517,11 +528,11 @@ public:
             output << std::endl;
         }*/
 
-        output << "OAM start address: " << registers.oamStartAddress << std::endl;
-        output << "OAM current address: " << registers.video.oam.address << std::endl;
-        output << "Video port control: " << registers.videoPortControl << std::endl;
-        //output << "VRAM start address: " << registers.vramStartAddress << std::endl;
-        output << "VRAM current address: " << registers.video.vram.address << std::endl;
+        output << "OAM start address: " << videoRegisters.oamStartAddress << std::endl;
+        output << "OAM current address: " << videoProcessor.oam.address << std::endl;
+        output << "Video port control: " << videoRegisters.videoPortControl << std::endl;
+        //output << "VRAM start address: " << videoRegisters.vramStartAddress << std::endl;
+        output << "VRAM current address: " << videoProcessor.vram.address << std::endl;
         output << "CPU bus: " << cpuState.getMemory().bus << std::endl;
 
         output << "          0     1     2     3     4     5     6     7" << std::endl
@@ -529,9 +540,9 @@ public:
             << "                0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f" << std::endl;
         int lastVramLowAddress = -1;
         int vramAddress = inspectedVideoMemory & 0xFF80;
-        int dspAddress = 0;
+        Byte dspAddress = 0;
         for (int i = 0; i < 16; ++i) {
-            if (vramAddress < video.vram.size) {
+            if (vramAddress < videoProcessor.vram.size) {
                 uint16_t lowAddress(vramAddress);
                 lowAddress = lowAddress >> 4;
                 if (lastVramLowAddress != lowAddress) {
@@ -542,24 +553,27 @@ public:
                 }
                 lastVramLowAddress = lowAddress;
 
-                for (int j = 0; j < 8 && vramAddress < video.vram.size; ++j) {
-                    output << video.vram.getByte(vramAddress, false) << ' ' << video.vram.getByte(vramAddress, true) << ' ';
+                for (int j = 0; j < 8 && vramAddress < videoProcessor.vram.size; ++j) {
+                    output << videoProcessor.vram.getByte(vramAddress, false) << ' ' << videoProcessor.vram.getByte(vramAddress, true) << ' ';
                     ++vramAddress;
                 }
             }
 
             output << "     ";
 
-            if (dspAddress < audio.dspMemory.size()) {
+            if (dspAddress < audioProcessor.dspMemory.size()) {
                 uint16_t lowAddress(dspAddress);
                 lowAddress = lowAddress >> 4;
                 output << std::hex << std::setw(3) << std::setfill('0') << lowAddress << "x  " << std::dec;
 
-                for (int j = 0; j < 16 && dspAddress < audio.dspMemory.size(); ++j) {
-                    Byte memory = audio.dspMemory[dspAddress++];
-                    //setColor(spcState, spcContext, dspAddress++, memory);
-                    output << memory << ' ';
-                    //System::setOutputColor(output, System::DefaultColor, false);
+                for (int j = 0; j < 16 && dspAddress < audioProcessor.dspMemory.size(); ++j) {
+                    MemoryAccess access(audioProcessor.dspMemory, dspAddress);
+                    OutputColorVisitor colorVisitor;
+                    access.accept(colorVisitor);
+                    System::setOutputColor(output, colorVisitor.color, false);
+                    output << access << ' ';
+                    System::setOutputColor(output, System::DefaultColor, false);
+                    ++dspAddress;
                 }
             }
 
@@ -587,9 +601,10 @@ public:
 
                 for (int j = 0; j < 16 && cpuAddress < cpuMemorySize; ++j) {
                     MemoryAccess access = cpuState.getMemoryAccess(cpuAddress);
-                    setColor(cpuState, cpuContext, cpuAddress++, access);
+                    setColor(cpuState, cpuContext, cpuAddress, access);
                     output << access << ' ';
                     System::setOutputColor(output, System::DefaultColor, false);
+                    ++cpuAddress;
                 }
             }
 
@@ -603,14 +618,14 @@ public:
                 for (int j = 0; j < 16 && spcAddress < spcMemorySize; ++j) {
                     MemoryAccess access = spcState.getMemoryAccess(spcAddress);
                     setColor(spcState, spcContext, spcAddress, access);
-                    if (spcAddress >= 0xffc0 && audio.bootRomDataEnabled) {
-                        output << audio.bootRomData[spcAddress - 0xffc0] << ' ';
+                    if (spcAddress >= 0xffc0 && audioRegisters.bootRomDataEnabled) {
+                        output << audioRegisters.bootRomData[spcAddress - 0xffc0] << ' ';
                     }
                     else {
                         output << access << ' ';
                     }
-                    ++spcAddress;
                     System::setOutputColor(output, System::DefaultColor, false);
+                    ++spcAddress;
                 }
             }
 
@@ -639,7 +654,6 @@ public:
     void printClockSpeed() const
     {
         std::time_t endTime = clock();
-        output << "Snap" << std::endl;
         double elapsedSeconds = double(endTime - startTime) / CLOCKS_PER_SEC;
         output << "Time delta=" << elapsedSeconds << std::endl;
         output << "Speed is " << cycleCount / 1000000.0 / elapsedSeconds << " MHz (kind of)" << std::endl;
@@ -651,8 +665,10 @@ private:
     std::ostream& output;
     std::istream& input;
     std::ostream& error;
-    Registers& registers;
-    SPC::Audio& audio;
+    Video::Registers& videoRegisters;
+    Video::Processor& videoProcessor;
+    Audio::Registers& audioRegisters;
+    Audio::Processor& audioProcessor;
     uint64_t& cycleCount;
     bool& running;
     Word inspectedVideoMemory = 0x0;

@@ -6,10 +6,12 @@
 #include "Common/Memory.h"
 #include "Common/RegisterManager.h"
 
-#include "Video.h"
-#include "Renderer.h"
+#include "VideoProcessor.h"
+#include "VideoRenderer.h"
 
-class Registers : public RegisterManager<CPU::State, System::Yellow>
+namespace Video {
+
+class Registers : public RegisterManager<CPU::State::MemoryType, System::Yellow>
 {
 public:
     enum IrqMode
@@ -34,23 +36,25 @@ public:
         bool hdmaDoTransfer = false;
     };
 
-    Registers(std::ostream& output, std::ostream& error, CPU::State& state, Video& video)
-        : RegisterManager(output, error, state)
+    Registers(std::ostream& output, std::ostream& error, CPU::State& state)
+        : RegisterManager(output, error, state.getMemory())
         , output(output)
         , error(error)
-        , video(video)
+        , state(state)
+        , memory(state.getMemory())
+        , processor(output, error)
     {
     }
 
     Registers(const Registers&) = delete;
     Registers& operator=(const Registers&) = delete;
 
-    void makeWriteTwiceRegister(Word address, const std::string& info, bool debug, Video::WriteTwiceRegister& variable, bool openBus = false)
+    void makeWriteTwiceRegister(Long address, const std::string& info, bool debug, WriteTwiceRegister& variable, bool openBus = false)
     {
         makeWriteRegister(address, info, debug, [&variable](Byte value) { variable.write(value); }, openBus);
     }
 
-    void makeReadTwiceRegister(Word address, const std::string& info, bool debug, Video::ReadTwiceRegister& variable)
+    void makeReadTwiceRegister(Long address, const std::string& info, bool debug, ReadTwiceRegister& variable)
     {
         makeReadRegister(address, info, debug, [&variable](Byte& value) { value = variable.read(); });
     }
@@ -58,44 +62,43 @@ public:
     void initialize()
     {
         // Registers
-        makeWriteRegister(0x2100, "Screen Display", false, video.screenDisplay);
+        makeWriteRegister(0x2100, "Screen Display", false, processor.screenDisplay);
         makeWriteRegister(0x2101, "Object Size and Chr Address", false,
             [this](Byte value) {
-                video.nameBaseSelect = value.getBits(0, 3) << 13;
-                video.nameSelect = (value.getBits(3, 2) + 1) << 12;
-                video.objectSizeIndex = value.getBits(5, 3);
+                processor.nameBaseSelect = value.getBits(0, 3) << 13;
+                processor.nameSelect = (value.getBits(3, 2) + 1) << 12;
+                processor.objectSizeIndex = value.getBits(5, 3);
             }
         );
 
         makeWriteRegister(0x2102, "OAM Address low byte", false,
             [this](Byte value) {
                 oamStartAddress.setLowByte(value);
-                video.oam.address = oamStartAddress;
+                processor.oam.address = oamStartAddress;
             });
         makeWriteRegister(0x2103, "OAM Address high bit and Obj Priority", false,
             [this](Byte value) {
                 oamStartAddress.setHighByte(value.getBit(0));
-                video.oam.address = oamStartAddress;
-                video.objectPriority = value.getBit(7);
+                processor.oam.address = oamStartAddress;
+                processor.objectPriority = value.getBit(7);
             });
         makeWriteRegister(0x2104, "OAM Data write", false,
             [this](Byte value) {
-                video.oam.writeByte(value);
+                processor.oam.writeByte(value);
             }
         );
 
         makeWriteRegister(0x2105, "BG Mode and Character Size", false,
             [this](Byte value) {
-                video.backgroundMode = value.getBits(0, 3);
-                video.mode1Extension = value.getBit(3);
-                video.characterSize = value.getBits(4, 4);
-                if (video.backgroundMode == 1) {
-                    video.backgrounds[BackgroundLayer1].bitsPerPixel = 4;
-                    video.backgrounds[BackgroundLayer2].bitsPerPixel = 4;
-                    video.backgrounds[BackgroundLayer3].bitsPerPixel = 2;
-                }
-                else if (video.backgroundMode == 7) {
-                    video.backgrounds[BackgroundLayer1].bitsPerPixel = 8;
+                processor.backgroundMode = value.getBits(0, 3);
+                processor.mode1Extension = value.getBit(3);
+                processor.characterSize = value.getBits(4, 4);
+                if (processor.backgroundMode == 1) {
+                    processor.backgrounds[BackgroundLayer1].bitsPerPixel = 4;
+                    processor.backgrounds[BackgroundLayer2].bitsPerPixel = 4;
+                    processor.backgrounds[BackgroundLayer3].bitsPerPixel = 2;
+                } else if (processor.backgroundMode == 7) {
+                    processor.backgrounds[BackgroundLayer1].bitsPerPixel = 8;
                 }
             });
 
@@ -107,8 +110,8 @@ public:
             std::string bgName2 = bgName + char('2' + i * 2);
             makeWriteRegister(0x210b + i, bgName1 + " and " + bgName2 + " Chr Address", false,
                 [this, i](Byte value) {
-                    video.backgrounds[i * 2].characterAddress = value.getBits(0, 4) << 12;
-                    video.backgrounds[i * 2 + 1].characterAddress = value.getBits(4, 4) << 12;
+                    processor.backgrounds[i * 2].characterAddress = value.getBits(0, 4) << 12;
+                    processor.backgrounds[i * 2 + 1].characterAddress = value.getBits(4, 4) << 12;
                 });
         }
         for (int i = 0; i < 4; ++i) {
@@ -116,25 +119,25 @@ public:
             bgName += '1' + i;
             makeWriteRegister(0x2107 + i, bgName + " Tilemap Address and Size", false,
                 [this, i](Byte value) {
-                    video.backgrounds[i].horizontalMirroring = value.getBit(0);
-                    video.backgrounds[i].verticalMirroring = value.getBit(1);
-                    video.backgrounds[i].tilemapAddress = value.getBits(2, 6) << 10;
+                    processor.backgrounds[i].horizontalMirroring = value.getBit(0);
+                    processor.backgrounds[i].verticalMirroring = value.getBit(1);
+                    processor.backgrounds[i].tilemapAddress = value.getBits(2, 6) << 10;
                 });
             if (i > 0) {
-                makeWriteTwiceRegister(0x210d + i * 2, bgName + " Horizontal Scroll", false, video.backgrounds[i].horizontalScroll, true);
-                makeWriteTwiceRegister(0x210e + i * 2, bgName + " Vertical Scroll", false, video.backgrounds[i].verticalScroll, true);
+                makeWriteTwiceRegister(0x210d + i * 2, bgName + " Horizontal Scroll", false, processor.backgrounds[i].horizontalScroll, true);
+                makeWriteTwiceRegister(0x210e + i * 2, bgName + " Vertical Scroll", false, processor.backgrounds[i].verticalScroll, true);
             }
         }
 
         makeWriteRegister(0x210d, "BG1 and Mode 7 Horizontal Scroll", false,
             [this](Byte value) {
-                video.backgrounds[BackgroundLayer1].horizontalScroll.write(value);
-                video.mode7HorizontalScroll = to13Bit2sComplement(getMode7WordValue(value));
+                processor.backgrounds[BackgroundLayer1].horizontalScroll.write(value);
+                processor.mode7HorizontalScroll = to13Bit2sComplement(getMode7WordValue(value));
             });
         makeWriteRegister(0x210e, "BG1 and Mode 7 Vertical Scroll", false,
             [this](Byte value) {
-                video.backgrounds[BackgroundLayer1].verticalScroll.write(value);
-                video.mode7VerticalScroll = to13Bit2sComplement(getMode7WordValue(value));
+                processor.backgrounds[BackgroundLayer1].verticalScroll.write(value);
+                processor.mode7VerticalScroll = to13Bit2sComplement(getMode7WordValue(value));
             });
 
         makeWriteRegister(0x2115, "Video Port Control", false,
@@ -143,18 +146,18 @@ public:
                 incrementVramOnHighByte = value.getBit(7);
             });
 
-        makeWriteRegister(0x2116, "VRAM Address low byte", false, 
+        makeWriteRegister(0x2116, "VRAM Address low byte", false,
             [this](Byte value) {
-                video.vram.address.setLowByte(value);
-                //vramBuffer = video.vram.readNextWord(0);
+                processor.vram.address.setLowByte(value);
+                //vramBuffer = processor.vram.readNextWord(0);
             });
 
         makeWriteRegister(0x2117, "VRAM Address high byte", false,
             [this](Byte value) {
-                video.vram.address.setHighByte(value & 0x7f);
-                vramBuffer = video.vram.readNextWord(0);
+                processor.vram.address.setHighByte(value & 0x7f);
+                vramBuffer = processor.vram.readNextWord(0);
             });
-        //makeWriteRegister(0x2116, "VRAM Address", false, video.vram.address);
+        //makeWriteRegister(0x2116, "VRAM Address", false, processor.vram.address);
 
         makeWriteRegister(0x2118, "VRAM Data Write low byte", false,
             [this](Byte value) {
@@ -170,90 +173,90 @@ public:
 
         makeWriteRegister(0x211a, "Mode 7 Settings", true,
             [this](Byte value) {
-                video.mode7HorizontalMirroring = value.getBit(0);
-                video.mode7VerticalMirroring = value.getBit(1);
-                video.mode7EmptySpaceFill = value.getBit(6);
-                video.mode7PlayingFieldSize = value.getBit(7);
+                processor.mode7HorizontalMirroring = value.getBit(0);
+                processor.mode7VerticalMirroring = value.getBit(1);
+                processor.mode7EmptySpaceFill = value.getBit(6);
+                processor.mode7PlayingFieldSize = value.getBit(7);
             });
 
         makeWriteRegister(0x211b, "Mode 7 Matrix A (also multiplicand for MPYx)", false,
             [this](Byte value) {
                 mode7Multiplicand = getMode7WordValue(value);
-                video.mode7MatrixA = mode7Multiplicand;
+                processor.mode7MatrixA = mode7Multiplicand;
             }
         );
         makeWriteRegister(0x211c, "Mode 7 Matrix B (also multiplier for MPYx)", false,
             [this](Byte value) {
                 multiplicationResult = mode7Multiplicand * int8_t(value);
-                video.mode7MatrixB = getMode7WordValue(value);
+                processor.mode7MatrixB = getMode7WordValue(value);
             }
         );
         makeWriteRegister(0x211d, "Mode 7 Matrix C", false,
             [this](Byte value) {
-                video.mode7MatrixC = getMode7WordValue(value);
+                processor.mode7MatrixC = getMode7WordValue(value);
             });
         makeWriteRegister(0x211e, "Mode 7 Matrix D", false,
             [this](Byte value) {
-                video.mode7MatrixD = getMode7WordValue(value);
+                processor.mode7MatrixD = getMode7WordValue(value);
             });
         makeWriteRegister(0x211f, "Mode 7 Center X", false,
             [this](Byte value) {
-                video.mode7CenterX = to13Bit2sComplement(getMode7WordValue(value));
+                processor.mode7CenterX = to13Bit2sComplement(getMode7WordValue(value));
             });
         makeWriteRegister(0x2120, "Mode 7 Center Y", false,
             [this](Byte value) {
-                video.mode7CenterY = to13Bit2sComplement(getMode7WordValue(value));
+                processor.mode7CenterY = to13Bit2sComplement(getMode7WordValue(value));
             });
 
         makeWriteRegister(0x2121, "CGRAM Address", false,
             [this](Byte value) {
-                video.cgram.address.setLowByte(value);
-                video.cgram.address.setHighByte(0x00);
+                processor.cgram.address.setLowByte(value);
+                processor.cgram.address.setHighByte(0x00);
             }
         );
         makeWriteRegister(0x2122, "CGRAM Data Write", false,
             [this](Byte value) {
-                Word cgramAddress = video.cgram.address;
+                Word cgramAddress = processor.cgram.address;
 
-                video.cgram.writeByte(value);
+                processor.cgram.writeByte(value);
 
                 /*if (cgramHighTable) {
                     int row = cgramAddress / 0x10;
                     int column = cgramAddress % 0x10;
-                    video.cgramRenderer.setPixel(row, column, video.cgram.readWord(cgramAddress));
+                    processor.cgramRenderer.setPixel(row, column, processor.cgram.readWord(cgramAddress));
                 }*/
             }
         );
 
-        makeWriteRegister(0x2123, "Window Mask Settings", true, video.windowMaskSettings);
-        makeWriteRegister(0x2126, "Window 1 Left Position", false, video.window1Left);
-        makeWriteRegister(0x2127, "Window 1 Right Position", false, video.window1Right);
-        makeWriteRegister(0x2128, "Window 2 Left Position", false, video.window2Left);
-        makeWriteRegister(0x2129, "Window 2 Right Position", false, video.window2Right);
-        makeWriteRegister(0x212a, "Window Mask Logic", true, video.windowMaskLogic);
-        makeWriteRegister(0x212c, "Main Screen Designation", false, video.mainScreenDesignation);
-        makeWriteRegister(0x212d, "Subscreen Designation", false, video.subscreenDesignation);
-        makeWriteRegister(0x212e, "Window Mask Designation for the Main Screen", true, video.mainScreenWindowMaskDesignation);
-        makeWriteRegister(0x212f, "Window Mask Designation for the Subscreen", true, video.subscreenWindowMaskDesignation);
+        makeWriteRegister(0x2123, "Window Mask Settings", true, processor.windowMaskSettings);
+        makeWriteRegister(0x2126, "Window 1 Left Position", false, processor.window1Left);
+        makeWriteRegister(0x2127, "Window 1 Right Position", false, processor.window1Right);
+        makeWriteRegister(0x2128, "Window 2 Left Position", false, processor.window2Left);
+        makeWriteRegister(0x2129, "Window 2 Right Position", false, processor.window2Right);
+        makeWriteRegister(0x212a, "Window Mask Logic", true, processor.windowMaskLogic);
+        makeWriteRegister(0x212c, "Main Screen Designation", false, processor.mainScreenDesignation);
+        makeWriteRegister(0x212d, "Subscreen Designation", false, processor.subscreenDesignation);
+        makeWriteRegister(0x212e, "Window Mask Designation for the Main Screen", true, processor.mainScreenWindowMaskDesignation);
+        makeWriteRegister(0x212f, "Window Mask Designation for the Subscreen", true, processor.subscreenWindowMaskDesignation);
         makeWriteRegister(0x2130, "Color Addition Select", false,
             [this](Byte value) {
-                video.directColorMode = value.getBit(0);
-                video.addSubscreen = value.getBit(1);
-                video.clipColorMathMode = Video::ColorWindowMode(int(value.getBits(4, 2)));
-                video.clipColorToBlackMode = Video::ColorWindowMode(int(value.getBits(6, 2)));
+                processor.directColorMode = value.getBit(0);
+                processor.addSubscreen = value.getBit(1);
+                processor.clipColorMathMode = ColorWindowMode(int(value.getBits(4, 2)));
+                processor.clipColorToBlackMode = ColorWindowMode(int(value.getBits(6, 2)));
             });
-        makeWriteRegister(0x2131, "Color Math Designation", false, video.colorMathDesignation);
+        makeWriteRegister(0x2131, "Color Math Designation", false, processor.colorMathDesignation);
         makeWriteRegister(0x2132, "Fixed Color Data", false,
             [this](Byte value) {
                 switch (value & 0xE0) {
                 case 0x80:
-                    video.clearColor.blue = value & 0x1F;
+                    processor.clearColor.blue = value & 0x1F;
                     break;
                 case 0x40:
-                    video.clearColor.green = value & 0x1F;
+                    processor.clearColor.green = value & 0x1F;
                     break;
                 case 0x20:
-                    video.clearColor.red = value & 0x1F;
+                    processor.clearColor.red = value & 0x1F;
                     break;
                 default:
                     break;
@@ -264,22 +267,22 @@ public:
         makeWriteRegister(0x2133, "Screen Mode/Video Select", true,
             [this](Byte value) {
                 if (value.getBit(0)) {
-                    throw Video::NotYetImplementedException("Register 2133: Screen interlace");
+                    throw NotYetImplementedException("Register 2133: Screen interlace");
                 }
                 if (value.getBit(1)) {
-                    throw Video::NotYetImplementedException("Register 2133: Object interlace");
+                    throw NotYetImplementedException("Register 2133: Object interlace");
                 }
                 if (value.getBit(2)) {
-                    throw Video::NotYetImplementedException("Register 2133: Overscan mode");
+                    throw NotYetImplementedException("Register 2133: Overscan mode");
                 }
                 if (value.getBit(3)) {
-                    throw Video::NotYetImplementedException("Register 2133: Pseudo-hires mode");
+                    throw NotYetImplementedException("Register 2133: Pseudo-hires mode");
                 }
                 if (value.getBit(6)) {
-                    throw Video::NotYetImplementedException("Register 2133: Mode 7 extra bg");
+                    throw NotYetImplementedException("Register 2133: Mode 7 extra bg");
                 }
                 if (value.getBit(7)) {
-                    throw Video::NotYetImplementedException("Register 2133: External sync");
+                    throw NotYetImplementedException("Register 2133: External sync");
                 }
             });
 
@@ -325,7 +328,7 @@ public:
 
         makeWriteRegister(0x2180, "WRAM Data read/write", false,
             [this](Byte value) {
-                state.writeMemoryByte(value, wramAddress++);
+                memory.writeByte(value, wramAddress++);
             });
         makeWriteRegister(0x2181, "WRAM Address", false, wramAddress);
 
@@ -335,9 +338,8 @@ public:
                 //printMemoryRegister(false, value, 0x4016, "NES-style Joypad Access Port 1");
             },
             [this](Byte value) {
-                if (value > 0)
-                {
-                    throw Video::NotYetImplementedException("Register 4016: Latch on");
+                if (value > 0) {
+                    throw NotYetImplementedException("Register 4016: Latch on");
                 }
             });
         makeReadWriteRegister(0x4017, "NES-style Joypad Access Port 2", false,
@@ -346,9 +348,8 @@ public:
                 //printMemoryRegister(false, value, 0x4017, "NES-style Joypad Access Port 2");
             },
             [this](Byte value) {
-                if (value > 0)
-                {
-                    throw Video::NotYetImplementedException("Register 4017: Latch on");
+                if (value > 0) {
+                    throw NotYetImplementedException("Register 4017: Latch on");
                 }
             });
 
@@ -383,8 +384,7 @@ public:
                 if (divisor == 0) {
                     quotient = 0xffff;
                     remainder = dividend;
-                }
-                else {
+                } else {
                     quotient = dividend / divisor;
                     remainder = dividend % divisor;
                 }
@@ -431,7 +431,7 @@ public:
             makeReadWriteRegister(toDmaAddress(i, 0xa), "HDMA Line Counter Channel " + channel, false, dmaChannels[i].lineCounter);
         }
 
-        std::vector<std::pair<Word, Word>> invalidRanges = {
+        std::vector<std::pair<Long, Long>> invalidRanges = {
             { 0x2000, 0x2100 },
             { 0x2144, 0x2180 },
             { 0x2200, 0x4016 },
@@ -440,12 +440,12 @@ public:
             { 0x437b, 0x8000 }
         };
 
-        for (const std::pair<Word, Word>& range : invalidRanges) {
-            for (Word address = range.first; address < range.second; ++address) {
+        for (const std::pair<Long, Long>& range : invalidRanges) {
+            for (Long address = range.first; address < range.second; ++address) {
                 makeReadRegister(address, "Invalid register", true,
                     [this](Byte& value) {
                         //pauseRequested = true;
-                        value = state.getMemory().bus;
+                        value = memory.bus;
                     });
             }
         }
@@ -508,48 +508,46 @@ public:
     void readControllers()
     {
         if (autoJoypadReadEnabled) {
-            controllerPort1Data1.setBit(4, video.renderer.buttonR);
-            controllerPort1Data1.setBit(5, video.renderer.buttonL);
-            controllerPort1Data1.setBit(6, video.renderer.buttonX);
-            controllerPort1Data1.setBit(7, video.renderer.buttonA);
-            controllerPort1Data1.setBit(8, video.renderer.buttonRight);
-            controllerPort1Data1.setBit(9, video.renderer.buttonLeft);
-            controllerPort1Data1.setBit(10, video.renderer.buttonDown);
-            controllerPort1Data1.setBit(11, video.renderer.buttonUp);
-            controllerPort1Data1.setBit(12, video.renderer.buttonStart);
-            controllerPort1Data1.setBit(13, video.renderer.buttonSelect);
-            controllerPort1Data1.setBit(14, video.renderer.buttonY);
-            controllerPort1Data1.setBit(15, video.renderer.buttonB);
+            controllerPort1Data1.setBit(4, processor.renderer.buttonR);
+            controllerPort1Data1.setBit(5, processor.renderer.buttonL);
+            controllerPort1Data1.setBit(6, processor.renderer.buttonX);
+            controllerPort1Data1.setBit(7, processor.renderer.buttonA);
+            controllerPort1Data1.setBit(8, processor.renderer.buttonRight);
+            controllerPort1Data1.setBit(9, processor.renderer.buttonLeft);
+            controllerPort1Data1.setBit(10, processor.renderer.buttonDown);
+            controllerPort1Data1.setBit(11, processor.renderer.buttonUp);
+            controllerPort1Data1.setBit(12, processor.renderer.buttonStart);
+            controllerPort1Data1.setBit(13, processor.renderer.buttonSelect);
+            controllerPort1Data1.setBit(14, processor.renderer.buttonY);
+            controllerPort1Data1.setBit(15, processor.renderer.buttonB);
         }
     }
 
     void writeToVram(Byte value, bool highByte, bool increment)
     {
         if (videoPortControl.getBits(2, 2) != 0) {
-            throw Video::NotYetImplementedException("Video port control address mapping");
+            throw NotYetImplementedException("Video port control address mapping");
         }
         if (increment) {
-            video.vram.writeByte(value, highByte, getVramIncrement());
-        }
-        else {
-            video.vram.writeByte(value, highByte, 0);
+            processor.vram.writeByte(value, highByte, getVramIncrement());
+        } else {
+            processor.vram.writeByte(value, highByte, 0);
         }
     }
 
     Byte readFromVram(bool highByte, bool increment)
     {
         if (videoPortControl.getBits(2, 2) != 0) {
-            throw Video::NotYetImplementedException("Video port control address mapping");
+            throw NotYetImplementedException("Video port control address mapping");
         }
         Byte result;
         if (highByte) {
             result = vramBuffer.getHighByte();
-        }
-        else {
+        } else {
             result = vramBuffer.getLowByte();
         }
         if (increment) {
-            vramBuffer = video.vram.readNextWord(getVramIncrement());
+            vramBuffer = processor.vram.readNextWord(getVramIncrement());
         }
         return result;
     }
@@ -557,13 +555,12 @@ public:
     int getVramIncrement()
     {
         if (videoPortControl.getBits(0, 2) == 2) {
-            throw Video::NotYetImplementedException("Video port control: unsure of increment 2");
+            throw NotYetImplementedException("Video port control: unsure of increment 2");
         }
         int increment = 1;
         if (videoPortControl.getBit(1)) {
             increment = 128;
-        }
-        else if (videoPortControl.getBit(0)) {
+        } else if (videoPortControl.getBit(0)) {
             increment = 32;
         }
         return increment;
@@ -577,12 +574,16 @@ public:
         mode7Buffer = 0;
         mode7Multiplicand = 0;
 
-        video.vram.address = 0;
+        processor.vram.address = 0;
     }
 
     std::ostream& output;
     std::ostream& error;
-    Video& video;
+
+    CPU::State& state;
+    CPU::State::MemoryType& memory;
+
+    Processor processor;
 
     bool pauseRequested = false;
 
@@ -620,8 +621,8 @@ public:
     Word vTimer;
     Byte programmableIOPort = 0xff;
     bool externalLatch = false;
-    Video::ReadTwiceRegister horizontalScanlineLocation;
-    Video::ReadTwiceRegister verticalScanlineLocation;
+    ReadTwiceRegister horizontalScanlineLocation;
+    ReadTwiceRegister verticalScanlineLocation;
     Byte ppuStatusFlagAndVersion;
 
     Byte dmaEnabled;
@@ -629,3 +630,5 @@ public:
 
     std::array<DmaChannel, 8> dmaChannels;
 };
+
+}

@@ -17,7 +17,7 @@ int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debu
 
 void Emulator::initialize()
 {
-    registers.initialize();
+    videoRegisters.initialize();
 
     rom.storeToMemory(cpuState);
 
@@ -121,9 +121,9 @@ void Emulator::initialize()
         throw std::runtime_error("Only the low-rom mempory map is supported for now");
     }
 
-    video.initialize(rom.gameTitle);
+    videoProcessor.initialize(rom.gameTitle);
 
-    audio.initialize(cpuMemory);
+    audioRegisters.initialize(cpuMemory);
 
     cpuMemory.finalize();
     spcMemory.finalize();
@@ -139,19 +139,19 @@ void Emulator::initialize()
 
 void Emulator::run()
 {
-    OamViewer oamViewer(video, 1080, 760);
-    BackgroundViewer background1Viewer(video, BackgroundLayer1, 0, 10);
-    BackgroundViewer background2Viewer(video, BackgroundLayer2, Video::rendererWidth * 2 + 20, 10);
-    BackgroundViewer background3Viewer(video, BackgroundLayer3, 0, Video::rendererWidth * 2 + 20);
-    BackgroundViewer background4Viewer(video, BackgroundLayer4, Video::rendererWidth * 2, Video::rendererWidth * 2 + 20);
-    SpriteLayerViewer spriteLayer1Viewer(video, 0, Video::rendererWidth * 2 + 20, Video::rendererWidth * 2 + 40);
-    SpriteLayerViewer spriteLayer2Viewer(video, 1, Video::rendererWidth * 2 + 20 + Video::rendererWidth + 20, Video::rendererWidth * 2 + 40);
-    SpriteLayerViewer spriteLayer3Viewer(video, 2, Video::rendererWidth * 2 + 20, Video::rendererWidth * 2 + 40 + Video::rendererWidth);
-    SpriteLayerViewer spriteLayer4Viewer(video, 3, Video::rendererWidth * 2 + 20 + Video::rendererWidth + 20, Video::rendererWidth * 2 + 40 + Video::rendererWidth);
-    Mode7Viewer mode7Viewer(video, 0, 40);
+    Video::OamViewer oamViewer(videoProcessor, 1080, 760);
+    Video::BackgroundViewer background1Viewer(videoProcessor, Video::BackgroundLayer1, 0, 10);
+    Video::BackgroundViewer background2Viewer(videoProcessor, Video::BackgroundLayer2, Video::rendererWidth * 2 + 20, 10);
+    Video::BackgroundViewer background3Viewer(videoProcessor, Video::BackgroundLayer3, 0, Video::rendererWidth * 2 + 20);
+    Video::BackgroundViewer background4Viewer(videoProcessor, Video::BackgroundLayer4, Video::rendererWidth * 2, Video::rendererWidth * 2 + 20);
+    Video::SpriteLayerViewer spriteLayer1Viewer(videoProcessor, 0, Video::rendererWidth * 2 + 20, Video::rendererWidth * 2 + 40);
+    Video::SpriteLayerViewer spriteLayer2Viewer(videoProcessor, 1, Video::rendererWidth * 2 + 20 + Video::rendererWidth + 20, Video::rendererWidth * 2 + 40);
+    Video::SpriteLayerViewer spriteLayer3Viewer(videoProcessor, 2, Video::rendererWidth * 2 + 20, Video::rendererWidth * 2 + 40 + Video::rendererWidth);
+    Video::SpriteLayerViewer spriteLayer4Viewer(videoProcessor, 3, Video::rendererWidth * 2 + 20 + Video::rendererWidth + 20, Video::rendererWidth * 2 + 40 + Video::rendererWidth);
+    Video::Mode7Viewer mode7Viewer(videoProcessor, 0, 40);
 
-    DmaInstruction dmaInstruction(output, error, cpuState, registers);
-    HdmaInstruction hdmaInstruction(output, error, cpuState, registers);
+    DmaInstruction dmaInstruction(output, error, cpuState, videoRegisters);
+    HdmaInstruction hdmaInstruction(output, error, cpuState, videoRegisters);
 
     uint64_t nextCpu = masterCycle;
     uint64_t nextSpc = masterCycle;
@@ -159,7 +159,7 @@ void Emulator::run()
 
     uint64_t audioCycle = 0;
 
-    registers.hCounter = int(masterCycle);
+    videoRegisters.hCounter = int(masterCycle);
 
     bool nmiRequested = false;
     bool irqRequested = false;
@@ -170,9 +170,8 @@ void Emulator::run()
     uint64_t cycleCountDelta = 0;
     bool stepMode = cpuContext.isPaused() || spcContext.isPaused();
     if (!stepMode) {
-        output << "Snip" << std::endl;
         debugger.startTime = clock();
-        runStartTime = video.renderer.getTime();
+        runStartTime = videoProcessor.renderer.getTime();
     }
     stepMode = true;
 
@@ -202,7 +201,7 @@ void Emulator::run()
                         dmaInstruction.blockedInstruction = instruction;
                         instruction = static_cast<Instruction*>(&dmaInstruction);
                         dmaPicked = true;
-                        if (!registers.vBlank) {
+                        if (!videoRegisters.vBlank) {
                             //output << "DMA not during V blank" << std::endl;
                             //cpuContext.stepMode = true;
                         }
@@ -223,9 +222,9 @@ void Emulator::run()
 
                     if (cpuContext.isPaused()) {
                         output << "Cycle count: " << masterCycle << ", Next cpu: " << nextCpu << ", Next spc: " << nextSpc << std::endl;
-                        output << "Frame: " << registers.frame << ", V counter: " << registers.vCounter << ", H counter: " << registers.hCounter << ", V blank: " << registers.vBlank << ", H blank: " << registers.hBlank << ", nmi: " << cpuState.isNmiActive() << ", irq: " << cpuState.isIrqActive() << std::endl;
+                        output << "Frame: " << videoRegisters.frame << ", V counter: " << videoRegisters.vCounter << ", H counter: " << videoRegisters.hCounter << ", V blank: " << videoRegisters.vBlank << ", H blank: " << videoRegisters.hBlank << ", nmi: " << cpuState.isNmiActive() << ", irq: " << cpuState.isIrqActive() << std::endl;
                         debugger.printBreakpoints(cpuContext, spcContext);
-                        debugger.printMemory(cpuState, cpuContext, spcState, spcContext, video);
+                        debugger.printMemory(cpuState, cpuContext, spcState, spcContext, videoProcessor);
                     }
 
                     if (int cycles = executeNext(instruction, cpuState, debugger, cpuContext, spcState, spcContext, error)) {
@@ -237,9 +236,9 @@ void Emulator::run()
                     }
                 }
 
-                if (registers.pauseRequested) {
+                if (videoRegisters.pauseRequested) {
                     cpuContext.setPaused(true);
-                    registers.pauseRequested = false;
+                    videoRegisters.pauseRequested = false;
                 }
 
                 if (masterCycle == nextSpc) {
@@ -251,7 +250,7 @@ void Emulator::run()
                     if (spcContext.isPaused()) {
                         output << "cycleCount=" << masterCycle << ", nextCpu=" << nextCpu << ", nextSpc=" << nextSpc << std::endl;
                         debugger.printBreakpoints(cpuContext, spcContext);
-                        debugger.printMemory(cpuState, cpuContext, spcState, spcContext, video);
+                        debugger.printMemory(cpuState, cpuContext, spcState, spcContext, videoProcessor);
                     }
 
                     if (int cycles = executeNext(instruction, spcState, debugger, spcContext, cpuState, cpuContext, error)) {
@@ -263,6 +262,11 @@ void Emulator::run()
                     }
                 }
 
+                if (audioRegisters.pauseRequested) {
+                    spcContext.setPaused(true);
+                    audioRegisters.pauseRequested = false;
+                }
+
                 bool increment = false;
                 if (cpuContext.isPaused() || spcContext.isPaused()) { // step mode
                     increment = true;
@@ -270,12 +274,12 @@ void Emulator::run()
                 }
                 else if (stepMode) { // run mode initiated
                     stepMode = false;
-                    runStartTime = video.renderer.getTime();
+                    runStartTime = videoProcessor.renderer.getTime();
                     cycleCountDelta = 0;
                 }
                 else { // run mode continued
                     if (iteration % 100 == 0) {
-                        double elapsedTime = video.renderer.getTime() - runStartTime;
+                        double elapsedTime = videoProcessor.renderer.getTime() - runStartTime;
                         static const double clockSpeedTarget = 1.89e9 / 88.0;
                         cycleCountTarget = uint64_t(elapsedTime * clockSpeedTarget);
                     }
@@ -284,7 +288,7 @@ void Emulator::run()
                         increment = true;
                     }
 
-                    increment = true;
+                    //increment = true;
 
                     if (increment) {
                         ++cycleCountDelta;
@@ -294,24 +298,24 @@ void Emulator::run()
                 if (increment) {
                     ++masterCycle;
                     if (masterCycle % 21 == 0) {
-                        audio.tick();
+                        audioRegisters.tick();
                     }
-                    ++registers.hCounter;
-                    if (registers.hCounter == 274) {
-                        if (registers.vCounter <= 224) {
-                            if (registers.vCounter > 0) {
-                                video.drawScanline(registers.vCounter);
+                    ++videoRegisters.hCounter;
+                    if (videoRegisters.hCounter == 274) {
+                        if (videoRegisters.vCounter <= 224) {
+                            if (videoRegisters.vCounter > 0) {
+                                videoProcessor.drawScanline(videoRegisters.vCounter);
                             }
                             if (hdmaInstruction.enabled() && !hdmaInstruction.isActive()) {
                                 hdmaInstruction.setActive(true);
                             }
                         }
-                        if (registers.vCounter == 224) {
-                            static double previousTime = video.renderer.getTime();
+                        if (videoRegisters.vCounter == 224) {
+                            static double previousTime = videoProcessor.renderer.getTime();
                             static uint32_t frameCount = 0;
                             static uint32_t totalFrameCount = 0;
 
-                            double currentTime = video.renderer.getTime();
+                            double currentTime = videoProcessor.renderer.getTime();
                             ++frameCount;
                             ++totalFrameCount;
                             static uint32_t minFrameCount = -1;
@@ -327,15 +331,15 @@ void Emulator::run()
                                 previousTime = currentTime;
 
                                 if (++printOuts % 10 == 0) {
-                                    double elapsedTime = video.renderer.getTime() - runStartTime;
+                                    double elapsedTime = videoProcessor.renderer.getTime() - runStartTime;
                                     output << "Avg. FPS: " << (totalFrameCount / elapsedTime) << std::endl;
                                     output << "Min. FPS: " << minFrameCount << std::endl;
                                     output << "Max. FPS: " << maxFrameCount << std::endl;
                                 }
                             }
 
-                            //video.renderer.update();
-                            video.rendererLock.unlock();
+                            //videoProcessor.renderer.update();
+                            videoProcessor.rendererLock.unlock();
 
                             oamViewer.update();
                             background1Viewer.update();
@@ -349,47 +353,47 @@ void Emulator::run()
                             mode7Viewer.update();
 
                         }
-                        registers.hBlank = true;
+                        videoRegisters.hBlank = true;
                     }
-                    else if (registers.hCounter == 1374) {
-                        registers.hCounter = 0;
-                        registers.hBlank = false;
-                        ++registers.vCounter;
-                        if (registers.irqMode == Registers::VCounterIrq && registers.vTimer == registers.vCounter) {
+                    else if (videoRegisters.hCounter == 1374) {
+                        videoRegisters.hCounter = 0;
+                        videoRegisters.hBlank = false;
+                        ++videoRegisters.vCounter;
+                        if (videoRegisters.irqMode == Video::Registers::VCounterIrq && videoRegisters.vTimer == videoRegisters.vCounter) {
                             irqRequested = true;
                         }
-                        if (registers.vCounter == 225) {
+                        if (videoRegisters.vCounter == 225) {
                             hdmaInstruction.setActive(false);
-                            registers.vBlank = true;
-                            registers.video.oam.address = registers.oamStartAddress;
-                            //registers.video.vram.address = registers.vramStartAddress;
-                            if (registers.nmiEnabled) {
+                            videoRegisters.vBlank = true;
+                            videoProcessor.oam.address = videoRegisters.oamStartAddress;
+                            //videoRegisters.videoProcessor.vram.address = videoRegisters.vramStartAddress;
+                            if (videoRegisters.nmiEnabled) {
                                 nmiRequested = true;
                             }
                         }
-                        else if (registers.vCounter == 227) {
-                            registers.readControllers();
+                        else if (videoRegisters.vCounter == 227) {
+                            videoRegisters.readControllers();
                         }
-                        else if (registers.vCounter == 262) {
-                            video.rendererLock.lock();
+                        else if (videoRegisters.vCounter == 262) {
+                            videoProcessor.rendererLock.lock();
 
-                            if (video.renderer.pauseRequested) {
-                                video.renderer.pauseRequested = false;
+                            if (videoProcessor.renderer.pauseRequested) {
+                                videoProcessor.renderer.pauseRequested = false;
                                 cpuContext.setPaused(true);
                             }
 
-                            ++registers.frame;
-                            registers.vCounter = 0;
-                            registers.interlaceField = !registers.interlaceField;
-                            registers.vBlank = false;
+                            ++videoRegisters.frame;
+                            videoRegisters.vCounter = 0;
+                            videoRegisters.interlaceField = !videoRegisters.interlaceField;
+                            videoRegisters.vBlank = false;
 
                             if (hdmaInstruction.enabled()) {
                                 hdmaInstruction.setActive(true, true);
                             }
                         }
                     }
-                    if (registers.hTimer == registers.hCounter) {
-                        if (registers.irqMode == Registers::HCounterIrq || registers.irqMode == Registers::HAndVCounterIrq && registers.vTimer == registers.vCounter) {
+                    if (videoRegisters.hTimer == videoRegisters.hCounter) {
+                        if (videoRegisters.irqMode == Video::Registers::HCounterIrq || videoRegisters.irqMode == Video::Registers::HAndVCounterIrq && videoRegisters.vTimer == videoRegisters.vCounter) {
                             irqRequested = true;
                         }
                     }

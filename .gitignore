@@ -260,14 +260,16 @@ paket-files/
 __pycache__/
 *.pyc
 
-# ROM Files
-*.sfc
-*.smc
-*.srm
 /build/vs2017/SnesEmulator/address.txt
 /build/vs2017/SnesEmulator/spc.txt
 /build/vs2017/SnesEmulator/cpu.txt
+
+# Binary files
+*.sfc
+*.smc
+*.srm
 *.save
+*.wav
 
 # CMake build output
 /build/cmake/SnesEmulator/out

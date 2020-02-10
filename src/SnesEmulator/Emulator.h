@@ -8,16 +8,18 @@
 
 #include "WDC65816/CpuState.h"
 #include "SPC700/SpcState.h"
-#include "SPC700/Audio.h"
 
 #include "WDC65816/CpuInstructionDecoder.h"
 #include "SPC700/SpcInstructionDecoder.h"
 
 #include "Rom.h"
 #include "Debugger.h"
-#include "Renderer.h"
-#include "Video.h"
-#include "Registers.h"
+
+#include "VideoRenderer.h"
+#include "VideoProcessor.h"
+#include "VideoRegisters.h"
+
+#include "AudioProcessor.h"
 
 class Emulator
 {
@@ -29,14 +31,17 @@ private:
         {
         }
 
+        ~SaveRamSaver()
+        {
+        }
+
         void operator()()
         {
-            running = true;
-            while (running) {
+            while (run) {
                 bool save = false;
                 {
                     std::unique_lock<std::mutex> lock(mutex);
-                    condition.wait(lock, [this]() { return saveRamModified || !running; });
+                    condition.wait(lock, [this]() { return saveRamModified || !run; });
                     save = saveRamModified;
                     saveRamModified = false;
                 }
@@ -50,7 +55,7 @@ private:
             }
         }
 
-        bool running = false;
+        bool run = true;
         bool saveRamModified = false;
         std::mutex mutex;
         std::condition_variable condition;
@@ -63,15 +68,16 @@ public:
         : output(output)
         , input(input)
         , error(error)
-        , video(output)
         , rom(rom)
         , cpuState()
         , spcState()
-        , registers(output, error, cpuState, video)
-        , audio(output, error, spcState)
-        , debugger(output, input, error, registers, audio, masterCycle, running)
         , cpuInstructionDecoder(cpuState)
         , spcInstructionDecoder(spcState)
+        , videoRegisters(output, error, cpuState)
+        , videoProcessor(videoRegisters.processor)
+        , audioRegisters(output, error, spcState)
+        , audioProcessor(audioRegisters.processor)
+        , debugger(output, input, error, videoRegisters, audioRegisters, masterCycle, running)
         , cpuContext("cpu.txt", System::Green, debugger)
         , spcContext("spc.txt", System::Magenta, debugger)
         , saveRamSaver(*this)
@@ -83,11 +89,9 @@ public:
 
     ~Emulator()
     {
-        if (saveRamSaver.running) {
-            saveRamSaver.running = false;
-            saveRamSaver.condition.notify_one();
-            saveRamSaverThread.join();
-        }
+        saveRamSaver.run = false;
+        saveRamSaver.condition.notify_one();
+        saveRamSaverThread.join();
     }
 
     void initialize();
@@ -108,24 +112,29 @@ private:
     std::istream& input;
     std::ostream& error;
 
-    Debugger debugger;
     const Rom& rom;
     CPU::State cpuState;
     SPC::State spcState;
     CPU::InstructionDecoder cpuInstructionDecoder;
     SPC::InstructionDecoder spcInstructionDecoder;
+
+    Video::Registers videoRegisters;
+    Audio::Registers audioRegisters;
+
+    Video::Processor& videoProcessor;
+    Audio::Processor& audioProcessor;
+
+
+    Debugger debugger;
+
     Debugger::Context<CPU::State> cpuContext;
     Debugger::Context<SPC::State> spcContext;
 
-    Video video;
-    Registers registers;
-    SPC::Audio audio;
+    SaveRamSaver saveRamSaver;
+    std::thread saveRamSaverThread;
 
     bool running = true;
     uint64_t masterCycle = 186;
-
-    SaveRamSaver saveRamSaver;
-    std::thread saveRamSaverThread;
 
     std::array<Byte, 4> cpuToSpcBuffers;
     std::array<Byte, 4> spcToCpuBuffers;

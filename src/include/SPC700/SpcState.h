@@ -192,9 +192,9 @@ public:
     }
 
     template<typename LocationType, typename... Args>
-    void createMemoryLocation(Word address, Args... args)
+    void createMemoryLocation(Word address, Args&&... args)
     {
-        memory.createLocation<LocationType, Args...>(address, args...);
+        memory.createLocation<LocationType, Args...>(address, std::forward<Args>(args)...);
     }
 
     bool hasBreakpoint(int offset) const

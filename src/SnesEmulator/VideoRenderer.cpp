@@ -1,4 +1,4 @@
-#include "Renderer.h"
+#include "VideoRenderer.h"
 
 #include <cmath>
 
@@ -80,6 +80,8 @@ void getConsoleWindowPosition(int& x, int& y)
 
 }
 
+namespace Video {
+
 Renderer::~Renderer()
 {
     output << "Renderer " << title << " destructor" << std::endl;
@@ -96,33 +98,18 @@ void Renderer::initialize(bool fullscreen, bool aspectCorrection)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
 
-    const float aspectCorrectionFactor = aspectCorrection ? (float(height) / float(width)) * (4.f / 3.f) : 1.f;
-
     int left, top, right, bottom;
     getConsoleWindowPosition(left, top, right, bottom);
     windowXPosition = right;
     windowYPosition = top;
 
-    if (fullscreen) {
-        GLFWmonitor* monitor = getMonitorForPoint(left, top);
-        const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-        glfwWindowHint(GLFW_RED_BITS, mode->redBits);
-        glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
-        glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
-        glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
-        window = glfwCreateWindow(mode->width, mode->height, title.c_str(), monitor, nullptr);
-        yScale = float(mode->height) / float(height);
-        xScale = yScale * aspectCorrectionFactor;
-        float correctedWidth = float(width) * xScale;
-        xScreenCoverage = correctedWidth / float(mode->width);
-    }
-    else {
-        yScale = scale;
-        xScale = yScale * aspectCorrectionFactor;
-        window = glfwCreateWindow(int(float(width) * xScale + 0.5), int(float(height) * yScale + 0.5), title.c_str(), nullptr, nullptr);
-        glfwSetWindowPos(window, windowXPosition, windowYPosition);
-        xScreenCoverage = 1.0;
-    }
+    GLFWmonitor* monitor = getMonitorForPoint(left, top);
+    const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+    glfwWindowHint(GLFW_RED_BITS, mode->redBits);
+    glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
+    glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
+    glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
+    window = glfwCreateWindow(mode->width, mode->height, title.c_str(), monitor, nullptr);
 
     output << "Created renderer with dimensions " << int(float(width) * xScale + 0.5) << ":" << int(float(height) * yScale + 0.5) << std::endl;
 
@@ -142,6 +129,12 @@ void Renderer::initialize(bool fullscreen, bool aspectCorrection)
 
     glShadeModel(GL_FLAT);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+    if (fullscreen) {
+        calculateScale(mode, aspectCorrection);
+    } else {
+        setWindowProperties(fullscreen, aspectCorrection);
+    }
 }
 
 void Renderer::terminate()
@@ -149,9 +142,29 @@ void Renderer::terminate()
     glfwTerminate();
 }
 
-void Renderer::setWindowProperties(bool fullscreen, bool aspectRatioCorrection)
+float Renderer::getAspectCorrectionFactor(bool aspectCorrection) const
 {
-    const float aspectCorrectionFactor = aspectRatioCorrection ? (float(height) / float(width)) * (4.f / 3.f) : 1.f;
+    return aspectCorrection ? (float(height) / float(width)) * (4.f / 3.f) : 1.f;
+}
+
+void Renderer::calculateScale(const GLFWvidmode* mode, bool aspectCorrection)
+{
+    yScale = float(mode->height) / float(height);
+    xScale = yScale * getAspectCorrectionFactor(aspectCorrection);
+    float screenWidth = float(width) * xScale;
+    xScreenCoverage = screenWidth / float(mode->width);
+    yScreenCoverage = 1.f;
+    if (xScreenCoverage > 1.f) {
+        float scaleFactor = 1.f / xScreenCoverage;
+        xScale *= scaleFactor;
+        yScale *= scaleFactor;
+        xScreenCoverage *= scaleFactor;
+        yScreenCoverage *= scaleFactor;
+    }
+}
+
+void Renderer::setWindowProperties(bool fullscreen, bool aspectCorrection)
+{
     if (fullscreen) {
         int x, y;
         getWindowPosition(window, x, y);
@@ -160,16 +173,13 @@ void Renderer::setWindowProperties(bool fullscreen, bool aspectRatioCorrection)
             fullscreenMonitor = glfwGetPrimaryMonitor();
         }
         const GLFWvidmode* mode = glfwGetVideoMode(fullscreenMonitor);
-        yScale = float(mode->height) / float(height);
-        xScale = yScale * aspectCorrectionFactor;
-        float correctedWidth = float(width) * xScale;
-        xScreenCoverage = correctedWidth / float(mode->width);
+        calculateScale(mode, aspectCorrection);
         glfwSetWindowMonitor(window, fullscreenMonitor, 0, 0, mode->width, mode->height, mode->refreshRate);
-    }
-    else {
+    } else {
         yScale = scale;
-        xScale = yScale * aspectCorrectionFactor;
-        xScreenCoverage = 1.0;
+        xScale = yScale * getAspectCorrectionFactor(aspectCorrection);
+        xScreenCoverage = 1.f;
+        yScreenCoverage = 1.f;
         glfwSetWindowMonitor(window, nullptr, windowXPosition, windowYPosition, int(float(width) * xScale + .5f), int(float(height) * yScale + .5f), 0);
     }
 }
@@ -183,7 +193,7 @@ void Renderer::update()
 
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glRasterPos2f(-xScreenCoverage, -1.0);
+    glRasterPos2f(-xScreenCoverage, -yScreenCoverage);
     glPixelZoom(xScale, yScale);
     {
         std::lock_guard lock(pixelBufferMutex);
@@ -219,8 +229,7 @@ void Renderer::update()
             toggleFullscreenRequested = true;
             pressKeyTimeout = 30;
         }
-    }
-    else {
+    } else {
         --pressKeyTimeout;
     }
 
@@ -238,11 +247,9 @@ void Renderer::update()
     buttonRight = isPressed(GLFW_KEY_D);
 
     for (int joystick = GLFW_JOYSTICK_1; joystick <= GLFW_JOYSTICK_LAST; ++joystick) {
-        if (glfwJoystickIsGamepad(joystick))
-        {
+        if (glfwJoystickIsGamepad(joystick)) {
             GLFWgamepadstate state;
-            if (glfwGetGamepadState(joystick, &state))
-            {
+            if (glfwGetGamepadState(joystick, &state)) {
                 buttonStart |= state.buttons[GLFW_GAMEPAD_BUTTON_START] == GLFW_PRESS;
                 buttonSelect |= state.buttons[GLFW_GAMEPAD_BUTTON_BACK] == GLFW_PRESS;
                 buttonA |= state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_PRESS;
@@ -263,18 +270,16 @@ void Renderer::update()
                 if (axisX * axisX + axisY * axisY > thresholdSquared) {
                     float angle = std::atan2f(axisY, axisX);
                     static const float pi8 = std::atanf(1.f) / 2.f;
-                    
+
                     if (angle > pi8 * 5 || angle < -pi8 * 5) {
                         buttonLeft = true;
-                    }
-                    else if (angle > -pi8 * 3 && angle < pi8 * 3) {
+                    } else if (angle > -pi8 * 3 && angle < pi8 * 3) {
                         buttonRight = true;
                     }
 
                     if (angle > -pi8 * 7 && angle < -pi8) {
                         buttonUp = true;
-                    }
-                    else if (angle > pi8 && angle < pi8 * 7) {
+                    } else if (angle > pi8 && angle < pi8 * 7) {
                         buttonDown = true;
                     }
                 }
@@ -350,4 +355,6 @@ bool Renderer::isPressed(int key) const
 void Renderer::focusWindow(bool value)
 {
     focusWindowRequested = value;
+}
+
 }

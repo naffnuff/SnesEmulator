@@ -339,6 +339,7 @@ private:
         if (onRead == nullptr) {
             Register::readImpl(bus);
         } else {
+            bus = 0xfa;
             onRead(bus);
         }
     }
@@ -492,10 +493,10 @@ public:
     }
 
     template<typename LocationType, typename... Args>
-    void createLocation(AddressType address, Args... args)
+    void createLocation(AddressType address, Args&&... args)
     {
         checkIsInitialized(address, false, __FUNCTION__);
-        memory[address] = std::make_shared<LocationType>(bus, args...);
+        memory[address] = std::make_shared<LocationType>(bus, std::forward<Args>(args)...);
     }
 
     void createMirror(AddressType mirror, AddressType origin)

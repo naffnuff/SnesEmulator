@@ -138,8 +138,6 @@ public:
 
     State()
     {
-        std::cout << "Memory size=" << memory.size() << std::endl;
-
 #ifdef DEBUGMEMORY
         for (int address = 0; address < memory.size(); ++address) {
             std::stringstream ss;
@@ -329,9 +327,9 @@ public:
     }
 
     template<typename LocationType, typename... Args>
-    void createMemoryLocation(Long address, Args... args)
+    void createMemoryLocation(Long address, Args&&... args)
     {
-        memory.createLocation<LocationType, Args...>(address, args...);
+        memory.createLocation<LocationType, Args...>(address, std::forward<Args>(args)...);
     }
 
     Byte readMemoryByte(Long address)

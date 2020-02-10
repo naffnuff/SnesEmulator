@@ -4,7 +4,7 @@
 #include <filesystem>
 
 #include "Emulator.h"
-#include "Renderer.h"
+#include "VideoRenderer.h"
 
 int main(int, char**)
 {

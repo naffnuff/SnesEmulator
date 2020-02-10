@@ -7,12 +7,12 @@
 
 #include "WDC65816/CpuState.h"
 
-#include "Registers.h"
+#include "VideoRegisters.h"
 
 class DmaInstruction : public Instruction
 {
 public:
-    DmaInstruction(std::ostream& output, std::ostream& error, CPU::State& state, Registers& registers)
+    DmaInstruction(std::ostream& output, std::ostream& error, CPU::State& state, Video::Registers& registers)
         : output(output)
         , error(error)
         , memory(state.getMemory())
@@ -32,7 +32,7 @@ public:
         if (registers.dmaEnabled) {
             for (int i = 0; i < 8; ++i) {
                 if (registers.dmaEnabled.getBit(i)) {
-                    const Registers::DmaChannel& channel = registers.dmaChannels[i];
+                    const Video::Registers::DmaChannel& channel = registers.dmaChannels[i];
                     ss << "Channel " << i << ": ";
                     ss << channel.sourceAddress;
                     ss << " -> ";
@@ -62,7 +62,7 @@ public:
                         cycles += 3;
                     }
 
-                    Registers::DmaChannel& channel = registers.dmaChannels[i];
+                    Video::Registers::DmaChannel& channel = registers.dmaChannels[i];
                     if (!channel.dmaActive) {
                         channel.dmaActive = true;
                         cycles += 1;
@@ -151,7 +151,7 @@ public:
 
 private:
     CPU::State::MemoryType& memory;
-    Registers& registers;
+    Video::Registers& registers;
 
     std::ostream& output;
     std::ostream& error;
