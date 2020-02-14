@@ -196,7 +196,7 @@ void Renderer::update()
     glRasterPos2f(-xScreenCoverage, -yScreenCoverage);
     glPixelZoom(xScale, yScale);
     {
-        std::lock_guard lock(pixelBufferMutex);
+        std::scoped_lock lock(pixelBufferMutex);
         glDrawPixels(width, height, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, pixelBuffer.data());
         if (!syncUpdate)
         {

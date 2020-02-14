@@ -29,4 +29,25 @@ void setOutputColor(std::ostream& output, Color color, bool bright)
 }
 #endif
 
+ScopedOutputColor::ScopedOutputColor(std::ostream& output)
+    : output(output)
+{
+}
+
+ScopedOutputColor::ScopedOutputColor(std::ostream& output, Color color, bool bright)
+    : output(output)
+{
+    set(color, bright);
+}
+
+ScopedOutputColor::~ScopedOutputColor()
+{
+    setOutputColor(output, DefaultColor, false);
+}
+
+void ScopedOutputColor::set(Color color, bool bright)
+{
+    setOutputColor(output, color, bright);
+}
+
 }

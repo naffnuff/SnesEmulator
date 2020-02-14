@@ -35,7 +35,21 @@ enum Color
 };
 #endif
 
-void setOutputColor(std::ostream& output, Color color, bool bright);
 void focusConsoleWindow();
+
+class ScopedOutputColor
+{
+public:
+    ScopedOutputColor(std::ostream& output);
+    ScopedOutputColor(std::ostream& output, Color color, bool bright);
+    ~ScopedOutputColor();
+
+    ScopedOutputColor(const ScopedOutputColor&) = delete;
+    ScopedOutputColor& operator=(const ScopedOutputColor&) = delete;
+
+    void set(Color color, bool bright);
+private:
+    std::ostream& output;
+};
 
 }

@@ -16,15 +16,6 @@ namespace Audio {
 class Registers : public RegisterManager<SPC::State::MemoryType, System::Blue>
 {
 public:
-    class NotYetImplementedException : public std::logic_error
-    {
-    public:
-        NotYetImplementedException(const std::string& name)
-            : std::logic_error("Registers feature not yet implemented: " + name)
-        {
-        }
-    };
-
     class Timer
     {
     public:
@@ -50,13 +41,13 @@ public:
 
     void tick()
     {
-        ++processor.audioCycle;
-        if (processor.audioCycle % 16 == 0) {
-            if (processor.audioCycle % 32 == 0) {
-                
+        ++spcCycle;
+        if (spcCycle % 16 == 0) {
+            if (spcCycle % 32 == 0) {
+                ++processor.dspCycle;
             }
             for (int i = 0; i < 3; ++i) {
-                if (timers[i].enabled && (timers[i].highPrecision || processor.audioCycle % 128 == 0)) {
+                if (timers[i].enabled && (timers[i].highPrecision || spcCycle % 128 == 0)) {
                     ++timers[i].tick;
                     if (timers[i].tick == timers[i].target) {
                         timers[i].tick = 0;
@@ -171,17 +162,18 @@ public:
             processor.makeReadWriteRegister(voiceAddressStart + 7, voiceName + "Gain", true,
                 [this, i](Byte& value) {
                     if (processor.voices[i].gainMode == Processor::Direct) {
-                        return processor.voices[i].gainValue;
+                        value = processor.voices[i].gainLevel;
                     } else {
-                        return Byte(processor.voices[i].gainMode << 5 | 1 << 7);
+                        value = Byte(processor.voices[i].gainLevel | processor.voices[i].gainMode << 5 | 1 << 7);
                     }
                 },
                 [this, i](Byte value) {
                     if (value.getBit(7)) {
                         processor.voices[i].gainMode = Processor::GainMode(uint8_t(value.getBits(5, 2)));
+                        processor.voices[i].gainLevel = value.getBits(0, 5);
                     } else {
                         processor.voices[i].gainMode = Processor::Direct;
-                        processor.voices[i].gainValue = value.getBits(0, 7);
+                        processor.voices[i].gainLevel = value.getBits(0, 7);
                     }
                 }
             );
@@ -192,18 +184,8 @@ public:
         processor.makeReadWriteRegister(0x1c, "Main Volume Right", true, processor.mainVolumeRight);
         processor.makeReadWriteRegister(0x2c, "Echo Volume Left", true, processor.echoVolumeLeft);
         processor.makeReadWriteRegister(0x3c, "Echo Volume Right", true, processor.echoVolumeRight);
-        processor.makeReadWriteRegister(0x4c, "Key On", true,
-            [this](Byte& value) {
-            },
-            [this](Byte value) {
-            }
-        );
-        processor.makeReadWriteRegister(0x5c, "Key Off", true,
-            [this](Byte& value) {
-            },
-            [this](Byte value) {
-            }
-        );
+        processor.makeReadWriteRegister(0x4c, "Key On", true, processor.keyOn);
+        processor.makeReadWriteRegister(0x5c, "Key Off", true, processor.keyOff);
         processor.makeReadWriteRegister(0x6c, "Flags", true,
             [this](Byte& value) {
                 value = processor.reset << 7 | processor.mute << 6 | processor.echoOff << 5 | processor.noiseGeneratorClock;
@@ -222,25 +204,10 @@ public:
             }
         );
         processor.makeReadWriteRegister(0x0d, "Echo Feedback", true, processor.echoFeedback);
-        processor.makeReadWriteRegister(0x2d, "Pitch Modulation", true,
-            [this](Byte& value) {
-            },
-            [this](Byte value) {
-            }
-        );
-        processor.makeReadWriteRegister(0x3d, "Noice On", true,
-            [this](Byte& value) {
-            },
-            [this](Byte value) {
-            }
-        );
+        processor.makeReadWriteRegister(0x2d, "Pitch Modulation", true, processor.pitchModulation);
+        processor.makeReadWriteRegister(0x3d, "Noise On", true, processor.noiseOn);
         processor.makeReadWriteRegister(0x4d, "Echo On", true, processor.echoOn);
-        processor.makeReadWriteRegister(0x5d, "Source Directory Offset", true,
-            [this](Byte& value) {
-            },
-            [this](Byte value) {
-            }
-        );
+        processor.makeReadWriteRegister(0x5d, "Source Directory Offset", true, processor.sourceDirectoryOffset);
         processor.makeReadWriteRegister(0x6d, "Echo Region Offset", true, processor.echoRegionOffset);
         processor.makeReadWriteRegister(0x7d, "Echo Delay", true,
             [this](Byte& value) {
@@ -260,6 +227,12 @@ public:
 
         processor.dspMemory.writeByte(0xe0, 0x6c);
         processor.dspMemory.writeByte(0xff, 0x7c);
+        
+        /*processor.dspMemory.writeByte(0x81, 0x00);
+        processor.dspMemory.writeByte(0x7f, 0x01);
+        processor.dspMemory.writeWord(0xffff, 0x02);
+        processor.dspMemory.writeWord(0xaaaa, 0x05);
+        processor.dspMemory.writeWord(0xaa, 0x07);*/
     }
     
     void reset()
@@ -270,6 +243,8 @@ public:
 
     std::ostream& output;
     std::ostream& error;
+
+    uint64_t spcCycle = 0;
 
     SPC::State::MemoryType& spcMemory;
 

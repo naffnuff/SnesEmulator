@@ -4,6 +4,14 @@
 
 namespace Audio {
 
+struct NotYetImplementedException : std::logic_error
+{
+    NotYetImplementedException(const std::string& name)
+        : std::logic_error("Audio feature not yet implemented: " + name)
+    {
+    }
+};
+
 class Processor : public RegisterManager<Memory<Byte>, System::Cyan>
 {
 public:
@@ -34,9 +42,39 @@ public:
         Byte sustainRate;
         Byte sustainLevel;
         GainMode gainMode;
-        Byte gainValue;
+        Byte gainLevel;
         Byte envelope;
         int8_t output;
+
+        std::string envelopeTypeToString() const
+        {
+            switch (envelopeType) {
+            case Audio::Processor::Gain:
+                return "Gain";
+            case Audio::Processor::ADSR:
+                return "ADSR";
+            default:
+                return "";
+            }
+        }
+
+        std::string gainModeToString() const
+        {
+            switch (gainMode) {
+            case Audio::Processor::Direct:
+                return "Direct";
+            case Audio::Processor::LinearIncrease:
+                return "Increase (Linear)";
+            case Audio::Processor::BentLineIncrease:
+                return "Increase (Bent Line)";
+            case Audio::Processor::LinearDecrease:
+                return "Decrease (Linear)";
+            case Audio::Processor::ExponentialDecrease:
+                return "Decrease (Exponential)";
+            default:
+                return "";
+            }
+        }
     };
 
     Processor(std::ostream& output, std::ostream& error)
@@ -86,11 +124,14 @@ public:
 
     void printMemoryRegister(bool write, Byte value, AddressType address, const std::string& info) override
     {
-        static uint64_t lastAudioCycle = 0;
-        System::setOutputColor(output, value ? System::Cyan : System::Magenta, true);
-        output << (write ? "Write " : "Read ") << value << " (" << std::bitset<8>(value) << ") @" << address << " (" << info << "), cycle " << audioCycle << " (+" << (audioCycle - lastAudioCycle) << ")" << std::endl;
-        System::setOutputColor(output, System::DefaultColor, false);
-        lastAudioCycle = audioCycle;
+        if (supressOutput)
+        {
+            return;
+        }
+        static uint64_t lastDspCycle = 0;
+        System::ScopedOutputColor outputColor(output, System::Cyan, value != 0);
+        output << (write ? "Write " : "Read ") << value << " (" << std::bitset<8>(value) << ") @" << address << " (" << info << "), cycle " << dspCycle << " (+" << (dspCycle - lastDspCycle) << ")" << std::endl;
+        lastDspCycle = dspCycle;
     }
 
     void playSound()
@@ -98,26 +139,30 @@ public:
         alSourcePlay(uiSource);
     }
 
-    std::array<Voice, 8> voices;
-    std::array<Byte, 8> coefficients;
-    
+    uint64_t dspCycle = 0;
+
     Memory<Byte> dspMemory;
 
-    uint64_t audioCycle = 0;
-
+    std::array<Voice, 8> voices;
     int8_t mainVolumeLeft;
     int8_t mainVolumeRight;
     int8_t echoVolumeLeft;
     int8_t echoVolumeRight;
-    std::bitset<8> echoOn;
+    std::bitset<8> keyOn;
+    std::bitset<8> keyOff;
     bool reset = false;
     bool mute = false;
     bool echoOff = false;
     Byte noiseGeneratorClock;
+    std::bitset<8> sourceEndBlock;    
     int8_t echoFeedback;
+    std::bitset<8> pitchModulation;
+    std::bitset<8> noiseOn;
+    std::bitset<8> echoOn;
+    Byte sourceDirectoryOffset;
     Byte echoRegionOffset;
     Byte echoDelay;
-
+    std::array<Byte, 8> coefficients;
 
 private:
     std::ostream& output;

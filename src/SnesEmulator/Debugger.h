@@ -272,9 +272,10 @@ public:
                     typename State::AddressType programAddress = state.getProgramAddress();
                     state.setProgramAddress(context.getLastKnownAddress());
                     output << " while executing ";
-                    System::setOutputColor(output, context.isPaused() ? context.debugColor : System::Red, true);
-                    output << context.nextInstruction->toString();
-                    System::setOutputColor(output, System::DefaultColor, false);
+                    {
+                        System::ScopedOutputColor outputColor(output, context.isPaused() ? context.debugColor : System::Red, true);
+                        output << context.nextInstruction->toString();
+                    }
                     output << " @" << context.getLastKnownAddress() << std::endl;
                     state.setProgramAddress(programAddress);
                 }
@@ -465,25 +466,23 @@ public:
     template<typename State>
     void printRegisters(const State& state, Context<State>& context)
     {
-        System::setOutputColor(output, context.debugColor, true);
+        System::ScopedOutputColor outputColor(output, context.debugColor, true);
         state.printRegisters(output) << std::endl;
-        System::setOutputColor(output, System::DefaultColor, false);
     }
 
     template<typename State>
     void printState(State& state, Context<State>& context)
     {
-        System::setOutputColor(output, context.isPaused() ? context.debugColor : System::Red, true);
+        System::ScopedOutputColor outputColor(output, context.isPaused() ? context.debugColor : System::Red, true);
         state.printRegisters(output) << std::endl;
         output << context.nextInstruction->opcodeToString() << std::endl;
         output << state.inspectProgramByte() << ": ";
         output << context.nextInstruction->toString();
         output << " #" << state.getMemory().getApplicationCount(state.getProgramAddress()) << std::endl;
-        System::setOutputColor(output, System::DefaultColor, false);
     }
 
     template<typename State>
-    void setColor(const State& state, const Context<State>& context, typename State::AddressType address, const LocationAccess& access)
+    void setColor(const State& state, const Context<State>& context, typename State::AddressType address, const LocationAccess& access, System::ScopedOutputColor& outputColor)
     {
         System::Color color = System::DefaultColor;
         bool bright = false;
@@ -503,13 +502,13 @@ public:
             color = colorVisitor.color;
         }
         if (color != System::DefaultColor) {
-            System::setOutputColor(output, color, bright);
+            outputColor.set(color, bright);
         }
     }
 
     void printMemory(CPU::State& cpuState, const Context<CPU::State>& cpuContext, SPC::State& spcState, const Context<SPC::State>& spcContext, Video::Processor& videoProcessor)
     {
-        System::setOutputColor(output, System::DefaultColor, false);
+        //System::setOutputColor(output, System::DefaultColor, false);
         int oamAddress = inspectedVideoMemory & 0xFF80;
         int oamAuxAddress = oamAddress / 8;
         int oamAuxOffset = oamAddress % 8;
@@ -534,6 +533,51 @@ public:
         //output << "VRAM start address: " << videoRegisters.vramStartAddress << std::endl;
         output << "VRAM current address: " << videoProcessor.vram.address << std::endl;
         output << "CPU bus: " << cpuState.getMemory().bus << std::endl;
+
+        output << "   Vol L Vol R Pitch Src      AR DR SR SL  Gain Mode               Lvl Env Out" << std::endl;
+        for (int i = 0; i < audioProcessor.voices.size(); ++i) {
+            const Audio::Processor::Voice& voice = audioProcessor.voices[i];
+            output << i << ": " << std::left << std::setfill(' ') << std::setw(4) << +voice.leftVolume
+                << "  " << std::setw(4) << +voice.rightVolume
+                << "  " << voice.pitch
+                << "  " << voice.sourceNumber
+                << "  " << voice.envelopeTypeToString()
+                << " " << voice.attackRate
+                << " " << voice.decayRate
+                << " " << voice.sustainRate
+                << " " << voice.sustainLevel
+                << "  " << std::left << std::setfill(' ') << std::setw(22) << voice.gainModeToString()
+                << "  " << voice.gainLevel
+                << "  " << voice.envelope
+                << "  " << +voice.output
+                << std::endl;
+        }
+        output << "Main Vol    Echo Vol    Key On    Key Off   R M E Gen Src End   Echo FB   Pitch Mod Noise On  Echo On   Dir ER  Delay" << std::endl;
+        output << std::left << std::setfill(' ') << std::setw(4) << +audioProcessor.mainVolumeLeft
+            << "  " << std::setw(4) << +audioProcessor.mainVolumeRight
+            << "  " << std::setw(4) << +audioProcessor.echoVolumeLeft
+            << "  " << std::setw(4) << +audioProcessor.echoVolumeRight
+            << "  " << audioProcessor.keyOn
+            << "  " << audioProcessor.keyOff
+            << "  " << audioProcessor.reset
+            << " " << audioProcessor.mute
+            << " " << audioProcessor.echoOff
+            << " " << audioProcessor.noiseGeneratorClock
+            << "  " << audioProcessor.sourceEndBlock
+            << "  " << std::setw(8) << +audioProcessor.echoFeedback
+            << "  " << audioProcessor.pitchModulation
+            << "  " << audioProcessor.noiseOn
+            << "  " << audioProcessor.echoOn
+            << "  " << audioProcessor.sourceDirectoryOffset
+            << "  " << audioProcessor.echoRegionOffset
+            << "  " << audioProcessor.echoDelay
+            << std::endl;
+        output << "Filter coefficients:";
+        for (int i = 0; i < audioProcessor.coefficients.size(); ++i) {
+            output << "  " << audioProcessor.coefficients[i];
+        }
+
+        output << std::endl << std::endl;
 
         output << "          0     1     2     3     4     5     6     7" << std::endl
             << "          8     9     a     b     c     d     e     f"
@@ -570,9 +614,8 @@ public:
                     MemoryAccess access(audioProcessor.dspMemory, dspAddress);
                     OutputColorVisitor colorVisitor;
                     access.accept(colorVisitor);
-                    System::setOutputColor(output, colorVisitor.color, false);
+                    System::ScopedOutputColor outputColor(output, colorVisitor.color, false);
                     output << access << ' ';
-                    System::setOutputColor(output, System::DefaultColor, false);
                     ++dspAddress;
                 }
             }
@@ -601,9 +644,9 @@ public:
 
                 for (int j = 0; j < 16 && cpuAddress < cpuMemorySize; ++j) {
                     MemoryAccess access = cpuState.getMemoryAccess(cpuAddress);
-                    setColor(cpuState, cpuContext, cpuAddress, access);
+                    System::ScopedOutputColor outputColor(output);
+                    setColor(cpuState, cpuContext, cpuAddress, access, outputColor);
                     output << access << ' ';
-                    System::setOutputColor(output, System::DefaultColor, false);
                     ++cpuAddress;
                 }
             }
@@ -617,14 +660,14 @@ public:
 
                 for (int j = 0; j < 16 && spcAddress < spcMemorySize; ++j) {
                     MemoryAccess access = spcState.getMemoryAccess(spcAddress);
-                    setColor(spcState, spcContext, spcAddress, access);
+                    System::ScopedOutputColor outputColor(output);
+                    setColor(spcState, spcContext, spcAddress, access, outputColor);
                     if (spcAddress >= 0xffc0 && audioRegisters.bootRomDataEnabled) {
                         output << audioRegisters.bootRomData[spcAddress - 0xffc0] << ' ';
                     }
                     else {
                         output << access << ' ';
                     }
-                    System::setOutputColor(output, System::DefaultColor, false);
                     ++spcAddress;
                 }
             }

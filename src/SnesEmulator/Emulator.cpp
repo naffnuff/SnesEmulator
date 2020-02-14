@@ -101,7 +101,7 @@ void Emulator::initialize()
                                 }
                                 if (newValue != saveRamSaver.saveRam[localAddress]) {
                                     saveRamSaver.saveRam[localAddress] = newValue;
-                                    std::lock_guard<std::mutex> lock(saveRamSaver.mutex);
+                                    std::scoped_lock<std::mutex> lock(saveRamSaver.mutex);
                                     saveRamSaver.saveRamModified = true;
                                 }
                                 saveRamSaver.condition.notify_one();

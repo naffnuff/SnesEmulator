@@ -18,9 +18,11 @@ public:
 
     virtual void printMemoryRegister(bool write, Byte value, AddressType address, const std::string& info)
     {
-        System::setOutputColor(output, DebugColor, true);
+        if (supressOutput) {
+            return;
+        }
+        System::ScopedOutputColor outputColor(output, DebugColor, value != 0);
         output << (write ? "Write " : "Read ") << value << " (" << std::bitset<8>(value) << ") @" << address << " (" << info << "), " << std::endl;
-        System::setOutputColor(output, System::DefaultColor, false);
     }
 
     void makeWriteRegister(AddressType address, const std::string& info, bool debug, std::function<void(Byte)> callback = nullptr, bool openBus = false)
@@ -97,7 +99,7 @@ public:
                 }
             },
             [this, address, writeCallback, info, debug](Byte oldValue, Byte newValue) {
-                if (debug /*newValue && *//*oldValue != newValue*/) {
+                if (debug /*newValue && */ && oldValue != newValue) {
                     printMemoryRegister(true, newValue, address, info);
                 }
                 if (writeCallback) {
@@ -137,15 +139,31 @@ public:
 
     void verifyRegister(AddressType address, Byte expectedValue)
     {
+        struct OutputSupressor
+        {
+            OutputSupressor(bool& supressOutput)
+                : supressOutput(supressOutput)
+            {
+                supressOutput = true;
+            }
+            ~OutputSupressor()
+            {
+                supressOutput = false;
+            }
+            bool& supressOutput;
+        } outputSupressor(supressOutput);
+
         Byte readValue = memory.readByte(address);
         if (readValue != expectedValue) {
             std::stringstream ss;
             ss << "Verify memory failed @" << address << ": ";
             ss << "Expected value: " << expectedValue << ", ";
             ss << "Read value: " << readValue;
-            throw std::logic_error(ss.str());
+            throw MemoryAccessException(ss.str());
         }
     }
+
+    bool supressOutput = false;
 
 private:
     std::ostream& output;

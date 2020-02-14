@@ -40,7 +40,7 @@ public:
 
     void update()
     {
-        std::lock_guard lock(renderer.pixelBufferMutex);
+        std::scoped_lock lock(renderer.pixelBufferMutex);
 
         renderer.clearDisplay(0x7c1f);
 
@@ -138,7 +138,7 @@ public:
 
     void update()
     {
-        std::lock_guard lock(renderer.pixelBufferMutex);
+        std::scoped_lock lock(renderer.pixelBufferMutex);
 
         if (backgroundLayer == BackgroundLayer1 && video.backgroundMode == 7) {
             renderer.clearDisplay(0x3ff);
@@ -249,7 +249,7 @@ public:
 
     void update()
     {
-        std::lock_guard lock(renderer.pixelBufferMutex);
+        std::scoped_lock lock(renderer.pixelBufferMutex);
         renderer.clearDisplay(0x7c1f);
         int firstObjectIndex = 0;
         if (video.objectPriority) {
@@ -364,7 +364,7 @@ public:
 
     void update()
     {
-        std::lock_guard lock(renderer.pixelBufferMutex);
+        std::scoped_lock lock(renderer.pixelBufferMutex);
         renderer.clearDisplay(0);
         int tileDataAddress = 0;
         int i = 0;
