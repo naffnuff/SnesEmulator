@@ -44,7 +44,7 @@ public:
         ++spcCycle;
         if (spcCycle % 16 == 0) {
             if (spcCycle % 32 == 0) {
-                ++processor.dspCycle;
+                processor.tick();
             }
             for (int i = 0; i < 3; ++i) {
                 if (timers[i].enabled && (timers[i].highPrecision || spcCycle % 128 == 0)) {
@@ -117,9 +117,9 @@ public:
             std::string voiceName("Voice ");
             voiceName += '0' + i;
             voiceName += " ";
-            processor.makeReadWriteRegister(voiceAddressStart, voiceName + "Left Volume", true, processor.voices[i].leftVolume);
-            processor.makeReadWriteRegister(voiceAddressStart + 1, voiceName + "Right Volume", true, processor.voices[i].rightVolume);
-            processor.makeReadWriteRegister(voiceAddressStart + 2, voiceName + "Pitch low byte", true,
+            processor.makeReadWriteRegister(voiceAddressStart, voiceName + "Left Volume", false, processor.voices[i].leftVolume);
+            processor.makeReadWriteRegister(voiceAddressStart + 1, voiceName + "Right Volume", false, processor.voices[i].rightVolume);
+            processor.makeReadWriteRegister(voiceAddressStart + 2, voiceName + "Pitch low byte", false,
                 [this, i](Byte& value) {
                     value = processor.voices[i].pitch.getLowByte();
                 },
@@ -127,7 +127,7 @@ public:
                     processor.voices[i].pitch.setLowByte(value);
                 }
             );
-            processor.makeReadWriteRegister(voiceAddressStart + 3, voiceName + "Pitch high byte", true,
+            processor.makeReadWriteRegister(voiceAddressStart + 3, voiceName + "Pitch high byte", false,
                 [this, i](Byte& value) {
                     value = processor.voices[i].pitch.getHighByte();
                 },
@@ -135,8 +135,8 @@ public:
                     processor.voices[i].pitch.setHighByte(value.getBits(0, 6));
                 }
             );
-            processor.makeReadWriteRegister(voiceAddressStart + 4, voiceName + "Source Number", true, processor.voices[i].sourceNumber);
-            processor.makeReadWriteRegister(voiceAddressStart + 5, voiceName + "ADSR low byte", true,
+            processor.makeReadWriteRegister(voiceAddressStart + 4, voiceName + "Source Number", false, processor.voices[i].sourceNumber);
+            processor.makeReadWriteRegister(voiceAddressStart + 5, voiceName + "ADSR low byte", false,
                 [this, i](Byte& value) {
                     value = processor.voices[i].attackRate | processor.voices[i].decayRate << 4 | processor.voices[i].envelopeType << 7;
                 },
@@ -150,7 +150,7 @@ public:
                     }
                 }
             );
-            processor.makeReadWriteRegister(voiceAddressStart + 6, voiceName + "ADSR high byte", true,
+            processor.makeReadWriteRegister(voiceAddressStart + 6, voiceName + "ADSR high byte", false,
                 [this, i](Byte& value) {
                     value = processor.voices[i].sustainRate | processor.voices[i].sustainLevel << 5;
                 },
@@ -159,7 +159,7 @@ public:
                     processor.voices[i].sustainLevel = value.getBits(5, 3);
                 }
             );
-            processor.makeReadWriteRegister(voiceAddressStart + 7, voiceName + "Gain", true,
+            processor.makeReadWriteRegister(voiceAddressStart + 7, voiceName + "Gain", false,
                 [this, i](Byte& value) {
                     if (processor.voices[i].gainMode == Processor::Direct) {
                         value = processor.voices[i].gainLevel;
@@ -177,16 +177,16 @@ public:
                     }
                 }
             );
-            processor.makeReadWriteRegister(voiceAddressStart + 8, voiceName + "Envelope", true, processor.voices[i].envelope);
-            processor.makeReadWriteRegister(voiceAddressStart + 9, voiceName + "Output", true, processor.voices[i].output);
+            processor.makeReadWriteRegister(voiceAddressStart + 8, voiceName + "Envelope", false, processor.voices[i].envelope);
+            processor.makeReadWriteRegister(voiceAddressStart + 9, voiceName + "Output", false, processor.voices[i].output);
         }
-        processor.makeReadWriteRegister(0x0c, "Main Volume Left", true, processor.mainVolumeLeft);
-        processor.makeReadWriteRegister(0x1c, "Main Volume Right", true, processor.mainVolumeRight);
-        processor.makeReadWriteRegister(0x2c, "Echo Volume Left", true, processor.echoVolumeLeft);
-        processor.makeReadWriteRegister(0x3c, "Echo Volume Right", true, processor.echoVolumeRight);
-        processor.makeReadWriteRegister(0x4c, "Key On", true, processor.keyOn);
-        processor.makeReadWriteRegister(0x5c, "Key Off", true, processor.keyOff);
-        processor.makeReadWriteRegister(0x6c, "Flags", true,
+        processor.makeReadWriteRegister(0x0c, "Main Volume Left", false, processor.mainVolumeLeft);
+        processor.makeReadWriteRegister(0x1c, "Main Volume Right", false, processor.mainVolumeRight);
+        processor.makeReadWriteRegister(0x2c, "Echo Volume Left", false, processor.echoVolumeLeft);
+        processor.makeReadWriteRegister(0x3c, "Echo Volume Right", false, processor.echoVolumeRight);
+        processor.makeReadWriteRegister(0x4c, "Key On", false, processor.keyOn);
+        processor.makeReadWriteRegister(0x5c, "Key Off", false, processor.keyOff);
+        processor.makeReadWriteRegister(0x6c, "Flags", false,
             [this](Byte& value) {
                 value = processor.reset << 7 | processor.mute << 6 | processor.echoOff << 5 | processor.noiseGeneratorClock;
             },
@@ -203,13 +203,13 @@ public:
             [this](Byte value) {
             }
         );
-        processor.makeReadWriteRegister(0x0d, "Echo Feedback", true, processor.echoFeedback);
-        processor.makeReadWriteRegister(0x2d, "Pitch Modulation", true, processor.pitchModulation);
-        processor.makeReadWriteRegister(0x3d, "Noise On", true, processor.noiseOn);
-        processor.makeReadWriteRegister(0x4d, "Echo On", true, processor.echoOn);
+        processor.makeReadWriteRegister(0x0d, "Echo Feedback", false, processor.echoFeedback);
+        processor.makeReadWriteRegister(0x2d, "Pitch Modulation", false, processor.pitchModulation);
+        processor.makeReadWriteRegister(0x3d, "Noise On", false, processor.noiseOn);
+        processor.makeReadWriteRegister(0x4d, "Echo On", false, processor.echoOn);
         processor.makeReadWriteRegister(0x5d, "Source Directory Offset", true, processor.sourceDirectoryOffset);
-        processor.makeReadWriteRegister(0x6d, "Echo Region Offset", true, processor.echoRegionOffset);
-        processor.makeReadWriteRegister(0x7d, "Echo Delay", true,
+        processor.makeReadWriteRegister(0x6d, "Echo Region Offset", false, processor.echoRegionOffset);
+        processor.makeReadWriteRegister(0x7d, "Echo Delay", false,
             [this](Byte& value) {
                 value = processor.echoDelay;
             },
@@ -220,7 +220,7 @@ public:
         for (int i = 0; i < processor.coefficients.size(); ++i) {
             std::string coefficientName("Coefficient ");
             coefficientName += '0' + i;
-            processor.makeReadWriteRegister(i << 4 | 0x0f, coefficientName, true, processor.coefficients[i]);
+            processor.makeReadWriteRegister(i << 4 | 0x0f, coefficientName, false, processor.coefficients[i]);
         }
 
         processor.dspMemory.finalize();

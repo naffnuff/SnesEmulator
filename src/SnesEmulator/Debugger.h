@@ -590,7 +590,7 @@ public:
                 uint16_t lowAddress(vramAddress);
                 lowAddress = lowAddress >> 4;
                 if (lastVramLowAddress != lowAddress) {
-                    output << "   " << std::hex << std::setw(3) << std::setfill('0') << lowAddress << "x  " << std::dec;
+                    output << "   " << std::hex << std::right << std::setw(3) << std::setfill('0') << lowAddress << "x  " << std::dec;
                 }
                 else {
                     output << "         ";
@@ -608,7 +608,7 @@ public:
             if (dspAddress < audioProcessor.dspMemory.size()) {
                 uint16_t lowAddress(dspAddress);
                 lowAddress = lowAddress >> 4;
-                output << std::hex << std::setw(3) << std::setfill('0') << lowAddress << "x  " << std::dec;
+                output << std::hex << std::right << std::setw(3) << std::setfill('0') << lowAddress << "x  " << std::dec;
 
                 for (int j = 0; j < 16 && dspAddress < audioProcessor.dspMemory.size(); ++j) {
                     MemoryAccess access(audioProcessor.dspMemory, dspAddress);
@@ -640,7 +640,7 @@ public:
                 Byte bank = Byte(cpuAddress >> 16);
                 uint16_t lowAddress(cpuAddress);
                 lowAddress = lowAddress >> 4;
-                output << bank << ':' << std::hex << std::setw(3) << std::setfill('0') << lowAddress << "x  " << std::dec;
+                output << bank << ':' << std::hex << std::right << std::setw(3) << std::setfill('0') << lowAddress << "x  " << std::dec;
 
                 for (int j = 0; j < 16 && cpuAddress < cpuMemorySize; ++j) {
                     MemoryAccess access = cpuState.getMemoryAccess(cpuAddress);
@@ -656,7 +656,7 @@ public:
             if (spcAddress < spcMemorySize) {
                 uint16_t lowAddress(spcAddress);
                 lowAddress = lowAddress >> 4;
-                output << std::hex << std::setw(3) << std::setfill('0') << lowAddress << "x  " << std::dec;
+                output << std::hex << std::right << std::setw(3) << std::setfill('0') << lowAddress << "x  " << std::dec;
 
                 for (int j = 0; j < 16 && spcAddress < spcMemorySize; ++j) {
                     MemoryAccess access = spcState.getMemoryAccess(spcAddress);

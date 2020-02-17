@@ -497,15 +497,15 @@ private:
 
 inline std::ostream& operator<<(std::ostream& output, Byte byte)
 {
-    return output << std::hex << std::setw(2) << std::setfill('0') << +byte.value << std::dec;
+    return output << std::hex << std::right << std::setw(2) << std::setfill('0') << +byte.value << std::dec;
 }
 
 inline std::ostream& operator<<(std::ostream& output, Word word)
 {
-    return output << std::hex << std::setw(4) << std::setfill('0') << word.value << std::dec;
+    return output << std::hex << std::right << std::setw(4) << std::setfill('0') << word.value << std::dec;
 }
 
 inline std::ostream& operator<<(std::ostream& output, Long long_)
 {
-    return output << std::hex << std::setw(6) << std::setfill('0') << long_.value << std::dec;
+    return output << std::hex << std::right << std::setw(6) << std::setfill('0') << long_.value << std::dec;
 }
