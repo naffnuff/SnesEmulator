@@ -91,6 +91,11 @@ public:
     {
     }
 
+    void initialize()
+    {
+        renderer.initialize();
+    }
+
     void printMemoryRegister(bool write, Byte value, AddressType address, const std::string& info) override
     {
         if (supressOutput)
@@ -117,16 +122,7 @@ public:
             }
         }
 
-        /*static double previousTime = timeInfo->currentTime;
-        static int count = 0;
-        double currentTime = timeInfo->currentTime;
-        count++;
-        if (currentTime - previousTime >= 1.0) {
-            output << "Proc: " << count << std::endl;
-
-            count = 0;
-            previousTime = currentTime;
-        }*/
+        renderer.tick();
     }
 
     static constexpr int voiceCount = Renderer::voiceCount;

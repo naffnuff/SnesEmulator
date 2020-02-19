@@ -177,6 +177,7 @@
     <ClInclude Include="..\..\..\src\SnesEmulator\VideoRenderer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\src\SnesEmulator\AudioRenderer.cpp" />
     <ClCompile Include="..\..\..\src\SnesEmulator\Emulator.cpp" />
     <ClCompile Include="..\..\..\src\SnesEmulator\Main.cpp" />
     <ClCompile Include="..\..\..\src\SnesEmulator\VideoRenderer.cpp" />

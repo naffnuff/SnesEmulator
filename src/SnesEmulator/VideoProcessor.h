@@ -24,6 +24,7 @@ public:
 
         void operator()()
         {
+            //return;
             video.renderer.title = gameTitle;
             video.renderer.initialize(fullscreen, aspectRatioCorrection);
             while (run && video.renderer.isRunning()) {

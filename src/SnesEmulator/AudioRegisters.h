@@ -233,6 +233,9 @@ public:
         processor.dspMemory.writeWord(0xffff, 0x02);
         processor.dspMemory.writeWord(0xaaaa, 0x05);
         processor.dspMemory.writeWord(0xaa, 0x07);*/
+
+        output << "BLUFFIS!" << std::endl;
+        processor.initialize();
     }
     
     void reset()
