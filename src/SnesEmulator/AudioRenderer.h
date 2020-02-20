@@ -4,6 +4,7 @@
 #include <iostream>
 #include <array>
 #include <vector>
+#include <mutex>
 
 namespace Audio {
 
@@ -30,6 +31,7 @@ public:
     ~Renderer();
 
     void initialize();
+    void start();
     void tick();
 
 public:
@@ -50,6 +52,10 @@ public:
     bool initialized = false;
 
     int counter = 0;
+    
+    uint64_t masterCycle = 0;
+    std::mutex mutex;
+    std::condition_variable condition;
     
     bool inputUnderflow = false;
     bool inputOverflow = false;

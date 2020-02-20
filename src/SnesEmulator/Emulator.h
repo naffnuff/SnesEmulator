@@ -7,10 +7,8 @@
 #include "Common/System.h"
 
 #include "WDC65816/CpuState.h"
-#include "SPC700/SpcState.h"
 
 #include "WDC65816/CpuInstructionDecoder.h"
-#include "SPC700/SpcInstructionDecoder.h"
 
 #include "Rom.h"
 #include "Debugger.h"
@@ -19,7 +17,7 @@
 #include "VideoProcessor.h"
 #include "VideoRegisters.h"
 
-#include "AudioProcessor.h"
+#include "AudioSystem.h"
 
 class Emulator
 {
@@ -70,16 +68,12 @@ public:
         , error(error)
         , rom(rom)
         , cpuState()
-        , spcState()
         , cpuInstructionDecoder(cpuState)
-        , spcInstructionDecoder(spcState)
         , videoRegisters(output, error, cpuState)
         , videoProcessor(videoRegisters.processor)
-        , audioRegisters(output, error, spcState)
-        , audioProcessor(audioRegisters.processor)
-        , debugger(output, input, error, videoRegisters, audioRegisters, masterCycle, running)
+        , audioSystem(output, error, debugger)
+        , debugger(output, input, error, videoRegisters, audioSystem.getRegisters(), masterCycle, running)
         , cpuContext("cpu.txt", System::Green, debugger)
-        , spcContext("spc.txt", System::Magenta, debugger)
         , saveRamSaver(*this)
     {
     }
@@ -102,33 +96,24 @@ public:
         return rom.gameTitle;
     }
 
-    void pause()
-    {
-        cpuContext.setPaused(true);
-    }
-
 private:
     std::ostream& output;
     std::istream& input;
     std::ostream& error;
 
     const Rom& rom;
+
     CPU::State cpuState;
-    SPC::State spcState;
     CPU::InstructionDecoder cpuInstructionDecoder;
-    SPC::InstructionDecoder spcInstructionDecoder;
 
     Video::Registers videoRegisters;
-    Audio::Registers audioRegisters;
-
     Video::Processor& videoProcessor;
-    Audio::Processor& audioProcessor;
 
+    AudioSystem audioSystem;
 
     Debugger debugger;
 
     Debugger::Context<CPU::State> cpuContext;
-    Debugger::Context<SPC::State> spcContext;
 
     SaveRamSaver saveRamSaver;
     std::thread saveRamSaverThread;

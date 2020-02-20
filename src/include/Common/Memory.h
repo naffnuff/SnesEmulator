@@ -448,13 +448,19 @@ public:
 class LocationAccess : public Access
 {
 public:
+    virtual bool setBreakpoint(Location::BreakpointCallback callback) = 0;
+    virtual bool hasBreakpoint() const = 0;
+};
+
+class ConstLocationAccess
+{
+public:
     virtual void accept(LocationVisitor& visitor) const = 0;
     virtual void print(std::ostream& out) const = 0;
     virtual bool hasBreakpoint() const = 0;
-    virtual bool setBreakpoint(Location::BreakpointCallback callback) = 0;
 };
 
-inline std::ostream& operator<<(std::ostream& out, const LocationAccess& access)
+inline std::ostream& operator<<(std::ostream& out, const ConstLocationAccess& access)
 {
     access.print(out);
     return out;
@@ -745,14 +751,41 @@ public:
         memory.writeWord(value, address, wrapping);
     }
 
+    bool setBreakpoint(Location::BreakpointCallback callback) override
+    {
+        return memory.setBreakpoint(address, callback);
+    }
+
     bool hasBreakpoint() const override
     {
         return memory.hasBreakpoint(address);
     }
 
-    bool setBreakpoint(Location::BreakpointCallback callback) override
+private:
+    Memory& memory;
+    const AddressType address;
+    const WrappingMask wrapping;
+};
+
+template<typename Memory>
+class ConstMemoryAccess : public ConstLocationAccess
+{
+public:
+    typedef typename Memory::AddressType AddressType;
+    typedef typename Memory::WrappingMask WrappingMask;
+
+    ConstMemoryAccess() = delete;
+
+    ConstMemoryAccess(const Memory& memory, AddressType address, WrappingMask wrapping = Memory::Full)
+        : memory(memory)
+        , address(address)
+        , wrapping(wrapping)
     {
-        return memory.setBreakpoint(address, callback);
+    }
+
+    bool hasBreakpoint() const override
+    {
+        return memory.hasBreakpoint(address);
     }
 
     void accept(LocationVisitor& visitor) const override
@@ -766,7 +799,7 @@ public:
     }
 
 private:
-    Memory& memory;
+    const Memory& memory;
     const AddressType address;
     const WrappingMask wrapping;
 };

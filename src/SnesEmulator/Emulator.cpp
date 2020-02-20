@@ -22,7 +22,6 @@ void Emulator::initialize()
     rom.storeToMemory(cpuState);
 
     CPU::State::MemoryType& cpuMemory = cpuState.getMemory();
-    SPC::State::MemoryType& spcMemory = spcState.getMemory();
 
     if (rom.isLowRom()) {
         // RAM
@@ -45,14 +44,6 @@ void Emulator::initialize()
                 },
                 [this, i](Byte, Byte newValue) {
                     cpuToSpcBuffers[i] = newValue;
-                }
-            );
-            spcMemory.createLocation<ReadWriteRegister>(Word(0xf4 + i),
-                [this, i](Byte& value) {
-                    value = cpuToSpcBuffers[i];
-                },
-                [this, i](Byte, Byte newValue) {
-                    spcToCpuBuffers[i] = newValue;
                 }
             );
         }
@@ -123,18 +114,15 @@ void Emulator::initialize()
 
     videoProcessor.initialize(rom.gameTitle);
 
-    audioRegisters.initialize(cpuMemory);
+    audioSystem.initialize(cpuToSpcBuffers, spcToCpuBuffers);
 
     cpuMemory.finalize();
-    spcMemory.finalize();
 
     cpuState.reset();
 
     debugger.loadBreakpoints(cpuContext, cpuState);
-    debugger.loadBreakpoints(spcContext, spcState);
 
     cpuContext.nextInstruction = cpuInstructionDecoder.getNextInstruction(cpuState);
-    spcContext.nextInstruction = spcInstructionDecoder.getNextInstruction(spcState);
 }
 
 void Emulator::run()
@@ -168,12 +156,14 @@ void Emulator::run()
 
     double runStartTime = 0.0;
     uint64_t cycleCountDelta = 0;
-    bool stepMode = cpuContext.isPaused() || spcContext.isPaused();
+    bool stepMode = debugger.isPaused();
     if (!stepMode) {
         debugger.startTime = clock();
         runStartTime = videoProcessor.renderer.getTime();
     }
     stepMode = true;
+
+    audioSystem.start();
 
     try {
         uint64_t iteration = 0;
@@ -181,7 +171,6 @@ void Emulator::run()
         while (running) {
             try {
                 if (masterCycle == nextCpu) {
-
                     if (nmiRequested) {
                         nmiRequested = false;
                         cpuState.startInterrupt(true);
@@ -212,7 +201,6 @@ void Emulator::run()
                         instruction = static_cast<Instruction*>(&hdmaInstruction);
                         if (dmaPicked) {
                             output << "HDMA interrupts DMA" << std::endl;
-                            cpuContext.setPaused(true);
                         }
                     }
 
@@ -220,14 +208,14 @@ void Emulator::run()
 
                     instruction->applyBreakpoints();
 
-                    if (cpuContext.isPaused()) {
+                    if (cpuContext.isStepMode()) {
                         output << "Cycle count: " << masterCycle << ", Next cpu: " << nextCpu << ", Next spc: " << nextSpc << std::endl;
                         output << "Frame: " << videoRegisters.frame << ", V counter: " << videoRegisters.vCounter << ", H counter: " << videoRegisters.hCounter << ", V blank: " << videoRegisters.vBlank << ", H blank: " << videoRegisters.hBlank << ", nmi: " << cpuState.isNmiActive() << ", irq: " << cpuState.isIrqActive() << std::endl;
-                        debugger.printBreakpoints(cpuContext, spcContext);
-                        debugger.printMemory(cpuState, cpuContext, spcState, spcContext, videoProcessor);
+                        debugger.printBreakpoints(cpuContext, audioSystem.context);
+                        debugger.printMemory(cpuState, cpuContext, audioSystem.state, audioSystem.context, videoProcessor);
                     }
 
-                    if (int cycles = executeNext(instruction, cpuState, debugger, cpuContext, spcState, spcContext, error)) {
+                    if (int cycles = executeNext(instruction, cpuState, debugger, cpuContext, audioSystem.state, audioSystem.context, error)) {
                         nextCpu += uint64_t(cycles) * 6;
                         cpuContext.nextInstruction = cpuInstructionDecoder.getNextInstruction(cpuState);
                     }
@@ -237,38 +225,39 @@ void Emulator::run()
                 }
 
                 if (videoRegisters.pauseRequested) {
-                    cpuContext.setPaused(true);
                     videoRegisters.pauseRequested = false;
+                    debugger.pause(cpuContext);
                 }
 
-                if (masterCycle == nextSpc) {
-                    Instruction* instruction = spcInstructionDecoder.getNextInstruction(spcState);
-                    spcContext.nextInstruction = instruction;
-
-                    instruction->applyBreakpoints();
-
-                    if (spcContext.isPaused()) {
-                        output << "cycleCount=" << masterCycle << ", nextCpu=" << nextCpu << ", nextSpc=" << nextSpc << std::endl;
-                        debugger.printBreakpoints(cpuContext, spcContext);
-                        debugger.printMemory(cpuState, cpuContext, spcState, spcContext, videoProcessor);
-                    }
-
-                    if (int cycles = executeNext(instruction, spcState, debugger, spcContext, cpuState, cpuContext, error)) {
-                        nextSpc += uint64_t(cycles) * 16;
-                        spcContext.nextInstruction = spcInstructionDecoder.getNextInstruction(spcState);
-                    }
-                    else {
-                        continue;
-                    }
+                if (audioSystem.pauseRequested) {
+                    audioSystem.pauseRequested = false;
+                    debugger.pause(audioSystem.context);
                 }
 
-                if (audioRegisters.pauseRequested) {
-                    spcContext.setPaused(true);
-                    audioRegisters.pauseRequested = false;
+                if (debugger.isPaused()) {
+                    if (masterCycle == nextSpc) {
+                        Instruction* instruction = audioSystem.instructionDecoder.getNextInstruction(audioSystem.state);
+                        audioSystem.context.nextInstruction = instruction;
+
+                        instruction->applyBreakpoints();
+
+                        if (audioSystem.context.isStepMode()) {
+                            output << "cycleCount=" << masterCycle << ", nextCpu=" << nextCpu << ", nextSpc=" << nextSpc << std::endl;
+                            debugger.printBreakpoints(cpuContext, audioSystem.context);
+                            debugger.printMemory(cpuState, cpuContext, audioSystem.state, audioSystem.context, videoProcessor);
+                        }
+
+                        if (int cycles = executeNext(instruction, audioSystem.state, debugger, audioSystem.context, cpuState, cpuContext, error)) {
+                            nextSpc += uint64_t(cycles) * 16;
+                            audioSystem.context.nextInstruction = audioSystem.instructionDecoder.getNextInstruction(audioSystem.state);
+                        } else {
+                            continue;
+                        }
+                    }
                 }
 
                 bool increment = false;
-                if (cpuContext.isPaused() || spcContext.isPaused()) { // step mode
+                if (debugger.isPaused()) { // step mode
                     increment = true;
                     stepMode = true;
                 }
@@ -288,7 +277,7 @@ void Emulator::run()
                         increment = true;
                     }
 
-                    increment = true;
+                    //increment = true;
 
                     if (increment) {
                         ++cycleCountDelta;
@@ -298,7 +287,7 @@ void Emulator::run()
                 if (increment) {
                     ++masterCycle;
                     if (masterCycle % 21 == 0) {
-                        audioRegisters.tick();
+                        audioSystem.tick();
                     }
                     ++videoRegisters.hCounter;
                     if (videoRegisters.hCounter == 274) {
@@ -379,7 +368,7 @@ void Emulator::run()
 
                             if (videoProcessor.renderer.pauseRequested) {
                                 videoProcessor.renderer.pauseRequested = false;
-                                cpuContext.setPaused(true);
+                                debugger.pause(cpuContext);
                             }
 
                             ++videoRegisters.frame;
@@ -401,7 +390,7 @@ void Emulator::run()
                 ++iteration;
             } catch (Video::MemoryAccessException& e) {
                 //cpuState.setProgramAddress(cpuState.getLastKnownAddress());
-                cpuContext.setPaused(true);
+                debugger.pause(cpuContext);
                 error << e.what() << std::endl;
             }
         }
@@ -416,12 +405,12 @@ int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debu
 {
     context.addKnownAddress(state.getProgramAddress());
     try {
-        if (context.isPaused()) {
+        if (debugger.isPaused()) {
             debugger.printState(state, context);
 
             if (debugger.awaitCommand(context, state, otherContext, otherState)) {
                 int cycles = instruction->execute();
-                if (context.isPaused()) {
+                if (debugger.isPaused()) {
                     debugger.printRegisters(state, context);
                 }
                 return cycles;
@@ -431,23 +420,23 @@ int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debu
             return instruction->execute();
         }
     } catch (OpcodeNotYetImplementedException& e) {
-        context.setPaused(true);
+        debugger.pause(context);
         error << e.what() << std::endl;
     } catch (AddressModeNotYetImplementedException& e) {
         state.setProgramAddress(context.getLastKnownAddress());
-        context.setPaused(true);
+        debugger.pause(context);
         error << e.what() << std::endl;
     } catch (OperatorNotYetImplementedException& e) {
         state.setProgramAddress(context.getLastKnownAddress());
-        context.setPaused(true);
+        debugger.pause(context);
         error << e.what() << std::endl;
     } catch (MemoryAccessException& e) {
         state.setProgramAddress(context.getLastKnownAddress());
-        context.setPaused(true);
+        debugger.pause(context);
         error << e.what() << std::endl;
     } catch (Video::NotYetImplementedException& e) {
         state.setProgramAddress(context.getLastKnownAddress());
-        context.setPaused(true);
+        debugger.pause(context);
         error << e.what() << std::endl;
     }
     return 0;

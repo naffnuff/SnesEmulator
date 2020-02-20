@@ -113,46 +113,12 @@ public:
         {
         }
 
-        void setPaused(bool paused)
-        {
-            if (paused == stepMode) {
-                return;
-            }
-            stepMode = paused;
-            if (paused) {
-                if (debugger.videoProcessor.rendererLock.owns_lock()) {
-                    debugger.videoProcessor.rendererLock.unlock();
-                    unlockedMutex = true;
-                }
-                if (debugger.videoProcessor.rendererRunner.fullscreen) {
-                    debugger.videoProcessor.renderer.toggleFullscreenRequested = true;
-                }
-                debugger.videoProcessor.renderer.focusWindow(false);
-                System::focusConsoleWindow();
-            }
-            else {
-                if (unlockedMutex) {
-                    debugger.videoProcessor.rendererLock.lock();
-                    unlockedMutex = false;
-                }
-                debugger.videoProcessor.renderer.focusWindow(true);
-            }
-        }
-
-        bool isPaused() const
-        {
-            return stepMode;
-        }
-
         Debugger& debugger;
         std::string fileName;
         Long inspectedAddress = 0;
         bool watchMode = true;
         System::Color debugColor;
         const Instruction* nextInstruction;
-    private:
-        bool stepMode = false;
-        bool unlockedMutex = false;
     };
 
     template<typename State>
@@ -195,9 +161,18 @@ public:
             }
         }
 
+        bool isStepMode() const
+        {
+            return stepMode;
+        }
+
+    private:
+        bool stepMode = false;
         Byte lastKnownAddressIndex = 0;
         std::array<AddressType, 0x100> knownAddresses;
         std::set<Breakpoint<State>> breakpoints;
+
+        friend class Debugger;
     };
 
     Debugger(std::ostream& output, std::istream& input, std::ostream& error, Video::Registers& videoRegisters, Audio::Registers& audioRegisters, uint64_t& cycleCount, bool& running)
@@ -257,15 +232,15 @@ public:
                 bool printInstruction = false;
                 if (operation == Location::Apply && (breakpoint.applicationCount == 0 || breakpoint.applicationCount == applicationCount)) {
                     output << "Apply: Breakpoint hit " << breakpoint << "#" << applicationCount << std::endl;
-                    context.setPaused(true);
+                    pause(context);
                 } else if (operation == Location::Read && (breakpoint.argumentValue == -1 || breakpoint.argumentValue == value)) {
                     output << "Read: Breakpoint hit @ " << breakpoint << ":" << value;
-                    context.setPaused(true);
+                    pause(context);
                     printInstruction = true;
                 }
                 else if (operation == Location::Write && (breakpoint.argumentValue == -1 || breakpoint.argumentValue == value)) {
                     output << "Write: Breakpoint hit " << breakpoint << ":" << value;
-                    context.setPaused(true);
+                    pause(context);
                     printInstruction = true;
                 }
                 if (printInstruction) {
@@ -273,7 +248,7 @@ public:
                     state.setProgramAddress(context.getLastKnownAddress());
                     output << " while executing ";
                     {
-                        System::ScopedOutputColor outputColor(output, context.isPaused() ? context.debugColor : System::Red, true);
+                        System::ScopedOutputColor outputColor(output, context.stepMode ? context.debugColor : System::Red, true);
                         output << context.nextInstruction->toString();
                     }
                     output << " @" << context.getLastKnownAddress() << std::endl;
@@ -335,23 +310,23 @@ public:
         }
         else if (command[0] == 'r') {
             if (command == "rr") {
-                context.setPaused(false);
-                otherContext.setPaused(false);
+                unpause(context, otherContext);
             }
             else {
-                context.setPaused(!context.isPaused());
-                if (context.isPaused()) {
+                context.stepMode = !context.stepMode;
+                if (context.stepMode) {
                     output << "Step mode" << std::endl;
                 }
-                else {
+                else if (!otherContext.stepMode) {
                     output << "Run mode" << std::endl;
+                    unpause(context, otherContext);
                 }
             }
-            if (!context.isPaused() && !otherContext.isPaused()) {
+            if (!paused) {
                 output << "All running" << std::endl;
                 startTime = clock();
             }
-            return !context.isPaused();
+            return !context.stepMode;
         }
         else if (command == "i") {
             output << "Inspect not implemented" << std::endl;
@@ -369,8 +344,7 @@ public:
             otherState.reset();
             videoRegisters.reset();
             audioRegisters.reset();
-            context.setPaused(false);
-            otherContext.setPaused(false);
+            unpause(context, otherContext);
             startTime = clock();
         }
         else if (command == "qq") {
@@ -473,7 +447,7 @@ public:
     template<typename State>
     void printState(State& state, Context<State>& context)
     {
-        System::ScopedOutputColor outputColor(output, context.isPaused() ? context.debugColor : System::Red, true);
+        System::ScopedOutputColor outputColor(output, paused ? context.debugColor : System::Red, true);
         state.printRegisters(output) << std::endl;
         output << context.nextInstruction->opcodeToString() << std::endl;
         output << state.inspectProgramByte() << ": ";
@@ -482,7 +456,7 @@ public:
     }
 
     template<typename State>
-    void setColor(const State& state, const Context<State>& context, typename State::AddressType address, const LocationAccess& access, System::ScopedOutputColor& outputColor)
+    void setColor(const State& state, const Context<State>& context, typename State::AddressType address, const ConstLocationAccess& access, System::ScopedOutputColor& outputColor)
     {
         System::Color color = System::DefaultColor;
         bool bright = false;
@@ -506,7 +480,7 @@ public:
         }
     }
 
-    void printMemory(CPU::State& cpuState, const Context<CPU::State>& cpuContext, SPC::State& spcState, const Context<SPC::State>& spcContext, Video::Processor& videoProcessor)
+    void printMemory(CPU::State& cpuState, const Context<CPU::State>& cpuContext, const SPC::State& spcState, const Context<SPC::State>& spcContext, Video::Processor& videoProcessor)
     {
         //System::setOutputColor(output, System::DefaultColor, false);
         int oamAddress = inspectedVideoMemory & 0xFF80;
@@ -611,7 +585,7 @@ public:
                 output << std::hex << std::right << std::setw(3) << std::setfill('0') << lowAddress << "x  " << std::dec;
 
                 for (int j = 0; j < 16 && dspAddress < audioProcessor.dspMemory.size(); ++j) {
-                    MemoryAccess access(audioProcessor.dspMemory, dspAddress);
+                    ConstMemoryAccess access(audioProcessor.dspMemory, dspAddress);
                     OutputColorVisitor colorVisitor;
                     access.accept(colorVisitor);
                     System::ScopedOutputColor outputColor(output, colorVisitor.color, false);
@@ -643,7 +617,7 @@ public:
                 output << bank << ':' << std::hex << std::right << std::setw(3) << std::setfill('0') << lowAddress << "x  " << std::dec;
 
                 for (int j = 0; j < 16 && cpuAddress < cpuMemorySize; ++j) {
-                    MemoryAccess access = cpuState.getMemoryAccess(cpuAddress);
+                    ConstMemoryAccess access = cpuState.getConstMemoryAccess(cpuAddress);
                     System::ScopedOutputColor outputColor(output);
                     setColor(cpuState, cpuContext, cpuAddress, access, outputColor);
                     output << access << ' ';
@@ -659,7 +633,7 @@ public:
                 output << std::hex << std::right << std::setw(3) << std::setfill('0') << lowAddress << "x  " << std::dec;
 
                 for (int j = 0; j < 16 && spcAddress < spcMemorySize; ++j) {
-                    MemoryAccess access = spcState.getMemoryAccess(spcAddress);
+                    ConstMemoryAccess access = spcState.getConstMemoryAccess(spcAddress);
                     System::ScopedOutputColor outputColor(output);
                     setColor(spcState, spcContext, spcAddress, access, outputColor);
                     if (spcAddress >= 0xffc0 && audioRegisters.bootRomDataEnabled) {
@@ -702,18 +676,62 @@ public:
         output << "Speed is " << cycleCount / 1000000.0 / elapsedSeconds << " MHz (kind of)" << std::endl;
     }
 
+    template<typename State>
+    void pause(Context<State>& context)
+    {
+        context.stepMode = true;
+        if (paused) {
+            return;
+        }
+        paused = true;
+        if (videoProcessor.rendererLock.owns_lock()) {
+            videoProcessor.rendererLock.unlock();
+            mutexUnlocked = true;
+        }
+        if (videoProcessor.rendererRunner.fullscreen) {
+            videoProcessor.renderer.toggleFullscreenRequested = true;
+        }
+        videoProcessor.renderer.focusWindow(false);
+        System::focusConsoleWindow();
+    }
+
+    template<typename State, typename OtherState>
+    void unpause(Context<State>& context, Context<OtherState>& otherContext)
+    {
+        if (!paused) {
+            return;
+        }
+        paused = false;
+        context.stepMode = false;
+        otherContext.stepMode = false;
+        if (mutexUnlocked) {
+            videoProcessor.rendererLock.lock();
+            mutexUnlocked = false;
+        }
+        videoProcessor.renderer.focusWindow(true);
+    }
+
+    bool isPaused() const
+    {
+        return paused;
+    }
+
     std::time_t startTime;
 
 private:
     std::ostream& output;
     std::istream& input;
     std::ostream& error;
+
     Video::Registers& videoRegisters;
     Video::Processor& videoProcessor;
+
     Audio::Registers& audioRegisters;
-    Audio::Processor& audioProcessor;
+    const Audio::Processor& audioProcessor;
+    
     uint64_t& cycleCount;
     bool& running;
     Word inspectedVideoMemory = 0x0;
-
+    bool paused = false;
+    bool mutexUnlocked = false;
 };

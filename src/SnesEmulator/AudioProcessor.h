@@ -96,6 +96,11 @@ public:
         renderer.initialize();
     }
 
+    void startRenderer()
+    {
+        renderer.start();
+    }
+
     void printMemoryRegister(bool write, Byte value, AddressType address, const std::string& info) override
     {
         if (supressOutput)
@@ -152,11 +157,11 @@ public:
     Byte echoDelay;
     std::array<Byte, voiceCount> coefficients;
 
+    Renderer renderer;
+
 private:
     std::ostream& output;
     std::ostream& error;
-
-    Renderer renderer;
 };
 
 }

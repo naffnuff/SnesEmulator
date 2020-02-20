@@ -58,10 +58,10 @@ public:
         }
     }
 
-    void initialize(Memory<Long>& cpuMemory)
+    void initialize(std::array<Byte, 4>& cpuToSpcBuffers)
     {
         makeWriteRegister(0xf1, "I/0 and Timer Control", false,
-            [this, &cpuMemory](Byte byte) {
+            [this, &cpuToSpcBuffers](Byte byte) {
                 for (int i = 0; i < 3; ++i) {
                     if (!timers[i].enabled && byte.getBit(i)) {
                         timers[i].tick = 0;
@@ -70,10 +70,12 @@ public:
                     timers[i].enabled = byte.getBit(i);
                 }
                 if (byte.getBit(4)) {
-                    cpuMemory.writeWord(0, 0x2140);
+                    cpuToSpcBuffers[0] = 0;
+                    cpuToSpcBuffers[1] = 0;
                 }
                 if (byte.getBit(5)) {
-                    cpuMemory.writeWord(0, 0x2142);
+                    cpuToSpcBuffers[2] = 0;
+                    cpuToSpcBuffers[3] = 0;
                 }
                 bootRomDataEnabled = byte.getBit(7);
             });

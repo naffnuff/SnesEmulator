@@ -19,6 +19,7 @@ public:
     typedef Long AddressType;
     typedef Memory<AddressType> MemoryType;
     typedef MemoryAccess<MemoryType> MemoryAccessType;
+    typedef ConstMemoryAccess<MemoryType> ConstMemoryAccessType;
 
     struct InterruptVectors
     {
@@ -368,6 +369,12 @@ public:
     MemoryAccessType getMemoryAccess(Long address, Word offset = 0)
     {
         return MemoryAccess(memory, Long(address + offset), Wrapping);
+    }
+
+    template<MemoryType::WrappingMask Wrapping = MemoryType::Full>
+    ConstMemoryAccessType getConstMemoryAccess(Long address, Word offset = 0) const
+    {
+        return ConstMemoryAccessType(memory, Long(address + offset), Wrapping);
     }
 
     template<MemoryType::WrappingMask Wrapping  = MemoryType::Full>

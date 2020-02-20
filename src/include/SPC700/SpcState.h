@@ -20,6 +20,7 @@ public:
     typedef Word AddressType;
     typedef Memory<AddressType> MemoryType;
     typedef MemoryAccess<MemoryType> MemoryAccessType;
+    typedef ConstMemoryAccess<MemoryType> ConstMemoryAccessType;
 
     enum Flag
     {
@@ -246,6 +247,12 @@ public:
     Word readMemoryWord(Word address)
     {
         return memory.readWord<Wrapping>(address);
+    }
+
+    template<MemoryType::WrappingMask Wrapping = MemoryType::Full>
+    ConstMemoryAccessType getConstMemoryAccess(Word address) const
+    {
+        return ConstMemoryAccessType(memory, address, Wrapping);
     }
 
     template<MemoryType::WrappingMask Wrapping = MemoryType::Full>

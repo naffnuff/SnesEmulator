@@ -63,6 +63,10 @@ int streamCallback(const void* input, void* output, unsigned long frameCount, co
     out[0] = sample;
     out[1] = sample;
 
+    renderer.masterCycle += 32;
+
+    renderer.condition.notify_one();
+
     static double previousTime = timeInfo->currentTime;
     static int count = 0;
     double currentTime = timeInfo->currentTime;
@@ -110,6 +114,13 @@ void Renderer::initialize()
     check(Pa_Initialize());
     initialized = true;
 
+    for (int i = 0; i < tableSize; i++) {
+        sine[i] = (float)sin(((double)i / (double)tableSize) * M_PI * 2.0);
+    }
+}
+
+void Renderer::start()
+{
     PaStreamParameters outputParameters;
     outputParameters.device = Pa_GetDefaultOutputDevice();
     if (outputParameters.device == paNoDevice) {
@@ -122,11 +133,6 @@ void Renderer::initialize()
     const PaDeviceInfo* info = Pa_GetDeviceInfo(outputParameters.device);
 
     output << "Host API " << Pa_GetHostApiInfo(info->hostApi)->name << std::endl;
-
-    for (int i = 0; i < tableSize; i++) {
-        sine[i] = (float)sin(((double)i / (double)tableSize) * M_PI * 2.0);
-        output << sine[i] << ".";
-    }
 
     PaStream* stream;
     check(Pa_OpenStream(&stream, nullptr, &outputParameters, sampleRate, bufferSize, paClipOff, streamCallback, this));
