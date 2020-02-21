@@ -134,7 +134,6 @@ void Renderer::start()
 
     output << "Host API " << Pa_GetHostApiInfo(info->hostApi)->name << std::endl;
 
-    PaStream* stream;
     check(Pa_OpenStream(&stream, nullptr, &outputParameters, sampleRate, bufferSize, paClipOff, streamCallback, this));
     check(Pa_StartStream(stream));
 }
@@ -158,6 +157,11 @@ void Renderer::tick()
         throw Exception("Priming output");
     }
     ++counter;
+}
+
+double Renderer::getStreamTime() const
+{
+    return Pa_GetStreamTime(stream);
 }
 
 }

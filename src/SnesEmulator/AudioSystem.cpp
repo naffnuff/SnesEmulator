@@ -16,6 +16,8 @@ public:
             uint64_t masterCycle = 0;
             uint64_t nextSpc = 0;
             system.output << "HELLO AUDIO MONKEY!" << std::endl;
+            system.processor.startRenderer();
+            double startTime = system.processor.renderer.getStreamTime();
             while (system.run) {
                 if (masterCycle == nextSpc) {
                     Instruction* instruction = system.instructionDecoder.getNextInstruction(system.state);
@@ -32,12 +34,23 @@ public:
                         continue;
                     }
                 }
-                if (masterCycle >= system.processor.renderer.masterCycle) {
+                /*if (masterCycle >= system.processor.renderer.masterCycle) {
                     std::unique_lock<std::mutex> lock(system.processor.renderer.mutex);
                     system.processor.renderer.condition.wait(lock, [this, masterCycle]() { return masterCycle < system.processor.renderer.masterCycle; });
+                }*/
+                constexpr double speed = 1.024e6;
+                double time = system.processor.renderer.getStreamTime() - startTime;
+                /*static double lastTime = time;
+                if (time - lastTime > 1.0) {
+                    system.output << "Time: " << time << std::endl;
+                    lastTime = time;
+                }*/
+                uint64_t targetMasterCycle = uint64_t(time * speed);
+                if (masterCycle < targetMasterCycle)
+                {
+                    ++masterCycle;
+                    system.registers.tick();
                 }
-                ++masterCycle;
-                system.registers.tick();
             }
             system.output << "BYE AUDIO MONKEY! " << std::endl;
         } catch (const std::exception& e) {
@@ -52,6 +65,5 @@ private:
 
 void AudioSystem::start()
 {
-    processor.startRenderer();
     systemThread = std::thread(AudioSystemRunner(*this));
 }

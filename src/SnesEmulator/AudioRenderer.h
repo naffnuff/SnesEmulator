@@ -33,6 +33,7 @@ public:
     void initialize();
     void start();
     void tick();
+    double getStreamTime() const;
 
 public:
     struct Data
@@ -48,6 +49,8 @@ public:
 
     std::ostream& output;
     std::ostream& error;
+
+    void* stream;
 
     bool initialized = false;
 
