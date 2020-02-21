@@ -71,7 +71,7 @@ int streamCallback(const void* input, void* output, unsigned long frameCount, co
     static int count = 0;
     double currentTime = timeInfo->currentTime;
     count++;
-    if (currentTime - previousTime >= 1.0) {
+    if (currentTime - previousTime >= 10.0) {
         renderer.output << "Proc: " << renderer.counter << std::endl;
         renderer.output << "Rend: " << count << std::endl;
         renderer.counter = 0;

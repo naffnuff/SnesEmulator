@@ -24,14 +24,13 @@ public:
                     //instruction->applyBreakpoints();
 
                     //system.context.addKnownAddress(system.state.getProgramAddress());
-                    //try {
-                        if (int cycles = instruction->execute()) {
-                            nextSpc += uint64_t(cycles);
-                            system.context.nextInstruction = system.instructionDecoder.getNextInstruction(system.state);
-                        } else {
-                            continue;
-                        }
-                    /*} catch...*/
+
+                    if (int cycles = instruction->execute()) {
+                        nextSpc += uint64_t(cycles);
+                        system.context.nextInstruction = system.instructionDecoder.getNextInstruction(system.state);
+                    } else {
+                        continue;
+                    }
                 }
                 if (masterCycle >= system.processor.renderer.masterCycle) {
                     std::unique_lock<std::mutex> lock(system.processor.renderer.mutex);
