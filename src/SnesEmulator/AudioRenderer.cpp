@@ -63,10 +63,6 @@ int streamCallback(const void* input, void* output, unsigned long frameCount, co
     out[0] = sample;
     out[1] = sample;
 
-    renderer.masterCycle += 32;
-
-    renderer.condition.notify_one();
-
     static double previousTime = timeInfo->currentTime;
     static int count = 0;
     double currentTime = timeInfo->currentTime;
@@ -159,9 +155,9 @@ void Renderer::tick()
     ++counter;
 }
 
-double Renderer::getStreamTime() const
+/*double Renderer::getStreamTime() const
 {
     return Pa_GetStreamTime(stream);
-}
+}*/
 
 }

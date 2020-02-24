@@ -33,7 +33,7 @@ public:
     void initialize();
     void start();
     void tick();
-    double getStreamTime() const;
+    //double getStreamTime() const;
 
 public:
     struct Data
@@ -55,10 +55,6 @@ public:
     bool initialized = false;
 
     int counter = 0;
-    
-    uint64_t masterCycle = 0;
-    std::mutex mutex;
-    std::condition_variable condition;
     
     bool inputUnderflow = false;
     bool inputOverflow = false;

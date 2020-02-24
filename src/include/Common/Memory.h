@@ -714,8 +714,10 @@ template<typename Memory>
 class MemoryAccess : public LocationAccess
 {
 public:
-    typedef typename Memory::AddressType AddressType;
-    typedef typename Memory::WrappingMask WrappingMask;
+    //typedef typename Memory::AddressType AddressType;
+    //typedef typename Memory::WrappingMask WrappingMask;
+    using AddressType = typename Memory::AddressType;
+    using WrappingMask = typename Memory::WrappingMask;
 
     MemoryAccess() = delete;
 
@@ -771,8 +773,10 @@ template<typename Memory>
 class ConstMemoryAccess : public ConstLocationAccess
 {
 public:
-    typedef typename Memory::AddressType AddressType;
-    typedef typename Memory::WrappingMask WrappingMask;
+    //typedef typename Memory::AddressType AddressType;
+    //typedef typename Memory::WrappingMask WrappingMask;
+    using AddressType = typename Memory::AddressType;
+    using WrappingMask = typename Memory::WrappingMask;
 
     ConstMemoryAccess() = delete;
 

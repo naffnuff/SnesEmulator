@@ -72,7 +72,8 @@ public:
 
     void tick()
     {
-        if (debugger.isPaused()) {
+        if (debugger.isPaused())
+        {
             registers.tick();
         }
     }
