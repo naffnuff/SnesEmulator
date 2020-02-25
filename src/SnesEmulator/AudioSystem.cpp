@@ -19,7 +19,8 @@ public:
             //uint64_t nextSpc = 0;
             system.output << "HELLO AUDIO MONKEY!" << std::endl;
             system.processor.startRenderer();
-            std::chrono::steady_clock::time_point startTime = std::chrono::steady_clock::now();
+            system.now = std::chrono::steady_clock::now();
+            std::chrono::steady_clock::time_point startTime = system.now;
             using Frequency = std::ratio<1, 1024000>;
             using CycleCount = std::chrono::duration<uint64_t, Frequency>;
             CycleCount oneCycle(1);
@@ -43,10 +44,10 @@ public:
                     }
                 }
                 constexpr double speed = 1.024e6;
-                std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-                std::chrono::nanoseconds elapsedTime = now - startTime;
+                system.now = std::chrono::steady_clock::now();
+                system.elapsedTime = system.now - startTime;
                 CycleCount nextCycle = masterCycle + oneCycle;
-                if (nextCycle <= elapsedTime)
+                if (nextCycle <= system.elapsedTime)
                 {
                     masterCycle = nextCycle;
                     system.registers.tick();
@@ -58,10 +59,9 @@ public:
                 }
                 ++iteration;
                 static std::chrono::steady_clock::time_point lastTime = startTime;
-                if (now - lastTime > std::chrono::seconds(1)) {
-                    uint64_t masterCycleCount = std::chrono::duration_cast<CycleCount>(masterCycle).count();
-                    system.output << "Audio cycles: " << masterCycleCount << " / " << iteration << " (" << (100.0 * masterCycleCount / iteration) << "%)" << std::endl;
-                    lastTime = now;
+                if (system.now - lastTime > std::chrono::seconds(1)) {
+                    system.output << "Audio cycles: " << masterCycle.count() << " / " << iteration << " (" << (100.0 * masterCycle.count() / iteration) << "%)" << std::endl;
+                    lastTime = system.now;
                 }
             }
             system.output << "BYE AUDIO MONKEY! " << std::endl;

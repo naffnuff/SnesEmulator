@@ -141,13 +141,14 @@ void Emulator::run()
     DmaInstruction dmaInstruction(output, error, cpuState, videoRegisters);
     HdmaInstruction hdmaInstruction(output, error, cpuState, videoRegisters);
 
-    uint64_t nextCpu = masterCycle;
-    uint64_t nextSpc = masterCycle;
-    uint64_t cycleCountTarget = masterCycle;
+    CycleCount nextCpu = masterCycle;
+    CycleCount nextSpc = masterCycle;
+    CycleCount nextAudioTick = masterCycle;
+    CycleCount oneCycle(1);
 
     uint64_t audioCycle = 0;
 
-    videoRegisters.hCounter = int(masterCycle);
+    videoRegisters.hCounter = int(masterCycle.count());
 
     bool nmiRequested = false;
     bool irqRequested = false;
@@ -155,7 +156,7 @@ void Emulator::run()
     //cpuContext.setPaused(true);
 
     double runStartTime = 0.0;
-    uint64_t cycleCountDelta = 0;
+    //uint64_t cycleCountDelta = 0;
     bool stepMode = debugger.isPaused();
     if (!stepMode) {
         debugger.startTime = clock();
@@ -174,11 +175,11 @@ void Emulator::run()
                     if (nmiRequested) {
                         nmiRequested = false;
                         cpuState.startInterrupt(true);
-                        nextCpu += 9 * 8; // TODO: check the correct cycles for interrupt
+                        nextCpu += CycleCount(9 * 8); // TODO: check the correct cycles for interrupt
                     } else if (irqRequested && !cpuState.getFlag(CPU::State::i) && !cpuState.isNmiActive()) {
                         irqRequested = false;
                         cpuState.startInterrupt(false);
-                        nextCpu += 9 * 8; // TODO: check the correct cycles for interrupt
+                        nextCpu += CycleCount(9 * 8); // TODO: check the correct cycles for interrupt
                     }
 
                     Instruction* instruction = cpuInstructionDecoder.getNextInstruction(cpuState);
@@ -208,14 +209,14 @@ void Emulator::run()
                     instruction->applyBreakpoints();
 
                     if (cpuContext.isStepMode()) {
-                        output << "Cycle count: " << masterCycle << ", Next cpu: " << nextCpu << ", Next spc: " << nextSpc << std::endl;
+                        output << "Cycle count: " << masterCycle.count() << ", Next cpu: " << nextCpu.count() << ", Next spc: " << nextSpc.count() << std::endl;
                         output << "Frame: " << videoRegisters.frame << ", V counter: " << videoRegisters.vCounter << ", H counter: " << videoRegisters.hCounter << ", V blank: " << videoRegisters.vBlank << ", H blank: " << videoRegisters.hBlank << ", nmi: " << cpuState.isNmiActive() << ", irq: " << cpuState.isIrqActive() << std::endl;
                         debugger.printBreakpoints(cpuContext, audioSystem.context);
                         debugger.printMemory(cpuState, cpuContext, audioSystem.state, audioSystem.context, videoProcessor);
                     }
 
                     if (int cycles = executeNext(instruction, cpuState, debugger, cpuContext, audioSystem.state, audioSystem.context, error)) {
-                        nextCpu += uint64_t(cycles) * 6;
+                        nextCpu += CycleCount(cycles * 6);
                         cpuContext.nextInstruction = cpuInstructionDecoder.getNextInstruction(cpuState);
                     } else {
                         continue;
@@ -241,13 +242,13 @@ void Emulator::run()
                         instruction->applyBreakpoints();
 
                         if (audioSystem.context.isStepMode()) {
-                            output << "cycleCount=" << masterCycle << ", nextCpu=" << nextCpu << ", nextSpc=" << nextSpc << std::endl;
+                            output << "cycleCount=" << masterCycle.count() << ", nextCpu=" << nextCpu.count() << ", nextSpc=" << nextSpc.count() << std::endl;
                             debugger.printBreakpoints(cpuContext, audioSystem.context);
                             debugger.printMemory(cpuState, cpuContext, audioSystem.state, audioSystem.context, videoProcessor);
                         }
 
                         if (int cycles = executeNext(instruction, audioSystem.state, debugger, audioSystem.context, cpuState, cpuContext, error)) {
-                            nextSpc += uint64_t(cycles) * 16;
+                            nextSpc += CycleCount(cycles * 16);
                             audioSystem.context.nextInstruction = audioSystem.instructionDecoder.getNextInstruction(audioSystem.state);
                         } else {
                             continue;
@@ -255,37 +256,39 @@ void Emulator::run()
                     }
                 }
 
+                CycleCount nextMasterCycle = masterCycle + oneCycle;
                 bool increment = false;
                 if (debugger.isPaused()) { // step mode
                     increment = true;
                     stepMode = true;
                 } else if (stepMode) { // run mode initiated
                     stepMode = false;
-                    runStartTime = videoProcessor.renderer.getTime();
-                    cycleCountDelta = 0;
+                    //runStartTime = videoProcessor.renderer.getTime();
+                    //cycleCountDelta = 0;
                 } else { // run mode continued
-                    if (iteration % 100 == 0)
+                    /*if (iteration % 100 == 0)
                     {
                         double elapsedTime = videoProcessor.renderer.getTime() - runStartTime;
-                        static const double clockSpeedTarget = 1.89e9 / 88.0;
+                        constexpr double clockSpeedTarget = 1.89e9 / 88.0;
                         cycleCountTarget = uint64_t(elapsedTime * clockSpeedTarget);
-                    }
+                    }*/
 
-                    if (cycleCountTarget > cycleCountDelta) {
+                    if (nextMasterCycle <= audioSystem.elapsedTime) {
                         increment = true;
                     }
 
                     //increment = true;
 
                     if (increment) {
-                        ++cycleCountDelta;
+                        //++cycleCountDelta;
                     }
                 }
 
                 if (increment) {
-                    ++masterCycle;
-                    if (masterCycle % 21 == 0) {
+                    masterCycle = nextMasterCycle;
+                    if (nextMasterCycle == nextAudioTick) {
                         audioSystem.tick();
+                        nextAudioTick += CycleCount(21);
                     }
                     ++videoRegisters.hCounter;
                     if (videoRegisters.hCounter == 274) {
@@ -298,17 +301,17 @@ void Emulator::run()
                             }
                         }
                         if (videoRegisters.vCounter == 224) {
-                            static double previousTime = videoProcessor.renderer.getTime();
+                            static std::chrono::steady_clock::time_point previousTime = audioSystem.now;
                             static uint32_t frameCount = 0;
                             static uint32_t totalFrameCount = 0;
 
-                            double currentTime = videoProcessor.renderer.getTime();
+                            std::chrono::steady_clock::time_point currentTime = audioSystem.now;
                             ++frameCount;
                             ++totalFrameCount;
                             static uint32_t minFrameCount = -1;
                             static uint32_t maxFrameCount = 0;
                             static int printOuts = 0;
-                            if (currentTime - previousTime >= 1.0) {
+                            if (currentTime - previousTime >= std::chrono::seconds(1)) {
                                 minFrameCount = min(minFrameCount, frameCount);
                                 maxFrameCount = max(maxFrameCount, frameCount);
 
@@ -326,7 +329,6 @@ void Emulator::run()
                             }
 
                             //videoProcessor.renderer.update();
-                            videoProcessor.rendererLock.unlock();
 
                             oamViewer.update();
                             background1Viewer.update();
@@ -339,6 +341,9 @@ void Emulator::run()
                             spriteLayer4Viewer.update();
                             mode7Viewer.update();
 
+                            videoProcessor.rendererLock.unlock();
+
+                            std::this_thread::yield();
                         }
                         videoRegisters.hBlank = true;
                     } else if (videoRegisters.hCounter == 1374) {
@@ -384,10 +389,10 @@ void Emulator::run()
                 } else {
                     //std::this_thread::yield();
                 }
-                static double lastTime = runStartTime;
-                if (videoProcessor.renderer.getTime() - lastTime > 1.0) {
-                    output << "Video cycles: " << masterCycle << " / " << iteration << " (" << (100.0 * masterCycle / iteration) << "%)" << std::endl;
-                    lastTime = videoProcessor.renderer.getTime();
+                static std::chrono::steady_clock::time_point lastTime = audioSystem.now;
+                if (audioSystem.now - lastTime > std::chrono::seconds(1)) {
+                    output << "Video cycles: " << masterCycle.count() << " / " << iteration << " (" << (100.0 * masterCycle.count() / iteration) << "%)" << std::endl;
+                    lastTime = audioSystem.now;
                 }
                 ++iteration;
             } catch (Video::MemoryAccessException& e) {

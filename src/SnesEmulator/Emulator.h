@@ -72,9 +72,10 @@ public:
         , videoRegisters(output, error, cpuState)
         , videoProcessor(videoRegisters.processor)
         , audioSystem(output, error, debugger)
-        , debugger(output, input, error, videoRegisters, audioSystem.getRegisters(), masterCycle, running)
+        , debugger(output, input, error, videoRegisters, audioSystem.getRegisters(), running)
         , cpuContext("cpu.txt", System::Green, debugger)
         , saveRamSaver(*this)
+        , masterCycle(0)
     {
     }
 
@@ -119,7 +120,10 @@ private:
     std::thread saveRamSaverThread;
 
     bool running = true;
-    uint64_t masterCycle = 186;
+
+    using Frequency = std::ratio<88, 1890000000>;
+    using CycleCount = std::chrono::duration<uint64_t, Frequency>;
+    CycleCount masterCycle;
 
     std::array<Byte, 4> cpuToSpcBuffers;
     std::array<Byte, 4> spcToCpuBuffers;

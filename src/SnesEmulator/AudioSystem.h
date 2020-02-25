@@ -24,6 +24,7 @@ public:
         , processor(registers.processor)
         , debugger(debugger)
         , context("spc.txt", System::Magenta, debugger)
+        , elapsedTime(0)
     {
     }
 
@@ -107,6 +108,9 @@ public:
     Debugger::Context<SPC::State> context;
 
     bool pauseRequested = false;
+
+    std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+    std::chrono::nanoseconds elapsedTime;
 
     friend class AudioSystemRunner;
 };

@@ -175,7 +175,7 @@ public:
         friend class Debugger;
     };
 
-    Debugger(std::ostream& output, std::istream& input, std::ostream& error, Video::Registers& videoRegisters, Audio::Registers& audioRegisters, uint64_t& cycleCount, bool& running)
+    Debugger(std::ostream& output, std::istream& input, std::ostream& error, Video::Registers& videoRegisters, Audio::Registers& audioRegisters, bool& running)
         : output(output)
         , input(input)
         , error(error)
@@ -183,7 +183,6 @@ public:
         , videoProcessor(videoRegisters.processor)
         , audioRegisters(audioRegisters)
         , audioProcessor(audioRegisters.processor)
-        , cycleCount(cycleCount)
         , running(running)
     {
     }
@@ -668,14 +667,6 @@ public:
         }
     }
 
-    void printClockSpeed() const
-    {
-        std::time_t endTime = clock();
-        double elapsedSeconds = double(endTime - startTime) / CLOCKS_PER_SEC;
-        output << "Time delta=" << elapsedSeconds << std::endl;
-        output << "Speed is " << cycleCount / 1000000.0 / elapsedSeconds << " MHz (kind of)" << std::endl;
-    }
-
     template<typename State>
     void pause(Context<State>& context)
     {
@@ -729,7 +720,6 @@ private:
     Audio::Registers& audioRegisters;
     const Audio::Processor& audioProcessor;
     
-    uint64_t& cycleCount;
     bool& running;
     Word inspectedVideoMemory = 0x0;
     bool paused = false;
