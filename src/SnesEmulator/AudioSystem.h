@@ -25,6 +25,7 @@ public:
         , debugger(debugger)
         , context("spc.txt", System::Magenta, debugger)
         , elapsedTime(0)
+        , nextSpc(0)
     {
     }
 
@@ -73,10 +74,7 @@ public:
 
     void tick()
     {
-        if (debugger.isPaused())
-        {
-            registers.tick();
-        }
+        registers.tick();
     }
 
     void reset()
@@ -102,15 +100,21 @@ private:
 
     Debugger& debugger;
 
+public:
     std::thread systemThread;
 
-public:
     Debugger::Context<SPC::State> context;
+
+    bool threaded = true;
 
     bool pauseRequested = false;
 
     std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
     std::chrono::nanoseconds elapsedTime;
+
+    using Frequency = std::ratio<1, 1024000>;
+    using CycleCount = std::chrono::duration<uint64_t, Frequency>;
+    CycleCount nextSpc;
 
     friend class AudioSystemRunner;
 };

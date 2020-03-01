@@ -32,9 +32,6 @@ public:
 
     struct Voice
     {
-        int8_t leftVolume;
-        int8_t rightVolume;
-        Word pitch;
         Byte sourceNumber;
         EnvelopeType envelopeType = Gain;
         Byte attackRate;
@@ -43,8 +40,6 @@ public:
         Byte sustainLevel;
         GainMode gainMode;
         Byte gainLevel;
-        Byte envelope;
-        int8_t output;
 
         std::string envelopeTypeToString() const
         {
@@ -96,11 +91,6 @@ public:
         renderer.initialize();
     }
 
-    void startRenderer()
-    {
-        renderer.start();
-    }
-
     void printMemoryRegister(bool write, Byte value, AddressType address, const std::string& info) override
     {
         if (supressOutput)
@@ -116,18 +106,7 @@ public:
     void tick()
     {
         ++dspCycle;
-        for (int i = 0; i < 8; ++i) {
-            if (keyOn[i]) {
-                renderer.data[i].playing = true;
-            } else if (keyOff[i]) {
-                renderer.data[i].playing = false;
-            }
-            if (renderer.data[i].playing) {
-                renderer.data[i].pitch = float(voices[i].pitch) / float(1 << 12);
-            }
-        }
-
-        renderer.tick();
+        ++renderer.targetTickCounter;
     }
 
     static constexpr int voiceCount = Renderer::voiceCount;
@@ -137,8 +116,6 @@ public:
     Memory<Byte> dspMemory;
 
     std::array<Voice, voiceCount> voices;
-    int8_t mainVolumeLeft;
-    int8_t mainVolumeRight;
     int8_t echoVolumeLeft;
     int8_t echoVolumeRight;
     std::bitset<voiceCount> keyOn;

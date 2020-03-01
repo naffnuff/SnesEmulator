@@ -47,6 +47,16 @@ public:
         makeWriteRegister(address, info, debug, [&variable](Byte value) { variable = value; }, openBus);
     }
 
+    void makeWriteRegister(AddressType address, const std::string& info, bool debug, int8_t& variable, bool openBus = false)
+    {
+        makeWriteRegister(address, info, debug, [&variable](Byte value) { variable = value; }, openBus);
+    }
+
+    void makeWriteRegister(AddressType address, const std::string& info, bool debug, std::bitset<8> & variable, bool openBus = false)
+    {
+        makeWriteRegister(address, info, debug, [&variable](Byte value) { variable = std::bitset<8>(value); }, openBus);
+    }
+
     void makeWriteRegister(AddressType address, const std::string& info, bool debug, Word& variable, bool openBus = false)
     {
         makeWriteRegister(address, info + " low byte", debug, [&variable](Byte value) { variable.setLowByte(value); }, openBus);
@@ -73,6 +83,21 @@ public:
             }
         );
     };
+
+    void makeReadRegister(AddressType address, const std::string& info, bool debug, Byte& variable)
+    {
+        makeReadRegister(address, info, debug, [&variable](Byte& value) { value = variable; });
+    }
+
+    void makeReadRegister(AddressType address, const std::string& info, bool debug, int8_t& variable)
+    {
+        makeReadRegister(address, info, debug, [&variable](Byte& value) { value = variable; });
+    }
+
+    void makeReadRegister(AddressType address, const std::string& info, bool debug, std::bitset<8> & variable)
+    {
+        makeReadRegister(address, info, debug, [&variable](Byte& value) { value = uint8_t(variable.to_ulong()); });
+    }
 
     void makeReadRegister(AddressType address, const std::string& info, bool debug, const Word& variable)
     {

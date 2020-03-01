@@ -144,6 +144,7 @@ void Emulator::run()
     CycleCount nextCpu = masterCycle;
     CycleCount nextSpc = masterCycle;
     CycleCount nextAudioTick = masterCycle;
+    CycleCount lostCycles(0);
     CycleCount oneCycle(1);
 
     uint64_t audioCycle = 0;
@@ -231,9 +232,11 @@ void Emulator::run()
                 if (audioSystem.pauseRequested) {
                     audioSystem.pauseRequested = false;
                     debugger.pause(audioSystem.context);
+                    //nextSpc = max(std::chrono::duration_cast<CycleCount>(audioSystem.nextSpc), masterCycle);
+                    nextSpc = masterCycle;
                 }
 
-                if (debugger.isPaused())
+                if (!audioSystem.threaded)
                 {
                     if (masterCycle == nextSpc) {
                         Instruction* instruction = audioSystem.instructionDecoder.getNextInstruction(audioSystem.state);
@@ -273,7 +276,7 @@ void Emulator::run()
                         cycleCountTarget = uint64_t(elapsedTime * clockSpeedTarget);
                     }*/
 
-                    if (nextMasterCycle <= audioSystem.elapsedTime) {
+                    if (nextMasterCycle <= audioSystem.elapsedTime - lostCycles) {
                         increment = true;
                     }
 
@@ -283,13 +286,13 @@ void Emulator::run()
                         //++cycleCountDelta;
                     }
                 }
+                if (!audioSystem.threaded && masterCycle == nextAudioTick) {
+                    audioSystem.tick();
+                    nextAudioTick += CycleCount(21);
+                }
 
                 if (increment) {
                     masterCycle = nextMasterCycle;
-                    if (nextMasterCycle == nextAudioTick) {
-                        audioSystem.tick();
-                        nextAudioTick += CycleCount(21);
-                    }
                     ++videoRegisters.hCounter;
                     if (videoRegisters.hCounter == 274) {
                         if (videoRegisters.vCounter <= 224) {
@@ -390,8 +393,10 @@ void Emulator::run()
                     //std::this_thread::yield();
                 }
                 static std::chrono::steady_clock::time_point lastTime = audioSystem.now;
-                if (audioSystem.now - lastTime > std::chrono::seconds(1)) {
+                if (audioSystem.now - lastTime > std::chrono::seconds(10)) {
+                    //lostCycles = std::chrono::duration_cast<CycleCount>(audioSystem.elapsedTime) - masterCycle;
                     output << "Video cycles: " << masterCycle.count() << " / " << iteration << " (" << (100.0 * masterCycle.count() / iteration) << "%)" << std::endl;
+                    output << "Lost cycles: " << lostCycles.count() << std::endl;
                     lastTime = audioSystem.now;
                 }
                 ++iteration;
@@ -412,7 +417,7 @@ int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debu
 {
     context.addKnownAddress(state.getProgramAddress());
     try {
-        if (debugger.isPaused()) {
+        if (context.isStepMode()) {
             debugger.printState(state, context);
 
             if (debugger.awaitCommand(context, state, otherContext, otherState)) {
@@ -442,6 +447,10 @@ int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debu
         debugger.pause(context);
         error << e.what() << std::endl;
     } catch (Video::NotYetImplementedException& e) {
+        state.setProgramAddress(context.getLastKnownAddress());
+        debugger.pause(context);
+        error << e.what() << std::endl;
+    } catch (Audio::NotYetImplementedException& e) {
         state.setProgramAddress(context.getLastKnownAddress());
         debugger.pause(context);
         error << e.what() << std::endl;

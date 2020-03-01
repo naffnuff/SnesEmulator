@@ -10,80 +10,28 @@
 #define M_PI 3.14159265358979323846264338327950288
 #endif
 
-namespace {
+namespace Audio {
 
 static constexpr int sampleRate = 32000;
 static constexpr int bufferSize = 1;
 
-int streamCallback(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void* userData)
+struct StreamHandler
 {
-    Audio::Renderer& renderer = *(Audio::Renderer*)userData;
-    float* out = (float*)output;
+    static int callback(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void* userData)
+    {
+        Audio::Renderer& renderer = *(Audio::Renderer*)userData;
+        float* out = (float*)output;
 
-    if (statusFlags) {
-        if (statusFlags & paInputUnderflow) {
-            renderer.output << "paInputUnderflow" << std::endl;
-            renderer.inputUnderflow = true;
-        }
-        if (statusFlags & paInputOverflow) {
-            renderer.output << "paInputOverflow" << std::endl;
-            renderer.inputOverflow = true;
-        }
-        if (statusFlags & paOutputUnderflow) {
-            renderer.output << "paOutputUnderflow" << std::endl;
-            renderer.outputUnderflow = true;
-        }
-        if (statusFlags & paOutputOverflow) {
-            renderer.output << "paOutputOverflow" << std::endl;
-            renderer.outputOverflow = true;
-        }
-        if (statusFlags & paPrimingOutput) {
-            renderer.output << "paPrimingOutput" << std::endl;
-            renderer.primingOutput = true;
-        }
-        renderer.output << std::endl << "STREAM CALLBACK FLAGS: " << statusFlags << std::endl;
-    }
-
-    float sample = 0.0f;
-    float sampleCount = 0.0f;
-    for (Audio::Renderer::Data& data : renderer.data) {
-        if (data.playing) {
-            data.counter += data.pitch;
-            int counter = int(data.counter + .5f);
-            if (counter >= Audio::Renderer::tableSize) {
-                data.counter -= Audio::Renderer::tableSize;
-                counter = int(data.counter + .5f);
-            }
-            sample += renderer.sine[counter];
-            ++sampleCount;
+        if (renderer.checkStreamStatus(statusFlags)) {
+            renderer.outputSample(out[0], out[1]);
+            renderer.printTimeInfo(timeInfo->currentTime);
+            return paContinue;
+        } else {
+            renderer.output << "ABORTING AUDIO RENDERER!" << std::endl;
+            return paAbort;
         }
     }
-    sample /= float(sampleCount);
-
-    out[0] = sample;
-    out[1] = sample;
-
-    static double previousTime = timeInfo->currentTime;
-    static int count = 0;
-    double currentTime = timeInfo->currentTime;
-    count++;
-    if (currentTime - previousTime >= 10.0) {
-        renderer.output << "Proc: " << renderer.counter << std::endl;
-        renderer.output << "Rend: " << count << std::endl;
-        renderer.counter = 0;
-        count = 0;
-        previousTime = currentTime;
-    }
-
-    if (statusFlags) {
-        renderer.output << "ABORTING AUDIO!" << std::endl;
-        //return paContinue;
-        return paAbort;
-    } else {
-        //renderer.output << "CONTINUING AS FUCK!" << std::endl;
-        return paContinue;
-    }
-}
+};
 
 void check(PaError error)
 {
@@ -92,9 +40,25 @@ void check(PaError error)
     }
 }
 
+Renderer::Renderer(std::ostream& output, std::ostream& error)
+    : output(output)
+    , error(error)
+{
+    size_t index = frequencyTable.size();
+    frequencyTable[--index] = 1;
+    frequencyTable[--index] = 2;
+    for (int i = 0; i < 10; ++i) {
+        frequencyTable[--index] = 3 << i;
+        frequencyTable[--index] = 4 << i;
+        frequencyTable[--index] = 5 << i;
+    }
+    frequencyTable[0] = 0;
+    output << "Frequencies:" << std::endl;
+    for (int frequency : frequencyTable) {
+        output << frequency << std::endl;
+    }
+    output << "***" << std::endl;
 }
-
-namespace Audio {
 
 Renderer::~Renderer()
 {
@@ -115,7 +79,7 @@ void Renderer::initialize()
     }
 }
 
-void Renderer::start()
+void Renderer::startStream()
 {
     PaStreamParameters outputParameters;
     outputParameters.device = Pa_GetDefaultOutputDevice();
@@ -130,34 +94,129 @@ void Renderer::start()
 
     output << "Host API " << Pa_GetHostApiInfo(info->hostApi)->name << std::endl;
 
-    check(Pa_OpenStream(&stream, nullptr, &outputParameters, sampleRate, bufferSize, paClipOff, streamCallback, this));
+    check(Pa_OpenStream(&stream, nullptr, &outputParameters, sampleRate, bufferSize, paClipOff, StreamHandler::callback, this));
     check(Pa_StartStream(stream));
 }
 
-void Renderer::tick()
+bool Renderer::checkStreamStatus(unsigned long statusFlags)
 {
-    if (inputUnderflow) {
-        output << "inputUnderflow" << std::endl;
-        throw Exception("Input underflow");
-    } else if (inputOverflow) {
-        output << "inputOverflow" << std::endl;
-        throw Exception("Input overflow");
-    } else if (outputUnderflow) {
-        output << "outputUnderflow" << std::endl;
-        throw Exception("Output underflow");
-    } else if (outputOverflow) {
-        output << "outputOverflow" << std::endl;
-        throw Exception("Output overflow");
-    } else if (primingOutput) {
-        output << "primingOutput" << std::endl;
-        throw Exception("Priming output");
+    if (false && statusFlags) {
+        if (statusFlags & paInputUnderflow) {
+            output << "paInputUnderflow" << std::endl;
+            inputUnderflow = true;
+        }
+        if (statusFlags & paInputOverflow) {
+            output << "paInputOverflow" << std::endl;
+            inputOverflow = true;
+        }
+        if (statusFlags & paOutputUnderflow) {
+            output << "paOutputUnderflow" << std::endl;
+            outputUnderflow = true;
+        }
+        if (statusFlags & paOutputOverflow) {
+            output << "paOutputOverflow" << std::endl;
+            outputOverflow = true;
+        }
+        if (statusFlags & paPrimingOutput) {
+            output << "paPrimingOutput" << std::endl;
+            primingOutput = true;
+        }
+        output << std::endl << "STREAM CALLBACK FLAGS: " << statusFlags << std::endl;
+        return false;
+    } else {
+        return true;
     }
-    ++counter;
 }
 
-/*double Renderer::getStreamTime() const
+void Renderer::outputSample(float& leftChannel, float& rightChannel)
 {
-    return Pa_GetStreamTime(stream);
-}*/
+    double leftSample = 0.0f;
+    double rightSample = 0.0f;
+    double sampleCount = 0.0f;
+    for (Audio::Renderer::Data& data : data) {
+        calculateEnvelope(data);
+        if (data.envelopeStage != Inactive) {
+            if (data.envelope == 0.0) {
+                output << "WTF" << std::endl;
+                output << data.envelope << std::endl;
+            }
+            data.counter += data.pitch;
+            int counter = int(data.counter + .5f);
+            if (counter >= Audio::Renderer::tableSize) {
+                data.counter -= Audio::Renderer::tableSize;
+                counter = int(data.counter + .5f);
+            }
+            leftSample += sine[counter] * data.envelope * data.leftVolume;
+            rightSample += sine[counter] * data.envelope * data.rightVolume;
+            ++sampleCount;
+        }
+    }
+    leftSample /= sampleCount;
+    rightSample /= sampleCount;
+
+    leftChannel = float(leftSample * mainVolumeLeft);
+    rightChannel = float(rightSample * mainVolumeRight);
+}
+
+void Renderer::calculateEnvelope(Data& data)
+{
+    if (data.envelopeStage == Attack) {
+        if (data.envelope < 1.0) {
+            constexpr double increment = 1.0 / 64.0;
+            data.envelope += increment;
+            if (data.envelope >= 1.0) {
+                data.envelope = 1.0;
+                data.envelopeStage = Sustain;
+            }
+        }
+    } else if (data.envelopeStage == Decay) {
+    } else if (data.envelopeStage == Sustain) {
+    } else if (data.envelopeStage == Release) {
+        if (data.envelope > 0.0) {
+            constexpr double decrement = 1.0 / 256.0;
+            data.envelope -= decrement;
+        }
+        if (data.envelope <= 0.0) {
+            data.envelope = 0.0;
+            data.envelopeStage = Inactive;
+        }
+    } else if (data.envelopeStage != Inactive) {
+        throw Exception("Illegal envelope stage");
+    }
+}
+
+void Renderer::printTimeInfo(double currentTime)
+{
+    if (previousTimeInfoTime == 0.0) {
+        previousTimeInfoTime = currentTime;
+    }
+    timeInfoTickCounter++;
+    if (currentTime - previousTimeInfoTime >= 10.0) {
+        output << "Audio ticks: " << targetTickCounter << " / " << timeInfoTickCounter << "(" << (100.0 * targetTickCounter / timeInfoTickCounter) << "%)" << std::endl;
+        targetTickCounter = 0;
+        timeInfoTickCounter = 0;
+        previousTimeInfoTime = currentTime;
+    }
+}
+
+void Renderer::checkStreamErrors()
+{
+    if (streamError) {
+        std::string message;
+        if (inputUnderflow) {
+            message = "Input underflow";
+        } else if (inputOverflow) {
+            message = "Input overflow";
+        } else if (outputUnderflow) {
+            message = "Output underflow";
+        } else if (outputOverflow) {
+            message = "Output overflow";
+        } else if (primingOutput) {
+            message = "Priming output";
+        }
+        output << message << std::endl;
+        throw Exception(message);
+    }
+}
 
 }
