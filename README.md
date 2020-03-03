@@ -29,15 +29,21 @@ http://www.6502.org/tutorials/decimal_mode.html
 ### SPC-700
 #### Table of opcodes, register descriptions, and boot ROM
 https://github.com/gilligan/snesdev/blob/master/docs/spc700.txt
-#### Full description of the sound module
-https://web.archive.org/web/20090106230547/http://www.alpha-ii.com/snesmusic/files/spc700_apu_manual.txt
-### SNES registers
+#### DSP (Digital Signal Processor)
+##### General
+The SNES DSP is one area of the SNES that is especially poorly documented. For this, I had to resort to the official SNES development manual, which is notoriously opaque and rife with error. I found it through the following link:
+http://folk.uio.no/sigurdkn/snes/snes_manual1.pdf
+##### ADSR
+I found the documentation especially lacking as to how the SNES produces its sound envelopes. In stead I ended up modelling it on a technique I found in the following blog posts (part 1-3):
+http://www.earlevel.com/main/2013/06/01/envelope-generators/
+### SNES
+#### registers
 http://folk.uio.no/sigurdkn/snes/registers.txt
-### SNES memory map
+#### memory map
 http://simsnex.tripod.com/SNESMem.txt
-### SNES timing
+#### timing
 http://folk.uio.no/sigurdkn/snes/timing.txt
-### SNES transparency
+#### transparency
 http://folk.uio.no/sigurdkn/snes/transparency.txt
 
 I did not in any way reverse engineer the SNES myself (I have never even ownded one!). In addition to relying on said documents I spent countless hours stepping through the debuggers of two emulators, Bsnes Classic plus (v073u1) and SnesX9 (v1.51.ep10r2 with Geiger's debugger), comparing their emulation state with mine and analyzing the behaviours I had an extra hard time understanding. The former is known for it's fidelity to the SNES hardware and has a very user-friendly debugger, whereas the latter was mainly useful to me for analyzing (H)DMA.
