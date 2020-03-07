@@ -17,10 +17,92 @@ static constexpr int bufferSize = 1;
 
 struct StreamHandler
 {
+    static void testAttack(Renderer& renderer, Byte tableIndex)
+    {
+        double time = 0.0;
+        Renderer::FrequencyCounter counter;
+        counter.changeFrequency((tableIndex << 1) + 0x1); // but not if tableIndex == 0xf
+        int iteration = 0;
+        double value = 0.0;
+        while (value < 1.0) {
+            time += 0.03125;
+            if (counter.tick()) {
+                ++iteration;
+                value += 1.0 / 64.0;
+            }
+            if (value == 1.0)
+            {
+                renderer.output << "tableIndex: " << tableIndex << ", Value: " << value << " after time: " << time << std::endl;
+            }
+        }
+    }
+
+    static void testDecay(Renderer& renderer, Byte tableIndex)
+    {
+        double time = 0.0;
+        Renderer::FrequencyCounter counter;
+        counter.changeFrequency((tableIndex << 1) + 0x10);
+        int iteration = 0;
+        double value = 1.0;
+        double targetLevel = 7.0 / 8.0;
+        double targetRatio = 0.0001;
+        double rate = 588.0;
+        double coef = exp(-log((1.0 + targetRatio) / targetRatio) / rate);
+        double base = (targetLevel - targetRatio) * (1.0 - coef);
+        while (iteration < rate) {
+            time += 0.03125;
+            if (counter.tick()) {
+                ++iteration;
+                value = base + value * coef;
+                //renderer.output << "Iteration: " << iteration << ", base: " << base << ", coef: " << coef << ", Value: " << value << " after time: " << (timeInfo->outputBufferDacTime - startTime) * 1000.0 << std::endl;
+            }
+
+            if (iteration == rate) {
+                renderer.output << "Iteration: " << iteration << ", Value: " << value << " after time: " << time << std::endl;
+            }
+        }
+    }
+
+    static void testSustain(Renderer& renderer, Byte tableIndex)
+    {
+        double time = 0.0;
+        Renderer::FrequencyCounter counter;
+        counter.changeFrequency(tableIndex);
+        int iteration = 0;
+        double value = 7.0 / 8.0;
+        double targetLevel = 0.0;
+        double targetRatio = 0.0001;
+        double rate = 588.0;
+        double coef = exp(-log((1.0 + targetRatio) / targetRatio) / rate);
+        double base = (targetLevel - targetRatio) * (1.0 - coef);
+        while (iteration < rate) {
+            time += 0.03125;
+            if (counter.tick()) {
+                ++iteration;
+                value = base + value * coef;
+                //renderer.output << "Iteration: " << iteration << ", base: " << base << ", coef: " << coef << ", Value: " << value << " after time: " << (timeInfo->outputBufferDacTime - startTime) * 1000.0 << std::endl;
+            }
+
+            if (iteration == rate) {
+                renderer.output << "Iteration: " << iteration << ", Value: " << value << " after time: " << time << std::endl;
+            }
+        }
+    }
+
     static int callback(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void* userData)
     {
-        Audio::Renderer& renderer = *(Audio::Renderer*)userData;
+        Renderer& renderer = *(Renderer*)userData;
         float* out = (float*)output;
+
+        for (int i = 0; i < 0x8; ++i) {
+            //testAttack(renderer, i);
+            //testDecay(renderer, i);
+        }
+        for (int i = 1; i < 0x20; ++i) {
+            //testAttack(renderer, i);
+            //testSustain(renderer, i);
+        }
+        //return paAbort;
 
         if (renderer.checkStreamStatus(statusFlags)) {
             renderer.outputSample(out[0], out[1]);
@@ -44,20 +126,6 @@ Renderer::Renderer(std::ostream& output, std::ostream& error)
     : output(output)
     , error(error)
 {
-    size_t index = frequencyTable.size();
-    frequencyTable[--index] = 1;
-    frequencyTable[--index] = 2;
-    for (int i = 0; i < 10; ++i) {
-        frequencyTable[--index] = 3 << i;
-        frequencyTable[--index] = 4 << i;
-        frequencyTable[--index] = 5 << i;
-    }
-    frequencyTable[0] = 0;
-    output << "Frequencies:" << std::endl;
-    for (int frequency : frequencyTable) {
-        output << frequency << std::endl;
-    }
-    output << "***" << std::endl;
 }
 
 Renderer::~Renderer()
@@ -133,21 +201,17 @@ void Renderer::outputSample(float& leftChannel, float& rightChannel)
     double leftSample = 0.0f;
     double rightSample = 0.0f;
     double sampleCount = 0.0f;
-    for (Audio::Renderer::Data& data : data) {
-        calculateEnvelope(data);
-        if (data.envelopeStage != Inactive) {
-            if (data.envelope == 0.0) {
-                output << "WTF" << std::endl;
-                output << data.envelope << std::endl;
-            }
-            data.counter += data.pitch;
-            int counter = int(data.counter + .5f);
+    for (Audio::Renderer::Voice& voice : voices) {
+        voice.calculateEnvelope();
+        if (voice.envelope > 0.0) {
+            voice.counter += voice.pitch;
+            int counter = int(voice.counter + .5f);
             if (counter >= Audio::Renderer::tableSize) {
-                data.counter -= Audio::Renderer::tableSize;
-                counter = int(data.counter + .5f);
+                voice.counter -= Audio::Renderer::tableSize;
+                counter = int(voice.counter + .5f);
             }
-            leftSample += sine[counter] * data.envelope * data.leftVolume;
-            rightSample += sine[counter] * data.envelope * data.rightVolume;
+            leftSample += sine[counter] * voice.envelope * voice.leftVolume;
+            rightSample += sine[counter] * voice.envelope * voice.rightVolume;
             ++sampleCount;
         }
     }
@@ -158,30 +222,60 @@ void Renderer::outputSample(float& leftChannel, float& rightChannel)
     rightChannel = float(rightSample * mainVolumeRight);
 }
 
-void Renderer::calculateEnvelope(Data& data)
+void Renderer::Voice::setEnvelopeStage(EnvelopeStage nextStage)
 {
-    if (data.envelopeStage == Attack) {
-        if (data.envelope < 1.0) {
-            constexpr double increment = 1.0 / 64.0;
-            data.envelope += increment;
-            if (data.envelope >= 1.0) {
-                data.envelope = 1.0;
-                data.envelopeStage = Sustain;
-            }
+    if (nextStage == Attack) {
+        if (attackRate == 0xf) {
+            envelope = 1.0;
+        } else {
+            frequencyCounter.changeFrequency((attackRate << 1) + 0x1);
         }
-    } else if (data.envelopeStage == Decay) {
-    } else if (data.envelopeStage == Sustain) {
-    } else if (data.envelopeStage == Release) {
-        if (data.envelope > 0.0) {
-            constexpr double decrement = 1.0 / 256.0;
-            data.envelope -= decrement;
+    } else if (nextStage == Decay || nextStage == Sustain && sustainRate > 0) {
+        double targetLevel = 0.0;
+        if (nextStage == Decay) {
+            targetLevel = sustainLevel;
+            frequencyCounter.changeFrequency((decayRate << 1) + 0x10);
+        } else {
+            frequencyCounter.changeFrequency(sustainRate);
         }
-        if (data.envelope <= 0.0) {
-            data.envelope = 0.0;
-            data.envelopeStage = Inactive;
+        constexpr double targetOvershoot = 0.0001;
+        constexpr double stageLength = 588.0;
+        outputCoefficient = exp(-log((1.0 + targetOvershoot) / targetOvershoot) / stageLength);
+        outputBase = (targetLevel - targetOvershoot) * (1.0 - outputCoefficient);
+    }
+    envelopeStage = nextStage;
+}
+
+void Renderer::Voice::calculateEnvelope() noexcept
+{
+    if (envelopeStage == Attack) {
+        if (attackRate == 0xf) {
+            envelope = 1.0;
         }
-    } else if (data.envelopeStage != Inactive) {
-        throw Exception("Illegal envelope stage");
+        else if (envelope < 1.0 && frequencyCounter.tick()) {
+            envelope += 1.0 / 64.0;
+        }
+        if (envelope >= 1.0) {
+            envelope = 1.0;
+            setEnvelopeStage(Decay);
+        }
+    } else if (envelopeStage == Decay || envelopeStage == Sustain && sustainRate > 0) {
+        double targetLevel = envelopeStage == Decay ? sustainLevel : 0.0;
+        if (envelope > targetLevel && frequencyCounter.tick()) {
+            output = outputBase + output * outputCoefficient;
+        }
+        if (envelope <= targetLevel) {
+            envelope = targetLevel;
+            setEnvelopeStage(EnvelopeStage(envelopeStage + 1));
+        }
+    } else if (envelopeStage == Release) {
+        if (envelope > 0.0) {
+            envelope -= 1.0 / 256.0;
+        }
+        if (envelope <= 0.0) {
+            envelope = 0.0;
+            setEnvelopeStage(Inactive);
+        }
     }
 }
 

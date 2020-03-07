@@ -511,21 +511,21 @@ public:
         output << "   Vol L Vol R Pitch Src      AR DR SR SL  Gain Mode               Lvl Env Out" << std::endl;
         for (int i = 0; i < audioProcessor.voices.size(); ++i) {
             const Audio::Processor::Voice& voice = audioProcessor.voices[i];
-            const Audio::Renderer::Data& data = audioProcessor.renderer.data[i];
+            const Audio::Renderer::Voice& data = audioProcessor.renderer.voices[i];
             output << i << ": "
                 << std::left << std::setfill(' ') << std::setw(4) << data.leftVolume
                 << "  " << std::setw(4) << data.rightVolume
                 << "  " << data.pitch
                 << "  " << voice.sourceNumber
                 << "  " << voice.envelopeTypeToString()
-                << " " << voice.attackRate
-                << " " << voice.decayRate
-                << " " << voice.sustainRate
-                << " " << voice.sustainLevel
+                << " " << data.attackRate
+                << " " << data.decayRate
+                << " " << data.sustainRate
+                << " " << data.sustainLevel
                 << "  " << std::left << std::setfill(' ') << std::setw(22) << voice.gainModeToString()
                 << "  " << voice.gainLevel
-                << "  " << +audioProcessor.renderer.data[i].envelope
-                << "  " << +audioProcessor.renderer.data[i].output
+                << "  " << +audioProcessor.renderer.voices[i].envelope
+                << "  " << +audioProcessor.renderer.voices[i].output
                 << std::endl;
         }
         output << "Main Vol    Echo Vol    Key On    Key Off   R M E Gen Src End   Echo FB   Pitch Mod Noise On  Echo On   Dir ER  Delay" << std::endl;

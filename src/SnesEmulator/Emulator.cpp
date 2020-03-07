@@ -167,7 +167,7 @@ void Emulator::run()
 
     audioSystem.start();
 
-    try {
+    //try {
         uint64_t iteration = 0;
         bool dmaActive = false;
         while (running) {
@@ -406,10 +406,11 @@ void Emulator::run()
                 error << e.what() << std::endl;
             }
         }
-    } catch (const std::exception& e) {
+    /*}
+    catch (const std::exception& e) {
         running = false;
         throw e;
-    }
+    }*/
 }
 
 template<typename State, typename OtherState>
@@ -431,26 +432,26 @@ int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debu
         else {
             return instruction->execute();
         }
-    } catch (OpcodeNotYetImplementedException& e) {
+    } catch (const OpcodeNotYetImplementedException& e) {
         debugger.pause(context);
         error << e.what() << std::endl;
-    } catch (AddressModeNotYetImplementedException& e) {
+    } catch (const AddressModeNotYetImplementedException& e) {
         state.setProgramAddress(context.getLastKnownAddress());
         debugger.pause(context);
         error << e.what() << std::endl;
-    } catch (OperatorNotYetImplementedException& e) {
+    } catch (const OperatorNotYetImplementedException& e) {
         state.setProgramAddress(context.getLastKnownAddress());
         debugger.pause(context);
         error << e.what() << std::endl;
-    } catch (MemoryAccessException& e) {
+    } catch (const MemoryAccessException& e) {
         state.setProgramAddress(context.getLastKnownAddress());
         debugger.pause(context);
         error << e.what() << std::endl;
-    } catch (Video::NotYetImplementedException& e) {
+    } catch (const Video::NotYetImplementedException& e) {
         state.setProgramAddress(context.getLastKnownAddress());
         debugger.pause(context);
         error << e.what() << std::endl;
-    } catch (Audio::NotYetImplementedException& e) {
+    } catch (const Audio::NotYetImplementedException& e) {
         state.setProgramAddress(context.getLastKnownAddress());
         debugger.pause(context);
         error << e.what() << std::endl;

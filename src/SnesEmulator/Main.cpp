@@ -12,7 +12,7 @@ int main(int, char**)
     std::istream& input = std::cin;
     std::ostream& error = std::cerr;
 
-    try {
+    //try {
         while (true) {
             Rom rom(output);
 
@@ -77,12 +77,13 @@ int main(int, char**)
             emulator.run();
         }
 
-    } catch (const std::exception& e) {
+    /*}
+    catch (const std::exception& e) {
         error << "Caught std::exception: " << e.what() << std::endl;
         error << "Failure";
         std::getchar();
         return 1;
-    }
+    }*/
 
     output << "Success";
     std::getchar();

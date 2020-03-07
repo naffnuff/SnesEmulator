@@ -121,12 +121,12 @@ public:
             voiceName += " ";
             processor.makeWriteRegister(voiceAddressStart, voiceName + "Left Volume", false,
                 [this, i](Byte value) {
-                    processor.renderer.data[i].leftVolume = toFactor(value);
+                    processor.renderer.voices[i].leftVolume = toFactor(value);
                 }
             );
             processor.makeWriteRegister(voiceAddressStart + 1, voiceName + "Right Volume", false,
                 [this, i](Byte value) {
-                    processor.renderer.data[i].rightVolume = toFactor(value);
+                    processor.renderer.voices[i].rightVolume = toFactor(value);
                 }
             );
             processor.makeWriteRegister(voiceAddressStart + 2, voiceName + "Pitch low byte", false,
@@ -154,8 +154,8 @@ public:
                     value = processor.voices[i].attackRate | processor.voices[i].decayRate << 4 | processor.voices[i].envelopeType << 7;
                 },*/
                 [this, i](Byte value) {
-                    processor.voices[i].attackRate = value.getBits(0, 4);
-                    processor.voices[i].decayRate = value.getBits(4, 3);
+                    processor.renderer.voices[i].attackRate = value.getBits(0, 4);
+                    processor.renderer.voices[i].decayRate = value.getBits(4, 3);
                     if (value.getBit(7)) {
                         processor.voices[i].envelopeType = Processor::ADSR;
                     } else {
@@ -169,8 +169,8 @@ public:
                     value = processor.voices[i].sustainRate | processor.voices[i].sustainLevel << 5;
                 },*/
                 [this, i](Byte value) {
-                    processor.voices[i].sustainRate = value.getBits(0, 5);
-                    processor.voices[i].sustainLevel = value.getBits(5, 3);
+                    processor.renderer.voices[i].sustainRate = value.getBits(0, 5);
+                    processor.renderer.voices[i].sustainLevel = double(value.getBits(5, 3) + 1.0) / 8.0;
                 }
             );
             processor.makeWriteRegister(voiceAddressStart + 7, voiceName + "Gain", false,
@@ -211,10 +211,7 @@ public:
                 std::bitset<8> newValue(value);
                 for (int i = 0; i < 8; ++i) {
                     if (newValue[i] && !processor.keyOn[i]) {
-                        //if (processor.renderer.data[i].envelopeStage == Renderer::Inactive)
-                        {
-                            processor.renderer.data[i].envelopeStage = Renderer::Attack;
-                        }
+                        processor.renderer.voices[i].setEnvelopeStage(Renderer::Voice::Attack);
                         //pauseRequested = true;
                     }
                 }
@@ -228,7 +225,7 @@ public:
                 std::bitset<8> newValue(value);
                 for (int i = 0; i < 8; ++i) {
                     if (newValue[i] && !processor.keyOff[i]) {
-                        processor.renderer.data[i].envelopeStage = Renderer::Release;
+                        processor.renderer.voices[i].setEnvelopeStage(Renderer::Voice::Release);
                     }
                 }
                 processor.keyOff = newValue;
@@ -296,7 +293,7 @@ public:
 
     void calculatePitch(int voice)
     {
-        processor.renderer.data[voice].pitch = float(voiceData[voice].pitch) / float(1 << 12);
+        processor.renderer.voices[voice].pitch = float(voiceData[voice].pitch) / float(1 << 12);
     }
 
     double toFactor(Byte value)

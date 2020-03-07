@@ -30,15 +30,23 @@ public:
                     Instruction* instruction = system.instructionDecoder.getNextInstruction(system.state);
                     system.context.nextInstruction = instruction;
 
-                    //instruction->applyBreakpoints();
+                    instruction->applyBreakpoints();
 
                     system.context.addKnownAddress(system.state.getProgramAddress());
+
+                    if (system.debugger.isPaused()) {
+                        break;
+                    }
 
                     if (int cycles = instruction->execute()) {
                         system.nextSpc += AudioSystem::CycleCount(cycles);
                         system.context.nextInstruction = system.instructionDecoder.getNextInstruction(system.state);
                     } else {
                         continue;
+                    }
+
+                    if (system.debugger.isPaused()) {
+                        break;
                     }
 
                     if (system.registers.pauseRequested) {
@@ -68,8 +76,8 @@ public:
                 }
             }
             system.output << "BYE AUDIO MONKEY! " << std::endl;
-        } catch (const std::exception& e) {
-            system.error << "AudioSystem thread: Caught std::exception: " << e.what() << std::endl;
+        } catch (const Audio::NotYetImplementedException& e) {
+            system.error << "AudioSystem thread: Caught Audio::NotYetImplementedException: " << e.what() << std::endl;
             system.context.printAddressHistory(system.output);
             //std::getchar();
         }

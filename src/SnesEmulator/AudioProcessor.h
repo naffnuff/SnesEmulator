@@ -34,10 +34,6 @@ public:
     {
         Byte sourceNumber;
         EnvelopeType envelopeType = Gain;
-        Byte attackRate;
-        Byte decayRate;
-        Byte sustainRate;
-        Byte sustainLevel;
         GainMode gainMode;
         Byte gainLevel;
 
