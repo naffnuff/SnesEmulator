@@ -32,7 +32,6 @@ public:
 
     struct Voice
     {
-        Byte sourceNumber;
         EnvelopeType envelopeType = Gain;
         GainMode gainMode;
         Byte gainLevel;
@@ -82,6 +81,9 @@ public:
     {
     }
 
+    Processor(const Processor&) = delete;
+    Processor& operator=(const Processor&) = delete;
+
     void initialize()
     {
         renderer.initialize();
@@ -125,7 +127,6 @@ public:
     std::bitset<voiceCount> pitchModulation;
     std::bitset<voiceCount> noiseOn;
     std::bitset<voiceCount> echoOn;
-    Byte sourceDirectoryOffset;
     Byte echoRegionOffset;
     Byte echoDelay;
     std::array<Byte, voiceCount> coefficients;

@@ -80,6 +80,10 @@ public:
             system.error << "AudioSystem thread: Caught Audio::NotYetImplementedException: " << e.what() << std::endl;
             system.context.printAddressHistory(system.output);
             //std::getchar();
+        } catch (const Audio::Exception& e) {
+            system.error << "AudioSystem thread: Caught Audio::Exception: " << e.what() << std::endl;
+            system.context.printAddressHistory(system.output);
+            //std::getchar();
         }
         system.elapsedTime = std::chrono::nanoseconds(0);
         system.pauseRequested = true;

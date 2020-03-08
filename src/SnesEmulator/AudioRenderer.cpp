@@ -143,7 +143,11 @@ void Renderer::initialize()
     initialized = true;
 
     for (int i = 0; i < tableSize; i++) {
-        sine[i] = (float)sin(((double)i / (double)tableSize) * M_PI * 2.0);
+        //sine[i] = sin(((double)i / (double)tableSize) * M_PI * 2.0);
+        //double time = (double)i / (double)tableSize;
+        //sine[i] = sampleSineWave(time, 0.01, 0.0) + sampleSquareWave(time, 1.0, 0.0) + sampleSawtoothWave(time, 0.5);
+        //sine[i] = sampleSineWave(time, 0.01, 0.0) + sampleSineWave(time, 0.1, 0.0) + sampleSineWave(time, 0.5, 0.0);
+        //sine[i] = sampleSquareWave(time, 0.01, 0.0) + sampleSineWave(time, 1.0, 0.0) + sampleSquareWave(time, 0.5, 0.0);
     }
 }
 
@@ -200,23 +204,20 @@ void Renderer::outputSample(float& leftChannel, float& rightChannel)
 {
     double leftSample = 0.0f;
     double rightSample = 0.0f;
-    double sampleCount = 0.0f;
+    //double sampleCount = 0.0f;
     for (Audio::Renderer::Voice& voice : voices) {
         voice.calculateEnvelope();
         if (voice.envelope > 0.0) {
-            voice.counter += voice.pitch;
-            int counter = int(voice.counter + .5f);
-            if (counter >= Audio::Renderer::tableSize) {
-                voice.counter -= Audio::Renderer::tableSize;
-                counter = int(voice.counter + .5f);
-            }
-            leftSample += sine[counter] * voice.envelope * voice.leftVolume;
-            rightSample += sine[counter] * voice.envelope * voice.rightVolume;
-            ++sampleCount;
+            double sample = voice.sample(soundLibrary);
+            leftSample += sample * voice.envelope * voice.leftVolume;
+            rightSample += sample * voice.envelope * voice.rightVolume;
+            //leftSample += sine[counter] * voice.envelope * voice.leftVolume;
+            //rightSample += sine[counter] * voice.envelope * voice.rightVolume;
+            //++sampleCount;
         }
     }
-    leftSample /= sampleCount;
-    rightSample /= sampleCount;
+    //leftSample /= sampleCount;
+    //rightSample /= sampleCount;
 
     leftChannel = float(leftSample * mainVolumeLeft);
     rightChannel = float(rightSample * mainVolumeRight);
@@ -225,6 +226,8 @@ void Renderer::outputSample(float& leftChannel, float& rightChannel)
 void Renderer::Voice::setEnvelopeStage(EnvelopeStage nextStage)
 {
     if (nextStage == Attack) {
+        inLoop = false;
+        sampleOffset = 0.0;
         if (attackRate == 0xf) {
             envelope = 1.0;
         } else {
@@ -277,6 +280,31 @@ void Renderer::Voice::calculateEnvelope() noexcept
             setEnvelopeStage(Inactive);
         }
     }
+}
+
+double Renderer::Voice::sample(SoundLibrary& library) noexcept
+{
+    const Sound& sound = library[sourceAddress];
+    if (inLoop && sound.loop.empty()) {
+        return 0.0;
+    }
+    sampleOffset += pitch;
+    int counter = int(sampleOffset + .5f);
+    size_t sampleSize = inLoop ? sound.loop.size() : sound.start.size();
+    if (counter >= sampleSize) {
+        if (inLoop) {
+            sampleOffset -= sampleSize;
+        } else {
+            sampleOffset -= sampleSize;
+            inLoop = true;
+            //std::cout << "START SIZE=" << sound.start.size() << ", LOOP SIZE=" << sound.loop.size() << std::endl;
+        }
+        counter = int(sampleOffset + .5f);
+    }
+    if (inLoop && sound.loop.empty()) {
+        return 0.0;
+    }
+    return (inLoop ? sound.loop : sound.start)[counter] / double(0x8000);
 }
 
 void Renderer::printTimeInfo(double currentTime)

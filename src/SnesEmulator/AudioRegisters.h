@@ -5,6 +5,7 @@
 
 #include "SPC700/SpcState.h"
 
+#include "Util.h"
 #include "RegisterManager.h"
 #include "System.h"
 #include "Memory.h"
@@ -148,7 +149,15 @@ public:
                     calculatePitch(i);
                 }
             );
-            processor.makeWriteRegister(voiceAddressStart + 4, voiceName + "Source Number", false, processor.voices[i].sourceNumber);
+            processor.makeWriteRegister(voiceAddressStart + 4, voiceName + "Source Number", false,
+                [this, i](Byte value) {
+                    Word sourceAddress = (sourceDirectory << 8) + (value << 2);
+                    decodeSource(sourceAddress);
+                    processor.renderer.voices[i].sampleOffset = 0.0;
+                    processor.renderer.voices[i].inLoop = false;
+                    processor.renderer.voices[i].sourceAddress = sourceAddress;
+                }
+            );
             processor.makeWriteRegister(voiceAddressStart + 5, voiceName + "ADSR low byte", false,
                 /*[this, i](Byte& value) {
                     value = processor.voices[i].attackRate | processor.voices[i].decayRate << 4 | processor.voices[i].envelopeType << 7;
@@ -254,7 +263,7 @@ public:
         processor.makeWriteRegister(0x2d, "Pitch Modulation", false, processor.pitchModulation);
         processor.makeWriteRegister(0x3d, "Noise On", false, processor.noiseOn);
         processor.makeWriteRegister(0x4d, "Echo On", false, processor.echoOn);
-        processor.makeWriteRegister(0x5d, "Source Directory Offset", true, processor.sourceDirectoryOffset);
+        processor.makeWriteRegister(0x5d, "Source Directory Offset", true, sourceDirectory);
         processor.makeWriteRegister(0x6d, "Echo Region Offset", false, processor.echoRegionOffset);
         processor.makeReadWriteRegister(0x7d, "Echo Delay", false,
             [this](Byte& value) {
@@ -305,6 +314,77 @@ public:
         }
     }
 
+    void decodeSource(Word sourceAddress)
+    {
+        //output << "MAMASITA! " << sourceAddress << std::endl;
+        Renderer::Sound& sound = processor.renderer.soundLibrary[sourceAddress];
+        if (sound.start.empty() && sound.loop.empty()) {
+            Word startAddress = spcMemory.readWord(sourceAddress);
+            Word loopAddress = spcMemory.readWord(sourceAddress + 2);
+            output << "startAddress=" << startAddress << ", loopAddress=" << loopAddress << std::endl;
+            Word currentAddress = startAddress;
+            bool end = false;
+            bool loop = false;
+            bool foundLoopStart = false;
+            std::vector<double>& sampleOutput = sound.start;
+            while (!end || loop) {
+                if (currentAddress == loopAddress) {
+                    output << "LOOPY MOTHERFUCKER!" << std::endl;
+                    foundLoopStart = true;
+                    sampleOutput = sound.loop;
+                }
+                decodeBlock(currentAddress, sampleOutput, end, loop);
+            }
+            /*if (loop) { // loop
+                output << "LOOPING" << std::endl;
+                if (loopAddress >= startAddress && loopAddress < currentAddress) {
+                    if (foundLoopStart != loop) {
+                        throw Exception("Da fuck!");
+                    }
+                    output << "Difference: " << (loopAddress - startAddress) << std::endl;
+                    output << "Snufs: " << (double(loopAddress - startAddress) / 9.0) << std::endl;
+                    output << "Snufs: " << (double(loopAddress - startAddress) / 9.0) * 16.0 << std::endl;
+                    output << "size: " << sound.start.size() << std::endl;
+                    int loopIndex = (loopAddress - startAddress) / 9 * 16;
+                } else {
+                    std::ostringstream ss;
+                    ss << "Loop address is bananas: start=" << startAddress << ", loop=" << loopAddress << ", current=" << currentAddress;
+                    throw Exception(ss.str());
+                }
+            } else {
+                output << "NOT LOOPING!" << std::endl;
+            }*/
+        }
+    }
+
+    void decodeBlock(Word& currentAddress, std::vector<double>& sampleOutput, bool& end, bool& loop)
+    {
+        Byte header = spcMemory.readByte(currentAddress++);
+        end = header.getBit(0);
+        loop = header.getBit(1);
+        Byte filter = header.getBits(2, 2);
+        //output << "FUCKING FILTER: " << filter << std::endl;
+        Byte range = header.getBits(4, 4);
+        for (int i = 0; i < 8; ++i) {
+            Byte sampleSource = spcMemory.readByte(currentAddress++);
+            for (int8_t sample : { sampleSource.getBits(4, 4), sampleSource.getBits(0, 4) }) {
+                if (sample >= 8) { // negative
+                    sample |= 0xf0;
+                }
+                double doubleSample(int64_t(sample) << range);
+                size_t size = sampleOutput.size();
+                if (filter == 1) {
+                    doubleSample += (size >= 1 ? sampleOutput[size - 1] * 15.0 / 16.0 : 0.0);
+                } else if (filter == 2) {
+                    doubleSample += (size >= 1 ? sampleOutput[size - 1] * 61.0 / 32.0 : 0.0) - (size >= 2 ? sampleOutput[size - 2] * 15.0 / 16.0 : 0.0);
+                } else if (filter == 3) {
+                    doubleSample += (size >= 1 ? sampleOutput[size - 1] * 115.0 / 64.0 : 0.0) - (size >=2 ? sampleOutput[size - 2] * 13.0 / 16.0 : 0.0);
+                }
+                sampleOutput.push_back(doubleSample);
+            }
+        }
+    }
+
     std::ostream& output;
     std::ostream& error;
 
@@ -323,18 +403,21 @@ public:
     bool bootRomDataEnabled = true;
 
     std::array<Byte, 64> bootRomData = {
-       0xCD, 0xEF, 0xBD, 0xE8, 0x00, 0xC6, 0x1D, 0xD0, 0xFC, 0x8F, 0xAA, 0xF4, 0x8F, 0xBB, 0xF5, 0x78,
-       0xCC, 0xF4, 0xD0, 0xFB, 0x2F, 0x19, 0xEB, 0xF4, 0xD0, 0xFC, 0x7E, 0xF4, 0xD0, 0x0B, 0xE4, 0xF5,
-       0xCB, 0xF4, 0xD7, 0x00, 0xFC, 0xD0, 0xF3, 0xAB, 0x01, 0x10, 0xEF, 0x7E, 0xF4, 0x10, 0xEB, 0xBA,
-       0xF6, 0xDA, 0x00, 0xBA, 0xF4, 0xC4, 0xF4, 0xDD, 0x5D, 0xD0, 0xDB, 0x1F, 0x00, 0x00, 0xC0, 0xFF,
+       0xcd, 0xef, 0xbd, 0xe8, 0x00, 0xc6, 0x1d, 0xd0, 0xfc, 0x8f, 0xaa, 0xf4, 0x8f, 0xbb, 0xf5, 0x78,
+       0xcc, 0xf4, 0xd0, 0xfb, 0x2f, 0x19, 0xeb, 0xf4, 0xd0, 0xfc, 0x7e, 0xf4, 0xd0, 0x0b, 0xe4, 0xf5,
+       0xcb, 0xf4, 0xd7, 0x00, 0xfc, 0xd0, 0xf3, 0xab, 0x01, 0x10, 0xef, 0x7e, 0xf4, 0x10, 0xeb, 0xba,
+       0xf6, 0xda, 0x00, 0xba, 0xf4, 0xc4, 0xf4, 0xdd, 0x5d, 0xd0, 0xdb, 0x1f, 0x00, 0x00, 0xc0, 0xff,
     };
 
     struct VoiceData
     {
         Word pitch;
+        Byte sourceNumber;
     };
 
     std::array<VoiceData, Processor::voiceCount> voiceData;
+
+    Byte sourceDirectory;
 };
 
 }

@@ -117,10 +117,10 @@ public:
         : programCounter(0xffc0)
     {
         for (Word address = 0; address < 0xf0; ++address) {
-            memory.createLocation<ReadWriteMemory>(address, 0xff);
+            memory.createLocation<ReadWriteMemory>(address, 0x55);
         }
         for (Word address = 0x100; address < 0xffc0; ++address) {
-            memory.createLocation<ReadWriteMemory>(address, 0xff);
+            memory.createLocation<ReadWriteMemory>(address, 0x55);
         }
     }
 

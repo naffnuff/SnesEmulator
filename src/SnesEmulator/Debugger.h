@@ -515,8 +515,10 @@ public:
             output << i << ": "
                 << std::left << std::setfill(' ') << std::setw(4) << data.leftVolume
                 << "  " << std::setw(4) << data.rightVolume
+                << "  " << audioRegisters.voiceData[i].pitch
                 << "  " << data.pitch
-                << "  " << voice.sourceNumber
+                << "  " << audioRegisters.voiceData[i].sourceNumber
+                << "  " << data.sourceAddress
                 << "  " << voice.envelopeTypeToString()
                 << " " << data.attackRate
                 << " " << data.decayRate
@@ -544,7 +546,7 @@ public:
             << "  " << audioProcessor.pitchModulation
             << "  " << audioProcessor.noiseOn
             << "  " << audioProcessor.echoOn
-            << "  " << audioProcessor.sourceDirectoryOffset
+            << "  " << audioRegisters.sourceDirectory
             << "  " << audioProcessor.echoRegionOffset
             << "  " << audioProcessor.echoDelay
             << std::endl;

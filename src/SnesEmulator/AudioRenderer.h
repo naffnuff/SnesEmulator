@@ -4,6 +4,7 @@
 #include <iostream>
 #include <array>
 #include <vector>
+#include <map>
 #include <mutex>
 
 #include "Types.h"
@@ -86,6 +87,18 @@ private:
     };
 
 public:
+    struct Sound
+    {
+        Sound() = default;
+
+        Sound(const Sound&) = delete;
+        Sound& operator=(const Sound&) = delete;
+
+        std::vector<double> start;
+        std::vector<double> loop;
+    };
+    using SoundLibrary = std::map<Word, Sound>;
+
     class Voice
     {
     public:
@@ -100,7 +113,6 @@ public:
 
         double leftVolume = 0.0f;
         double rightVolume = 0.0f;
-        double counter = 0.0f;
         double pitch = 1.0f;
         Byte attackRate;
         Byte decayRate;
@@ -112,9 +124,13 @@ public:
         FrequencyCounter frequencyCounter;
         double outputBase = 0.0;
         double outputCoefficient = 0.0;
+        bool inLoop = false;
+        double sampleOffset = 0.0f;
+        Word sourceAddress;
 
         void setEnvelopeStage(EnvelopeStage nextStage);
         void calculateEnvelope() noexcept;
+        double sample(SoundLibrary& sounds) noexcept;
 
     private:
         EnvelopeStage envelopeStage = Inactive;
@@ -126,6 +142,9 @@ public:
     Renderer(std::ostream& output, std::ostream& error);
     ~Renderer();
 
+    Renderer(const Renderer&) = delete;
+    Renderer& operator=(const Renderer&) = delete;
+
     void initialize();
     void startStream();
     void checkStreamErrors();
@@ -136,8 +155,86 @@ private:
 
     void printTimeInfo(double currentTime);
 
+    static constexpr double level = 0.33;
+    static constexpr double double_Pi = 3.14159265358979323846264338327950288;
+
+    /*
+ * Generate sine wave
+ */
+    double sampleSineWave(double t, double frequency, double phase)
+    {
+        return level * sin(2.0 * double_Pi * frequency * t + phase);
+    };
+
+    /*
+     * Generate square wave
+     * This can be generated using 2 variants
+     * First is to calculate values by periods
+     * Second is to use sine wave and apply sign function to it
+     */
+    double sampleSquareWave(double t, double frequency, double phase)
+    {
+        //return level * sampleByTime(t);
+        return level * sampleBySinSign(t, frequency, phase);
+    };
+
+    double sampleByTime(double t, double frequency, double phase)
+    {
+        double fullPeriodTime = 1.0 / frequency;
+        double halfPeriodTime = fullPeriodTime / 2.0;
+        double localTime = fmod(t, fullPeriodTime);
+
+        if (localTime < halfPeriodTime) return 1.0;
+        else return -1.0;
+    }
+
+    double sampleBySinSign(double t, double frequency, double phase)
+    {
+        return sign(sin(2 * double_Pi * frequency * t + phase));
+    }
+
+    int sign(double value)
+    {
+        return (value >= 0.0) ? 1 : -1;
+    }
+
+    /*
+     * Generate triangle wave
+     */
+    double sampleTriangleWave(double t, double frequency)
+    {
+        double res = 0.0;
+        double fullPeriodTime = 1.0 / frequency;
+        double localTime = fmod(t, fullPeriodTime);
+
+        double value = localTime / fullPeriodTime;
+
+        if (value < 0.25) {
+            res = value * 4;
+        } else if (value < 0.75) {
+            res = 2.0 - (value * 4.0);
+        } else {
+            res = value * 4 - 4.0;
+        }
+
+        return level * res;
+    };
+
+    /*
+     * Generate sawtooth wave
+     */
+    double sampleSawtoothWave(double t, double frequency)
+    {
+        double fullPeriodTime = 1.0 / frequency;
+        double localTime = fmod(t, fullPeriodTime);
+
+        return level * ((localTime / fullPeriodTime) * 2 - 1.0);
+    };
+
 public:
-    double sine[tableSize];
+    //double sine[tableSize];
+
+    SoundLibrary soundLibrary;
 
     std::array<Voice, voiceCount> voices;
 

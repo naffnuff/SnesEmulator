@@ -28,7 +28,7 @@ public:
     void makeWriteRegister(AddressType address, const std::string& info, bool debug, std::function<void(Byte)> callback = nullptr, bool openBus = false)
     {
         std::function<void(Byte, Byte)> onWrite = [this, address, callback, info, debug](Byte oldValue, Byte newValue) {
-            if (debug && newValue && oldValue != newValue) {
+            if (debug && /*newValue && */oldValue != newValue) {
                 printMemoryRegister(true, newValue, address, info);
             }
             if (callback) {
