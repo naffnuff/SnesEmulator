@@ -37,6 +37,8 @@ http://folk.uio.no/sigurdkn/snes/snes_manual1.pdf
 ##### ADSR
 I found the official documentation especially lacking as to how the SNES produces its sound envelopes. Instead I ended up modelling it on a technique I found in the following blog posts (part 1-3):
 http://www.earlevel.com/main/2013/06/01/envelope-generators/
+##### BRR (Bit-rate reduction)
+https://wiki.superfamicom.org/bit-rate-reduction-(brr)
 ### SNES
 #### registers
 http://folk.uio.no/sigurdkn/snes/registers.txt
