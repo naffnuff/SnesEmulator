@@ -49,7 +49,7 @@ http://folk.uio.no/sigurdkn/snes/timing.txt
 #### transparency
 http://folk.uio.no/sigurdkn/snes/transparency.txt
 
-I did not in any way reverse engineer the SNES myself. In addition to relying on said documents I spent countless hours stepping through the debuggers of two emulators, Bsnes Classic plus (v073u1) and SnesX9 (v1.51.ep10r2 with Geiger's debugger), comparing their emulation state with mine and analyzing the behaviours I had an extra hard time understanding. The former is known for it's fidelity to the SNES hardware and has a very user-friendly debugger, whereas the latter was mainly useful to me for analyzing (H)DMA.
+I did not in any way reverse engineer the SNES myself. In addition to relying on said documents I spent some time stepping through the debuggers of two emulators, Bsnes Plus (v05.35) and SnesX9 (v1.51.ep10r2 with Geiger's debugger), comparing their emulation state with mine and analyzing the behaviours I had an extra hard time understanding. The former is known for it's fidelity to the SNES hardware and has a very user-friendly debugger, whereas the latter was mainly useful to me for analyzing (H)DMA.
 
 To get me started with the renderer I also took and modified some code from tutorial #1 in these turorials:
 https://github.com/opengl-tutorials/ogl
