@@ -34,10 +34,10 @@ https://github.com/gilligan/snesdev/blob/master/docs/spc700.txt
 ##### General
 The SNES DSP is one area of the SNES for which it is especially hard to find secondary documentation. For this, I had to resort to the official SNES development manual, which is notoriously opaque and rife with error. I found it through the following link:
 http://folk.uio.no/sigurdkn/snes/snes_manual1.pdf
-##### ADSR
+##### ADSR (Attack-Delay-Sustain-Release, or sound envelope)
 I found the official documentation especially lacking as to how the SNES produces its sound envelopes. Instead I ended up modelling it on a technique I found in the following blog posts (part 1-3):
 http://www.earlevel.com/main/2013/06/01/envelope-generators/
-##### BRR (Bit-rate reduction)
+##### BRR (Bit-Rate Reduction)
 https://wiki.superfamicom.org/bit-rate-reduction-(brr)
 ### SNES
 #### registers
