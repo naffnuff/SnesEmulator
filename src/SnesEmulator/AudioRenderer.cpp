@@ -92,24 +92,29 @@ struct StreamHandler
     static int callback(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void* userData)
     {
         Renderer& renderer = *(Renderer*)userData;
-        float* out = (float*)output;
+        try {
+            float* out = (float*)output;
 
-        for (int i = 0; i < 0x8; ++i) {
-            //testAttack(renderer, i);
-            //testDecay(renderer, i);
-        }
-        for (int i = 1; i < 0x20; ++i) {
-            //testAttack(renderer, i);
-            //testSustain(renderer, i);
-        }
-        //return paAbort;
+            for (int i = 0; i < 0x8; ++i) {
+                //testAttack(renderer, i);
+                //testDecay(renderer, i);
+            }
+            for (int i = 1; i < 0x20; ++i) {
+                //testAttack(renderer, i);
+                //testSustain(renderer, i);
+            }
+            //return paAbort;
 
-        if (renderer.checkStreamStatus(statusFlags)) {
-            renderer.outputSample(out[0], out[1]);
-            renderer.printTimeInfo(timeInfo->currentTime);
-            return paContinue;
-        } else {
-            renderer.output << "ABORTING AUDIO RENDERER!" << std::endl;
+            if (renderer.checkStreamStatus(statusFlags)) {
+                renderer.outputSample(out[0], out[1]);
+                renderer.printTimeInfo(timeInfo->currentTime);
+                return paContinue;
+            } else {
+                renderer.output << "ABORTING AUDIO RENDERER!" << std::endl;
+                return paAbort;
+            }
+        } catch (const std::exception& e) {
+            renderer.output << "Caught std::exception in Audio Renderer: " << e.what() << std::endl;
             return paAbort;
         }
     }
@@ -227,7 +232,7 @@ void Renderer::Voice::setEnvelopeStage(EnvelopeStage nextStage)
 {
     if (nextStage == Attack) {
         inLoop = false;
-        sampleOffset = 0.0;
+        bufferOffset = 0.0;
         if (attackRate == 0xf) {
             envelope = 1.0;
         } else {
@@ -284,27 +289,45 @@ void Renderer::Voice::calculateEnvelope() noexcept
 
 double Renderer::Voice::sample(SoundLibrary& library) noexcept
 {
+    /*
+0x3c00
+0x3c04
+0x3c08
+0x3c0c
+0x3c28
+0x3c2c
+0x3c30
+0x3c34
+0x3c3c
+0x3c44
+0x3c4c
+    */
     const Sound& sound = library[sourceAddress];
     if (inLoop && sound.loop.empty()) {
         return 0.0;
     }
-    sampleOffset += pitch;
-    int counter = int(sampleOffset + .5f);
-    size_t sampleSize = inLoop ? sound.loop.size() : sound.start.size();
-    if (counter >= sampleSize) {
-        if (inLoop) {
-            sampleOffset -= sampleSize;
-        } else {
-            sampleOffset -= sampleSize;
-            inLoop = true;
-            //std::cout << "START SIZE=" << sound.start.size() << ", LOOP SIZE=" << sound.loop.size() << std::endl;
+    bufferOffset += pitch;
+    int roundedBufferOffset = int(bufferOffset + .5f);
+    size_t bufferSize = inLoop ? sound.loop.size() : sound.start.size();
+    int iterations = 0;
+    while (roundedBufferOffset >= bufferSize) {
+        if (++iterations > 2) {
+            std::cerr << sourceAddress << std::endl;
+            return 0.0;
+            throw Exception("Iterations WTF " + Util::toString(sourceAddress));
         }
-        counter = int(sampleOffset + .5f);
+        bufferOffset -= double(bufferSize);
+        roundedBufferOffset = int(bufferOffset + .5f);
+        if (roundedBufferOffset < 0) {
+            throw Exception("roundedBufferOffset==" + Util::toString(roundedBufferOffset));
+        }
+        inLoop = true;
+        bufferSize = sound.loop.size();
     }
     if (inLoop && sound.loop.empty()) {
         return 0.0;
     }
-    return (inLoop ? sound.loop : sound.start)[counter] / double(0x8000);
+    return (inLoop ? sound.loop : sound.start)[roundedBufferOffset];
 }
 
 void Renderer::printTimeInfo(double currentTime)

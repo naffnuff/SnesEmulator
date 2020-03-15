@@ -125,7 +125,7 @@ public:
         double outputBase = 0.0;
         double outputCoefficient = 0.0;
         bool inLoop = false;
-        double sampleOffset = 0.0f;
+        double bufferOffset = 0.0f;
         Word sourceAddress;
 
         void setEnvelopeStage(EnvelopeStage nextStage);

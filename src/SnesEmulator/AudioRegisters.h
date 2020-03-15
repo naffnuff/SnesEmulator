@@ -144,16 +144,17 @@ public:
                     value = processor.voices[i].pitch.getHighByte();
                 },*/
                 [this, i](Byte value) {
-                    //processor.voices[i].pitch.setHighByte(value.getBits(0, 6));
-                    voiceData[i].pitch.setHighByte(value);
+                    voiceData[i].pitch.setHighByte(value.getBits(0, 6));
+                    //voiceData[i].pitch.setHighByte(value);
                     calculatePitch(i);
                 }
             );
             processor.makeWriteRegister(voiceAddressStart + 4, voiceName + "Source Number", false,
                 [this, i](Byte value) {
-                    Word sourceAddress = (sourceDirectory << 8) + (value << 2);
+                    Word sourceAddress = (sourceDirectory << 8) | (value << 2);
+                    output << "MAMASITA! " << i << ": " << sourceAddress << std::endl;
                     decodeSource(sourceAddress);
-                    processor.renderer.voices[i].sampleOffset = 0.0;
+                    processor.renderer.voices[i].bufferOffset = 0.0;
                     processor.renderer.voices[i].inLoop = false;
                     processor.renderer.voices[i].sourceAddress = sourceAddress;
                 }
@@ -316,36 +317,40 @@ public:
 
     void decodeSource(Word sourceAddress)
     {
-        //output << "MAMASITA! " << sourceAddress << std::endl;
         Renderer::Sound& sound = processor.renderer.soundLibrary[sourceAddress];
         if (sound.start.empty() && sound.loop.empty()) {
             Word startAddress = spcMemory.readWord(sourceAddress);
             Word loopAddress = spcMemory.readWord(sourceAddress + 2);
             output << "startAddress=" << startAddress << ", loopAddress=" << loopAddress << std::endl;
             Word currentAddress = startAddress;
+            double lastSample = 0.0;
+            double secondLastSample = 0.0;
             bool end = false;
             bool loop = false;
             bool foundLoopStart = false;
-            std::vector<double>& sampleOutput = sound.start;
-            while (!end || loop) {
+            std::vector<double>* sampleOutput = &sound.start;
+            while (!end) {
                 if (currentAddress == loopAddress) {
                     output << "LOOPY MOTHERFUCKER!" << std::endl;
                     foundLoopStart = true;
-                    sampleOutput = sound.loop;
+                    sampleOutput = &sound.loop;
                 }
-                decodeBlock(currentAddress, sampleOutput, end, loop);
+                decodeBlock(currentAddress, *sampleOutput, lastSample, secondLastSample, end, loop);
             }
-            /*if (loop) { // loop
+            if (loop) { // loop
                 output << "LOOPING" << std::endl;
                 if (loopAddress >= startAddress && loopAddress < currentAddress) {
-                    if (foundLoopStart != loop) {
+                    if (!foundLoopStart) {
                         throw Exception("Da fuck!");
                     }
                     output << "Difference: " << (loopAddress - startAddress) << std::endl;
                     output << "Snufs: " << (double(loopAddress - startAddress) / 9.0) << std::endl;
                     output << "Snufs: " << (double(loopAddress - startAddress) / 9.0) * 16.0 << std::endl;
-                    output << "size: " << sound.start.size() << std::endl;
+                    output << "start size: " << sound.start.size() << std::endl;
+                    output << "loop size: " << sound.loop.size() << std::endl;
                     int loopIndex = (loopAddress - startAddress) / 9 * 16;
+                    int endIndex = (currentAddress - startAddress) / 9 * 16;
+                    output << "loop index: " << loopIndex << " / " << endIndex << std::endl;
                 } else {
                     std::ostringstream ss;
                     ss << "Loop address is bananas: start=" << startAddress << ", loop=" << loopAddress << ", current=" << currentAddress;
@@ -353,11 +358,19 @@ public:
                 }
             } else {
                 output << "NOT LOOPING!" << std::endl;
-            }*/
+                if (!sound.loop.empty()) {
+                    throw Exception("Should not create loop!");
+                }
+            }
+            libraryByteCount += (sound.start.size() + sound.loop.size()) * 8;
+            output << "Sound library size: " << libraryByteCount << " bytes" << std::endl;
+            for (const Renderer::SoundLibrary::value_type& kvp : processor.renderer.soundLibrary) {
+                output << kvp.first << std::endl;
+            }
         }
     }
 
-    void decodeBlock(Word& currentAddress, std::vector<double>& sampleOutput, bool& end, bool& loop)
+    void decodeBlock(Word& currentAddress, std::vector<double>& sampleOutput, double& lastSample, double& secondLastSample, bool& end, bool& loop)
     {
         Byte header = spcMemory.readByte(currentAddress++);
         end = header.getBit(0);
@@ -374,13 +387,15 @@ public:
                 double doubleSample(int64_t(sample) << range);
                 size_t size = sampleOutput.size();
                 if (filter == 1) {
-                    doubleSample += (size >= 1 ? sampleOutput[size - 1] * 15.0 / 16.0 : 0.0);
+                    doubleSample += lastSample * 15.0 / 16.0;
                 } else if (filter == 2) {
-                    doubleSample += (size >= 1 ? sampleOutput[size - 1] * 61.0 / 32.0 : 0.0) - (size >= 2 ? sampleOutput[size - 2] * 15.0 / 16.0 : 0.0);
+                    doubleSample += lastSample * 61.0 / 32.0 - secondLastSample * 15.0 / 16.0;
                 } else if (filter == 3) {
-                    doubleSample += (size >= 1 ? sampleOutput[size - 1] * 115.0 / 64.0 : 0.0) - (size >=2 ? sampleOutput[size - 2] * 13.0 / 16.0 : 0.0);
+                    doubleSample += lastSample * 115.0 / 64.0 - secondLastSample * 13.0 / 16.0;
                 }
-                sampleOutput.push_back(doubleSample);
+                sampleOutput.push_back(doubleSample / double(0x8000));
+                secondLastSample = lastSample;
+                lastSample = doubleSample;
             }
         }
     }
@@ -418,6 +433,8 @@ public:
     std::array<VoiceData, Processor::voiceCount> voiceData;
 
     Byte sourceDirectory;
+
+    int libraryByteCount = 0;
 };
 
 }

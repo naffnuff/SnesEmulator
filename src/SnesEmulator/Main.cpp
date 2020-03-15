@@ -37,7 +37,7 @@ int main(int, char**)
             while (pickedTitle.empty()) {
                 output << "Enter command or game index (h for help): ";
                 std::string command = "1";
-                //std::getline(input, command);
+                std::getline(input, command);
                 try {
                     if (command.empty()) {
                     }
