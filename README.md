@@ -7,8 +7,7 @@ This emulator will probably never be able to run all or even most SNES games, le
 * Super Mario World
 * The Legend of Zelda - A Link to the Past
 * Super Metroid
-
-As of now, there is no audio.
+As of now, these three games are playable, however, there is no audio (on master, there is on the experimental and not quite stable audio branch).
 
 ## Build dependencies
 In order to build the source you will need a compiler capable of C++17. Visual Studio 2019 Community is the main tool I used, but I have also worked to keep compability with GCC (v7.3.1) and CMake (v3.10). You will also need
