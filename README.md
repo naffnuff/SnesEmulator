@@ -29,7 +29,7 @@ http://www.westerndesigncenter.com/wdc/documentation/w65c816s.pdf
 http://www.6502.org/tutorials/decimal_mode.html
 ### SPC-700 (Sound processor)
 #### Table of opcodes, register descriptions, and boot ROM
-https://github.com/gilligan/snesdev/blob/master/docs/spc700.txt
+https://github.com/naffnuff/SnesEmulator/blob/master/doc/Anomie's%20SPC700%20Doc
 #### DSP (Digital Signal Processor, part of the sound processor)
 ##### General
 https://github.com/naffnuff/SnesEmulator/blob/master/doc/Anomie's%20S-DSP%20Doc
