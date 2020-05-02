@@ -280,7 +280,9 @@ void Emulator::run()
                         increment = true;
                     }
 
-                    //increment = true;
+                    if (!audioSystem.threaded) {
+                        increment = true;
+                    }
 
                     if (increment) {
                         //++cycleCountDelta;

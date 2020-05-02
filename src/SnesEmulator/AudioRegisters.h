@@ -151,12 +151,17 @@ public:
             );
             processor.makeWriteRegister(voiceAddressStart + 4, voiceName + "Source Number", false,
                 [this, i](Byte value) {
-                    Word sourceAddress = (sourceDirectory << 8) | (value << 2);
-                    output << "MAMASITA! " << i << ": " << sourceAddress << std::endl;
-                    decodeSource(sourceAddress);
+                    if (((sourceDirectory << 8) | (value << 2)) != ((sourceDirectory << 8) + (value << 2))) {
+                        throw Exception("Source address is wonky!");
+                    }
+                    Word sourceAddress = (sourceDirectory << 8) + (value << 2);
+                    output << "Picked sample for voice " << i << ": " << sourceAddress << ", dir: " << sourceDirectory << ", number: " << value << std::endl;
+                    Word startAddress = spcMemory.readWord(sourceAddress);
+                    Word loopAddress = spcMemory.readWord(sourceAddress + 2);
+                    decodeSource(startAddress, loopAddress);
                     processor.renderer.voices[i].bufferOffset = 0.0;
                     processor.renderer.voices[i].inLoop = false;
-                    processor.renderer.voices[i].sourceAddress = sourceAddress;
+                    processor.renderer.voices[i].sourceAddress = loopAddress << 16 | startAddress;
                 }
             );
             processor.makeWriteRegister(voiceAddressStart + 5, voiceName + "ADSR low byte", false,
@@ -315,13 +320,16 @@ public:
         }
     }
 
-    void decodeSource(Word sourceAddress)
+    void decodeSource(Word startAddress, Word loopAddress)
     {
-        Renderer::Sound& sound = processor.renderer.soundLibrary[sourceAddress];
+        Renderer::Sound& sound = processor.renderer.soundLibrary[loopAddress << 16 | startAddress];
         if (sound.start.empty() && sound.loop.empty()) {
-            Word startAddress = spcMemory.readWord(sourceAddress);
-            Word loopAddress = spcMemory.readWord(sourceAddress + 2);
-            output << "startAddress=" << startAddress << ", loopAddress=" << loopAddress << std::endl;
+            output << "Decoding sample: ";
+            {
+                System::ScopedOutputColor color(output, System::Magenta, true);
+                output << startAddress << ":" << loopAddress << std::endl;
+            }
+            output << "StartAddress=" << startAddress << ", loopAddress=" << loopAddress << std::endl;
             Word currentAddress = startAddress;
             double lastSample = 0.0;
             double secondLastSample = 0.0;
@@ -331,23 +339,21 @@ public:
             std::vector<double>* sampleOutput = &sound.start;
             while (!end) {
                 if (currentAddress == loopAddress) {
-                    output << "LOOPY MOTHERFUCKER!" << std::endl;
+                    output << "LOOPY!" << std::endl;
                     foundLoopStart = true;
                     sampleOutput = &sound.loop;
                 }
                 decodeBlock(currentAddress, *sampleOutput, lastSample, secondLastSample, end, loop);
             }
             if (loop) { // loop
-                output << "LOOPING" << std::endl;
+                output << "LOOPING CONFIRMED" << std::endl;
                 if (loopAddress >= startAddress && loopAddress < currentAddress) {
                     if (!foundLoopStart) {
                         throw Exception("Da fuck!");
                     }
                     output << "Difference: " << (loopAddress - startAddress) << std::endl;
-                    output << "Snufs: " << (double(loopAddress - startAddress) / 9.0) << std::endl;
-                    output << "Snufs: " << (double(loopAddress - startAddress) / 9.0) * 16.0 << std::endl;
-                    output << "start size: " << sound.start.size() << std::endl;
-                    output << "loop size: " << sound.loop.size() << std::endl;
+                    output << "Blocks: " << (double(loopAddress - startAddress) / 9.0) << std::endl;
+                    output << "Samples: " << (double(loopAddress - startAddress) / 9.0) * 16.0 << std::endl;
                     int loopIndex = (loopAddress - startAddress) / 9 * 16;
                     int endIndex = (currentAddress - startAddress) / 9 * 16;
                     output << "loop index: " << loopIndex << " / " << endIndex << std::endl;
@@ -362,11 +368,10 @@ public:
                     throw Exception("Should not create loop!");
                 }
             }
+            output << "Finishing address: " << currentAddress << std::endl;
+            output << "Start sample count: " << sound.start.size() << ", loop sample count: " << sound.loop.size() << std::endl;
             libraryByteCount += (sound.start.size() + sound.loop.size()) * 8;
             output << "Sound library size: " << libraryByteCount << " bytes" << std::endl;
-            for (const Renderer::SoundLibrary::value_type& kvp : processor.renderer.soundLibrary) {
-                output << kvp.first << std::endl;
-            }
         }
     }
 

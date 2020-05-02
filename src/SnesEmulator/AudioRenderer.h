@@ -97,7 +97,7 @@ public:
         std::vector<double> start;
         std::vector<double> loop;
     };
-    using SoundLibrary = std::map<Word, Sound>;
+    using SoundLibrary = std::map<uint32_t, Sound>;
 
     class Voice
     {
@@ -126,7 +126,7 @@ public:
         double outputCoefficient = 0.0;
         bool inLoop = false;
         double bufferOffset = 0.0f;
-        Word sourceAddress;
+        uint32_t sourceAddress;
 
         void setEnvelopeStage(EnvelopeStage nextStage);
         void calculateEnvelope() noexcept;

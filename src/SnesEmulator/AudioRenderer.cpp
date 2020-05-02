@@ -312,8 +312,11 @@ double Renderer::Voice::sample(SoundLibrary& library) noexcept
     int iterations = 0;
     while (roundedBufferOffset >= bufferSize) {
         if (++iterations > 2) {
-            std::cerr << sourceAddress << std::endl;
-            return 0.0;
+            std::cerr << "Too many iterations when playing " << sourceAddress << std::endl;
+            std::cerr << "roundedBufferOffset==" << roundedBufferOffset << std::endl;
+            std::cerr << "bufferSize==" << bufferSize << std::endl;
+            std::cerr << "inLoop==" << inLoop << std::endl;
+            //return 0.0;
             throw Exception("Iterations WTF " + Util::toString(sourceAddress));
         }
         bufferOffset -= double(bufferSize);
@@ -322,10 +325,10 @@ double Renderer::Voice::sample(SoundLibrary& library) noexcept
             throw Exception("roundedBufferOffset==" + Util::toString(roundedBufferOffset));
         }
         inLoop = true;
+        if (sound.loop.empty()) {
+            return 0.0;
+        }
         bufferSize = sound.loop.size();
-    }
-    if (inLoop && sound.loop.empty()) {
-        return 0.0;
     }
     return (inLoop ? sound.loop : sound.start)[roundedBufferOffset];
 }
