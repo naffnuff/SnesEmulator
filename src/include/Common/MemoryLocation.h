@@ -99,7 +99,7 @@ public:
             try {
                 mirroredMemory->setValue(newValue);
             }
-            catch (AccessException& e) {
+            catch (const AccessException& e) {
                 throwAccessException(e.what());
             }
             return;
@@ -135,7 +135,7 @@ public:
             try {
                 return mirroredMemory->getValue();
             }
-            catch (AccessException& e) {
+            catch (const AccessException& e) {
                 throwAccessException(e.what());
             }
         }
@@ -166,7 +166,7 @@ public:
             try {
                 return mirroredMemory->apply();
             }
-            catch (AccessException& e) {
+            catch (const AccessException& e) {
                 throwAccessException(e.what());
             }
         }

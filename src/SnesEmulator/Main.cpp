@@ -67,6 +67,7 @@ int main(int, char**)
                     }
                 }
                 catch (const std::exception& e) {
+                    System::ScopedOutputColor outputColor(error, System::Red, true);
                     error << "Bad input: " << e.what() << std::endl;
                 }
             }
@@ -79,6 +80,7 @@ int main(int, char**)
 
     /*}
     catch (const std::exception& e) {
+        System::ScopedOutputColor outputColor(error, System::Red, true);
         error << "Caught std::exception: " << e.what() << std::endl;
         error << "Failure";
         std::getchar();

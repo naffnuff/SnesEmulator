@@ -4,6 +4,7 @@
 
 #include <portaudio.h>
 
+#include "System.h"
 #include "Util.h"
 
 #ifndef M_PI
@@ -114,6 +115,7 @@ struct StreamHandler
                 return paAbort;
             }
         } catch (const std::exception& e) {
+            System::ScopedOutputColor outputColor(renderer.output, System::Red, true);
             renderer.output << "Caught std::exception in Audio Renderer: " << e.what() << std::endl;
             return paAbort;
         }
@@ -254,7 +256,7 @@ void Renderer::Voice::setEnvelopeStage(EnvelopeStage nextStage)
     envelopeStage = nextStage;
 }
 
-void Renderer::Voice::calculateEnvelope() noexcept
+void Renderer::Voice::calculateEnvelope()
 {
     if (envelopeStage == Attack) {
         if (attackRate == 0xf) {
@@ -287,7 +289,7 @@ void Renderer::Voice::calculateEnvelope() noexcept
     }
 }
 
-double Renderer::Voice::sample(SoundLibrary& library) noexcept
+double Renderer::Voice::sample(SoundLibrary& library)
 {
     /*
 0x3c00

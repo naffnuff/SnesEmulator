@@ -66,7 +66,7 @@ private:
             counter = 0;
         }
 
-        bool tick() noexcept
+        bool tick()
         {
             if (frequency == 0) {
                 std::cerr << __FUNCTION__ << ": Frequency is zero" << std::endl;
@@ -129,8 +129,8 @@ public:
         uint32_t sourceAddress;
 
         void setEnvelopeStage(EnvelopeStage nextStage);
-        void calculateEnvelope() noexcept;
-        double sample(SoundLibrary& sounds) noexcept;
+        void calculateEnvelope();
+        double sample(SoundLibrary& sounds);
 
     private:
         EnvelopeStage envelopeStage = Inactive;

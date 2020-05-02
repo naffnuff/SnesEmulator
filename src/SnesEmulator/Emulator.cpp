@@ -402,9 +402,10 @@ void Emulator::run()
                     lastTime = audioSystem.now;
                 }
                 ++iteration;
-            } catch (Video::MemoryAccessException& e) {
+            } catch (const Video::MemoryAccessException& e) {
                 //cpuState.setProgramAddress(cpuState.getLastKnownAddress());
                 debugger.pause(cpuContext);
+                System::ScopedOutputColor outputColor(output, System::Red, true);
                 error << e.what() << std::endl;
             }
         }
@@ -436,26 +437,32 @@ int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debu
         }
     } catch (const OpcodeNotYetImplementedException& e) {
         debugger.pause(context);
+        System::ScopedOutputColor outputColor(error, System::Red, true);
         error << e.what() << std::endl;
     } catch (const AddressModeNotYetImplementedException& e) {
         state.setProgramAddress(context.getLastKnownAddress());
         debugger.pause(context);
+        System::ScopedOutputColor outputColor(error, System::Red, true);
         error << e.what() << std::endl;
     } catch (const OperatorNotYetImplementedException& e) {
         state.setProgramAddress(context.getLastKnownAddress());
         debugger.pause(context);
+        System::ScopedOutputColor outputColor(error, System::Red, true);
         error << e.what() << std::endl;
     } catch (const MemoryAccessException& e) {
         state.setProgramAddress(context.getLastKnownAddress());
         debugger.pause(context);
+        System::ScopedOutputColor outputColor(error, System::Red, true);
         error << e.what() << std::endl;
     } catch (const Video::NotYetImplementedException& e) {
         state.setProgramAddress(context.getLastKnownAddress());
         debugger.pause(context);
+        System::ScopedOutputColor outputColor(error, System::Red, true);
         error << e.what() << std::endl;
     } catch (const Audio::NotYetImplementedException& e) {
         state.setProgramAddress(context.getLastKnownAddress());
         debugger.pause(context);
+        System::ScopedOutputColor outputColor(error, System::Red, true);
         error << e.what() << std::endl;
     }
     return 0;

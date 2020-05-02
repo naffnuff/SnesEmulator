@@ -373,8 +373,9 @@ public:
             else if (command.substr(0, 2) == "t ") {
                 try {
                     breakpoint.address = stoi(command.substr(2), 0, 16);
-                } catch (std::exception& e) {
-                    std::cerr << "Not a valid value: " << e.what() << std::endl;
+                } catch (const std::exception& e) {
+                    System::ScopedOutputColor outputColor(output, System::Red, true);
+                    output << "Not a valid value: " << e.what() << std::endl;
                 }
             }
             MemoryAccess access = state.getMemoryAccess(breakpoint.address);
@@ -389,8 +390,9 @@ public:
         else if (command[0] == 'v') {
             try {
                 inspectedVideoMemory = stoi(command.substr(2), 0, 16);
-            } catch (std::exception& e) {
-                std::cerr << "Not a valid value: " << e.what() << std::endl;
+            } catch (const std::exception& e) {
+                System::ScopedOutputColor outputColor(output, System::Red, true);
+                output << "Not a valid value: " << e.what() << std::endl;
             }
         }
         else if (command == "w") {
@@ -407,7 +409,8 @@ public:
                 Word value = (Word)stoi(command.substr(2), 0, 16);
                 output << "Setting register " << command[0] << "=" << value << std::endl;
                 state.setRegisterDebug(command[0], value);
-            } catch (std::exception& e) {
+            } catch (const std::exception& e) {
+                System::ScopedOutputColor outputColor(output, System::Red, true);
                 error << "Not a valid address: " << e.what() << std::endl;
             }
         }
@@ -420,7 +423,8 @@ public:
                 output << "Setting address " << address <<
                     "=" << value << std::endl;
                 state.getMemory().writeByte(value, address);
-            } catch (std::exception& e) {
+            } catch (const std::exception& e) {
+                System::ScopedOutputColor outputColor(output, System::Red, true);
                 error << "Not valid: " << command.substr(0, pos) << " or " << command.substr(pos + 1) << ": " << e.what() << std::endl;
             }
         }
@@ -429,7 +433,8 @@ public:
                 context.inspectedAddress = stoi(command, 0, 16);
                 output << "Inspecting address " << context.inspectedAddress << std::endl;
                 context.watchMode = false;
-            } catch (std::exception& e) {
+            } catch (const std::exception& e) {
+                System::ScopedOutputColor outputColor(output, System::Red, true);
                 error << "Not a valid address: " << e.what() << std::endl;
             }
         }

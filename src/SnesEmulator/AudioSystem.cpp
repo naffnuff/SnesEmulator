@@ -77,10 +77,12 @@ public:
             }
             system.output << "BYE AUDIO MONKEY! " << std::endl;
         } catch (const Audio::NotYetImplementedException& e) {
+            System::ScopedOutputColor outputColor(system.output, System::Red, true);
             system.error << "AudioSystem thread: Caught Audio::NotYetImplementedException: " << e.what() << std::endl;
             system.context.printAddressHistory(system.output);
             //std::getchar();
         } catch (const Audio::Exception& e) {
+            System::ScopedOutputColor outputColor(system.output, System::Red, true);
             system.error << "AudioSystem thread: Caught Audio::Exception: " << e.what() << std::endl;
             system.context.printAddressHistory(system.output);
             //std::getchar();
