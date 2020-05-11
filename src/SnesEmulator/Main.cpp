@@ -3,91 +3,91 @@
 #include <thread>
 #include <filesystem>
 
+#include "Output.h"
 #include "Emulator.h"
 #include "VideoRenderer.h"
 
 int main(int, char**)
 {
-    std::ostream& output = std::cout;
-    std::istream& input = std::cin;
-    std::ostream& error = std::cerr;
+    Output::System outputSystem("logconfig.txt");
+    Output output(outputSystem, "main");
 
     //try {
         while (true) {
             Rom rom(output);
 
-            output << "Welcome to Naffnuff's SNES emulator!" << std::endl;
-            std::vector<std::string> titles;
-            while (titles.empty()) {
-                for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(".")) {
-                    std::string extension = entry.path().extension().string();
-                    if (entry.is_regular_file() && (extension == ".smc" || extension == ".sfc")) {
-                        std::string filename = entry.path().filename().string();
-                        titles.push_back(filename);
-                        output << titles.size() << ". " << filename << std::endl;
+            {
+                std::string pickedTitle;
+                {
+                    Output::Lock lock(output);
+                    output.printLine(lock, "Welcome to Naffnuff's SNES emulator!");
+                    std::vector<std::string> titles;
+                    while (titles.empty()) {
+                        for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(".")) {
+                            std::string extension = entry.path().extension().string();
+                            if (entry.is_regular_file() && (extension == ".smc" || extension == ".sfc")) {
+                                std::string filename = entry.path().filename().string();
+                                titles.push_back(filename);
+                                output.printLine(lock, titles.size(), ". ", filename);
+                            }
+                        }
+                        if (titles.empty()) {
+                            output.printLine(lock, "Put some ROM images in the same folder as the application file and press enter!");
+                            int dummy = std::getchar();
+                        }
                     }
-                }
-                if (titles.empty()) {
-                    output << "Put some ROM images in the same folder as the application file and press enter!" << std::endl;
-                    int dummy = std::getchar();
-                }
-            }
-            output << std::endl;
-            std::string pickedTitle;
-            while (pickedTitle.empty()) {
-                output << "Enter command or game index (h for help): ";
-                std::string command = "1";
-                std::getline(input, command);
-                try {
-                    if (command.empty()) {
-                    }
-                    else if (command == "h") {
-                        output << "Keyboard controls:" << std::endl;
-                        output << "Toggle fullscreen: Space" << std::endl;
-                        output << "Up: W" << std::endl;
-                        output << "Left: A" << std::endl;
-                        output << "Down: S" << std::endl;
-                        output << "Right: D" << std::endl;
-                        output << "A: L" << std::endl;
-                        output << "B: K" << std::endl;
-                        output << "X: I" << std::endl;
-                        output << "Y: J" << std::endl;
-                        output << "L: U" << std::endl;
-                        output << "R: O" << std::endl;
-                        output << "Start: ," << std::endl;
-                        output << "Select: ." << std::endl;
-                        output << "Or connect a controller!" << std::endl;
-                    }
-                    else {
-                        int inputValue = stoi(command);
-                        --inputValue;
-                        if (inputValue >= 0 && inputValue < titles.size()) {
-                            pickedTitle = titles[inputValue];
+                    output.printLine(lock);
+                    while (pickedTitle.empty()) {
+                        output.printLine(lock, "Enter command or game index (h for help): ");
+                        std::string command = "1";
+                        std::getline(std::cin, command);
+                        try {
+                            if (command.empty()) {
+                            } else if (command == "h") {
+                                output.printLine(lock, "Keyboard controls:");
+                                output.printLine(lock, "Toggle fullscreen: Space");
+                                output.printLine(lock, "Up: W");
+                                output.printLine(lock, "Left: A");
+                                output.printLine(lock, "Down: S");
+                                output.printLine(lock, "Right: D");
+                                output.printLine(lock, "A: L");
+                                output.printLine(lock, "B: K");
+                                output.printLine(lock, "X: I");
+                                output.printLine(lock, "Y: J");
+                                output.printLine(lock, "L: U");
+                                output.printLine(lock, "R: O");
+                                output.printLine(lock, "Start: ,");
+                                output.printLine(lock, "Select: .");
+                                output.printLine(lock, "Or connect a controller!");
+                            } else {
+                                int inputValue = stoi(command);
+                                --inputValue;
+                                if (inputValue >= 0 && inputValue < titles.size()) {
+                                    pickedTitle = titles[inputValue];
+                                }
+                            }
+                        } catch (const std::exception & e) {
+                            output.error("Bad input: ", e.what());
                         }
                     }
                 }
-                catch (const std::exception& e) {
-                    System::ScopedOutputColor outputColor(error, System::Red, true);
-                    error << "Bad input: " << e.what() << std::endl;
-                }
+                rom.loadFromFile(pickedTitle);
             }
-            rom.loadFromFile(pickedTitle);
 
-            Emulator emulator(output, input, error, rom);
+            Emulator emulator(output, rom);
             emulator.initialize();
             emulator.run();
         }
 
     /*}
     catch (const std::exception& e) {
-        System::ScopedOutputColor outputColor(error, System::Red, true);
-        error << "Caught std::exception: " << e.what() << std::endl;
-        error << "Failure";
+        output.error("Caught std::exception: " << e.what());
+        output.error("Failure");
         std::getchar();
         return 1;
     }*/
 
-    output << "Success";
+    output.info("Success");
     std::getchar();
     return 0;
 }

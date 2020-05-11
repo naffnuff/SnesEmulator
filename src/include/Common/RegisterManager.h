@@ -2,16 +2,18 @@
 
 #include "Types.h"
 #include "System.h"
+#include "Output.h"
 
-template<typename Memory, System::Color DebugColor>
+template<typename Memory, Output::Color DebugColor>
 class RegisterManager
 {
+    EXCEPTION(AccessException, ::AccessException)
+
 public:
     typedef typename Memory::AddressType AddressType;
 
-    RegisterManager(std::ostream& output, std::ostream& error, Memory& memory)
-        : output(output)
-        , error(error)
+    RegisterManager(Output& output, const std::string& logName, Memory& memory)
+        : output(output, logName)
         , memory(memory)
     {
     }
@@ -21,8 +23,7 @@ public:
         if (supressOutput) {
             return;
         }
-        System::ScopedOutputColor outputColor(output, DebugColor, value != 0);
-        output << (write ? "Write " : "Read ") << value << " (" << std::bitset<8>(value) << ") @" << address << " (" << info << "), " << std::endl;
+        output.log(Log::Level::Debug, DebugColor, value != 0, (write ? "Write " : "Read "), value, " (", std::bitset<8>(value), ") @", address, " (", info, "), ");
     }
 
     void makeWriteRegister(AddressType address, const std::string& info, bool debug, std::function<void(Byte)> callback = nullptr, bool openBus = false)
@@ -180,19 +181,14 @@ public:
 
         Byte readValue = memory.readByte(address);
         if (readValue != expectedValue) {
-            std::stringstream ss;
-            ss << "Verify memory failed @" << address << ": ";
-            ss << "Expected value: " << expectedValue << ", ";
-            ss << "Read value: " << readValue;
-            throw MemoryAccessException(ss.str());
+            throw AccessException("Verify memory failed @", address, ": ", "Expected value: ", expectedValue, ", ", "Read value: ", readValue);
         }
     }
 
     bool supressOutput = false;
 
 private:
-    std::ostream& output;
-    std::ostream& error;
+    Output output;
 
     Memory& memory;
 };

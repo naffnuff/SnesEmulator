@@ -7,6 +7,7 @@
 #include <bitset>
 #include <iomanip>
 
+#include "Output.h"
 #include "Types.h"
 #include "Memory.h"
 #include "Util.h"
@@ -175,7 +176,7 @@ public:
         return memory.size();
     }
 
-    std::ostream& printRegisters(std::ostream& output) const
+    void printRegisters(Output& output, Output::Lock& lock) const
     {
         std::string flagsString;
         if (emulationMode) {
@@ -191,18 +192,18 @@ public:
         }
 
         std::bitset<8> flagSet(flags);
-        
-        return output
-            << "PB=" << programBank
-            << ", PC=" << programCounter
-            << ", A=" << getAccumulatorC()
-            << ", X=" << getIndexRegister<X>()
-            << ", Y=" << getIndexRegister<Y>()
-            << ", S=" << stackPointer
-            << ", DP=" << directPage
-            << ", DB=" << dataBank
-            << ", flags=" << flagSet << " (" << flagsString << ", $" << flags << ")"
-            << ", e=" << emulationMode;
+
+        return output.print(lock,
+            "PB=", programBank,
+            ", PC=", programCounter,
+            ", A=", getAccumulatorC(),
+            ", X=", getIndexRegister<X>(),
+            ", Y=", getIndexRegister<Y>(),
+            ", S=", stackPointer,
+            ", DP=", directPage,
+            ", DB=", dataBank,
+            ", flags=", flagSet, " (", flagsString, ", $", flags, ")",
+            ", e=", emulationMode);
     }
 
     void setFlag(Byte flag, bool value)

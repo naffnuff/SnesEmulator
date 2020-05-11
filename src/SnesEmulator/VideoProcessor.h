@@ -15,7 +15,7 @@ class Processor
 public:
     struct RendererRunner
     {
-        RendererRunner(Processor& video, std::ostream& output)
+        RendererRunner(Processor& video, Output& output)
             : video(video)
             , gameTitle(gameTitle)
         {
@@ -45,13 +45,12 @@ public:
         bool aspectRatioCorrection = true;
     };
 
-    Processor(std::ostream& output, std::ostream& error)
-        : output(output)
-        , error(error)
+    Processor(Output& output)
+        : output(output, "video")
         , vram(0x8000)
         , cgram(0x100)
         , oam(0x110)
-        , renderer(1000, 40, rendererWidth, rendererHeight, 3.f, true, output, error)
+        , renderer(1000, 40, rendererWidth, rendererHeight, 3.f, true, output)
         , rendererRunner(*this, output)
         , backgrounds(4)
         , rendererLock(renderer.pixelBufferMutex)
@@ -123,8 +122,7 @@ public:
             }
             drawMode(mode7, vCounter, true);
         } else if (backgroundMode != 0) {
-            output << "BG mode: " << backgroundMode << ", e: " << mode1Extension << std::endl;
-            throw NotYetImplementedException("bg mode");
+            throw NotYetImplementedException("BG mode: ", backgroundMode, ", e: ", mode1Extension);
         }
     }
 
@@ -469,7 +467,7 @@ public:
             if (settings.windowOperator == 0) {
                 inside = inside1 || inside2;
             } else {
-                throw NotYetImplementedException("Window operator " + Util::toString(settings.windowOperator));
+                throw NotYetImplementedException("Window operator ", settings.windowOperator);
             }
         } else if (settings.window1Enabled) {
             inside = column >= window1Left && column <= window1Right;
@@ -565,8 +563,7 @@ public:
         return c;
     }
 
-    std::ostream& output;
-    std::ostream& error;
+    Output output;
 
     Table vram;
     Table cgram;

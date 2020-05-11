@@ -8,6 +8,7 @@
 #include <bitset>
 #include <iomanip>
 
+#include "Output.h"
 #include "Types.h"
 #include "Memory.h"
 #include "Util.h"
@@ -140,7 +141,7 @@ public:
         return memory.size();
     }
 
-    std::ostream& printRegisters(std::ostream& output) const
+    void printRegisters(Output& output, Output::Lock& lock) const
     {
         std::string flagsString = "nvpbhizc";
 
@@ -152,14 +153,14 @@ public:
 
         std::bitset<8> flagSet(readRegister<PSW>());
 
-        return output
-            << "PC=" << programCounter
-            << ", A=" << readRegister<A>()
-            << ", X=" << readRegister<X>()
-            << ", Y=" << readRegister<Y>()
-            << ", S=" << getStackPointer()
-            << ", YA=" << getYAccumulator()
-            << ", flags=" << flagSet << " (" << flagsString << ", $" << readRegister<PSW>() << ")";
+        output.print(lock,
+            "PC=", programCounter,
+            ", A=", readRegister<A>(),
+            ", X=", readRegister<X>(),
+            ", Y=", readRegister<Y>(),
+            ", S=", getStackPointer(),
+            ", YA=", getYAccumulator(),
+            ", flags=", flagSet, " (", flagsString, ", $", readRegister<PSW>(), ")");
     }
 
     Word getProgramAddress(int offset = 0) const

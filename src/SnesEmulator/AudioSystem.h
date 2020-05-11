@@ -16,14 +16,13 @@
 class AudioSystem
 {
 public:
-    AudioSystem(std::ostream& output, std::ostream& error, Debugger& debugger)
-        : output(output)
-        , error(error)
+    AudioSystem(Output& output, Debugger& debugger)
+        : output(output, "audio")
         , instructionDecoder(state)
-        , registers(output, error, state)
+        , registers(output, state)
         , processor(registers.processor)
         , debugger(debugger)
-        , context("spc.txt", System::Magenta, debugger)
+        , context("spc.txt", Output::Magenta, debugger)
         , elapsedTime(0)
         , nextSpc(0)
     {
@@ -85,8 +84,7 @@ public:
     void start();
 
 private:
-    std::ostream& output;
-    std::ostream& error;
+    Output output;
 
     bool run = true;
 

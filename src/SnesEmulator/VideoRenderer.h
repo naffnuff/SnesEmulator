@@ -6,6 +6,8 @@
 #include <string>
 #include <mutex>
 
+#include "Common/Output.h"
+
 struct GLFWwindow;
 struct GLFWvidmode;
 
@@ -16,9 +18,8 @@ class Renderer
 public:
     typedef uint16_t Pixel;
 
-    Renderer(int windowXPosition, int windowYPosition, int width, int height, float scale, bool syncUpdate, std::ostream& output, std::ostream& error)
-        : output(output)
-        , error(error)
+    Renderer(int windowXPosition, int windowYPosition, int width, int height, float scale, bool syncUpdate, Output& output)
+        : output(output, "video")
         , windowXPosition(windowXPosition)
         , windowYPosition(windowYPosition)
         , width(width)
@@ -80,8 +81,7 @@ public:
     std::vector<Pixel> pixelBuffer;
     std::mutex pixelBufferMutex;
 
-    std::ostream& output;
-    std::ostream& error;
+    Output output;
 
     GLFWwindow* window = nullptr;
 

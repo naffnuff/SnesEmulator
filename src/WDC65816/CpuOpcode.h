@@ -9,6 +9,8 @@ namespace CPU {
 
 namespace Opcode {
 
+EXCEPTION(NotYetImplementedException, ::NotYetImplementedException)
+
 // ADC Add With Carry [Flags affected: n,v,z,c]
 // ADC (dp,X)
 // Direct Page Indexed Indirect, X (2-Byte)
@@ -19,7 +21,7 @@ class ADC_61 : public AddressMode::DirectPageIndexedIndirectX<Operator::ADC>
     // 2   7-m+w       (dir,X)   mm....mm . ADC ($10,X)
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ADC_61");
+        throw NotYetImplementedException("ADC_61");
         return 6 + applyOperand();
     }
 
@@ -182,7 +184,7 @@ class ADC_73 : public AddressMode::StackRelativeIndirectIndexedY<Operator::ADC>
     // 2   8-m         (stk,S),Y mm....mm . ADC ($32,S),Y
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ADC_73");
+        throw NotYetImplementedException("ADC_73");
         return 7 + applyOperand();
     }
 
@@ -279,7 +281,7 @@ class AND_21 : public AddressMode::DirectPageIndexedIndirectX<Operator::AND>
     // 2   7-m+w       (dir,X)   m.....m. . AND ($10,X)
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("AND_21");
+        throw NotYetImplementedException("AND_21");
         return 6 + applyOperand();
     }
 
@@ -296,7 +298,7 @@ class AND_23 : public AddressMode::StackRelative<Operator::AND>
     // 2   5-m         stk,S     m.....m. . AND $32,S
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("AND_23");
+        throw NotYetImplementedException("AND_23");
         return 4 + applyOperand();
     }
 
@@ -329,7 +331,7 @@ class AND_27 : public AddressMode::DirectPageIndirectLong<Operator::AND>
     // 2   7-m+w       [dir]     m.....m. . AND [$10]
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("AND_27");
+        throw NotYetImplementedException("AND_27");
         return 6 + applyOperand();
     }
 
@@ -412,7 +414,7 @@ class AND_31 : public AddressMode::DirectPageIndirectIndexedY<Operator::AND>
     // 2   7-m+w-x+x*p (dir),Y   m.....m. . AND ($10),Y
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("AND_31");
+        throw NotYetImplementedException("AND_31");
         return 5 + applyOperand();
     }
 
@@ -429,7 +431,7 @@ class AND_32 : public AddressMode::DirectPageIndirect<Operator::AND>
     // 2   6-m+w       (dir)     m.....m. . AND ($10)
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("AND_32");
+        throw NotYetImplementedException("AND_32");
         return 5 + applyOperand();
     }
 
@@ -446,7 +448,7 @@ class AND_33 : public AddressMode::StackRelativeIndirectIndexedY<Operator::AND>
     // 2   8-m         (stk,S),Y m.....m. . AND ($32,S),Y
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("AND_33");
+        throw NotYetImplementedException("AND_33");
         return 7 + applyOperand();
     }
 
@@ -463,7 +465,7 @@ class AND_35 : public AddressMode::DirectPageIndexed<Operator::AND, State::X>
     // 2   5-m+w       dir,X     m.....m. . AND $10,X
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("AND_35");
+        throw NotYetImplementedException("AND_35");
         return 4 + applyOperand();
     }
 
@@ -480,7 +482,7 @@ class AND_37 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::AND>
     // 2   7-m+w       [dir],Y   m.....m. . AND [$10],Y
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("AND_37");
+        throw NotYetImplementedException("AND_37");
         return 6 + applyOperand();
     }
 
@@ -837,7 +839,7 @@ class BRK_00 : public AddressMode::Immediate<Operator::BRK>
     // 1   8-e         imp       ....01.. . BRK
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("BRK_00");
+        throw NotYetImplementedException("BRK_00");
         return 7 + applyOperand();
     }
 
@@ -950,7 +952,7 @@ class CLV_B8 : public AddressMode::Implied<Operator::SE_<State::v, false>>
     // 1   2           imp       .0...... . CLV
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("CLV_B8");
+        throw NotYetImplementedException("CLV_B8");
         return 2 + applyOperand();
     }
 
@@ -967,7 +969,7 @@ class CMP_C1 : public AddressMode::DirectPageIndexedIndirectX<Operator::CMP>
     // 2   7-m+w       (dir,X)   m.....mm . CMP ($10,X)
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("CMP_C1");
+        throw NotYetImplementedException("CMP_C1");
         return 6 + applyOperand();
     }
 
@@ -1098,7 +1100,7 @@ class CMP_D1 : public AddressMode::DirectPageIndirectIndexedY<Operator::CMP>
     // 2   7-m+w-x+x*p (dir),Y   m.....mm . CMP ($10),Y
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("CMP_D1");
+        throw NotYetImplementedException("CMP_D1");
         return 5 + applyOperand();
     }
 
@@ -1115,7 +1117,7 @@ class CMP_D2 : public AddressMode::DirectPageIndirect<Operator::CMP>
     // 2   6-m+w       (dir)     m.....mm . CMP ($10)
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("CMP_D2");
+        throw NotYetImplementedException("CMP_D2");
         return 5 + applyOperand();
     }
 
@@ -1132,7 +1134,7 @@ class CMP_D3 : public AddressMode::StackRelativeIndirectIndexedY<Operator::CMP>
     // 2   8-m         (stk,S),Y m.....mm . CMP ($32,S),Y
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("CMP_D3");
+        throw NotYetImplementedException("CMP_D3");
         return 7 + applyOperand();
     }
 
@@ -1230,7 +1232,7 @@ class COP_02 : public AddressMode::Immediate<Operator::COP>
     // 2   8-e         imm       ....01.. . COP #$12
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("COP_02");
+        throw NotYetImplementedException("COP_02");
         return 7 + applyOperand();
     }
 
@@ -1492,7 +1494,7 @@ class EOR_41 : public AddressMode::DirectPageIndexedIndirectX<Operator::EOR>
     // 2   7-m+w       (dir,X)   m.....m. . EOR ($10,X)
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("EOR_41");
+        throw NotYetImplementedException("EOR_41");
         return 6 + applyOperand();
     }
 
@@ -1541,7 +1543,7 @@ class EOR_47 : public AddressMode::DirectPageIndirectLong<Operator::EOR>
     // 2   7-m+w       [dir]     m.....m. . EOR [$10]
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("EOR_47");
+        throw NotYetImplementedException("EOR_47");
         return 6 + applyOperand();
     }
 
@@ -1608,7 +1610,7 @@ class EOR_4F : public AddressMode::AbsoluteLong<Operator::EOR>
     // 4   6-m         long      m.....m. . EOR $FEDBCA
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("EOR_4F");
+        throw NotYetImplementedException("EOR_4F");
         return 5 + applyOperand();
     }
 
@@ -1625,7 +1627,7 @@ class EOR_51 : public AddressMode::DirectPageIndirectIndexedY<Operator::EOR>
     // 2   7-m+w-x+x*p (dir),Y   m.....m. . EOR ($10),Y
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("EOR_51");
+        throw NotYetImplementedException("EOR_51");
         return 5 + applyOperand();
     }
 
@@ -1642,7 +1644,7 @@ class EOR_52 : public AddressMode::DirectPageIndirect<Operator::EOR>
     // 2   6-m+w       (dir)     m.....m. . EOR ($10)
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("EOR_52");
+        throw NotYetImplementedException("EOR_52");
         return 5 + applyOperand();
     }
 
@@ -1659,7 +1661,7 @@ class EOR_53 : public AddressMode::StackRelativeIndirectIndexedY<Operator::EOR>
     // 2   8-m         (stk,S),Y m.....m. . EOR ($32,S),Y
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("EOR_53");
+        throw NotYetImplementedException("EOR_53");
         return 7 + applyOperand();
     }
 
@@ -1692,7 +1694,7 @@ class EOR_57 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::EOR>
     // 2   7-m+w       [dir],Y   m.....m. . EOR [$10],Y
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("EOR_57");
+        throw NotYetImplementedException("EOR_57");
         return 6 + applyOperand();
     }
 
@@ -1741,7 +1743,7 @@ class EOR_5F : public AddressMode::AbsoluteLongIndexedX<Operator::EOR>
     // 4   6-m         long,X    m.....m. . EOR $FEDCBA,X
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("EOR_5F");
+        throw NotYetImplementedException("EOR_5F");
         return 5 + applyOperand();
     }
 
@@ -1999,7 +2001,7 @@ class LDA_A1 : public AddressMode::DirectPageIndexedIndirectX<Operator::LDA>
     // 2   7-m+w       (dir,X)   m.....m. . LDA ($10,X)
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("LDA_A1");
+        throw NotYetImplementedException("LDA_A1");
         return 6 + applyOperand();
     }
 
@@ -2502,7 +2504,7 @@ class LSR_56 : public AddressMode::DirectPageIndexed<Operator::LSR, State::X>
     // 2   8-2*m+w     dir,X     0.....m* . LSR $10,X
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("LSR_56");
+        throw NotYetImplementedException("LSR_56");
         return 6 + applyOperand();
     }
 
@@ -2552,7 +2554,7 @@ class MVP_44 : public AddressMode::BlockMove<Operator::MVP>
     // 3   7           src,dest  ........ . MVP #$12,#$34
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("MVP_44");
+        throw NotYetImplementedException("MVP_44");
         return 7 + applyOperand();
     }
 
@@ -2585,7 +2587,7 @@ class ORA_01 : public AddressMode::DirectPageIndexedIndirectX<Operator::ORA>
     // 2   7-m+w       (dir,X)   m.....m. . ORA ($10,X)
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ORA_01");
+        throw NotYetImplementedException("ORA_01");
         return 6 + applyOperand();
     }
 
@@ -2716,7 +2718,7 @@ class ORA_11 : public AddressMode::DirectPageIndirectIndexedY<Operator::ORA>
     // 2   7-m+w-x+x*p (dir),Y   m.....m. . ORA ($10),Y
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ORA_11");
+        throw NotYetImplementedException("ORA_11");
         return 5 + applyOperand();
     }
 
@@ -2733,7 +2735,7 @@ class ORA_12 : public AddressMode::DirectPageIndirect<Operator::ORA>
     // 2   6-m+w       (dir)     m.....m. . ORA ($10)
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ORA_12");
+        throw NotYetImplementedException("ORA_12");
         return 5 + applyOperand();
     }
 
@@ -2750,7 +2752,7 @@ class ORA_13 : public AddressMode::StackRelativeIndirectIndexedY<Operator::ORA>
     // 2   8-m         (stk,S),Y m.....m. . ORA ($32,S),Y
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ORA_13");
+        throw NotYetImplementedException("ORA_13");
         return 7 + applyOperand();
     }
 
@@ -2783,7 +2785,7 @@ class ORA_17 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::ORA>
     // 2   7-m+w       [dir],Y   m.....m. . ORA [$10],Y
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ORA_17");
+        throw NotYetImplementedException("ORA_17");
         return 6 + applyOperand();
     }
 
@@ -3168,7 +3170,7 @@ class ROL_36 : public AddressMode::DirectPageIndexed<Operator::ROL, State::X>
     // 2   8-2*m+w     dir,X     m.....mm . ROL $10,X
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("ROL_36");
+        throw NotYetImplementedException("ROL_36");
         return 6 + applyOperand();
     }
 
@@ -3331,7 +3333,7 @@ class SBC_E1 : public AddressMode::DirectPageIndexedIndirectX<Operator::SBC>
     // 2   7-m+w       (dir,X)   mm....mm . SBC ($10,X)
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("SBC_E1");
+        throw NotYetImplementedException("SBC_E1");
         return 6 + applyOperand();
     }
 
@@ -3380,7 +3382,7 @@ class SBC_E7 : public AddressMode::DirectPageIndirectLong<Operator::SBC>
     // 2   7-m+w       [dir]     mm....mm . SBC [$10]
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("SBC_E7");
+        throw NotYetImplementedException("SBC_E7");
         return 6 + applyOperand();
     }
 
@@ -3463,7 +3465,7 @@ class SBC_F1 : public AddressMode::DirectPageIndirectIndexedY<Operator::SBC>
     // 2   7-m+w-x+x*p (dir),Y   mm....mm . SBC ($10),Y
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("SBC_F1");
+        throw NotYetImplementedException("SBC_F1");
         return 5 + applyOperand();
     }
 
@@ -3480,7 +3482,7 @@ class SBC_F2 : public AddressMode::DirectPageIndirect<Operator::SBC>
     // 2   6-m+w       (dir)     mm....mm . SBC ($10)
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("SBC_F2");
+        throw NotYetImplementedException("SBC_F2");
         return 5 + applyOperand();
     }
 
@@ -3497,7 +3499,7 @@ class SBC_F3 : public AddressMode::StackRelativeIndirectIndexedY<Operator::SBC>
     // 2   8-m         (stk,S),Y mm....mm . SBC ($32,S),Y
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("SBC_F3");
+        throw NotYetImplementedException("SBC_F3");
         return 7 + applyOperand();
     }
 
@@ -3530,7 +3532,7 @@ class SBC_F7 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::SBC>
     // 2   7-m+w       [dir],Y   mm....mm . SBC [$10],Y
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("SBC_F7");
+        throw NotYetImplementedException("SBC_F7");
         return 6 + applyOperand();
     }
 
@@ -3659,7 +3661,7 @@ class STA_81 : public AddressMode::DirectPageIndexedIndirectX<Operator::STA>
     // 2   7-m+w       (dir,X)   ........ . STA ($10,X)
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("STA_81");
+        throw NotYetImplementedException("STA_81");
         return 6 + applyOperand();
     }
 
@@ -3789,7 +3791,7 @@ class STA_93 : public AddressMode::StackRelativeIndirectIndexedY<Operator::STA>
     // 2   8-m         (stk,S),Y ........ . STA ($32,S),Y
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("STA_93");
+        throw NotYetImplementedException("STA_93");
         return 7 + applyOperand();
     }
 
@@ -3887,7 +3889,7 @@ class STP_DB : public AddressMode::Implied<Operator::STP>
     // 1   3           imp       ........ . STP
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("STP_DB");
+        throw NotYetImplementedException("STP_DB");
         return 3 + applyOperand();
     }
 
@@ -3936,7 +3938,7 @@ class STX_96 : public AddressMode::DirectPageIndexed<Operator::ST_<State::X>, St
     // 2   5-x+w       dir,Y     ........ . STX $10,Y
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("STX_96");
+        throw NotYetImplementedException("STX_96");
         return 4 + applyOperand();
     }
 
@@ -4226,7 +4228,7 @@ class TSX_BA : public AddressMode::Implied<Operator::TSX>
     // 1   2           imp       x.....x. . TSX
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("TSX_BA");
+        throw NotYetImplementedException("TSX_BA");
         return 2 + applyOperand();
     }
 
@@ -4323,7 +4325,7 @@ class WAI_CB : public AddressMode::Implied<Operator::WAI>
     // 1   3           imp       ........ . WAI
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("WAI_CB");
+        throw NotYetImplementedException("WAI_CB");
         return 3 + applyOperand();
     }
 
@@ -4340,7 +4342,7 @@ class WDM_42 : public AddressMode::Immediate<Operator::WDM>
     // 2   2           imm       ........ . WDM
     int execute() override
     {
-        throw OpcodeNotYetImplementedException("WDM_42");
+        throw NotYetImplementedException("WDM_42");
         return 2 + applyOperand();
     }
 

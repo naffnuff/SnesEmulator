@@ -84,7 +84,7 @@ namespace Video {
 
 Renderer::~Renderer()
 {
-    output << "Renderer " << title << " destructor" << std::endl;
+    output.debug("Renderer ", title, " destructor");
     terminate();
 }
 
@@ -111,7 +111,7 @@ void Renderer::initialize(bool fullscreen, bool aspectCorrection)
     glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
     window = glfwCreateWindow(mode->width, mode->height, title.c_str(), monitor, nullptr);
 
-    output << "Created renderer with dimensions " << int(float(width) * xScale + 0.5) << ":" << int(float(height) * yScale + 0.5) << std::endl;
+    output.debug("Created renderer with dimensions ", int(float(width) * xScale + 0.5), ":", int(float(height) * yScale + 0.5));
 
     if (window == nullptr) {
         glfwTerminate();
@@ -206,7 +206,7 @@ void Renderer::update()
             double currentTime = glfwGetTime();
             frameCount++;
             if (currentTime - previousTime >= 1.0) {
-                output << frameCount << std::endl;
+                output.debug(frameCount);
 
                 frameCount = 0;
                 previousTime = currentTime;

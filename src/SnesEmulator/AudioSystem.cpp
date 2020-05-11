@@ -17,7 +17,7 @@ public:
             uint64_t iteration = 0;
             //uint64_t masterCycle = 0;
             //uint64_t nextSpc = 0;
-            system.output << "HELLO AUDIO SYSTEM!" << std::endl;
+            system.output.debug("HELLO AUDIO SYSTEM!");
             system.now = std::chrono::steady_clock::now();
             std::chrono::steady_clock::time_point startTime = system.now;
             AudioSystem::CycleCount oneCycle(1);
@@ -71,19 +71,17 @@ public:
                 ++iteration;
                 static std::chrono::steady_clock::time_point lastTime = startTime;
                 if (system.now - lastTime > std::chrono::seconds(10)) {
-                    system.output << "Audio cycles: " << masterCycle.count() << " / " << iteration << " (" << (100.0 * masterCycle.count() / iteration) << "%)" << std::endl;
+                    system.output.debug("Audio cycles: ", masterCycle.count(), " / ", iteration, " (", (100.0 * masterCycle.count() / iteration), "%)");
                     lastTime = system.now;
                 }
             }
-            system.output << "BYE AUDIO MONKEY! " << std::endl;
+            system.output.debug("BYE AUDIO MONKEY! ");
         } catch (const Audio::NotYetImplementedException& e) {
-            System::ScopedOutputColor outputColor(system.output, System::Red, true);
-            system.error << "AudioSystem thread: Caught Audio::NotYetImplementedException: " << e.what() << std::endl;
+            system.output.error(Output::Red, true, "AudioSystem thread: Caught Audio::NotYetImplementedException: ", e.what());
             system.context.printAddressHistory(system.output);
             //std::getchar();
-        } catch (const Audio::Exception& e) {
-            System::ScopedOutputColor outputColor(system.output, System::Red, true);
-            system.error << "AudioSystem thread: Caught Audio::Exception: " << e.what() << std::endl;
+        } catch (const Audio::RuntimeError& e) {
+            system.output.error(Output::Red, true, "AudioSystem thread: Caught Audio::Exception: ", e.what());
             system.context.printAddressHistory(system.output);
             //std::getchar();
         }

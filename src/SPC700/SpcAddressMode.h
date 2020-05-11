@@ -12,6 +12,8 @@ typedef InstructionBase<State, Byte, Byte> Instruction3Byte;
 
 namespace AddressMode {
 
+EXCEPTION(NotYetImplementedException, ::NotYetImplementedException)
+
 // Absolute
 // ASL !a:     	Left shift (a) as above    	[N.....ZC]
 // DEC !a:     	(a)--    	[N.....Z.]
@@ -129,7 +131,7 @@ class CarryMemoryBit : public Instruction3Byte
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
-        throw AddressModeNotYetImplementedException("CarryMemoryBit");
+        throw NotYetImplementedException("CarryMemoryBit");
         MemoryAccess access = state.getMemoryAccess(0);
         return Operator::invoke(state, access, 0);
     }
@@ -150,7 +152,7 @@ class CarryNegatedMemoryBit : public Instruction3Byte
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
-        throw AddressModeNotYetImplementedException("CarryNegatedMemoryBit");
+        throw NotYetImplementedException("CarryNegatedMemoryBit");
         MemoryAccess access = state.getMemoryAccess(0);
         return Operator::invoke(state, access, 0);
     }
@@ -488,7 +490,7 @@ class IndirectIndirect : public Instruction1Byte
 
     int invokeOperator() override
     {
-        throw AddressModeNotYetImplementedException("IndirectIndirect");
+        throw NotYetImplementedException("IndirectIndirect");
         MemoryAccess access = state.getMemoryAccess(0);
         return Operator::invoke(state, access, 0);
     }
@@ -508,7 +510,7 @@ class MemoryBit : public Instruction3Byte
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
-        throw AddressModeNotYetImplementedException("MemoryBit");
+        throw NotYetImplementedException("MemoryBit");
         MemoryAccess access = state.getMemoryAccess(0);
         return Operator::invoke(state, access, 0);
     }
@@ -528,7 +530,7 @@ class MemoryBitCarry : public Instruction3Byte
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
-        throw AddressModeNotYetImplementedException("MemoryBitCarry");
+        throw NotYetImplementedException("MemoryBitCarry");
         MemoryAccess access = state.getMemoryAccess(0);
         return Operator::invoke(state, access, 0);
     }
@@ -929,7 +931,7 @@ class RegisterRegisterIndirectIncrement : public Instruction1Byte
 
     int invokeOperator() override
     {
-        throw AddressModeNotYetImplementedException("RegisterRegisterIndirectIncrement");
+        throw NotYetImplementedException("RegisterRegisterIndirectIncrement");
         MemoryAccess access = state.getMemoryAccess(0);
         return Operator::invoke(state, access, 0);
     }
@@ -964,7 +966,7 @@ class Table : public Instruction1Byte
 
     int invokeOperator() override
     {
-        throw AddressModeNotYetImplementedException("Table");
+        throw NotYetImplementedException("Table");
         MemoryAccess access = state.getMemoryAccess(0);
         return Operator::invoke(state, access, 0);
     }
@@ -984,7 +986,7 @@ class UPage : public Instruction2Byte
 
     int invokeOperator(Byte lowByte) override
     {
-        throw AddressModeNotYetImplementedException("UPage");
+        throw NotYetImplementedException("UPage");
         MemoryAccess access = state.getMemoryAccess(0);
         return Operator::invoke(state, access, 0);
     }

@@ -33,7 +33,7 @@ struct StreamHandler
             }
             if (value == 1.0)
             {
-                renderer.output << "tableIndex: " << tableIndex << ", Value: " << value << " after time: " << time << std::endl;
+                renderer.output.info("tableIndex: ", tableIndex, ", Value: ", value, " after time: ", time);
             }
         }
     }
@@ -59,7 +59,7 @@ struct StreamHandler
             }
 
             if (iteration == rate) {
-                renderer.output << "Iteration: " << iteration << ", Value: " << value << " after time: " << time << std::endl;
+                renderer.output.info("Iteration: ", iteration, ", Value: ", value, " after time: ", time);
             }
         }
     }
@@ -85,7 +85,7 @@ struct StreamHandler
             }
 
             if (iteration == rate) {
-                renderer.output << "Iteration: " << iteration << ", Value: " << value << " after time: " << time << std::endl;
+                renderer.output.info("Iteration: ", iteration, ", Value: ", value, " after time: ", time);
             }
         }
     }
@@ -111,12 +111,11 @@ struct StreamHandler
                 renderer.printTimeInfo(timeInfo->currentTime);
                 return paContinue;
             } else {
-                renderer.output << "ABORTING AUDIO RENDERER!" << std::endl;
+                renderer.output.error("ABORTING AUDIO RENDERER!");
                 return paAbort;
             }
         } catch (const std::exception& e) {
-            System::ScopedOutputColor outputColor(renderer.output, System::Red, true);
-            renderer.output << "Caught std::exception in Audio Renderer: " << e.what() << std::endl;
+            renderer.output.error("Caught std::exception in Audio Renderer: ", e.what());
             return paAbort;
         }
     }
@@ -125,13 +124,12 @@ struct StreamHandler
 void check(PaError error)
 {
     if (error != paNoError) {
-        throw Audio::Exception(Pa_GetErrorText(error));
+        throw RuntimeError(Pa_GetErrorText(error));
     }
 }
 
-Renderer::Renderer(std::ostream& output, std::ostream& error)
-    : output(output)
-    , error(error)
+Renderer::Renderer(Output& output)
+    : output(output, "audio")
 {
 }
 
@@ -145,7 +143,7 @@ Renderer::~Renderer()
 
 void Renderer::initialize()
 {
-    output << "Initializing PortAudio version " << Pa_GetVersionInfo()->versionText << std::endl;
+    output.debug("Initializing PortAudio version ", Pa_GetVersionInfo()->versionText);
     check(Pa_Initialize());
     initialized = true;
 
@@ -163,7 +161,7 @@ void Renderer::startStream()
     PaStreamParameters outputParameters;
     outputParameters.device = Pa_GetDefaultOutputDevice();
     if (outputParameters.device == paNoDevice) {
-        throw Exception("No output device found, device count=" + Util::toString(Pa_GetDeviceCount()));
+        throw RuntimeError("No output device found, device count=", Pa_GetDeviceCount());
     }
     outputParameters.channelCount = 2; // stereo
     outputParameters.sampleFormat = paFloat32;
@@ -171,7 +169,7 @@ void Renderer::startStream()
     outputParameters.hostApiSpecificStreamInfo = NULL;
     const PaDeviceInfo* info = Pa_GetDeviceInfo(outputParameters.device);
 
-    output << "Host API " << Pa_GetHostApiInfo(info->hostApi)->name << std::endl;
+    output.debug("Host API ", Pa_GetHostApiInfo(info->hostApi)->name);
 
     check(Pa_OpenStream(&stream, nullptr, &outputParameters, sampleRate, bufferSize, paClipOff, StreamHandler::callback, this));
     check(Pa_StartStream(stream));
@@ -181,26 +179,26 @@ bool Renderer::checkStreamStatus(unsigned long statusFlags)
 {
     if (false && statusFlags) {
         if (statusFlags & paInputUnderflow) {
-            output << "paInputUnderflow" << std::endl;
+            output.error("paInputUnderflow");
             inputUnderflow = true;
         }
         if (statusFlags & paInputOverflow) {
-            output << "paInputOverflow" << std::endl;
+            output.error("paInputOverflow");
             inputOverflow = true;
         }
         if (statusFlags & paOutputUnderflow) {
-            output << "paOutputUnderflow" << std::endl;
+            output.error("paOutputUnderflow");
             outputUnderflow = true;
         }
         if (statusFlags & paOutputOverflow) {
-            output << "paOutputOverflow" << std::endl;
+            output.error("paOutputOverflow");
             outputOverflow = true;
         }
         if (statusFlags & paPrimingOutput) {
-            output << "paPrimingOutput" << std::endl;
+            output.error("paPrimingOutput");
             primingOutput = true;
         }
-        output << std::endl << "STREAM CALLBACK FLAGS: " << statusFlags << std::endl;
+        output.error("STREAM CALLBACK FLAGS: ", statusFlags);
         return false;
     } else {
         return true;
@@ -250,7 +248,7 @@ void Renderer::Voice::setEnvelopeStage(EnvelopeStage nextStage)
         }
         constexpr double targetOvershoot = 0.0001;
         constexpr double stageLength = 588.0;
-        outputCoefficient = exp(-log((1.0 + targetOvershoot) / targetOvershoot) / stageLength);
+        outputCoefficient = exp(-::log((1.0 + targetOvershoot) / targetOvershoot) / stageLength);
         outputBase = (targetLevel - targetOvershoot) * (1.0 - outputCoefficient);
     }
     envelopeStage = nextStage;
@@ -291,19 +289,6 @@ void Renderer::Voice::calculateEnvelope()
 
 double Renderer::Voice::sample(SoundLibrary& library)
 {
-    /*
-0x3c00
-0x3c04
-0x3c08
-0x3c0c
-0x3c28
-0x3c2c
-0x3c30
-0x3c34
-0x3c3c
-0x3c44
-0x3c4c
-    */
     const Sound& sound = library[sourceAddress];
     if (inLoop && sound.loop.empty()) {
         return 0.0;
@@ -314,17 +299,12 @@ double Renderer::Voice::sample(SoundLibrary& library)
     int iterations = 0;
     while (roundedBufferOffset >= bufferSize) {
         if (++iterations > 2) {
-            std::cerr << "Too many iterations when playing " << sourceAddress << std::endl;
-            std::cerr << "roundedBufferOffset==" << roundedBufferOffset << std::endl;
-            std::cerr << "bufferSize==" << bufferSize << std::endl;
-            std::cerr << "inLoop==" << inLoop << std::endl;
-            //return 0.0;
-            throw Exception("Iterations WTF " + Util::toString(sourceAddress));
+            throw RuntimeError("Too many iterations when playing ", sourceAddress, ", roundedBufferOffset: ", roundedBufferOffset, ", bufferSize: ", bufferSize, ", inLoop: ", inLoop);
         }
         bufferOffset -= double(bufferSize);
         roundedBufferOffset = int(bufferOffset + .5f);
         if (roundedBufferOffset < 0) {
-            throw Exception("roundedBufferOffset==" + Util::toString(roundedBufferOffset));
+            throw RuntimeError("roundedBufferOffset==", roundedBufferOffset);
         }
         inLoop = true;
         if (sound.loop.empty()) {
@@ -342,7 +322,7 @@ void Renderer::printTimeInfo(double currentTime)
     }
     timeInfoTickCounter++;
     if (currentTime - previousTimeInfoTime >= 10.0) {
-        output << "Audio ticks: " << targetTickCounter << " / " << timeInfoTickCounter << "(" << (100.0 * targetTickCounter / timeInfoTickCounter) << "%)" << std::endl;
+        output.debug("Audio ticks: ", targetTickCounter, " / ", timeInfoTickCounter, "(", 100.0 * targetTickCounter / timeInfoTickCounter, "%)");
         targetTickCounter = 0;
         timeInfoTickCounter = 0;
         previousTimeInfoTime = currentTime;
@@ -352,20 +332,17 @@ void Renderer::printTimeInfo(double currentTime)
 void Renderer::checkStreamErrors()
 {
     if (streamError) {
-        std::string message;
         if (inputUnderflow) {
-            message = "Input underflow";
+            throw RuntimeError("Input underflow");
         } else if (inputOverflow) {
-            message = "Input overflow";
+            throw RuntimeError("Input overflow");
         } else if (outputUnderflow) {
-            message = "Output underflow";
+            throw RuntimeError("Output underflow");
         } else if (outputOverflow) {
-            message = "Output overflow";
+            throw RuntimeError("Output overflow");
         } else if (primingOutput) {
-            message = "Priming output";
+            throw RuntimeError("Priming output");
         }
-        output << message << std::endl;
-        throw Exception(message);
     }
 }
 

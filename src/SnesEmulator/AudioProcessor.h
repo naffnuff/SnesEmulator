@@ -4,15 +4,7 @@
 
 namespace Audio {
 
-struct NotYetImplementedException : std::logic_error
-{
-    NotYetImplementedException(const std::string& name)
-        : std::logic_error("Audio feature not yet implemented: " + name)
-    {
-    }
-};
-
-class Processor : public RegisterManager<Memory<Byte>, System::Cyan>
+class Processor : public RegisterManager<Memory<Byte>, Output::Cyan>
 {
 public:
     enum EnvelopeType
@@ -67,12 +59,11 @@ public:
         }
     };
 
-    Processor(std::ostream& output, std::ostream& error)
-        : RegisterManager(output, error, dspMemory)
-        , output(output)
-        , error(error)
+    Processor(Output& output)
+        : RegisterManager(output, "audio", dspMemory)
+        , output(output, "audio")
         , dspMemory(0x80)
-        , renderer(output, error)
+        , renderer(output)
     {
 
     }
@@ -96,8 +87,7 @@ public:
             return;
         }
         static uint64_t lastDspCycle = 0;
-        System::ScopedOutputColor outputColor(output, System::Cyan, value != 0);
-        output << (write ? "Write " : "Read ") << value << " (" << std::bitset<8>(value) << ") @" << address << " (" << info << "), cycle " << dspCycle << " (+" << (dspCycle - lastDspCycle) << ")" << std::endl;
+        output.log(Log::Level::Debug, Output::Cyan, value != 0, (write ? "Write " : "Read "), value, " (", std::bitset<8>(value), ") @", address, " (", info, "), cycle ", dspCycle, " (+", (dspCycle - lastDspCycle), ")");
         lastDspCycle = dspCycle;
     }
 
@@ -134,8 +124,7 @@ public:
     Renderer renderer;
 
 private:
-    std::ostream& output;
-    std::ostream& error;
+    Output output;
 };
 
 }

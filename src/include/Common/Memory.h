@@ -5,12 +5,8 @@
 #include <vector>
 #include <sstream>
 
+#include "Exception.h"
 #include "Types.h"
-
-class MemoryAccessException : public std::logic_error
-{
-    using std::logic_error::logic_error;
-};
 
 class LocationVisitor
 {
@@ -123,7 +119,7 @@ protected:
 
     void throwAccessException(const std::string& function, const std::string& message) const
     {
-        throw MemoryAccessException(std::string(typeid(this).name()) + ": " + function + ": Bad memory access: " + message);
+        throw AccessException(typeid(this).name(), ": ", function, ": Bad memory access: ", message);
     }
 
 private:
@@ -438,7 +434,7 @@ public:
     virtual Word readWord() = 0;
     virtual Long readLong()
     {
-        throw MemoryAccessException("Long read access is not implemented");
+        throw AccessException("Long read access is not implemented");
     }
 
     virtual void writeByte(Byte value) = 0;
@@ -528,7 +524,7 @@ public:
         checkIsInitialized(address, true, __FUNCTION__);
         try {
             result = memory[address]->read();
-        } catch (const MemoryAccessException& e) {
+        } catch (const AccessException& e) {
             handleAccessException(e, address);
         }
         return result;
@@ -570,7 +566,7 @@ public:
         try {
             return memory[address]->write(value);
         }
-        catch (const MemoryAccessException& e) {
+        catch (const AccessException& e) {
             handleAccessException(e, address);
         }
     }
@@ -594,7 +590,7 @@ public:
         checkIsInitialized(address, true, __FUNCTION__);
         try {
             result = memory[address]->apply();
-        } catch (const MemoryAccessException& e) {
+        } catch (const AccessException& e) {
             handleAccessException(e, address);
         }
         return result;
@@ -605,7 +601,7 @@ public:
         checkIsInitialized(address, true, __FUNCTION__);
         try {
             return memory[address]->reset();
-        } catch (const MemoryAccessException& e) {
+        } catch (const AccessException& e) {
             handleAccessException(e, address);
         }
     }
@@ -634,7 +630,7 @@ public:
         checkIsInitialized(address, true, __FUNCTION__);
         try {
             result = memory[address]->inspect();
-        } catch (const MemoryAccessException& e) {
+        } catch (const AccessException& e) {
             handleAccessException(e, address);
         }
         return result;
@@ -670,7 +666,7 @@ private:
             std::ostringstream ss;
             ss << operation << ": ";
             ss << address << " is out of bounds, memory size is " << memorySize;
-            throw MemoryAccessException(ss.str());
+            throw AccessException(ss.str());
         }
     }
 
@@ -691,15 +687,15 @@ private:
             else {
                 ss << "is not initialized";
             }
-            throw MemoryAccessException(ss.str());
+            throw AccessException(ss.str());
         }
     }
 
-    void handleAccessException(const MemoryAccessException& e, AddressType address) const
+    void handleAccessException(const AccessException& e, AddressType address) const
     {
         std::ostringstream ss;
         ss << " @" << address;
-        throw MemoryAccessException(e.what() + ss.str());
+        throw AccessException(e.what() + ss.str());
     }
     
 public:

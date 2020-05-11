@@ -7,6 +7,8 @@ namespace CPU {
 
 namespace Operator {
 
+EXCEPTION(NotYetImplementedException, ::NotYetImplementedException)
+
 // ADC Add With Carry [Flags affected: n,v,z,c]
 class ADC
 {
@@ -257,7 +259,7 @@ public:
     // §9: Add 1 cycle for 65816 native mode (e=0)
     static int invoke(State& state, const Access& access)
     {
-        throw OperatorNotYetImplementedException("BRK");
+        throw NotYetImplementedException("BRK");
         int cycles = 0;
         if (state.isNativeMode()) {
             cycles += 1;
@@ -342,7 +344,7 @@ public:
     // §9: Add 1 cycle for 65816 native mode (e=0)
     static int invoke(State& state, const Access& access)
     {
-        throw OperatorNotYetImplementedException("COP");
+        throw NotYetImplementedException("COP");
         int cycles = 0;
         if (state.isNativeMode()) {
             cycles += 1;
@@ -649,7 +651,7 @@ public:
     // §13: 7 cycles per byte moved
     static int invoke(State& state, Byte sourceBank, Byte destinationBank, Word byteCount)
     {
-        throw OperatorNotYetImplementedException("MVP");
+        throw NotYetImplementedException("MVP");
         return 0;
     }
 
@@ -1118,7 +1120,7 @@ public:
     // §14: Uses 3 cycles to shut the processor down; additional cycles are required by reset to restart it
     static int invoke(State& state)
     {
-        throw OperatorNotYetImplementedException("STP");
+        throw NotYetImplementedException("STP");
         return 0;
     }
 
@@ -1305,7 +1307,7 @@ class TSX
 public:
     static int invoke(State& state)
     {
-        throw OperatorNotYetImplementedException("TSX");
+        throw NotYetImplementedException("TSX");
         return 0;
     }
 
@@ -1365,7 +1367,7 @@ public:
     // §15: Uses 3 cycles to shut the processor down; additional cycles are required by interrupt to restart it
     static int invoke(State& state)
     {
-        throw OperatorNotYetImplementedException("WAI");
+        throw NotYetImplementedException("WAI");
         return 0;
     }
 
@@ -1379,7 +1381,7 @@ public:
     // §16: Byte and cycle counts subject to change in future processors which expand WDM into 2-byte opcode portions of instructions of varying lengths
     static int invoke(State& state, const Access& access)
     {
-        throw OperatorNotYetImplementedException("WDM");
+        throw NotYetImplementedException("WDM");
         return 0;
     }
 

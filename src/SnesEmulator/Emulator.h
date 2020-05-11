@@ -62,18 +62,16 @@ private:
     };
 
 public:
-    Emulator(std::ostream& output, std::istream& input, std::ostream& error, const Rom& rom)
-        : output(output)
-        , input(input)
-        , error(error)
+    Emulator(Output& output, const Rom& rom)
+        : output(output, "emulator")
         , rom(rom)
         , cpuState()
         , cpuInstructionDecoder(cpuState)
-        , videoRegisters(output, error, cpuState)
+        , videoRegisters(output, cpuState)
         , videoProcessor(videoRegisters.processor)
-        , audioSystem(output, error, debugger)
-        , debugger(output, input, error, videoRegisters, audioSystem.getRegisters(), running)
-        , cpuContext("cpu.txt", System::Green, debugger)
+        , audioSystem(output, debugger)
+        , debugger(output, videoRegisters, audioSystem.getRegisters(), running)
+        , cpuContext("cpu.txt", Output::Green, debugger)
         , saveRamSaver(*this)
         , masterCycle(0)
     {
@@ -98,9 +96,7 @@ public:
     }
 
 private:
-    std::ostream& output;
-    std::istream& input;
-    std::ostream& error;
+    Output output;
 
     const Rom& rom;
 

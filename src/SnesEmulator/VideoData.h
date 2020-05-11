@@ -4,21 +4,8 @@
 
 namespace Video {
 
-struct NotYetImplementedException : std::logic_error
-{
-    NotYetImplementedException(const std::string& name)
-        : std::logic_error("Video feature not yet implemented: " + name)
-    {
-    }
-};
-
-struct MemoryAccessException : std::logic_error
-{
-    MemoryAccessException(const std::string& message)
-        : std::logic_error("Bad video memory access: " + message)
-    {
-    }
-};
+EXCEPTION(NotYetImplementedException, ::NotYetImplementedException)
+EXCEPTION(AccessException, ::AccessException)
 
 struct Table
 {
@@ -41,7 +28,7 @@ struct Table
     {
         const std::vector<Byte>& table = highTableSelect ? highTable : lowTable;
         if (address >= size) {
-            throw MemoryAccessException("Processor::Table::getByte: Processor-memory table out-of-bounds @ " + Util::toString(address) + ", size=" + Util::toString(size));
+            throw AccessException("Processor::Table::getByte: Processor-memory table out-of-bounds @ ", address, ", size=", size);
         }
         return table[address];
     }
@@ -49,7 +36,7 @@ struct Table
     Word getWord(Word address) const
     {
         if (address >= size) {
-            throw MemoryAccessException("Processor::Table::getWord: Processor-memory table out-of-bounds @ " + Util::toString(address) + ", size=" + Util::toString(size));
+            throw AccessException("Processor::Table::getWord: Processor-memory table out-of-bounds @ ", address, ", size=", size);
         }
         return Word(lowTable[address], highTable[address]);
     }
@@ -57,7 +44,7 @@ struct Table
     Word readNextWord(int increment)
     {
         if (address >= size) {
-            throw MemoryAccessException("Processor::Table::readNextWord: Processor-memory table out-of-bounds @ " + Util::toString(address) + ", size=" + Util::toString(size));
+            throw AccessException("Processor::Table::readNextWord: Processor-memory table out-of-bounds @ ", address, ", size=", size);
         }
         Word result = Word(lowTable[address], highTable[address]);
         address += increment;
@@ -67,7 +54,7 @@ struct Table
     void writeWord(Word data)
     {
         if (address >= size) {
-            throw MemoryAccessException("Processor::Table::writeWord: Processor-memory table out-of-bounds @ " + Util::toString(address) + ", size=" + Util::toString(size));
+            throw AccessException("Processor::Table::writeWord: Processor-memory table out-of-bounds @ ", address, ", size=", size);
         }
         lowTable[address] = data.getLowByte();
         highTable[address] = data.getHighByte();

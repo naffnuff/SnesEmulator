@@ -1,0 +1,9 @@
+audio info
+debugger info
+default info
+dma info
+emulator info
+hdma info
+main info
+rom info
+video info

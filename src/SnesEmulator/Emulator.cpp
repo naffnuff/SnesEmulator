@@ -13,7 +13,7 @@
 #include "HdmaInstruction.h"
 
 template<typename State, typename OtherState>
-int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debugger::Context<State>& context, OtherState& otherState, Debugger::Context<OtherState>& otherContext, std::ostream& error);
+int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debugger::Context<State>& context, OtherState& otherState, Debugger::Context<OtherState>& otherContext, Output& output);
 
 void Emulator::initialize()
 {
@@ -102,7 +102,7 @@ void Emulator::initialize()
                         cpuMemory.createMirror(address, saveRamAddress);
                     }
                 }
-                output << "Save RAM end address: " << saveRamAddress << std::endl;
+                output.debug("Save RAM end address: ", saveRamAddress);
             }
         }
 
@@ -138,8 +138,8 @@ void Emulator::run()
     Video::SpriteLayerViewer spriteLayer4Viewer(videoProcessor, 3, Video::rendererWidth * 2 + 20 + Video::rendererWidth + 20, Video::rendererWidth * 2 + 40 + Video::rendererWidth);
     Video::Mode7Viewer mode7Viewer(videoProcessor, 0, 40);
 
-    DmaInstruction dmaInstruction(output, error, cpuState, videoRegisters);
-    HdmaInstruction hdmaInstruction(output, error, cpuState, videoRegisters);
+    DmaInstruction dmaInstruction(output, cpuState, videoRegisters);
+    HdmaInstruction hdmaInstruction(output, cpuState, videoRegisters);
 
     CycleCount nextCpu = masterCycle;
     CycleCount nextSpc = masterCycle;
@@ -201,7 +201,7 @@ void Emulator::run()
                         hdmaInstruction.blockedInstruction = instruction;
                         instruction = static_cast<Instruction*>(&hdmaInstruction);
                         if (dmaPicked) {
-                            output << "HDMA interrupts DMA" << std::endl;
+                            output.info("HDMA interrupts DMA");
                         }
                     }
 
@@ -210,13 +210,13 @@ void Emulator::run()
                     instruction->applyBreakpoints();
 
                     if (cpuContext.isStepMode()) {
-                        output << "Cycle count: " << masterCycle.count() << ", Next cpu: " << nextCpu.count() << ", Next spc: " << nextSpc.count() << std::endl;
-                        output << "Frame: " << videoRegisters.frame << ", V counter: " << videoRegisters.vCounter << ", H counter: " << videoRegisters.hCounter << ", V blank: " << videoRegisters.vBlank << ", H blank: " << videoRegisters.hBlank << ", nmi: " << cpuState.isNmiActive() << ", irq: " << cpuState.isIrqActive() << std::endl;
+                        output.debug("Cycle count: ", masterCycle.count(), ", Next cpu: ", nextCpu.count(), ", Next spc: ", nextSpc.count());
+                        output.debug("Frame: ", videoRegisters.frame, ", V counter: ", videoRegisters.vCounter, ", H counter: ", videoRegisters.hCounter, ", V blank: ", videoRegisters.vBlank, ", H blank: ", videoRegisters.hBlank, ", nmi: ", cpuState.isNmiActive(), ", irq: ", cpuState.isIrqActive());
                         debugger.printBreakpoints(cpuContext, audioSystem.context);
                         debugger.printMemory(cpuState, cpuContext, audioSystem.state, audioSystem.context, videoProcessor);
                     }
 
-                    if (int cycles = executeNext(instruction, cpuState, debugger, cpuContext, audioSystem.state, audioSystem.context, error)) {
+                    if (int cycles = executeNext(instruction, cpuState, debugger, cpuContext, audioSystem.state, audioSystem.context, output)) {
                         nextCpu += CycleCount(cycles * 6);
                         cpuContext.nextInstruction = cpuInstructionDecoder.getNextInstruction(cpuState);
                     } else {
@@ -245,12 +245,12 @@ void Emulator::run()
                         instruction->applyBreakpoints();
 
                         if (audioSystem.context.isStepMode()) {
-                            output << "cycleCount=" << masterCycle.count() << ", nextCpu=" << nextCpu.count() << ", nextSpc=" << nextSpc.count() << std::endl;
+                            output.debug("cycleCount=", masterCycle.count(), ", nextCpu=", nextCpu.count(), ", nextSpc=", nextSpc.count());
                             debugger.printBreakpoints(cpuContext, audioSystem.context);
                             debugger.printMemory(cpuState, cpuContext, audioSystem.state, audioSystem.context, videoProcessor);
                         }
 
-                        if (int cycles = executeNext(instruction, audioSystem.state, debugger, audioSystem.context, cpuState, cpuContext, error)) {
+                        if (int cycles = executeNext(instruction, audioSystem.state, debugger, audioSystem.context, cpuState, cpuContext, output)) {
                             nextSpc += CycleCount(cycles * 16);
                             audioSystem.context.nextInstruction = audioSystem.instructionDecoder.getNextInstruction(audioSystem.state);
                         } else {
@@ -320,16 +320,16 @@ void Emulator::run()
                                 minFrameCount = min(minFrameCount, frameCount);
                                 maxFrameCount = max(maxFrameCount, frameCount);
 
-                                output << "FPS: " << frameCount << std::endl;
+                                output.debug("FPS: ", frameCount);
 
                                 frameCount = 0;
                                 previousTime = currentTime;
 
                                 if (++printOuts % 10 == 0) {
                                     double elapsedTime = videoProcessor.renderer.getTime() - runStartTime;
-                                    output << "Avg. FPS: " << (totalFrameCount / elapsedTime) << std::endl;
-                                    output << "Min. FPS: " << minFrameCount << std::endl;
-                                    output << "Max. FPS: " << maxFrameCount << std::endl;
+                                    output.debug("Avg. FPS: ", (totalFrameCount / elapsedTime));
+                                    output.debug("Min. FPS: ", minFrameCount);
+                                    output.debug("Max. FPS: ", maxFrameCount);
                                 }
                             }
 
@@ -397,16 +397,15 @@ void Emulator::run()
                 static std::chrono::steady_clock::time_point lastTime = audioSystem.now;
                 if (audioSystem.now - lastTime > std::chrono::seconds(10)) {
                     //lostCycles = std::chrono::duration_cast<CycleCount>(audioSystem.elapsedTime) - masterCycle;
-                    output << "Video cycles: " << masterCycle.count() << " / " << iteration << " (" << (100.0 * masterCycle.count() / iteration) << "%)" << std::endl;
-                    output << "Lost cycles: " << lostCycles.count() << std::endl;
+                    output.debug("Video cycles: ", masterCycle.count(), " / ", iteration, " (", (100.0 * masterCycle.count() / iteration), "%)");
+                    output.debug("Lost cycles: ", lostCycles.count());
                     lastTime = audioSystem.now;
                 }
                 ++iteration;
-            } catch (const Video::MemoryAccessException& e) {
+            } catch (const Video::AccessException& e) {
                 //cpuState.setProgramAddress(cpuState.getLastKnownAddress());
                 debugger.pause(cpuContext);
-                System::ScopedOutputColor outputColor(output, System::Red, true);
-                error << e.what() << std::endl;
+                output.error(e.what());
             }
         }
     /*}
@@ -417,7 +416,7 @@ void Emulator::run()
 }
 
 template<typename State, typename OtherState>
-int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debugger::Context<State>& context, OtherState& otherState, Debugger::Context<OtherState>& otherContext, std::ostream& error)
+int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debugger::Context<State>& context, OtherState& otherState, Debugger::Context<OtherState>& otherContext, Output& output)
 {
     context.addKnownAddress(state.getProgramAddress());
     try {
@@ -435,35 +434,18 @@ int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debu
         else {
             return instruction->execute();
         }
-    } catch (const OpcodeNotYetImplementedException& e) {
-        debugger.pause(context);
-        System::ScopedOutputColor outputColor(error, System::Red, true);
-        error << e.what() << std::endl;
-    } catch (const AddressModeNotYetImplementedException& e) {
+    } catch (const NotYetImplementedException& e) {
         state.setProgramAddress(context.getLastKnownAddress());
         debugger.pause(context);
-        System::ScopedOutputColor outputColor(error, System::Red, true);
-        error << e.what() << std::endl;
-    } catch (const OperatorNotYetImplementedException& e) {
+        output.error(e.what());
+    } catch (const AccessException& e) {
         state.setProgramAddress(context.getLastKnownAddress());
         debugger.pause(context);
-        System::ScopedOutputColor outputColor(error, System::Red, true);
-        error << e.what() << std::endl;
-    } catch (const MemoryAccessException& e) {
+        output.error(e.what());
+    } catch (const RuntimeError& e) {
         state.setProgramAddress(context.getLastKnownAddress());
         debugger.pause(context);
-        System::ScopedOutputColor outputColor(error, System::Red, true);
-        error << e.what() << std::endl;
-    } catch (const Video::NotYetImplementedException& e) {
-        state.setProgramAddress(context.getLastKnownAddress());
-        debugger.pause(context);
-        System::ScopedOutputColor outputColor(error, System::Red, true);
-        error << e.what() << std::endl;
-    } catch (const Audio::NotYetImplementedException& e) {
-        state.setProgramAddress(context.getLastKnownAddress());
-        debugger.pause(context);
-        System::ScopedOutputColor outputColor(error, System::Red, true);
-        error << e.what() << std::endl;
+        output.error(e.what());
     }
     return 0;
 }

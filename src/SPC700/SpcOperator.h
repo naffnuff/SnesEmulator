@@ -7,6 +7,8 @@ namespace SPC {
 
 namespace Operator {
 
+EXCEPTION(NotYetImplementedException, ::NotYetImplementedException)
+
 // ADC
 // (X), (Y): (X) = (X)+(Y)+C    	[NV..H.ZC]
 // A, #i: A = A+i+C    	[NV..H.ZC]
@@ -97,7 +99,7 @@ class AND1
 public:
     static int invoke(State& state, Access& leftOperand, Byte rightOperand)
     {
-        throw OperatorNotYetImplementedException("AND1");
+        throw NotYetImplementedException("AND1");
         return 0;
     }
 
@@ -261,7 +263,7 @@ class BRK
 public:
     static int invoke(State& state)
     {
-        throw OperatorNotYetImplementedException("BRK");
+        throw NotYetImplementedException("BRK");
         return 0;
     }
 
@@ -305,7 +307,7 @@ class CLRV
 public:
     static int invoke(State& state)
     {
-        throw OperatorNotYetImplementedException("CLRV");
+        throw NotYetImplementedException("CLRV");
         return 0;
     }
 
@@ -366,7 +368,7 @@ class DAA
 public:
     static int invoke(State& state, Access& operand)
     {
-        throw OperatorNotYetImplementedException("DAA");
+        throw NotYetImplementedException("DAA");
         return 0;
     }
 
@@ -380,7 +382,7 @@ class DAS
 public:
     static int invoke(State& state, Access& operand)
     {
-        throw OperatorNotYetImplementedException("DAS");
+        throw NotYetImplementedException("DAS");
         return 0;
     }
 
@@ -448,7 +450,7 @@ class DI
 public:
     static int invoke(State& state)
     {
-        throw OperatorNotYetImplementedException("DI");
+        throw NotYetImplementedException("DI");
         return 0;
     }
 
@@ -482,7 +484,7 @@ class EI
 public:
     static int invoke(State& state)
     {
-        throw OperatorNotYetImplementedException("EI");
+        throw NotYetImplementedException("EI");
         return 0;
     }
 
@@ -523,7 +525,7 @@ class EOR1
 public:
     static int invoke(State& state, Access& leftOperand, Byte rightOperand)
     {
-        throw OperatorNotYetImplementedException("EOR1");
+        throw NotYetImplementedException("EOR1");
         return 0;
     }
 
@@ -676,7 +678,7 @@ class MOV1
 public:
     static int invoke(State& state, Access& leftOperand, Byte rightOperand)
     {
-        throw OperatorNotYetImplementedException("MOV1");
+        throw NotYetImplementedException("MOV1");
         return 0;
     }
 
@@ -753,7 +755,7 @@ class NOT1
 public:
     static int invoke(State& state, Access& leftOperand, Byte rightOperand)
     {
-        throw OperatorNotYetImplementedException("NOT1");
+        throw NotYetImplementedException("NOT1");
         return 0;
     }
 
@@ -809,7 +811,7 @@ class OR1
 public:
     static int invoke(State& state, Access& leftOperand, Byte rightOperand)
     {
-        throw OperatorNotYetImplementedException("OR1");
+        throw NotYetImplementedException("OR1");
         return 0;
     }
 
@@ -823,7 +825,7 @@ class PCALL
 public:
     static int invoke(State& state, Access& leftOperand, Byte rightOperand)
     {
-        throw OperatorNotYetImplementedException("PCALL");
+        throw NotYetImplementedException("PCALL");
         return 0;
     }
 
@@ -885,7 +887,7 @@ class RET1
 public:
     static int invoke(State& state)
     {
-        throw OperatorNotYetImplementedException("RET1");
+        throw NotYetImplementedException("RET1");
         return 0;
     }
 
@@ -1039,7 +1041,7 @@ class SLEEP
 public:
     static int invoke(State& state)
     {
-        throw OperatorNotYetImplementedException("SLEEP");
+        throw NotYetImplementedException("SLEEP");
         return 0;
     }
 
@@ -1053,7 +1055,7 @@ class STOP
 public:
     static int invoke(State& state)
     {
-        throw OperatorNotYetImplementedException("STOP");
+        throw NotYetImplementedException("STOP");
         return 0;
     }
 
@@ -1104,7 +1106,7 @@ class TCALL
 public:
     static int invoke(State& state, Access& leftOperand, Byte rightOperand)
     {
-        throw OperatorNotYetImplementedException("TCALL");
+        throw NotYetImplementedException("TCALL");
         return 0;
     }
 

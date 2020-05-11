@@ -1,30 +1,42 @@
 #pragma once
 
 #include <stdexcept>
+#include <sstream>
 
-class OpcodeNotYetImplementedException : public std::logic_error
+#define EXCEPTION(NAME, BASE) \
+class NAME : public BASE \
+{ \
+public: \
+    template<typename... Ts> \
+    NAME(const Ts&... message) \
+        : BASE(__FUNCTION__, message...) \
+    { \
+    } \
+};
+
+class Exception : public std::runtime_error
 {
-public:
-    OpcodeNotYetImplementedException(const std::string& name)
-        : std::logic_error("Opcode not yet implemented: " + name)
+protected:
+    template<typename... Ts>
+    Exception(const Ts&... message)
+        : std::runtime_error(toString(message...))
     {
+    }
+
+    Exception() = delete;
+
+    Exception(const Exception&) = delete;
+    Exception& operator=(const Exception&) = delete;
+
+    template<typename... Ts>
+    std::string toString(const Ts&... message)
+    {
+        std::stringstream ss;
+        (ss << ... << message);
+        return ss.str();
     }
 };
 
-class AddressModeNotYetImplementedException : public std::logic_error
-{
-public:
-    AddressModeNotYetImplementedException(const std::string& name)
-        : std::logic_error("Address mode not yet implemented: " + name)
-    {
-    }
-};
-
-class OperatorNotYetImplementedException : public std::logic_error
-{
-public:
-    OperatorNotYetImplementedException(const std::string& name)
-        : std::logic_error("Operator not yet implemented: " + name)
-    {
-    }
-};
+EXCEPTION(AccessException, Exception)
+EXCEPTION(NotYetImplementedException, Exception)
+EXCEPTION(RuntimeError, Exception)

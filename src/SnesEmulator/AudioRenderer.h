@@ -7,17 +7,14 @@
 #include <map>
 #include <mutex>
 
+#include "Output.h"
+#include "Exception.h"
 #include "Types.h"
 
 namespace Audio {
 
-struct Exception : std::runtime_error
-{
-    Exception(const std::string& message)
-        : std::runtime_error("Audio Exception: " + message)
-    {
-    }
-};
+EXCEPTION(NotYetImplementedException, ::NotYetImplementedException)
+EXCEPTION(RuntimeError, ::RuntimeError)
 
 class Renderer
 {
@@ -56,12 +53,11 @@ private:
         void changeFrequency(int index)
         {
             if (index < 0 || index >= tableSize) {
-                throw Exception(__FUNCTION__ ": Frequency index is out-of-bounds");
+                throw RuntimeError(__FUNCTION__ ": Frequency index is out-of-bounds");
             }
             frequency = getTable()[index];
             if (frequency == 0) {
-                std::cerr << __FUNCTION__ << ": Frequency is zero" << std::endl;
-                throw Exception(__FUNCTION__ ": Frequency is zero");
+                throw RuntimeError(__FUNCTION__ ": Frequency is zero");
             }
             counter = 0;
         }
@@ -69,10 +65,10 @@ private:
         bool tick()
         {
             if (frequency == 0) {
-                std::cerr << __FUNCTION__ << ": Frequency is zero" << std::endl;
+                throw RuntimeError(__FUNCTION__ ": Frequency is zero");
             }
             if (counter >= frequency) {
-                //std::cerr << __FUNCTION__ << ": Counter is beyond frequency: " << counter << " >= " << frequency << std::endl;
+                throw RuntimeError(__FUNCTION__ ": Counter is beyond frequency: counter: ", counter, ", frequency: ", frequency);
             }
             if (++counter == frequency) {
                 counter = 0;
@@ -139,7 +135,7 @@ public:
     static constexpr int tableSize = 50;
     static constexpr int voiceCount = 8;
 
-    Renderer(std::ostream& output, std::ostream& error);
+    Renderer(Output& output);
     ~Renderer();
 
     Renderer(const Renderer&) = delete;
@@ -241,8 +237,7 @@ public:
     double mainVolumeLeft;
     double mainVolumeRight;
 
-    std::ostream& output;
-    std::ostream& error;
+    Output output;
 
     void* stream;
 

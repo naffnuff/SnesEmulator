@@ -9,10 +9,11 @@
 
 class HdmaInstruction : public Instruction
 {
+EXCEPTION(NotYetImplementedException, ::NotYetImplementedException)
+
 public:
-    HdmaInstruction(std::ostream& output, std::ostream& error, CPU::State& state, Video::Registers& registers)
-        : output(output)
-        , error(error)
+    HdmaInstruction(Output& output, CPU::State& state, Video::Registers& registers)
+        : output(output, "hdma")
         , memory(state.getMemory())
         , registers(registers)
     {
@@ -71,8 +72,7 @@ public:
 
                     bool direction = channel.control.getBit(7);
                     if (direction) {
-                        error << "HDMA control: " << channel.control << std::endl;
-                        throw OperatorNotYetImplementedException("HDMA direction not implemented");
+                        throw NotYetImplementedException("HDMA direction not implemented, HDMA control: ", channel.control);
                     }
 
                     bool indirectAddressingMode = channel.control.getBit(6);
@@ -117,9 +117,7 @@ public:
                                 cycles += 4;
                             }
                             else {
-                                error << "HDMA control: " << channel.control << std::endl;
-                                error << "HDMA transfer mode: " << transferMode << std::endl;
-                                throw OperatorNotYetImplementedException("HDMA transfer mode not implemented");
+                                throw NotYetImplementedException("HDMA transfer mode not implemented, control: ", channel.control, ", transfer mode: ", transferMode);
                             }
                         }
                         --channel.lineCounter;
@@ -194,6 +192,5 @@ private:
     bool initializationRequested = false;
     int iteration = -1;
 
-    std::ostream& output;
-    std::ostream& error;
+    Output output;
 };

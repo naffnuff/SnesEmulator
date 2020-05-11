@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "Common/System.h"
+#include "Common/Output.h"
 #include "Common/Memory.h"
 #include "Common/RegisterManager.h"
 
@@ -11,7 +12,7 @@
 
 namespace Video {
 
-class Registers : public RegisterManager<CPU::State::MemoryType, System::Yellow>
+class Registers : public RegisterManager<CPU::State::MemoryType, Output::Yellow>
 {
 public:
     enum IrqMode
@@ -36,13 +37,12 @@ public:
         bool hdmaDoTransfer = false;
     };
 
-    Registers(std::ostream& output, std::ostream& error, CPU::State& state)
-        : RegisterManager(output, error, state.getMemory())
-        , output(output)
-        , error(error)
+    Registers(Output& output, CPU::State& state)
+        : RegisterManager(output, "video", state.getMemory())
+        , output(output, "video")
         , state(state)
         , memory(state.getMemory())
-        , processor(output, error)
+        , processor(output)
     {
     }
 
@@ -577,8 +577,7 @@ public:
         processor.vram.address = 0;
     }
 
-    std::ostream& output;
-    std::ostream& error;
+    Output output;
 
     CPU::State& state;
     CPU::State::MemoryType& memory;

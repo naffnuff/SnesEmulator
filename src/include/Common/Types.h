@@ -231,6 +231,9 @@ private:
 
 class Word
 {
+private:
+    EXCEPTION(NotYetImplementedException, ::NotYetImplementedException)
+
 public:
     static constexpr int bitCount = 16;
     static constexpr uint32_t spaceSize = Types::SpaceSize<Word>::value;
@@ -369,13 +372,13 @@ public:
 
     static Word decimalAdd(Word augend, Word addend, bool& unsignedCarry, bool& signedOverflow)
     {
-        throw OperatorNotYetImplementedException("Decimal addition for Word");
+        throw NotYetImplementedException("Decimal addition for Word");
         return 0;
     }
 
     static Word decimalSubtract(Word minuhend, Word subtrahend, bool& invertedUnsignedBorrow, bool& signedOverflow)
     {
-        throw OperatorNotYetImplementedException("Decimal subtraction for Word");
+        throw NotYetImplementedException("Decimal subtraction for Word");
         return 0;
     }
 

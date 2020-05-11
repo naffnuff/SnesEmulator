@@ -13,17 +13,19 @@
 class Rom
 {
 public:
-    Rom(std::ostream& output)
-        : output(output)
+    Rom(Output& output)
+        : output(output, "rom")
     {
     }
+
+    Rom() = delete;
 
     Rom(const Rom&) = delete;
     Rom& operator=(const Rom&) = delete;
 
     void loadFromFile(const std::string& path)
     {
-        output << "Reading " << path << std::endl;
+        output.debug("Reading ", path);
 
         std::vector<char> rom;
 
@@ -33,7 +35,7 @@ public:
         }
         std::ifstream::pos_type pos = ifs.tellg();
 
-        output << "Reading " << pos << " bytes" << std::endl;
+        output.debug("Reading ", pos, " bytes");
 
         rom.resize((size_t)pos);
 
@@ -58,7 +60,7 @@ public:
                 Long longAddress(address, bank);
                 state.createMemoryLocation<ReadOnlyMemory>(longAddress, data[romIndex++]);
                 if (romIndex >= (int)data.size()) {
-                    output << "ROM ends at " << longAddress << std::endl << std::endl;
+                    output.debug("ROM ends at ", longAddress);
                     romLoaded = true;
                     break;
                 }
@@ -77,25 +79,24 @@ public:
         CPU::State::InterruptVectors& nativeVectors = state.getInterruptVectors(true);
         CPU::State::InterruptVectors& emulationVectors = state.getInterruptVectors(false);
 
-        output
-            << "Native Co-processor=" << nativeVectors.Coprocessor << std::endl
-            << "Native Break=" << nativeVectors.Break << std::endl
-            << "Native Abort=" << nativeVectors.Abort << std::endl
-            << "Native NMI=" << nativeVectors.Nmi << std::endl
-            << "Native Reset=" << nativeVectors.Reset << std::endl
-            << "Native IRQ=" << nativeVectors.Irq << std::endl
-            << std::endl
-            << "Emulation Co-processor=" << emulationVectors.Coprocessor << std::endl
-            << "Emulation Break=" << emulationVectors.Break << std::endl
-            << "Emulation Abort=" << emulationVectors.Abort << std::endl
-            << "Emulation NMI=" << emulationVectors.Nmi << std::endl
-            << "Emulation Reset=" << emulationVectors.Reset << std::endl
-            << "Emulation IRQ=" << emulationVectors.Irq << std::endl
-            << std::endl;
+        output.debug("Native Co-processor=", nativeVectors.Coprocessor);
+        output.debug("Native Break=", nativeVectors.Break);
+        output.debug("Native Abort=", nativeVectors.Abort);
+        output.debug("Native NMI=", nativeVectors.Nmi);
+        output.debug("Native Reset=", nativeVectors.Reset);
+        output.debug("Native IRQ=", nativeVectors.Irq);
+        output.debug();
+        output.debug("Emulation Co-processor=", emulationVectors.Coprocessor);
+        output.debug("Emulation Break=", emulationVectors.Break);
+        output.debug("Emulation Abort=", emulationVectors.Abort);
+        output.debug("Emulation NMI=", emulationVectors.Nmi);
+        output.debug("Emulation Reset=", emulationVectors.Reset);
+        output.debug("Emulation IRQ=", emulationVectors.Irq);
+        output.debug();
 
-        output << "Success reading header" << std::endl;
+        output.debug("Success reading header");
 
-        output << std::endl;
+        output.debug();
     }
 
     bool isLowRom() const
@@ -106,14 +107,14 @@ public:
 private:
     bool tryReadHeader(Word offset)
     {
-        output << "Trying to read ROM header assuming address offset " << offset << std::endl;
+        output.debug("Trying to read ROM header assuming address offset ", offset);
 
         if ((int)data.size() < 0x10000 - offset) {
-            output << "Rom too small" << std::endl;
+            output.debug("Rom too small");
             return false;
         }
 
-        output << "Maker code: " << data[0xFFD6 - offset] << std::endl;
+        output.debug("Maker code: ", data[0xFFD6 - offset]);
 
         for (int i = 0; i < 21; ++i) {
             gameTitle.push_back(data[0xFFC0 + i - offset]);
@@ -127,20 +128,19 @@ private:
 
         saveRamSize = 0x400 << data[0xFFD8 - offset];
 
-        output
-            << "Game Title=" << gameTitle << std::endl
-            << "Map Mode=" << mapMode << std::endl
-            << "Cartridge Type=" << cartridgeType << std::endl
-            << "ROM Size=" << romSize << std::endl
-            << "SaveRAM Size=" << saveRamSize << std::endl
-            << std::endl;
+        output.debug("Game Title=", gameTitle);
+        output.debug("Map Mode=", mapMode);
+        output.debug("Cartridge Type=", cartridgeType);
+        output.debug("ROM Size=", romSize);
+        output.debug("SaveRAM Size=", saveRamSize);
+        output.debug();
 
         return true;
     }
 
 private:
     std::vector<Byte> data;
-    std::ostream& output;
+    Output output;
 
 public:
     std::string gameTitle;

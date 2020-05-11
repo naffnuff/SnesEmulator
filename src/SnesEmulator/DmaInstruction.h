@@ -11,10 +11,12 @@
 
 class DmaInstruction : public Instruction
 {
+EXCEPTION(NotYetImplementedException, ::NotYetImplementedException
+)
+
 public:
-    DmaInstruction(std::ostream& output, std::ostream& error, CPU::State& state, Video::Registers& registers)
-        : output(output)
-        , error(error)
+    DmaInstruction(Output& output, CPU::State& state, Video::Registers& registers)
+        : output(output, "dma")
         , memory(state.getMemory())
         , registers(registers)
     {
@@ -80,8 +82,7 @@ public:
                         transfer(channel.sourceAddress, registerAddress, direction, channel.dataSize > 1, byteCount);
                     }
                     else {
-                        error << "DMA control: " << channel.control << std::endl;
-                        throw OperatorNotYetImplementedException("DMA transfer mode not implemented");
+                        throw NotYetImplementedException("DMA transfer mode not implemented, DMA control: ", channel.control);
                     }
 
                     bool fixedTransfer = channel.control.getBit(3);
@@ -153,8 +154,7 @@ private:
     CPU::State::MemoryType& memory;
     Video::Registers& registers;
 
-    std::ostream& output;
-    std::ostream& error;
+    Output output;
 
     int iteration = 0;
 };

@@ -14,7 +14,7 @@
 
 namespace Audio {
 
-class Registers : public RegisterManager<SPC::State::MemoryType, System::Blue>
+class Registers : public RegisterManager<SPC::State::MemoryType, Output::Blue>
 {
 public:
     class Timer
@@ -27,12 +27,11 @@ public:
         int counter = 0;
     };
 
-    Registers(std::ostream& output, std::ostream& error, SPC::State& state)
-        : RegisterManager(output, error, state.getMemory())
-        , output(output)
-        , error(error)
+    Registers(Output& output, SPC::State& state)
+        : RegisterManager(output, "audio", state.getMemory())
+        , output(output, "audio")
         , spcMemory(state.getMemory())
-        , processor(output, error)
+        , processor(output)
     {
         timers[2].highPrecision = true;
     }
@@ -61,6 +60,7 @@ public:
 
     void initialize(std::array<Byte, 4>& cpuToSpcBuffers)
     {
+        // SPC Registers
         makeWriteRegister(0xf1, "I/0 and Timer Control", false,
             [this, &cpuToSpcBuffers](Byte byte) {
                 for (int i = 0; i < 3; ++i) {
@@ -115,6 +115,7 @@ public:
             spcMemory.createLocation<BootRomLocation>(address, 0xff, bootRomData[i], std::ref(bootRomDataEnabled));
         }
 
+        // DSP Registers
         for (int i = 0; i < processor.voices.size(); ++i) {
             Byte voiceAddressStart = i << 4;
             std::string voiceName("Voice ");
@@ -152,10 +153,10 @@ public:
             processor.makeWriteRegister(voiceAddressStart + 4, voiceName + "Source Number", false,
                 [this, i](Byte value) {
                     if (((sourceDirectory << 8) | (value << 2)) != ((sourceDirectory << 8) + (value << 2))) {
-                        throw Exception("Source address is wonky!");
+                        throw RuntimeError("Source address is wonky!");
                     }
                     Word sourceAddress = (sourceDirectory << 8) + (value << 2);
-                    output << "Picked sample for voice " << i << ": " << sourceAddress << ", dir: " << sourceDirectory << ", number: " << value << std::endl;
+                    output.debug("Picked sample for voice ", i, ": ", sourceAddress, ", dir: ", sourceDirectory, ", number: ", value);
                     Word startAddress = spcMemory.readWord(sourceAddress);
                     Word loopAddress = spcMemory.readWord(sourceAddress + 2);
                     decodeSource(startAddress, loopAddress);
@@ -296,7 +297,7 @@ public:
         processor.dspMemory.writeWord(0xaaaa, 0x05);
         processor.dspMemory.writeWord(0xaa, 0x07);*/
 
-        output << "BLUFFIS!" << std::endl;
+        output.debug("All audio registers created");
         processor.initialize();
     }
     
@@ -324,12 +325,11 @@ public:
     {
         Renderer::Sound& sound = processor.renderer.soundLibrary[loopAddress << 16 | startAddress];
         if (sound.start.empty() && sound.loop.empty()) {
-            output << "Decoding sample: ";
+            output.debug("Decoding sample: ");
             {
-                System::ScopedOutputColor color(output, System::Magenta, true);
-                output << startAddress << ":" << loopAddress << std::endl;
+                output.debug(startAddress, ":", loopAddress);
             }
-            output << "StartAddress=" << startAddress << ", loopAddress=" << loopAddress << std::endl;
+            output.debug("StartAddress=", startAddress, ", loopAddress=", loopAddress);
             Word currentAddress = startAddress;
             double lastSample = 0.0;
             double secondLastSample = 0.0;
@@ -339,39 +339,39 @@ public:
             std::vector<double>* sampleOutput = &sound.start;
             while (!end) {
                 if (currentAddress == loopAddress) {
-                    output << "LOOPY!" << std::endl;
+                    output.debug("LOOPY!");
                     foundLoopStart = true;
                     sampleOutput = &sound.loop;
                 }
                 decodeBlock(currentAddress, *sampleOutput, lastSample, secondLastSample, end, loop);
             }
             if (loop) { // loop
-                output << "LOOPING CONFIRMED" << std::endl;
+                output.debug("LOOPING CONFIRMED");
                 if (loopAddress >= startAddress && loopAddress < currentAddress) {
                     if (!foundLoopStart) {
-                        throw Exception("Da fuck!");
+                        throw RuntimeError("Da fuck!");
                     }
-                    output << "Difference: " << (loopAddress - startAddress) << std::endl;
-                    output << "Blocks: " << (double(loopAddress - startAddress) / 9.0) << std::endl;
-                    output << "Samples: " << (double(loopAddress - startAddress) / 9.0) * 16.0 << std::endl;
+                    output.debug("Difference: ", loopAddress - startAddress);
+                    output.debug("Blocks: ", double(loopAddress - startAddress) / 9.0);
+                    output.debug("Samples: ", double(loopAddress - startAddress) / 9.0 * 16.0);
                     int loopIndex = (loopAddress - startAddress) / 9 * 16;
                     int endIndex = (currentAddress - startAddress) / 9 * 16;
-                    output << "loop index: " << loopIndex << " / " << endIndex << std::endl;
+                    output.debug("loop index: ", loopIndex, " / ", endIndex);
                 } else {
                     std::ostringstream ss;
                     ss << "Loop address is bananas: start=" << startAddress << ", loop=" << loopAddress << ", current=" << currentAddress;
-                    throw Exception(ss.str());
+                    throw RuntimeError(ss.str());
                 }
             } else {
-                output << "NOT LOOPING!" << std::endl;
+                output.debug("NOT LOOPING!");
                 if (!sound.loop.empty()) {
-                    throw Exception("Should not create loop!");
+                    throw RuntimeError("Should not create loop!");
                 }
             }
-            output << "Finishing address: " << currentAddress << std::endl;
-            output << "Start sample count: " << sound.start.size() << ", loop sample count: " << sound.loop.size() << std::endl;
-            libraryByteCount += (sound.start.size() + sound.loop.size()) * 8;
-            output << "Sound library size: " << libraryByteCount << " bytes" << std::endl;
+            output.debug("Finishing address: ", currentAddress);
+            output.debug("Start sample count: ", sound.start.size(), ", loop sample count: ", sound.loop.size());
+            libraryByteCount += int(sound.start.size() + sound.loop.size()) * 8;
+            output.debug("Sound library size: ", libraryByteCount, " bytes");
         }
     }
 
@@ -389,7 +389,7 @@ public:
                 if (sample >= 8) { // negative
                     sample |= 0xf0;
                 }
-                double doubleSample(int64_t(sample) << range);
+                double doubleSample = double((int64_t(sample) << range));
                 size_t size = sampleOutput.size();
                 if (filter == 1) {
                     doubleSample += lastSample * 15.0 / 16.0;
@@ -405,8 +405,7 @@ public:
         }
     }
 
-    std::ostream& output;
-    std::ostream& error;
+    Output output;
 
     uint64_t spcCycle = 0;
 

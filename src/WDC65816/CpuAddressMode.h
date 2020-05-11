@@ -14,6 +14,8 @@ typedef InstructionBase<State, Byte, Byte, Byte> Instruction4Byte;
 
 namespace AddressMode {
 
+EXCEPTION(NotYetImplementedException, ::NotYetImplementedException)
+
 // Absolute
 // addr
 template <typename Operator>
@@ -285,7 +287,7 @@ class DirectPageIndexedIndirectX : public Instruction2Byte
     // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int invokeOperator(Byte lowByte) override
     {
-        throw AddressModeNotYetImplementedException("DirectPageIndexedIndirectX");
+        throw NotYetImplementedException("DirectPageIndexedIndirectX");
         int cycles = 0;
         if ((Byte)state.getDirectPageRegister()) {
             cycles += 1;

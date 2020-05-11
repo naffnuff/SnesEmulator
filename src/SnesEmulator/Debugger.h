@@ -52,53 +52,53 @@ private:
     public:
         void visit(const InvalidLocation&) override
         {
-            color = System::DefaultColor;
+            color = Output::DefaultColor;
         }
 
         void visit(const ReadOnlyMemory& location) override
         {
-            color = location.getApplicationCount() > 0 ? System::Cyan : System::Blue;
+            color = location.getApplicationCount() > 0 ? Output::Cyan : Output::Blue;
         }
 
         void visit(const ReadWriteMemory& location) override
         {
-            color = location.getApplicationCount() > 0 ? System::Cyan : System::Red;
+            color = location.getApplicationCount() > 0 ? Output::Cyan : Output::Red;
         }
 
         void visit(const ReadRegister&) override
         {
-            color = System::Magenta;
+            color = Output::Magenta;
         }
 
         void visit(const WriteRegister&) override
         {
-            color = System::Green;
+            color = Output::Green;
         }
 
         void visit(const ReadWriteRegister&) override
         {
-            color = System::Yellow;
+            color = Output::Yellow;
         }
 
         void visit(const BootRomLocation& location) override
         {
             if (location.getApplicationCount() > 0) {
-                color = System::Cyan;
+                color = Output::Cyan;
             } else if (location.bootRomDataEnabled) {
-                color = System::Blue;
+                color = Output::Blue;
             } else {
-                color = System::Red;
+                color = Output::Red;
             }
         }
 
-        System::Color color = System::DefaultColor;
+        Output::Color color = Output::DefaultColor;
     };
 
 public:
     class ContextBase
     {
     public:
-        ContextBase(std::string fileName, System::Color debugColor, Debugger& debugger)
+        ContextBase(std::string fileName, Output::Color debugColor, Debugger& debugger)
             : fileName(fileName)
             , debugColor(debugColor)
             , debugger(debugger)
@@ -117,7 +117,7 @@ public:
         std::string fileName;
         Long inspectedAddress = 0;
         bool watchMode = true;
-        System::Color debugColor;
+        Output::Color debugColor;
         const Instruction* nextInstruction;
     };
 
@@ -153,13 +153,14 @@ public:
             return currentAddress;
         }
 
-        void printAddressHistory(std::ostream& output)
+        void printAddressHistory(Output& output)
         {
-            output << "Address history:" << std::endl;
+            Output::Lock lock(output);
+            output.printLine(lock, "Address history:");
             for (Byte i = lastKnownAddressIndex; i != Byte(lastKnownAddressIndex - 10); --i) {
-                output << "@" << knownAddresses[i] << " ";
+                output.print(lock, "@", knownAddresses[i], " ");
             }
-            output << std::endl;
+            output.printLine(lock);
         }
 
         bool isStepMode() const
@@ -176,10 +177,8 @@ public:
         friend class Debugger;
     };
 
-    Debugger(std::ostream& output, std::istream& input, std::ostream& error, Video::Registers& videoRegisters, Audio::Registers& audioRegisters, bool& running)
-        : output(output)
-        , input(input)
-        , error(error)
+    Debugger(Output& output, Video::Registers& videoRegisters, Audio::Registers& audioRegisters, bool& running)
+        : output(output, "debugger")
         , videoRegisters(videoRegisters)
         , videoProcessor(videoRegisters.processor)
         , audioRegisters(audioRegisters)
@@ -209,7 +208,7 @@ public:
                 if (argumentValueIndex >= 0) {
                     breakpoint.argumentValue = std::stoi(breakpointString.substr(argumentValueIndex + 1), 0, 16);
                 }
-                output << "Read breakpoint: " << breakpoint << " from " << context.fileName << std::endl;
+                output.debug("Read breakpoint: ", breakpoint, " from ", context.fileName);
                 MemoryAccess access = state.getMemoryAccess(typename State::AddressType(breakpoint.address));
                 toggleBreakpoint(context, state, access, breakpoint);
             }
@@ -222,44 +221,45 @@ public:
         if (access.hasBreakpoint()) {
             if (access.setBreakpoint(nullptr)) {
                 context.breakpoints.erase(breakpoint);
-                output << "Breakpoint removed at address " << breakpoint.address << std::endl;
+                output.debug("Breakpoint removed at address ", breakpoint.address);
             }
             else {
-                output << "Breakpoint not allowed at address " << breakpoint.address << std::endl;
+                output.error("Breakpoint not allowed at address ", breakpoint.address);
             }
         } else {
             bool success = access.setBreakpoint([this, &context, &state, breakpoint](Location::Operation operation, Byte value, uint64_t applicationCount) {
                 bool printInstruction = false;
+                Output::Lock lock(output);
                 if (operation == Location::Apply && (breakpoint.applicationCount == 0 || breakpoint.applicationCount == applicationCount)) {
-                    output << "Apply: Breakpoint hit " << breakpoint << "#" << applicationCount << std::endl;
+                    output.printLine(lock, "Apply: Breakpoint hit ", breakpoint, "#", applicationCount);
                     pause(context);
                 } else if (operation == Location::Read && (breakpoint.argumentValue == -1 || breakpoint.argumentValue == value)) {
-                    output << "Read: Breakpoint hit @ " << breakpoint << ":" << value;
+                    output.print(lock, "Read: Breakpoint hit @ ", breakpoint, ":", value);
                     pause(context);
                     printInstruction = true;
                 }
                 else if (operation == Location::Write && (breakpoint.argumentValue == -1 || breakpoint.argumentValue == value)) {
-                    output << "Write: Breakpoint hit " << breakpoint << ":" << value;
+                    output.print(lock, "Write: Breakpoint hit ", breakpoint, ":", value);
                     pause(context);
                     printInstruction = true;
                 }
                 if (printInstruction) {
                     typename State::AddressType programAddress = state.getProgramAddress();
                     state.setProgramAddress(context.getLastKnownAddress());
-                    output << " while executing ";
+                    output.print(lock, " while executing ");
                     {
-                        System::ScopedOutputColor outputColor(output, context.stepMode ? context.debugColor : System::Red, true);
-                        output << context.nextInstruction->toString();
+                        Output::ColorScope colorScope(lock, context.stepMode ? context.debugColor : Output::Red, true);
+                        output.print(lock, context.nextInstruction->toString());
                     }
-                    output << " @" << context.getLastKnownAddress() << std::endl;
+                    output.printLine(lock, " @", context.getLastKnownAddress());
                     state.setProgramAddress(programAddress);
                 }
             });
             if (success) {
                 context.breakpoints.insert(breakpoint);
-                output << "Breakpoint inserted: " << breakpoint << std::endl;
+                output.debug("Breakpoint inserted: ", breakpoint);
             } else {
-                    output << "Breakpoint not allowed at address " << breakpoint.address << std::endl;
+                    output.error("Breakpoint not allowed at address ", breakpoint.address);
                 }
         }
     }
@@ -267,38 +267,38 @@ public:
     template<typename State, typename OtherState>
     bool awaitCommand(Context<State>& context, State& state, Context<OtherState>& otherContext, OtherState& otherState)
     {
-        output << "Command (h for help): ";
+        output.print(Output::Lock(output), "Command (h for help): ");
 
         std::string command;
-        std::getline(input, command);
+        std::getline(std::cin, command);
 
         if (command.empty()) {
-            output << "Step" << std::endl;
+            output.info("Step");
             return true;
         }
         else if (command == "h") {
-            output
-                << "Commands:"
-                << "[return]: step into next instruction" << std::endl
-                << "n: inspect next memory page" << std::endl
-                << "p: inspect previous memory page" << std::endl
-                << "i: inspect operand address" << std::endl
-                << "r: toggle run context" << std::endl
-                << "rr: run all contexts" << std::endl
-                << "q: soft reset" << std::endl
-                << "qr: soft reset and run" << std::endl
-                << "qq: hard reset" << std::endl
-                << "t: toggle breakpoint at current Program Counter address" << std::endl
-                << "tt: toggle breakpoint at next Program Counter address" << std::endl
-                << "ttt: toggle breakpoint at last executed Program Counter address" << std::endl
-                << "t [hex]: toogle breakpoint at address [hex]" << std::endl
-                << "clear: clear all breakpoints" << std::endl
-                << "w: watch executing program memory" << std::endl
-                << "[hex]: inspect memory page containing address [hex]" << std::endl
-                << "v [hex]: inspect videoProcessor memory containing address [hex]" << std::endl
-                << "[p|s|a|x|y|d|f]=[hex]: set register to [hex]" << std::endl
-                << "[a]=[hex]: set address [a] to [hex]" << std::endl
-                << "s: switch contexts" << std::endl;
+            Output::Lock lock(output);
+            output.printLine(lock, "Commands:");
+            output.printLine(lock, "[return]: step into next instruction");
+            output.printLine(lock, "n: inspect next memory page");
+            output.printLine(lock, "p: inspect previous memory page");
+            output.printLine(lock, "i: inspect operand address");
+            output.printLine(lock, "r: toggle run context");
+            output.printLine(lock, "rr: run all contexts");
+            output.printLine(lock, "q: soft reset");
+            output.printLine(lock, "qr: soft reset and run");
+            output.printLine(lock, "qq: hard reset");
+            output.printLine(lock, "t: toggle breakpoint at current Program Counter address");
+            output.printLine(lock, "tt: toggle breakpoint at next Program Counter address");
+            output.printLine(lock, "ttt: toggle breakpoint at last executed Program Counter address");
+            output.printLine(lock, "t [hex]: toogle breakpoint at address [hex]");
+            output.printLine(lock, "clear: clear all breakpoints");
+            output.printLine(lock, "w: watch executing program memory");
+            output.printLine(lock, "[hex]: inspect memory page containing address [hex]");
+            output.printLine(lock, "v [hex]: inspect videoProcessor memory containing address [hex]");
+            output.printLine(lock, "[p|s|a|x|y|d|f]=[hex]: set register to [hex]");
+            output.printLine(lock, "[a]=[hex]: set address [a] to [hex]");
+            output.printLine(lock, "s: switch contexts");
         }
         else if (command == "n") {
             context.watchMode = false;
@@ -315,31 +315,31 @@ public:
             else {
                 context.stepMode = !context.stepMode;
                 if (context.stepMode) {
-                    output << "Step mode" << std::endl;
+                    output.info("Step mode");
                 }
                 else if (!otherContext.stepMode) {
-                    output << "Run mode" << std::endl;
+                    output.info("Run mode");
                     unpause(context, otherContext);
                 }
             }
             if (!paused) {
-                output << "All running" << std::endl;
+                output.info("All running");
                 startTime = clock();
             }
             return !context.stepMode;
         }
         else if (command == "i") {
-            output << "Inspect not implemented" << std::endl;
+            output.info("Inspect not implemented");
         }
         else if (command == "q") {
-            output << "Soft reset" << std::endl;
+            output.info("Soft reset");
             state.reset();
             otherState.reset();
             videoRegisters.reset();
             audioRegisters.reset();
         }
         else if (command == "qr") {
-            output << "Soft reset and run" << std::endl;
+            output.info("Soft reset and run");
             state.reset();
             otherState.reset();
             videoRegisters.reset();
@@ -348,7 +348,7 @@ public:
             startTime = clock();
         }
         else if (command == "qq") {
-            output << "Hard reset" << std::endl;
+            output.info("Hard reset");
             running = false;
         }
         else if (command == "clear") {
@@ -356,7 +356,7 @@ public:
                 state.getMemoryAccess(breakpoint.address).setBreakpoint(nullptr);
             }
             context.breakpoints.clear();
-            output << "Cleared context " << context.fileName << std::endl;
+            output.info("Cleared context ", context.fileName);
             std::ofstream file(context.fileName);
         }
         else if (command[0] == 't') {
@@ -374,8 +374,7 @@ public:
                 try {
                     breakpoint.address = stoi(command.substr(2), 0, 16);
                 } catch (const std::exception& e) {
-                    System::ScopedOutputColor outputColor(output, System::Red, true);
-                    output << "Not a valid value: " << e.what() << std::endl;
+                    output.error("Not a valid value: ", e.what());
                 }
             }
             MemoryAccess access = state.getMemoryAccess(breakpoint.address);
@@ -391,51 +390,46 @@ public:
             try {
                 inspectedVideoMemory = stoi(command.substr(2), 0, 16);
             } catch (const std::exception& e) {
-                System::ScopedOutputColor outputColor(output, System::Red, true);
-                output << "Not a valid value: " << e.what() << std::endl;
+                output.error("Not a valid value: ", e.what());
             }
         }
         else if (command == "w") {
             context.watchMode = !context.watchMode;
-            output << "Watch mode " << (context.watchMode ? "on" : "off") << std::endl;
+            output.info("Watch mode ", (context.watchMode ? "on" : "off"));
         }
         else if (command == "s") {
-            output << "Switched contexts" << std::endl;
+            output.info("Switched contexts");
             printState(otherState, otherContext);
             return awaitCommand(otherContext, otherState, context, state);
         }
         else if (command.size() > 1 && command[1] == '=') {
             try {
                 Word value = (Word)stoi(command.substr(2), 0, 16);
-                output << "Setting register " << command[0] << "=" << value << std::endl;
+                output.info("Setting register ", command[0], "=", value);
                 state.setRegisterDebug(command[0], value);
             } catch (const std::exception& e) {
-                System::ScopedOutputColor outputColor(output, System::Red, true);
-                error << "Not a valid address: " << e.what() << std::endl;
+                output.error("Not a valid address: ", e.what());
             }
         }
         else if (command.find('=') != std::string::npos) {
             size_t pos = command.find('=');
             try {
-                output << "Address: " << command.substr(0, pos) << ", value: " << command.substr(pos + 1) << std::endl;
+                output.info("Address: ", command.substr(0, pos), ", value: ", command.substr(pos + 1));
                 typename State::AddressType address = stoi(command.substr(0, pos), 0, 16);
                 Byte value = (Byte)stoi(command.substr(pos + 1), 0, 16);
-                output << "Setting address " << address <<
-                    "=" << value << std::endl;
+                output.info("Setting address ", address, "=", value);
                 state.getMemory().writeByte(value, address);
             } catch (const std::exception& e) {
-                System::ScopedOutputColor outputColor(output, System::Red, true);
-                error << "Not valid: " << command.substr(0, pos) << " or " << command.substr(pos + 1) << ": " << e.what() << std::endl;
+                output.error("Not valid: ", command.substr(0, pos), " or ", command.substr(pos + 1), ": ", e.what());
             }
         }
         else {
             try {
                 context.inspectedAddress = stoi(command, 0, 16);
-                output << "Inspecting address " << context.inspectedAddress << std::endl;
+                output.info("Inspecting address ", context.inspectedAddress);
                 context.watchMode = false;
             } catch (const std::exception& e) {
-                System::ScopedOutputColor outputColor(output, System::Red, true);
-                error << "Not a valid address: " << e.what() << std::endl;
+                output.error("Not a valid address: ", e.what());
             }
         }
 
@@ -445,32 +439,36 @@ public:
     template<typename State>
     void printRegisters(const State& state, Context<State>& context)
     {
-        System::ScopedOutputColor outputColor(output, context.debugColor, true);
-        state.printRegisters(output) << std::endl;
+        Output::Lock lock(output);
+        Output::ColorScope colorScope(lock, context.debugColor, true);
+        state.printRegisters(output, lock);
+        output.printLine(lock);
     }
 
     template<typename State>
     void printState(State& state, Context<State>& context)
     {
-        System::ScopedOutputColor outputColor(output, paused ? context.debugColor : System::Red, true);
-        state.printRegisters(output) << std::endl;
-        output << context.nextInstruction->opcodeToString() << std::endl;
-        output << state.inspectProgramByte() << ": ";
-        output << context.nextInstruction->toString();
-        output << " #" << state.getMemory().getApplicationCount(state.getProgramAddress()) << std::endl;
+        Output::Lock lock(output);
+        Output::ColorScope colorScope(lock, paused ? context.debugColor : Output::Red, true);
+        state.printRegisters(output, lock);
+        output.printLine(lock);
+        output.printLine(lock, context.nextInstruction->opcodeToString());
+        output.print(lock, state.inspectProgramByte(), ": ");
+        output.print(lock, context.nextInstruction->toString());
+        output.printLine(lock, " #", state.getMemory().getApplicationCount(state.getProgramAddress()));
     }
 
     template<typename State>
-    void setColor(const State& state, const Context<State>& context, typename State::AddressType address, const ConstLocationAccess& access, System::ScopedOutputColor& outputColor)
+    void setColor(const State& state, const Context<State>& context, typename State::AddressType address, const ConstLocationAccess& access, Output::Color& color, bool& bright)
     {
-        System::Color color = System::DefaultColor;
-        bool bright = false;
+        color = Output::DefaultColor;
+        bright = false;
         bool executing = address >= state.getProgramAddress() && address < state.getProgramAddress() + context.nextInstruction->size();
         if (access.hasBreakpoint() && executing) {
-            color = System::Cyan;
+            color = Output::Cyan;
             bright = true;
         } else if (access.hasBreakpoint()) {
-            color = System::Red;
+            color = Output::Red;
             bright = true;
         } else if (executing) {
             color = context.debugColor;
@@ -479,9 +477,6 @@ public:
             OutputColorVisitor colorVisitor;
             access.accept(colorVisitor);
             color = colorVisitor.color;
-        }
-        if (color != System::DefaultColor) {
-            outputColor.set(color, bright);
         }
     }
 
@@ -506,65 +501,66 @@ public:
             output << std::endl;
         }*/
 
-        output << "OAM start address: " << videoRegisters.oamStartAddress << std::endl;
-        output << "OAM current address: " << videoProcessor.oam.address << std::endl;
-        output << "Video port control: " << videoRegisters.videoPortControl << std::endl;
-        //output << "VRAM start address: " << videoRegisters.vramStartAddress << std::endl;
-        output << "VRAM current address: " << videoProcessor.vram.address << std::endl;
-        output << "CPU bus: " << cpuState.getMemory().bus << std::endl;
+        Output::Lock lock(output);
 
-        output << "   Vol L Vol R Pitch Src      AR DR SR SL  Gain Mode               Lvl Env Out" << std::endl;
+        output.printLine(lock, "OAM start address: ", videoRegisters.oamStartAddress);
+        output.printLine(lock, "OAM current address: ", videoProcessor.oam.address);
+        output.printLine(lock, "Video port control: ", videoRegisters.videoPortControl);
+        //output << "VRAM start address: " << videoRegisters.vramStartAddress << std::endl;
+        output.printLine(lock, "VRAM current address: ", videoProcessor.vram.address);
+        output.printLine(lock, "CPU bus: ", cpuState.getMemory().bus);
+
+        output.printLine(lock, "   Vol L Vol R Pitch Src      AR DR SR SL  Gain Mode               Lvl Env Out");
         for (int i = 0; i < audioProcessor.voices.size(); ++i) {
             const Audio::Processor::Voice& voice = audioProcessor.voices[i];
             const Audio::Renderer::Voice& data = audioProcessor.renderer.voices[i];
-            output << i << ": "
-                << std::left << std::setfill(' ') << std::setw(4) << data.leftVolume
-                << "  " << std::setw(4) << data.rightVolume
-                << "  " << audioRegisters.voiceData[i].pitch
-                << "  " << data.pitch
-                << "  " << audioRegisters.voiceData[i].sourceNumber
-                << "  " << data.sourceAddress
-                << "  " << voice.envelopeTypeToString()
-                << " " << data.attackRate
-                << " " << data.decayRate
-                << " " << data.sustainRate
-                << " " << data.sustainLevel
-                << "  " << std::left << std::setfill(' ') << std::setw(22) << voice.gainModeToString()
-                << "  " << voice.gainLevel
-                << "  " << +audioProcessor.renderer.voices[i].envelope
-                << "  " << +audioProcessor.renderer.voices[i].output
-                << std::endl;
+            output.printLine(lock, i, ": ",
+                std::left, std::setfill(' '), std::setw(4), data.leftVolume,
+                "  ", std::setw(4), data.rightVolume,
+                "  ", audioRegisters.voiceData[i].pitch,
+                "  ", data.pitch,
+                "  ", audioRegisters.voiceData[i].sourceNumber,
+                "  ", data.sourceAddress,
+                "  ", voice.envelopeTypeToString(),
+                " ", data.attackRate,
+                " ", data.decayRate,
+                " ", data.sustainRate,
+                " ", data.sustainLevel,
+                "  ", std::left, std::setfill(' '), std::setw(22), voice.gainModeToString(),
+                "  ", voice.gainLevel,
+                "  ", +audioProcessor.renderer.voices[i].envelope,
+                "  ", +audioProcessor.renderer.voices[i].output);
         }
-        output << "Main Vol    Echo Vol    Key On    Key Off   R M E Gen Src End   Echo FB   Pitch Mod Noise On  Echo On   Dir ER  Delay" << std::endl;
-        output << std::left << std::setfill(' ') << std::setw(4) << audioProcessor.renderer.mainVolumeLeft
-            << "  " << std::setw(4) << audioProcessor.renderer.mainVolumeRight
-            << "  " << std::setw(4) << +audioProcessor.echoVolumeLeft
-            << "  " << std::setw(4) << +audioProcessor.echoVolumeRight
-            << "  " << audioProcessor.keyOn
-            << "  " << audioProcessor.keyOff
-            << "  " << audioProcessor.reset
-            << " " << audioProcessor.mute
-            << " " << audioProcessor.echoOff
-            << " " << audioProcessor.noiseGeneratorClock
-            << "  " << audioProcessor.sourceEndBlock
-            << "  " << std::setw(8) << +audioProcessor.echoFeedback
-            << "  " << audioProcessor.pitchModulation
-            << "  " << audioProcessor.noiseOn
-            << "  " << audioProcessor.echoOn
-            << "  " << audioRegisters.sourceDirectory
-            << "  " << audioProcessor.echoRegionOffset
-            << "  " << audioProcessor.echoDelay
-            << std::endl;
-        output << "Filter coefficients:";
+        output.printLine(lock, "Main Vol    Echo Vol    Key On    Key Off   R M E Gen Src End   Echo FB   Pitch Mod Noise On  Echo On   Dir ER  Delay");
+        output.printLine(lock, std::left, std::setfill(' '), std::setw(4), audioProcessor.renderer.mainVolumeLeft,
+            "  ", std::setw(4), audioProcessor.renderer.mainVolumeRight,
+            "  ", std::setw(4), +audioProcessor.echoVolumeLeft,
+            "  ", std::setw(4), +audioProcessor.echoVolumeRight,
+            "  ", audioProcessor.keyOn,
+            "  ", audioProcessor.keyOff,
+            "  ", audioProcessor.reset,
+            " ", audioProcessor.mute,
+            " ", audioProcessor.echoOff,
+            " ", audioProcessor.noiseGeneratorClock,
+            "  ", audioProcessor.sourceEndBlock,
+            "  ", std::setw(8), +audioProcessor.echoFeedback,
+            "  ", audioProcessor.pitchModulation,
+            "  ", audioProcessor.noiseOn,
+            "  ", audioProcessor.echoOn,
+            "  ", audioRegisters.sourceDirectory,
+            "  ", audioProcessor.echoRegionOffset,
+            "  ", audioProcessor.echoDelay);
+        output.print(lock, "Filter coefficients:");
         for (int i = 0; i < audioProcessor.coefficients.size(); ++i) {
-            output << "  " << audioProcessor.coefficients[i];
+            output.print(lock, "  ", audioProcessor.coefficients[i]);
         }
 
-        output << std::endl << std::endl;
+        output.printLine(lock);
+        output.printLine(lock);
 
-        output << "          0     1     2     3     4     5     6     7" << std::endl
-            << "          8     9     a     b     c     d     e     f"
-            << "                0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f" << std::endl;
+        output.printLine(lock, "          0     1     2     3     4     5     6     7");
+        output.print(lock, "          8     9     a     b     c     d     e     f");
+        output.printLine(lock, "                0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f");
         int lastVramLowAddress = -1;
         int vramAddress = inspectedVideoMemory & 0xFF80;
         Byte dspAddress = 0;
@@ -573,39 +569,39 @@ public:
                 uint16_t lowAddress(vramAddress);
                 lowAddress = lowAddress >> 4;
                 if (lastVramLowAddress != lowAddress) {
-                    output << "   " << std::hex << std::right << std::setw(3) << std::setfill('0') << lowAddress << "x  " << std::dec;
+                    output.print(lock, "   ", std::hex, std::right, std::setw(3), std::setfill('0'), lowAddress, "x  ", std::dec);
                 }
                 else {
-                    output << "         ";
+                    output.print(lock, "         ");
                 }
                 lastVramLowAddress = lowAddress;
 
                 for (int j = 0; j < 8 && vramAddress < videoProcessor.vram.size; ++j) {
-                    output << videoProcessor.vram.getByte(vramAddress, false) << ' ' << videoProcessor.vram.getByte(vramAddress, true) << ' ';
+                    output.print(lock, videoProcessor.vram.getByte(vramAddress, false), ' ', videoProcessor.vram.getByte(vramAddress, true), ' ');
                     ++vramAddress;
                 }
             }
 
-            output << "     ";
+            output.print(lock, "     ");
 
             if (dspAddress < audioProcessor.dspMemory.size()) {
                 uint16_t lowAddress(dspAddress);
                 lowAddress = lowAddress >> 4;
-                output << std::hex << std::right << std::setw(3) << std::setfill('0') << lowAddress << "x  " << std::dec;
+                output.print(lock, std::hex, std::right, std::setw(3), std::setfill('0'), lowAddress, "x  ", std::dec);
 
                 for (int j = 0; j < 16 && dspAddress < audioProcessor.dspMemory.size(); ++j) {
                     ConstMemoryAccess access(audioProcessor.dspMemory, dspAddress);
                     OutputColorVisitor colorVisitor;
                     access.accept(colorVisitor);
-                    System::ScopedOutputColor outputColor(output, colorVisitor.color, false);
-                    output << access << ' ';
+                    Output::ColorScope outputColor(lock, colorVisitor.color, false);
+                    output.print(lock, access, ' ');
                     ++dspAddress;
                 }
             }
 
-            output << std::endl;
+            output.printLine(lock);
         }
-        output << std::endl;
+        output.print(lock);
 
         Long startCpuAddress = cpuContext.watchMode ? cpuState.getProgramAddress() : cpuContext.inspectedAddress;
         Long startSpcAddress = spcContext.watchMode ? spcState.getProgramAddress() : spcContext.inspectedAddress;
@@ -613,8 +609,8 @@ public:
         size_t cpuMemorySize = cpuState.getMemorySize();
         size_t spcMemorySize = spcState.getMemorySize();
 
-        output << "          0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f"
-            << "             0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f" << std::endl;
+        output.printLine(lock, "          0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f",
+            "             0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f");
         Long cpuAddress = startCpuAddress & 0xFFFF00;
         Word spcAddress = startSpcAddress & 0xFFFF00;
 
@@ -623,57 +619,62 @@ public:
                 Byte bank = Byte(cpuAddress >> 16);
                 uint16_t lowAddress(cpuAddress);
                 lowAddress = lowAddress >> 4;
-                output << bank << ':' << std::hex << std::right << std::setw(3) << std::setfill('0') << lowAddress << "x  " << std::dec;
+                output.print(lock, bank, ':', std::hex, std::right, std::setw(3), std::setfill('0'), lowAddress, "x  ", std::dec);
 
                 for (int j = 0; j < 16 && cpuAddress < cpuMemorySize; ++j) {
                     ConstMemoryAccess access = cpuState.getConstMemoryAccess(cpuAddress);
-                    System::ScopedOutputColor outputColor(output);
-                    setColor(cpuState, cpuContext, cpuAddress, access, outputColor);
-                    output << access << ' ';
+                    Output::Color color = Output::DefaultColor;
+                    bool bright = false;
+                    setColor(cpuState, cpuContext, cpuAddress, access, color, bright);
+                    Output::ColorScope outputColor(lock, color, bright);
+                    output.print(lock, access, ' ');
                     ++cpuAddress;
                 }
             }
 
-            output << "     ";
+            output.print(lock, "     ");
 
             if (spcAddress < spcMemorySize) {
                 uint16_t lowAddress(spcAddress);
                 lowAddress = lowAddress >> 4;
-                output << std::hex << std::right << std::setw(3) << std::setfill('0') << lowAddress << "x  " << std::dec;
+                output.print(lock, std::hex, std::right, std::setw(3), std::setfill('0'), lowAddress, "x  ", std::dec);
 
                 for (int j = 0; j < 16 && spcAddress < spcMemorySize; ++j) {
                     ConstMemoryAccess access = spcState.getConstMemoryAccess(spcAddress);
-                    System::ScopedOutputColor outputColor(output);
-                    setColor(spcState, spcContext, spcAddress, access, outputColor);
+                    Output::Color color;
+                    bool bright = false;
+                    setColor(spcState, spcContext, spcAddress, access, color, bright);
+                    Output::ColorScope outputColor(lock, color, bright);
                     if (spcAddress >= 0xffc0 && audioRegisters.bootRomDataEnabled) {
-                        output << audioRegisters.bootRomData[spcAddress - 0xffc0] << ' ';
+                        output.print(lock, audioRegisters.bootRomData[spcAddress - 0xffc0], ' ');
                     }
                     else {
-                        output << access << ' ';
+                        output.print(lock, access, ' ');
                     }
                     ++spcAddress;
                 }
             }
 
-            output << std::endl;
+            output.printLine(lock);
         }
     }
 
-    void printBreakpoints(const Context<CPU::State>& cpuContext, const Context<SPC::State>& spcContext) const
+    void printBreakpoints(const Context<CPU::State>& cpuContext, const Context<SPC::State>& spcContext)
     {
         printBreakpoints(cpuContext);
         printBreakpoints(spcContext);
     }
 
     template<typename State>
-    void printBreakpoints(const Context<State>& context) const
+    void printBreakpoints(const Context<State>& context)
     {
         if (!context.breakpoints.empty()) {
-            output << "Breakpoints:";
+            Output::Lock lock(output);
+            output.print(lock, "Breakpoints:");
             for (const Breakpoint<State>& breakpoint : context.breakpoints) {
-                output << " " << breakpoint;
+                output.print(lock, " ", breakpoint);
             }
-            output << std::endl;
+            output.printLine(lock);
         }
     }
 
@@ -720,9 +721,7 @@ public:
     std::time_t startTime;
 
 private:
-    std::ostream& output;
-    std::istream& input;
-    std::ostream& error;
+    Output output;
 
     Video::Registers& videoRegisters;
     Video::Processor& videoProcessor;
