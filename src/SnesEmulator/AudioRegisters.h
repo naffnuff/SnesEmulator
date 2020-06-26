@@ -162,7 +162,8 @@ public:
                     decodeSource(startAddress, loopAddress);
                     processor.renderer.voices[i].bufferOffset = 0.0;
                     processor.renderer.voices[i].inLoop = false;
-                    processor.renderer.voices[i].sourceAddress = loopAddress << 16 | startAddress;
+                    processor.renderer.voices[i].startAddress = startAddress;
+                    processor.renderer.voices[i].loopAddress = loopAddress;
                 }
             );
             processor.makeWriteRegister(voiceAddressStart + 5, voiceName + "ADSR low byte", false,
@@ -323,7 +324,7 @@ public:
 
     void decodeSource(Word startAddress, Word loopAddress)
     {
-        Renderer::Sound& sound = processor.renderer.soundLibrary[loopAddress << 16 | startAddress];
+        Renderer::Sound& sound = processor.renderer.soundLibrary[Renderer::SoundLibraryKey(startAddress, loopAddress)];
         if (sound.start.empty() && sound.loop.empty()) {
             output.debug("Decoding sample: ");
             {

@@ -510,17 +510,17 @@ public:
         output.printLine(lock, "VRAM current address: ", videoProcessor.vram.address);
         output.printLine(lock, "CPU bus: ", cpuState.getMemory().bus);
 
-        output.printLine(lock, "   Vol L Vol R Pitch Src      AR DR SR SL  Gain Mode               Lvl Env Out");
+        output.printLine(lock, "   Vol L       Vol R       Pitch Src      AR DR SR SL  Gain Mode               Lvl Env Out");
         for (int i = 0; i < audioProcessor.voices.size(); ++i) {
             const Audio::Processor::Voice& voice = audioProcessor.voices[i];
             const Audio::Renderer::Voice& data = audioProcessor.renderer.voices[i];
             output.printLine(lock, i, ": ",
-                std::left, std::setfill(' '), std::setw(4), data.leftVolume,
-                "  ", std::setw(4), data.rightVolume,
+                std::left, std::setfill(' '), std::setw(10), data.leftVolume,
+                "  ", std::setw(10), data.rightVolume,
                 "  ", audioRegisters.voiceData[i].pitch,
                 "  ", data.pitch,
                 "  ", audioRegisters.voiceData[i].sourceNumber,
-                "  ", data.sourceAddress,
+                "  (", data.startAddress, ":", data.loopAddress, ")"
                 "  ", voice.envelopeTypeToString(),
                 " ", data.attackRate,
                 " ", data.decayRate,

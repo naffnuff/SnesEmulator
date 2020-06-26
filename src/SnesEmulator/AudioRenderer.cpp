@@ -289,7 +289,7 @@ void Renderer::Voice::calculateEnvelope()
 
 double Renderer::Voice::sample(SoundLibrary& library)
 {
-    const Sound& sound = library[sourceAddress];
+    const Sound& sound = library[SoundLibraryKey(startAddress, loopAddress)];
     if (inLoop && sound.loop.empty()) {
         return 0.0;
     }
@@ -299,7 +299,7 @@ double Renderer::Voice::sample(SoundLibrary& library)
     int iterations = 0;
     while (roundedBufferOffset >= bufferSize) {
         if (++iterations > 2) {
-            throw RuntimeError("Too many iterations when playing ", sourceAddress, ", roundedBufferOffset: ", roundedBufferOffset, ", bufferSize: ", bufferSize, ", inLoop: ", inLoop);
+            throw RuntimeError("Too many iterations when playing ", startAddress, ":", loopAddress, ", roundedBufferOffset: ", roundedBufferOffset, ", bufferSize: ", bufferSize, ", inLoop: ", inLoop);
         }
         bufferOffset -= double(bufferSize);
         roundedBufferOffset = int(bufferOffset + .5f);
