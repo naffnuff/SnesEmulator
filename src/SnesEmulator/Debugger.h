@@ -510,30 +510,9 @@ public:
         output.printLine(lock, "VRAM current address: ", videoProcessor.vram.address);
         output.printLine(lock, "CPU bus: ", cpuState.getMemory().bus);
 
-        output.printLine(lock, "   Vol L       Vol R       Pitch Src      AR DR SR SL  Gain Mode               Lvl Env Out");
-        for (int i = 0; i < audioProcessor.voices.size(); ++i) {
-            const Audio::Processor::Voice& voice = audioProcessor.voices[i];
-            const Audio::Renderer::Voice& data = audioProcessor.renderer.voices[i];
-            output.printLine(lock, i, ": ",
-                std::left, std::setfill(' '), std::setw(10), data.leftVolume,
-                "  ", std::setw(10), data.rightVolume,
-                "  ", audioRegisters.voiceData[i].pitch,
-                "  ", data.pitch,
-                "  ", audioRegisters.voiceData[i].sourceNumber,
-                "  (", data.startAddress, ":", data.loopAddress, ")"
-                "  ", voice.envelopeTypeToString(),
-                " ", data.attackRate,
-                " ", data.decayRate,
-                " ", data.sustainRate,
-                " ", data.sustainLevel,
-                "  ", std::left, std::setfill(' '), std::setw(22), voice.gainModeToString(),
-                "  ", voice.gainLevel,
-                "  ", +audioProcessor.renderer.voices[i].envelope,
-                "  ", +audioProcessor.renderer.voices[i].output);
-        }
         output.printLine(lock, "Main Vol    Echo Vol    Key On    Key Off   R M E Gen Src End   Echo FB   Pitch Mod Noise On  Echo On   Dir ER  Delay");
-        output.printLine(lock, std::left, std::setfill(' '), std::setw(4), audioProcessor.renderer.mainVolumeLeft,
-            "  ", std::setw(4), audioProcessor.renderer.mainVolumeRight,
+        output.printLine(lock, std::left, std::setfill(' '), std::setw(4), audioProcessor.mainVolumeLeft,
+            "  ", std::setw(4), audioProcessor.mainVolumeRight,
             "  ", std::setw(4), +audioProcessor.echoVolumeLeft,
             "  ", std::setw(4), +audioProcessor.echoVolumeRight,
             "  ", audioProcessor.keyOn,
@@ -550,9 +529,30 @@ public:
             "  ", audioRegisters.sourceDirectory,
             "  ", audioProcessor.echoRegionOffset,
             "  ", audioProcessor.echoDelay);
+
         output.print(lock, "Filter coefficients:");
         for (int i = 0; i < audioProcessor.coefficients.size(); ++i) {
             output.print(lock, "  ", audioProcessor.coefficients[i]);
+        }
+        output.printLine(lock);
+
+        output.printLine(lock, "   Vol L       Vol R       Pitch       Src  Type AR DR SR SL     Gain Mode               Lvl Envelope    Output");
+        for (int i = 0; i < audioProcessor.voices.size(); ++i) {
+            const Audio::Processor::Voice& voice = audioProcessor.voices[i];
+            output.printLine(lock, i, ": ",
+                std::left, std::setfill(' '), std::setw(10), voice.leftVolume,
+                "  ", std::setw(10), voice.rightVolume,
+                "  ", std::left, std::setfill(' '), std::setw(10), voice.pitch, "",
+                "  ", audioRegisters.voiceData[i].sourceNumber,
+                "   ", voice.envelopeTypeToString(),
+                " ", voice.attackRate,
+                " ", voice.decayRate,
+                " ", voice.sustainRate,
+                " ", std::left, std::setfill(' '), std::setw(5), voice.sustainLevel,
+                "  ", std::left, std::setfill(' '), std::setw(22), voice.gainModeToString(),
+                "  ", voice.gainLevel,
+                "  ", std::left, std::setfill(' '), std::setw(10), voice.envelope,
+                "  ", std::left, std::setfill(' '), std::setw(10), voice.output);
         }
 
         output.printLine(lock);

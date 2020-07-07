@@ -278,3 +278,4 @@ __pycache__/
 /build/cmake/SnesEmulator/SPC700/out
 /build/cmake/SnesEmulator/Common/out
 build/vscode/WDC65816.lib
+*.bin

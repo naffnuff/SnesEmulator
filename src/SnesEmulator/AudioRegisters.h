@@ -123,12 +123,12 @@ public:
             voiceName += " ";
             processor.makeWriteRegister(voiceAddressStart, voiceName + "Left Volume", false,
                 [this, i](Byte value) {
-                    processor.renderer.voices[i].leftVolume = toFactor(value);
+                    processor.voices[i].leftVolume = toFactor(value);
                 }
             );
             processor.makeWriteRegister(voiceAddressStart + 1, voiceName + "Right Volume", false,
                 [this, i](Byte value) {
-                    processor.renderer.voices[i].rightVolume = toFactor(value);
+                    processor.voices[i].rightVolume = toFactor(value);
                 }
             );
             processor.makeWriteRegister(voiceAddressStart + 2, voiceName + "Pitch low byte", false,
@@ -160,10 +160,10 @@ public:
                     Word startAddress = spcMemory.readWord(sourceAddress);
                     Word loopAddress = spcMemory.readWord(sourceAddress + 2);
                     decodeSource(startAddress, loopAddress);
-                    processor.renderer.voices[i].bufferOffset = 0.0;
-                    processor.renderer.voices[i].inLoop = false;
-                    processor.renderer.voices[i].startAddress = startAddress;
-                    processor.renderer.voices[i].loopAddress = loopAddress;
+                    processor.voices[i].bufferOffset = 0.0;
+                    processor.voices[i].inLoop = false;
+                    processor.voices[i].startAddress = startAddress;
+                    processor.voices[i].loopAddress = loopAddress;
                 }
             );
             processor.makeWriteRegister(voiceAddressStart + 5, voiceName + "ADSR low byte", false,
@@ -171,12 +171,12 @@ public:
                     value = processor.voices[i].attackRate | processor.voices[i].decayRate << 4 | processor.voices[i].envelopeType << 7;
                 },*/
                 [this, i](Byte value) {
-                    processor.renderer.voices[i].attackRate = value.getBits(0, 4);
-                    processor.renderer.voices[i].decayRate = value.getBits(4, 3);
+                    processor.voices[i].attackRate = value.getBits(0, 4);
+                    processor.voices[i].decayRate = value.getBits(4, 3);
                     if (value.getBit(7)) {
-                        processor.voices[i].envelopeType = Processor::ADSR;
+                        processor.voices[i].envelopeType = Processor::Voice::ADSR;
                     } else {
-                        processor.voices[i].envelopeType = Processor::Gain;
+                        processor.voices[i].envelopeType = Processor::Voice::Gain;
                         throw NotYetImplementedException("Gain mode not supported");
                     }
                 }
@@ -186,8 +186,8 @@ public:
                     value = processor.voices[i].sustainRate | processor.voices[i].sustainLevel << 5;
                 },*/
                 [this, i](Byte value) {
-                    processor.renderer.voices[i].sustainRate = value.getBits(0, 5);
-                    processor.renderer.voices[i].sustainLevel = double(value.getBits(5, 3) + 1.0) / 8.0;
+                    processor.voices[i].sustainRate = value.getBits(0, 5);
+                    processor.voices[i].sustainLevel = double(value.getBits(5, 3) + 1.0) / 8.0;
                 }
             );
             processor.makeWriteRegister(voiceAddressStart + 7, voiceName + "Gain", false,
@@ -200,10 +200,10 @@ public:
                 },*/
                 [this, i](Byte value) {
                     if (value.getBit(7)) {
-                        processor.voices[i].gainMode = Processor::GainMode(uint8_t(value.getBits(5, 2)));
+                        processor.voices[i].gainMode = Processor::Voice::GainMode(uint8_t(value.getBits(5, 2)));
                         processor.voices[i].gainLevel = value.getBits(0, 5);
                     } else {
-                        processor.voices[i].gainMode = Processor::Direct;
+                        processor.voices[i].gainMode = Processor::Voice::Direct;
                         processor.voices[i].gainLevel = value.getBits(0, 7);
                     }
                 }
@@ -213,12 +213,12 @@ public:
         }
         processor.makeWriteRegister(0x0c, "Main Volume Left", false,
             [this](Byte value) {
-                processor.renderer.mainVolumeLeft = toFactor(value);
+                processor.mainVolumeLeft = toFactor(value);
             }
         );
         processor.makeWriteRegister(0x1c, "Main Volume Right", false,
             [this](Byte value) {
-                processor.renderer.mainVolumeRight = toFactor(value);
+                processor.mainVolumeRight = toFactor(value);
             }
         );
         processor.makeWriteRegister(0x2c, "Echo Volume Left", false, processor.echoVolumeLeft);
@@ -228,7 +228,7 @@ public:
                 std::bitset<8> newValue(value);
                 for (int i = 0; i < 8; ++i) {
                     if (newValue[i] && !processor.keyOn[i]) {
-                        processor.renderer.voices[i].setEnvelopeStage(Renderer::Voice::Attack);
+                        processor.voices[i].setEnvelopeStage(Processor::Voice::Attack);
                         //pauseRequested = true;
                     }
                 }
@@ -242,7 +242,7 @@ public:
                 std::bitset<8> newValue(value);
                 for (int i = 0; i < 8; ++i) {
                     if (newValue[i] && !processor.keyOff[i]) {
-                        processor.renderer.voices[i].setEnvelopeStage(Renderer::Voice::Release);
+                        processor.voices[i].setEnvelopeStage(Processor::Voice::Release);
                     }
                 }
                 processor.keyOff = newValue;
@@ -310,7 +310,7 @@ public:
 
     void calculatePitch(int voice)
     {
-        processor.renderer.voices[voice].pitch = float(voiceData[voice].pitch) / float(1 << 12);
+        processor.voices[voice].pitch = float(voiceData[voice].pitch) / float(1 << 12);
     }
 
     double toFactor(Byte value)
@@ -324,7 +324,7 @@ public:
 
     void decodeSource(Word startAddress, Word loopAddress)
     {
-        Renderer::Sound& sound = processor.renderer.soundLibrary[Renderer::SoundLibraryKey(startAddress, loopAddress)];
+        Processor::Sound& sound = processor.soundLibrary[Processor::SoundLibraryKey(startAddress, loopAddress)];
         if (sound.start.empty() && sound.loop.empty()) {
             output.debug("Decoding sample: ");
             {

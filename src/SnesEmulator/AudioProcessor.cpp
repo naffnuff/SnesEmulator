@@ -1,4 +1,4 @@
-#include "AudioRenderer.h"
+#include "AudioProcessor.h"
 
 #include <iostream>
 
@@ -18,104 +18,32 @@ static constexpr int bufferSize = 1;
 
 struct StreamHandler
 {
-    static void testAttack(Renderer& renderer, Byte tableIndex)
-    {
-        double time = 0.0;
-        Renderer::FrequencyCounter counter;
-        counter.changeFrequency((tableIndex << 1) + 0x1); // but not if tableIndex == 0xf
-        int iteration = 0;
-        double value = 0.0;
-        while (value < 1.0) {
-            time += 0.03125;
-            if (counter.tick()) {
-                ++iteration;
-                value += 1.0 / 64.0;
-            }
-            if (value == 1.0)
-            {
-                renderer.output.info("tableIndex: ", tableIndex, ", Value: ", value, " after time: ", time);
-            }
-        }
-    }
-
-    static void testDecay(Renderer& renderer, Byte tableIndex)
-    {
-        double time = 0.0;
-        Renderer::FrequencyCounter counter;
-        counter.changeFrequency((tableIndex << 1) + 0x10);
-        int iteration = 0;
-        double value = 1.0;
-        double targetLevel = 7.0 / 8.0;
-        double targetRatio = 0.0001;
-        double rate = 588.0;
-        double coef = exp(-log((1.0 + targetRatio) / targetRatio) / rate);
-        double base = (targetLevel - targetRatio) * (1.0 - coef);
-        while (iteration < rate) {
-            time += 0.03125;
-            if (counter.tick()) {
-                ++iteration;
-                value = base + value * coef;
-                //renderer.output << "Iteration: " << iteration << ", base: " << base << ", coef: " << coef << ", Value: " << value << " after time: " << (timeInfo->outputBufferDacTime - startTime) * 1000.0 << std::endl;
-            }
-
-            if (iteration == rate) {
-                renderer.output.info("Iteration: ", iteration, ", Value: ", value, " after time: ", time);
-            }
-        }
-    }
-
-    static void testSustain(Renderer& renderer, Byte tableIndex)
-    {
-        double time = 0.0;
-        Renderer::FrequencyCounter counter;
-        counter.changeFrequency(tableIndex);
-        int iteration = 0;
-        double value = 7.0 / 8.0;
-        double targetLevel = 0.0;
-        double targetRatio = 0.0001;
-        double rate = 588.0;
-        double coef = exp(-log((1.0 + targetRatio) / targetRatio) / rate);
-        double base = (targetLevel - targetRatio) * (1.0 - coef);
-        while (iteration < rate) {
-            time += 0.03125;
-            if (counter.tick()) {
-                ++iteration;
-                value = base + value * coef;
-                //renderer.output << "Iteration: " << iteration << ", base: " << base << ", coef: " << coef << ", Value: " << value << " after time: " << (timeInfo->outputBufferDacTime - startTime) * 1000.0 << std::endl;
-            }
-
-            if (iteration == rate) {
-                renderer.output.info("Iteration: ", iteration, ", Value: ", value, " after time: ", time);
-            }
-        }
-    }
-
     static int callback(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void* userData)
     {
-        Renderer& renderer = *(Renderer*)userData;
+        Processor& processor = *(Processor*)userData;
         try {
             float* out = (float*)output;
 
             for (int i = 0; i < 0x8; ++i) {
-                //testAttack(renderer, i);
-                //testDecay(renderer, i);
+                //testAttack(processor, i);
+                //testDecay(processor, i);
             }
             for (int i = 1; i < 0x20; ++i) {
-                //testAttack(renderer, i);
-                //testSustain(renderer, i);
+                //testAttack(processor, i);
+                //testSustain(processor, i);
             }
             //return paAbort;
 
-            if (renderer.checkStreamStatus(statusFlags)) {
-                renderer.outputSample(out[0], out[1]);
-                renderer.printTimeInfo(timeInfo->currentTime);
+            if (processor.checkStreamStatus(statusFlags)) {
+                processor.outputSample(out[0], out[1]);
+                processor.printTimeInfo(timeInfo->currentTime);
                 return paContinue;
             } else {
-                renderer.output.error("ABORTING AUDIO RENDERER!");
+                processor.output.error("ABORTING AUDIO PROCESSOR!");
                 return paAbort;
             }
         } catch (const std::exception& e) {
-            renderer.output.error("Caught std::exception in Audio Renderer: ", e.what());
+            processor.output.error("Caught std::exception in Audio processor: ", e.what());
             return paAbort;
         }
     }
@@ -128,12 +56,14 @@ void check(PaError error)
     }
 }
 
-Renderer::Renderer(Output& output)
-    : output(output, "audio")
+Processor::Processor(Output& output)
+    : RegisterManager(output, "audio", dspMemory)
+    , output(output, "audio")
+    , dspMemory(0x80)
 {
 }
 
-Renderer::~Renderer()
+Processor::~Processor()
 {
     if (initialized) {
         check(Pa_Terminate());
@@ -141,7 +71,7 @@ Renderer::~Renderer()
     }
 }
 
-void Renderer::initialize()
+void Processor::initialize()
 {
     output.debug("Initializing PortAudio version ", Pa_GetVersionInfo()->versionText);
     check(Pa_Initialize());
@@ -156,7 +86,7 @@ void Renderer::initialize()
     }
 }
 
-void Renderer::startStream()
+void Processor::startStream()
 {
     PaStreamParameters outputParameters;
     outputParameters.device = Pa_GetDefaultOutputDevice();
@@ -175,7 +105,7 @@ void Renderer::startStream()
     check(Pa_StartStream(stream));
 }
 
-bool Renderer::checkStreamStatus(unsigned long statusFlags)
+bool Processor::checkStreamStatus(unsigned long statusFlags)
 {
     if (false && statusFlags) {
         if (statusFlags & paInputUnderflow) {
@@ -205,12 +135,12 @@ bool Renderer::checkStreamStatus(unsigned long statusFlags)
     }
 }
 
-void Renderer::outputSample(float& leftChannel, float& rightChannel)
+void Processor::outputSample(float& leftChannel, float& rightChannel)
 {
     double leftSample = 0.0f;
     double rightSample = 0.0f;
     //double sampleCount = 0.0f;
-    for (Audio::Renderer::Voice& voice : voices) {
+    for (Audio::Processor::Voice& voice : voices) {
         voice.calculateEnvelope();
         if (voice.envelope > 0.0) {
             double sample = voice.sample(soundLibrary);
@@ -228,7 +158,7 @@ void Renderer::outputSample(float& leftChannel, float& rightChannel)
     rightChannel = float(rightSample * mainVolumeRight);
 }
 
-void Renderer::Voice::setEnvelopeStage(EnvelopeStage nextStage)
+void Processor::Voice::setEnvelopeStage(EnvelopeStage nextStage)
 {
     if (nextStage == Attack) {
         inLoop = false;
@@ -254,7 +184,7 @@ void Renderer::Voice::setEnvelopeStage(EnvelopeStage nextStage)
     envelopeStage = nextStage;
 }
 
-void Renderer::Voice::calculateEnvelope()
+void Processor::Voice::calculateEnvelope()
 {
     if (envelopeStage == Attack) {
         if (attackRate == 0xf) {
@@ -287,7 +217,7 @@ void Renderer::Voice::calculateEnvelope()
     }
 }
 
-double Renderer::Voice::sample(SoundLibrary& library)
+double Processor::Voice::sample(SoundLibrary& library)
 {
     const Sound& sound = library[SoundLibraryKey(startAddress, loopAddress)];
     if (inLoop && sound.loop.empty()) {
@@ -315,7 +245,7 @@ double Renderer::Voice::sample(SoundLibrary& library)
     return (inLoop ? sound.loop : sound.start)[roundedBufferOffset];
 }
 
-void Renderer::printTimeInfo(double currentTime)
+void Processor::printTimeInfo(double currentTime)
 {
     if (previousTimeInfoTime == 0.0) {
         previousTimeInfoTime = currentTime;
@@ -329,7 +259,7 @@ void Renderer::printTimeInfo(double currentTime)
     }
 }
 
-void Renderer::checkStreamErrors()
+void Processor::checkStreamErrors()
 {
     if (streamError) {
         if (inputUnderflow) {

@@ -24,7 +24,7 @@ public:
             AudioSystem::CycleCount masterCycle(0);
             //double startTime = system.processor.renderer.getStreamTime();
             while (system.run) {
-                system.processor.renderer.checkStreamErrors();
+                system.processor.checkStreamErrors();
 
                 if (masterCycle == system.nextSpc) {
                     Instruction* instruction = system.instructionDecoder.getNextInstruction(system.state);
@@ -96,7 +96,7 @@ private:
 
 void AudioSystem::start()
 {
-    processor.renderer.startStream();
+    processor.startStream();
     if (threaded) {
         systemThread = std::thread(AudioSystemRunner(*this));
     }

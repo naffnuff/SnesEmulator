@@ -64,10 +64,10 @@
     <ClInclude Include="..\..\..\src\SnesEmulator\VideoData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\SnesEmulator\AudioRenderer.h">
+    <ClInclude Include="..\..\..\src\SnesEmulator\AudioSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\SnesEmulator\AudioSystem.h">
+    <ClInclude Include="..\..\..\src\SnesEmulator\AudioTest.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -81,10 +81,10 @@
     <ClCompile Include="..\..\..\src\SnesEmulator\VideoRenderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\SnesEmulator\AudioRenderer.cpp">
+    <ClCompile Include="..\..\..\src\SnesEmulator\AudioSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\SnesEmulator\AudioSystem.cpp">
+    <ClCompile Include="..\..\..\src\SnesEmulator\AudioProcessor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
