@@ -414,7 +414,7 @@ public:
             });
 
         makeReadRegister(0x4214, "Quotient of Divide Result", false, quotient);
-        makeReadRegister(0x4216, "Multiplication Product or Divide Remainder", false, product);
+        makeReadRegister(0x4216, "Multiplication Product or Divide Remainder", false, product, false);
 
         makeReadRegister(0x4218, "Controller Port 1 Data1 Register", false, controllerPort1Data1);
         makeReadRegister(0x421a, "Controller Port 2 Data1 Register low byte", false);

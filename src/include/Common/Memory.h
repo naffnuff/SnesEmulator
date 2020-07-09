@@ -107,9 +107,7 @@ public:
 protected:
     virtual void readImpl(Byte& bus)
     {
-        std::stringstream ss;
-        ss << "reading not allowed, bus value=" << bus;
-        throwAccessException(__FUNCTION__, ss.str());
+        throwAccessException(__FUNCTION__, "reading not allowed, bus value=", bus);
     }
 
     virtual void writeImpl(Byte)
@@ -117,9 +115,10 @@ protected:
         throwAccessException(__FUNCTION__, "writing not allowed");
     }
 
-    void throwAccessException(const std::string& function, const std::string& message) const
+    template<typename... Ts>
+    void throwAccessException(const std::string& function, const Ts&... message) const
     {
-        throw AccessException(typeid(this).name(), ": ", function, ": Bad memory access: ", message);
+        throw AccessException(typeid(this).name(), ": ", function, ": Bad memory access: ", message...);
     }
 
 private:
@@ -228,9 +227,10 @@ protected:
 class ReadRegister : public Register
 {
 public:
-    ReadRegister(Byte& bus, std::function<void(Byte&)> onRead)
+    ReadRegister(Byte& bus, std::function<void(Byte&)> onRead, bool throwOnWrite)
         : Register(bus)
         , onRead(onRead)
+        , throwOnWrite(throwOnWrite)
     {
     }
 
@@ -243,6 +243,13 @@ private:
             onRead(bus);
         }
         lastValue = bus;
+    }
+
+    void writeImpl(Byte) override
+    {
+        if (throwOnWrite) {
+            throwAccessException(__FUNCTION__, "writing not allowed");
+        }
     }
 
     void accept(LocationVisitor& visitor) const override
@@ -258,6 +265,7 @@ private:
 private:
     std::function<void(Byte&)> onRead;
     Byte lastValue;
+    const bool throwOnWrite = true;
 };
 
 class WriteRegister : public Register

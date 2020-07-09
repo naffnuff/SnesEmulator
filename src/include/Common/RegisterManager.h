@@ -71,7 +71,7 @@ public:
         makeWriteRegister(address + 2, info + " bank byte", debug, [&variable](Byte value) { variable.setBankByte(value); }, openBus);
     }
 
-    void makeReadRegister(AddressType address, const std::string& info, bool debug, std::function<void(Byte&)> callback = nullptr)
+    void makeReadRegister(AddressType address, const std::string& info, bool debug, std::function<void(Byte&)> callback = nullptr, bool throwOnWrite = true)
     {
         memory.createLocation<ReadRegister>(address,
             [this, address, callback, info, debug](Byte& value) {
@@ -81,36 +81,37 @@ public:
                 if (debug && value) {
                     printMemoryRegister(false, value, address, info);
                 }
-            }
+            },
+            throwOnWrite
         );
     };
 
-    void makeReadRegister(AddressType address, const std::string& info, bool debug, Byte& variable)
+    void makeReadRegister(AddressType address, const std::string& info, bool debug, Byte& variable, bool throwOnWrite = true)
     {
-        makeReadRegister(address, info, debug, [&variable](Byte& value) { value = variable; });
+        makeReadRegister(address, info, debug, [&variable](Byte& value) { value = variable; }, throwOnWrite);
     }
 
-    void makeReadRegister(AddressType address, const std::string& info, bool debug, int8_t& variable)
+    void makeReadRegister(AddressType address, const std::string& info, bool debug, int8_t& variable, bool throwOnWrite = true)
     {
-        makeReadRegister(address, info, debug, [&variable](Byte& value) { value = variable; });
+        makeReadRegister(address, info, debug, [&variable](Byte& value) { value = variable; }, throwOnWrite);
     }
 
-    void makeReadRegister(AddressType address, const std::string& info, bool debug, std::bitset<8> & variable)
+    void makeReadRegister(AddressType address, const std::string& info, bool debug, std::bitset<8> & variable, bool throwOnWrite = true)
     {
-        makeReadRegister(address, info, debug, [&variable](Byte& value) { value = uint8_t(variable.to_ulong()); });
+        makeReadRegister(address, info, debug, [&variable](Byte& value) { value = uint8_t(variable.to_ulong()); }, throwOnWrite);
     }
 
-    void makeReadRegister(AddressType address, const std::string& info, bool debug, const Word& variable)
+    void makeReadRegister(AddressType address, const std::string& info, bool debug, const Word& variable, bool throwOnWrite = true)
     {
-        makeReadRegister(address, info + " low byte", debug, [&variable](Byte& value) { value = variable.getLowByte(); });
-        makeReadRegister(address + 1, info + " high byte", debug, [&variable](Byte& value) { value = variable.getHighByte(); });
+        makeReadRegister(address, info + " low byte", debug, [&variable](Byte& value) { value = variable.getLowByte(); }, throwOnWrite);
+        makeReadRegister(address + 1, info + " high byte", debug, [&variable](Byte& value) { value = variable.getHighByte(); }, throwOnWrite);
     }
 
-    void makeReadRegister(AddressType address, const std::string& info, bool debug, const Long& variable)
+    void makeReadRegister(AddressType address, const std::string& info, bool debug, const Long& variable, bool throwOnWrite = true)
     {
-        makeReadRegister(address, info + " low byte", debug, [&variable](Byte& value) { value = variable.getLowByte(); });
-        makeReadRegister(address + 1, info + " high byte", debug, [&variable](Byte& value) { value = variable.getHighByte(); });
-        makeReadRegister(address + 2, info + " bank byte", debug, [&variable](Byte& value) { value = variable.getBankByte(); });
+        makeReadRegister(address, info + " low byte", debug, [&variable](Byte& value) { value = variable.getLowByte(); }, throwOnWrite);
+        makeReadRegister(address + 1, info + " high byte", debug, [&variable](Byte& value) { value = variable.getHighByte(); }, throwOnWrite);
+        makeReadRegister(address + 2, info + " bank byte", debug, [&variable](Byte& value) { value = variable.getBankByte(); }, throwOnWrite);
     }
 
     void makeReadWriteRegister(AddressType address, const std::string& info, bool debug, std::function<void(Byte&)> readCallback, std::function<void(Byte)> writeCallback)
