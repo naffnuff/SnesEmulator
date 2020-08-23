@@ -76,12 +76,16 @@ public:
                 }
             }
             system.output.debug("BYE AUDIO MONKEY! ");
-        } catch (const Audio::NotYetImplementedException& e) {
-            system.output.error(Output::Red, true, "AudioSystem thread: Caught Audio::NotYetImplementedException: ", e.what());
+        } catch (const ::NotYetImplementedException& e) {
+            system.output.error(Output::Red, true, "AudioSystem thread: ", e.what());
             system.context.printAddressHistory(system.output);
             //std::getchar();
-        } catch (const Audio::RuntimeError& e) {
-            system.output.error(Output::Red, true, "AudioSystem thread: Caught Audio::Exception: ", e.what());
+        } catch (const ::RuntimeError& e) {
+            system.output.error(Output::Red, true, "AudioSystem thread: ", e.what());
+            system.context.printAddressHistory(system.output);
+            //std::getchar();
+        } catch (const ::AccessException& e) {
+            system.output.error(Output::Red, true, "AudioSystem thread: ", e.what());
             system.context.printAddressHistory(system.output);
             //std::getchar();
         }
@@ -99,5 +103,6 @@ void AudioSystem::start()
     processor.startStream();
     if (threaded) {
         systemThread = std::thread(AudioSystemRunner(*this));
+        systemThreadStarted = true;
     }
 }

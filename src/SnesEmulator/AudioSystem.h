@@ -31,7 +31,9 @@ public:
     ~AudioSystem()
     {
         run = false;
-        systemThread.join();
+        if (systemThreadStarted) {
+            systemThread.join();
+        }
     }
 
     AudioSystem(const AudioSystem&) = delete;
@@ -97,6 +99,8 @@ private:
     Audio::Processor& processor;
 
     Debugger& debugger;
+
+    bool systemThreadStarted = false;
 
 public:
     std::thread systemThread;

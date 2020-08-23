@@ -105,8 +105,6 @@ void Emulator::initialize()
                 output.debug("Save RAM end address: ", saveRamAddress);
             }
         }
-
-        saveRamSaverThread = std::thread(std::ref(saveRamSaver));
     }
     else {
         throw std::runtime_error("Only the low-rom mempory map is supported for now");
@@ -123,6 +121,10 @@ void Emulator::initialize()
     debugger.loadBreakpoints(cpuContext, cpuState);
 
     cpuContext.nextInstruction = cpuInstructionDecoder.getNextInstruction(cpuState);
+    
+    saveRamSaverThread = std::thread(std::ref(saveRamSaver));
+
+    isInitialized = true;
 }
 
 void Emulator::run()

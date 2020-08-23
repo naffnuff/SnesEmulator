@@ -177,7 +177,7 @@ public:
                         processor.voices[i].envelopeType = Processor::Voice::ADSR;
                     } else {
                         processor.voices[i].envelopeType = Processor::Voice::Gain;
-                        throw NotYetImplementedException("Gain mode not supported");
+                        //throw NotYetImplementedException("Gain mode not supported");
                     }
                 }
             );

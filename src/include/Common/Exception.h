@@ -9,7 +9,7 @@ class NAME : public BASE \
 public: \
     template<typename... Ts> \
     NAME(const Ts&... message) \
-        : BASE(__FUNCTION__, message...) \
+        : BASE(__FUNCTION__, ": ", message...) \
     { \
     } \
 };

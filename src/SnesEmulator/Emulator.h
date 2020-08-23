@@ -82,9 +82,11 @@ public:
 
     ~Emulator()
     {
-        saveRamSaver.run = false;
-        saveRamSaver.condition.notify_one();
-        saveRamSaverThread.join();
+        if (isInitialized) {
+            saveRamSaver.run = false;
+            saveRamSaver.condition.notify_one();
+            saveRamSaverThread.join();
+        }
     }
 
     void initialize();
@@ -96,6 +98,8 @@ public:
     }
 
 private:
+    bool isInitialized = false;
+
     Output output;
 
     const Rom& rom;
