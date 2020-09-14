@@ -53,10 +53,10 @@ public:
         makeWriteRegister(address, info, debug, [&variable](Byte value) { variable = value; }, openBus);
     }
 
-    void makeWriteRegister(AddressType address, const std::string& info, bool debug, std::bitset<8> & variable, bool openBus = false)
+    /*void makeWriteRegister(AddressType address, const std::string& info, bool debug, std::bitset<8>& variable, bool openBus = false)
     {
         makeWriteRegister(address, info, debug, [&variable](Byte value) { variable = std::bitset<8>(value); }, openBus);
-    }
+    }*/
 
     void makeWriteRegister(AddressType address, const std::string& info, bool debug, Word& variable, bool openBus = false)
     {
@@ -96,10 +96,10 @@ public:
         makeReadRegister(address, info, debug, [&variable](Byte& value) { value = variable; }, throwOnWrite);
     }
 
-    void makeReadRegister(AddressType address, const std::string& info, bool debug, std::bitset<8> & variable, bool throwOnWrite = true)
+    /*void makeReadRegister(AddressType address, const std::string& info, bool debug, std::bitset<8> & variable, bool throwOnWrite = true)
     {
         makeReadRegister(address, info, debug, [&variable](Byte& value) { value = uint8_t(variable.to_ulong()); }, throwOnWrite);
-    }
+    }*/
 
     void makeReadRegister(AddressType address, const std::string& info, bool debug, const Word& variable, bool throwOnWrite = true)
     {
@@ -146,10 +146,10 @@ public:
         makeReadWriteRegister(address, info, debug, [&variable](Byte& value) { value = variable; }, [&variable](Byte value) { variable = value; });
     }
 
-    void makeReadWriteRegister(AddressType address, const std::string& info, bool debug, std::bitset<8>& variable)
+    /*void makeReadWriteRegister(AddressType address, const std::string& info, bool debug, std::bitset<8>& variable)
     {
         makeReadWriteRegister(address, info, debug, [&variable](Byte& value) { value = uint8_t(variable.to_ulong()); }, [&variable](Byte value) { variable = std::bitset<8>(value); });
-    }
+    }*/
 
     void makeReadWriteRegister(AddressType address, const std::string& info, bool debug, Word& variable)
     {

@@ -31,7 +31,7 @@ public:
         : RegisterManager(output, "audio", state.getMemory())
         , output(output, "audio")
         , spcMemory(state.getMemory())
-        , processor(output)
+        , processor(output, state.getMemory())
     {
         timers[2].highPrecision = true;
     }
@@ -121,23 +121,14 @@ public:
             std::string voiceName("Voice ");
             voiceName += '0' + i;
             voiceName += " ";
-            processor.makeWriteRegister(voiceAddressStart, voiceName + "Left Volume", false,
-                [this, i](Byte value) {
-                    processor.voices[i].leftVolume = toFactor(value);
-                }
-            );
-            processor.makeWriteRegister(voiceAddressStart + 1, voiceName + "Right Volume", false,
-                [this, i](Byte value) {
-                    processor.voices[i].rightVolume = toFactor(value);
-                }
-            );
+            processor.makeWriteRegister(voiceAddressStart, voiceName + "Left Volume", false, processor.voices[i].leftVolume);
+            processor.makeWriteRegister(voiceAddressStart + 1, voiceName + "Right Volume", false, processor.voices[i].rightVolume);
             processor.makeWriteRegister(voiceAddressStart + 2, voiceName + "Pitch low byte", false,
                 /*[this, i](Byte& value) {
                     value = processor.voices[i].pitch.getLowByte();
                 },*/
                 [this, i](Byte value) {
-                    voiceData[i].pitch.setLowByte(value);
-                    calculatePitch(i);
+                    processor.voices[i].pitch.setLowByte(value);
                 }
             );
             processor.makeWriteRegister(voiceAddressStart + 3, voiceName + "Pitch high byte", false,
@@ -145,27 +136,10 @@ public:
                     value = processor.voices[i].pitch.getHighByte();
                 },*/
                 [this, i](Byte value) {
-                    voiceData[i].pitch.setHighByte(value.getBits(0, 6));
-                    //voiceData[i].pitch.setHighByte(value);
-                    calculatePitch(i);
+                    processor.voices[i].pitch.setHighByte(value.getBits(0, 6));
                 }
             );
-            processor.makeWriteRegister(voiceAddressStart + 4, voiceName + "Source Number", false,
-                [this, i](Byte value) {
-                    if (((sourceDirectory << 8) | (value << 2)) != ((sourceDirectory << 8) + (value << 2))) {
-                        throw RuntimeError("Source address is wonky!");
-                    }
-                    Word sourceAddress = (sourceDirectory << 8) + (value << 2);
-                    output.debug("Picked sample for voice ", i, ": ", sourceAddress, ", dir: ", sourceDirectory, ", number: ", value);
-                    Word startAddress = spcMemory.readWord(sourceAddress);
-                    Word loopAddress = spcMemory.readWord(sourceAddress + 2);
-                    decodeSource(startAddress, loopAddress);
-                    processor.voices[i].bufferOffset = 0.0;
-                    processor.voices[i].inLoop = false;
-                    processor.voices[i].startAddress = startAddress;
-                    processor.voices[i].loopAddress = loopAddress;
-                }
-            );
+            processor.makeWriteRegister(voiceAddressStart + 4, voiceName + "Source Number", false, processor.voices[i].sourceNumber);
             processor.makeWriteRegister(voiceAddressStart + 5, voiceName + "ADSR low byte", false,
                 /*[this, i](Byte& value) {
                     value = processor.voices[i].attackRate | processor.voices[i].decayRate << 4 | processor.voices[i].envelopeType << 7;
@@ -187,7 +161,7 @@ public:
                 },*/
                 [this, i](Byte value) {
                     processor.voices[i].sustainRate = value.getBits(0, 5);
-                    processor.voices[i].sustainLevel = double(value.getBits(5, 3) + 1.0) / 8.0;
+                    processor.voices[i].sustainLevel = value.getBits(5, 3);
                 }
             );
             processor.makeWriteRegister(voiceAddressStart + 7, voiceName + "Gain", false,
@@ -211,45 +185,22 @@ public:
             //processor.makeReadRegister(voiceAddressStart + 8, voiceName + "Envelope", false, processor.renderer.data[i].envelope);
             //processor.makeReadRegister(voiceAddressStart + 9, voiceName + "Output", false, processor.renderer.data[i].output);
         }
-        processor.makeWriteRegister(0x0c, "Main Volume Left", false,
-            [this](Byte value) {
-                processor.mainVolumeLeft = toFactor(value);
-            }
-        );
-        processor.makeWriteRegister(0x1c, "Main Volume Right", false,
-            [this](Byte value) {
-                processor.mainVolumeRight = toFactor(value);
-            }
-        );
+        processor.makeWriteRegister(0x0c, "Main Volume Left", false, processor.mainVolumeLeft);
+        processor.makeWriteRegister(0x1c, "Main Volume Right", false, processor.mainVolumeRight);
         processor.makeWriteRegister(0x2c, "Echo Volume Left", false, processor.echoVolumeLeft);
         processor.makeWriteRegister(0x3c, "Echo Volume Right", false, processor.echoVolumeRight);
         processor.makeWriteRegister(0x4c, "Key On", false,
             [this](Byte value) {
-                std::bitset<8> newValue(value);
+                std::bitset<8> bitSet(value);
                 for (int i = 0; i < 8; ++i) {
-                    if (newValue[i] && !processor.keyOn[i]) {
-                        processor.voices[i].setEnvelopeStage(Processor::Voice::Attack);
-                        //pauseRequested = true;
+                    processor.voices[i].keyOn = bitSet[i];
+                    if (bitSet[i]) {
+                        processor.voices[i].keyOnIsSet = true;
                     }
-                }
-                processor.keyOn = newValue;
-                if (value) {
                 }
             }
         );
-        processor.makeWriteRegister(0x5c, "Key Off", false,
-            [this](Byte value) {
-                std::bitset<8> newValue(value);
-                for (int i = 0; i < 8; ++i) {
-                    if (newValue[i] && !processor.keyOff[i]) {
-                        processor.voices[i].setEnvelopeStage(Processor::Voice::Release);
-                    }
-                }
-                processor.keyOff = newValue;
-                if (value) {
-                    //pauseRequested = true;
-                }
-            });
+        processor.makeVoiceBitWriteRegister<&Processor::Voice::keyOff>(0x5c, "Key Off", false);
         processor.makeWriteRegister(0x6c, "Flags", false,
             /*[this](Byte& value) {
                 value = processor.reset << 7 | processor.mute << 6 | processor.echoOff << 5 | processor.noiseGeneratorClock;
@@ -265,13 +216,16 @@ public:
             /*[this](Byte& value) {
             },*/
             [this](Byte value) {
+                for (Processor::Voice& voice : processor.voices) {
+                    voice.sourceEndBlock = false;
+                }
             }
         );
         processor.makeWriteRegister(0x0d, "Echo Feedback", false, processor.echoFeedback);
-        processor.makeWriteRegister(0x2d, "Pitch Modulation", false, processor.pitchModulation);
-        processor.makeWriteRegister(0x3d, "Noise On", false, processor.noiseOn);
-        processor.makeWriteRegister(0x4d, "Echo On", false, processor.echoOn);
-        processor.makeWriteRegister(0x5d, "Source Directory Offset", true, sourceDirectory);
+        processor.makeVoiceBitWriteRegister<&Processor::Voice::pitchModulation>(0x2d, "Pitch Modulation", false);
+        processor.makeVoiceBitWriteRegister<&Processor::Voice::noiseOn>(0x3d, "Noise On", false);
+        processor.makeVoiceBitWriteRegister<&Processor::Voice::echoOn>(0x4d, "Echo On", false);
+        processor.makeWriteRegister(0x5d, "Source Directory Offset", true, processor.sourceDirectory);
         processor.makeWriteRegister(0x6d, "Echo Region Offset", false, processor.echoRegionOffset);
         processor.makeReadWriteRegister(0x7d, "Echo Delay", false,
             [this](Byte& value) {
@@ -281,10 +235,10 @@ public:
                 processor.echoDelay = value.getBits(0, 4);
             }
         );
-        for (int i = 0; i < processor.coefficients.size(); ++i) {
+        for (int i = 0; i < processor.voiceCount; ++i) {
             std::string coefficientName("Coefficient ");
             coefficientName += '0' + i;
-            processor.makeWriteRegister(i << 4 | 0x0f, coefficientName, false, processor.coefficients[i]);
+            processor.makeWriteRegister(i << 4 | 0x0f, coefficientName, false, processor.voices[i].coefficient);
         }
 
         processor.dspMemory.finalize();
@@ -306,104 +260,6 @@ public:
     {
         bootRomDataEnabled = true;
         timers = {};
-    }
-
-    void calculatePitch(int voice)
-    {
-        processor.voices[voice].pitch = float(voiceData[voice].pitch) / float(1 << 12);
-    }
-
-    double toFactor(Byte value)
-    {
-        if (value.isNegative()) {
-            return double(value) / 128.0;
-        } else {
-            return double(value) / 127.0;
-        }
-    }
-
-    void decodeSource(Word startAddress, Word loopAddress)
-    {
-        Processor::Sound& sound = processor.soundLibrary[Processor::SoundLibraryKey(startAddress, loopAddress)];
-        if (sound.start.empty() && sound.loop.empty()) {
-            output.debug("Decoding sample: ");
-            {
-                output.debug(startAddress, ":", loopAddress);
-            }
-            output.debug("StartAddress=", startAddress, ", loopAddress=", loopAddress);
-            Word currentAddress = startAddress;
-            double lastSample = 0.0;
-            double secondLastSample = 0.0;
-            bool end = false;
-            bool loop = false;
-            bool foundLoopStart = false;
-            std::vector<double>* sampleOutput = &sound.start;
-            while (!end) {
-                if (currentAddress == loopAddress) {
-                    output.debug("LOOPY!");
-                    foundLoopStart = true;
-                    sampleOutput = &sound.loop;
-                }
-                decodeBlock(currentAddress, *sampleOutput, lastSample, secondLastSample, end, loop);
-            }
-            if (loop) { // loop
-                output.debug("LOOPING CONFIRMED");
-                if (loopAddress >= startAddress && loopAddress < currentAddress) {
-                    if (!foundLoopStart) {
-                        throw RuntimeError("Da fuck!");
-                    }
-                    output.debug("Difference: ", loopAddress - startAddress);
-                    output.debug("Blocks: ", double(loopAddress - startAddress) / 9.0);
-                    output.debug("Samples: ", double(loopAddress - startAddress) / 9.0 * 16.0);
-                    int loopIndex = (loopAddress - startAddress) / 9 * 16;
-                    int endIndex = (currentAddress - startAddress) / 9 * 16;
-                    output.debug("loop index: ", loopIndex, " / ", endIndex);
-                } else {
-                    std::ostringstream ss;
-                    ss << "Loop address is bananas: start=" << startAddress << ", loop=" << loopAddress << ", current=" << currentAddress;
-                    throw RuntimeError(ss.str());
-                }
-            } else {
-                output.debug("NOT LOOPING!");
-                if (!sound.loop.empty()) {
-                    throw RuntimeError("Should not create loop!");
-                }
-            }
-            output.debug("Finishing address: ", currentAddress);
-            output.debug("Start sample count: ", sound.start.size(), ", loop sample count: ", sound.loop.size());
-            libraryByteCount += int(sound.start.size() + sound.loop.size()) * 8;
-            output.debug("Sound library size: ", libraryByteCount, " bytes");
-        }
-    }
-
-    void decodeBlock(Word& currentAddress, std::vector<double>& sampleOutput, double& lastSample, double& secondLastSample, bool& end, bool& loop)
-    {
-        Byte header = spcMemory.readByte(currentAddress++);
-        end = header.getBit(0);
-        loop = header.getBit(1);
-        Byte filter = header.getBits(2, 2);
-        //output << "FUCKING FILTER: " << filter << std::endl;
-        Byte range = header.getBits(4, 4);
-        for (int i = 0; i < 8; ++i) {
-            Byte sampleSource = spcMemory.readByte(currentAddress++);
-            for (int8_t sample : { sampleSource.getBits(4, 4), sampleSource.getBits(0, 4) }) {
-                if (sample >= 8) { // negative
-                    sample |= 0xf0;
-                }
-                double doubleSample = double((int64_t(sample) << range));
-                size_t size = sampleOutput.size();
-                if (filter == 1) {
-                    doubleSample += lastSample * 15.0 / 16.0;
-                } else if (filter == 2) {
-                    doubleSample += lastSample * 61.0 / 32.0 - secondLastSample * 15.0 / 16.0;
-                } else if (filter == 3) {
-                    doubleSample += lastSample * 115.0 / 64.0 - secondLastSample * 13.0 / 16.0;
-                }
-                sampleOutput.push_back(doubleSample / double(0x8000));
-                secondLastSample = lastSample;
-                lastSample = doubleSample;
-            }
-        }
     }
 
     Output output;
@@ -428,16 +284,6 @@ public:
        0xcb, 0xf4, 0xd7, 0x00, 0xfc, 0xd0, 0xf3, 0xab, 0x01, 0x10, 0xef, 0x7e, 0xf4, 0x10, 0xeb, 0xba,
        0xf6, 0xda, 0x00, 0xba, 0xf4, 0xc4, 0xf4, 0xdd, 0x5d, 0xd0, 0xdb, 0x1f, 0x00, 0x00, 0xc0, 0xff,
     };
-
-    struct VoiceData
-    {
-        Word pitch;
-        Byte sourceNumber;
-    };
-
-    std::array<VoiceData, Processor::voiceCount> voiceData;
-
-    Byte sourceDirectory;
 
     int libraryByteCount = 0;
 };

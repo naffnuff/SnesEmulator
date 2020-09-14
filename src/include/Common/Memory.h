@@ -45,18 +45,18 @@ public:
 public:
     Byte read()
     {
-        readImpl(bus);
+        const Byte value = readImpl(bus);
         if (breakpoint) {
-            breakpoint(Read, bus, 0);
+            breakpoint(Read, value, 0);
         }
-        return bus;
+        return value;
     }
 
     Byte apply()
     {
-        readImpl(bus);
+        const Byte value = readImpl(bus);
         ++applicationCount;
-        return bus;
+        return value;
     }
 
     void write(Byte value)
@@ -105,9 +105,10 @@ public:
     virtual void print(std::ostream& out) const = 0;
 
 protected:
-    virtual void readImpl(Byte& bus)
+    virtual Byte readImpl(Byte& bus)
     {
         throwAccessException(__FUNCTION__, "reading not allowed, bus value=", bus);
+        return bus;
     }
 
     virtual void writeImpl(Byte)
@@ -159,9 +160,10 @@ public:
     }
 
 private:
-    void readImpl(Byte& bus) override
+    Byte readImpl(Byte& bus) override
     {
         bus = value;
+        return value;
     }
 
     Byte inspect() const override
@@ -235,14 +237,17 @@ public:
     }
 
 private:
-    void readImpl(Byte& bus) override
+    Byte readImpl(Byte& bus) override
     {
+        Byte value;
         if (onRead == nullptr) {
-            Register::readImpl(bus);
+            value = Register::readImpl(bus);
         } else {
-            onRead(bus);
+            onRead(value);
         }
-        lastValue = bus;
+        lastValue = value;
+        bus = value;
+        return value;
     }
 
     void writeImpl(Byte) override
@@ -308,8 +313,9 @@ class OpenBusWriteRegister : public WriteRegister
     using WriteRegister::WriteRegister;
 
 private:
-    void readImpl(Byte&) override
+    Byte readImpl(Byte& bus) override
     {
+        return bus;
     }
 };
 
@@ -318,11 +324,12 @@ class VideoOpenBusWriteRegister : public WriteRegister
     using WriteRegister::WriteRegister;
 
 private:
-    void readImpl(Byte& bus) override
+    Byte readImpl(Byte& bus) override
     {
         std::stringstream ss;
         ss << "VIDEO OPEN BUS REGISTER, bus value=" << bus;
         throwAccessException(__FUNCTION__, ss.str());
+        return bus;
     }
 };
 
@@ -338,14 +345,17 @@ public:
     }
 
 private:
-    void readImpl(Byte& bus) override
+    Byte readImpl(Byte& bus) override
     {
+        Byte value;
         if (onRead == nullptr) {
-            Register::readImpl(bus);
+            value = Register::readImpl(bus);
         } else {
-            bus = 0xfa;
-            onRead(bus);
+            value = 0xfa;
+            onRead(value);
         }
+        bus = value;
+        return value;
     }
 
     void writeImpl(Byte value) override
@@ -386,13 +396,16 @@ public:
     }
 
 private:
-    void readImpl(Byte& bus) override
+    Byte readImpl(Byte& bus) override
     {
+        Byte value;
         if (bootRomDataEnabled) {
-            bus = bootRomValue;
+            value = bootRomValue;
         } else {
-            bus = ramValue;
+            value = ramValue;
         }
+        bus = value;
+        return value;
     }
 
     void writeImpl(Byte newValue) override
@@ -711,7 +724,7 @@ public:
 
 private:
     std::vector<std::shared_ptr<Location>> memory;
-    uint32_t memorySize;
+    const uint32_t memorySize;
 };
 
 template<typename Memory>

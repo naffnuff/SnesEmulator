@@ -8,6 +8,37 @@
 
 namespace Types {
 
+template<int bitCount, typename T>
+T signedClamp(T value)
+{
+    constexpr int32_t max = (1 << (bitCount - 1)) - 1;
+    if (value > max) {
+        value = max;
+    } else if (value < ~max) {
+        value = ~max;
+    }
+    return value;
+}
+
+template<int bitCount, typename T>
+T unsignedClamp(T value)
+{
+    constexpr int32_t max = (1 << bitCount) - 1;
+    if (value > max) {
+        value = max;
+    } else if (value < 0) {
+        value = 0;
+    }
+    return value;
+}
+
+template<int bitCount, typename T>
+T clip(T value)
+{
+    constexpr int32_t max = (1 << bitCount) - 1;
+    return value & max;
+}
+
 template<typename T>
 struct SpaceSize
 {

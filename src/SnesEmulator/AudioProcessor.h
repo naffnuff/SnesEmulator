@@ -59,16 +59,13 @@ private:
                 throw RuntimeError(__FUNCTION__ ": Frequency index is out-of-bounds");
             }
             frequency = getTable()[index];
-            if (frequency == 0) {
-                throw RuntimeError(__FUNCTION__ ": Frequency is zero");
-            }
             counter = 0;
         }
 
         bool tick()
         {
             if (frequency == 0) {
-                throw RuntimeError(__FUNCTION__ ": Frequency is zero");
+                return false;
             }
             if (counter >= frequency) {
                 throw RuntimeError(__FUNCTION__ ": Counter is beyond frequency: counter: ", counter, ", frequency: ", frequency);
@@ -86,19 +83,6 @@ private:
     };
 
 public:
-    struct Sound
-    {
-        Sound() = default;
-
-        Sound(const Sound&) = delete;
-        Sound& operator=(const Sound&) = delete;
-
-        std::vector<double> start;
-        std::vector<double> loop;
-    };
-    using SoundLibraryKey = std::pair<Word, Word>;
-    using SoundLibrary = std::map<SoundLibraryKey, Sound>;
-
     class Voice
     {
     public:
@@ -117,7 +101,7 @@ public:
             ExponentialDecrease = 1
         };
 
-        enum EnvelopeStage
+        enum ADSRStage
         {
             Inactive,
             Attack,
@@ -126,23 +110,45 @@ public:
             Release,
         };
 
-        double leftVolume = 0.0f;
-        double rightVolume = 0.0f;
-        double pitch = 0.0f;
+        Voice(Processor& processor)
+            : processor(processor)
+        {
+        }
+
+        Word headerAddress;
+        Word nextSampleAddress;
+
+        std::array<int16_t, 12> sampleBuffer;
+
+        int8_t leftVolume = 0;
+        int8_t rightVolume = 0;
+
+        Word pitch;
+
         Byte attackRate;
         Byte decayRate;
         Byte sustainRate;
-        double sustainLevel;
-        double envelope = 0.0;
-        double output = 0.0;
+        Byte sustainLevel;
+
+        Byte sourceNumber;
+
+        Word envelope;
+        Word output;
+
+        int setupPhase = 0;
+        bool keyOnIsSet = false;
+
+        bool keyOn = false;
+        bool keyOff = false;
+        bool sourceEndBlock = false;
+        bool pitchModulation = false;
+        bool noiseOn = false;
+        bool echoOn = false;
+        Byte coefficient;
+
+        uint16_t interpolationIndex = 0;
 
         FrequencyCounter frequencyCounter;
-        double outputBase = 0.0;
-        double outputCoefficient = 0.0;
-        bool inLoop = false;
-        double bufferOffset = 0.0f;
-        Word startAddress;
-        Word loopAddress;
 
         EnvelopeType envelopeType = Gain;
         GainMode gainMode;
@@ -178,23 +184,50 @@ public:
             }
         }
 
-        void setEnvelopeStage(EnvelopeStage nextStage);
+        void calculateNextSample(int16_t& nextSample);
+        void setADSRStage(ADSRStage nextStage);
         void calculateEnvelope();
-        double sample(SoundLibrary& sounds);
+        void readSampleAddress(bool loopAddress);
+        void decodeNextBlock();
 
     private:
-        EnvelopeStage envelopeStage = Inactive;
+        Processor& processor;
+        ADSRStage adsrStage = Inactive;
     };
 
     static constexpr int tableSize = 50;
     static constexpr int voiceCount = 8;
 
-    Processor(Output& output);
+    Processor(Output& output, Memory<Word>& spcMemory);
 
     Processor(const Processor&) = delete;
     Processor& operator=(const Processor&) = delete;
 
     ~Processor();
+
+    template<bool Voice::*DataMember>
+    void setVoiceBits(Byte value)
+    {
+        for (int i = 0; i < voiceCount; ++i) {
+            voices[i].*DataMember = value.getBit(i);
+        }
+    }
+
+    template<bool Voice::*DataMember>
+    Byte getVoiceBits() const
+    {
+        Byte result;
+        for (int i = 0; i < voiceCount; ++i) {
+            result.setBit(i, voices[i].*DataMember);
+        }
+        return result;
+    }
+
+    template<bool Voice::*DataMember>
+    void makeVoiceBitWriteRegister(AddressType address, const std::string& info, bool debug, bool openBus = false)
+    {
+        makeWriteRegister(address, info, debug, [this](Byte value) { setVoiceBits<DataMember>(value); }, openBus);
+    }
 
     void initialize();
     void startStream();
@@ -219,37 +252,30 @@ public:
 
 private:
     bool checkStreamStatus(unsigned long flags);
-    void outputSample(float& leftChannel, float& rightChannel);
+    void outputNextSample(float& leftChannel, float& rightChannel);
 
     void printTimeInfo(double currentTime);
 
 public:
     uint64_t dspCycle = 0;
 
+    Memory<Word>& spcMemory;
     Memory<Byte> dspMemory;
 
-    std::array<Voice, voiceCount> voices;
+    std::array<Voice, voiceCount> voices = { *this, *this, *this, *this, *this, *this, *this, *this };
+    int8_t mainVolumeLeft;
+    int8_t mainVolumeRight;
     int8_t echoVolumeLeft;
     int8_t echoVolumeRight;
-    std::bitset<voiceCount> keyOn;
-    std::bitset<voiceCount> keyOff;
     bool reset = false;
     bool mute = false;
     bool echoOff = false;
+    bool end = false;
     Byte noiseGeneratorClock;
-    std::bitset<voiceCount> sourceEndBlock;    
     int8_t echoFeedback = 0;
-    std::bitset<voiceCount> pitchModulation;
-    std::bitset<voiceCount> noiseOn;
-    std::bitset<voiceCount> echoOn;
+    Byte sourceDirectory;
     Byte echoRegionOffset;
     Byte echoDelay;
-    std::array<Byte, voiceCount> coefficients;
-
-    SoundLibrary soundLibrary;
-
-    double mainVolumeLeft;
-    double mainVolumeRight;
 
     void* stream;
 

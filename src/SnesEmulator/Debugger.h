@@ -511,28 +511,28 @@ public:
         output.printLine(lock, "CPU bus: ", cpuState.getMemory().bus);
 
         output.printLine(lock, "Main Vol    Echo Vol    Key On    Key Off   R M E Gen Src End   Echo FB   Pitch Mod Noise On  Echo On   Dir ER  Delay");
-        output.printLine(lock, std::left, std::setfill(' '), std::setw(4), audioProcessor.mainVolumeLeft,
-            "  ", std::setw(4), audioProcessor.mainVolumeRight,
+        output.printLine(lock, std::left, std::setfill(' '), std::setw(4), +audioProcessor.mainVolumeLeft,
+            "  ", std::setw(4), +audioProcessor.mainVolumeRight,
             "  ", std::setw(4), +audioProcessor.echoVolumeLeft,
             "  ", std::setw(4), +audioProcessor.echoVolumeRight,
-            "  ", audioProcessor.keyOn,
-            "  ", audioProcessor.keyOff,
+            "  ", audioProcessor.getVoiceBits<&Audio::Processor::Voice::keyOn>(),
+            "  ", audioProcessor.getVoiceBits<&Audio::Processor::Voice::keyOff>(),
             "  ", audioProcessor.reset,
             " ", audioProcessor.mute,
             " ", audioProcessor.echoOff,
             " ", audioProcessor.noiseGeneratorClock,
-            "  ", audioProcessor.sourceEndBlock,
+            "  ", audioProcessor.getVoiceBits<&Audio::Processor::Voice::sourceEndBlock>(),
             "  ", std::setw(8), +audioProcessor.echoFeedback,
-            "  ", audioProcessor.pitchModulation,
-            "  ", audioProcessor.noiseOn,
-            "  ", audioProcessor.echoOn,
-            "  ", audioRegisters.sourceDirectory,
+            "  ", audioProcessor.getVoiceBits<&Audio::Processor::Voice::pitchModulation>(),
+            "  ", audioProcessor.getVoiceBits<&Audio::Processor::Voice::noiseOn>(),
+            "  ", audioProcessor.getVoiceBits<&Audio::Processor::Voice::echoOn>(),
+            "  ", audioProcessor.sourceDirectory,
             "  ", audioProcessor.echoRegionOffset,
             "  ", audioProcessor.echoDelay);
 
         output.print(lock, "Filter coefficients:");
-        for (int i = 0; i < audioProcessor.coefficients.size(); ++i) {
-            output.print(lock, "  ", audioProcessor.coefficients[i]);
+        for (int i = 0; i < audioProcessor.voiceCount; ++i) {
+            output.print(lock, "  ", audioProcessor.voices[i].coefficient);
         }
         output.printLine(lock);
 
@@ -540,10 +540,10 @@ public:
         for (int i = 0; i < audioProcessor.voices.size(); ++i) {
             const Audio::Processor::Voice& voice = audioProcessor.voices[i];
             output.printLine(lock, i, ": ",
-                std::left, std::setfill(' '), std::setw(10), voice.leftVolume,
-                "  ", std::setw(10), voice.rightVolume,
+                std::left, std::setfill(' '), std::setw(10), +voice.leftVolume,
+                "  ", std::setw(10), +voice.rightVolume,
                 "  ", std::left, std::setfill(' '), std::setw(10), voice.pitch, "",
-                "  ", audioRegisters.voiceData[i].sourceNumber,
+                "  ", audioProcessor.voices[i].sourceNumber,
                 "   ", voice.envelopeTypeToString(),
                 " ", voice.attackRate,
                 " ", voice.decayRate,
