@@ -26,7 +26,7 @@ public:
         , height(height)
         , scale(scale)
         , syncUpdate(syncUpdate)
-        , pixelBuffer(size_t(height* width))
+        , pixelBuffer(size_t(height) * size_t(width))
         , title("SNES Emulator")
     {
     }
@@ -88,10 +88,10 @@ public:
     std::string title;
 
     float scale;
-    float xScale;
-    float yScale;
-    float xScreenCoverage;
-    float yScreenCoverage;
+    float xScale = 0.0f;
+    float yScale = 0.0f;
+    float xScreenCoverage = 0.0f;
+    float yScreenCoverage = 0.0f;
     const bool syncUpdate;
 
     int pressKeyTimeout = 0;

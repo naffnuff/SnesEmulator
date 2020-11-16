@@ -23,7 +23,7 @@ public:
     typedef MemoryAccess<MemoryType> MemoryAccessType;
     typedef ConstMemoryAccess<MemoryType> ConstMemoryAccessType;
 
-    enum Flag
+    enum class Flag
     {
         c = 1 << 0, // Carry
         z = 1 << 1, // Zero
@@ -35,14 +35,14 @@ public:
         n = 1 << 7  // Negative
     };
 
-    enum Register
+    enum class Register
     {
         A,
         Y,
         X,
         SP,
         PSW,
-        RegisterCount
+        Count
     };
 
 private:
@@ -52,30 +52,30 @@ private:
         template<Register RegisterIndex>
         Byte readByte() const
         {
-            return registers[RegisterIndex];
+            return registers[size_t(RegisterIndex)];
         }
 
         template<Register RegisterIndex>
         Word readWord() const
         {
-            return Word(registers[RegisterIndex], registers[RegisterIndex + 1]);
+            return Word(registers[size_t(RegisterIndex)], registers[size_t(RegisterIndex) + 1]);
         }
 
         template<Register RegisterIndex>
         void writeByte(Byte value)
         {
-            registers[RegisterIndex] = value;
+            registers[size_t(RegisterIndex)] = value;
         }
 
         template<Register RegisterIndex>
         void writeWord(Word value)
         {
-            registers[RegisterIndex] = value.getLowByte();
-            registers[RegisterIndex + 1] = value.getHighByte();
+            registers[size_t(RegisterIndex)] = value.getLowByte();
+            registers[size_t(RegisterIndex) + 1] = value.getHighByte();
         }
 
     private:
-        std::array<Byte, RegisterCount> registers;
+        std::array<Byte, size_t(Register::Count)> registers;
     };
 
 public:
@@ -118,10 +118,10 @@ public:
         : programCounter(0xffc0)
     {
         for (Word address = 0; address < 0xf0; ++address) {
-            memory.createLocation<ReadWriteMemory>(address, 0x55);
+            memory.createLocation<ReadWriteMemory>(address, Byte(0x55));
         }
         for (Word address = 0x100; address < 0xffc0; ++address) {
-            memory.createLocation<ReadWriteMemory>(address, 0x55);
+            memory.createLocation<ReadWriteMemory>(address, Byte(0x55));
         }
     }
 
@@ -132,7 +132,7 @@ public:
     {
         programCounter = 0xffc0;
         for (uint32_t i = 0; i < memory.size(); ++i) {
-            memory.reset(i);
+            memory.reset(Word(i));
         }
     }
 
@@ -146,21 +146,21 @@ public:
         std::string flagsString = "nvpbhizc";
 
         for (size_t i = 0; i < flagsString.size(); ++i) {
-            if (readRegister<PSW>() & 1 << i) {
-                flagsString[flagsString.size() - i - 1] = toupper(flagsString[flagsString.size() - i - 1]);
+            if (readRegister<Register::PSW>() & 1 << i) {
+                flagsString[flagsString.size() - i - 1] = (char)toupper(flagsString[flagsString.size() - i - 1]);
             }
         }
 
-        std::bitset<8> flagSet(readRegister<PSW>());
+        std::bitset<8> flagSet(readRegister<Register::PSW>());
 
         output.print(lock,
             "PC=", programCounter,
-            ", A=", readRegister<A>(),
-            ", X=", readRegister<X>(),
-            ", Y=", readRegister<Y>(),
+            ", A=", readRegister<Register::A>(),
+            ", X=", readRegister<Register::X>(),
+            ", Y=", readRegister<Register::Y>(),
             ", S=", getStackPointer(),
             ", YA=", getYAccumulator(),
-            ", flags=", flagSet, " (", flagsString, ", $", readRegister<PSW>(), ")");
+            ", flags=", flagSet, " (", flagsString, ", $", readRegister<Register::PSW>(), ")");
     }
 
     Word getProgramAddress(int offset = 0) const
@@ -170,7 +170,7 @@ public:
 
     Word getProgramCounter(int offset = 0) const
     {
-        return programCounter + offset;
+        return Word(int(programCounter) + offset);
     }
 
     void setProgramCounter(Word value)
@@ -221,12 +221,12 @@ public:
 
     Word getStackPointer() const
     {
-        return 0x0100 | readRegister<SP>();
+        return 0x0100 | readRegister<Register::SP>();
     }
 
     Word getYAccumulator() const
     {
-        return registers.readWord<A>();
+        return registers.readWord<Register::A>();
     }
 
     MemoryType& getMemory()
@@ -244,25 +244,25 @@ public:
         return readMemoryByte(Word(lowByte, highByte));
     }
 
-    template<MemoryType::WrappingMask Wrapping = MemoryType::Full>
+    template<MemoryType::WrappingMask Wrapping = MemoryType::WrappingMask::Full>
     Word readMemoryWord(Word address)
     {
         return memory.readWord<Wrapping>(address);
     }
 
-    template<MemoryType::WrappingMask Wrapping = MemoryType::Full>
+    template<MemoryType::WrappingMask Wrapping = MemoryType::WrappingMask::Full>
     ConstMemoryAccessType getConstMemoryAccess(Word address) const
     {
         return ConstMemoryAccessType(memory, address, Wrapping);
     }
 
-    template<MemoryType::WrappingMask Wrapping = MemoryType::Full>
+    template<MemoryType::WrappingMask Wrapping = MemoryType::WrappingMask::Full>
     MemoryAccessType getMemoryAccess(Word address)
     {
         return MemoryAccess(memory, address, Wrapping);
     }
 
-    template<MemoryType::WrappingMask Wrapping = MemoryType::Full>
+    template<MemoryType::WrappingMask Wrapping = MemoryType::WrappingMask::Full>
     MemoryAccessType getMemoryAccess(Byte lowByte, Byte highByte)
     {
         return getMemoryAccess(Word(lowByte, highByte));
@@ -270,7 +270,7 @@ public:
 
     Word getDirectAddress(Byte lowByte) const
     {
-        if (getFlag(p)) {
+        if (getFlag(Flag::p)) {
             return Word(lowByte, 0x01);
         }
         else {
@@ -315,7 +315,7 @@ public:
     static std::string getRegisterName()
     {
         std::string names[] = { "A", "Y", "X", "SP", "PSW" };
-        return names[RegisterIndex];
+        return names[size_t(RegisterIndex)];
     }
 
     template<Flag Flag>
@@ -323,45 +323,50 @@ public:
     {
         std::string names[] = { "C", "Z", "I", "H", "B", "P", "V", "N" };
         for (int i = 0; i < 8; ++i) {
-            if (1 << i == Flag) {
+            if (1 << i == int(Flag)) {
                 return names[i];
             }
         }
         return "";
     }
 
-    void setFlag(Byte flag, bool value)
+    void setFlag(Flag flag, bool value)
+    {
+        setMultipleFlags(uint8_t(flag), value);
+    }
+
+    void setMultipleFlags(Byte flags, bool value)
     {
         if (value) {
-            writeRegister<PSW>(readRegister<PSW>() | flag);
+            writeRegister<Register::PSW>(readRegister<Register::PSW>() | flags);
         }
         else {
-            writeRegister<PSW>(readRegister<PSW>() & ~flag);
+            writeRegister<Register::PSW>(readRegister<Register::PSW>() & ~flags);
         }
     }
 
     bool getFlag(Flag flag) const
     {
-        return readRegister<PSW>() & flag;
+        return readRegister<Register::PSW>() & int(flag);
     }
 
     void setFlags(Byte value)
     {
-        writeRegister<PSW>(value);
+        writeRegister<Register::PSW>(value);
     }
 
     template<typename T>
     void updateSignFlags(T value)
     {
-        setFlag(State::z, value == 0);
-        setFlag(State::n, value.isNegative());
+        setFlag(State::Flag::z, value == 0);
+        setFlag(State::Flag::n, value.isNegative());
     }
 
     void pushToStack(Byte byte)
     {
-        Byte stackLowByte = registers.readByte<SP>();
+        Byte stackLowByte = registers.readByte<Register::SP>();
         MemoryAccess access = getMemoryAccess(stackLowByte, 0x01);
-        registers.writeByte<SP>(stackLowByte - 1);
+        registers.writeByte<Register::SP>(stackLowByte - 1);
         access.writeByte(byte);
     }
 
@@ -373,9 +378,9 @@ public:
 
     Byte pullFromStack()
     {
-        Byte stackLowByte = registers.readByte<SP>();
+        Byte stackLowByte = registers.readByte<Register::SP>();
         MemoryAccess access = getMemoryAccess(++stackLowByte, 0x01);
-        registers.writeByte<SP>(stackLowByte);
+        registers.writeByte<Register::SP>(stackLowByte);
         return access.readByte();
     }
 

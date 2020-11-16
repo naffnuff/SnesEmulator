@@ -34,6 +34,7 @@ int main(int, char**)
                         if (titles.empty()) {
                             output.printLine(lock, "Put some ROM images in the same folder as the application file and press enter!");
                             int dummy = std::getchar();
+                            dummy = dummy;
                         }
                     }
                     output.printLine(lock);

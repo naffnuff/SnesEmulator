@@ -118,7 +118,7 @@ public:
         }
 
         if (transferWord) {
-            memory.writeWord<CPU::State::MemoryType::Bank>(memory.readWord<CPU::State::MemoryType::Bank>(sourceAddress), destinationAddress);
+            memory.writeWord<CPU::State::MemoryType::WrappingMask::Bank>(memory.readWord<CPU::State::MemoryType::WrappingMask::Bank>(sourceAddress), destinationAddress);
             byteCount += 2;
         }
         else {

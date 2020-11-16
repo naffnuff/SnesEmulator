@@ -32,7 +32,7 @@ public:
         Word Irq;
     };
 
-    enum Flag
+    enum class Flag
     {
         c = 1 << 0, // Carry
         z = 1 << 1, // Zero
@@ -45,11 +45,11 @@ public:
         n = 1 << 7  // Negative
     };
 
-    enum IndexRegister
+    enum class IndexRegister
     {
         X = 0,
         Y = 1,
-        IndexRegisterCount
+        Count
     };
 
 private:
@@ -156,19 +156,19 @@ public:
 
     void loadInterruptVectors()
     {
-        nativeVectors.Coprocessor = memory.readWord<MemoryType::Bank>(0xFFE4);
-        nativeVectors.Break = memory.readWord<MemoryType::Bank>(0xFFE6);
-        nativeVectors.Abort = memory.readWord<MemoryType::Bank>(0xFFE8);
-        nativeVectors.Nmi = memory.readWord<MemoryType::Bank>(0xFFEA);
-        nativeVectors.Reset = memory.readWord<MemoryType::Bank>(0xFFEC);
-        nativeVectors.Irq = memory.readWord<MemoryType::Bank>(0xFFEE);
+        nativeVectors.Coprocessor = memory.readWord<MemoryType::WrappingMask::Bank>(0xFFE4);
+        nativeVectors.Break = memory.readWord<MemoryType::WrappingMask::Bank>(0xFFE6);
+        nativeVectors.Abort = memory.readWord<MemoryType::WrappingMask::Bank>(0xFFE8);
+        nativeVectors.Nmi = memory.readWord<MemoryType::WrappingMask::Bank>(0xFFEA);
+        nativeVectors.Reset = memory.readWord<MemoryType::WrappingMask::Bank>(0xFFEC);
+        nativeVectors.Irq = memory.readWord<MemoryType::WrappingMask::Bank>(0xFFEE);
 
-        emulationVectors.Coprocessor = memory.readWord<MemoryType::Bank>(0xFFF4);
-        emulationVectors.Break = memory.readWord<MemoryType::Bank>(0xFFF6);
-        emulationVectors.Abort = memory.readWord<MemoryType::Bank>(0xFFF8);
-        emulationVectors.Nmi = memory.readWord<MemoryType::Bank>(0xFFFA);
-        emulationVectors.Reset = memory.readWord<MemoryType::Bank>(0xFFFC);
-        emulationVectors.Irq = memory.readWord<MemoryType::Bank>(0xFFFE);
+        emulationVectors.Coprocessor = memory.readWord<MemoryType::WrappingMask::Bank>(0xFFF4);
+        emulationVectors.Break = memory.readWord<MemoryType::WrappingMask::Bank>(0xFFF6);
+        emulationVectors.Abort = memory.readWord<MemoryType::WrappingMask::Bank>(0xFFF8);
+        emulationVectors.Nmi = memory.readWord<MemoryType::WrappingMask::Bank>(0xFFFA);
+        emulationVectors.Reset = memory.readWord<MemoryType::WrappingMask::Bank>(0xFFFC);
+        emulationVectors.Irq = memory.readWord<MemoryType::WrappingMask::Bank>(0xFFFE);
     }
 
     size_t getMemorySize() const
@@ -187,7 +187,7 @@ public:
         }
         for (size_t i = 0; i < flagsString.size(); ++i) {
             if (flags & 1 << i) {
-                flagsString[flagsString.size() - i - 1] = toupper(flagsString[flagsString.size() - i - 1]);
+                flagsString[flagsString.size() - i - 1] = (char)toupper(flagsString[flagsString.size() - i - 1]);
             }
         }
 
@@ -197,8 +197,8 @@ public:
             "PB=", programBank,
             ", PC=", programCounter,
             ", A=", getAccumulatorC(),
-            ", X=", getIndexRegister<X>(),
-            ", Y=", getIndexRegister<Y>(),
+            ", X=", getIndexRegister<IndexRegister::X>(),
+            ", Y=", getIndexRegister<IndexRegister::Y>(),
             ", S=", stackPointer,
             ", DP=", directPage,
             ", DB=", dataBank,
@@ -206,8 +206,15 @@ public:
             ", e=", emulationMode);
     }
 
-    void setFlag(Byte flag, bool value)
+    void setFlag(Flag flag, bool value)
     {
+        setMultipleFlags(value, flag);
+    }
+
+    template< typename... Args >
+    void setMultipleFlags(bool value, Args... args)
+    {
+        uint8_t flag = (... | uint8_t(args));
         Byte oldFlags = flags;
         if (value) {
             flags |= flag;
@@ -221,7 +228,7 @@ public:
 
     bool getFlag(Flag flag) const
     {
-        return flags & flag;
+        return flags & int(flag);
     }
 
     void setFlags(Byte value)
@@ -282,7 +289,7 @@ public:
 
     Word getProgramCounter(int offset = 0) const
     {
-        return programCounter + offset;
+        return Word(int(programCounter) + offset);
     }
 
     Byte getProgramBank() const
@@ -329,7 +336,7 @@ public:
     }
 
     template<typename LocationType, typename... Args>
-    void createMemoryLocation(Long address, Args&&... args)
+    void createMemoryLocation(AddressType address, Args&&... args)
     {
         memory.createLocation<LocationType, Args...>(address, std::forward<Args>(args)...);
     }
@@ -344,13 +351,13 @@ public:
         memory.writeByte(value, address);
     }
 
-    template<MemoryType::WrappingMask Wrapping = MemoryType::Full>
+    template<MemoryType::WrappingMask Wrapping = MemoryType::WrappingMask::Full>
     Word readMemoryWord(Long address)
     {
         return memory.readWord<Wrapping>(address);
     }
 
-    template<MemoryType::WrappingMask Wrapping = MemoryType::Full>
+    template<MemoryType::WrappingMask Wrapping = MemoryType::WrappingMask::Full>
     Long readMemoryLong(Long address)
     {
         return memory.readLong<Wrapping>(address);
@@ -366,25 +373,25 @@ public:
         return memory;
     }
 
-    template<MemoryType::WrappingMask Wrapping = MemoryType::Full>
+    template<MemoryType::WrappingMask Wrapping = MemoryType::WrappingMask::Full>
     MemoryAccessType getMemoryAccess(Long address, Word offset = 0)
     {
         return MemoryAccess(memory, Long(address + offset), Wrapping);
     }
 
-    template<MemoryType::WrappingMask Wrapping = MemoryType::Full>
+    template<MemoryType::WrappingMask Wrapping = MemoryType::WrappingMask::Full>
     ConstMemoryAccessType getConstMemoryAccess(Long address, Word offset = 0) const
     {
         return ConstMemoryAccessType(memory, Long(address + offset), Wrapping);
     }
 
-    template<MemoryType::WrappingMask Wrapping  = MemoryType::Full>
+    template<MemoryType::WrappingMask Wrapping  = MemoryType::WrappingMask::Full>
     MemoryAccessType getMemoryAccess(Byte lowByte, Byte highByte, Byte bankByte, Word offset = 0)
     {
         return getMemoryAccess<Wrapping>(Long(lowByte, highByte, bankByte), offset);
     }
 
-    template<MemoryType::WrappingMask Wrapping = MemoryType::Full>
+    template<MemoryType::WrappingMask Wrapping = MemoryType::WrappingMask::Full>
     MemoryAccessType getMemoryAccess(Byte lowByte, Byte highByte)
     {
         return getMemoryAccess<Wrapping>(lowByte, highByte, dataBank);
@@ -393,10 +400,10 @@ public:
     MemoryAccessType getDirectMemoryAccess(Byte lowByte, Word offset = 0)
     {
         if (emulationMode && directPage.getLowByte() == 0) {
-            return getMemoryAccess<MemoryType::Page>(lowByte + offset, directPage.getHighByte(), 0);
+            return getMemoryAccess<MemoryType::WrappingMask::Page>(Byte(lowByte + offset), directPage.getHighByte(), 0);
         }
         else {
-            return getMemoryAccess<MemoryType::Bank>(Long(Word(directPage + lowByte + offset), 0));
+            return getMemoryAccess<MemoryType::WrappingMask::Bank>(Long(Word(directPage + lowByte + offset), 0));
         }
     }
 
@@ -405,8 +412,8 @@ public:
         forceRegisters();
 
         bool carry = emulationMode;
-        emulationMode = getFlag(c);
-        setFlag(c, carry);
+        emulationMode = getFlag(Flag::c);
+        setFlag(Flag::c, carry);
 
         forceRegisters();
     }
@@ -414,20 +421,20 @@ public:
     void forceRegisters()
     {
         if (emulationMode) {
-            setFlag(x | m, true);
+            setMultipleFlags(true, Flag::x, Flag::m);
             ((Byte*)(&stackPointer))[1] = 1;
         }
-        if (getFlag(x)) {
-            ((Byte*)(&getIndexRegister<X>()))[1] = 0;
-            ((Byte*)(&getIndexRegister<Y>()))[1] = 0;
+        if (getFlag(Flag::x)) {
+            ((Byte*)(&getIndexRegister<IndexRegister::X>()))[1] = 0;
+            ((Byte*)(&getIndexRegister<IndexRegister::Y>()))[1] = 0;
         }
     }
 
     template<typename T>
     void updateSignFlags(T value)
     {
-        setFlag(State::z, value == 0);
-        setFlag(State::n, value.isNegative());
+        setFlag(State::Flag::z, value == 0);
+        setFlag(State::Flag::n, value.isNegative());
     }
 
     void pushToStack(Byte value)
@@ -489,7 +496,7 @@ public:
     {
         getIndexRegister<Register>() = value;
         forceRegisters();
-        if (getFlag(x)) {
+        if (getFlag(Flag::x)) {
             updateSignFlags(Byte(value));
         }
         else {
@@ -507,20 +514,20 @@ public:
     template<IndexRegister Register>
     Word& getIndexRegister()
     {
-        return indexRegisters[Register];
+        return indexRegisters[size_t(Register)];
     }
 
     template<IndexRegister Register>
     Word getIndexRegister() const
     {
-        return indexRegisters[Register];
+        return indexRegisters[size_t(Register)];
     }
 
     template<IndexRegister Register>
     static std::string getIndexRegisterName()
     {
         std::string names[] = { "X", "Y" };
-        return names[Register];
+        return names[size_t(Register)];
     }
 
     template<Flag Flag>
@@ -528,7 +535,7 @@ public:
     {
         std::string names[] = { "C", "Z", "I", "D", "X", "M", "V", "N" };
         for (int i = 0; i < 8; ++i) {
-            if (1 << i == Flag) {
+            if (1 << i == int(Flag)) {
                 return names[i];
             }
         }
@@ -565,10 +572,10 @@ public:
             setAccumulatorC(value);
             break;
         case 'x':
-            setIndexRegister<State::X>(value);
+            setIndexRegister<State::IndexRegister::X>(value);
             break;
         case 'y':
-            setIndexRegister<State::Y>(value);
+            setIndexRegister<State::IndexRegister::Y>(value);
             break;
         case 'd':
             setDirectPageRegister(value);
@@ -593,14 +600,14 @@ public:
         if (isNmi) {
             programCounter = getInterruptVectors(isNativeMode()).Nmi;
             nmiActive = true;
-            setFlag(i, true);
+            setFlag(Flag::i, true);
         }
         else {
             programCounter = getInterruptVectors(isNativeMode()).Irq;
             irqActive = true;
         }
 
-        setFlag(d, false);
+        setFlag(Flag::d, false);
     }
 
     void endInterrupt()
@@ -651,7 +658,7 @@ public:
         stackPointer = 0;
         programBank = 0;
         programCounter = emulationVectors.Reset;
-        flags = i;
+        flags = uint8_t(Flag::i);
         emulationMode = true;
 
         nmiActive = false;
@@ -672,13 +679,13 @@ private:
     Byte programBank = 0;
     Word programCounter = 0;
 
-    Byte flags = i;
+    Byte flags = uint8_t(Flag::i);
     bool emulationMode = true;
 
     MemoryType memory;
     Accumulator accumulator;
 
-    std::array<Word, IndexRegisterCount> indexRegisters;
+    std::array<Word, size_t(IndexRegister::Count)> indexRegisters;
 
     InterruptVectors nativeVectors;
     InterruptVectors emulationVectors;

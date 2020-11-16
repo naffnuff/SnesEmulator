@@ -5,6 +5,8 @@
 #include "Memory.h"
 #include "CpuState.h"
 
+#pragma warning( disable : 4702 ) // unreachable code
+
 namespace CPU {
 
 typedef InstructionBase<State> Instruction1Byte;
@@ -60,9 +62,9 @@ class AbsoluteIndexedIndirect : public Instruction3Byte
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
-        Word indexedAddress = Word(lowByte, highByte) + state.getIndexRegister<State::X>();
+        Word indexedAddress = Word(lowByte, highByte) + state.getIndexRegister<State::IndexRegister::X>();
         Long longAddress(indexedAddress, state.getProgramBank());
-        return Operator::invoke(state, state.readMemoryWord<State::MemoryType::Bank>(longAddress));
+        return Operator::invoke(state, state.readMemoryWord<State::MemoryType::WrappingMask::Bank>(longAddress));
     }
 
     std::string toString() const override
@@ -106,8 +108,8 @@ class AbsoluteIndexed_ExtraCycle : public AbsoluteIndexed<Operator, Register>
     int getCycles(Long staticAddress, Long indexedAddress) const override
     {
         int cycles = 0;
-        Word addressPage = staticAddress >> 8;
-        Word indexedAddressPage = indexedAddress >> 8;
+        Word addressPage(staticAddress >> 8);
+        Word indexedAddressPage(indexedAddress >> 8);
         if (addressPage != indexedAddressPage) {
             cycles += 1;
         }
@@ -124,7 +126,7 @@ class AbsoluteIndirect : public Instruction3Byte
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
-        return Operator::invoke(state, state.readMemoryWord<State::MemoryType::Bank>(Long(lowByte, highByte, 0)));
+        return Operator::invoke(state, state.readMemoryWord<State::MemoryType::WrappingMask::Bank>(Long(lowByte, highByte, 0)));
     }
 
     std::string toString() const override
@@ -142,7 +144,7 @@ class AbsoluteIndirectLong : public Instruction3Byte
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
-        return Operator::invoke(state, state.readMemoryLong<State::MemoryType::Bank>(Long(lowByte, highByte, 0)));
+        return Operator::invoke(state, state.readMemoryLong<State::MemoryType::WrappingMask::Bank>(Long(lowByte, highByte, 0)));
     }
 
     std::string toString() const override
@@ -195,7 +197,7 @@ class AbsoluteLongIndexedX : public Instruction4Byte
 
     int invokeOperator(Byte lowByte, Byte highByte, Byte bankByte) override
     {
-        MemoryAccess access = state.getMemoryAccess(lowByte, highByte, bankByte, state.getIndexRegister<State::X>());
+        MemoryAccess access = state.getMemoryAccess(lowByte, highByte, bankByte, state.getIndexRegister<State::IndexRegister::X>());
         return Operator::invoke(state, access);
     }
 
@@ -216,7 +218,7 @@ class Accumulator : public Instruction1Byte
     int invokeOperator() override
     {
         int cycles = 0;
-        if (state.is16Bit(State::m)) {
+        if (state.is16Bit(State::Flag::m)) {
             cycles -= 2;
         }
         State::AccumulatorAccess accumulatorAccess = state.getAccumulatorAccess();
@@ -240,7 +242,7 @@ class BlockMove : public Instruction3Byte
     {
         Word byteCount = state.getAccumulatorC();
         if (byteCount != 0) {
-            state.incrementProgramCounter(-size());
+            state.incrementProgramCounter(Word(-size()));
         }
         state.setAccumulatorC(byteCount - 1);
         return Operator::invoke(state, highByte, lowByte, byteCount);
@@ -391,7 +393,7 @@ class DirectPageIndirectIndexedY : public Instruction2Byte
             cycles += 1;
         }
         Long address(state.getDirectMemoryAccess(lowByte).readWord(), state.getDataBank());
-        Long indexedAddress = address + state.getIndexRegister<State::Y>();
+        Long indexedAddress = address + state.getIndexRegister<State::IndexRegister::Y>();
         if (address >> 8 != indexedAddress >> 8) {
             cycles += 1;
         }
@@ -445,7 +447,7 @@ class DirectPageIndirectLongIndexedY : public Instruction2Byte
             cycles += 1;
         }
         Long address = state.getDirectMemoryAccess(lowByte).readLong();
-        MemoryAccess access = state.getMemoryAccess(address, state.getIndexRegister<State::Y>());
+        MemoryAccess access = state.getMemoryAccess(address, state.getIndexRegister<State::IndexRegister::Y>());
         return cycles + Operator::invoke(state, access);
     }
 
@@ -566,7 +568,7 @@ class StackRelative : public Instruction2Byte
 
     int invokeOperator(Byte lowByte) override
     {
-        MemoryAccess access = state.getMemoryAccess<State::MemoryType::Bank>(Long(state.getStackPointer() + lowByte, 0));
+        MemoryAccess access = state.getMemoryAccess<State::MemoryType::WrappingMask::Bank>(Long(state.getStackPointer() + lowByte, 0));
         return Operator::invoke(state, access);
     }
 
@@ -585,8 +587,8 @@ class StackRelativeIndirectIndexedY : public Instruction2Byte
 
     int invokeOperator(Byte lowByte) override
     {
-        Word address = state.readMemoryWord<State::MemoryType::Bank>(Long(state.getStackPointer() + lowByte, 0));
-        MemoryAccess access = state.getMemoryAccess(Long(address, state.getDataBank()), state.getIndexRegister<State::Y>());
+        Word address = state.readMemoryWord<State::MemoryType::WrappingMask::Bank>(Long(state.getStackPointer() + lowByte, 0));
+        MemoryAccess access = state.getMemoryAccess(Long(address, state.getDataBank()), state.getIndexRegister<State::IndexRegister::Y>());
         return Operator::invoke(state, access);
     }
 

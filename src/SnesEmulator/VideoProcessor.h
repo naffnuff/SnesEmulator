@@ -8,6 +8,8 @@
 #include "VideoData.h"
 #include "VideoRenderer.h"
 
+#pragma warning( disable : 26110 ) // Caller failing to hold lock <lock> before calling function <func>
+
 namespace Video {
 
 class Processor
@@ -61,14 +63,35 @@ public:
     ~Processor()
     {
         rendererRunner.run = false;
-        if (rendererLock.owns_lock()) {
-            rendererLock.unlock();
-        }
+        tryUnlockRenderer();
         rendererThread.join();
     }
 
     Processor(const Processor&) = delete;
     Processor& operator=(const Processor&) = delete;
+
+    void lockRenderer()
+	{
+        rendererLock.lock();
+    }
+
+    void unlockRenderer()
+    {
+        rendererLock.unlock();
+    }
+
+    bool tryUnlockRenderer()
+	{
+		if (rendererLock.owns_lock())
+		{
+			rendererLock.unlock();
+            return true;
+		}
+        else
+        {
+            return false;
+        }
+    }
 
     void initialize(const std::string& gameTitle)
     {
@@ -77,7 +100,8 @@ public:
 
     int getObjectSize(bool sizeSelect) const
     {
-        switch (objectSizeIndex) {
+        switch (objectSizeIndex)
+        {
         case 0:
             return sizeSelect ? 16 : 8;
         case 1:
@@ -126,7 +150,7 @@ public:
         }
     }
 
-    void drawMode(const std::vector<ModeEntry>& modeEntries, int displayRow, bool mode7 = false)
+    void drawMode(const std::vector<ModeEntry>& modeEntries, int displayRow, bool isMode7 = false)
     {
         Word backdropColor = cgram.getWord(0);
         Word fixedColor = clearColor;
@@ -144,10 +168,10 @@ public:
         }
 
         ScanlineBuffers mainScreenBackgroundLayers;
-        createLayers(mainScreenBackgroundLayers, modeEntries, displayRow, mainScreenDesignation, mainScreenWindowMaskDesignation, windowSettings, mode7);
+        createLayers(mainScreenBackgroundLayers, modeEntries, displayRow, mainScreenDesignation, mainScreenWindowMaskDesignation, windowSettings, isMode7);
 
         ScanlineBuffers subscreenBackgroundLayers;
-        createLayers(subscreenBackgroundLayers, modeEntries, displayRow, subscreenDesignation, subscreenWindowMaskDesignation, windowSettings, mode7);
+        createLayers(subscreenBackgroundLayers, modeEntries, displayRow, subscreenDesignation, subscreenWindowMaskDesignation, windowSettings, isMode7);
 
         int brightness = screenDisplay.getBits(0, 4);
         float brightnessFactor = float(brightness) / float(0xf);
@@ -171,7 +195,7 @@ public:
                     disableHalfMath = true;
                 }
             }
-            Word mainScreenPixel = calculateMainScreenPixel(modeEntries, mainScreenBackgroundLayers, mainScreenDesignation, displayRow, displayColumn, backdropColor, addendPixel, colorMathDesignation, colorWindowSettings, disableHalfMath);
+            Word mainScreenPixel = calculateMainScreenPixel(modeEntries, mainScreenBackgroundLayers, mainScreenDesignation, displayRow, displayColumn, backdropColor, addendPixel, currentColorMathDesignation, colorWindowSettings, disableHalfMath);
             if (brightness != 0xf) {
                 mainScreenPixel = factorColors(mainScreenPixel, brightnessFactor);
             }
@@ -179,32 +203,32 @@ public:
         }
     }
 
-    void createLayers(ScanlineBuffers& buffers, const std::vector<ModeEntry>& mode, int displayRow, Byte screenDesignation, Byte windowMaskDesignation, std::array<WindowSettings, 5> & windowSettings, bool mode7)
+    void createLayers(ScanlineBuffers& buffers, const std::vector<ModeEntry>& mode, int displayRow, Byte screenDesignation, Byte windowMaskDesignation, std::array<WindowSettings, 5> & windowSettings, bool isMode7)
     {
         std::bitset<rendererWidth> backgroundsBufferMask;
         for (const ModeEntry& modeEntry : mode) {
-            if (modeEntry.layer < BackgroundLayerCount && screenDesignation.getBit(modeEntry.layer)) {
+            if (modeEntry.layer < Layer::BackgroundCount && screenDesignation.getBit(int(modeEntry.layer))) {
                 ScanlineBuffer& buffer = buffers.getBuffer(Layer(modeEntry.layer), modeEntry.priority);
                 //buffer.data.fill(0);
-                if (mode7) {
+                if (isMode7) {
                     drawMode7Background(buffer, displayRow);
                 } else {
-                    drawBackground(buffer, backgrounds[modeEntry.layer], displayRow, modeEntry.priority, windowMaskDesignation.getBit(modeEntry.layer), windowSettings[modeEntry.layer], backgroundsBufferMask);
+                    drawBackground(buffer, backgrounds[size_t(modeEntry.layer)], displayRow, modeEntry.priority, windowMaskDesignation.getBit(int(modeEntry.layer)), windowSettings[size_t(modeEntry.layer)], backgroundsBufferMask);
                 }
             }
         }
-        if (screenDesignation.getBit(ObjectLayer)) {
+        if (screenDesignation.getBit(int(Layer::Object))) {
             for (int priority = 0; priority < 4; ++priority) {
                 //buffers.getBuffer(ObjectLayer, priority).data.fill(0);
             }
             int firstObjectIndex = 0;
             if (objectPriority) {
-                firstObjectIndex = oam.address * 2;
+                firstObjectIndex = oam.currentAddress * 2;
             }
             std::bitset<rendererWidth> objectsBufferMask;
             for (int i = firstObjectIndex; i < 128 + firstObjectIndex; ++i) {
                 Object object = readObject(i % 128);
-                drawObject(buffers.getBuffer(ObjectLayer, object.priority), object, displayRow, windowMaskDesignation.getBit(ObjectLayer), windowSettings[ObjectLayer], objectsBufferMask);
+                drawObject(buffers.getBuffer(Layer::Object, object.priority), object, displayRow, windowMaskDesignation.getBit(int(Layer::Object)), windowSettings[size_t(Layer::Object)], objectsBufferMask);
             }
         }
     }
@@ -257,9 +281,9 @@ public:
             } else {
                 Byte tileData;
                 if (calculateTile) {
-                    Word tileRow = fieldRow >> 3;
-                    Word tileColumn = fieldColumn >> 3;
-                    Word tileDataAddress = (tileRow << 7) + tileColumn;
+                    Word tileRow(fieldRow >> 3);
+                    Word tileColumn(fieldColumn >> 3);
+                    Word tileDataAddress((tileRow << 7) + tileColumn);
                     tileData = vram.getByte(tileDataAddress, false);
                 }
                 Word row = fieldRow & 7;
@@ -294,7 +318,7 @@ public:
                 screenColumn = background.horizontalMirroring;
                 tileColumn %= 32;
             }
-            Word tileDataAddress = background.tilemapAddress + (tileRow << 5) + tileColumn;
+            Word tileDataAddress(background.tilemapAddress + (tileRow << 5) + tileColumn);
             if (screenRow) {
                 if (background.horizontalMirroring) {
                     tileDataAddress += 0x800;
@@ -312,16 +336,16 @@ public:
                 int palette = tileData.getBits(10, 3);
                 bool horizontalFlip = tileData.getBit(14);
                 bool verticalFlip = tileData.getBit(15);
-                Word tileAddress = background.characterAddress + (tileNumber * tileSize * background.bitsPerPixel / 2) + (verticalFlip ? tileSize - 1 - row : row);
-                drawTile(buffer, displayColumn, 0, tileAddress, (1 << background.bitsPerPixel) * palette, tileSize, horizontalFlip, background.bitsPerPixel, windowEnabled, windowSettings, bufferMask);
+                Word tileAddress(background.characterAddress + (tileNumber * tileSize * background.bitsPerPixel / 2) + (verticalFlip ? tileSize - 1 - row : row));
+                drawTile(buffer, displayColumn, 0, tileAddress, uint8_t((1 << background.bitsPerPixel) * palette), tileSize, horizontalFlip, background.bitsPerPixel, windowEnabled, windowSettings, bufferMask);
             }
         }
     }
 
     Object readObject(int index) const
     {
-        Word lowAddress = index * 2;
-        Word highAddress = index / 8;
+        Word lowAddress(index * 2);
+        Word highAddress(index / 8);
         Byte highTableOffset = index % 8;
         Word firstWord = oam.getWord(lowAddress);
         Word secondWord = oam.getWord(lowAddress + 1);
@@ -364,13 +388,13 @@ public:
             }
             for (int tileColumn = 0; tileColumn < objectTileSize; ++tileColumn) {
                 int tileIndex = object.tileIndex + tileRow * 0x10 + tileColumn;
-                Word tileAddress = nameBaseSelect + (tileIndex << 4);
+                Word tileAddress(nameBaseSelect + (tileIndex << 4));
                 if (object.nameTable) {
                     tileAddress += nameSelect;
                 }
                 tileAddress += row;
                 const int bitsPerPixel = 4;
-                drawTile(buffer, objectX, tileColumn * 8, tileAddress, 0x80 + (1 << bitsPerPixel) * object.palette, objectSize, object.horizontalFlip, bitsPerPixel, windowEnabled, windowSettings, bufferMask);
+                drawTile(buffer, objectX, tileColumn * 8, tileAddress, uint8_t(0x80 + (1 << bitsPerPixel) * object.palette), objectSize, object.horizontalFlip, bitsPerPixel, windowEnabled, windowSettings, bufferMask);
             }
         }
     }
@@ -416,7 +440,7 @@ public:
     Byte calculateSubscreenPixel(const std::vector<ModeEntry>& mode, ScanlineBuffers& buffers, Byte designation, int displayRow, int displayColumn)
     {
         for (const ModeEntry& modeEntry : mode) {
-            if (designation.getBit(modeEntry.layer)) {
+            if (designation.getBit(int(modeEntry.layer))) {
                 Byte colorIndex = buffers.getBuffer(modeEntry.layer, modeEntry.priority).data[displayColumn];
                 if (colorIndex > 0) {
                     return colorIndex;
@@ -435,11 +459,11 @@ public:
         bool halfMath = !disableHalfMath && !clipColor && colorMathDesignation.getBit(6);
 
         for (const ModeEntry& modeEntry : mode) {
-            if (designation.getBit(modeEntry.layer)) {
+            if (designation.getBit(int(modeEntry.layer))) {
                 Byte colorIndex = buffers.getBuffer(modeEntry.layer, modeEntry.priority).data[displayColumn];
                 if (colorIndex > 0) {
                     Word color = cgram.getWord(Word(colorIndex));
-                    if (modeEntry.layer == ObjectLayer && colorIndex > 0x80 && colorIndex < 0xc0) {
+                    if (modeEntry.layer == Layer::Object && colorIndex > 0x80 && colorIndex < 0xc0) {
                         return color;
                     } else {
                         return applyColorMath(color, modeEntry.layer, addendPixel, colorMathDesignation, clipColor, clipMath, subtract, halfMath);
@@ -447,7 +471,7 @@ public:
                 }
             }
         }
-        return applyColorMath(defaultPixel, BackdropLayer, addendPixel, colorMathDesignation, clipColor, clipMath, subtract, halfMath);
+        return applyColorMath(defaultPixel, Layer::Backdrop, addendPixel, colorMathDesignation, clipColor, clipMath, subtract, halfMath);
     }
 
     bool insideWindow(int column, const WindowSettings& settings)
@@ -486,9 +510,9 @@ public:
     bool setColorBlack(bool insideColorWindow)
     {
         switch (clipColorToBlackMode) {
-        case Never: return false;
-        case OutsideColorWindowOnly: return !insideColorWindow;
-        case InsideColorWindowOnly: return insideColorWindow;
+        case ColorWindowMode::Never: return false;
+        case ColorWindowMode::OutsideOnly: return !insideColorWindow;
+        case ColorWindowMode::InsideOnly: return insideColorWindow;
         default: return true;
         }
     }
@@ -496,9 +520,9 @@ public:
     bool preventColorMath(bool insideColorWindow)
     {
         switch (clipColorMathMode) {
-        case Never: return false;
-        case OutsideColorWindowOnly: return !insideColorWindow;
-        case InsideColorWindowOnly: return insideColorWindow;
+        case ColorWindowMode::Never: return false;
+        case ColorWindowMode::OutsideOnly: return !insideColorWindow;
+        case ColorWindowMode::InsideOnly: return insideColorWindow;
         default: return true;
         }
     }
@@ -506,7 +530,7 @@ public:
     Word applyColorMath(Word inputPixel, Layer layer, Word addendPixel, Byte colorMathDesignation, bool clipColor, bool clipMath, bool subtract, bool halfMath)
     {
         Word result = inputPixel;
-        if (colorMathDesignation.getBit(layer)) {
+        if (colorMathDesignation.getBit(int(layer))) {
             if (clipColor) {
                 result = 0;
             }
@@ -557,9 +581,9 @@ public:
     static Word factorColors(ColorComponents a, float b)
     {
         ColorComponents c;
-        c.red = int(a.red * b);
-        c.green = int(a.green * b);
-        c.blue = int(a.blue * b);
+        c.red = uint8_t(a.red * b);
+        c.green = uint8_t(a.green * b);
+        c.blue = uint8_t(a.blue * b);
         return c;
     }
 
@@ -587,10 +611,10 @@ public:
     Byte subscreenDesignation;
     Byte mainScreenWindowMaskDesignation;
     Byte subscreenWindowMaskDesignation;
-    Byte colorMathDesignation;
+    Byte currentColorMathDesignation;
 
-    ColorWindowMode clipColorToBlackMode = Never;
-    ColorWindowMode clipColorMathMode = Never;
+    ColorWindowMode clipColorToBlackMode = ColorWindowMode::Never;
+    ColorWindowMode clipColorMathMode = ColorWindowMode::Never;
     bool addSubscreen = false;
     bool directColorMode = false;
 
@@ -621,6 +645,7 @@ public:
     bool mode7VerticalMirroring = false;
     bool mode7EmptySpaceFill = false;
 
+private:
     std::unique_lock<std::mutex> rendererLock;
 };
 

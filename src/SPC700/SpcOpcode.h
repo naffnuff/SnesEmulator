@@ -30,7 +30,7 @@ class ADC_99 : public AddressMode::IndirectIndirect<Operator::ADC>
 // ADC A, #i
 // A = A+i+C    	[NV..H.ZC]
 // Register Immediate (2-Byte)
-class ADC_88 : public AddressMode::RegisterImmediate<Operator::ADC, State::A>
+class ADC_88 : public AddressMode::RegisterImmediate<Operator::ADC, State::Register::A>
 {
     using RegisterImmediate::RegisterImmediate;
 
@@ -45,7 +45,7 @@ class ADC_88 : public AddressMode::RegisterImmediate<Operator::ADC, State::A>
 // ADC A, (X)
 // A = A+(X)+C    	[NV..H.ZC]
 // Register Register Indirect (1-Byte)
-class ADC_86 : public AddressMode::RegisterRegisterIndirect<Operator::ADC, State::A, State::X>
+class ADC_86 : public AddressMode::RegisterRegisterIndirect<Operator::ADC, State::Register::A, State::Register::X>
 {
     using RegisterRegisterIndirect::RegisterRegisterIndirect;
 
@@ -61,7 +61,7 @@ class ADC_86 : public AddressMode::RegisterRegisterIndirect<Operator::ADC, State
 // ADC A, [d]+Y
 // A = A+([d]+Y)+C    	[NV..H.ZC]
 // Register Direct Indirect Indexed (2-Byte)
-class ADC_97 : public AddressMode::RegisterDirectIndirectIndexed<Operator::ADC, State::A, State::Y>
+class ADC_97 : public AddressMode::RegisterDirectIndirectIndexed<Operator::ADC, State::Register::A, State::Register::Y>
 {
     using RegisterDirectIndirectIndexed::RegisterDirectIndirectIndexed;
 
@@ -76,7 +76,7 @@ class ADC_97 : public AddressMode::RegisterDirectIndirectIndexed<Operator::ADC, 
 // ADC A, [d+X]
 // A = A+([d+X])+C    	[NV..H.ZC]
 // Register Direct Indexed Indirect (2-Byte)
-class ADC_87 : public AddressMode::RegisterDirectIndexedIndirect<Operator::ADC, State::A, State::X>
+class ADC_87 : public AddressMode::RegisterDirectIndexedIndirect<Operator::ADC, State::Register::A, State::Register::X>
 {
     using RegisterDirectIndexedIndirect::RegisterDirectIndexedIndirect;
 
@@ -92,7 +92,7 @@ class ADC_87 : public AddressMode::RegisterDirectIndexedIndirect<Operator::ADC, 
 // ADC A, d
 // A = A+(d)+C    	[NV..H.ZC]
 // Register Direct (2-Byte)
-class ADC_84 : public AddressMode::RegisterDirect<Operator::ADC, State::A>
+class ADC_84 : public AddressMode::RegisterDirect<Operator::ADC, State::Register::A>
 {
     using RegisterDirect::RegisterDirect;
 
@@ -107,7 +107,7 @@ class ADC_84 : public AddressMode::RegisterDirect<Operator::ADC, State::A>
 // ADC A, d+X
 // A = A+(d+X)+C    	[NV..H.ZC]
 // Register Direct Indexed (2-Byte)
-class ADC_94 : public AddressMode::RegisterDirectIndexed<Operator::ADC, State::A, State::X>
+class ADC_94 : public AddressMode::RegisterDirectIndexed<Operator::ADC, State::Register::A, State::Register::X>
 {
     using RegisterDirectIndexed::RegisterDirectIndexed;
 
@@ -122,7 +122,7 @@ class ADC_94 : public AddressMode::RegisterDirectIndexed<Operator::ADC, State::A
 // ADC A, !a
 // A = A+(a)+C    	[NV..H.ZC]
 // Register Absolute (3-Byte)
-class ADC_85 : public AddressMode::RegisterAbsolute<Operator::ADC, State::A>
+class ADC_85 : public AddressMode::RegisterAbsolute<Operator::ADC, State::Register::A>
 {
     using RegisterAbsolute::RegisterAbsolute;
 
@@ -137,7 +137,7 @@ class ADC_85 : public AddressMode::RegisterAbsolute<Operator::ADC, State::A>
 // ADC A, !a+X
 // A = A+(a+X)+C    	[NV..H.ZC]
 // Register Absolute Indexed (3-Byte)
-class ADC_95 : public AddressMode::RegisterAbsoluteIndexed<Operator::ADC, State::A, State::X>
+class ADC_95 : public AddressMode::RegisterAbsoluteIndexed<Operator::ADC, State::Register::A, State::Register::X>
 {
     using RegisterAbsoluteIndexed::RegisterAbsoluteIndexed;
 
@@ -152,7 +152,7 @@ class ADC_95 : public AddressMode::RegisterAbsoluteIndexed<Operator::ADC, State:
 // ADC A, !a+Y
 // A = A+(a+Y)+C    	[NV..H.ZC]
 // Register Absolute Indexed (3-Byte)
-class ADC_96 : public AddressMode::RegisterAbsoluteIndexed<Operator::ADC, State::A, State::Y>
+class ADC_96 : public AddressMode::RegisterAbsoluteIndexed<Operator::ADC, State::Register::A, State::Register::Y>
 {
     using RegisterAbsoluteIndexed::RegisterAbsoluteIndexed;
 
@@ -229,7 +229,7 @@ class AND_39 : public AddressMode::IndirectIndirect<Operator::AND>
 // AND A, #i
 // A = A & i    	[N.....Z.]
 // Register Immediate (2-Byte)
-class AND_28 : public AddressMode::RegisterImmediate<Operator::AND, State::A>
+class AND_28 : public AddressMode::RegisterImmediate<Operator::AND, State::Register::A>
 {
     using RegisterImmediate::RegisterImmediate;
 
@@ -244,7 +244,7 @@ class AND_28 : public AddressMode::RegisterImmediate<Operator::AND, State::A>
 // AND A, (X)
 // A = A & (X)    	[N.....Z.]
 // Register Register Indirect (1-Byte)
-class AND_26 : public AddressMode::RegisterRegisterIndirect<Operator::AND, State::A, State::X>
+class AND_26 : public AddressMode::RegisterRegisterIndirect<Operator::AND, State::Register::A, State::Register::X>
 {
     using RegisterRegisterIndirect::RegisterRegisterIndirect;
 
@@ -259,7 +259,7 @@ class AND_26 : public AddressMode::RegisterRegisterIndirect<Operator::AND, State
 // AND A, [d]+Y
 // A = A & ([d]+Y)    	[N.....Z.]
 // Register Direct Indirect Indexed (2-Byte)
-class AND_37 : public AddressMode::RegisterDirectIndirectIndexed<Operator::AND, State::A, State::Y>
+class AND_37 : public AddressMode::RegisterDirectIndirectIndexed<Operator::AND, State::Register::A, State::Register::Y>
 {
     using RegisterDirectIndirectIndexed::RegisterDirectIndirectIndexed;
 
@@ -275,7 +275,7 @@ class AND_37 : public AddressMode::RegisterDirectIndirectIndexed<Operator::AND, 
 // AND A, [d+X]
 // A = A & ([d+X])    	[N.....Z.]
 // Register Direct Indexed Indirect (2-Byte)
-class AND_27 : public AddressMode::RegisterDirectIndexedIndirect<Operator::AND, State::A, State::X>
+class AND_27 : public AddressMode::RegisterDirectIndexedIndirect<Operator::AND, State::Register::A, State::Register::X>
 {
     using RegisterDirectIndexedIndirect::RegisterDirectIndexedIndirect;
 
@@ -291,7 +291,7 @@ class AND_27 : public AddressMode::RegisterDirectIndexedIndirect<Operator::AND, 
 // AND A, d
 // A = A & (d)    	[N.....Z.]
 // Register Direct (2-Byte)
-class AND_24 : public AddressMode::RegisterDirect<Operator::AND, State::A>
+class AND_24 : public AddressMode::RegisterDirect<Operator::AND, State::Register::A>
 {
     using RegisterDirect::RegisterDirect;
 
@@ -306,7 +306,7 @@ class AND_24 : public AddressMode::RegisterDirect<Operator::AND, State::A>
 // AND A, d+X
 // A = A & (d+X)    	[N.....Z.]
 // Register Direct Indexed (2-Byte)
-class AND_34 : public AddressMode::RegisterDirectIndexed<Operator::AND, State::A, State::X>
+class AND_34 : public AddressMode::RegisterDirectIndexed<Operator::AND, State::Register::A, State::Register::X>
 {
     using RegisterDirectIndexed::RegisterDirectIndexed;
 
@@ -322,7 +322,7 @@ class AND_34 : public AddressMode::RegisterDirectIndexed<Operator::AND, State::A
 // AND A, !a
 // A = A & (a)    	[N.....Z.]
 // Register Absolute (3-Byte)
-class AND_25 : public AddressMode::RegisterAbsolute<Operator::AND, State::A>
+class AND_25 : public AddressMode::RegisterAbsolute<Operator::AND, State::Register::A>
 {
     using RegisterAbsolute::RegisterAbsolute;
 
@@ -337,7 +337,7 @@ class AND_25 : public AddressMode::RegisterAbsolute<Operator::AND, State::A>
 // AND A, !a+X
 // A = A & (a+X)    	[N.....Z.]
 // Register Absolute Indexed (3-Byte)
-class AND_35 : public AddressMode::RegisterAbsoluteIndexed<Operator::AND, State::A, State::X>
+class AND_35 : public AddressMode::RegisterAbsoluteIndexed<Operator::AND, State::Register::A, State::Register::X>
 {
     using RegisterAbsoluteIndexed::RegisterAbsoluteIndexed;
 
@@ -353,7 +353,7 @@ class AND_35 : public AddressMode::RegisterAbsoluteIndexed<Operator::AND, State:
 // AND A, !a+Y
 // A = A & (a+Y)    	[N.....Z.]
 // Register Absolute Indexed (3-Byte)
-class AND_36 : public AddressMode::RegisterAbsoluteIndexed<Operator::AND, State::A, State::Y>
+class AND_36 : public AddressMode::RegisterAbsoluteIndexed<Operator::AND, State::Register::A, State::Register::Y>
 {
     using RegisterAbsoluteIndexed::RegisterAbsoluteIndexed;
 
@@ -432,7 +432,7 @@ class AND1_4A : public AddressMode::CarryMemoryBit<Operator::AND1>
 // ASL A
 // Left shift A: high->C, 0->low    	[N.....ZC]
 // Register (1-Byte)
-class ASL_1C : public AddressMode::Register<Operator::ASL, State::A>
+class ASL_1C : public AddressMode::Register<Operator::ASL, State::Register::A>
 {
     using Register::Register;
 
@@ -462,7 +462,7 @@ class ASL_0B : public AddressMode::Direct<Operator::ASL>
 // ASL d+X
 // Left shift (d+X) as above    	[N.....ZC]
 // Direct Indexed (2-Byte)
-class ASL_1B : public AddressMode::DirectIndexed<Operator::ASL, State::X>
+class ASL_1B : public AddressMode::DirectIndexed<Operator::ASL, State::Register::X>
 {
     using DirectIndexed::DirectIndexed;
 
@@ -741,7 +741,7 @@ class BBS_E3 : public AddressMode::DirectProgramCounterRelative<Operator::BB<7, 
 // BCC r
 // PC+=r  if C == 0    	[........]
 // Program Counter Relative (2-Byte)
-class BCC_90 : public AddressMode::ProgramCounterRelative<Operator::B<State::c, false>>
+class BCC_90 : public AddressMode::ProgramCounterRelative<Operator::B<State::Flag::c, false>>
 {
     using ProgramCounterRelative::ProgramCounterRelative;
 
@@ -756,7 +756,7 @@ class BCC_90 : public AddressMode::ProgramCounterRelative<Operator::B<State::c, 
 // BCS r
 // PC+=r  if C == 1    	[........]
 // Program Counter Relative (2-Byte)
-class BCS_B0 : public AddressMode::ProgramCounterRelative<Operator::B<State::c, true>>
+class BCS_B0 : public AddressMode::ProgramCounterRelative<Operator::B<State::Flag::c, true>>
 {
     using ProgramCounterRelative::ProgramCounterRelative;
 
@@ -831,7 +831,7 @@ class BPL_10 : public AddressMode::ProgramCounterRelative<Operator::BPL>
 // BVC r
 // PC+=r  if V == 0    	[........]
 // Program Counter Relative (2-Byte)
-class BVC_50 : public AddressMode::ProgramCounterRelative<Operator::B<State::v, false>>
+class BVC_50 : public AddressMode::ProgramCounterRelative<Operator::B<State::Flag::v, false>>
 {
     using ProgramCounterRelative::ProgramCounterRelative;
 
@@ -847,7 +847,7 @@ class BVC_50 : public AddressMode::ProgramCounterRelative<Operator::B<State::v, 
 // BVS r
 // PC+=r  if V == 1    	[........]
 // Program Counter Relative (2-Byte)
-class BVS_70 : public AddressMode::ProgramCounterRelative<Operator::B<State::v, true>>
+class BVS_70 : public AddressMode::ProgramCounterRelative<Operator::B<State::Flag::v, true>>
 {
     using ProgramCounterRelative::ProgramCounterRelative;
 
@@ -909,7 +909,7 @@ class CALL_3F : public AddressMode::Absolute_ControlFlow<Operator::CALL>
 // CBNE d+X, r
 // CMP A, (d+X) then BNE    	[........]
 // Direct Indexed Program Counter Relative (3-Byte)
-class CBNE_DE : public AddressMode::DirectIndexedProgramCounterRelative<Operator::CBNE, State::X>
+class CBNE_DE : public AddressMode::DirectIndexedProgramCounterRelative<Operator::CBNE, State::Register::X>
 {
     using DirectIndexedProgramCounterRelative::DirectIndexedProgramCounterRelative;
 
@@ -1060,7 +1060,7 @@ class CLR1_F2 : public AddressMode::Direct<Operator::SET1<7, false>>
 // CLRC 
 // C = 0    	[.......0]
 // Implied (1-Byte)
-class CLRC_60 : public AddressMode::Implied<Operator::SET<State::c, false>>
+class CLRC_60 : public AddressMode::Implied<Operator::SET<State::Flag::c, false>>
 {
     using Implied::Implied;
 
@@ -1075,7 +1075,7 @@ class CLRC_60 : public AddressMode::Implied<Operator::SET<State::c, false>>
 // CLRP 
 // P = 0    	[..0.....]
 // Implied (1-Byte)
-class CLRP_20 : public AddressMode::Implied<Operator::SET<State::p, false>>
+class CLRP_20 : public AddressMode::Implied<Operator::SET<State::Flag::p, false>>
 {
     using Implied::Implied;
 
@@ -1122,7 +1122,7 @@ class CMP_79 : public AddressMode::IndirectIndirect<Operator::CMP>
 // CMP A, #i
 // A - i    	[N.....ZC]
 // Register Immediate (2-Byte)
-class CMP_68 : public AddressMode::RegisterImmediate<Operator::CMP, State::A>
+class CMP_68 : public AddressMode::RegisterImmediate<Operator::CMP, State::Register::A>
 {
     using RegisterImmediate::RegisterImmediate;
 
@@ -1137,7 +1137,7 @@ class CMP_68 : public AddressMode::RegisterImmediate<Operator::CMP, State::A>
 // CMP A, (X)
 // A - (X)    	[N.....ZC]
 // Register Register Indirect (1-Byte)
-class CMP_66 : public AddressMode::RegisterRegisterIndirect<Operator::CMP, State::A, State::X>
+class CMP_66 : public AddressMode::RegisterRegisterIndirect<Operator::CMP, State::Register::A, State::Register::X>
 {
     using RegisterRegisterIndirect::RegisterRegisterIndirect;
 
@@ -1153,7 +1153,7 @@ class CMP_66 : public AddressMode::RegisterRegisterIndirect<Operator::CMP, State
 // CMP A, [d]+Y
 // A - ([d]+Y)    	[N.....ZC]
 // Register Direct Indirect Indexed (2-Byte)
-class CMP_77 : public AddressMode::RegisterDirectIndirectIndexed<Operator::CMP, State::A, State::Y>
+class CMP_77 : public AddressMode::RegisterDirectIndirectIndexed<Operator::CMP, State::Register::A, State::Register::Y>
 {
     using RegisterDirectIndirectIndexed::RegisterDirectIndirectIndexed;
 
@@ -1169,7 +1169,7 @@ class CMP_77 : public AddressMode::RegisterDirectIndirectIndexed<Operator::CMP, 
 // CMP A, [d+X]
 // A - ([d+X])    	[N.....ZC]
 // Register Direct Indexed Indirect (2-Byte)
-class CMP_67 : public AddressMode::RegisterDirectIndexedIndirect<Operator::CMP, State::A, State::X>
+class CMP_67 : public AddressMode::RegisterDirectIndexedIndirect<Operator::CMP, State::Register::A, State::Register::X>
 {
     using RegisterDirectIndexedIndirect::RegisterDirectIndexedIndirect;
 
@@ -1185,7 +1185,7 @@ class CMP_67 : public AddressMode::RegisterDirectIndexedIndirect<Operator::CMP, 
 // CMP A, d
 // A - (d)    	[N.....ZC]
 // Register Direct (2-Byte)
-class CMP_64 : public AddressMode::RegisterDirect<Operator::CMP, State::A>
+class CMP_64 : public AddressMode::RegisterDirect<Operator::CMP, State::Register::A>
 {
     using RegisterDirect::RegisterDirect;
 
@@ -1200,7 +1200,7 @@ class CMP_64 : public AddressMode::RegisterDirect<Operator::CMP, State::A>
 // CMP A, d+X
 // A - (d+X)    	[N.....ZC]
 // Register Direct Indexed (2-Byte)
-class CMP_74 : public AddressMode::RegisterDirectIndexed<Operator::CMP, State::A, State::X>
+class CMP_74 : public AddressMode::RegisterDirectIndexed<Operator::CMP, State::Register::A, State::Register::X>
 {
     using RegisterDirectIndexed::RegisterDirectIndexed;
 
@@ -1215,7 +1215,7 @@ class CMP_74 : public AddressMode::RegisterDirectIndexed<Operator::CMP, State::A
 // CMP A, !a
 // A - (a)    	[N.....ZC]
 // Register Absolute (3-Byte)
-class CMP_65 : public AddressMode::RegisterAbsolute<Operator::CMP, State::A>
+class CMP_65 : public AddressMode::RegisterAbsolute<Operator::CMP, State::Register::A>
 {
     using RegisterAbsolute::RegisterAbsolute;
 
@@ -1230,7 +1230,7 @@ class CMP_65 : public AddressMode::RegisterAbsolute<Operator::CMP, State::A>
 // CMP A, !a+X
 // A - (a+X)    	[N.....ZC]
 // Register Absolute Indexed (3-Byte)
-class CMP_75 : public AddressMode::RegisterAbsoluteIndexed<Operator::CMP, State::A, State::X>
+class CMP_75 : public AddressMode::RegisterAbsoluteIndexed<Operator::CMP, State::Register::A, State::Register::X>
 {
     using RegisterAbsoluteIndexed::RegisterAbsoluteIndexed;
 
@@ -1245,7 +1245,7 @@ class CMP_75 : public AddressMode::RegisterAbsoluteIndexed<Operator::CMP, State:
 // CMP A, !a+Y
 // A - (a+Y)    	[N.....ZC]
 // Register Absolute Indexed (3-Byte)
-class CMP_76 : public AddressMode::RegisterAbsoluteIndexed<Operator::CMP, State::A, State::Y>
+class CMP_76 : public AddressMode::RegisterAbsoluteIndexed<Operator::CMP, State::Register::A, State::Register::Y>
 {
     using RegisterAbsoluteIndexed::RegisterAbsoluteIndexed;
 
@@ -1261,7 +1261,7 @@ class CMP_76 : public AddressMode::RegisterAbsoluteIndexed<Operator::CMP, State:
 // CMP X, #i
 // X - i    	[N.....ZC]
 // Register Immediate (2-Byte)
-class CMP_C8 : public AddressMode::RegisterImmediate<Operator::CMP, State::X>
+class CMP_C8 : public AddressMode::RegisterImmediate<Operator::CMP, State::Register::X>
 {
     using RegisterImmediate::RegisterImmediate;
 
@@ -1276,7 +1276,7 @@ class CMP_C8 : public AddressMode::RegisterImmediate<Operator::CMP, State::X>
 // CMP X, d
 // X - (d)    	[N.....ZC]
 // Register Direct (2-Byte)
-class CMP_3E : public AddressMode::RegisterDirect<Operator::CMP, State::X>
+class CMP_3E : public AddressMode::RegisterDirect<Operator::CMP, State::Register::X>
 {
     using RegisterDirect::RegisterDirect;
 
@@ -1291,7 +1291,7 @@ class CMP_3E : public AddressMode::RegisterDirect<Operator::CMP, State::X>
 // CMP X, !a
 // X - (a)    	[N.....ZC]
 // Register Absolute (3-Byte)
-class CMP_1E : public AddressMode::RegisterAbsolute<Operator::CMP, State::X>
+class CMP_1E : public AddressMode::RegisterAbsolute<Operator::CMP, State::Register::X>
 {
     using RegisterAbsolute::RegisterAbsolute;
 
@@ -1307,7 +1307,7 @@ class CMP_1E : public AddressMode::RegisterAbsolute<Operator::CMP, State::X>
 // CMP Y, #i
 // Y - i    	[N.....ZC]
 // Register Immediate (2-Byte)
-class CMP_AD : public AddressMode::RegisterImmediate<Operator::CMP, State::Y>
+class CMP_AD : public AddressMode::RegisterImmediate<Operator::CMP, State::Register::Y>
 {
     using RegisterImmediate::RegisterImmediate;
 
@@ -1322,7 +1322,7 @@ class CMP_AD : public AddressMode::RegisterImmediate<Operator::CMP, State::Y>
 // CMP Y, d
 // Y - (d)    	[N.....ZC]
 // Register Direct (2-Byte)
-class CMP_7E : public AddressMode::RegisterDirect<Operator::CMP, State::Y>
+class CMP_7E : public AddressMode::RegisterDirect<Operator::CMP, State::Register::Y>
 {
     using RegisterDirect::RegisterDirect;
 
@@ -1337,7 +1337,7 @@ class CMP_7E : public AddressMode::RegisterDirect<Operator::CMP, State::Y>
 // CMP Y, !a
 // Y - (a)    	[N.....ZC]
 // Register Absolute (3-Byte)
-class CMP_5E : public AddressMode::RegisterAbsolute<Operator::CMP, State::Y>
+class CMP_5E : public AddressMode::RegisterAbsolute<Operator::CMP, State::Register::Y>
 {
     using RegisterAbsolute::RegisterAbsolute;
 
@@ -1397,7 +1397,7 @@ class CMPW_5A : public AddressMode::YAccumulatorDirect<Operator::CMPW>
 // DAA A
 // decimal adjust for addition    	[N.....ZC]
 // Register (1-Byte)
-class DAA_DF : public AddressMode::Register<Operator::DAA, State::A>
+class DAA_DF : public AddressMode::Register<Operator::DAA, State::Register::A>
 {
     using Register::Register;
 
@@ -1413,7 +1413,7 @@ class DAA_DF : public AddressMode::Register<Operator::DAA, State::A>
 // DAS A
 // decimal adjust for subtraction    	[N.....ZC]
 // Register (1-Byte)
-class DAS_BE : public AddressMode::Register<Operator::DAS, State::A>
+class DAS_BE : public AddressMode::Register<Operator::DAS, State::Register::A>
 {
     using Register::Register;
 
@@ -1429,7 +1429,7 @@ class DAS_BE : public AddressMode::Register<Operator::DAS, State::A>
 // DBNZ Y, r
 // Y-- then JNZ    	[........]
 // Register Program Counter Relative (2-Byte)
-class DBNZ_FE : public AddressMode::RegisterProgramCounterRelative<Operator::DBNZ, State::Y>
+class DBNZ_FE : public AddressMode::RegisterProgramCounterRelative<Operator::DBNZ, State::Register::Y>
 {
     using RegisterProgramCounterRelative::RegisterProgramCounterRelative;
 
@@ -1459,7 +1459,7 @@ class DBNZ_6E : public AddressMode::DirectProgramCounterRelative<Operator::DBNZ>
 // DEC A
 // A--    	[N.....Z.]
 // Register (1-Byte)
-class DEC_9C : public AddressMode::Register<Operator::DEC, State::A>
+class DEC_9C : public AddressMode::Register<Operator::DEC, State::Register::A>
 {
     using Register::Register;
 
@@ -1474,7 +1474,7 @@ class DEC_9C : public AddressMode::Register<Operator::DEC, State::A>
 // DEC X
 // X--    	[N.....Z.]
 // Register (1-Byte)
-class DEC_1D : public AddressMode::Register<Operator::DEC, State::X>
+class DEC_1D : public AddressMode::Register<Operator::DEC, State::Register::X>
 {
     using Register::Register;
 
@@ -1489,7 +1489,7 @@ class DEC_1D : public AddressMode::Register<Operator::DEC, State::X>
 // DEC Y
 // Y--    	[N.....Z.]
 // Register (1-Byte)
-class DEC_DC : public AddressMode::Register<Operator::DEC, State::Y>
+class DEC_DC : public AddressMode::Register<Operator::DEC, State::Register::Y>
 {
     using Register::Register;
 
@@ -1519,7 +1519,7 @@ class DEC_8B : public AddressMode::Direct<Operator::DEC>
 // DEC d+X
 // (d+X)--    	[N.....Z.]
 // Direct Indexed (2-Byte)
-class DEC_9B : public AddressMode::DirectIndexed<Operator::DEC, State::X>
+class DEC_9B : public AddressMode::DirectIndexed<Operator::DEC, State::Register::X>
 {
     using DirectIndexed::DirectIndexed;
 
@@ -1580,7 +1580,7 @@ class DI_C0 : public AddressMode::Implied<Operator::DI>
 // DIV YA, X
 // A=YA/X, Y=mod(YA,X)    	[NV..H.Z.]
 // Y Accumulator Index (1-Byte)
-class DIV_9E : public AddressMode::YAccumulatorRegister<Operator::DIV, State::X>
+class DIV_9E : public AddressMode::YAccumulatorRegister<Operator::DIV, State::Register::X>
 {
     using YAccumulatorRegister::YAccumulatorRegister;
 
@@ -1627,7 +1627,7 @@ class EOR_59 : public AddressMode::IndirectIndirect<Operator::EOR>
 // EOR A, #i
 // A = A EOR i    	[N.....Z.]
 // Register Immediate (2-Byte)
-class EOR_48 : public AddressMode::RegisterImmediate<Operator::EOR, State::A>
+class EOR_48 : public AddressMode::RegisterImmediate<Operator::EOR, State::Register::A>
 {
     using RegisterImmediate::RegisterImmediate;
 
@@ -1642,7 +1642,7 @@ class EOR_48 : public AddressMode::RegisterImmediate<Operator::EOR, State::A>
 // EOR A, (X)
 // A = A EOR (X)    	[N.....Z.]
 // Register Register Indirect (1-Byte)
-class EOR_46 : public AddressMode::RegisterRegisterIndirect<Operator::EOR, State::A, State::X>
+class EOR_46 : public AddressMode::RegisterRegisterIndirect<Operator::EOR, State::Register::A, State::Register::X>
 {
     using RegisterRegisterIndirect::RegisterRegisterIndirect;
 
@@ -1658,7 +1658,7 @@ class EOR_46 : public AddressMode::RegisterRegisterIndirect<Operator::EOR, State
 // EOR A, [d]+Y
 // A = A EOR ([d]+Y)    	[N.....Z.]
 // Register Direct Indirect Indexed (2-Byte)
-class EOR_57 : public AddressMode::RegisterDirectIndirectIndexed<Operator::EOR, State::A, State::Y>
+class EOR_57 : public AddressMode::RegisterDirectIndirectIndexed<Operator::EOR, State::Register::A, State::Register::Y>
 {
     using RegisterDirectIndirectIndexed::RegisterDirectIndirectIndexed;
 
@@ -1674,7 +1674,7 @@ class EOR_57 : public AddressMode::RegisterDirectIndirectIndexed<Operator::EOR, 
 // EOR A, [d+X]
 // A = A EOR ([d+X])    	[N.....Z.]
 // Register Direct Indexed Indirect (2-Byte)
-class EOR_47 : public AddressMode::RegisterDirectIndexedIndirect<Operator::EOR, State::A, State::X>
+class EOR_47 : public AddressMode::RegisterDirectIndexedIndirect<Operator::EOR, State::Register::A, State::Register::X>
 {
     using RegisterDirectIndexedIndirect::RegisterDirectIndexedIndirect;
 
@@ -1690,7 +1690,7 @@ class EOR_47 : public AddressMode::RegisterDirectIndexedIndirect<Operator::EOR, 
 // EOR A, d
 // A = A EOR (d)    	[N.....Z.]
 // Register Direct (2-Byte)
-class EOR_44 : public AddressMode::RegisterDirect<Operator::EOR, State::A>
+class EOR_44 : public AddressMode::RegisterDirect<Operator::EOR, State::Register::A>
 {
     using RegisterDirect::RegisterDirect;
 
@@ -1705,7 +1705,7 @@ class EOR_44 : public AddressMode::RegisterDirect<Operator::EOR, State::A>
 // EOR A, d+X
 // A = A EOR (d+X)    	[N.....Z.]
 // Register Direct Indexed (2-Byte)
-class EOR_54 : public AddressMode::RegisterDirectIndexed<Operator::EOR, State::A, State::X>
+class EOR_54 : public AddressMode::RegisterDirectIndexed<Operator::EOR, State::Register::A, State::Register::X>
 {
     using RegisterDirectIndexed::RegisterDirectIndexed;
 
@@ -1720,7 +1720,7 @@ class EOR_54 : public AddressMode::RegisterDirectIndexed<Operator::EOR, State::A
 // EOR A, !a
 // A = A EOR (a)    	[N.....Z.]
 // Register Absolute (3-Byte)
-class EOR_45 : public AddressMode::RegisterAbsolute<Operator::EOR, State::A>
+class EOR_45 : public AddressMode::RegisterAbsolute<Operator::EOR, State::Register::A>
 {
     using RegisterAbsolute::RegisterAbsolute;
 
@@ -1736,7 +1736,7 @@ class EOR_45 : public AddressMode::RegisterAbsolute<Operator::EOR, State::A>
 // EOR A, !a+X
 // A = A EOR (a+X)    	[N.....Z.]
 // Register Absolute Indexed (3-Byte)
-class EOR_55 : public AddressMode::RegisterAbsoluteIndexed<Operator::EOR, State::A, State::X>
+class EOR_55 : public AddressMode::RegisterAbsoluteIndexed<Operator::EOR, State::Register::A, State::Register::X>
 {
     using RegisterAbsoluteIndexed::RegisterAbsoluteIndexed;
 
@@ -1752,7 +1752,7 @@ class EOR_55 : public AddressMode::RegisterAbsoluteIndexed<Operator::EOR, State:
 // EOR A, !a+Y
 // A = A EOR (a+Y)    	[N.....Z.]
 // Register Absolute Indexed (3-Byte)
-class EOR_56 : public AddressMode::RegisterAbsoluteIndexed<Operator::EOR, State::A, State::Y>
+class EOR_56 : public AddressMode::RegisterAbsoluteIndexed<Operator::EOR, State::Register::A, State::Register::Y>
 {
     using RegisterAbsoluteIndexed::RegisterAbsoluteIndexed;
 
@@ -1815,7 +1815,7 @@ class EOR1_8A : public AddressMode::CarryMemoryBit<Operator::EOR1>
 // INC A
 // A++    	[N.....Z.]
 // Register (1-Byte)
-class INC_BC : public AddressMode::Register<Operator::INC, State::A>
+class INC_BC : public AddressMode::Register<Operator::INC, State::Register::A>
 {
     using Register::Register;
 
@@ -1830,7 +1830,7 @@ class INC_BC : public AddressMode::Register<Operator::INC, State::A>
 // INC X
 // X++    	[N.....Z.]
 // Register (1-Byte)
-class INC_3D : public AddressMode::Register<Operator::INC, State::X>
+class INC_3D : public AddressMode::Register<Operator::INC, State::Register::X>
 {
     using Register::Register;
 
@@ -1845,7 +1845,7 @@ class INC_3D : public AddressMode::Register<Operator::INC, State::X>
 // INC Y
 // Y++    	[N.....Z.]
 // Register (1-Byte)
-class INC_FC : public AddressMode::Register<Operator::INC, State::Y>
+class INC_FC : public AddressMode::Register<Operator::INC, State::Register::Y>
 {
     using Register::Register;
 
@@ -1875,7 +1875,7 @@ class INC_AB : public AddressMode::Direct<Operator::INC>
 // INC d+X
 // (d+X)++    	[N.....Z.]
 // Direct Indexed (2-Byte)
-class INC_BB : public AddressMode::DirectIndexed<Operator::INC, State::X>
+class INC_BB : public AddressMode::DirectIndexed<Operator::INC, State::Register::X>
 {
     using DirectIndexed::DirectIndexed;
 
@@ -1920,7 +1920,7 @@ class INCW_3A : public AddressMode::Direct<Operator::INCW>
 // JMP [!a+X]
 // PC = [a+X]    	[........]
 // Absolute Indexed Indirect (3-Byte)
-class JMP_1F : public AddressMode::AbsoluteIndexedIndirect<Operator::JMP, State::X>
+class JMP_1F : public AddressMode::AbsoluteIndexedIndirect<Operator::JMP, State::Register::X>
 {
     using AbsoluteIndexedIndirect::AbsoluteIndexedIndirect;
 
@@ -1950,7 +1950,7 @@ class JMP_5F : public AddressMode::Absolute_ControlFlow<Operator::JMP>
 // LSR A
 // Right shift A: 0->high, low->C    	[N.....ZC]
 // Register (1-Byte)
-class LSR_5C : public AddressMode::Register<Operator::LSR, State::A>
+class LSR_5C : public AddressMode::Register<Operator::LSR, State::Register::A>
 {
     using Register::Register;
 
@@ -1980,7 +1980,7 @@ class LSR_4B : public AddressMode::Direct<Operator::LSR>
 // LSR d+X
 // Right shift (d+X) as above    	[N.....ZC]
 // Direct Indexed (2-Byte)
-class LSR_5B : public AddressMode::DirectIndexed<Operator::LSR, State::X>
+class LSR_5B : public AddressMode::DirectIndexed<Operator::LSR, State::Register::X>
 {
     using DirectIndexed::DirectIndexed;
 
@@ -2011,7 +2011,7 @@ class LSR_4C : public AddressMode::Absolute<Operator::LSR>
 // MOV (X)+, A
 // (X++) = A      (no read)    	[........]
 // Register Indirect Increment Register (1-Byte)
-class MOV_AF : public AddressMode::RegisterIndirectIncrementRegister<Operator::MOV, State::X, State::A>
+class MOV_AF : public AddressMode::RegisterIndirectIncrementRegister<Operator::MOV, State::Register::X, State::Register::A>
 {
     using RegisterIndirectIncrementRegister::RegisterIndirectIncrementRegister;
 
@@ -2026,7 +2026,7 @@ class MOV_AF : public AddressMode::RegisterIndirectIncrementRegister<Operator::M
 // MOV (X), A
 // (X) = A        (read)    	[........]
 // Register Indirect Register (1-Byte)
-class MOV_C6 : public AddressMode::RegisterIndirectRegister<Operator::MOV, State::X, State::A>
+class MOV_C6 : public AddressMode::RegisterIndirectRegister<Operator::MOV, State::Register::X, State::Register::A>
 {
     using RegisterIndirectRegister::RegisterIndirectRegister;
 
@@ -2041,7 +2041,7 @@ class MOV_C6 : public AddressMode::RegisterIndirectRegister<Operator::MOV, State
 // MOV [d]+Y, A
 // ([d]+Y) = A    (read)    	[........]
 // Direct Indirect Indexed Register (2-Byte)
-class MOV_D7 : public AddressMode::DirectIndirectIndexedRegister<Operator::MOV, State::Y, State::A>
+class MOV_D7 : public AddressMode::DirectIndirectIndexedRegister<Operator::MOV, State::Register::Y, State::Register::A>
 {
     using DirectIndirectIndexedRegister::DirectIndirectIndexedRegister;
 
@@ -2056,7 +2056,7 @@ class MOV_D7 : public AddressMode::DirectIndirectIndexedRegister<Operator::MOV, 
 // MOV [d+X], A
 // ([d+X]) = A    (read)    	[........]
 // Direct Indexed Indirect Register (2-Byte)
-class MOV_C7 : public AddressMode::DirectIndexedIndirectRegister<Operator::MOV, State::X, State::A>
+class MOV_C7 : public AddressMode::DirectIndexedIndirectRegister<Operator::MOV, State::Register::X, State::Register::A>
 {
     using DirectIndexedIndirectRegister::DirectIndexedIndirectRegister;
 
@@ -2071,7 +2071,7 @@ class MOV_C7 : public AddressMode::DirectIndexedIndirectRegister<Operator::MOV, 
 // MOV A, #i
 // A = i    	[N.....Z.]
 // Register Immediate (2-Byte)
-class MOV_E8 : public AddressMode::RegisterImmediate<Operator::MOV_SignedResult, State::A>
+class MOV_E8 : public AddressMode::RegisterImmediate<Operator::MOV_SignedResult, State::Register::A>
 {
     using RegisterImmediate::RegisterImmediate;
 
@@ -2086,7 +2086,7 @@ class MOV_E8 : public AddressMode::RegisterImmediate<Operator::MOV_SignedResult,
 // MOV A, (X)
 // A = (X)    	[N.....Z.]
 // Register Register Indirect (1-Byte)
-class MOV_E6 : public AddressMode::RegisterRegisterIndirect<Operator::MOV_SignedResult, State::A, State::X>
+class MOV_E6 : public AddressMode::RegisterRegisterIndirect<Operator::MOV_SignedResult, State::Register::A, State::Register::X>
 {
     using RegisterRegisterIndirect::RegisterRegisterIndirect;
 
@@ -2101,7 +2101,7 @@ class MOV_E6 : public AddressMode::RegisterRegisterIndirect<Operator::MOV_Signed
 // MOV A, (X)+
 // A = (X++)    	[N.....Z.]
 // Register Register Indirect Increment (1-Byte)
-class MOV_BF : public AddressMode::RegisterRegisterIndirectIncrement<Operator::MOV_SignedResult, State::A, State::X>
+class MOV_BF : public AddressMode::RegisterRegisterIndirectIncrement<Operator::MOV_SignedResult, State::Register::A, State::Register::X>
 {
     using RegisterRegisterIndirectIncrement::RegisterRegisterIndirectIncrement;
 
@@ -2117,7 +2117,7 @@ class MOV_BF : public AddressMode::RegisterRegisterIndirectIncrement<Operator::M
 // MOV A, [d]+Y
 // A = ([d]+Y)    	[N.....Z.]
 // Register Direct Indirect Indexed (2-Byte)
-class MOV_F7 : public AddressMode::RegisterDirectIndirectIndexed<Operator::MOV_SignedResult, State::A, State::Y>
+class MOV_F7 : public AddressMode::RegisterDirectIndirectIndexed<Operator::MOV_SignedResult, State::Register::A, State::Register::Y>
 {
     using RegisterDirectIndirectIndexed::RegisterDirectIndirectIndexed;
 
@@ -2132,7 +2132,7 @@ class MOV_F7 : public AddressMode::RegisterDirectIndirectIndexed<Operator::MOV_S
 // MOV A, [d+X]
 // A = ([d+X])    	[N.....Z.]
 // Register Direct Indexed Indirect (2-Byte)
-class MOV_E7 : public AddressMode::RegisterDirectIndexedIndirect<Operator::MOV_SignedResult, State::A, State::X>
+class MOV_E7 : public AddressMode::RegisterDirectIndexedIndirect<Operator::MOV_SignedResult, State::Register::A, State::Register::X>
 {
     using RegisterDirectIndexedIndirect::RegisterDirectIndexedIndirect;
 
@@ -2147,7 +2147,7 @@ class MOV_E7 : public AddressMode::RegisterDirectIndexedIndirect<Operator::MOV_S
 // MOV A, X
 // A = X    	[N.....Z.]
 // Register Register (1-Byte)
-class MOV_7D : public AddressMode::RegisterRegister<Operator::MOV_SignedResult, State::A, State::X>
+class MOV_7D : public AddressMode::RegisterRegister<Operator::MOV_SignedResult, State::Register::A, State::Register::X>
 {
     using RegisterRegister::RegisterRegister;
 
@@ -2162,7 +2162,7 @@ class MOV_7D : public AddressMode::RegisterRegister<Operator::MOV_SignedResult, 
 // MOV A, Y
 // A = Y    	[N.....Z.]
 // Register Register (1-Byte)
-class MOV_DD : public AddressMode::RegisterRegister<Operator::MOV_SignedResult, State::A, State::Y>
+class MOV_DD : public AddressMode::RegisterRegister<Operator::MOV_SignedResult, State::Register::A, State::Register::Y>
 {
     using RegisterRegister::RegisterRegister;
 
@@ -2177,7 +2177,7 @@ class MOV_DD : public AddressMode::RegisterRegister<Operator::MOV_SignedResult, 
 // MOV A, d
 // A = (d)    	[N.....Z.]
 // Register Direct (2-Byte)
-class MOV_E4 : public AddressMode::RegisterDirect<Operator::MOV_SignedResult, State::A>
+class MOV_E4 : public AddressMode::RegisterDirect<Operator::MOV_SignedResult, State::Register::A>
 {
     using RegisterDirect::RegisterDirect;
 
@@ -2192,7 +2192,7 @@ class MOV_E4 : public AddressMode::RegisterDirect<Operator::MOV_SignedResult, St
 // MOV A, d+X
 // A = (d+X)    	[N.....Z.]
 // Register Direct Indexed (2-Byte)
-class MOV_F4 : public AddressMode::RegisterDirectIndexed<Operator::MOV_SignedResult, State::A, State::X>
+class MOV_F4 : public AddressMode::RegisterDirectIndexed<Operator::MOV_SignedResult, State::Register::A, State::Register::X>
 {
     using RegisterDirectIndexed::RegisterDirectIndexed;
 
@@ -2207,7 +2207,7 @@ class MOV_F4 : public AddressMode::RegisterDirectIndexed<Operator::MOV_SignedRes
 // MOV A, !a
 // A = (a)    	[N.....Z.]
 // Register Absolute (3-Byte)
-class MOV_E5 : public AddressMode::RegisterAbsolute<Operator::MOV_SignedResult, State::A>
+class MOV_E5 : public AddressMode::RegisterAbsolute<Operator::MOV_SignedResult, State::Register::A>
 {
     using RegisterAbsolute::RegisterAbsolute;
 
@@ -2222,7 +2222,7 @@ class MOV_E5 : public AddressMode::RegisterAbsolute<Operator::MOV_SignedResult, 
 // MOV A, !a+X
 // A = (a+X)    	[N.....Z.]
 // Register Absolute Indexed (3-Byte)
-class MOV_F5 : public AddressMode::RegisterAbsoluteIndexed<Operator::MOV_SignedResult, State::A, State::X>
+class MOV_F5 : public AddressMode::RegisterAbsoluteIndexed<Operator::MOV_SignedResult, State::Register::A, State::Register::X>
 {
     using RegisterAbsoluteIndexed::RegisterAbsoluteIndexed;
 
@@ -2237,7 +2237,7 @@ class MOV_F5 : public AddressMode::RegisterAbsoluteIndexed<Operator::MOV_SignedR
 // MOV A, !a+Y
 // A = (a+Y)    	[N.....Z.]
 // Register Absolute Indexed (3-Byte)
-class MOV_F6 : public AddressMode::RegisterAbsoluteIndexed<Operator::MOV_SignedResult, State::A, State::Y>
+class MOV_F6 : public AddressMode::RegisterAbsoluteIndexed<Operator::MOV_SignedResult, State::Register::A, State::Register::Y>
 {
     using RegisterAbsoluteIndexed::RegisterAbsoluteIndexed;
 
@@ -2252,7 +2252,7 @@ class MOV_F6 : public AddressMode::RegisterAbsoluteIndexed<Operator::MOV_SignedR
 // MOV SP, X
 // SP = X    	[........]
 // Register Register (1-Byte)
-class MOV_BD : public AddressMode::RegisterRegister<Operator::MOV, State::SP, State::X>
+class MOV_BD : public AddressMode::RegisterRegister<Operator::MOV, State::Register::SP, State::Register::X>
 {
     using RegisterRegister::RegisterRegister;
 
@@ -2267,7 +2267,7 @@ class MOV_BD : public AddressMode::RegisterRegister<Operator::MOV, State::SP, St
 // MOV X, #i
 // X = i    	[N.....Z.]
 // Register Immediate (2-Byte)
-class MOV_CD : public AddressMode::RegisterImmediate<Operator::MOV_SignedResult, State::X>
+class MOV_CD : public AddressMode::RegisterImmediate<Operator::MOV_SignedResult, State::Register::X>
 {
     using RegisterImmediate::RegisterImmediate;
 
@@ -2282,7 +2282,7 @@ class MOV_CD : public AddressMode::RegisterImmediate<Operator::MOV_SignedResult,
 // MOV X, A
 // X = A    	[N.....Z.]
 // Register Register (1-Byte)
-class MOV_5D : public AddressMode::RegisterRegister<Operator::MOV_SignedResult, State::X, State::A>
+class MOV_5D : public AddressMode::RegisterRegister<Operator::MOV_SignedResult, State::Register::X, State::Register::A>
 {
     using RegisterRegister::RegisterRegister;
 
@@ -2297,7 +2297,7 @@ class MOV_5D : public AddressMode::RegisterRegister<Operator::MOV_SignedResult, 
 // MOV X, SP
 // X = SP    	[N.....Z.]
 // Register Register (1-Byte)
-class MOV_9D : public AddressMode::RegisterRegister<Operator::MOV_SignedResult, State::X, State::SP>
+class MOV_9D : public AddressMode::RegisterRegister<Operator::MOV_SignedResult, State::Register::X, State::Register::SP>
 {
     using RegisterRegister::RegisterRegister;
 
@@ -2313,7 +2313,7 @@ class MOV_9D : public AddressMode::RegisterRegister<Operator::MOV_SignedResult, 
 // MOV X, d
 // X = (d)    	[N.....Z.]
 // Register Direct (2-Byte)
-class MOV_F8 : public AddressMode::RegisterDirect<Operator::MOV_SignedResult, State::X>
+class MOV_F8 : public AddressMode::RegisterDirect<Operator::MOV_SignedResult, State::Register::X>
 {
     using RegisterDirect::RegisterDirect;
 
@@ -2328,7 +2328,7 @@ class MOV_F8 : public AddressMode::RegisterDirect<Operator::MOV_SignedResult, St
 // MOV X, d+Y
 // X = (d+Y)    	[N.....Z.]
 // Register Direct Indexed (2-Byte)
-class MOV_F9 : public AddressMode::RegisterDirectIndexed<Operator::MOV_SignedResult, State::X, State::Y>
+class MOV_F9 : public AddressMode::RegisterDirectIndexed<Operator::MOV_SignedResult, State::Register::X, State::Register::Y>
 {
     using RegisterDirectIndexed::RegisterDirectIndexed;
 
@@ -2344,7 +2344,7 @@ class MOV_F9 : public AddressMode::RegisterDirectIndexed<Operator::MOV_SignedRes
 // MOV X, !a
 // X = (a)    	[N.....Z.]
 // Register Absolute (3-Byte)
-class MOV_E9 : public AddressMode::RegisterAbsolute<Operator::MOV_SignedResult, State::X>
+class MOV_E9 : public AddressMode::RegisterAbsolute<Operator::MOV_SignedResult, State::Register::X>
 {
     using RegisterAbsolute::RegisterAbsolute;
 
@@ -2359,7 +2359,7 @@ class MOV_E9 : public AddressMode::RegisterAbsolute<Operator::MOV_SignedResult, 
 // MOV Y, #i
 // Y = i    	[N.....Z.]
 // Register Immediate (2-Byte)
-class MOV_8D : public AddressMode::RegisterImmediate<Operator::MOV_SignedResult, State::Y>
+class MOV_8D : public AddressMode::RegisterImmediate<Operator::MOV_SignedResult, State::Register::Y>
 {
     using RegisterImmediate::RegisterImmediate;
 
@@ -2374,7 +2374,7 @@ class MOV_8D : public AddressMode::RegisterImmediate<Operator::MOV_SignedResult,
 // MOV Y, A
 // Y = A    	[N.....Z.]
 // Register Register (1-Byte)
-class MOV_FD : public AddressMode::RegisterRegister<Operator::MOV_SignedResult, State::Y, State::A>
+class MOV_FD : public AddressMode::RegisterRegister<Operator::MOV_SignedResult, State::Register::Y, State::Register::A>
 {
     using RegisterRegister::RegisterRegister;
 
@@ -2389,7 +2389,7 @@ class MOV_FD : public AddressMode::RegisterRegister<Operator::MOV_SignedResult, 
 // MOV Y, d
 // Y = (d)    	[N.....Z.]
 // Register Direct (2-Byte)
-class MOV_EB : public AddressMode::RegisterDirect<Operator::MOV_SignedResult, State::Y>
+class MOV_EB : public AddressMode::RegisterDirect<Operator::MOV_SignedResult, State::Register::Y>
 {
     using RegisterDirect::RegisterDirect;
 
@@ -2404,7 +2404,7 @@ class MOV_EB : public AddressMode::RegisterDirect<Operator::MOV_SignedResult, St
 // MOV Y, d+X
 // Y = (d+X)    	[N.....Z.]
 // Register Direct Indexed (2-Byte)
-class MOV_FB : public AddressMode::RegisterDirectIndexed<Operator::MOV_SignedResult, State::Y, State::X>
+class MOV_FB : public AddressMode::RegisterDirectIndexed<Operator::MOV_SignedResult, State::Register::Y, State::Register::X>
 {
     using RegisterDirectIndexed::RegisterDirectIndexed;
 
@@ -2419,7 +2419,7 @@ class MOV_FB : public AddressMode::RegisterDirectIndexed<Operator::MOV_SignedRes
 // MOV Y, !a
 // Y = (a)    	[N.....Z.]
 // Register Absolute (3-Byte)
-class MOV_EC : public AddressMode::RegisterAbsolute<Operator::MOV_SignedResult, State::Y>
+class MOV_EC : public AddressMode::RegisterAbsolute<Operator::MOV_SignedResult, State::Register::Y>
 {
     using RegisterAbsolute::RegisterAbsolute;
 
@@ -2449,7 +2449,7 @@ class MOV_FA : public AddressMode::DirectDirect<Operator::MOV>
 // MOV d+X, A
 // (d+X) = A      (read)    	[........]
 // Direct Indexed Register (2-Byte)
-class MOV_D4 : public AddressMode::DirectIndexedRegister<Operator::MOV, State::X, State::A>
+class MOV_D4 : public AddressMode::DirectIndexedRegister<Operator::MOV, State::Register::X, State::Register::A>
 {
     using DirectIndexedRegister::DirectIndexedRegister;
 
@@ -2464,7 +2464,7 @@ class MOV_D4 : public AddressMode::DirectIndexedRegister<Operator::MOV, State::X
 // MOV d+X, Y
 // (d+X) = Y      (read)    	[........]
 // Direct Indexed Register (2-Byte)
-class MOV_DB : public AddressMode::DirectIndexedRegister<Operator::MOV, State::X, State::Y>
+class MOV_DB : public AddressMode::DirectIndexedRegister<Operator::MOV, State::Register::X, State::Register::Y>
 {
     using DirectIndexedRegister::DirectIndexedRegister;
 
@@ -2479,7 +2479,7 @@ class MOV_DB : public AddressMode::DirectIndexedRegister<Operator::MOV, State::X
 // MOV d+Y, X
 // (d+Y) = X      (read)    	[........]
 // Direct Indexed Register (2-Byte)
-class MOV_D9 : public AddressMode::DirectIndexedRegister<Operator::MOV, State::Y, State::X>
+class MOV_D9 : public AddressMode::DirectIndexedRegister<Operator::MOV, State::Register::Y, State::Register::X>
 {
     using DirectIndexedRegister::DirectIndexedRegister;
 
@@ -2510,7 +2510,7 @@ class MOV_8F : public AddressMode::DirectImmediate<Operator::MOV>
 // MOV d, A
 // (d) = A        (read)    	[........]
 // Direct Register (2-Byte)
-class MOV_C4 : public AddressMode::DirectRegister<Operator::MOV, State::A>
+class MOV_C4 : public AddressMode::DirectRegister<Operator::MOV, State::Register::A>
 {
     using DirectRegister::DirectRegister;
 
@@ -2525,7 +2525,7 @@ class MOV_C4 : public AddressMode::DirectRegister<Operator::MOV, State::A>
 // MOV d, X
 // (d) = X        (read)    	[........]
 // Direct Register (2-Byte)
-class MOV_D8 : public AddressMode::DirectRegister<Operator::MOV, State::X>
+class MOV_D8 : public AddressMode::DirectRegister<Operator::MOV, State::Register::X>
 {
     using DirectRegister::DirectRegister;
 
@@ -2540,7 +2540,7 @@ class MOV_D8 : public AddressMode::DirectRegister<Operator::MOV, State::X>
 // MOV d, Y
 // (d) = Y        (read)    	[........]
 // Direct Register (2-Byte)
-class MOV_CB : public AddressMode::DirectRegister<Operator::MOV, State::Y>
+class MOV_CB : public AddressMode::DirectRegister<Operator::MOV, State::Register::Y>
 {
     using DirectRegister::DirectRegister;
 
@@ -2555,7 +2555,7 @@ class MOV_CB : public AddressMode::DirectRegister<Operator::MOV, State::Y>
 // MOV !a+X, A
 // (a+X) = A      (read)    	[........]
 // Absolute Indexed Register (3-Byte)
-class MOV_D5 : public AddressMode::AbsoluteIndexedRegister<Operator::MOV, State::X, State::A>
+class MOV_D5 : public AddressMode::AbsoluteIndexedRegister<Operator::MOV, State::Register::X, State::Register::A>
 {
     using AbsoluteIndexedRegister::AbsoluteIndexedRegister;
 
@@ -2570,7 +2570,7 @@ class MOV_D5 : public AddressMode::AbsoluteIndexedRegister<Operator::MOV, State:
 // MOV !a+Y, A
 // (a+Y) = A      (read)    	[........]
 // Absolute Indexed Register (3-Byte)
-class MOV_D6 : public AddressMode::AbsoluteIndexedRegister<Operator::MOV, State::Y, State::A>
+class MOV_D6 : public AddressMode::AbsoluteIndexedRegister<Operator::MOV, State::Register::Y, State::Register::A>
 {
     using AbsoluteIndexedRegister::AbsoluteIndexedRegister;
 
@@ -2585,7 +2585,7 @@ class MOV_D6 : public AddressMode::AbsoluteIndexedRegister<Operator::MOV, State:
 // MOV !a, A
 // (a) = A        (read)    	[........]
 // Absolute Register (3-Byte)
-class MOV_C5 : public AddressMode::AbsoluteRegister<Operator::MOV, State::A>
+class MOV_C5 : public AddressMode::AbsoluteRegister<Operator::MOV, State::Register::A>
 {
     using AbsoluteRegister::AbsoluteRegister;
 
@@ -2600,7 +2600,7 @@ class MOV_C5 : public AddressMode::AbsoluteRegister<Operator::MOV, State::A>
 // MOV !a, X
 // (a) = X        (read)    	[........]
 // Absolute Register (3-Byte)
-class MOV_C9 : public AddressMode::AbsoluteRegister<Operator::MOV, State::X>
+class MOV_C9 : public AddressMode::AbsoluteRegister<Operator::MOV, State::Register::X>
 {
     using AbsoluteRegister::AbsoluteRegister;
 
@@ -2615,7 +2615,7 @@ class MOV_C9 : public AddressMode::AbsoluteRegister<Operator::MOV, State::X>
 // MOV !a, Y
 // (a) = Y        (read)    	[........]
 // Absolute Register (3-Byte)
-class MOV_CC : public AddressMode::AbsoluteRegister<Operator::MOV, State::Y>
+class MOV_CC : public AddressMode::AbsoluteRegister<Operator::MOV, State::Register::Y>
 {
     using AbsoluteRegister::AbsoluteRegister;
 
@@ -2769,7 +2769,7 @@ class OR_19 : public AddressMode::IndirectIndirect<Operator::OR>
 // OR A, #i
 // A = A | i    	[N.....Z.]
 // Register Immediate (2-Byte)
-class OR_08 : public AddressMode::RegisterImmediate<Operator::OR, State::A>
+class OR_08 : public AddressMode::RegisterImmediate<Operator::OR, State::Register::A>
 {
     using RegisterImmediate::RegisterImmediate;
 
@@ -2784,7 +2784,7 @@ class OR_08 : public AddressMode::RegisterImmediate<Operator::OR, State::A>
 // OR A, (X)
 // A = A | (X)    	[N.....Z.]
 // Register Register Indirect (1-Byte)
-class OR_06 : public AddressMode::RegisterRegisterIndirect<Operator::OR, State::A, State::X>
+class OR_06 : public AddressMode::RegisterRegisterIndirect<Operator::OR, State::Register::A, State::Register::X>
 {
     using RegisterRegisterIndirect::RegisterRegisterIndirect;
 
@@ -2800,7 +2800,7 @@ class OR_06 : public AddressMode::RegisterRegisterIndirect<Operator::OR, State::
 // OR A, [d]+Y
 // A = A | ([d]+Y)    	[N.....Z.]
 // Register Direct Indirect Indexed (2-Byte)
-class OR_17 : public AddressMode::RegisterDirectIndirectIndexed<Operator::OR, State::A, State::Y>
+class OR_17 : public AddressMode::RegisterDirectIndirectIndexed<Operator::OR, State::Register::A, State::Register::Y>
 {
     using RegisterDirectIndirectIndexed::RegisterDirectIndirectIndexed;
 
@@ -2816,7 +2816,7 @@ class OR_17 : public AddressMode::RegisterDirectIndirectIndexed<Operator::OR, St
 // OR A, [d+X]
 // A = A | ([d+X])    	[N.....Z.]
 // Register Direct Indexed Indirect (2-Byte)
-class OR_07 : public AddressMode::RegisterDirectIndexedIndirect<Operator::OR, State::A, State::X>
+class OR_07 : public AddressMode::RegisterDirectIndexedIndirect<Operator::OR, State::Register::A, State::Register::X>
 {
     using RegisterDirectIndexedIndirect::RegisterDirectIndexedIndirect;
 
@@ -2832,7 +2832,7 @@ class OR_07 : public AddressMode::RegisterDirectIndexedIndirect<Operator::OR, St
 // OR A, d
 // A = A | (d)    	[N.....Z.]
 // Register Direct (2-Byte)
-class OR_04 : public AddressMode::RegisterDirect<Operator::OR, State::A>
+class OR_04 : public AddressMode::RegisterDirect<Operator::OR, State::Register::A>
 {
     using RegisterDirect::RegisterDirect;
 
@@ -2847,7 +2847,7 @@ class OR_04 : public AddressMode::RegisterDirect<Operator::OR, State::A>
 // OR A, d+X
 // A = A | (d+X)    	[N.....Z.]
 // Register Direct Indexed (2-Byte)
-class OR_14 : public AddressMode::RegisterDirectIndexed<Operator::OR, State::A, State::X>
+class OR_14 : public AddressMode::RegisterDirectIndexed<Operator::OR, State::Register::A, State::Register::X>
 {
     using RegisterDirectIndexed::RegisterDirectIndexed;
 
@@ -2862,7 +2862,7 @@ class OR_14 : public AddressMode::RegisterDirectIndexed<Operator::OR, State::A, 
 // OR A, !a
 // A = A | (a)    	[N.....Z.]
 // Register Absolute (3-Byte)
-class OR_05 : public AddressMode::RegisterAbsolute<Operator::OR, State::A>
+class OR_05 : public AddressMode::RegisterAbsolute<Operator::OR, State::Register::A>
 {
     using RegisterAbsolute::RegisterAbsolute;
 
@@ -2877,7 +2877,7 @@ class OR_05 : public AddressMode::RegisterAbsolute<Operator::OR, State::A>
 // OR A, !a+X
 // A = A | (a+X)    	[N.....Z.]
 // Register Absolute Indexed (3-Byte)
-class OR_15 : public AddressMode::RegisterAbsoluteIndexed<Operator::OR, State::A, State::X>
+class OR_15 : public AddressMode::RegisterAbsoluteIndexed<Operator::OR, State::Register::A, State::Register::X>
 {
     using RegisterAbsoluteIndexed::RegisterAbsoluteIndexed;
 
@@ -2892,7 +2892,7 @@ class OR_15 : public AddressMode::RegisterAbsoluteIndexed<Operator::OR, State::A
 // OR A, !a+Y
 // A = A | (a+Y)    	[N.....Z.]
 // Register Absolute Indexed (3-Byte)
-class OR_16 : public AddressMode::RegisterAbsoluteIndexed<Operator::OR, State::A, State::Y>
+class OR_16 : public AddressMode::RegisterAbsoluteIndexed<Operator::OR, State::Register::A, State::Register::Y>
 {
     using RegisterAbsoluteIndexed::RegisterAbsoluteIndexed;
 
@@ -2987,7 +2987,7 @@ class PCALL_4F : public AddressMode::UPage<Operator::PCALL>
 // POP A
 // A = (++SP)    	[........]
 // Register (1-Byte)
-class POP_AE : public AddressMode::Register<Operator::POP, State::A>
+class POP_AE : public AddressMode::Register<Operator::POP, State::Register::A>
 {
     using Register::Register;
 
@@ -3002,7 +3002,7 @@ class POP_AE : public AddressMode::Register<Operator::POP, State::A>
 // POP PSW
 // Flags = (++SP)    	[NVPBHIZC]
 // Register (1-Byte)
-class POP_8E : public AddressMode::Register<Operator::POP, State::PSW>
+class POP_8E : public AddressMode::Register<Operator::POP, State::Register::PSW>
 {
     using Register::Register;
 
@@ -3017,7 +3017,7 @@ class POP_8E : public AddressMode::Register<Operator::POP, State::PSW>
 // POP X
 // X = (++SP)    	[........]
 // Register (1-Byte)
-class POP_CE : public AddressMode::Register<Operator::POP, State::X>
+class POP_CE : public AddressMode::Register<Operator::POP, State::Register::X>
 {
     using Register::Register;
 
@@ -3032,7 +3032,7 @@ class POP_CE : public AddressMode::Register<Operator::POP, State::X>
 // POP Y
 // Y = (++SP)    	[........]
 // Register (1-Byte)
-class POP_EE : public AddressMode::Register<Operator::POP, State::Y>
+class POP_EE : public AddressMode::Register<Operator::POP, State::Register::Y>
 {
     using Register::Register;
 
@@ -3047,7 +3047,7 @@ class POP_EE : public AddressMode::Register<Operator::POP, State::Y>
 // PUSH A
 // (SP--) = A    	[........]
 // Register (1-Byte)
-class PUSH_2D : public AddressMode::Register<Operator::PUSH, State::A>
+class PUSH_2D : public AddressMode::Register<Operator::PUSH, State::Register::A>
 {
     using Register::Register;
 
@@ -3062,7 +3062,7 @@ class PUSH_2D : public AddressMode::Register<Operator::PUSH, State::A>
 // PUSH PSW
 // (SP--) = Flags    	[........]
 // Register (1-Byte)
-class PUSH_0D : public AddressMode::Register<Operator::PUSH, State::PSW>
+class PUSH_0D : public AddressMode::Register<Operator::PUSH, State::Register::PSW>
 {
     using Register::Register;
 
@@ -3077,7 +3077,7 @@ class PUSH_0D : public AddressMode::Register<Operator::PUSH, State::PSW>
 // PUSH X
 // (SP--) = X    	[........]
 // Register (1-Byte)
-class PUSH_4D : public AddressMode::Register<Operator::PUSH, State::X>
+class PUSH_4D : public AddressMode::Register<Operator::PUSH, State::Register::X>
 {
     using Register::Register;
 
@@ -3092,7 +3092,7 @@ class PUSH_4D : public AddressMode::Register<Operator::PUSH, State::X>
 // PUSH Y
 // (SP--) = Y    	[........]
 // Register (1-Byte)
-class PUSH_6D : public AddressMode::Register<Operator::PUSH, State::Y>
+class PUSH_6D : public AddressMode::Register<Operator::PUSH, State::Register::Y>
 {
     using Register::Register;
 
@@ -3138,7 +3138,7 @@ class RET1_7F : public AddressMode::Implied<Operator::RET1>
 // ROL A
 // Left shift A: low=C, C=high    	[N.....ZC]
 // Register (1-Byte)
-class ROL_3C : public AddressMode::Register<Operator::ROL, State::A>
+class ROL_3C : public AddressMode::Register<Operator::ROL, State::Register::A>
 {
     using Register::Register;
 
@@ -3169,7 +3169,7 @@ class ROL_2B : public AddressMode::Direct<Operator::ROL>
 // ROL d+X
 // Left shift (d+X) as above    	[N.....ZC]
 // Direct Indexed (2-Byte)
-class ROL_3B : public AddressMode::DirectIndexed<Operator::ROL, State::X>
+class ROL_3B : public AddressMode::DirectIndexed<Operator::ROL, State::Register::X>
 {
     using DirectIndexed::DirectIndexed;
 
@@ -3201,7 +3201,7 @@ class ROL_2C : public AddressMode::Absolute<Operator::ROL>
 // ROR A
 // Right shift A: high=C, C=low    	[N.....ZC]
 // Register (1-Byte)
-class ROR_7C : public AddressMode::Register<Operator::ROR, State::A>
+class ROR_7C : public AddressMode::Register<Operator::ROR, State::Register::A>
 {
     using Register::Register;
 
@@ -3231,7 +3231,7 @@ class ROR_6B : public AddressMode::Direct<Operator::ROR>
 // ROR d+X
 // Right shift (d+X) as above    	[N.....ZC]
 // Direct Indexed (2-Byte)
-class ROR_7B : public AddressMode::DirectIndexed<Operator::ROR, State::X>
+class ROR_7B : public AddressMode::DirectIndexed<Operator::ROR, State::Register::X>
 {
     using DirectIndexed::DirectIndexed;
 
@@ -3279,7 +3279,7 @@ class SBC_B9 : public AddressMode::IndirectIndirect<Operator::SBC>
 // SBC A, #i
 // A = A-i-!C    	[NV..H.ZC]
 // Register Immediate (2-Byte)
-class SBC_A8 : public AddressMode::RegisterImmediate<Operator::SBC, State::A>
+class SBC_A8 : public AddressMode::RegisterImmediate<Operator::SBC, State::Register::A>
 {
     using RegisterImmediate::RegisterImmediate;
 
@@ -3294,7 +3294,7 @@ class SBC_A8 : public AddressMode::RegisterImmediate<Operator::SBC, State::A>
 // SBC A, (X)
 // A = A-(X)-!C    	[NV..H.ZC]
 // Register Register Indirect (1-Byte)
-class SBC_A6 : public AddressMode::RegisterRegisterIndirect<Operator::SBC, State::A, State::X>
+class SBC_A6 : public AddressMode::RegisterRegisterIndirect<Operator::SBC, State::Register::A, State::Register::X>
 {
     using RegisterRegisterIndirect::RegisterRegisterIndirect;
 
@@ -3310,7 +3310,7 @@ class SBC_A6 : public AddressMode::RegisterRegisterIndirect<Operator::SBC, State
 // SBC A, [d]+Y
 // A = A-([d]+Y)-!C    	[NV..H.ZC]
 // Register Direct Indirect Indexed (2-Byte)
-class SBC_B7 : public AddressMode::RegisterDirectIndirectIndexed<Operator::SBC, State::A, State::Y>
+class SBC_B7 : public AddressMode::RegisterDirectIndirectIndexed<Operator::SBC, State::Register::A, State::Register::Y>
 {
     using RegisterDirectIndirectIndexed::RegisterDirectIndirectIndexed;
 
@@ -3326,7 +3326,7 @@ class SBC_B7 : public AddressMode::RegisterDirectIndirectIndexed<Operator::SBC, 
 // SBC A, [d+X]
 // A = A-([d+X])-!C    	[NV..H.ZC]
 // Register Direct Indexed Indirect (2-Byte)
-class SBC_A7 : public AddressMode::RegisterDirectIndexedIndirect<Operator::SBC, State::A, State::X>
+class SBC_A7 : public AddressMode::RegisterDirectIndexedIndirect<Operator::SBC, State::Register::A, State::Register::X>
 {
     using RegisterDirectIndexedIndirect::RegisterDirectIndexedIndirect;
 
@@ -3342,7 +3342,7 @@ class SBC_A7 : public AddressMode::RegisterDirectIndexedIndirect<Operator::SBC, 
 // SBC A, d
 // A = A-(d)-!C    	[NV..H.ZC]
 // Register Direct (2-Byte)
-class SBC_A4 : public AddressMode::RegisterDirect<Operator::SBC, State::A>
+class SBC_A4 : public AddressMode::RegisterDirect<Operator::SBC, State::Register::A>
 {
     using RegisterDirect::RegisterDirect;
 
@@ -3357,7 +3357,7 @@ class SBC_A4 : public AddressMode::RegisterDirect<Operator::SBC, State::A>
 // SBC A, d+X
 // A = A-(d+X)-!C    	[NV..H.ZC]
 // Register Direct Indexed (2-Byte)
-class SBC_B4 : public AddressMode::RegisterDirectIndexed<Operator::SBC, State::A, State::X>
+class SBC_B4 : public AddressMode::RegisterDirectIndexed<Operator::SBC, State::Register::A, State::Register::X>
 {
     using RegisterDirectIndexed::RegisterDirectIndexed;
 
@@ -3373,7 +3373,7 @@ class SBC_B4 : public AddressMode::RegisterDirectIndexed<Operator::SBC, State::A
 // SBC A, !a
 // A = A-(a)-!C    	[NV..H.ZC]
 // Register Absolute (3-Byte)
-class SBC_A5 : public AddressMode::RegisterAbsolute<Operator::SBC, State::A>
+class SBC_A5 : public AddressMode::RegisterAbsolute<Operator::SBC, State::Register::A>
 {
     using RegisterAbsolute::RegisterAbsolute;
 
@@ -3388,7 +3388,7 @@ class SBC_A5 : public AddressMode::RegisterAbsolute<Operator::SBC, State::A>
 // SBC A, !a+X
 // A = A-(a+X)-!C    	[NV..H.ZC]
 // Register Absolute Indexed (3-Byte)
-class SBC_B5 : public AddressMode::RegisterAbsoluteIndexed<Operator::SBC, State::A, State::X>
+class SBC_B5 : public AddressMode::RegisterAbsoluteIndexed<Operator::SBC, State::Register::A, State::Register::X>
 {
     using RegisterAbsoluteIndexed::RegisterAbsoluteIndexed;
 
@@ -3403,7 +3403,7 @@ class SBC_B5 : public AddressMode::RegisterAbsoluteIndexed<Operator::SBC, State:
 // SBC A, !a+Y
 // A = A-(a+Y)-!C    	[NV..H.ZC]
 // Register Absolute Indexed (3-Byte)
-class SBC_B6 : public AddressMode::RegisterAbsoluteIndexed<Operator::SBC, State::A, State::Y>
+class SBC_B6 : public AddressMode::RegisterAbsoluteIndexed<Operator::SBC, State::Register::A, State::Register::Y>
 {
     using RegisterAbsoluteIndexed::RegisterAbsoluteIndexed;
 
@@ -3572,7 +3572,7 @@ class SET1_E2 : public AddressMode::Direct<Operator::SET1<7, true>>
 // SETC 
 // C = 1    	[.......1]
 // Implied (1-Byte)
-class SETC_80 : public AddressMode::Implied<Operator::SET<State::c, true>>
+class SETC_80 : public AddressMode::Implied<Operator::SET<State::Flag::c, true>>
 {
     using Implied::Implied;
 
@@ -3587,7 +3587,7 @@ class SETC_80 : public AddressMode::Implied<Operator::SET<State::c, true>>
 // SETP 
 // P = 1    	[..1.....]
 // Implied (1-Byte)
-class SETP_40 : public AddressMode::Implied<Operator::SET<State::p, true>>
+class SETP_40 : public AddressMode::Implied<Operator::SET<State::Flag::p, true>>
 {
     using Implied::Implied;
 
@@ -3935,7 +3935,7 @@ class TSET1_0E : public AddressMode::Absolute<Operator::TSET1>
 // XCN A
 // A = (A>>4) | (A<<4)    	[N.....Z.]
 // Register (1-Byte)
-class XCN_9F : public AddressMode::Register<Operator::XCN, State::A>
+class XCN_9F : public AddressMode::Register<Operator::XCN, State::Register::A>
 {
     using Register::Register;
 

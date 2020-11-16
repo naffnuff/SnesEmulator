@@ -76,7 +76,7 @@ Processor::~Processor()
 
 void Processor::initialize()
 {
-    output.debug("Initializing PortAudio version ", Pa_GetVersionInfo()->versionText);
+    //output.debug("Initializing PortAudio version ", Pa_GetVersionInfo()->versionText);
     check(Pa_Initialize());
     initialized = true;
 
@@ -110,7 +110,7 @@ void Processor::startStream()
 
 bool Processor::checkStreamStatus(unsigned long statusFlags)
 {
-    if (false && statusFlags) {
+    if (statusFlags) {
         if (statusFlags & paInputUnderflow) {
             output.error("paInputUnderflow");
             inputUnderflow = true;
@@ -145,13 +145,13 @@ void Processor::outputNextSample(float& leftChannel, float& rightChannel)
     int16_t nextSample = 0;
     for (Audio::Processor::Voice& voice : voices) {
         voice.calculateNextSample(nextSample);
-        int16_t leftSample = Types::signedClamp<16>(nextSample * voice.leftVolume >> 7);
-        int16_t rightSample = Types::signedClamp<16>(nextSample * voice.rightVolume >> 7);
-        leftSampleSum = Types::signedClamp<16>(leftSampleSum + leftSample);
-        rightSampleSum = Types::signedClamp<16>(rightSampleSum + rightSample);
+        int16_t leftSample = Types::signedClamp<16, int16_t>(nextSample * voice.leftVolume >> 7);
+        int16_t rightSample = Types::signedClamp<16, int16_t>(nextSample * voice.rightVolume >> 7);
+        leftSampleSum = Types::signedClamp<16, int32_t>(leftSampleSum + leftSample);
+        rightSampleSum = Types::signedClamp<16, int32_t>(rightSampleSum + rightSample);
     }
-    leftSampleSum = Types::signedClamp<16>(leftSampleSum * mainVolumeLeft >> 7);
-    rightSampleSum = Types::signedClamp<16>(rightSampleSum * mainVolumeRight >> 7);
+    leftSampleSum = Types::signedClamp<16, int32_t>(leftSampleSum * mainVolumeLeft >> 7);
+    rightSampleSum = Types::signedClamp<16, int32_t>(rightSampleSum * mainVolumeRight >> 7);
     leftChannel = float(leftSampleSum) / float(leftSampleSum < 0 ? 0x8000 : 0x7fff);
     rightChannel = float(rightSampleSum) / float(rightSampleSum < 0 ? 0x8000 : 0x7fff);
 }
@@ -164,15 +164,15 @@ void Processor::Voice::calculateNextSample(int16_t& nextSample)
     }
     if (keyOff) {
         setupPhase = 0;
-        setADSRStage(Release);
+        setADSRStage(ADSRStage::Release);
     }
     if (setupPhase > 0) {
         if (setupPhase == 5) {
             envelope = 0;
-            adsrStage = Inactive;
+            adsrStage = ADSRStage::Inactive;
             readSampleAddress(false);
         } else if (setupPhase == 1) {
-            setADSRStage(Attack);
+            setADSRStage(ADSRStage::Attack);
         } else {
             decodeNextBlock();
         }
@@ -240,16 +240,15 @@ void Processor::Voice::decodeNextBlock()
             } else if (filter == 3) {
                 expandedSample += (lastSample << 1) + ((-(lastSample + (lastSample << 2) + (lastSample << 3))) >> 6) - secondLastSample + (((secondLastSample << 1) + secondLastSample) >> 4);
             }
-            expandedSample = Types::signedClamp<16>(expandedSample);
-            expandedSample = Types::clip<15>(expandedSample);
-            sampleBuffer[bufferIndex++] = expandedSample;
+            expandedSample = Types::signedClamp<16, int>(expandedSample);
+            sampleBuffer[bufferIndex++] = Types::clip<15, int16_t>(expandedSample);
         }
     }
     if (nextSampleAddress - headerAddress > 8) {
         if (header.getBit(0)) { // end bit, really means "loop"
             if (!header.getBit(1)) { // loop bit, really means "don't end"
                 envelope = 0;
-                adsrStage = Inactive;
+                adsrStage = ADSRStage::Inactive;
             }
             readSampleAddress(true);
         } else {
@@ -261,13 +260,13 @@ void Processor::Voice::decodeNextBlock()
 
 void Processor::Voice::setADSRStage(ADSRStage nextStage)
 {
-    if (nextStage == Attack) {
+    if (nextStage == ADSRStage::Attack) {
         if (attackRate != 0xf) {
             frequencyCounter.changeFrequency((attackRate << 1) + 0x1);
         }
-    } else if (nextStage == Decay) {
+    } else if (nextStage == ADSRStage::Decay) {
         frequencyCounter.changeFrequency((decayRate << 1) + 0x10);
-    } else if (nextStage == Sustain) {
+    } else if (nextStage == ADSRStage::Sustain) {
         frequencyCounter.changeFrequency(sustainRate);
     }
     adsrStage = nextStage;
@@ -275,7 +274,7 @@ void Processor::Voice::setADSRStage(ADSRStage nextStage)
 
 void Processor::Voice::calculateEnvelope()
 {
-    if (adsrStage == Attack) {
+    if (adsrStage == ADSRStage::Attack) {
         if (attackRate == 0xf) {
             envelope += 1024;
         }
@@ -284,24 +283,24 @@ void Processor::Voice::calculateEnvelope()
         }
         if (envelope > 0x7ff) {
             envelope = 0x7ff;
-            setADSRStage(Decay);
+            setADSRStage(ADSRStage::Decay);
         }
-    } else if ((adsrStage == Decay || adsrStage == Sustain) && frequencyCounter.tick()) {
-        const int16_t targetLevel = adsrStage == Decay ? (sustainLevel << 8 & 0xff) : 0;
+    } else if ((adsrStage == ADSRStage::Decay || adsrStage == ADSRStage::Sustain) && frequencyCounter.tick()) {
+        const int16_t targetLevel = adsrStage == ADSRStage::Decay ? (sustainLevel << 8 & 0xff) : 0;
         if (envelope > targetLevel) {
             envelope -= ((envelope - 1) >> 8) + 1;
         }
         if (envelope <= targetLevel) {
-            setADSRStage(ADSRStage(adsrStage + 1));
+            setADSRStage(ADSRStage(int(adsrStage) + 1));
         }
     }
-    if (adsrStage == Release) {
+    if (adsrStage == ADSRStage::Release) {
         if (envelope > 0) {
             envelope -= 8;
         }
         if (envelope <= 0) {
             envelope = 0;
-            setADSRStage(Inactive);
+            setADSRStage(ADSRStage::Inactive);
         }
     }
 }

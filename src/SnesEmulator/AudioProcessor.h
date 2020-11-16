@@ -19,7 +19,7 @@ namespace Audio {
 EXCEPTION(NotYetImplementedException, ::NotYetImplementedException)
 EXCEPTION(RuntimeError, ::RuntimeError)
 
-class Processor : public RegisterManager<Memory<Byte>, Output::Cyan>
+class Processor : public RegisterManager<Memory<Byte>, Output::Color::Cyan>
 {
 private:
     class FrequencyCounter
@@ -86,13 +86,13 @@ public:
     class Voice
     {
     public:
-        enum EnvelopeType
+        enum class EnvelopeType
         {
             Gain = 0,
             ADSR = 1
         };
 
-        enum GainMode
+        enum class GainMode
         {
             Direct = 4,
             LinearIncrease = 2,
@@ -101,7 +101,7 @@ public:
             ExponentialDecrease = 1
         };
 
-        enum ADSRStage
+        enum class ADSRStage
         {
             Inactive,
             Attack,
@@ -118,7 +118,7 @@ public:
         Word headerAddress;
         Word nextSampleAddress;
 
-        std::array<int16_t, 12> sampleBuffer;
+        std::array<int16_t, 12> sampleBuffer = { 0 };
 
         int8_t leftVolume = 0;
         int8_t rightVolume = 0;
@@ -150,16 +150,16 @@ public:
 
         FrequencyCounter frequencyCounter;
 
-        EnvelopeType envelopeType = Gain;
-        GainMode gainMode;
+        EnvelopeType envelopeType = EnvelopeType::Gain;
+        GainMode gainMode = GainMode::Direct;
         Byte gainLevel;
 
         std::string envelopeTypeToString() const
         {
             switch (envelopeType) {
-            case Audio::Processor::Voice::Gain:
+            case EnvelopeType::Gain:
                 return "Gain";
-            case Audio::Processor::Voice::ADSR:
+            case EnvelopeType::ADSR:
                 return "ADSR";
             default:
                 return "";
@@ -169,15 +169,15 @@ public:
         std::string gainModeToString() const
         {
             switch (gainMode) {
-            case Audio::Processor::Voice::Direct:
+            case GainMode::Direct:
                 return "Direct";
-            case Audio::Processor::Voice::LinearIncrease:
+            case GainMode::LinearIncrease:
                 return "Increase (Linear)";
-            case Audio::Processor::Voice::BentLineIncrease:
+            case GainMode::BentLineIncrease:
                 return "Increase (Bent Line)";
-            case Audio::Processor::Voice::LinearDecrease:
+            case GainMode::LinearDecrease:
                 return "Decrease (Linear)";
-            case Audio::Processor::Voice::ExponentialDecrease:
+            case GainMode::ExponentialDecrease:
                 return "Decrease (Exponential)";
             default:
                 return "";
@@ -192,7 +192,7 @@ public:
 
     private:
         Processor& processor;
-        ADSRStage adsrStage = Inactive;
+        ADSRStage adsrStage = ADSRStage::Inactive;
     };
 
     static constexpr int tableSize = 50;
@@ -240,7 +240,7 @@ public:
             return;
         }
         static uint64_t lastDspCycle = 0;
-        output.log(Log::Level::Debug, Output::Cyan, value != 0, (write ? "Write " : "Read "), value, " (", std::bitset<8>(value), ") @", address, " (", info, "), cycle ", dspCycle, " (+", (dspCycle - lastDspCycle), ")");
+        output.log(Log::Level::Debug, Output::Color::Cyan, value != 0, (write ? "Write " : "Read "), value, " (", std::bitset<8>(value), ") @", address, " (", info, "), cycle ", dspCycle, " (+", (dspCycle - lastDspCycle), ")");
         lastDspCycle = dspCycle;
     }
 

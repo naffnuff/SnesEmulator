@@ -24,10 +24,10 @@ public:
 
     Instruction* getInstruction(const State& state, Byte opcode) const
     {
-        if (state.is16Bit(State::m) && instructions16BitM[opcode]) {
+        if (state.is16Bit(State::Flag::m) && instructions16BitM[opcode]) {
             return instructions16BitM[opcode].get();
         }
-        else if (state.is16Bit(State::x) && instructions16BitX[opcode]) {
+        else if (state.is16Bit(State::Flag::x) && instructions16BitX[opcode]) {
             return instructions16BitX[opcode].get();
         }
         else {

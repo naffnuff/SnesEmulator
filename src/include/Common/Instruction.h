@@ -10,6 +10,7 @@
 class Instruction
 {
 public:
+    virtual ~Instruction() { }
     virtual std::string toString() const = 0;
     virtual std::string opcodeToString() const = 0;
     virtual void applyBreakpoints() const = 0;

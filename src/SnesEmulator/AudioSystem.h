@@ -22,7 +22,7 @@ public:
         , registers(output, state)
         , processor(registers.processor)
         , debugger(debugger)
-        , context("spc.txt", Output::Magenta, debugger)
+        , context("spc.txt", Output::Color::Magenta, debugger)
         , elapsedTime(0)
         , nextSpc(0)
     {

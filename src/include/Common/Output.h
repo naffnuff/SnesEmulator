@@ -54,7 +54,7 @@ class Output
 {
 public:
 #ifdef _WIN32
-    enum Color
+    enum class Color
     {
         Red = FOREGROUND_RED,
         Green = FOREGROUND_GREEN,
@@ -62,10 +62,10 @@ public:
         Blue = FOREGROUND_BLUE,
         Magenta = FOREGROUND_RED | FOREGROUND_BLUE,
         Cyan = FOREGROUND_BLUE | FOREGROUND_GREEN,
-        DefaultColor = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE
+        Default = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE
     };
 #else
-    enum Color
+    enum class Color
     {
         Red = 31,
         Green = 32,
@@ -73,7 +73,7 @@ public:
         Blue = 34,
         Magenta = 35,
         Cyan = 36,
-        DefaultColor = 0
+        Default = 0
     };
 #endif
 
@@ -102,10 +102,10 @@ public:
                     std::istringstream ss(entry);
                     std::string logName;
                     ss >> logName;
-                    std::string logLevel;
-                    ss >> logLevel;
-                    if (!logLevel.empty()) {
-                        logLevels[logName] = logLevel;
+                    std::string level;
+                    ss >> level;
+                    if (!level.empty()) {
+                        logLevels[logName] = level;
                     }
                 }
             }
@@ -133,11 +133,11 @@ public:
 #ifdef _WIN32
         void setOutputColor(Color color, bool bright)
         {
-            int effectiveColor = color;
+            int effectiveColor = int(color);
             if (bright) {
                 effectiveColor |= FOREGROUND_INTENSITY;
             }
-            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), effectiveColor);
+            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), WORD(effectiveColor));
         }
 #else
         void setOutputColor(Color color, bool bright)
@@ -209,7 +209,7 @@ public:
 
         ~ColorScope()
         {
-            system.setOutputColor(DefaultColor, false);
+            system.setOutputColor(Color::Default, false);
         }
 
         ColorScope() = delete;
@@ -238,67 +238,67 @@ public:
     Output& operator=(const Output&) = delete;
 
     template<typename... Ts>
-    void print(const Lock&, const Ts&... values) const
+    void print(const Lock&, Ts&&... values) const
     {
         if (logLevel > Log::Level::None) {
             std::ostream& outputStream = system.outputStream;
-            (outputStream << ... << values);
+            (outputStream << ... << std::forward<Ts>(values));
         }
     }
 
     template<typename... Ts>
-    void print(Lock&&, const Ts&... values) const
+    void print(Lock&&, Ts&&... values) const
     {
         if (logLevel > Log::Level::None) {
             std::ostream& outputStream = system.outputStream;
-            (outputStream << ... << values);
+            (outputStream << ... << std::forward<Ts>(values));
         }
     }
 
     template<typename... Ts>
-    void printLine(const Lock&, const Ts&... values) const
+    void printLine(const Lock&, Ts&&... values) const
     {
         if (logLevel > Log::Level::None) {
             std::ostream& outputStream = system.outputStream;
-            (outputStream << ... << values);
+            (outputStream << ... << std::forward<Ts>(values));
             outputStream << std::endl;
         }
     }
 
     template<typename... Ts>
-    void printLine(Color color, bool bright, const Ts&... values) const
+    void printLine(Color color, bool bright, Ts&&... values) const
     {
         if (logLevel > Log::Level::None) {
             Lock lock(system);
             ColorScope colorScope(lock, color, bright);
-            printLine(lock, values...);
+            printLine(lock, std::forward<Ts>(values)...);
         }
     }
 
     template<typename... Ts>
-    void log(Log::Level level, Color color, bool bright, const Ts&... values) const
+    void log(Log::Level level, Color color, bool bright, Ts&&... values) const
     {
         if (logLevel >= level) {
-            printLine(color, bright, values...);
+            printLine(color, bright, std::forward<Ts>(values)...);
         }
     }
 
     template<typename... Ts>
-    void error(const Ts&... values) const
+    void error(Ts&&... values) const
     {
-        log(Log::Level::Error, Red, true, values...);
+        log(Log::Level::Error, Color::Red, true, std::forward<Ts>(values)...);
     }
 
     template<typename... Ts>
-    void info(const Ts&... values) const
+    void info(Ts&&... values) const
     {
-        log(Log::Level::Info, DefaultColor, true, values...);
+        log(Log::Level::Info, Color::Default, true, std::forward<Ts>(values)...);
     }
 
     template<typename... Ts>
-    void debug(const Ts&... values) const
+    void debug(Ts&&... values) const
     {
-        log(Log::Level::Debug, Green, true, values...);
+        log(Log::Level::Debug, Color::Green, true, std::forward<Ts>(values)...);
     }
 
 private:

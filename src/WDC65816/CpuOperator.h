@@ -17,17 +17,17 @@ private:
     static T add(State& state, T accumulator, T memory)
     {
         T result;
-        bool carry = state.getFlag(State::c);
+        bool carry = state.getFlag(State::Flag::c);
         bool overflow = false;
-        if (state.getFlag(State::d)) {
+        if (state.getFlag(State::Flag::d)) {
             result = Types::decimalAdd(accumulator, memory, carry, overflow);
         }
         else {
             bool dummy = false;
             result = Types::binaryAdd(accumulator, memory, carry, overflow, dummy);
         }
-        state.setFlag(State::c, carry);
-        state.setFlag(State::v, overflow);
+        state.setFlag(State::Flag::c, carry);
+        state.setFlag(State::Flag::v, overflow);
         return result;
     }
 
@@ -36,7 +36,7 @@ public:
     static int invoke(State& state, Access& access)
     {
         int cycles = 0;
-        if (state.is16Bit(State::m)) {
+        if (state.is16Bit(State::Flag::m)) {
             cycles += 1;
             state.setAccumulatorC(add(state, state.getAccumulatorC(), access.readWord()));
         }
@@ -57,7 +57,7 @@ public:
     static int invoke(State& state, Access& access)
     {
         int cycles = 0;
-        if (state.is16Bit(State::m)) {
+        if (state.is16Bit(State::Flag::m)) {
             cycles += 1;
             state.setAccumulatorC(state.getAccumulatorC() & access.readWord());
         }
@@ -77,7 +77,7 @@ private:
     template<typename T>
     static T arithmeticShiftLeft(State& state, T value)
     {
-        state.setFlag(State::c, value.isNegative());
+        state.setFlag(State::Flag::c, value.isNegative());
         value <<= 1;
         state.updateSignFlags(value);
         return value;
@@ -88,7 +88,7 @@ public:
     static int invoke(State& state, Access& access)
     {
         int cycles = 0;
-        if (state.is16Bit(State::m)) {
+        if (state.is16Bit(State::Flag::m)) {
             cycles += 2;
             access.writeWord(arithmeticShiftLeft(state, access.readWord()));
         }
@@ -127,7 +127,7 @@ public:
     // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, int8_t offset)
     {
-        return branchIf(!state.getFlag(State::c), state, offset);
+        return branchIf(!state.getFlag(State::Flag::c), state, offset);
     }
 
     static std::string toString() { return "BCC"; }
@@ -141,7 +141,7 @@ public:
     // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, int8_t offset)
     {
-        return branchIf(state.getFlag(State::c), state, offset);
+        return branchIf(state.getFlag(State::Flag::c), state, offset);
     }
 
     static std::string toString() { return "BCS"; }
@@ -155,7 +155,7 @@ public:
     // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, int8_t offset)
     {
-        return branchIf(state.getFlag(State::z), state, offset);
+        return branchIf(state.getFlag(State::Flag::z), state, offset);
     }
 
     static std::string toString() { return "BEQ"; }
@@ -173,7 +173,7 @@ public:
         bool zFlag = false;
         bool nFlag = false;
         bool vFlag = false;
-        if (state.is16Bit(State::m)) {
+        if (state.is16Bit(State::Flag::m)) {
             cycles += 1;
             Word data = access.readWord();
             nFlag = data.isNegative();
@@ -187,10 +187,10 @@ public:
             zFlag = (state.getAccumulatorA() & data) == 0;
         }
         if (!ImmediateMode) {
-            state.setFlag(State::n, nFlag);
-            state.setFlag(State::v, vFlag);
+            state.setFlag(State::Flag::n, nFlag);
+            state.setFlag(State::Flag::v, vFlag);
         }
-        state.setFlag(State::z, zFlag);
+        state.setFlag(State::Flag::z, zFlag);
         return cycles;
     }
 
@@ -205,7 +205,7 @@ public:
     // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, int8_t offset)
     {
-        return branchIf(state.getFlag(State::n), state, offset);
+        return branchIf(state.getFlag(State::Flag::n), state, offset);
     }
 
     static std::string toString() { return "BMI"; }
@@ -219,7 +219,7 @@ public:
     // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, int8_t offset)
     {
-        return branchIf(!state.getFlag(State::z), state, offset);
+        return branchIf(!state.getFlag(State::Flag::z), state, offset);
     }
 
     static std::string toString() { return "BNE"; }
@@ -233,7 +233,7 @@ public:
     // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, int8_t offset)
     {
-        return branchIf(!state.getFlag(State::n), state, offset);
+        return branchIf(!state.getFlag(State::Flag::n), state, offset);
     }
 
     static std::string toString() { return "BPL"; }
@@ -277,7 +277,6 @@ public:
     static int invoke(State& state, int16_t offset)
     {
         return branchIf(true, state, offset);
-        return 0;
     }
 
     static std::string toString() { return "BRL"; }
@@ -291,7 +290,7 @@ public:
     // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, int8_t offset)
     {
-        return branchIf(!state.getFlag(State::v), state, offset);
+        return branchIf(!state.getFlag(State::Flag::v), state, offset);
     }
 
     static std::string toString() { return "BVC"; }
@@ -305,7 +304,7 @@ public:
     // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, int8_t offset)
     {
-        return branchIf(state.getFlag(State::v), state, offset);
+        return branchIf(state.getFlag(State::Flag::v), state, offset);
     }
 
     static std::string toString() { return "BVS"; }
@@ -319,16 +318,16 @@ public:
     static int invoke(State& state, Access& access)
     {
         int cycles = 0;
-        if (state.is16Bit(State::m)) {
+        if (state.is16Bit(State::Flag::m)) {
             cycles += 1;
             Word accumulator = state.getAccumulatorC();
             Word data = access.readWord();
-            state.setFlag(State::c, accumulator >= data);
+            state.setFlag(State::Flag::c, accumulator >= data);
             state.updateSignFlags(Word(accumulator - data));
         } else {
             Byte accumulator = state.getAccumulatorA();
             Byte data = access.readByte();
-            state.setFlag(State::c, accumulator >= data);
+            state.setFlag(State::Flag::c, accumulator >= data);
             state.updateSignFlags(Byte(accumulator - data));
         }
         return cycles;
@@ -364,17 +363,17 @@ public:
     static int invoke(State& state, Access& access)
     {
         int cycles = 0;
-        if (state.is16Bit(State::x)) {
+        if (state.is16Bit(State::Flag::x)) {
             cycles += 1;
             Word indexRegister = state.getIndexRegister<Register>();
             Word data = access.readWord();
-            state.setFlag(State::c, indexRegister >= data);
+            state.setFlag(State::Flag::c, indexRegister >= data);
             state.updateSignFlags(Word(indexRegister - data));
         }
         else {
             Byte indexRegister(state.getIndexRegister<Register>());
             Byte data = access.readByte();
-            state.setFlag(State::c, indexRegister >= data);
+            state.setFlag(State::Flag::c, indexRegister >= data);
             state.updateSignFlags(Byte(indexRegister - data));
         }
         return cycles;
@@ -391,7 +390,7 @@ public:
     static int invoke(State& state, Access& access)
     {
         int cycles = 0;
-        if (state.is16Bit(State::m)) {
+        if (state.is16Bit(State::Flag::m)) {
             cycles += 2;
             Word value = access.readWord() - 1;
             access.writeWord(value);
@@ -416,7 +415,7 @@ public:
     static int invoke(State& state)
     {
         int cycles = 0;
-        if (state.is16Bit(State::x)) {
+        if (state.is16Bit(State::Flag::x)) {
             cycles += 2;
             Word& indexRegister = state.getIndexRegister<Register>();
             state.updateSignFlags(--indexRegister);
@@ -439,7 +438,7 @@ public:
     static int invoke(State& state, Access& access)
     {
         int cycles = 0;
-        if (state.is16Bit(State::m)) {
+        if (state.is16Bit(State::Flag::m)) {
             cycles += 1;
             state.setAccumulatorC(state.getAccumulatorC() ^ access.readWord());
         }
@@ -460,7 +459,7 @@ public:
     static int invoke(State& state, Access& access)
     {
         int cycles = 0;
-        if (state.is16Bit(State::m)) {
+        if (state.is16Bit(State::Flag::m)) {
             cycles += 2;
             Word value = access.readWord() + 1;
             access.writeWord(value);
@@ -484,8 +483,7 @@ class IN_
 public:
     static int invoke(State& state)
     {
-        int cycles = 0;
-        if (state.is16Bit(State::x)) {
+        if (state.is16Bit(State::Flag::x)) {
             Word& indexRegister = state.getIndexRegister<Register>();
             state.updateSignFlags(++indexRegister);
         }
@@ -560,7 +558,7 @@ public:
     static int invoke(State& state, Access& access)
     {
         int cycles = 0;
-        if (state.is16Bit(State::m)) {
+        if (state.is16Bit(State::Flag::m)) {
             cycles += 1;
             state.setAccumulatorC(access.readWord());
         } else {
@@ -581,7 +579,7 @@ public:
     static int invoke(State& state, Access& access)
     {
         int cycles = 0;
-        if (state.is16Bit(State::x)) {
+        if (state.is16Bit(State::Flag::x)) {
             state.setIndexRegister<Register>(access.readWord());
             cycles += 1;
         } else {
@@ -600,7 +598,7 @@ private:
     template<typename T>
     static T logicalShiftLeft(State& state, T value)
     {
-        state.setFlag(State::c, value.getBit(0));
+        state.setFlag(State::Flag::c, value.getBit(0));
         value >>= 1;
         state.updateSignFlags(value);
         return value;
@@ -611,7 +609,7 @@ public:
     static int invoke(State& state, Access& access)
     {
         int cycles = 0;
-        if (state.is16Bit(State::m)) {
+        if (state.is16Bit(State::Flag::m)) {
             cycles += 2;
             access.writeWord(logicalShiftLeft(state, access.readWord()));
         } else {
@@ -630,14 +628,14 @@ public:
     // §13: 7 cycles per byte moved
     static int invoke(State& state, Byte sourceBank, Byte destinationBank, Word byteCount)
     {
-        Word sourceAddress = state.getIndexRegister<State::X>();
-        Word destinationAddress = state.getIndexRegister<State::Y>();
+        Word sourceAddress = state.getIndexRegister<State::IndexRegister::X>();
+        Word destinationAddress = state.getIndexRegister<State::IndexRegister::Y>();
         
         Byte value = state.readMemoryByte(Long(sourceAddress, sourceBank));
         state.writeMemoryByte(value, Long(destinationAddress, destinationBank));
 
-        state.setIndexRegister<State::X>(Word(sourceAddress + 1));
-        state.setIndexRegister<State::Y>(Word(destinationAddress + 1));
+        state.setIndexRegister<State::IndexRegister::X>(Word(sourceAddress + 1));
+        state.setIndexRegister<State::IndexRegister::Y>(Word(destinationAddress + 1));
         return 0;
     }
 
@@ -678,7 +676,7 @@ public:
     static int invoke(State& state, Access& access)
     {
         int cycles = 0;
-        if (state.is16Bit(State::m)) {
+        if (state.is16Bit(State::Flag::m)) {
             cycles += 1;
             state.setAccumulatorC(state.getAccumulatorC() | access.readWord());
         }
@@ -726,7 +724,7 @@ public:
     static int invoke(State& state)
     {
         int cycles = 0;
-        if (state.is16Bit(State::m)) {
+        if (state.is16Bit(State::Flag::m)) {
             cycles += 1;
             state.pushWordToStack(state.getAccumulatorC());
         }
@@ -801,7 +799,7 @@ public:
     {
         int cycles = 0;
         Word indexRegister = state.getIndexRegister<Register>();
-        if (state.is16Bit(State::x)) {
+        if (state.is16Bit(State::Flag::x)) {
             cycles += 1;
             state.pushWordToStack(indexRegister);
         }
@@ -822,7 +820,7 @@ public:
     static int invoke(State& state)
     {
         int cycles = 0;
-        if (state.is16Bit(State::m)) {
+        if (state.is16Bit(State::Flag::m)) {
             cycles += 1;
             state.setAccumulatorC(state.pullWordFromStack());
         }
@@ -883,7 +881,7 @@ public:
     static int invoke(State& state)
     {
         int cycles = 0;
-        if (state.is16Bit(State::x)) {
+        if (state.is16Bit(State::Flag::x)) {
             cycles += 1;
             state.setIndexRegister<Register>(state.pullWordFromStack());
         } else {
@@ -901,7 +899,7 @@ class REP
 public:
     static int invoke(State& state, Access& access)
     {
-        state.setFlag(access.readByte(), false);
+        state.setMultipleFlags(false, access.readByte());
         return 0;
     }
 
@@ -917,8 +915,8 @@ private:
     {
         bool carry = value.isNegative();
         value <<= 1;
-        value.setBit(0, state.getFlag(State::c));
-        state.setFlag(State::c, carry);
+        value.setBit(0, state.getFlag(State::Flag::c));
+        state.setFlag(State::Flag::c, carry);
         state.updateSignFlags(value);
         return value;
     }
@@ -928,7 +926,7 @@ public:
     static int invoke(State& state, Access& access)
     {
         int cycles = 0;
-        if (state.is16Bit(State::m)) {
+        if (state.is16Bit(State::Flag::m)) {
             cycles += 2;
             access.writeWord(rotateLeft(state, access.readWord()));
         }
@@ -950,8 +948,8 @@ private:
     {
         bool carry = value.getBit(0);
         value >>= 1;
-        value.setBit(T::bitCount - 1, state.getFlag(State::c));
-        state.setFlag(State::c, carry);
+        value.setBit(T::bitCount - 1, state.getFlag(State::Flag::c));
+        state.setFlag(State::Flag::c, carry);
         state.updateSignFlags(value);
         return value;
     }
@@ -961,7 +959,7 @@ public:
     static int invoke(State& state, Access& access)
     {
         int cycles = 0;
-        if (state.is16Bit(State::m)) {
+        if (state.is16Bit(State::Flag::m)) {
             cycles += 2;
             access.writeWord(rotateRight(state, access.readWord()));
         } else {
@@ -1027,17 +1025,17 @@ private:
     static T subtract(State& state, T accumulator, T memory)
     {
         T result;
-        bool carry = state.getFlag(State::c);
+        bool carry = state.getFlag(State::Flag::c);
         bool overflow = false;
-        if (state.getFlag(State::d)) {
+        if (state.getFlag(State::Flag::d)) {
             result = Types::decimalSubtract(accumulator, memory, carry, overflow);
         }
         else {
             bool dummy = false;
             result = Types::binarySubtract(accumulator, memory, carry, overflow, dummy);
         }
-        state.setFlag(State::c, carry);
-        state.setFlag(State::v, overflow);
+        state.setFlag(State::Flag::c, carry);
+        state.setFlag(State::Flag::v, overflow);
         return result;
     }
 
@@ -1046,7 +1044,7 @@ public:
     static int invoke(State& state, Access& access)
     {
         int cycles = 0;
-        if (state.is16Bit(State::m)) {
+        if (state.is16Bit(State::Flag::m)) {
             cycles += 1;
             state.setAccumulatorC(subtract(state, state.getAccumulatorC(), access.readWord()));
         }
@@ -1085,7 +1083,7 @@ class SEP
 public:
     static int invoke(State& state, Access& access)
     {
-        state.setFlag(access.readByte(), true);
+        state.setMultipleFlags(true, access.readByte());
         return 0;
     }
 
@@ -1100,7 +1098,7 @@ public:
     static int invoke(State& state, Access& access)
     {
         int cycles = 0;
-        if (state.is16Bit(State::m)) {
+        if (state.is16Bit(State::Flag::m)) {
             cycles += 1;
             access.writeWord(state.getAccumulatorC());
         }
@@ -1136,7 +1134,7 @@ public:
     static int invoke(State& state, Access& access)
     {
         int cycles = 0;
-        if (state.is16Bit(State::x)) {
+        if (state.is16Bit(State::Flag::x)) {
             cycles += 1;
             access.writeWord(state.getIndexRegister<Register>());
         }
@@ -1158,7 +1156,7 @@ public:
     {
         int cycles = 0;
 
-        if (state.is16Bit(State::m)) {
+        if (state.is16Bit(State::Flag::m)) {
             cycles += 1;
             access.writeWord(0);
         }
@@ -1179,7 +1177,7 @@ class TA_
 public:
     static int invoke(State& state)
     {
-        if (state.is16Bit(State::x)) {
+        if (state.is16Bit(State::Flag::x)) {
             state.setIndexRegister<Register>(state.getAccumulatorC());
         }
         else {
@@ -1237,7 +1235,7 @@ private:
     template<typename T>
     static T testAndReset(State& state, T data, T accumulator)
     {
-        state.setFlag(State::z, (data & accumulator) == 0);
+        state.setFlag(State::Flag::z, (data & accumulator) == 0);
         return data & ~accumulator;
     }
 
@@ -1246,7 +1244,7 @@ public:
     static int invoke(State& state, Access& access)
     {
         int cycles = 0;
-        if (state.is16Bit(State::m)) {
+        if (state.is16Bit(State::Flag::m)) {
             access.writeWord(testAndReset(state, access.readWord(), state.getAccumulatorC()));
             cycles += 2;
         }
@@ -1266,7 +1264,7 @@ private:
     template<typename T>
     static T testAndSet(State& state, T data, T accumulator)
     {
-        state.setFlag(State::z, (data & accumulator) == 0);
+        state.setFlag(State::Flag::z, (data & accumulator) == 0);
         return data | accumulator;
     }
 
@@ -1275,7 +1273,7 @@ public:
     static int invoke(State& state, Access& access)
     {
         int cycles = 0;
-        if (state.is16Bit(State::m)) {
+        if (state.is16Bit(State::Flag::m)) {
             access.writeWord(testAndSet(state, access.readWord(), state.getAccumulatorC()));
             cycles += 2;
         }
@@ -1321,7 +1319,7 @@ class T_A
 public:
     static int invoke(State& state)
     {
-        if (state.is16Bit(State::m)) {
+        if (state.is16Bit(State::Flag::m)) {
             state.setAccumulatorC(state.getIndexRegister<Register>());
         }
         else {
@@ -1339,7 +1337,7 @@ class TXS
 public:
     static int invoke(State& state)
     {
-        state.setStackPointer(state.getIndexRegister<State::X>());
+        state.setStackPointer(state.getIndexRegister<State::IndexRegister::X>());
         return 0;
     }
 

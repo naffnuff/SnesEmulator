@@ -57,7 +57,7 @@ public:
         int romIndex = 0;
         for (int bank = 0; bank < Byte::spaceSize; ++bank) {
             for (int address = 0x8000; address < Word::spaceSize; ++address) {
-                Long longAddress(address, bank);
+                Long longAddress = Long(Word(address), Byte(bank));
                 state.createMemoryLocation<ReadOnlyMemory>(longAddress, data[romIndex++]);
                 if (romIndex >= (int)data.size()) {
                     output.debug("ROM ends at ", longAddress);
@@ -117,7 +117,7 @@ private:
         output.debug("Maker code: ", data[0xFFD6 - offset]);
 
         for (int i = 0; i < 21; ++i) {
-            gameTitle.push_back(data[0xFFC0 + i - offset]);
+            gameTitle.push_back(data[0xFFC0 + size_t(i) - size_t(offset)]);
         }
 
         mapMode = data[0xFFD5 - offset];
@@ -146,6 +146,6 @@ public:
     std::string gameTitle;
     Byte mapMode;
     Byte cartridgeType;
-    int romSize;
-    int saveRamSize;
+    int romSize = 0;
+    int saveRamSize = 0;
 };

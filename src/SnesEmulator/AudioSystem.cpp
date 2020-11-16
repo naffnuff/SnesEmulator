@@ -77,15 +77,15 @@ public:
             }
             system.output.debug("BYE AUDIO MONKEY! ");
         } catch (const ::NotYetImplementedException& e) {
-            system.output.error(Output::Red, true, "AudioSystem thread: ", e.what());
+            system.output.error("AudioSystem thread: ", e.what());
             system.context.printAddressHistory(system.output);
             //std::getchar();
         } catch (const ::RuntimeError& e) {
-            system.output.error(Output::Red, true, "AudioSystem thread: ", e.what());
+            system.output.error("AudioSystem thread: ", e.what());
             system.context.printAddressHistory(system.output);
             //std::getchar();
         } catch (const ::AccessException& e) {
-            system.output.error(Output::Red, true, "AudioSystem thread: ", e.what());
+            system.output.error("AudioSystem thread: ", e.what());
             system.context.printAddressHistory(system.output);
             //std::getchar();
         }

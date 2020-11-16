@@ -26,7 +26,7 @@ void Emulator::initialize()
     if (rom.isLowRom()) {
         // RAM
         for (Long address = 0x7e0000; address < 0x800000; address++) {
-            cpuMemory.createLocation<ReadWriteMemory>(address, 0x55);
+            cpuMemory.createLocation<ReadWriteMemory>(address, Byte(0x55));
         }
 
         // RAM mirrors
@@ -67,14 +67,14 @@ void Emulator::initialize()
                 file >> std::hex;
                 Long saveRamAddress = 0x700000;
                 for (Long address = saveRamAddress; address < 0x7e0000; ++address, ++saveRamAddress) {
-                    if (saveRamAddress == 0x700000 + rom.saveRamSize) {
+                    if (saveRamAddress == Long(0x700000 + rom.saveRamSize)) {
                         saveRamAddress = 0x700000;
                     }
                     if (address == saveRamAddress) {
                         Byte byte;
                         int inputValue;
                         if (file >> inputValue) {
-                            byte = inputValue;
+                            byte = Byte(inputValue);
                         }
                         Long localAddress = address - 0x700000;
                         saveRamSaver.saveRam[localAddress] = byte;
@@ -130,10 +130,10 @@ void Emulator::initialize()
 void Emulator::run()
 {
     Video::OamViewer oamViewer(videoProcessor, 1080, 760);
-    Video::BackgroundViewer background1Viewer(videoProcessor, Video::BackgroundLayer1, 0, 10);
-    Video::BackgroundViewer background2Viewer(videoProcessor, Video::BackgroundLayer2, Video::rendererWidth * 2 + 20, 10);
-    Video::BackgroundViewer background3Viewer(videoProcessor, Video::BackgroundLayer3, 0, Video::rendererWidth * 2 + 20);
-    Video::BackgroundViewer background4Viewer(videoProcessor, Video::BackgroundLayer4, Video::rendererWidth * 2, Video::rendererWidth * 2 + 20);
+    Video::BackgroundViewer background1Viewer(videoProcessor, Video::Layer::Background1, 0, 10);
+    Video::BackgroundViewer background2Viewer(videoProcessor, Video::Layer::Background2, Video::rendererWidth * 2 + 20, 10);
+    Video::BackgroundViewer background3Viewer(videoProcessor, Video::Layer::Background3, 0, Video::rendererWidth * 2 + 20);
+    Video::BackgroundViewer background4Viewer(videoProcessor, Video::Layer::Background4, Video::rendererWidth * 2, Video::rendererWidth * 2 + 20);
     Video::SpriteLayerViewer spriteLayer1Viewer(videoProcessor, 0, Video::rendererWidth * 2 + 20, Video::rendererWidth * 2 + 40);
     Video::SpriteLayerViewer spriteLayer2Viewer(videoProcessor, 1, Video::rendererWidth * 2 + 20 + Video::rendererWidth + 20, Video::rendererWidth * 2 + 40);
     Video::SpriteLayerViewer spriteLayer3Viewer(videoProcessor, 2, Video::rendererWidth * 2 + 20, Video::rendererWidth * 2 + 40 + Video::rendererWidth);
@@ -149,7 +149,7 @@ void Emulator::run()
     CycleCount lostCycles(0);
     CycleCount oneCycle(1);
 
-    uint64_t audioCycle = 0;
+    //uint64_t audioCycle = 0;
 
     videoRegisters.hCounter = int(masterCycle.count());
 
@@ -171,7 +171,7 @@ void Emulator::run()
 
     //try {
         uint64_t iteration = 0;
-        bool dmaActive = false;
+        //bool dmaActive = false;
         while (running) {
             try {
                 if (masterCycle == nextCpu) {
@@ -179,7 +179,7 @@ void Emulator::run()
                         nmiRequested = false;
                         cpuState.startInterrupt(true);
                         nextCpu += CycleCount(9 * 8); // TODO: check the correct cycles for interrupt
-                    } else if (irqRequested && !cpuState.getFlag(CPU::State::i) && !cpuState.isNmiActive()) {
+                    } else if (irqRequested && !cpuState.getFlag(CPU::State::Flag::i) && !cpuState.isNmiActive()) {
                         irqRequested = false;
                         cpuState.startInterrupt(false);
                         nextCpu += CycleCount(9 * 8); // TODO: check the correct cycles for interrupt
@@ -215,7 +215,7 @@ void Emulator::run()
                         output.debug("Cycle count: ", masterCycle.count(), ", Next cpu: ", nextCpu.count(), ", Next spc: ", nextSpc.count());
                         output.debug("Frame: ", videoRegisters.frame, ", V counter: ", videoRegisters.vCounter, ", H counter: ", videoRegisters.hCounter, ", V blank: ", videoRegisters.vBlank, ", H blank: ", videoRegisters.hBlank, ", nmi: ", cpuState.isNmiActive(), ", irq: ", cpuState.isIrqActive());
                         debugger.printBreakpoints(cpuContext, audioSystem.context);
-                        debugger.printMemory(cpuState, cpuContext, audioSystem.state, audioSystem.context, videoProcessor);
+                        debugger.printMemory(cpuState, cpuContext, audioSystem.state, audioSystem.context);
                     }
 
                     if (int cycles = executeNext(instruction, cpuState, debugger, cpuContext, audioSystem.state, audioSystem.context, output)) {
@@ -249,7 +249,7 @@ void Emulator::run()
                         if (audioSystem.context.isStepMode()) {
                             output.debug("cycleCount=", masterCycle.count(), ", nextCpu=", nextCpu.count(), ", nextSpc=", nextSpc.count());
                             debugger.printBreakpoints(cpuContext, audioSystem.context);
-                            debugger.printMemory(cpuState, cpuContext, audioSystem.state, audioSystem.context, videoProcessor);
+                            debugger.printMemory(cpuState, cpuContext, audioSystem.state, audioSystem.context);
                         }
 
                         if (int cycles = executeNext(instruction, audioSystem.state, debugger, audioSystem.context, cpuState, cpuContext, output)) {
@@ -315,7 +315,7 @@ void Emulator::run()
                             std::chrono::steady_clock::time_point currentTime = audioSystem.now;
                             ++frameCount;
                             ++totalFrameCount;
-                            static uint32_t minFrameCount = -1;
+                            static uint32_t minFrameCount = uint32_t(-1);
                             static uint32_t maxFrameCount = 0;
                             static int printOuts = 0;
                             if (currentTime - previousTime >= std::chrono::seconds(1)) {
@@ -348,7 +348,7 @@ void Emulator::run()
                             spriteLayer4Viewer.update();
                             mode7Viewer.update();
 
-                            videoProcessor.rendererLock.unlock();
+                            videoProcessor.unlockRenderer();
 
                             std::this_thread::yield();
                         }
@@ -357,13 +357,13 @@ void Emulator::run()
                         videoRegisters.hCounter = 0;
                         videoRegisters.hBlank = false;
                         ++videoRegisters.vCounter;
-                        if (videoRegisters.irqMode == Video::Registers::VCounterIrq && videoRegisters.vTimer == videoRegisters.vCounter) {
+                        if (videoRegisters.irqMode == Video::Registers::IrqMode::VCounter && videoRegisters.vTimer == videoRegisters.vCounter) {
                             irqRequested = true;
                         }
                         if (videoRegisters.vCounter == 225) {
                             hdmaInstruction.setActive(false);
                             videoRegisters.vBlank = true;
-                            videoProcessor.oam.address = videoRegisters.oamStartAddress;
+                            videoProcessor.oam.currentAddress = videoRegisters.oamStartAddress;
                             //videoRegisters.videoProcessor.vram.address = videoRegisters.vramStartAddress;
                             if (videoRegisters.nmiEnabled) {
                                 nmiRequested = true;
@@ -371,7 +371,7 @@ void Emulator::run()
                         } else if (videoRegisters.vCounter == 227) {
                             videoRegisters.readControllers();
                         } else if (videoRegisters.vCounter == 262) {
-                            videoProcessor.rendererLock.lock();
+                            videoProcessor.lockRenderer();
 
                             if (videoProcessor.renderer.pauseRequested) {
                                 videoProcessor.renderer.pauseRequested = false;
@@ -389,7 +389,7 @@ void Emulator::run()
                         }
                     }
                     if (videoRegisters.hTimer == videoRegisters.hCounter) {
-                        if (videoRegisters.irqMode == Video::Registers::HCounterIrq || videoRegisters.irqMode == Video::Registers::HAndVCounterIrq && videoRegisters.vTimer == videoRegisters.vCounter) {
+                        if (videoRegisters.irqMode == Video::Registers::IrqMode::HCounter || videoRegisters.irqMode == Video::Registers::IrqMode::HAndVCounter && videoRegisters.vTimer == videoRegisters.vCounter) {
                             irqRequested = true;
                         }
                     }

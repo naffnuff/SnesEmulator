@@ -12,15 +12,15 @@
 
 namespace Video {
 
-class Registers : public RegisterManager<CPU::State::MemoryType, Output::Yellow>
+class Registers : public RegisterManager<CPU::State::MemoryType, Output::Color::Yellow>
 {
 public:
-    enum IrqMode
+    enum class IrqMode
     {
-        NoIrq = 0,
-        HCounterIrq = 1,
-        VCounterIrq = 2,
-        HAndVCounterIrq = 3
+        None = 0,
+        HCounter = 1,
+        VCounter = 2,
+        HAndVCounter = 3
     };
 
     struct DmaChannel
@@ -74,12 +74,12 @@ public:
         makeWriteRegister(0x2102, "OAM Address low byte", false,
             [this](Byte value) {
                 oamStartAddress.setLowByte(value);
-                processor.oam.address = oamStartAddress;
+                processor.oam.currentAddress = oamStartAddress;
             });
         makeWriteRegister(0x2103, "OAM Address high bit and Obj Priority", false,
             [this](Byte value) {
                 oamStartAddress.setHighByte(value.getBit(0));
-                processor.oam.address = oamStartAddress;
+                processor.oam.currentAddress = oamStartAddress;
                 processor.objectPriority = value.getBit(7);
             });
         makeWriteRegister(0x2104, "OAM Data write", false,
@@ -94,11 +94,11 @@ public:
                 processor.mode1Extension = value.getBit(3);
                 processor.characterSize = value.getBits(4, 4);
                 if (processor.backgroundMode == 1) {
-                    processor.backgrounds[BackgroundLayer1].bitsPerPixel = 4;
-                    processor.backgrounds[BackgroundLayer2].bitsPerPixel = 4;
-                    processor.backgrounds[BackgroundLayer3].bitsPerPixel = 2;
+                    processor.backgrounds[size_t(Layer::Background1)].bitsPerPixel = 4;
+                    processor.backgrounds[size_t(Layer::Background2)].bitsPerPixel = 4;
+                    processor.backgrounds[size_t(Layer::Background3)].bitsPerPixel = 2;
                 } else if (processor.backgroundMode == 7) {
-                    processor.backgrounds[BackgroundLayer1].bitsPerPixel = 8;
+                    processor.backgrounds[size_t(Layer::Background1)].bitsPerPixel = 8;
                 }
             });
 
@@ -110,13 +110,13 @@ public:
             std::string bgName2 = bgName + char('2' + i * 2);
             makeWriteRegister(0x210b + i, bgName1 + " and " + bgName2 + " Chr Address", false,
                 [this, i](Byte value) {
-                    processor.backgrounds[i * 2].characterAddress = value.getBits(0, 4) << 12;
-                    processor.backgrounds[i * 2 + 1].characterAddress = value.getBits(4, 4) << 12;
+                    processor.backgrounds[size_t(i) * 2].characterAddress = value.getBits(0, 4) << 12;
+                    processor.backgrounds[size_t(i) * 2 + 1].characterAddress = value.getBits(4, 4) << 12;
                 });
         }
         for (int i = 0; i < 4; ++i) {
             std::string bgName = "BG";
-            bgName += '1' + i;
+            bgName += char('1' + i);
             makeWriteRegister(0x2107 + i, bgName + " Tilemap Address and Size", false,
                 [this, i](Byte value) {
                     processor.backgrounds[i].horizontalMirroring = value.getBit(0);
@@ -131,12 +131,12 @@ public:
 
         makeWriteRegister(0x210d, "BG1 and Mode 7 Horizontal Scroll", false,
             [this](Byte value) {
-                processor.backgrounds[BackgroundLayer1].horizontalScroll.write(value);
+                processor.backgrounds[size_t(Layer::Background1)].horizontalScroll.write(value);
                 processor.mode7HorizontalScroll = to13Bit2sComplement(getMode7WordValue(value));
             });
         makeWriteRegister(0x210e, "BG1 and Mode 7 Vertical Scroll", false,
             [this](Byte value) {
-                processor.backgrounds[BackgroundLayer1].verticalScroll.write(value);
+                processor.backgrounds[size_t(Layer::Background1)].verticalScroll.write(value);
                 processor.mode7VerticalScroll = to13Bit2sComplement(getMode7WordValue(value));
             });
 
@@ -148,13 +148,13 @@ public:
 
         makeWriteRegister(0x2116, "VRAM Address low byte", false,
             [this](Byte value) {
-                processor.vram.address.setLowByte(value);
+                processor.vram.currentAddress.setLowByte(value);
                 //vramBuffer = processor.vram.readNextWord(0);
             });
 
         makeWriteRegister(0x2117, "VRAM Address high byte", false,
             [this](Byte value) {
-                processor.vram.address.setHighByte(value & 0x7f);
+                processor.vram.currentAddress.setHighByte(value & 0x7f);
                 vramBuffer = processor.vram.readNextWord(0);
             });
         //makeWriteRegister(0x2116, "VRAM Address", false, processor.vram.address);
@@ -210,13 +210,13 @@ public:
 
         makeWriteRegister(0x2121, "CGRAM Address", false,
             [this](Byte value) {
-                processor.cgram.address.setLowByte(value);
-                processor.cgram.address.setHighByte(0x00);
+                processor.cgram.currentAddress.setLowByte(value);
+                processor.cgram.currentAddress.setHighByte(0x00);
             }
         );
         makeWriteRegister(0x2122, "CGRAM Data Write", false,
             [this](Byte value) {
-                Word cgramAddress = processor.cgram.address;
+                Word cgramAddress = processor.cgram.currentAddress;
 
                 processor.cgram.writeByte(value);
 
@@ -245,7 +245,7 @@ public:
                 processor.clipColorMathMode = ColorWindowMode(int(value.getBits(4, 2)));
                 processor.clipColorToBlackMode = ColorWindowMode(int(value.getBits(6, 2)));
             });
-        makeWriteRegister(0x2131, "Color Math Designation", false, processor.colorMathDesignation);
+        makeWriteRegister(0x2131, "Color Math Designation", false, processor.currentColorMathDesignation);
         makeWriteRegister(0x2132, "Fixed Color Data", false,
             [this](Byte value) {
                 switch (value & 0xE0) {
@@ -294,8 +294,8 @@ public:
         makeReadRegister(0x2137, "Software Latch for H/V Counter", false,
             [this](Byte) {
                 if (programmableIOPort.getBit(7)) {
-                    horizontalScanlineLocation.value = hCounter;
-                    verticalScanlineLocation.value = vCounter;
+                    horizontalScanlineLocation.value = Word(hCounter);
+                    verticalScanlineLocation.value = Word(vCounter);
                     externalLatch = true;
                 }
             });
@@ -363,8 +363,8 @@ public:
         makeWriteRegister(0x4201, "Programmable I/O port (out-port)", true,
             [this](Byte value) {
                 if (programmableIOPort.getBit(7) && !value.getBit(7)) { // 1 -> 0
-                    horizontalScanlineLocation.value = hCounter;
-                    verticalScanlineLocation.value = vCounter;
+                    horizontalScanlineLocation.value = Word(hCounter);
+                    verticalScanlineLocation.value = Word(vCounter);
                     externalLatch = true;
                 }
                 if (value.getBit(6)) {
@@ -574,7 +574,7 @@ public:
         mode7Buffer = 0;
         mode7Multiplicand = 0;
 
-        processor.vram.address = 0;
+        processor.vram.currentAddress = 0;
     }
 
     Output output;
@@ -614,7 +614,7 @@ public:
     Word& remainder = product;
     bool nmiEnabled = false;
 
-    IrqMode irqMode;
+    IrqMode irqMode = IrqMode::None;
     bool autoJoypadReadEnabled = false;
     Word hTimer;
     Word vTimer;

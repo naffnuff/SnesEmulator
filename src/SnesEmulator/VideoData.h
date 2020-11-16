@@ -21,7 +21,7 @@ struct Table
 
     void setAddress(Word value)
     {
-        address = value;
+        currentAddress = value;
     }
 
     Byte getByte(Word address, bool highTableSelect) const
@@ -43,61 +43,64 @@ struct Table
 
     Word readNextWord(int increment)
     {
-        if (address >= size) {
-            throw AccessException("Processor::Table::readNextWord: Processor-memory table out-of-bounds @ ", address, ", size=", size);
+        if (currentAddress >= size) {
+            throw AccessException("Processor::Table::readNextWord: Processor-memory table out-of-bounds @ ", currentAddress, ", size=", size);
         }
-        Word result = Word(lowTable[address], highTable[address]);
-        address += increment;
+        Word result = Word(lowTable[currentAddress], highTable[currentAddress]);
+        currentAddress += increment;
         return result;
     }
 
     void writeWord(Word data)
     {
-        if (address >= size) {
-            throw AccessException("Processor::Table::writeWord: Processor-memory table out-of-bounds @ ", address, ", size=", size);
+        if (currentAddress >= size) {
+            throw AccessException("Processor::Table::writeWord: Processor-memory table out-of-bounds @ ", currentAddress, ", size=", size);
         }
-        lowTable[address] = data.getLowByte();
-        highTable[address] = data.getHighByte();
-        ++address;
+        lowTable[currentAddress] = data.getLowByte();
+        highTable[currentAddress] = data.getHighByte();
+        ++currentAddress;
     }
 
     void writeByte(Byte data, bool highTableSelect, int increment)
     {
         std::vector<Byte>& table = highTableSelect ? highTable : lowTable;
-        if (address >= size) {
+        if (currentAddress >= size) {
             //throw MemoryAccessException("Processor::Table::writeByte: Processor-memory table out-of-bounds @ " + Util::toString(address) + ", size=" + Util::toString(size));
-            address &= size - 1;
+            currentAddress &= size - 1;
         }
         /*if (address == 0x4800 && (highTableSelect && data == 0xff || !highTableSelect && data == 0xaa)) {
             throw MemoryAccessException("DAMN!");
         }*/
-        table[address] = data;
-        address += increment;
+        table[currentAddress] = data;
+        currentAddress += increment;
     }
 
     void writeByte(Byte data)
     {
-        writeByte(data, highTableSelect, highTableSelect);
-        highTableSelect = !highTableSelect;
+        writeByte(data, currentHighTableSelect, currentHighTableSelect);
+        currentHighTableSelect = !currentHighTableSelect;
     }
 
     const Word size = 0;
-    Word address = 0;
+    Word currentAddress = 0;
     std::vector<Byte> lowTable;
     std::vector<Byte> highTable;
-    bool highTableSelect = false;
+    bool currentHighTableSelect = false;
 };
 
 struct ReadTwiceRegister
 {
     Byte read()
-    {
-        if (highByteSelect) {
-            return value.getHighByte();
-        } else {
-            return value.getLowByte();
+	{
+		highByteSelect = !highByteSelect;
+		if (highByteSelect)
+		{
+			return value.getLowByte();
+		}
+		else
+		{
+			return value.getHighByte();
         }
-        highByteSelect = !highByteSelect;
     }
     Word value;
     bool highByteSelect = false;
@@ -118,15 +121,15 @@ struct WriteTwiceRegister
     bool highByteSelect = false;
 };
 
-enum Layer
+enum class Layer
 {
-    BackgroundLayer1 = 0,
-    BackgroundLayer2 = 1,
-    BackgroundLayer3 = 2,
-    BackgroundLayer4 = 3,
-    BackgroundLayerCount = 4,
-    ObjectLayer = 4,
-    BackdropLayer = 5
+    Background1 = 0,
+    Background2 = 1,
+    Background3 = 2,
+    Background4 = 3,
+    BackgroundCount = 4,
+    Object = 4,
+    Backdrop = 5
 };
 
 struct ModeEntry
@@ -151,12 +154,12 @@ struct Object
 struct Background
 {
     Word tilemapAddress;
-    bool horizontalMirroring;
-    bool verticalMirroring;
+    bool horizontalMirroring = false;
+    bool verticalMirroring = false;
     Word characterAddress;
     WriteTwiceRegister horizontalScroll;
     WriteTwiceRegister verticalScroll;
-    int bitsPerPixel;
+    int bitsPerPixel = 0;
 };
 
 static const int rendererWidth = 256;
@@ -180,10 +183,10 @@ struct ScanlineBuffers
 
     ScanlineBuffer& getBuffer(Layer layer, int priority)
     {
-        if (layer == ObjectLayer) {
+        if (layer == Layer::Object) {
             return objectsBuffer.priorities[priority];
         } else {
-            return backgroundBuffers[layer].priorities[priority];
+            return backgroundBuffers[size_t(layer)].priorities[priority];
         }
     }
 
@@ -223,49 +226,49 @@ struct WindowSettings
     Byte windowOperator;
 };
 
-enum ColorWindowMode
+enum class ColorWindowMode
 {
     Never,
-    OutsideColorWindowOnly,
-    InsideColorWindowOnly,
+    OutsideOnly,
+    InsideOnly,
     Always
 };
 
 static const std::vector<ModeEntry> mode1 =
 {
-    { ObjectLayer, 3 },
-    { BackgroundLayer1, 1 },
-    { BackgroundLayer2, 1 },
-    { ObjectLayer, 2 },
-    { BackgroundLayer1, 0 },
-    { BackgroundLayer2, 0 },
-    { ObjectLayer, 1 },
-    { BackgroundLayer3, 1 },
-    { ObjectLayer, 0 },
-    { BackgroundLayer3, 0 }
+    { Layer::Object, 3 },
+    { Layer::Background1, 1 },
+    { Layer::Background2, 1 },
+    { Layer::Object, 2 },
+    { Layer::Background1, 0 },
+    { Layer::Background2, 0 },
+    { Layer::Object, 1 },
+    { Layer::Background3, 1 },
+    { Layer::Object, 0 },
+    { Layer::Background3, 0 }
 };
 
 static const std::vector<ModeEntry> mode1e =
 {
-    { BackgroundLayer3, 1 },
-    { ObjectLayer, 3 },
-    { BackgroundLayer1, 1 },
-    { BackgroundLayer2, 1 },
-    { ObjectLayer, 2 },
-    { BackgroundLayer1, 0 },
-    { BackgroundLayer2, 0 },
-    { ObjectLayer, 1 },
-    { ObjectLayer, 0 },
-    { BackgroundLayer3, 0 }
+    { Layer::Background3, 1 },
+    { Layer::Object, 3 },
+    { Layer::Background1, 1 },
+    { Layer::Background2, 1 },
+    { Layer::Object, 2 },
+    { Layer::Background1, 0 },
+    { Layer::Background2, 0 },
+    { Layer::Object, 1 },
+    { Layer::Object, 0 },
+    { Layer::Background3, 0 }
 };
 
 static const std::vector<ModeEntry> mode7 =
 {
-    { ObjectLayer, 3 },
-    { ObjectLayer, 2 },
-    { ObjectLayer, 1 },
-    { BackgroundLayer1, 0 },
-    { ObjectLayer, 0 }
+    { Layer::Object, 3 },
+    { Layer::Object, 2 },
+    { Layer::Object, 1 },
+    { Layer::Background1, 0 },
+    { Layer::Object, 0 }
 };
 
 }

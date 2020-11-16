@@ -27,13 +27,13 @@ class ADC
 public:
     static int invoke(State& state, Access& leftOperand, Byte rightOperand)
     {
-        bool carry = state.getFlag(State::c);
+        bool carry = state.getFlag(State::Flag::c);
         bool overflow = false;
         bool halfCarry = false;
         Byte result = Types::binaryAdd(leftOperand.readByte(), rightOperand, carry, overflow, halfCarry);
-        state.setFlag(State::c, carry);
-        state.setFlag(State::v, overflow);
-        state.setFlag(State::h, halfCarry);
+        state.setFlag(State::Flag::c, carry);
+        state.setFlag(State::Flag::v, overflow);
+        state.setFlag(State::Flag::h, halfCarry);
         leftOperand.writeByte(result);
         state.updateSignFlags(result);
         return 0;
@@ -53,9 +53,9 @@ public:
         bool overflow = false;
         bool halfCarry = false;
         Word result = Types::binaryAdd(leftOperand.readWord(), rightOperand, carry, overflow, halfCarry);
-        state.setFlag(State::c, carry);
-        state.setFlag(State::v, overflow);
-        state.setFlag(State::h, halfCarry);
+        state.setFlag(State::Flag::c, carry);
+        state.setFlag(State::Flag::v, overflow);
+        state.setFlag(State::Flag::h, halfCarry);
         leftOperand.writeWord(result);
         state.updateSignFlags(result);
         return 0;
@@ -117,7 +117,7 @@ public:
     static int invoke(State& state, Access& operand)
     {
         Byte value = operand.readByte();
-        state.setFlag(State::c, value.isNegative());
+        state.setFlag(State::Flag::c, value.isNegative());
         value <<= 1;
         operand.writeByte(value);
         state.updateSignFlags(value);
@@ -194,7 +194,7 @@ public:
     // §1: Add 1 cycle if branch is taken
     static int invoke(State& state, int8_t offset)
     {
-        return branchIf(state.getFlag(State::z), state, offset);
+        return branchIf(state.getFlag(State::Flag::z), state, offset);
     }
 
     static std::string toString() { return "BEQ"; }
@@ -208,7 +208,7 @@ public:
     // §1: Add 1 cycle if branch is taken
     static int invoke(State& state, int8_t offset)
     {
-        return branchIf(state.getFlag(State::n), state, offset);
+        return branchIf(state.getFlag(State::Flag::n), state, offset);
     }
 
     static std::string toString() { return "BMI"; }
@@ -222,7 +222,7 @@ public:
     // §1: Add 1 cycle if branch is taken
     static int invoke(State& state, int8_t offset)
     {
-        return branchIf(!state.getFlag(State::z), state, offset);
+        return branchIf(!state.getFlag(State::Flag::z), state, offset);
     }
 
     static std::string toString() { return "BNE"; }
@@ -236,7 +236,7 @@ public:
     // §1: Add 1 cycle if branch is taken
     static int invoke(State& state, int8_t offset)
     {
-        return branchIf(!state.getFlag(State::n), state, offset);
+        return branchIf(!state.getFlag(State::Flag::n), state, offset);
     }
 
     static std::string toString() { return "BPL"; }
@@ -294,7 +294,7 @@ public:
     // §1: Add 1 cycle if branch is taken
     static int invoke(State& state, Access& access, int8_t offset)
     {
-        return branchIf(state.readRegister<State::A>() != access.readByte(), state, offset);
+        return branchIf(state.readRegister<State::Register::A>() != access.readByte(), state, offset);
     }
 
     static std::string toString() { return "CBNE"; }
@@ -338,7 +338,7 @@ class CMP
 public:
     static int invoke(State& state, Access& leftOperand, Byte rightOperand)
     {
-        state.setFlag(State::c, leftOperand.readByte() >= rightOperand);
+        state.setFlag(State::Flag::c, leftOperand.readByte() >= rightOperand);
         state.updateSignFlags(Byte(leftOperand.readByte() - rightOperand));
         return 0;
     }
@@ -353,7 +353,7 @@ class CMPW
 public:
     static int invoke(State& state, Access& leftOperand, Word rightOperand)
     {
-        state.setFlag(State::c, leftOperand.readWord() >= rightOperand);
+        state.setFlag(State::Flag::c, leftOperand.readWord() >= rightOperand);
         state.updateSignFlags(Word(leftOperand.readWord() - rightOperand));
         return 0;
     }
@@ -465,10 +465,10 @@ public:
     static int invoke(State& state, Access& access, Byte divisor)
     {
         Word dividend = access.readWord();
-        Byte quotient = dividend / divisor;
+        Byte quotient = uint8_t(dividend / divisor);
         Byte remainder = dividend % divisor;
-        state.setFlag(State::v, divisor <= dividend.getHighByte());
-        state.setFlag(State::h, (divisor & 0xf) <= (dividend.getHighByte() & 0xf));
+        state.setFlag(State::Flag::v, divisor <= dividend.getHighByte());
+        state.setFlag(State::Flag::h, (divisor & 0xf) <= (dividend.getHighByte() & 0xf));
         access.writeWord(Word(quotient, remainder));
         state.updateSignFlags(quotient);
         return 0;
@@ -595,7 +595,7 @@ public:
     static int invoke(State& state, Access& operand)
     {
         Byte value = operand.readByte();
-        state.setFlag(State::c, value.getBit(0));
+        state.setFlag(State::Flag::c, value.getBit(0));
         value >>= 1;
         operand.writeByte(value);
         state.updateSignFlags(value);
@@ -769,7 +769,7 @@ class NOTC
 public:
     static int invoke(State& state)
     {
-        state.setFlag(State::c, !state.getFlag(State::c));
+        state.setFlag(State::Flag::c, !state.getFlag(State::Flag::c));
         return 0;
     }
 
@@ -812,7 +812,6 @@ public:
     static int invoke(State& state, Access& leftOperand, Byte rightOperand)
     {
         throw NotYetImplementedException("OR1");
-        return 0;
     }
 
     static std::string toString() { return "OR1"; }
@@ -826,7 +825,6 @@ public:
     static int invoke(State& state, Access& leftOperand, Byte rightOperand)
     {
         throw NotYetImplementedException("PCALL");
-        return 0;
     }
 
     static std::string toString() { return "PCALL"; }
@@ -888,7 +886,6 @@ public:
     static int invoke(State& state)
     {
         throw NotYetImplementedException("RET1");
-        return 0;
     }
 
     static std::string toString() { return "RET1"; }
@@ -905,8 +902,8 @@ public:
     static int invoke(State& state, Access& operand)
     {
         Byte value = operand.readByte();
-        bool carry = state.getFlag(State::c);
-        state.setFlag(State::c, value.getBit(7));
+        bool carry = state.getFlag(State::Flag::c);
+        state.setFlag(State::Flag::c, value.getBit(7));
         value <<= 1;
         value.setBit(0, carry);
         operand.writeByte(value);
@@ -928,8 +925,8 @@ public:
     static int invoke(State& state, Access& operand)
     {
         Byte value = operand.readByte();
-        bool carry = state.getFlag(State::c);
-        state.setFlag(State::c, value.getBit(0));
+        bool carry = state.getFlag(State::Flag::c);
+        state.setFlag(State::Flag::c, value.getBit(0));
         value >>= 1;
         value.setBit(7, carry);
         operand.writeByte(value);
@@ -958,13 +955,13 @@ class SBC
 public:
     static int invoke(State& state, Access& leftOperand, Byte rightOperand)
     {
-        bool carry = state.getFlag(State::c);
+        bool carry = state.getFlag(State::Flag::c);
         bool overflow = false;
         bool halfCarry = false;
         Byte result = Types::binarySubtract(leftOperand.readByte(), rightOperand, carry, overflow, halfCarry);
-        state.setFlag(State::c, carry);
-        state.setFlag(State::v, overflow);
-        state.setFlag(State::h, halfCarry);
+        state.setFlag(State::Flag::c, carry);
+        state.setFlag(State::Flag::v, overflow);
+        state.setFlag(State::Flag::h, halfCarry);
         leftOperand.writeByte(result);
         state.updateSignFlags(result);
         return 0;
@@ -1042,7 +1039,6 @@ public:
     static int invoke(State& state)
     {
         throw NotYetImplementedException("SLEEP");
-        return 0;
     }
 
     static std::string toString() { return "SLEEP"; }
@@ -1056,7 +1052,6 @@ public:
     static int invoke(State& state)
     {
         throw NotYetImplementedException("STOP");
-        return 0;
     }
 
     static std::string toString() { return "STOP"; }
@@ -1073,9 +1068,9 @@ public:
         bool overflow = false;
         bool halfCarry = false;
         Word result = Types::binarySubtract(leftOperand.readWord(), rightOperand, carry, overflow, halfCarry);
-        state.setFlag(State::c, carry);
-        state.setFlag(State::v, overflow);
-        state.setFlag(State::h, halfCarry);
+        state.setFlag(State::Flag::c, carry);
+        state.setFlag(State::Flag::v, overflow);
+        state.setFlag(State::Flag::h, halfCarry);
         leftOperand.writeWord(result);
         state.updateSignFlags(result);
         return 0;
@@ -1107,7 +1102,6 @@ public:
     static int invoke(State& state, Access& leftOperand, Byte rightOperand)
     {
         throw NotYetImplementedException("TCALL");
-        return 0;
     }
 
     static std::string toString() { return "TCALL"; }
@@ -1120,7 +1114,7 @@ class TCLR1
 public:
     static int invoke(State& state, Access& operand)
     {
-        Byte accumulator = state.readRegister<State::A>();
+        Byte accumulator = state.readRegister<State::Register::A>();
         Byte data = operand.readByte();
         state.updateSignFlags(Byte(accumulator - data));
         operand.writeByte(data & ~accumulator);
@@ -1137,7 +1131,7 @@ class TSET1
 public:
     static int invoke(State& state, Access& operand)
     {
-        Byte accumulator = state.readRegister<State::A>();
+        Byte accumulator = state.readRegister<State::Register::A>();
         Byte data = operand.readByte();
         state.updateSignFlags(Byte(accumulator - data));
         operand.writeByte(data | accumulator);

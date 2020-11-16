@@ -14,7 +14,7 @@
 
 namespace Audio {
 
-class Registers : public RegisterManager<SPC::State::MemoryType, Output::Blue>
+class Registers : public RegisterManager<SPC::State::MemoryType, Output::Color::Blue>
 {
 public:
     class Timer
@@ -99,27 +99,27 @@ public:
             });
 
         for (int i = 0; i < 3; ++i) {
-            makeWriteRegister(0xfa + i, std::string("Timer ") + char('1' + i) + " Scaling Target", true,
+            makeWriteRegister(Word(0xfa + i), std::string("Timer ") + char('1' + i) + " Scaling Target", true,
                 [this, i](Byte value) {
                     timers[i].target = value == 0 ? 0x100 : int(value);
                 });
-            makeReadRegister(0xfd + i, std::string("Timer ") + char('1' + i) + " Output", false,
+            makeReadRegister(Word(0xfd + i), std::string("Timer ") + char('1' + i) + " Output", false,
                 [this, i](Byte& value) {
-                    value = timers[i].counter;
+                    value = Byte(timers[i].counter);
                     timers[i].counter = 0;
                 });
         }
 
         for (int i = 0; i < bootRomData.size(); ++i) {
-            Word address = 0xffc0 + i;
-            spcMemory.createLocation<BootRomLocation>(address, 0xff, bootRomData[i], std::ref(bootRomDataEnabled));
+            Word address(0xffc0 + i);
+            spcMemory.createLocation<BootRomLocation>(address, Byte(0xff), bootRomData[i], std::ref(bootRomDataEnabled));
         }
 
         // DSP Registers
         for (int i = 0; i < processor.voices.size(); ++i) {
-            Byte voiceAddressStart = i << 4;
+            Byte voiceAddressStart(i << 4);
             std::string voiceName("Voice ");
-            voiceName += '0' + i;
+            voiceName += char('0' + i);
             voiceName += " ";
             processor.makeWriteRegister(voiceAddressStart, voiceName + "Left Volume", false, processor.voices[i].leftVolume);
             processor.makeWriteRegister(voiceAddressStart + 1, voiceName + "Right Volume", false, processor.voices[i].rightVolume);
@@ -148,9 +148,9 @@ public:
                     processor.voices[i].attackRate = value.getBits(0, 4);
                     processor.voices[i].decayRate = value.getBits(4, 3);
                     if (value.getBit(7)) {
-                        processor.voices[i].envelopeType = Processor::Voice::ADSR;
+                        processor.voices[i].envelopeType = Processor::Voice::EnvelopeType::ADSR;
                     } else {
-                        processor.voices[i].envelopeType = Processor::Voice::Gain;
+                        processor.voices[i].envelopeType = Processor::Voice::EnvelopeType::Gain;
                         //throw NotYetImplementedException("Gain mode not supported");
                     }
                 }
@@ -177,7 +177,7 @@ public:
                         processor.voices[i].gainMode = Processor::Voice::GainMode(uint8_t(value.getBits(5, 2)));
                         processor.voices[i].gainLevel = value.getBits(0, 5);
                     } else {
-                        processor.voices[i].gainMode = Processor::Voice::Direct;
+                        processor.voices[i].gainMode = Processor::Voice::GainMode::Direct;
                         processor.voices[i].gainLevel = value.getBits(0, 7);
                     }
                 }
@@ -237,8 +237,8 @@ public:
         );
         for (int i = 0; i < processor.voiceCount; ++i) {
             std::string coefficientName("Coefficient ");
-            coefficientName += '0' + i;
-            processor.makeWriteRegister(i << 4 | 0x0f, coefficientName, false, processor.voices[i].coefficient);
+            coefficientName += char('0' + i);
+            processor.makeWriteRegister(Byte(i << 4 | 0x0f), coefficientName, false, processor.voices[i].coefficient);
         }
 
         processor.dspMemory.finalize();

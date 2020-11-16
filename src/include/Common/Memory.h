@@ -23,7 +23,7 @@ public:
 class Location
 {
 public:
-    enum Operation
+    enum class Operation
     {
         Read,
         Write,
@@ -34,8 +34,8 @@ public:
 
     Location() = delete;
 
-    Location(Byte& bus)
-        : bus(bus)
+    Location(Byte& defaultBus)
+        : defaultBus(defaultBus)
     {
     }
 
@@ -45,16 +45,16 @@ public:
 public:
     Byte read()
     {
-        const Byte value = readImpl(bus);
+        const Byte value = readImpl(defaultBus);
         if (breakpoint) {
-            breakpoint(Read, value, 0);
+            breakpoint(Operation::Read, value, 0);
         }
         return value;
     }
 
     Byte apply()
     {
-        const Byte value = readImpl(bus);
+        const Byte value = readImpl(defaultBus);
         ++applicationCount;
         return value;
     }
@@ -63,7 +63,7 @@ public:
     {
         writeImpl(value);
         if (breakpoint) {
-            breakpoint(Write, value, 0);
+            breakpoint(Operation::Write, value, 0);
         }
     }
 
@@ -85,7 +85,7 @@ public:
     void applyBreakpoint() const
     {
         if (breakpoint) {
-            breakpoint(Apply, 0, applicationCount + 1);
+            breakpoint(Operation::Apply, 0, applicationCount + 1);
         }
     }
 
@@ -123,7 +123,7 @@ protected:
     }
 
 private:
-    Byte& bus;
+    Byte& defaultBus;
     uint64_t applicationCount = 0;
     BreakpointCallback breakpoint;
 };
@@ -131,8 +131,8 @@ private:
 class InvalidLocation : public Location
 {
 public:
-    InvalidLocation(Byte& bus)
-        : Location(bus)
+    InvalidLocation(Byte& defaultBus)
+        : Location(defaultBus)
     {
     }
 
@@ -153,8 +153,8 @@ private:
 class MemoryLocation : public Location
 {
 public:
-    MemoryLocation(Byte& bus, Byte value)
-        : Location(bus)
+    MemoryLocation(Byte& defaultBus, Byte value)
+        : Location(defaultBus)
         , value(value)
     {
     }
@@ -183,7 +183,7 @@ protected:
 class ReadOnlyMemory : public MemoryLocation
 {
 public:
-    ReadOnlyMemory(Byte& bus, Byte value)
+    ReadOnlyMemory(Byte& bus, const Byte& value)
         : MemoryLocation(bus, value)
     {
     }
@@ -220,8 +220,8 @@ private:
 class Register : public Location
 {
 protected:
-    Register(Byte& bus)
-        : Location(bus)
+    Register(Byte& defaultBus)
+        : Location(defaultBus)
     {
     }
 };
@@ -387,8 +387,8 @@ private:
 class BootRomLocation : public Location
 {
 public:
-    BootRomLocation(Byte& bus, Byte ramValue, Byte bootRomValue, bool& bootRomDataEnabled)
-        : Location(bus)
+    BootRomLocation(Byte& defaultBus, Byte ramValue, Byte bootRomValue, bool& bootRomDataEnabled)
+        : Location(defaultBus)
         , ramValue(ramValue)
         , bootRomValue(bootRomValue)
         , bootRomDataEnabled(bootRomDataEnabled)
@@ -489,7 +489,7 @@ class Memory
 public:
     typedef AddressType AddressType;
 
-    enum WrappingMask
+    enum class WrappingMask
     {
         Page = Byte::bitMask,
         Bank = Word::bitMask,
@@ -551,10 +551,10 @@ public:
         return result;
     }
 
-    template<WrappingMask Wrapping = Full>
+    template<WrappingMask Wrapping = WrappingMask::Full>
     Word readWord(AddressType address)
     {
-        return readWord(address, Wrapping);
+        return readWord(address, uint32_t(Wrapping));
     }
 
     Word readWord(AddressType lowAddress, uint32_t wrappingMask)
@@ -565,10 +565,10 @@ public:
         return Word(lowByte, highByte);
     }
 
-    template<WrappingMask Wrapping = Full>
+    template<WrappingMask Wrapping = WrappingMask::Full>
     Long readLong(AddressType address)
     {
-        return readLong(address, Wrapping);
+        return readLong(address, uint32_t(Wrapping));
     }
 
     Long readLong(AddressType lowAddress, uint32_t wrappingMask)
@@ -592,10 +592,10 @@ public:
         }
     }
 
-    template<WrappingMask Wrapping = Full>
+    template<WrappingMask Wrapping = WrappingMask::Full>
     void writeWord(Word value, AddressType address)
     {
-        writeWord(value, address, Wrapping);
+        writeWord(value, address, uint32_t(Wrapping));
     }
 
     void writeWord(Word value, AddressType lowAddress, uint32_t wrappingMask)
@@ -738,7 +738,7 @@ public:
 
     MemoryAccess() = delete;
 
-    MemoryAccess(Memory& memory, AddressType address, WrappingMask wrapping = Memory::Full)
+    MemoryAccess(Memory& memory, AddressType address, WrappingMask wrapping = Memory::WrappingMask::Full)
         : memory(memory)
         , address(address)
         , wrapping(wrapping)
@@ -752,12 +752,12 @@ public:
 
     Word readWord() override
     {
-        return memory.readWord(address, wrapping);
+        return memory.readWord(address, uint32_t(wrapping));
     }
 
     Long readLong() override
     {
-        return memory.readLong(address, wrapping);
+        return memory.readLong(address, uint32_t(wrapping));
     }
 
     void writeByte(Byte value) override
@@ -767,7 +767,7 @@ public:
 
     void writeWord(Word value) override
     {
-        memory.writeWord(value, address, wrapping);
+        memory.writeWord(value, address, uint32_t(wrapping));
     }
 
     bool setBreakpoint(Location::BreakpointCallback callback) override
@@ -797,7 +797,7 @@ public:
 
     ConstMemoryAccess() = delete;
 
-    ConstMemoryAccess(const Memory& memory, AddressType address, WrappingMask wrapping = Memory::Full)
+    ConstMemoryAccess(const Memory& memory, AddressType address, WrappingMask wrapping = Memory::WrappingMask::Full)
         : memory(memory)
         , address(address)
         , wrapping(wrapping)

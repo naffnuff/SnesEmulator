@@ -6,10 +6,12 @@
 
 #include "Exception.h"
 
+#pragma warning( disable : 4100 ) // unreferenced formal parameter
+
 namespace Types {
 
-template<int bitCount, typename T>
-T signedClamp(T value)
+template<int bitCount, typename ReturnT, typename T>
+ReturnT signedClamp(T value)
 {
     constexpr int32_t max = (1 << (bitCount - 1)) - 1;
     if (value > max) {
@@ -17,11 +19,11 @@ T signedClamp(T value)
     } else if (value < ~max) {
         value = ~max;
     }
-    return value;
+    return ReturnT(value);
 }
 
-template<int bitCount, typename T>
-T unsignedClamp(T value)
+template<int bitCount, typename ReturnT, typename T>
+ReturnT unsignedClamp(T value)
 {
     constexpr int32_t max = (1 << bitCount) - 1;
     if (value > max) {
@@ -29,14 +31,14 @@ T unsignedClamp(T value)
     } else if (value < 0) {
         value = 0;
     }
-    return value;
+    return ReturnT(value);
 }
 
-template<int bitCount, typename T>
-T clip(T value)
+template<int bitCount, typename ReturnT, typename T>
+ReturnT clip(T value)
 {
     constexpr int32_t max = (1 << bitCount) - 1;
-    return value & max;
+    return ReturnT(value & max);
 }
 
 template<typename T>
@@ -104,7 +106,18 @@ public:
     Byte(uint8_t value)
         : value(value)
     {
-    }
+	}
+
+    Byte(const Byte& other)
+	{
+		*this = other;
+	}
+
+    Byte& operator=(const Byte& other)
+	{
+		value = other;
+		return *this;
+	}
 
     explicit Byte(char value)
         : value(uint8_t(value))
@@ -236,7 +249,7 @@ public:
         unsignedCarry = sum >= 0x100;
         int signedSum = int8_t(augend & 0xf0) + int8_t(addend & 0xf0) + int8_t(sumLow);
         signedOverflow = signedSum < -128 || signedSum > 127;
-        return sum;
+        return Byte(sum);
     }
 
     static Byte decimalSubtract(Byte minuhend, Byte subtrahend, bool& invertedUnsignedBorrow, bool& signedOverflow)
@@ -251,7 +264,7 @@ public:
         }
         bool dummy = false;
         Types::binarySubtract(minuhend, subtrahend, invertedUnsignedBorrow, signedOverflow, dummy);
-        return difference;
+        return Byte(difference);
     }
 
 private:
@@ -275,15 +288,39 @@ public:
     {
     }
 
+#pragma warning(push)
+#pragma warning(disable : 4702) // unreachable code
     Word(uint16_t value)
         : value(value)
+    {
+    }
+#pragma warning(pop)
+
+    explicit Word(uint32_t value)
+        : value(uint16_t(value))
+    {
+    }
+
+    explicit Word(int32_t value)
+        : value(uint16_t(value))
     {
     }
 
     Word(Byte lowByte, Byte highByte)
         : value(lowByte | highByte << 8)
     {
-    }
+	}
+
+    Word(const Word& other)
+	{
+		*this = other;
+	}
+
+    Word& operator=(const Word& other)
+	{
+		value = other;
+		return *this;
+	}
 
     operator uint16_t() const
     {
@@ -293,14 +330,14 @@ public:
     template<typename T>
     Word& operator+=(T operand)
     {
-        value += operand;
+        value += uint16_t(operand);
         return *this;
     }
 
     template<typename T>
     Word& operator-=(T operand)
     {
-        value -= operand;
+        value -= uint16_t(operand);
         return *this;
     }
 
@@ -446,6 +483,17 @@ public:
     {
     }
 
+    Long(const Long& other)
+    {
+        *this = other;
+    }
+
+    Long& operator=(const Long& other)
+    {
+        value = other;
+        return *this;
+    }
+
     operator uint32_t() const
     {
         return value;
@@ -453,8 +501,8 @@ public:
 
     void wrapValue()
     {
-        constexpr uint32_t bitMask = (1 << bitCount) - 1;
-        value = value & bitMask;
+        constexpr uint32_t mask = (1 << bitCount) - 1;
+        value = value & mask;
     }
 
     template<typename T>

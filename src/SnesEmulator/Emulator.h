@@ -71,7 +71,7 @@ public:
         , videoProcessor(videoRegisters.processor)
         , audioSystem(output, debugger)
         , debugger(output, videoRegisters, audioSystem.getRegisters(), running)
-        , cpuContext("cpu.txt", Output::Green, debugger)
+        , cpuContext("cpu.txt", Output::Color::Green, debugger)
         , saveRamSaver(*this)
         , masterCycle(0)
     {

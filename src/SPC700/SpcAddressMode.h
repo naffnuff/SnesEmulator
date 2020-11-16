@@ -4,6 +4,8 @@
 #include "Instruction.h"
 #include "SpcState.h"
 
+#pragma warning( disable : 4702 ) // unreachable code
+
 namespace SPC {
 
 typedef InstructionBase<State> Instruction1Byte;
@@ -68,7 +70,7 @@ class AbsoluteIndexedIndirect : public Instruction3Byte
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
         Word address(lowByte, highByte);
-        address += Word(state.readRegister<State::X>());
+        address += Word(state.readRegister<State::Register::X>());
         return Operator::invoke(state, state.readMemoryWord(address));
     }
 
@@ -1006,8 +1008,8 @@ class YAccumulator : public Instruction1Byte
 
     int invokeOperator() override
     {
-        State::RegisterAccess firstRegisterAccess = state.getRegisterAccess<State::A>();
-        State::RegisterAccess secondRegisterAccess = state.getRegisterAccess<State::Y>();
+        State::RegisterAccess firstRegisterAccess = state.getRegisterAccess<State::Register::A>();
+        State::RegisterAccess secondRegisterAccess = state.getRegisterAccess<State::Register::Y>();
         return Operator::invoke(state, firstRegisterAccess, secondRegisterAccess);
     }
 
@@ -1029,7 +1031,7 @@ class YAccumulatorDirect : public Instruction2Byte
 
     int invokeOperator(Byte lowByte) override
     {
-        State::RegisterAccess access = state.getRegisterAccess<State::A>();
+        State::RegisterAccess access = state.getRegisterAccess<State::Register::A>();
         return Operator::invoke(state, access, state.readDirectMemoryWord(lowByte));
     }
 
@@ -1048,7 +1050,7 @@ class YAccumulatorRegister : public Instruction1Byte
 
     int invokeOperator() override
     {
-        State::RegisterAccess access = state.getRegisterAccess<State::A>();
+        State::RegisterAccess access = state.getRegisterAccess<State::Register::A>();
         return Operator::invoke(state, access, state.readRegister<RegisterIndex>());
     }
 
