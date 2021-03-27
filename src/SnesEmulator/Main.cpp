@@ -40,8 +40,8 @@ int main(int, char**)
                     output.printLine(lock);
                     while (pickedTitle.empty()) {
                         output.printLine(lock, "Enter command or game index (h for help): ");
-                        std::string command = "1";
-                        std::getline(std::cin, command);
+                        std::string command = "18";
+                        //std::getline(std::cin, command);
                         try {
                             if (command.empty()) {
                             } else if (command == "h") {

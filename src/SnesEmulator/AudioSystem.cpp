@@ -13,7 +13,8 @@ public:
 
     void operator()()
     {
-        try {
+        try
+        {
             uint64_t iteration = 0;
             //uint64_t masterCycle = 0;
             //uint64_t nextSpc = 0;
@@ -23,10 +24,12 @@ public:
             AudioSystem::CycleCount oneCycle(1);
             AudioSystem::CycleCount masterCycle(0);
             //double startTime = system.processor.renderer.getStreamTime();
-            while (system.run) {
+            while (system.run)
+            {
                 system.processor.checkStreamErrors();
 
-                if (masterCycle == system.nextSpc) {
+                if (system.threaded && masterCycle == system.nextSpc)
+                {
                     Instruction* instruction = system.instructionDecoder.getNextInstruction(system.state);
                     system.context.nextInstruction = instruction;
 
@@ -34,22 +37,28 @@ public:
 
                     system.context.addKnownAddress(system.state.getProgramAddress());
 
-                    if (system.debugger.isPaused()) {
+                    if (system.debugger.isPaused())
+                    {
                         break;
                     }
 
-                    if (int cycles = instruction->execute()) {
+                    if (int cycles = instruction->execute())
+                    {
                         system.nextSpc += AudioSystem::CycleCount(cycles);
                         system.context.nextInstruction = system.instructionDecoder.getNextInstruction(system.state);
-                    } else {
+                    }
+                    else
+                    {
                         continue;
                     }
 
-                    if (system.debugger.isPaused()) {
+                    if (system.debugger.isPaused())
+                    {
                         break;
                     }
 
-                    if (system.registers.pauseRequested) {
+                    if (system.registers.pauseRequested)
+                    {
                         break;
                     }
                 }
@@ -70,21 +79,28 @@ public:
                 }
                 ++iteration;
                 static std::chrono::steady_clock::time_point lastTime = startTime;
-                if (system.now - lastTime > std::chrono::seconds(10)) {
+                if (system.now - lastTime > std::chrono::seconds(10))
+                {
                     system.output.debug("Audio cycles: ", masterCycle.count(), " / ", iteration, " (", (100.0 * masterCycle.count() / iteration), "%)");
                     lastTime = system.now;
                 }
             }
             system.output.debug("BYE AUDIO MONKEY! ");
-        } catch (const ::NotYetImplementedException& e) {
+        }
+        catch (const ::NotYetImplementedException& e)
+        {
             system.output.error("AudioSystem thread: ", e.what());
             system.context.printAddressHistory(system.output);
             //std::getchar();
-        } catch (const ::RuntimeError& e) {
+        }
+        catch (const ::RuntimeError& e)
+        {
             system.output.error("AudioSystem thread: ", e.what());
             system.context.printAddressHistory(system.output);
             //std::getchar();
-        } catch (const ::AccessException& e) {
+        }
+        catch (const ::AccessException& e)
+        {
             system.output.error("AudioSystem thread: ", e.what());
             system.context.printAddressHistory(system.output);
             //std::getchar();
@@ -101,7 +117,8 @@ private:
 void AudioSystem::start()
 {
     processor.startStream();
-    if (threaded) {
+    //if (threaded)
+    {
         systemThread = std::thread(AudioSystemRunner(*this));
         systemThreadStarted = true;
     }

@@ -283,7 +283,7 @@ void Emulator::run()
                     }
 
                     if (!audioSystem.threaded) {
-                        increment = true;
+                        //increment = true;
                     }
 
                     if (increment) {
@@ -291,8 +291,8 @@ void Emulator::run()
                     }
                 }
                 if (!audioSystem.threaded && masterCycle == nextAudioTick) {
-                    audioSystem.tick();
-                    nextAudioTick += CycleCount(21);
+                    //audioSystem.tick();
+                    //nextAudioTick += CycleCount(21);
                 }
 
                 if (increment) {

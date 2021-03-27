@@ -1,4 +1,4 @@
-audio info
+audio debug
 debugger info
 default info
 dma info

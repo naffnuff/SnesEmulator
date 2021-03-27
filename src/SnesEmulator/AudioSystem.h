@@ -107,7 +107,7 @@ public:
 
     Debugger::Context<SPC::State> context;
 
-    bool threaded = true;
+    bool threaded = false;
 
     bool pauseRequested = false;
 
