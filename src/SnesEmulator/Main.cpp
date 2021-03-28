@@ -12,8 +12,10 @@ int main(int, char**)
     Output::System outputSystem("logconfig.txt");
     Output output(outputSystem, "main");
 
-    while (true) {
-        try {
+    while (true)
+    {
+        try
+        {
             Rom rom(output);
 
             {
@@ -22,29 +24,38 @@ int main(int, char**)
                     Output::Lock lock(output);
                     output.printLine(lock, "Welcome to Naffnuff's SNES emulator!");
                     std::vector<std::string> titles;
-                    while (titles.empty()) {
-                        for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(".")) {
+                    while (titles.empty())
+                    {
+                        for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator("."))
+                        {
                             std::string extension = entry.path().extension().string();
-                            if (entry.is_regular_file() && (extension == ".smc" || extension == ".sfc")) {
+                            if (entry.is_regular_file() && (extension == ".smc" || extension == ".sfc"))
+                            {
                                 std::string filename = entry.path().filename().string();
                                 titles.push_back(filename);
                                 output.printLine(lock, titles.size(), ". ", filename);
                             }
                         }
-                        if (titles.empty()) {
+                        if (titles.empty())
+                        {
                             output.printLine(lock, "Put some ROM images in the same folder as the application file and press enter!");
                             int dummy = std::getchar();
                             dummy = dummy;
                         }
                     }
                     output.printLine(lock);
-                    while (pickedTitle.empty()) {
+                    while (pickedTitle.empty())
+                    {
                         output.printLine(lock, "Enter command or game index (h for help): ");
                         std::string command = "18";
-                        //std::getline(std::cin, command);
-                        try {
-                            if (command.empty()) {
-                            } else if (command == "h") {
+                        std::getline(std::cin, command);
+                        try
+                        {
+                            if (command.empty())
+                            {
+                            }
+                            else if (command == "h")
+                            {
                                 output.printLine(lock, "Keyboard controls:");
                                 output.printLine(lock, "Toggle fullscreen: Space");
                                 output.printLine(lock, "Up: W");
@@ -60,14 +71,19 @@ int main(int, char**)
                                 output.printLine(lock, "Start: ,");
                                 output.printLine(lock, "Select: .");
                                 output.printLine(lock, "Or connect a controller!");
-                            } else {
+                            }
+                            else
+                            {
                                 int inputValue = stoi(command);
                                 --inputValue;
-                                if (inputValue >= 0 && inputValue < titles.size()) {
+                                if (inputValue >= 0 && inputValue < titles.size())
+                                {
                                     pickedTitle = titles[inputValue];
                                 }
                             }
-                        } catch (const std::exception & e) {
+                        }
+                        catch (const std::exception& e)
+                        {
                             output.error("Bad input: ", e.what());
                         }
                     }
@@ -78,7 +94,9 @@ int main(int, char**)
             Emulator emulator(output, rom);
             emulator.initialize();
             emulator.run();
-        } catch (const std::exception & e) {
+        }
+        catch (const std::exception& e)
+        {
             output.error("Failure: ", e.what());
             output.error("Press [RETURN] to restart");
             std::getchar();

@@ -54,15 +54,18 @@ public:
         SPC::State::MemoryType& memory = state.getMemory();
 
         // I/O between the CPU and SPC700
-        for (Word i = 0; i < 4; ++i) {
+        for (Word i = 0; i < 4; ++i)
+        {
             memory.createLocation<ReadWriteRegister>(Word(0xf4 + i),
-                [this, i, &cpuToSpcBuffers](Byte& value) {
+                [this, i, &cpuToSpcBuffers](Byte& value)
+                {
                     value = cpuToSpcBuffers[i];
                 },
-                [this, i, &spcToCpuBuffers](Byte, Byte newValue) {
+                [this, i, &spcToCpuBuffers](Byte, Byte newValue)
+                {
                     spcToCpuBuffers[i] = newValue;
                 }
-            );
+                );
         }
 
         registers.initialize(cpuToSpcBuffers);
@@ -107,7 +110,7 @@ public:
 
     Debugger::Context<SPC::State> context;
 
-    bool threaded = false;
+    bool threaded = true;
 
     bool pauseRequested = false;
 

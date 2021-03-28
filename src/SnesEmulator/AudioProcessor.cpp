@@ -11,7 +11,8 @@
 #define M_PI 3.14159265358979323846264338327950288
 #endif
 
-namespace Audio {
+namespace Audio
+{
 
 static constexpr int sampleRate = 32000;
 static constexpr int bufferSize = 1;
@@ -21,9 +22,10 @@ struct StreamHandler
     static int callback(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void* userData)
     {
         Processor& processor = *(Processor*)userData;
-        try {
+        try
+        {
             float* out = (float*)output;
-            
+
             /*
             for (int i = 0; i < 0x8; ++i) {
                 //testAttack(processor, i);
@@ -36,15 +38,25 @@ struct StreamHandler
             //return paAbort;
             */
 
-            if (processor.checkStreamStatus(statusFlags)) {
+            if (processor.checkStreamStatus(statusFlags))
+            {
                 processor.outputNextSample(out[0], out[1]);
                 processor.printTimeInfo(timeInfo->currentTime);
                 return paContinue;
-            } else {
+            }
+            else
+            {
                 processor.output.error("ABORTING AUDIO PROCESSOR!");
                 return paAbort;
             }
-        } catch (const std::exception& e) {
+        }
+        catch (const AccessException& e)
+        {
+            processor.output.debug("Caught AccessException in Audio processor: ", e.what());
+            return paContinue;
+        }
+        catch (const std::exception& e)
+        {
             processor.output.error("Caught std::exception in Audio processor: ", e.what());
             return paAbort;
         }
@@ -53,7 +65,8 @@ struct StreamHandler
 
 void check(PaError error)
 {
-    if (error != paNoError) {
+    if (error != paNoError)
+    {
         throw RuntimeError(Pa_GetErrorText(error));
     }
 }
@@ -68,7 +81,8 @@ Processor::Processor(Output& output, Memory<Word>& spcMemory)
 
 Processor::~Processor()
 {
-    if (initialized) {
+    if (initialized)
+    {
         check(Pa_Terminate());
         initialized = false;
     }
@@ -80,7 +94,8 @@ void Processor::initialize()
     check(Pa_Initialize());
     initialized = true;
 
-    for (int i = 0; i < tableSize; i++) {
+    for (int i = 0; i < tableSize; i++)
+    {
         //sine[i] = sin(((double)i / (double)tableSize) * M_PI * 2.0);
         //double time = (double)i / (double)tableSize;
         //sine[i] = sampleSineWave(time, 0.01, 0.0) + sampleSquareWave(time, 1.0, 0.0) + sampleSawtoothWave(time, 0.5);
@@ -93,7 +108,8 @@ void Processor::startStream()
 {
     PaStreamParameters outputParameters;
     outputParameters.device = Pa_GetDefaultOutputDevice();
-    if (outputParameters.device == paNoDevice) {
+    if (outputParameters.device == paNoDevice)
+    {
         throw RuntimeError("No output device found, device count=", Pa_GetDeviceCount());
     }
     outputParameters.channelCount = 2; // stereo
@@ -110,30 +126,38 @@ void Processor::startStream()
 
 bool Processor::checkStreamStatus(unsigned long statusFlags)
 {
-    if (statusFlags) {
-        if (statusFlags & paInputUnderflow) {
+    if (statusFlags)
+    {
+        if (statusFlags & paInputUnderflow)
+        {
             output.error("paInputUnderflow");
             inputUnderflow = true;
         }
-        if (statusFlags & paInputOverflow) {
+        if (statusFlags & paInputOverflow)
+        {
             output.error("paInputOverflow");
             inputOverflow = true;
         }
-        if (statusFlags & paOutputUnderflow) {
+        if (statusFlags & paOutputUnderflow)
+        {
             output.error("paOutputUnderflow");
             outputUnderflow = true;
         }
-        if (statusFlags & paOutputOverflow) {
+        if (statusFlags & paOutputOverflow)
+        {
             output.error("paOutputOverflow");
             outputOverflow = true;
         }
-        if (statusFlags & paPrimingOutput) {
+        if (statusFlags & paPrimingOutput)
+        {
             output.error("paPrimingOutput");
             primingOutput = true;
         }
         output.error("STREAM CALLBACK FLAGS: ", statusFlags);
         return false;
-    } else {
+    }
+    else
+    {
         return true;
     }
 }
@@ -143,7 +167,8 @@ void Processor::outputNextSample(float& leftChannel, float& rightChannel)
     int32_t leftSampleSum = 0;
     int32_t rightSampleSum = 0;
     int16_t nextSample = 0;
-    for (Audio::Processor::Voice& voice : voices) {
+    for (Audio::Processor::Voice& voice : voices)
+    {
         voice.calculateNextSample(nextSample);
         int16_t leftSample = Types::signedClamp<16, int16_t>(nextSample * voice.leftVolume >> 7);
         int16_t rightSample = Types::signedClamp<16, int16_t>(nextSample * voice.rightVolume >> 7);
@@ -158,37 +183,50 @@ void Processor::outputNextSample(float& leftChannel, float& rightChannel)
 
 void Processor::Voice::calculateNextSample(int16_t& nextSample)
 {
-    if (keyOnIsSet) {
+    if (keyOnIsSet)
+    {
         setupPhase = 5;
         keyOnIsSet = false;
     }
-    if (keyOff) {
+    if (keyOff)
+    {
         setupPhase = 0;
         setADSRStage(ADSRStage::Release);
     }
-    if (setupPhase > 0) {
-        if (setupPhase == 5) {
+    if (setupPhase > 0)
+    {
+        if (setupPhase == 5)
+        {
             envelope = 0;
             adsrStage = ADSRStage::Inactive;
             readSampleAddress(false);
-        } else if (setupPhase == 1) {
+        }
+        else if (setupPhase == 1)
+        {
             setADSRStage(ADSRStage::Attack);
-        } else {
+        }
+        else
+        {
             decodeNextBlock();
         }
         --setupPhase;
-    } else {
+    }
+    else
+    {
         interpolationIndex += pitch;
-        if (interpolationIndex > 0x7fff) {
+        if (interpolationIndex > 0x7fff)
+        {
             interpolationIndex = 0x7fff;
         }
-        if (interpolationIndex >= 0x4000) {
+        if (interpolationIndex >= 0x4000)
+        {
             decodeNextBlock();
             interpolationIndex -= 0x4000;
         }
         nextSample = sampleBuffer[interpolationIndex >> 12];
         calculateEnvelope();
-        if (envelope == 0) {
+        if (envelope == 0)
+        {
             nextSample = 0;
         }
         //nextSample = Types::signedClamp<16>(nextSample * envelope >> 11);
@@ -197,11 +235,13 @@ void Processor::Voice::calculateNextSample(int16_t& nextSample)
 
 void Processor::Voice::readSampleAddress(bool loopAddress)
 {
-    if (((processor.sourceDirectory << 8) | (sourceNumber << 2)) != ((processor.sourceDirectory << 8) + (sourceNumber << 2))) {
+    if (((processor.sourceDirectory << 8) | (sourceNumber << 2)) != ((processor.sourceDirectory << 8) + (sourceNumber << 2)))
+    {
         throw RuntimeError("Source address is wonky!");
     }
     Word sourceAddress = (processor.sourceDirectory << 8) + (sourceNumber << 2);
-    if (loopAddress) {
+    if (loopAddress)
+    {
         sourceAddress += 2;
     }
     headerAddress = processor.spcMemory.readWord(sourceAddress);
@@ -210,48 +250,65 @@ void Processor::Voice::readSampleAddress(bool loopAddress)
 
 void Processor::Voice::decodeNextBlock()
 {
-    for (size_t i = 0; i < 8; ++i) {
+    for (size_t i = 0; i < 8; ++i)
+    {
         sampleBuffer[i] = sampleBuffer[i + 4];
     }
     const Byte header = processor.spcMemory.readByte(headerAddress);
     const Byte filter = header.getBits(2, 2);
     const Byte range = header.getBits(4, 4);
     size_t bufferIndex = 8;
-    for (int i = 0; i < 2; ++i) {
+    for (int i = 0; i < 2; ++i)
+    {
         const Byte sampleSource = processor.spcMemory.readByte(nextSampleAddress++);
-        for (int8_t sample : { sampleSource.getBits(4, 4), sampleSource.getBits(0, 4) }) {
+        for (int8_t sample : { sampleSource.getBits(4, 4), sampleSource.getBits(0, 4) })
+        {
             bool isNegative = false;
-            if (sample >= 8) {
+            if (sample >= 8)
+            {
                 isNegative = true;
                 sample |= 0xf0;
             }
             int expandedSample = 0;
-            if (range <= 12) {
+            if (range <= 12)
+            {
                 expandedSample = int16_t(int16_t(sample) << range) >> 1;
-            } else if (isNegative) {
+            }
+            else if (isNegative)
+            {
                 expandedSample = 0xf800;
             }
             const int16_t lastSample = sampleBuffer[bufferIndex - 1];
             const int16_t secondLastSample = sampleBuffer[bufferIndex - 2];
-            if (filter == 1) {
+            if (filter == 1)
+            {
                 expandedSample += lastSample + (-lastSample >> 4);
-            } else if (filter == 2) {
+            }
+            else if (filter == 2)
+            {
                 expandedSample += (lastSample << 1) + ((-((lastSample << 1) + lastSample)) >> 5) - secondLastSample + (secondLastSample >> 4);
-            } else if (filter == 3) {
+            }
+            else if (filter == 3)
+            {
                 expandedSample += (lastSample << 1) + ((-(lastSample + (lastSample << 2) + (lastSample << 3))) >> 6) - secondLastSample + (((secondLastSample << 1) + secondLastSample) >> 4);
             }
             expandedSample = Types::signedClamp<16, int>(expandedSample);
             sampleBuffer[bufferIndex++] = Types::clip<15, int16_t>(expandedSample);
         }
     }
-    if (nextSampleAddress - headerAddress > 8) {
-        if (header.getBit(0)) { // end bit, really means "loop"
-            if (!header.getBit(1)) { // loop bit, really means "don't end"
+    if (nextSampleAddress - headerAddress > 8)
+    {
+        if (header.getBit(0))
+        { // end bit, really means "loop"
+            if (!header.getBit(1))
+            { // loop bit, really means "don't end"
                 envelope = 0;
                 adsrStage = ADSRStage::Inactive;
             }
             readSampleAddress(true);
-        } else {
+        }
+        else
+        {
             headerAddress = nextSampleAddress;
             ++nextSampleAddress;
         }
@@ -260,13 +317,19 @@ void Processor::Voice::decodeNextBlock()
 
 void Processor::Voice::setADSRStage(ADSRStage nextStage)
 {
-    if (nextStage == ADSRStage::Attack) {
-        if (attackRate != 0xf) {
+    if (nextStage == ADSRStage::Attack)
+    {
+        if (attackRate != 0xf)
+        {
             frequencyCounter.changeFrequency((attackRate << 1) + 0x1);
         }
-    } else if (nextStage == ADSRStage::Decay) {
+    }
+    else if (nextStage == ADSRStage::Decay)
+    {
         frequencyCounter.changeFrequency((decayRate << 1) + 0x10);
-    } else if (nextStage == ADSRStage::Sustain) {
+    }
+    else if (nextStage == ADSRStage::Sustain)
+    {
         frequencyCounter.changeFrequency(sustainRate);
     }
     adsrStage = nextStage;
@@ -274,31 +337,42 @@ void Processor::Voice::setADSRStage(ADSRStage nextStage)
 
 void Processor::Voice::calculateEnvelope()
 {
-    if (adsrStage == ADSRStage::Attack) {
-        if (attackRate == 0xf) {
+    if (adsrStage == ADSRStage::Attack)
+    {
+        if (attackRate == 0xf)
+        {
             envelope += 1024;
         }
-        else if (envelope < 0x7ff && frequencyCounter.tick()) {
+        else if (envelope < 0x7ff && frequencyCounter.tick())
+        {
             envelope += 32;
         }
-        if (envelope > 0x7ff) {
+        if (envelope > 0x7ff)
+        {
             envelope = 0x7ff;
             setADSRStage(ADSRStage::Decay);
         }
-    } else if ((adsrStage == ADSRStage::Decay || adsrStage == ADSRStage::Sustain) && frequencyCounter.tick()) {
+    }
+    else if ((adsrStage == ADSRStage::Decay || adsrStage == ADSRStage::Sustain) && frequencyCounter.tick())
+    {
         const int16_t targetLevel = adsrStage == ADSRStage::Decay ? (sustainLevel << 8 & 0xff) : 0;
-        if (envelope > targetLevel) {
+        if (envelope > targetLevel)
+        {
             envelope -= ((envelope - 1) >> 8) + 1;
         }
-        if (envelope <= targetLevel) {
+        if (envelope <= targetLevel)
+        {
             setADSRStage(ADSRStage(int(adsrStage) + 1));
         }
     }
-    if (adsrStage == ADSRStage::Release) {
-        if (envelope > 0) {
+    if (adsrStage == ADSRStage::Release)
+    {
+        if (envelope > 0)
+        {
             envelope -= 8;
         }
-        if (envelope <= 0) {
+        if (envelope <= 0)
+        {
             envelope = 0;
             setADSRStage(ADSRStage::Inactive);
         }
@@ -307,11 +381,13 @@ void Processor::Voice::calculateEnvelope()
 
 void Processor::printTimeInfo(double currentTime)
 {
-    if (previousTimeInfoTime == 0.0) {
+    if (previousTimeInfoTime == 0.0)
+    {
         previousTimeInfoTime = currentTime;
     }
     timeInfoTickCounter++;
-    if (currentTime - previousTimeInfoTime >= 10.0) {
+    if (currentTime - previousTimeInfoTime >= 10.0)
+    {
         output.debug("Audio ticks: ", targetTickCounter, " / ", timeInfoTickCounter, "(", 100.0 * targetTickCounter / timeInfoTickCounter, "%)");
         targetTickCounter = 0;
         timeInfoTickCounter = 0;
@@ -321,16 +397,26 @@ void Processor::printTimeInfo(double currentTime)
 
 void Processor::checkStreamErrors()
 {
-    if (streamError) {
-        if (inputUnderflow) {
+    if (streamError)
+    {
+        if (inputUnderflow)
+        {
             throw RuntimeError("Input underflow");
-        } else if (inputOverflow) {
+        }
+        else if (inputOverflow)
+        {
             throw RuntimeError("Input overflow");
-        } else if (outputUnderflow) {
+        }
+        else if (outputUnderflow)
+        {
             throw RuntimeError("Output underflow");
-        } else if (outputOverflow) {
+        }
+        else if (outputOverflow)
+        {
             throw RuntimeError("Output overflow");
-        } else if (primingOutput) {
+        }
+        else if (primingOutput)
+        {
             throw RuntimeError("Priming output");
         }
     }
