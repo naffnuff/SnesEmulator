@@ -58,7 +58,7 @@ private:
             if (index < 0 || index >= tableSize) {
                 throw RuntimeError(__FUNCTION__ ": Frequency index is out-of-bounds");
             }
-            frequency = getTable()[index];
+            frequency = frequencyTable[index];
             counter = 0;
         }
 
@@ -77,7 +77,9 @@ private:
                 return false;
             }
         }
-    private:
+	private:
+		static Table frequencyTable;
+
         int frequency = 0;
         int counter = 0;
     };

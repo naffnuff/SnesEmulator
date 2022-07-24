@@ -13,6 +13,7 @@
 
 namespace Audio
 {
+Processor::FrequencyCounter::Table Processor::FrequencyCounter::frequencyTable = Processor::FrequencyCounter::getTable();
 
 static constexpr int sampleRate = 32000;
 static constexpr int bufferSize = 1;
