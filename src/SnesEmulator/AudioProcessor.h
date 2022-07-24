@@ -34,7 +34,8 @@ private:
             size_t index = table.size();
             table[--index] = 1;
             table[--index] = 2;
-            for (int i = 0; i < 10; ++i) {
+            for (int i = 0; i < 10; ++i)
+            {
                 table[--index] = 3 << i;
                 table[--index] = 4 << i;
                 table[--index] = 5 << i;
@@ -47,7 +48,8 @@ private:
         FrequencyCounter()
         {
             /*std::cout << "Frequencies:" << std::endl;
-            for (int frequency : getTable()) {
+            for (int frequency : getTable())
+            {
                 std::cout << frequency << std::endl;
             }
             std::cout << "***" << std::endl;*/
@@ -55,7 +57,8 @@ private:
 
         void changeFrequency(int index)
         {
-            if (index < 0 || index >= tableSize) {
+            if (index < 0 || index >= tableSize)
+            {
                 throw RuntimeError(__FUNCTION__ ": Frequency index is out-of-bounds");
             }
             frequency = frequencyTable[index];
@@ -64,16 +67,21 @@ private:
 
         bool tick()
         {
-            if (frequency == 0) {
+            if (frequency == 0)
+            {
                 return false;
             }
-            if (counter >= frequency) {
+            if (counter >= frequency)
+            {
                 throw RuntimeError(__FUNCTION__ ": Counter is beyond frequency: counter: ", counter, ", frequency: ", frequency);
             }
-            if (++counter == frequency) {
+            if (++counter == frequency)
+            {
                 counter = 0;
                 return true;
-            } else {
+            }
+            else
+            {
                 return false;
             }
         }
@@ -158,7 +166,8 @@ public:
 
         std::string envelopeTypeToString() const
         {
-            switch (envelopeType) {
+            switch (envelopeType)
+            {
             case EnvelopeType::Gain:
                 return "Gain";
             case EnvelopeType::ADSR:
@@ -170,7 +179,8 @@ public:
 
         std::string gainModeToString() const
         {
-            switch (gainMode) {
+            switch (gainMode)
+            {
             case GainMode::Direct:
                 return "Direct";
             case GainMode::LinearIncrease:
@@ -210,7 +220,8 @@ public:
     template<bool Voice::*DataMember>
     void setVoiceBits(Byte value)
     {
-        for (int i = 0; i < voiceCount; ++i) {
+        for (int i = 0; i < voiceCount; ++i)
+        {
             voices[i].*DataMember = value.getBit(i);
         }
     }
@@ -219,7 +230,8 @@ public:
     Byte getVoiceBits() const
     {
         Byte result;
-        for (int i = 0; i < voiceCount; ++i) {
+        for (int i = 0; i < voiceCount; ++i)
+        {
             result.setBit(i, voices[i].*DataMember);
         }
         return result;
