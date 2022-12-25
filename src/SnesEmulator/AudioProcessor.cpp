@@ -73,7 +73,7 @@ Processor::~Processor()
 
 void Processor::initialize()
 {
-    output.debug("Initializing PortAudio version ", Pa_GetVersionInfo()->versionText);
+    //output.debug("Initializing PortAudio version ", Pa_GetVersionInfo()->versionText);
     check(Pa_Initialize());
     initialized = true;
 
