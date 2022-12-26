@@ -21,7 +21,7 @@ public:
             system.output.debug("HELLO AUDIO SYSTEM!");
             system.now = std::chrono::steady_clock::now();
             std::chrono::steady_clock::time_point startTime = system.now;
-            AudioSystem::CycleCount oneCycle(1);
+            constexpr AudioSystem::CycleCount oneCycle(1);
             AudioSystem::CycleCount masterCycle(0);
             //double startTime = system.processor.renderer.getStreamTime();
             while (system.run)

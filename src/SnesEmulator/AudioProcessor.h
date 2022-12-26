@@ -142,6 +142,8 @@ public:
 
         Byte sourceNumber;
 
+        Word sourceAddress;
+
         Word envelope;
         Word output;
 
@@ -258,11 +260,7 @@ public:
         lastDspCycle = dspCycle;
     }
 
-    void tick()
-    {
-        ++dspCycle;
-        ++targetTickCounter;
-    }
+    void tick();
 
 private:
     bool checkStreamStatus(unsigned long flags);

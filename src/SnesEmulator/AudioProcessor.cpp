@@ -163,13 +163,30 @@ bool Processor::checkStreamStatus(unsigned long statusFlags)
     }
 }
 
+void Processor::tick()
+{
+    for (Audio::Processor::Voice& voice : voices)
+	{
+		if (((sourceDirectory << 8) | (voice.sourceNumber << 2)) != ((sourceDirectory << 8) + (voice.sourceNumber << 2)))
+		{
+			throw RuntimeError("Source address is wonky!");
+		}
+        voice.sourceAddress = (sourceDirectory << 8) + (voice.sourceNumber << 2);
+    }
+
+	++dspCycle;
+	++targetTickCounter;
+}
+
 void Processor::outputNextSample(float& leftChannel, float& rightChannel)
 {
     int32_t leftSampleSum = 0;
     int32_t rightSampleSum = 0;
     int16_t nextSample = 0;
     for (Audio::Processor::Voice& voice : voices)
-    {
+	{
+		//Audio::Processor::Voice& voice = voices[7];
+
         voice.calculateNextSample(nextSample);
         int16_t leftSample = Types::signedClamp<16, int16_t>(nextSample * voice.leftVolume >> 7);
         int16_t rightSample = Types::signedClamp<16, int16_t>(nextSample * voice.rightVolume >> 7);
@@ -236,16 +253,12 @@ void Processor::Voice::calculateNextSample(int16_t& nextSample)
 
 void Processor::Voice::readSampleAddress(bool loopAddress)
 {
-    if (((processor.sourceDirectory << 8) | (sourceNumber << 2)) != ((processor.sourceDirectory << 8) + (sourceNumber << 2)))
-    {
-        throw RuntimeError("Source address is wonky!");
-    }
-    Word sourceAddress = (processor.sourceDirectory << 8) + (sourceNumber << 2);
+    Word finalSourceAddress = sourceAddress;
     if (loopAddress)
     {
-        sourceAddress += 2;
+        finalSourceAddress += 2;
     }
-    headerAddress = processor.spcMemory.readWord(sourceAddress);
+    headerAddress = processor.spcMemory.readWord(finalSourceAddress);
     nextSampleAddress = headerAddress + 1;
 }
 
