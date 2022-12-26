@@ -165,15 +165,6 @@ bool Processor::checkStreamStatus(unsigned long statusFlags)
 
 void Processor::tick()
 {
-    for (Audio::Processor::Voice& voice : voices)
-	{
-		if (((sourceDirectory << 8) | (voice.sourceNumber << 2)) != ((sourceDirectory << 8) + (voice.sourceNumber << 2)))
-		{
-			throw RuntimeError("Source address is wonky!");
-		}
-        voice.sourceAddress = (sourceDirectory << 8) + (voice.sourceNumber << 2);
-    }
-
 	++dspCycle;
 	++targetTickCounter;
 }
@@ -247,18 +238,20 @@ void Processor::Voice::calculateNextSample(int16_t& nextSample)
         {
             nextSample = 0;
         }
-        //nextSample = Types::signedClamp<16>(nextSample * envelope >> 11);
+        nextSample = Types::signedClamp<16, int16_t>(nextSample * envelope >> 11);
     }
 }
 
-void Processor::Voice::readSampleAddress(bool loopAddress)
+void Processor::Voice::readSampleAddress(bool loop)
 {
-    Word finalSourceAddress = sourceAddress;
-    if (loopAddress)
+    if (loop)
     {
-        finalSourceAddress += 2;
+        headerAddress = loopAddress;
     }
-    headerAddress = processor.spcMemory.readWord(finalSourceAddress);
+    else
+    {
+        headerAddress = startAddress;
+    }
     nextSampleAddress = headerAddress + 1;
 }
 
@@ -283,6 +276,7 @@ void Processor::Voice::decodeNextBlock()
                 isNegative = true;
                 sample |= 0xf0;
             }
+
             int expandedSample = 0;
             if (range <= 12)
             {
@@ -313,9 +307,9 @@ void Processor::Voice::decodeNextBlock()
     if (nextSampleAddress - headerAddress > 8)
     {
         if (header.getBit(0))
-        { // end bit, really means "loop"
+        { // end bit set
             if (!header.getBit(1))
-            { // loop bit, really means "don't end"
+            { // loop bit not set
                 envelope = 0;
                 adsrStage = ADSRStage::Inactive;
             }

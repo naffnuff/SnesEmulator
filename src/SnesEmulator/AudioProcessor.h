@@ -142,7 +142,8 @@ public:
 
         Byte sourceNumber;
 
-        Word sourceAddress;
+        Word startAddress;
+        Word loopAddress;
 
         Word envelope;
         Word output;
@@ -201,7 +202,7 @@ public:
         void calculateNextSample(int16_t& nextSample);
         void setADSRStage(ADSRStage nextStage);
         void calculateEnvelope();
-        void readSampleAddress(bool loopAddress);
+        void readSampleAddress(bool loop);
         void decodeNextBlock();
 
     private:

@@ -139,7 +139,19 @@ public:
                     processor.voices[i].pitch.setHighByte(value.getBits(0, 6));
                 }
             );
-            processor.makeWriteRegister(voiceAddressStart + 4, voiceName + "Source Number", false, processor.voices[i].sourceNumber);
+            processor.makeWriteRegister(voiceAddressStart + 4, voiceName + "Source Number", false,
+                [this, i](Byte value)
+				{
+					if (((processor.sourceDirectory << 8) | (value << 2)) != ((processor.sourceDirectory << 8) + (value << 2)))
+					{
+						throw RuntimeError("Source address is wonky!");
+					}
+                    processor.voices[i].sourceNumber = value;
+                    Word sourceAddress = (processor.sourceDirectory << 8) + (value << 2);
+					processor.voices[i].startAddress = spcMemory.readWord(sourceAddress);
+					processor.voices[i].loopAddress = spcMemory.readWord(sourceAddress + 2);
+                }
+            );
             processor.makeWriteRegister(voiceAddressStart + 5, voiceName + "ADSR low byte", false,
                 /*[this, i](Byte& value) {
                     value = processor.voices[i].attackRate | processor.voices[i].decayRate << 4 | processor.voices[i].envelopeType << 7;
