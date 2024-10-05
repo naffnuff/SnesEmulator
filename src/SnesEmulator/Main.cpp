@@ -48,7 +48,7 @@ int main(int, char**)
                     {
                         output.printLine(lock, "Enter command or game index (h for help): ");
                         std::string command = "43";
-                        //std::getline(std::cin, command);
+                        std::getline(std::cin, command);
                         try
                         {
                             if (command.empty())

@@ -25,9 +25,6 @@ protected:
 
     Exception() = delete;
 
-    Exception(const Exception&) = delete;
-    Exception& operator=(const Exception&) = delete;
-
     template<typename... Ts>
     std::string toString(const Ts&... message)
     {
