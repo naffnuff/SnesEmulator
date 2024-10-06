@@ -48,9 +48,15 @@ private:
         FrequencyCounter()
         {
             /*std::cout << "Frequencies:" << std::endl;
-            for (int frequency : getTable())
+            int i = 0;
+            for (int entry : getTable())
             {
-                std::cout << frequency << std::endl;
+                std::cout << entry << "\t";
+
+                if (++i % 3 == 0)
+                {
+                    std::cout << std::endl;
+                }
             }
             std::cout << "***" << std::endl;*/
         }
@@ -145,7 +151,7 @@ public:
         Word startAddress;
         Word loopAddress;
 
-        Word envelope;
+        int envelope;
         Word output;
 
         int setupPhase = 0;
@@ -177,6 +183,31 @@ public:
                 return "ADSR";
             default:
                 return "";
+            }
+        }
+
+        std::string adsrStageToString() const
+        {
+            switch (adsrStage)
+            {
+            case ADSRStage::Inactive:
+                return "Inactive";
+                break;
+            case ADSRStage::Attack:
+                return "Attack";
+                break;
+            case ADSRStage::Decay:
+                return "Decay";
+                break;
+            case ADSRStage::Sustain:
+                return "Sustain";
+                break;
+            case ADSRStage::Release:
+                return "Release";
+                break;
+            default:
+                return "";
+                break;
             }
         }
 

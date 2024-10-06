@@ -169,20 +169,42 @@ void Processor::tick()
 	++targetTickCounter;
 }
 
+int hoy = 0;
+
 void Processor::outputNextSample(float& leftChannel, float& rightChannel)
 {
     int32_t leftSampleSum = 0;
     int32_t rightSampleSum = 0;
     int16_t nextSample = 0;
+    int i = 0;
     for (Audio::Processor::Voice& voice : voices)
 	{
-		//Audio::Processor::Voice& voice = voices[7];
+        ++i;
+		//Audio::Processor::Voice& voice = voices[0];
+        
+        if (voice.envelopeType == Voice::EnvelopeType::ADSR)
+        {
+            voice.calculateNextSample(nextSample);
+            int16_t leftSample = Types::signedClamp<16, int16_t>(nextSample * voice.leftVolume >> 7);
+            int16_t rightSample = Types::signedClamp<16, int16_t>(nextSample * voice.rightVolume >> 7);
+            leftSampleSum = Types::signedClamp<16, int32_t>(leftSampleSum + leftSample);
+            rightSampleSum = Types::signedClamp<16, int32_t>(rightSampleSum + rightSample);
 
-        voice.calculateNextSample(nextSample);
-        int16_t leftSample = Types::signedClamp<16, int16_t>(nextSample * voice.leftVolume >> 7);
-        int16_t rightSample = Types::signedClamp<16, int16_t>(nextSample * voice.rightVolume >> 7);
-        leftSampleSum = Types::signedClamp<16, int32_t>(leftSampleSum + leftSample);
-        rightSampleSum = Types::signedClamp<16, int32_t>(rightSampleSum + rightSample);
+            if (voice.envelope > 0x7ff)
+            {
+                if (hoy == 0)
+                {
+                    hoy = 10000;
+                    std::cout << i << ": " << voice.envelope;
+                    std::cout << " (" << voice.adsrStageToString() << ")" << std::endl;
+                    std::cout << std::endl;
+                }
+            }
+            if (hoy > 0)
+            {
+                --hoy;
+            }
+        }
     }
     leftSampleSum = Types::signedClamp<16, int32_t>(leftSampleSum * mainVolumeLeft >> 7);
     rightSampleSum = Types::signedClamp<16, int32_t>(rightSampleSum * mainVolumeRight >> 7);
@@ -218,6 +240,7 @@ void Processor::Voice::calculateNextSample(int16_t& nextSample)
         {
             decodeNextBlock();
         }
+        //calculateEnvelope();
         --setupPhase;
     }
     else
@@ -238,7 +261,7 @@ void Processor::Voice::calculateNextSample(int16_t& nextSample)
         {
             nextSample = 0;
         }
-        nextSample = Types::signedClamp<16, int16_t>(nextSample * envelope >> 11);
+        nextSample = Types::signedClamp<16, int16_t>(int(nextSample) * int(envelope) >> 11);
     }
 }
 
@@ -301,7 +324,8 @@ void Processor::Voice::decodeNextBlock()
                 expandedSample += (lastSample << 1) + ((-(lastSample + (lastSample << 2) + (lastSample << 3))) >> 6) - secondLastSample + (((secondLastSample << 1) + secondLastSample) >> 4);
             }
             expandedSample = Types::signedClamp<16, int>(expandedSample);
-            sampleBuffer[bufferIndex++] = Types::clip<15, int16_t>(expandedSample);
+            //sampleBuffer[bufferIndex++] = Types::clip<15, int16_t>(expandedSample); WTF?
+            sampleBuffer[bufferIndex++] = Types::clip<16, int16_t>(expandedSample);
         }
     }
     if (nextSampleAddress - headerAddress > 8)
@@ -361,19 +385,30 @@ void Processor::Voice::calculateEnvelope()
             setADSRStage(ADSRStage::Decay);
         }
     }
-    else if ((adsrStage == ADSRStage::Decay || adsrStage == ADSRStage::Sustain) && frequencyCounter.tick())
+    else if (adsrStage == ADSRStage::Decay && frequencyCounter.tick())
     {
-        const int16_t targetLevel = adsrStage == ADSRStage::Decay ? (sustainLevel << 8 & 0xff) : 0;
-        if (envelope > targetLevel)
+        if ((envelope >> 8) != sustainLevel)
         {
             envelope -= ((envelope - 1) >> 8) + 1;
         }
-        if (envelope <= targetLevel)
+        if ((envelope >> 8) == sustainLevel)
         {
-            setADSRStage(ADSRStage(int(adsrStage) + 1));
+            setADSRStage(ADSRStage::Sustain);
         }
     }
-    if (adsrStage == ADSRStage::Release)
+    else if (adsrStage == ADSRStage::Sustain && frequencyCounter.tick())
+    {
+        if (envelope > 0)
+        {
+            envelope -= ((envelope - 1) >> 8) + 1;
+        }
+        if (envelope <= 0)
+        {
+            envelope = 0;
+            setADSRStage(ADSRStage::Release);
+        }
+    }
+    else if (adsrStage == ADSRStage::Release)
     {
         if (envelope > 0)
         {
