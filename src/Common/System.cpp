@@ -1,5 +1,7 @@
 #include "System.h"
 
+#include <iostream>
+
 #ifdef _WIN32
 #include <windows.h>
 #define SHARED __declspec(dllexport)
