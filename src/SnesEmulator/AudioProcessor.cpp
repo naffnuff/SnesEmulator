@@ -185,10 +185,18 @@ void Processor::outputNextSample(float& leftChannel, float& rightChannel)
         if (voice.envelopeType == Voice::EnvelopeType::ADSR)
         {
             voice.calculateNextSample(nextSample);
-            int16_t leftSample = Types::signedClamp<16, int16_t>(nextSample * voice.leftVolume >> 7);
-            int16_t rightSample = Types::signedClamp<16, int16_t>(nextSample * voice.rightVolume >> 7);
-            leftSampleSum = Types::signedClamp<16, int32_t>(leftSampleSum + leftSample);
-            rightSampleSum = Types::signedClamp<16, int32_t>(rightSampleSum + rightSample);
+            if (voice.envelope > 0)
+            {
+                int16_t leftSample = Types::signedClamp<16, int16_t>(nextSample * voice.leftVolume >> 7);
+                int16_t rightSample = Types::signedClamp<16, int16_t>(nextSample * voice.rightVolume >> 7);
+                leftSampleSum = Types::signedClamp<16, int32_t>(leftSampleSum + leftSample);
+                rightSampleSum = Types::signedClamp<16, int32_t>(rightSampleSum + rightSample);
+            }
+
+            if (voice.envelope == 0 && nextSample != 0)
+            {
+                std::cout << "envelope=" << voice.envelope << ", nextSample=" << Word(nextSample) << std::endl;
+            }
 
             if (voice.envelope > 0x7ff)
             {
@@ -242,6 +250,7 @@ void Processor::Voice::calculateNextSample(int16_t& nextSample)
         }
         //calculateEnvelope();
         --setupPhase;
+        nextSample = 0;
     }
     else
     {
