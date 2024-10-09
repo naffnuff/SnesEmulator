@@ -180,40 +180,50 @@ void Processor::outputNextSample(float& leftChannel, float& rightChannel)
     for (Audio::Processor::Voice& voice : voices)
 	{
         ++i;
-		//Audio::Processor::Voice& voice = voices[0];
-        
-        if (voice.envelopeType == Voice::EnvelopeType::ADSR)
+
+
+        try
         {
-            voice.calculateNextSample(nextSample);
-            if (voice.envelope > 0)
-            {
-                int16_t leftSample = Types::signedClamp<16, int16_t>(nextSample * voice.leftVolume >> 7);
-                int16_t rightSample = Types::signedClamp<16, int16_t>(nextSample * voice.rightVolume >> 7);
-                leftSampleSum = Types::signedClamp<16, int32_t>(leftSampleSum + leftSample);
-                rightSampleSum = Types::signedClamp<16, int32_t>(rightSampleSum + rightSample);
-            }
+            //Audio::Processor::Voice& voice = voices[0];
 
-            if (voice.envelope == 0 && nextSample != 0)
+            if (voice.envelopeType == Voice::EnvelopeType::ADSR)
             {
-                std::cout << "envelope=" << voice.envelope << ", nextSample=" << Word(nextSample) << std::endl;
-            }
-
-            if (voice.envelope > 0x7ff)
-            {
-                if (hoy == 0)
+                voice.calculateNextSample(nextSample);
+                if (voice.envelope > 0)
                 {
-                    hoy = 10000;
-                    std::cout << i << ": " << voice.envelope;
-                    std::cout << " (" << voice.adsrStageToString() << ")" << std::endl;
-                    std::cout << std::endl;
+                    int16_t leftSample = Types::signedClamp<16, int16_t>(nextSample * voice.leftVolume >> 7);
+                    int16_t rightSample = Types::signedClamp<16, int16_t>(nextSample * voice.rightVolume >> 7);
+                    leftSampleSum = Types::signedClamp<16, int32_t>(leftSampleSum + leftSample);
+                    rightSampleSum = Types::signedClamp<16, int32_t>(rightSampleSum + rightSample);
+                }
+
+                if (voice.envelope == 0 && nextSample != 0)
+                {
+                    std::cout << "envelope=" << voice.envelope << ", nextSample=" << Word(nextSample) << std::endl;
+                }
+
+                if (voice.envelope > 0x7ff)
+                {
+                    if (hoy == 0)
+                    {
+                        hoy = 10000;
+                        std::cout << i << ": " << voice.envelope;
+                        std::cout << " (" << voice.adsrStageToString() << ")" << std::endl;
+                        std::cout << std::endl;
+                    }
+                }
+                if (hoy > 0)
+                {
+                    --hoy;
                 }
             }
-            if (hoy > 0)
-            {
-                --hoy;
-            }
+        }
+        catch (const std::runtime_error&)
+        {
+            output.debug("Exception in voice ", i);
         }
     }
+
     leftSampleSum = Types::signedClamp<16, int32_t>(leftSampleSum * mainVolumeLeft >> 7);
     rightSampleSum = Types::signedClamp<16, int32_t>(rightSampleSum * mainVolumeRight >> 7);
     leftChannel = float(leftSampleSum) / float(leftSampleSum < 0 ? 0x8000 : 0x7fff);
@@ -274,16 +284,24 @@ void Processor::Voice::calculateNextSample(int16_t& nextSample)
     }
 }
 
-void Processor::Voice::readSampleAddress(bool loop)
+void Processor::Voice::readSampleAddress(bool loopAddress)
 {
-    if (loop)
+    Word finalSourceAddress = (processor.sourceDirectory << 8) | sourceNumber << 2;
+    if (loopAddress)
     {
-        headerAddress = loopAddress;
+        finalSourceAddress += 2;
     }
-    else
+
+    try
     {
-        headerAddress = startAddress;
+        headerAddress = processor.spcMemory.readWord(finalSourceAddress);
     }
+    catch (const std::runtime_error& e)
+    {
+        std::cout << "Exception while reading header address, loopAddress=" << loopAddress << std::endl;
+        throw e;
+    }
+
     nextSampleAddress = headerAddress + 1;
 }
 
