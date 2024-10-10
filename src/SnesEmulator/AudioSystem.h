@@ -78,7 +78,7 @@ public:
 
     void tick()
     {
-        registers.tick();
+        processor.tick();
     }
 
     void reset()

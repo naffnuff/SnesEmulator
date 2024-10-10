@@ -69,7 +69,7 @@ public:
                 if (nextCycle <= system.elapsedTime)
                 {
                     masterCycle = nextCycle;
-                    system.registers.tick();
+                    system.processor.tick();
                 }
                 else
                 {

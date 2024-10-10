@@ -17,46 +17,16 @@ namespace Audio {
 class Registers : public RegisterManager<SPC::State::MemoryType, Output::Color::Blue>
 {
 public:
-    class Timer
-    {
-    public:
-        bool highPrecision = false;
-        bool enabled = false;
-        int tick = 0;
-        int target = 256;
-        int counter = 0;
-    };
-
     Registers(Output& output, SPC::State& state)
         : RegisterManager(output, "audio", state.getMemory())
         , output(output, "audio")
         , spcMemory(state.getMemory())
         , processor(output, state.getMemory())
     {
-        timers[2].highPrecision = true;
     }
 
     Registers(const Registers&) = delete;
     Registers& operator=(const Registers&) = delete;
-
-    void tick()
-    {
-        ++spcCycle;
-        if (spcCycle % 16 == 0) {
-            if (spcCycle % 32 == 0) {
-                processor.tick();
-            }
-            for (int i = 0; i < 3; ++i) {
-                if (timers[i].enabled && (timers[i].highPrecision || spcCycle % 128 == 0)) {
-                    ++timers[i].tick;
-                    if (timers[i].tick == timers[i].target) {
-                        timers[i].tick = 0;
-                        timers[i].counter = (timers[i].counter + 1) % 0x10;
-                    }
-                }
-            }
-        }
-    }
 
     void initialize(std::array<Byte, 4>& cpuToSpcBuffers)
     {
@@ -64,11 +34,11 @@ public:
         makeWriteRegister(0xf1, "I/0 and Timer Control", false,
             [this, &cpuToSpcBuffers](Byte byte) {
                 for (int i = 0; i < 3; ++i) {
-                    if (!timers[i].enabled && byte.getBit(i)) {
-                        timers[i].tick = 0;
-                        timers[i].counter = 0;
+                    if (!processor.timers[i].enabled && byte.getBit(i)) {
+                        processor.timers[i].tick = 0;
+                        processor.timers[i].counter = 0;
                     }
-                    timers[i].enabled = byte.getBit(i);
+                    processor.timers[i].enabled = byte.getBit(i);
                 }
                 if (byte.getBit(4)) {
                     cpuToSpcBuffers[0] = 0;
@@ -101,12 +71,12 @@ public:
         for (int i = 0; i < 3; ++i) {
             makeWriteRegister(Word(0xfa + i), std::string("Timer ") + char('1' + i) + " Scaling Target", true,
                 [this, i](Byte value) {
-                    timers[i].target = value == 0 ? 0x100 : int(value);
+                    processor.timers[i].target = value == 0 ? 0x100 : int(value);
                 });
             makeReadRegister(Word(0xfd + i), std::string("Timer ") + char('1' + i) + " Output", false,
                 [this, i](Byte& value) {
-                    value = Byte(timers[i].counter);
-                    timers[i].counter = 0;
+                    value = Byte(processor.timers[i].counter);
+                    processor.timers[i].counter = 0;
                 });
         }
 
@@ -259,20 +229,16 @@ public:
     void reset()
     {
         bootRomDataEnabled = true;
-        timers = {};
+        processor.resetTimers();
     }
 
     Output output;
-
-    uint64_t spcCycle = 0;
 
     SPC::State::MemoryType& spcMemory;
 
     Processor processor;
 
     bool pauseRequested = false;
-
-    std::array<Timer, 3> timers;
 
     Byte dspAddress;
 

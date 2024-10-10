@@ -22,6 +22,16 @@ EXCEPTION(RuntimeError, ::RuntimeError)
 class Processor : public RegisterManager<Memory<Byte>, Output::Color::Cyan>
 {
 private:
+    class Timer
+    {
+    public:
+        bool highPrecision = false;
+        bool enabled = false;
+        int tick = 0;
+        int target = 256;
+        int counter = 0;
+    };
+
     class FrequencyCounter
     {
     private:
@@ -291,6 +301,11 @@ public:
 
     void tick();
 
+    void resetTimers()
+    {
+        timers = {};
+    }
+
 private:
     bool checkStreamStatus(unsigned long flags);
     void outputNextSample(float& leftChannel, float& rightChannel);
@@ -334,10 +349,14 @@ public:
     double previousTimeInfoTime = 0.0;
     int timeInfoTickCounter = 0;
 
+    std::array<Timer, 3> timers;
+
 private:
     Output output;
 
     friend struct StreamHandler;
+
+    uint64_t spcCycle = 0;
 };
 
 }
