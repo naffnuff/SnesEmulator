@@ -35,12 +35,12 @@ private:
     class FrequencyCounter
     {
     private:
-        static constexpr int tableSize = 32;
-        using Table = std::array<int, tableSize>;
+        static constexpr int frequencyTableSize = 32;
+        using FrequencyTable = std::array<int, frequencyTableSize>;
 
-        static constexpr Table getTable()
+        static constexpr FrequencyTable getFrequencyTable()
         {
-            Table table = { 0 };
+            FrequencyTable table = { 0 };
             size_t index = table.size();
             table[--index] = 1;
             table[--index] = 2;
@@ -73,7 +73,7 @@ private:
 
         void changeFrequency(int index)
         {
-            if (index < 0 || index >= tableSize)
+            if (index < 0 || index >= frequencyTableSize)
             {
                 throw RuntimeError(__FUNCTION__ ": Frequency index is out-of-bounds");
             }
@@ -102,7 +102,7 @@ private:
             }
         }
 	private:
-		static Table frequencyTable;
+		static FrequencyTable frequencyTable;
 
         int frequency = 0;
         int counter = 0;
@@ -248,7 +248,11 @@ public:
         ADSRStage adsrStage = ADSRStage::Inactive;
     };
 
-    static constexpr int tableSize = 50;
+    using SampleCycleTable = std::array<void(*)(Processor&), 32>;
+
+    static SampleCycleTable sampleCycleTable;
+
+    //static constexpr int tableSize = 50;
     static constexpr int voiceCount = 8;
 
     Processor(Output& output, Memory<Word>& spcMemory);
@@ -298,6 +302,9 @@ public:
         output.log(Log::Level::Debug, Output::Color::Cyan, value != 0, (write ? "Write " : "Read "), value, " (", std::bitset<8>(value), ") @", address, " (", info, "), cycle ", dspCycle, " (+", (dspCycle - lastDspCycle), ")");
         lastDspCycle = dspCycle;
     }
+
+    template<int N>
+    void onSampleCycle() = delete;
 
     void tick();
 

@@ -6,6 +6,7 @@
 
 #include "Exception.h"
 
+#pragma warning( disable : 4702 ) // unreachable code
 #pragma warning( disable : 4100 ) // unreferenced formal parameter
 
 namespace Types {
