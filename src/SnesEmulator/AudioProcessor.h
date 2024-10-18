@@ -243,6 +243,13 @@ public:
         void readSampleAddress(bool loopAddress);
         void decodeNextBlock();
 
+        void doStep3a();
+        void doStep3b();
+        void doStep3c();
+
+        template<int N>
+        void doStep() = delete;
+
     private:
         Processor& processor;
         ADSRStage adsrStage = ADSRStage::Inactive;
@@ -302,6 +309,8 @@ public:
         output.log(Log::Level::Debug, Output::Color::Cyan, value != 0, (write ? "Write " : "Read "), value, " (", std::bitset<8>(value), ") @", address, " (", info, "), cycle ", dspCycle, " (+", (dspCycle - lastDspCycle), ")");
         lastDspCycle = dspCycle;
     }
+
+    void tickTimers(bool tickAllTimers);
 
     template<int N>
     void onSampleCycle() = delete;

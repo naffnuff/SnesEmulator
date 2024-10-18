@@ -446,16 +446,32 @@ void Processor::Voice::calculateEnvelope()
 }
 
 //  S1.Load VxSRCN register, if necessary.
-// 
+template<>
+void Processor::Voice::doStep<1>()
+{
+}
+
 //  S2.Load the sample pointer(using previously loaded DIR and VxSRCN) if
 //  necessary.
 //  Load VxPITCHL register.
 //  Load VxADSR1 register.
-// 
+template<>
+void Processor::Voice::doStep<2>()
+{
+}
+
 //  S3.a.Load VxPITCHH register.
 //  Apply pitch modulation if applicable.
+void Processor::Voice::doStep3a()
+{
+}
+
 //  b.Load the BRR header byte(every time), and the first of the two BRR
 //  bytes that will be decoded.
+void Processor::Voice::doStep3b()
+{
+}
+
 //  c.If applicable, replace the current sample with the noise sample.
 //  Apply the volume envelope.
 //  - This is the value used for modulating the next voice's pitch, if
@@ -466,7 +482,18 @@ void Processor::Voice::calculateEnvelope()
 //  be cleared in step S7.
 //  Load VxGAIN or VxADSR2 register depending on ADSR1.7.
 //  Update the volume envelope, using previously loaded values.
-// 
+void Processor::Voice::doStep3c()
+{
+}
+
+template<>
+void Processor::Voice::doStep<3>()
+{
+    doStep3a();
+    doStep3b();
+    doStep3c();
+}
+
 //  S4.Load and apply VxVOLL register.
 //  If a new group of BRR samples is required, load the second BRR byte and
 //  decode the group of 4 BRR samples.This is definitely not done when not
@@ -477,21 +504,61 @@ void Processor::Voice::calculateEnvelope()
 //  Increment interpolation sample position as specified by pitch values.
 //  At any point from now until we next get to S3c, the next sample may be
 //  calculated using the interpolation position and BRR buffer contents.
-// 
+template<>
+void Processor::Voice::doStep<4>()
+{
+}
+
 //  S5.Load and apply VxVOLR register.
 //  The new ENDX.x value is prepared, and can be overwritten.Reads will not
 //  see it yet.
-// 
+template<>
+void Processor::Voice::doStep<5>()
+{
+}
+
 //  S6.The new VxOUTX value is prepared, and can be overwritten.Reads will not
 //  see it yet.
-// 
+template<>
+void Processor::Voice::doStep<6>()
+{
+}
+
 //  S7.The new ENDX.x value may now be read.
 //  The new VxENVX value is prepared, and can be overwritten.Reads will not
 //  see it yet.
-// 
+template<>
+void Processor::Voice::doStep<7>()
+{
+}
+
 //  S8.The new VxOUTX value may now be read.
-// 
+template<>
+void Processor::Voice::doStep<8>()
+{
+}
+
 //  S9.The new VxENVX value may now be read.
+template<>
+void Processor::Voice::doStep<9>()
+{
+}
+
+void Processor::tickTimers(bool tickAllTimers)
+{
+    for (int i = 0; i < 3; ++i)
+    {
+        if (timers[i].enabled && (timers[i].highPrecision || tickAllTimers))
+        {
+            ++timers[i].tick;
+            if (timers[i].tick == timers[i].target)
+            {
+                timers[i].tick = 0;
+                timers[i].counter = (timers[i].counter + 1) % 0x10;
+            }
+        }
+    }
+}
 
 //    0. Voice steps : V0:S5  V1 : S2
 //    Tick the SPC700 Stage 1 timers, always for T2 and every 4 samples for
@@ -499,97 +566,147 @@ void Processor::Voice::calculateEnvelope()
 template<>
 void Processor::onSampleCycle<0>()
 {
+    voices[0].doStep<5>();
+    voices[1].doStep<2>();
+
+    tickTimers(spcCycle % 128 == 0);
+
+    ++dspCycle;
+    ++targetTickCounter;
 }
 
 //    1. Voice steps : V0:S6  V1 : S3
 template<>
 void Processor::onSampleCycle<1>()
 {
+    voices[0].doStep<6>();
+    voices[1].doStep<3>();
 }
 
 //    2. Voice steps : V0:S7  V1 : S4         V3 : S1
 template<>
 void Processor::onSampleCycle<2>()
 {
+    voices[0].doStep<7>();
+    voices[1].doStep<4>();
+    voices[3].doStep<1>();
 }
 
 //    3. Voice steps : V0:S8  V1 : S5  V2 : S2
 template<>
 void Processor::onSampleCycle<3>()
 {
+    voices[0].doStep<8>();
+    voices[1].doStep<5>();
+    voices[2].doStep<2>();
 }
 
 //    4. Voice steps : V0:S9  V1 : S6  V2 : S3
 template<>
 void Processor::onSampleCycle<4>()
 {
+    voices[0].doStep<9>();
+    voices[1].doStep<6>();
+    voices[2].doStep<3>();
 }
 
 //    5. Voice steps : V1:S7  V2 : S4         V4 : S1
 template<>
 void Processor::onSampleCycle<5>()
 {
+    voices[1].doStep<7>();
+    voices[2].doStep<4>();
+    voices[4].doStep<1>();
 }
 
 //    6. Voice steps : V1:S8  V2 : S5  V3 : S2
 template<>
 void Processor::onSampleCycle<6>()
 {
+    voices[1].doStep<8>();
+    voices[2].doStep<5>();
+    voices[3].doStep<2>();
 }
 
 //    7. Voice steps : V1:S9  V2 : S6  V3 : S3
 template<>
 void Processor::onSampleCycle<7>()
 {
+    voices[1].doStep<9>();
+    voices[2].doStep<6>();
+    voices[3].doStep<3>();
 }
 
 //    8. Voice steps : V2:S7  V3 : S4         V5 : S1
 template<>
 void Processor::onSampleCycle<8>()
 {
+    voices[2].doStep<7>();
+    voices[3].doStep<4>();
+    voices[5].doStep<1>();
 }
 
 //    9. Voice steps : V2:S8  V3 : S5  V4 : S2
 template<>
 void Processor::onSampleCycle<9>()
 {
+    voices[2].doStep<8>();
+    voices[3].doStep<5>();
+    voices[4].doStep<2>();
 }
 
 //    10. Voice steps : V2:S9  V3 : S6  V4 : S3
 template<>
 void Processor::onSampleCycle<10>()
 {
+    voices[2].doStep<9>();
+    voices[3].doStep<6>();
+    voices[4].doStep<3>();
 }
 
 //    11. Voice steps : V3:S7  V4 : S4         V6 : S1
 template<>
 void Processor::onSampleCycle<11>()
 {
+    voices[3].doStep<7>();
+    voices[4].doStep<4>();
+    voices[6].doStep<1>();
 }
 
 //    12. Voice steps : V3:S8  V4 : S5  V5 : S2
 template<>
 void Processor::onSampleCycle<12>()
 {
+    voices[3].doStep<8>();
+    voices[4].doStep<5>();
+    voices[5].doStep<2>();
 }
 
 //    13. Voice steps : V3:S9  V4 : S6  V5 : S3
 template<>
 void Processor::onSampleCycle<13>()
 {
+    voices[3].doStep<9>();
+    voices[4].doStep<6>();
+    voices[5].doStep<3>();
 }
 
 //    14. Voice steps : V4:S7  V5 : S4         V7 : S1
 template<>
 void Processor::onSampleCycle<14>()
 {
+    voices[4].doStep<7>();
+    voices[5].doStep<4>();
+    voices[7].doStep<1>();
 }
 
 //    15. Voice steps : V4:S8  V5 : S5  V6 : S2
 template<>
 void Processor::onSampleCycle<15>()
 {
-    std::cout << "Tick number " << 15 << std::endl;
+    voices[4].doStep<8>();
+    voices[5].doStep<5>();
+    voices[6].doStep<2>();
 }
 
 //    16. Voice steps : V4:S9  V5 : S6  V6 : S3
@@ -597,37 +714,56 @@ void Processor::onSampleCycle<15>()
 template<>
 void Processor::onSampleCycle<16>()
 {
-    std::cout << "Tick number " << 16 << std::endl;
+    voices[4].doStep<9>();
+    voices[5].doStep<6>();
+    voices[6].doStep<3>();
+
+    tickTimers(false);
 }
 
 //    17. Voice steps : V0:S1                              V5 : S7  V6 : S4
 template<>
 void Processor::onSampleCycle<17>()
 {
+    voices[0].doStep<1>();
+    voices[5].doStep<7>();
+    voices[6].doStep<4>();
 }
 
 //    18. Voice steps : V5:S8  V6 : S5  V7 : S2
 template<>
 void Processor::onSampleCycle<18>()
 {
+    voices[5].doStep<8>();
+    voices[6].doStep<5>();
+    voices[7].doStep<2>();
 }
 
 //    19. Voice steps : V5:S9  V6 : S6  V7 : S3
 template<>
 void Processor::onSampleCycle<19>()
 {
+    voices[5].doStep<9>();
+    voices[6].doStep<6>();
+    voices[7].doStep<3>();
 }
 
 //    20. Voice steps : V1:S1                              V6 : S7  V7 : S4
 template<>
 void Processor::onSampleCycle<20>()
 {
+    voices[1].doStep<1>();
+    voices[6].doStep<7>();
+    voices[7].doStep<4>();
 }
 
 //    21. Voice steps : V0:S2                                     V6 : S8  V7 : S5
 template<>
 void Processor::onSampleCycle<21>()
 {
+    voices[0].doStep<2>();
+    voices[6].doStep<8>();
+    voices[7].doStep<5>();
 }
 
 //    22. Voice steps : V0:S3a                                    V6 : S9  V7 : S6
@@ -638,6 +774,14 @@ void Processor::onSampleCycle<21>()
 template<>
 void Processor::onSampleCycle<22>()
 {
+    voices[0].doStep3a();
+    voices[6].doStep<9>();
+    voices[7].doStep<6>();
+
+    //    Apply ESA using the previously loaded value along with the previously
+    //    calculated echo offset to calculate new echo pointer.
+    //    Load left channel sample from the echo buffer.
+    //    Load FFC0.
 }
 
 //    23. Voice steps : V7:S7
@@ -646,6 +790,10 @@ void Processor::onSampleCycle<22>()
 template<>
 void Processor::onSampleCycle<23>()
 {
+    voices[7].doStep<7>();
+
+    //    Load right channel sample from the echo buffer.
+    //    Load FFC1 and FFC2.
 }
 
 //    24. Voice steps : V7:S8
@@ -653,6 +801,9 @@ void Processor::onSampleCycle<23>()
 template<>
 void Processor::onSampleCycle<24>()
 {
+    voices[7].doStep<8>();
+
+    //    Load FFC3, FFC4, and FFC5.
 }
 
 //    25. Voice steps : V0:S3b                                           V7 : S9
@@ -660,6 +811,10 @@ void Processor::onSampleCycle<24>()
 template<>
 void Processor::onSampleCycle<25>()
 {
+    voices[0].doStep3b();
+    voices[7].doStep<9>();
+
+    //    Load FFC6 and FFC7.
 }
 
 //    26. Load and apply MVOLL.
@@ -669,6 +824,10 @@ void Processor::onSampleCycle<25>()
 template<>
 void Processor::onSampleCycle<26>()
 {
+    //    26. Load and apply MVOLL.
+    //    Load and apply EVOLL.
+    //    Output the left sample to the DAC.
+    //    Load and apply EFB.
 }
 
 //    27. Load and apply MVOLR.
@@ -678,6 +837,10 @@ void Processor::onSampleCycle<26>()
 template<>
 void Processor::onSampleCycle<27>()
 {
+    //    27. Load and apply MVOLR.
+    //    Load and apply EVOLR.
+    //    Output the right sample to the DAC.
+    //    Load PMON
 }
 
 //    28. Load NON, EON, and DIR.
@@ -685,6 +848,8 @@ void Processor::onSampleCycle<27>()
 template<>
 void Processor::onSampleCycle<28>()
 {
+    //    28. Load NON, EON, and DIR.
+    //    Load FLG bit 5 (ECENx) for application to the left channel.
 }
 
 //    29. Update global counter.
@@ -696,6 +861,12 @@ void Processor::onSampleCycle<28>()
 template<>
 void Processor::onSampleCycle<29>()
 {
+    //    29. Update global counter.
+    //    Write left channel sample to the echo buffer, if allowed by ECENx.
+    //    Load EDL - if the current echo offset is 0, apply EDL.
+    //    Load ESA for future use.
+    //    Load FLG bit 5 (ECENx)again for application to the right channel.
+    //    ** Clear internal KON bits for any channels keyed on in the previous 2 samples.
 }
 
 //    30. Voice steps : V0:S3c
@@ -706,12 +877,19 @@ void Processor::onSampleCycle<29>()
 template<>
 void Processor::onSampleCycle<30>()
 {
+    voices[0].doStep3c();
+    //    Write right channel sample to the echo buffer, if allowed by ECENx.
+    //    Increment the echo offset, and set to 0 if it exceeds the buffer length.
+    //    Load FLG bits 0 - 4 and update noise sample if necessary.
+    //    ** Load KOFF and internal KON.
 }
 
 //    31. Voice steps : V0:S4         V2 : S1
 template<>
 void Processor::onSampleCycle<31>()
 {
+    voices[0].doStep<4>();
+    voices[2].doStep<1>();
 }
 
 template<int... Indices>
@@ -729,26 +907,9 @@ Processor::SampleCycleTable Processor::sampleCycleTable = getSampleCycleTable();
 
 void Processor::tick()
 {
-    ++spcCycle;
     int sampleCycle = spcCycle % 32;
     sampleCycleTable[sampleCycle](*this);
-
-    if (spcCycle % 16 == 0) {
-        if (spcCycle % 32 == 0) {
-            ++dspCycle;
-            ++targetTickCounter;
-        }
-        for (int i = 0; i < 3; ++i) {
-            if (timers[i].enabled && (timers[i].highPrecision || spcCycle % 128 == 0)) {
-                ++timers[i].tick;
-                if (timers[i].tick == timers[i].target) {
-                    timers[i].tick = 0;
-                    timers[i].counter = (timers[i].counter + 1) % 0x10;
-                }
-            }
-        }
-    }
-
+    ++spcCycle;
 }
 
 void Processor::printTimeInfo(double currentTime)
