@@ -182,37 +182,11 @@ void Processor::outputNextSample(float& leftChannel, float& rightChannel)
         {
             //Audio::Processor::Voice& voice = voices[0];
 
-            if (voice.envelopeType == Voice::EnvelopeType::ADSR)
-            {
-                voice.calculateNextSample(nextSample);
-                if (voice.envelope > 0)
-                {
-                    int16_t leftSample = Types::signedClamp<16, int16_t>(nextSample * voice.leftVolume >> 7);
-                    int16_t rightSample = Types::signedClamp<16, int16_t>(nextSample * voice.rightVolume >> 7);
-                    leftSampleSum = Types::signedClamp<16, int32_t>(leftSampleSum + leftSample);
-                    rightSampleSum = Types::signedClamp<16, int32_t>(rightSampleSum + rightSample);
-                }
-
-                if (voice.envelope == 0 && nextSample != 0)
-                {
-                    std::cout << "envelope=" << voice.envelope << ", nextSample=" << Word(nextSample) << std::endl;
-                }
-
-                if (voice.envelope > 0x7ff)
-                {
-                    if (hoy == 0)
-                    {
-                        hoy = 10000;
-                        std::cout << i << ": " << voice.envelope;
-                        std::cout << " (" << voice.adsrStageToString() << ")" << std::endl;
-                        std::cout << std::endl;
-                    }
-                }
-                if (hoy > 0)
-                {
-                    --hoy;
-                }
-            }
+            voice.calculateNextSample(nextSample);
+            int16_t leftSample = voice.applyLeftVolume(nextSample);
+            int16_t rightSample = voice.applyRightVolume(nextSample);
+            leftSampleSum = Types::signedClamp<16, int32_t>(leftSampleSum + leftSample);
+            rightSampleSum = Types::signedClamp<16, int32_t>(rightSampleSum + rightSample);
         }
         catch (const std::runtime_error&)
         {
@@ -278,6 +252,16 @@ void Processor::Voice::calculateNextSample(int16_t& nextSample)
         }
         nextSample = Types::signedClamp<16, int16_t>(int(nextSample) * int(envelope) >> 11);
     }
+}
+
+int16_t Processor::Voice::applyLeftVolume(int16_t nextSample)
+{
+    return Types::signedClamp<16, int16_t>(nextSample * leftVolume >> 7);
+}
+
+int16_t Processor::Voice::applyRightVolume(int16_t nextSample)
+{
+    return Types::signedClamp<16, int16_t>(nextSample * rightVolume >> 7);
 }
 
 void Processor::Voice::readSampleAddress(bool loopAddress)
@@ -953,6 +937,57 @@ void Processor::checkStreamErrors()
         {
             throw RuntimeError("Priming output");
         }
+    }
+}
+
+void Processor::printDebuggerInfo(Output& out, Output::Lock& lock) const
+{
+    out.printLine(lock, "Main Vol    Echo Vol    Key On    Key Off   R M E Gen Src End   Echo FB   Pitch Mod Noise On  Echo On   Dir ER  Delay");
+    out.printLine(lock, std::left, std::setfill(' '), std::setw(4), +mainVolumeLeft,
+        "  ", std::setw(4), +mainVolumeRight,
+        "  ", std::setw(4), +echoVolumeLeft,
+        "  ", std::setw(4), +echoVolumeRight,
+        "  ", getVoiceBits<&Voice::keyOn>(),
+        "  ", getVoiceBits<&Voice::keyOff>(),
+        "  ", reset,
+        " ", mute,
+        " ", echoOff,
+        " ", noiseGeneratorClock,
+        "  ", getVoiceBits<&Voice::sourceEndBlock>(),
+        "  ", std::setw(8), +echoFeedback,
+        "  ", getVoiceBits<&Voice::pitchModulation>(),
+        "  ", getVoiceBits<&Voice::noiseOn>(),
+        "  ", getVoiceBits<&Voice::echoOn>(),
+        "  ", sourceDirectory,
+        "  ", echoRegionOffset,
+        "  ", echoDelay);
+
+
+    out.print(lock, "Filter coefficients:");
+    for (int i = 0; i < voiceCount; ++i)
+    {
+        out.print(lock, "  ", voices[i].coefficient);
+    }
+    out.printLine(lock);
+
+    out.printLine(lock, "   Vol L       Vol R       Pitch       Src  Type AR DR SR SL     Gain Mode               Lvl Envelope    Output");
+    for (int i = 0; i < voices.size(); ++i)
+    {
+        const Voice& voice = voices[i];
+        out.printLine(lock, i, ": ",
+            std::left, std::setfill(' '), std::setw(10), +voice.leftVolume,
+            "  ", std::setw(10), +voice.rightVolume,
+            "  ", std::left, std::setfill(' '), std::setw(10), voice.pitch, "",
+            "  ", voice.sourceNumber,
+            "   ", voice.envelopeTypeToString(),
+            " ", voice.attackRate,
+            " ", voice.decayRate,
+            " ", voice.sustainRate,
+            " ", std::left, std::setfill(' '), std::setw(5), voice.sustainLevel,
+            "  ", std::left, std::setfill(' '), std::setw(22), voice.gainModeToString(),
+            "  ", voice.gainLevel,
+            "  ", std::left, std::setfill(' '), std::setw(10), voice.envelope,
+            "  ", std::left, std::setfill(' '), std::setw(10), voice.output);
     }
 }
 

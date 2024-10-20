@@ -112,6 +112,45 @@ public:
     class Voice
     {
     public:
+        enum class Register
+        {
+            VxVOLL, // processor.voices[i].leftVolume
+            VxVOLR, // processor.voices[i].rightVolume
+            VxPITCHL, // processor.voices[i].pitch.setLowByte(value);
+            VxPITCHH, // processor.voices[i].pitch.setHighByte(value.getBits(0, 6));
+            VxSRCN, // processor.voices[i].sourceNumber
+            VxADSR1, // 
+                            //processor.voices[i].attackRate = value.getBits(0, 4);
+                            //processor.voices[i].decayRate = value.getBits(4, 3);
+                            //if (value.getBit(7))
+                            //{
+                            //    processor.voices[i].envelopeType = Processor::Voice::EnvelopeType::ADSR;
+                            //}
+                            //else
+                            //{
+                            //    processor.voices[i].envelopeType = Processor::Voice::EnvelopeType::Gain;
+                            //    //throw NotYetImplementedException("Gain mode not supported");
+                            //}
+            VxADSR2, // 
+                            //processor.voices[i].sustainRate = value.getBits(0, 5);
+                            //processor.voices[i].sustainLevel = value.getBits(5, 3);
+            VxGAIN, // 
+                            /*if (value.getBit(7))
+                            {
+                                processor.voices[i].gainMode = Processor::Voice::GainMode(uint8_t(value.getBits(5, 2)));
+                                processor.voices[i].gainLevel = value.getBits(0, 5);
+                            }
+                            else
+                            {
+                                processor.voices[i].gainMode = Processor::Voice::GainMode::Direct;
+                                processor.voices[i].gainLevel = value.getBits(0, 7);
+                            }*/
+            VxENV, // processor.renderer.data[i].envelope
+            VxOUT, // processor.renderer.data[i].output
+            FFCx, // processor.voices[i].coefficient
+            Count
+        };
+
         enum class EnvelopeType
         {
             Gain = 0,
@@ -140,45 +179,6 @@ public:
             : processor(processor)
         {
         }
-
-        Word headerAddress;
-        Word nextSampleAddress;
-
-        std::array<int16_t, 12> sampleBuffer = { 0 };
-
-        int8_t leftVolume = 0;
-        int8_t rightVolume = 0;
-
-        Word pitch;
-
-        Byte attackRate;
-        Byte decayRate;
-        Byte sustainRate;
-        Byte sustainLevel;
-
-        Byte sourceNumber;
-
-        int envelope;
-        Word output;
-
-        int setupPhase = 0;
-        bool keyOnIsSet = false;
-
-        bool keyOn = false;
-        bool keyOff = false;
-        bool sourceEndBlock = false;
-        bool pitchModulation = false;
-        bool noiseOn = false;
-        bool echoOn = false;
-        Byte coefficient;
-
-        uint16_t interpolationIndex = 0;
-
-        FrequencyCounter frequencyCounter;
-
-        EnvelopeType envelopeType = EnvelopeType::Gain;
-        GainMode gainMode = GainMode::Direct;
-        Byte gainLevel;
 
         std::string envelopeTypeToString() const
         {
@@ -238,6 +238,8 @@ public:
         }
 
         void calculateNextSample(int16_t& nextSample);
+        int16_t applyLeftVolume(int16_t nextSample);
+        int16_t applyRightVolume(int16_t nextSample);
         void setADSRStage(ADSRStage nextStage);
         void calculateEnvelope();
         void readSampleAddress(bool loopAddress);
@@ -250,9 +252,98 @@ public:
         template<int N>
         void doStep() = delete;
 
+    public:
+        std::array<Byte, size_t(Register::Count)> registers;
+
     private:
         Processor& processor;
         ADSRStage adsrStage = ADSRStage::Inactive;
+
+
+        Word headerAddress;
+        Word nextSampleAddress;
+
+        std::array<int16_t, 12> sampleBuffer = { 0 };
+
+        int8_t leftVolume = 0;
+        int8_t rightVolume = 0;
+
+        Word pitch;
+
+        Byte attackRate;
+        Byte decayRate;
+        Byte sustainRate;
+        Byte sustainLevel;
+
+        Byte sourceNumber;
+
+        int envelope;
+        Word output;
+
+        int setupPhase = 0;
+        bool keyOnIsSet = false;
+
+        bool keyOn = false;
+        bool keyOff = false;
+        bool sourceEndBlock = false;
+        bool pitchModulation = false;
+        bool noiseOn = false;
+        bool echoOn = false;
+        Byte coefficient;
+
+        uint16_t interpolationIndex = 0;
+
+        FrequencyCounter frequencyCounter;
+
+        EnvelopeType envelopeType = EnvelopeType::Gain;
+        GainMode gainMode = GainMode::Direct;
+        Byte gainLevel;
+
+        friend class Processor;
+    };
+
+    enum class Register
+    {
+        MVOLL, // processor.mainVolumeLeft
+        MVOLR, // processor.mainVolumeRight
+        EVOLL, // processor.echoVolumeLeft
+        EVOLR, // processor.echoVolumeRight
+        KON, //
+                /*std::bitset<8> bitSet(value);
+                for (int i = 0; i < 8; ++i)
+                {
+                    processor.voices[i].keyOn = bitSet[i];
+                    if (bitSet[i])
+                    {
+                        processor.voices[i].keyOnIsSet = true;
+                    }
+                }*/
+        KOFF, // makeVoiceBitWriteRegister<&Processor::Voice::keyOff>
+        FLG, //
+                /*processor.reset = value.getBit(7);
+                processor.mute = value.getBit(6);
+                processor.echoOff = value.getBit(5);
+                processor.noiseGeneratorClock = value.getBits(0, 5);*/
+        ENDX, //
+                /*for (Processor::Voice& voice : processor.voices)
+                {
+                    voice.sourceEndBlock = false;
+                }*/
+        EFB, // processor.echoFeedback
+        PMON, // makeVoiceBitWriteRegister<&Processor::Voice::pitchModulation>
+        NON, // makeVoiceBitWriteRegister<&Processor::Voice::noiseOn>
+        EON, // makeVoiceBitWriteRegister<&Processor::Voice::echoOn>
+        DIR, // processor.sourceDirectory
+        ESA, // processor.echoRegionOffset
+        EDL, //[this](Byte& value)
+            /*{
+                value = processor.echoDelay;
+            },
+            [this](Byte value)
+            {
+                processor.echoDelay = value.getBits(0, 4);
+            }*/
+        Count
     };
 
     using SampleCycleTable = std::array<void(*)(Processor&), 32>;
@@ -268,6 +359,24 @@ public:
     Processor& operator=(const Processor&) = delete;
 
     ~Processor();
+
+    template<Register R>
+    void makeAudioWriteRegister(AddressType address, const std::string& info, bool debug, bool openBus = false)
+    {
+        makeWriteRegister(address, info, debug, registers[size_t(R)], openBus);
+    }
+
+    template<Register R>
+    void makeAudioReadWriteRegister(AddressType address, const std::string& info, bool debug)
+    {
+        makeReadWriteRegister(address, info, debug, registers[size_t(R)]);
+    }
+
+    template<Voice::Register R>
+    void makeAudioVoiceWriteRegister(int voiceIndex, AddressType address, const std::string& info, bool debug, bool openBus = false)
+    {
+        makeWriteRegister(address, info, debug, voices[voiceIndex].registers[size_t(R)], openBus);
+    }
 
     template<bool Voice::*DataMember>
     void setVoiceBits(Byte value)
@@ -322,6 +431,8 @@ public:
         timers = {};
     }
 
+    void printDebuggerInfo(Output& output, Output::Lock& lock) const;
+
 private:
     bool checkStreamStatus(unsigned long flags);
     void outputNextSample(float& leftChannel, float& rightChannel);
@@ -329,12 +440,25 @@ private:
     void printTimeInfo(double currentTime);
 
 public:
+    std::array<Voice, voiceCount> voices = { *this, *this, *this, *this, *this, *this, *this, *this };
+
+    std::array<Timer, 3> timers;
+
+    Memory<Byte> dspMemory;
+
+    std::array<Byte, size_t(Register::Count)> registers;
+
+private:
+    Output output;
+
+    friend struct StreamHandler;
+
+    uint64_t spcCycle = 0;
+
     uint64_t dspCycle = 0;
 
     Memory<Word>& spcMemory;
-    Memory<Byte> dspMemory;
 
-    std::array<Voice, voiceCount> voices = { *this, *this, *this, *this, *this, *this, *this, *this };
     int8_t mainVolumeLeft;
     int8_t mainVolumeRight;
     int8_t echoVolumeLeft;
@@ -364,15 +488,6 @@ public:
 
     double previousTimeInfoTime = 0.0;
     int timeInfoTickCounter = 0;
-
-    std::array<Timer, 3> timers;
-
-private:
-    Output output;
-
-    friend struct StreamHandler;
-
-    uint64_t spcCycle = 0;
 };
 
 }
