@@ -116,21 +116,10 @@ public:
         {
             VxVOLL, // processor.voices[i].leftVolume
             VxVOLR, // processor.voices[i].rightVolume
-            VxPITCHL, // processor.voices[i].pitch.setLowByte(value);
-            VxPITCHH, // processor.voices[i].pitch.setHighByte(value.getBits(0, 6));
-            VxSRCN, // processor.voices[i].sourceNumber
+            VxPITCHL,
+            VxPITCHH,
+            VxSRCN,
             VxADSR1, // 
-                            //processor.voices[i].attackRate = value.getBits(0, 4);
-                            //processor.voices[i].decayRate = value.getBits(4, 3);
-                            //if (value.getBit(7))
-                            //{
-                            //    processor.voices[i].envelopeType = Processor::Voice::EnvelopeType::ADSR;
-                            //}
-                            //else
-                            //{
-                            //    processor.voices[i].envelopeType = Processor::Voice::EnvelopeType::Gain;
-                            //    //throw NotYetImplementedException("Gain mode not supported");
-                            //}
             VxADSR2, // 
                             //processor.voices[i].sustainRate = value.getBits(0, 5);
                             //processor.voices[i].sustainLevel = value.getBits(5, 3);
@@ -259,6 +248,7 @@ public:
         Processor& processor;
         ADSRStage adsrStage = ADSRStage::Inactive;
 
+        Word sourceAddress;
 
         Word headerAddress;
         Word nextSampleAddress;

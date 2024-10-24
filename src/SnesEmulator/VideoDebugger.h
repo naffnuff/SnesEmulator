@@ -16,7 +16,7 @@ public:
     static const int spriteSize = 16;
 
 #ifdef DEBUGOAM
-    OamViewer(Video& video, int windowXPosition, int windowYPosition)
+    OamViewer(Processor& video, int windowXPosition, int windowYPosition)
         : video(video)
         , renderer(windowXPosition, windowYPosition, 0x80, 0x100, 2.f, true, video.output)
     {
@@ -54,12 +54,12 @@ public:
             for (int tileRow = 0; tileRow < objectTileSize; ++tileRow) {
                 for (int tileColumn = 0; tileColumn < objectTileSize; ++tileColumn) {
                     int tileIndex = object.tileIndex + tileRow * 0x10 + tileColumn;
-                    Word tileAddress = video.nameBaseSelect + (tileIndex << 4);
+                    Word tileAddress = video.nameBaseSelect + uint16_t(tileIndex << 4);
                     if (object.nameTable) {
                         tileAddress += video.nameSelect;
                     }
                     for (int row = 0; row < 8; ++row, ++tileAddress) {
-                        const int bpp = 4;
+                        int bpp = 4;
                         const int displayRow = rowOffset + tileRow * 8 + row;
                         const int displayColumnOffset = tileColumn * 8;
                         Byte firstLowByte(video.vram.lowTable[tileAddress]);
@@ -75,7 +75,7 @@ public:
                                 paletteIndex.setBit(3, secondHighByte.getBit(7 - column));
                             }
                             if (paletteIndex > 0) {
-                                Word colorAddress = 0x80 + (1 << bpp) * object.palette + paletteIndex;
+                                Word colorAddress = uint16_t(0x80 + (1 << bpp) * object.palette + paletteIndex);
                                 Word color = video.cgram.getWord(colorAddress);
                                 if (object.horizontalFlip) {
                                     renderer.setPixel(displayRow, columnOffset + objectSize - 1 - displayColumnOffset - column, color);
@@ -97,7 +97,7 @@ public:
 
     std::thread thread;
     Renderer renderer;
-    Video& video;
+    Processor& video;
     bool running = true;
 #else
     OamViewer(Processor&, int, int)
@@ -113,7 +113,7 @@ class BackgroundViewer
 {
 public:
 #ifdef DEBUGBG
-    BackgroundViewer(Video& video, Layer backgroundLayer, int windowXPosition, int windowYPosition)
+    BackgroundViewer(Processor& video, Layer backgroundLayer, int windowXPosition, int windowYPosition)
         : video(video)
         , backgroundLayer(backgroundLayer)
         , renderer(windowXPosition, windowYPosition, Video::rendererWidth * 2, Video::rendererWidth * 2, 1.f, true, video.output)
@@ -129,7 +129,7 @@ public:
 
     void operator()()
     {
-        renderer.title = std::string("Background ") + char('1' + backgroundLayer) + " viewer";
+        renderer.title = std::string("Background ") + char('1' + int(backgroundLayer)) + " viewer";
         renderer.initialize();
         while (running && renderer.isRunning()) {
             renderer.update();
@@ -140,21 +140,21 @@ public:
     {
         std::scoped_lock lock(renderer.pixelBufferMutex);
 
-        if (backgroundLayer == BackgroundLayer1 && video.backgroundMode == 7) {
+        if (backgroundLayer == Layer::Background1 && video.backgroundMode == 7) {
             renderer.clearDisplay(0x3ff);
             return;
         } else {
             renderer.clearDisplay(0);
         }
 
-        Video::Background& background = video.backgrounds[backgroundLayer];
+        Video::Background& background = video.backgrounds[size_t(backgroundLayer)];
 
         const int tileSize = 8;
         for (int screenRow = 0; screenRow < background.verticalMirroring + 1; ++screenRow) {
             for (int screenColumn = 0; screenColumn < background.horizontalMirroring + 1; ++screenColumn) {
                 for (int tileRow = 0; tileRow < 32; ++tileRow) {
                     for (int tileColumn = 0; tileColumn < 32; ++tileColumn) {
-                        Word tileDataAddress = background.tilemapAddress + (tileRow << 5) + tileColumn;
+                        Word tileDataAddress = uint16_t(background.tilemapAddress + (tileRow << 5) + tileColumn);
                         if (screenRow) {
                             if (background.horizontalMirroring) {
                                 tileDataAddress += 0x800;
@@ -171,7 +171,7 @@ public:
                         int palette = tileData.getBits(10, 3);
                         bool horizontalFlip = tileData.getBit(14);
                         bool verticalFlip = tileData.getBit(15);
-                        Word tileAddress = background.characterAddress + (tileNumber * tileSize * background.bitsPerPixel / 2);
+                        Word tileAddress = background.characterAddress + uint16_t(tileNumber * tileSize * background.bitsPerPixel / 2);
                         int paletteAddress = (1 << background.bitsPerPixel) * palette;
                         for (int row = 0; row < 8; ++row) {
                             Byte firstLowByte(video.vram.lowTable[tileAddress + row]);
@@ -190,11 +190,11 @@ public:
                                 Word color = 0x5555;
                                 int displayColumn = tileColumn * tileSize + screenColumn * Video::rendererWidth + (horizontalFlip ? tileSize - 1 - column : column);
                                 if (paletteIndex > 0) {
-                                    Word colorAddress = paletteAddress + paletteIndex;
+                                    Word colorAddress = uint16_t(paletteAddress + paletteIndex);
                                     color = video.cgram.getWord(colorAddress);
                                 }
                                 if (tilePriority) {
-                                    color = Video::addColors(color, Word(0x1084), false);//0x2108));
+                                    color = Processor::addColors(color, Word(0x1084), false);//0x2108));
                                 }
                                 renderer.setPixel(displayRow, displayColumn, color);
                             }
@@ -207,7 +207,7 @@ public:
 
     std::thread thread;
     Renderer renderer;
-    Video& video;
+    Processor& video;
     bool running = true;
     Layer backgroundLayer;
 #else
@@ -224,7 +224,7 @@ class SpriteLayerViewer
 {
 public:
 #ifdef DEBUGSPRITES
-    SpriteLayerViewer(Video& video, int priority, int windowXPosition, int windowYPosition)
+    SpriteLayerViewer(Processor& video, int priority, int windowXPosition, int windowYPosition)
         : video(video)
         , priority(priority)
         , renderer(windowXPosition, windowYPosition, Video::rendererWidth, Video::rendererHeight, 1.f, true, video.output)
@@ -253,14 +253,14 @@ public:
         renderer.clearDisplay(0x7c1f);
         int firstObjectIndex = 0;
         if (video.objectPriority) {
-            firstObjectIndex = video.oam.address * 2;
+            firstObjectIndex = video.oam.currentAddress * 2;
         }
         for (int i = 127; i >= 0; --i) {
             Video::Object object = video.readObject((i + firstObjectIndex) % 128);
             if (object.priority != priority) {
                 continue;
             }
-            const int bitsPerPixel = 4;
+            int bitsPerPixel = 4;
             int paletteAddress = 0x80 + (1 << bitsPerPixel) * object.palette;
             int objectSize = video.getObjectSize(object.sizeSelect);
             int objectY = object.y;
@@ -277,7 +277,7 @@ public:
                 for (int tileColumn = 0; tileColumn < objectTileSize; ++tileColumn) {
                     int tileIndex = object.tileIndex + tileRow * 0x10 + tileColumn;
                     for (int row = 0; row < 8; ++row) {
-                        Word tileAddress = video.nameBaseSelect + (tileIndex << 4);
+                        Word tileAddress = video.nameBaseSelect + uint16_t(tileIndex << 4);
                         if (object.nameTable) {
                             tileAddress += video.nameSelect;
                         }
@@ -310,9 +310,9 @@ public:
                                 continue;
                             }
                             if (paletteIndex > 0) {
-                                Word colorAddress = paletteAddress + paletteIndex;
+                                Word colorAddress = uint16_t(paletteAddress + paletteIndex);
                                 int color = video.cgram.getWord(colorAddress);
-                                renderer.setPixel(displayRow, displayColumn, color);
+                                renderer.setPixel(displayRow, displayColumn, Renderer::Pixel(color));
                             }
                         }
                     }
@@ -323,7 +323,7 @@ public:
 
     std::thread thread;
     Renderer renderer;
-    Video& video;
+    Processor& video;
     bool running = true;
     int priority = 0;
 #else
@@ -340,7 +340,7 @@ class Mode7Viewer
 {
 public:
 #ifdef DEBUGMODE7
-    Mode7Viewer(Video& video, int windowXPosition, int windowYPosition)
+    Mode7Viewer(Processor& video, int windowXPosition, int windowYPosition)
         : video(video)
         , renderer(windowXPosition, windowYPosition, 1024, 1024, 1.f, true, video.output)
     {
@@ -367,7 +367,7 @@ public:
         std::scoped_lock lock(renderer.pixelBufferMutex);
         renderer.clearDisplay(0);
         int tileDataAddress = 0;
-        int i = 0;
+        //int i = 0;
         for (int tileRow = 0; tileRow < 128; ++tileRow) {
             for (int tileColumn = 0; tileColumn < 128; ++tileColumn) {
                 Byte tileData = video.vram.lowTable[tileDataAddress];
@@ -386,7 +386,7 @@ public:
 
     std::thread thread;
     Renderer renderer;
-    Video& video;
+    Processor& video;
     bool running = true;
 #else
     Mode7Viewer(Processor&, int, int)

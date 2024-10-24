@@ -26,7 +26,7 @@ struct StreamHandler
         Processor& processor = *(Processor*)userData;
         try
         {
-            float* out = (float*)output;
+            //float* out = (float*)output;
 
             /*
             for (int i = 0; i < 0x8; ++i) {
@@ -42,7 +42,7 @@ struct StreamHandler
 
             if (processor.checkStreamStatus(statusFlags))
             {
-                processor.outputNextSample(out[0], out[1]);
+                //processor.outputNextSample(out[0], out[1]);
                 processor.printTimeInfo(timeInfo->currentTime);
                 return paContinue;
             }
@@ -175,9 +175,6 @@ void Processor::outputNextSample(float& leftChannel, float& rightChannel)
     int i = 0;
     for (Audio::Processor::Voice& voice : voices)
 	{
-        ++i;
-
-
         try
         {
             //Audio::Processor::Voice& voice = voices[0];
@@ -188,10 +185,13 @@ void Processor::outputNextSample(float& leftChannel, float& rightChannel)
             leftSampleSum = Types::signedClamp<16, int32_t>(leftSampleSum + leftSample);
             rightSampleSum = Types::signedClamp<16, int32_t>(rightSampleSum + rightSample);
         }
-        catch (const std::runtime_error&)
+        catch (const std::runtime_error& e)
         {
-            output.debug("Exception in voice ", i);
+            output.error("Exception in voice ", i);
+            output.error(e.what());
         }
+
+        ++i;
     }
 
     leftSampleSum = Types::signedClamp<16, int32_t>(leftSampleSum * mainVolumeLeft >> 7);
@@ -278,7 +278,7 @@ void Processor::Voice::readSampleAddress(bool loopAddress)
     }
     catch (const std::runtime_error& e)
     {
-        std::cout << "Exception while reading header address, loopAddress=" << loopAddress << std::endl;
+        processor.output.error("Exception while reading header address, loopAddress=", loopAddress);
         throw e;
     }
 
@@ -429,43 +429,71 @@ void Processor::Voice::calculateEnvelope()
     }
 }
 
-//  S1.Load VxSRCN register, if necessary.
+//  S1.
+//  1. Load VxSRCN register, if necessary.
 template<>
 void Processor::Voice::doStep<1>()
 {
+    sourceNumber = registers[size_t(Register::VxSRCN)];
 }
 
-//  S2.Load the sample pointer(using previously loaded DIR and VxSRCN) if
+//  S2.
+//  1. Load the sample pointer(using previously loaded DIR and VxSRCN) if
 //  necessary.
-//  Load VxPITCHL register.
-//  Load VxADSR1 register.
+//  2. Load VxPITCHL register.
+//  3. Load VxADSR1 register.
 template<>
 void Processor::Voice::doStep<2>()
 {
+    sourceAddress = (processor.sourceDirectory << 8) | sourceNumber << 2;
+
+    pitch.setLowByte(registers[size_t(Register::VxPITCHL)]);
+
+    Byte adsr1 = registers[size_t(Register::VxADSR1)];
+    attackRate = adsr1.getBits(0, 4);
+    decayRate = adsr1.getBits(4, 3);
+    if (adsr1.getBit(7))
+    {
+        envelopeType = Processor::Voice::EnvelopeType::ADSR;
+    }
+    else
+    {
+        envelopeType = Processor::Voice::EnvelopeType::Gain;
+    }
 }
 
-//  S3.a.Load VxPITCHH register.
-//  Apply pitch modulation if applicable.
+//  S3.
+//  a.
+//  1. Load VxPITCHH register.
+//  2. Apply pitch modulation if applicable.
 void Processor::Voice::doStep3a()
 {
+    pitch.setHighByte(registers[size_t(Register::VxPITCHH)].getBits(0, 6));
+    //  2. Apply pitch modulation if applicable.
+    if (pitchModulation)
+    {
+        throw NotYetImplementedException("Pitch modulation is not yet implemented in voice step 3a");
+    }
 }
 
-//  b.Load the BRR header byte(every time), and the first of the two BRR
+//  b.
+//  1. Load the BRR header byte(every time), and the first of the two BRR
 //  bytes that will be decoded.
 void Processor::Voice::doStep3b()
 {
 }
 
-//  c.If applicable, replace the current sample with the noise sample.
-//  Apply the volume envelope.
+//  c.
+//  1. If applicable, replace the current sample with the noise sample.
+//  2. Apply the volume envelope.
 //  - This is the value used for modulating the next voice's pitch, if
 //  applicable.
-//  Check FLG bit 7 (NOT previously loaded).
-//  Check BRR header 'e' and 'l' bits to determine if the voice ends.
-//  Handle KOFF and KON using previously loaded values.If KON, ENDX.x will
+//  3. Check FLG bit 7 (NOT previously loaded).
+//  4. Check BRR header 'e' and 'l' bits to determine if the voice ends.
+//  5. Handle KOFF and KON using previously loaded values. If KON, ENDX.x will
 //  be cleared in step S7.
-//  Load VxGAIN or VxADSR2 register depending on ADSR1.7.
-//  Update the volume envelope, using previously loaded values.
+//  6. Load VxGAIN or VxADSR2 register depending on ADSR1.7.
+//  7. Update the volume envelope, using previously loaded values.
 void Processor::Voice::doStep3c()
 {
 }
@@ -478,14 +506,15 @@ void Processor::Voice::doStep<3>()
     doStep3c();
 }
 
-//  S4.Load and apply VxVOLL register.
-//  If a new group of BRR samples is required, load the second BRR byte and
-//  decode the group of 4 BRR samples.This is definitely not done when not
-//  necessary.If necessary, adjust the BRR pointer to the next block, or
+//  S4.
+//  1. Load and apply VxVOLL register.
+//  2. If a new group of BRR samples is required, load the second BRR byte and
+//  decode the group of 4 BRR samples. This is definitely not done when not
+//  necessary. If necessary, adjust the BRR pointer to the next block, or
 //  flag the loop address for loading next step S2 and set ENDX.x in step S7.
 //  Note that this setting of ENDX.x will not override the clearing due to KON
 //  in step S3c, if both occur during the same sample.
-//  Increment interpolation sample position as specified by pitch values.
+//  3. Increment interpolation sample position as specified by pitch values.
 //  At any point from now until we next get to S3c, the next sample may be
 //  calculated using the interpolation position and BRR buffer contents.
 template<>
@@ -493,36 +522,41 @@ void Processor::Voice::doStep<4>()
 {
 }
 
-//  S5.Load and apply VxVOLR register.
-//  The new ENDX.x value is prepared, and can be overwritten.Reads will not
+//  S5.
+//  1. Load and apply VxVOLR register.
+//  2. The new ENDX.x value is prepared, and can be overwritten. Reads will not
 //  see it yet.
 template<>
 void Processor::Voice::doStep<5>()
 {
 }
 
-//  S6.The new VxOUTX value is prepared, and can be overwritten.Reads will not
+//  S6.
+//  1. The new VxOUTX value is prepared, and can be overwritten. Reads will not
 //  see it yet.
 template<>
 void Processor::Voice::doStep<6>()
 {
 }
 
-//  S7.The new ENDX.x value may now be read.
-//  The new VxENVX value is prepared, and can be overwritten.Reads will not
+//  S7.
+//  1. The new ENDX.x value may now be read.
+//  2. The new VxENVX value is prepared, and can be overwritten.Reads will not
 //  see it yet.
 template<>
 void Processor::Voice::doStep<7>()
 {
 }
 
-//  S8.The new VxOUTX value may now be read.
+//  S8.
+//  1. The new VxOUTX value may now be read.
 template<>
 void Processor::Voice::doStep<8>()
 {
 }
 
-//  S9.The new VxENVX value may now be read.
+//  S9.
+//  1. The new VxENVX value may now be read.
 template<>
 void Processor::Voice::doStep<9>()
 {
@@ -824,7 +858,7 @@ void Processor::onSampleCycle<27>()
     //    27. Load and apply MVOLR.
     //    Load and apply EVOLR.
     //    Output the right sample to the DAC.
-    //    Load PMON
+    setVoiceBits<&Processor::Voice::pitchModulation>(registers[size_t(Register::PMON)]);
 }
 
 //    28. Load NON, EON, and DIR.

@@ -80,7 +80,8 @@ void getConsoleWindowPosition(int& x, int& y)
 
 }
 
-namespace Video {
+namespace Video
+{
 
 Renderer::~Renderer()
 {
@@ -90,7 +91,8 @@ Renderer::~Renderer()
 
 void Renderer::initialize(bool fullscreen, bool aspectCorrection)
 {
-    if (!glfwInit()) {
+    if (!glfwInit())
+    {
         throw std::runtime_error("Failed to initialize GLFW");
     }
 
@@ -113,7 +115,8 @@ void Renderer::initialize(bool fullscreen, bool aspectCorrection)
 
     output.debug("Created renderer with dimensions ", int(float(width) * xScale + 0.5), ":", int(float(height) * yScale + 0.5));
 
-    if (window == nullptr) {
+    if (window == nullptr)
+    {
         glfwTerminate();
         throw std::runtime_error("Failed to open GLFW window.");
     }
@@ -121,7 +124,8 @@ void Renderer::initialize(bool fullscreen, bool aspectCorrection)
 
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 
-    if (syncUpdate) {
+    if (syncUpdate)
+    {
         glfwSwapInterval(1);
     }
 
@@ -130,9 +134,12 @@ void Renderer::initialize(bool fullscreen, bool aspectCorrection)
     glShadeModel(GL_FLAT);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-    if (fullscreen) {
+    if (fullscreen)
+    {
         calculateScale(mode, aspectCorrection);
-    } else {
+    }
+    else
+    {
         setWindowProperties(fullscreen, aspectCorrection);
     }
 }
@@ -154,7 +161,8 @@ void Renderer::calculateScale(const GLFWvidmode* mode, bool aspectCorrection)
     float screenWidth = float(width) * xScale;
     xScreenCoverage = screenWidth / float(mode->width);
     yScreenCoverage = 1.f;
-    if (xScreenCoverage > 1.f) {
+    if (xScreenCoverage > 1.f)
+    {
         float scaleFactor = 1.f / xScreenCoverage;
         xScale *= scaleFactor;
         yScale *= scaleFactor;
@@ -165,17 +173,21 @@ void Renderer::calculateScale(const GLFWvidmode* mode, bool aspectCorrection)
 
 void Renderer::setWindowProperties(bool fullscreen, bool aspectCorrection)
 {
-    if (fullscreen) {
+    if (fullscreen)
+    {
         int x, y;
         getWindowPosition(window, x, y);
         GLFWmonitor* fullscreenMonitor = getMonitorForPoint(x, y);
-        if (!fullscreenMonitor) {
+        if (!fullscreenMonitor)
+        {
             fullscreenMonitor = glfwGetPrimaryMonitor();
         }
         const GLFWvidmode* mode = glfwGetVideoMode(fullscreenMonitor);
         calculateScale(mode, aspectCorrection);
         glfwSetWindowMonitor(window, fullscreenMonitor, 0, 0, mode->width, mode->height, mode->refreshRate);
-    } else {
+    }
+    else
+    {
         yScale = scale;
         xScale = yScale * getAspectCorrectionFactor(aspectCorrection);
         xScreenCoverage = 1.f;
@@ -186,7 +198,8 @@ void Renderer::setWindowProperties(bool fullscreen, bool aspectCorrection)
 
 void Renderer::update()
 {
-    if (focusWindowRequested) {
+    if (focusWindowRequested)
+    {
         glfwFocusWindow(window);
         focusWindowRequested = false;
     }
@@ -205,7 +218,8 @@ void Renderer::update()
 
             double currentTime = glfwGetTime();
             frameCount++;
-            if (currentTime - previousTime >= 1.0) {
+            if (currentTime - previousTime >= 1.0)
+            {
                 output.debug(frameCount);
 
                 frameCount = 0;
@@ -220,16 +234,21 @@ void Renderer::update()
 
     bool spacePressed = isPressed(GLFW_KEY_SPACE);
     bool escapePressed = isPressed(GLFW_KEY_ESCAPE);
-    if (pressKeyTimeout == 0) {
-        if (escapePressed) {
+    if (pressKeyTimeout == 0)
+    {
+        if (escapePressed)
+        {
             pauseRequested = true;
             pressKeyTimeout = 30;
         }
-        if (spacePressed) {
+        if (spacePressed)
+        {
             toggleFullscreenRequested = true;
             pressKeyTimeout = 30;
         }
-    } else {
+    }
+    else
+    {
         --pressKeyTimeout;
     }
 
@@ -246,10 +265,13 @@ void Renderer::update()
     buttonLeft = isPressed(GLFW_KEY_A);
     buttonRight = isPressed(GLFW_KEY_D);
 
-    for (int joystick = GLFW_JOYSTICK_1; joystick <= GLFW_JOYSTICK_LAST; ++joystick) {
-        if (glfwJoystickIsGamepad(joystick)) {
+    for (int joystick = GLFW_JOYSTICK_1; joystick <= GLFW_JOYSTICK_LAST; ++joystick)
+    {
+        if (glfwJoystickIsGamepad(joystick))
+        {
             GLFWgamepadstate state;
-            if (glfwGetGamepadState(joystick, &state)) {
+            if (glfwGetGamepadState(joystick, &state))
+            {
                 buttonStart |= state.buttons[GLFW_GAMEPAD_BUTTON_START] == GLFW_PRESS;
                 buttonSelect |= state.buttons[GLFW_GAMEPAD_BUTTON_BACK] == GLFW_PRESS;
                 buttonA |= state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_PRESS;
@@ -267,19 +289,26 @@ void Renderer::update()
                 float axisY = state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
 
                 static const float thresholdSquared = .25f * .25f;
-                if (axisX * axisX + axisY * axisY > thresholdSquared) {
+                if (axisX * axisX + axisY * axisY > thresholdSquared)
+                {
                     float angle = std::atan2f(axisY, axisX);
                     static const float pi8 = std::atanf(1.f) / 2.f;
 
-                    if (angle > pi8 * 5 || angle < -pi8 * 5) {
+                    if (angle > pi8 * 5 || angle < -pi8 * 5)
+                    {
                         buttonLeft = true;
-                    } else if (angle > -pi8 * 3 && angle < pi8 * 3) {
+                    }
+                    else if (angle > -pi8 * 3 && angle < pi8 * 3)
+                    {
                         buttonRight = true;
                     }
 
-                    if (angle > -pi8 * 7 && angle < -pi8) {
+                    if (angle > -pi8 * 7 && angle < -pi8)
+                    {
                         buttonUp = true;
-                    } else if (angle > pi8 && angle < pi8 * 7) {
+                    }
+                    else if (angle > pi8 && angle < pi8 * 7)
+                    {
                         buttonDown = true;
                     }
                 }
@@ -300,7 +329,8 @@ double Renderer::getTime() const
 
 void Renderer::setScanline(int lineIndex, const std::vector<Pixel>& pixels)
 {
-    for (int i = 0; i < pixels.size(); ++i) {
+    for (int i = 0; i < pixels.size(); ++i)
+    {
         setPixel(lineIndex, i, pixels[i]);
     }
 }
@@ -309,7 +339,8 @@ void Renderer::setPixel(int row, int column, Pixel pixel)
 {
     row = height - 1 - row;
     int index = row * width + column;
-    if (index < 0 || index >= pixelBuffer.size()) {
+    if (index < 0 || index >= pixelBuffer.size())
+    {
         throw std::logic_error("Renderer: Index out of bounds in pixel buffer");
     }
     pixelBuffer[index] = pixel;
@@ -322,10 +353,12 @@ void Renderer::setGrayscalePixel(int row, int column, uint8_t white)
     setPixel(row, column, pixel);
 }
 
-void Renderer::setGrayscaleTile(int startRow, int startColumn, const std::array<std::array<uint8_t, 8>, 8> & tile, int bitsPerPixel)
+void Renderer::setGrayscaleTile(int startRow, int startColumn, const std::array<std::array<uint8_t, 8>, 8>& tile, int bitsPerPixel)
 {
-    for (int row = 0; row < 8; ++row) {
-        for (int column = 0; column < 8; ++column) {
+    for (int row = 0; row < 8; ++row)
+    {
+        for (int column = 0; column < 8; ++column)
+        {
             setGrayscalePixel(startRow + row, startColumn + column, tile[row][column] * (bitsPerPixel == 2 ? 85 : 17));
         }
     }
@@ -333,8 +366,10 @@ void Renderer::setGrayscaleTile(int startRow, int startColumn, const std::array<
 
 void Renderer::clearDisplay(uint16_t clearColor)
 {
-    for (int row = 0; row < height; ++row) {
-        for (int column = 0; column < width; ++column) {
+    for (int row = 0; row < height; ++row)
+    {
+        for (int column = 0; column < width; ++column)
+        {
             setPixel(row, column, clearColor);
         }
     }
@@ -342,7 +377,8 @@ void Renderer::clearDisplay(uint16_t clearColor)
 
 void Renderer::clearScanline(int vCounter, uint16_t clearColor)
 {
-    for (int column = 0; column < width; ++column) {
+    for (int column = 0; column < width; ++column)
+    {
         setPixel(vCounter, column, clearColor);
     }
 }
