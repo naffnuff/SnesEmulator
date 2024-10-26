@@ -164,6 +164,38 @@ public:
             Release,
         };
 
+        enum class SampleStage
+        {
+            Inactive = -1,
+            /* #0 = After the final pre-KON sample is prepared, the envelope is set to 0 and
+                    enters the Attack state, and is not updated for the next several
+                    samples. The interpolation index is reset to 0, and is not updated for
+                    the next several samples. The final pre-KON BRR decode also occurs here
+                    (which can matter if the first block of the new BRR data uses a
+                    non-Direct filter).*/
+            Reset = 0,
+            /* #1 = The first '0x0000' sample. At step S2, the start address is read. No BRR
+                    decoding or header checks, envelope updating, or interpolation index
+                    updating is performed.*/
+            AddressRead = 1,
+            /* #2 = At step S4, first BRR group is decoded. No envelope or interpolation
+                    index updating.*/
+            FirstBRRGroup = 2,
+            /* #3 = At step S4, second BRR group is decoded. No envelope or interpolation
+                    index updating.*/
+            SecondBRRGroup = 3,
+            /* #4 = At step S4, third BRR group is decoded. No envelope or interpolation
+                    index updating.*/
+            ThirdBRRGroup = 4,
+            /* #5 = Envelope updating begins. The sample output is still '0x0000', because of
+                    the order in which voice operations are performed. The interpolation
+                    position is still 0.*/
+            PrepareOutput = 5,
+            /* #6 = Finally, we see the first data sample. The first interpolation position
+                    update is done during step S4.*/
+            Output = 6
+        };
+
         Voice(Processor& processor)
             : processor(processor)
         {
@@ -270,10 +302,13 @@ public:
         int envelope;
         Word output;
 
-        int setupPhase = 0;
-        bool keyOnIsSet = false;
+        int setupPhase = -1; // remove
+        SampleStage sampleStage = SampleStage::Inactive;
+
+        //bool keyOnIsSet = false;
 
         bool keyOn = false;
+        bool keyOnInternal = false;
         bool keyOff = false;
         bool sourceEndBlock = false;
         bool pitchModulation = false;
@@ -405,7 +440,7 @@ public:
             return;
         }
         static uint64_t lastDspCycle = 0;
-        output.log(Log::Level::Debug, Output::Color::Cyan, value != 0, (write ? "Write " : "Read "), value, " (", std::bitset<8>(value), ") @", address, " (", info, "), cycle ", dspCycle, " (+", (dspCycle - lastDspCycle), ")");
+        output.log(Log::Level::Debug, Output::Color::Cyan, value != 0, (write ? "Write " : "Read "), value, " (", std::bitset<8>(value), ") @", address, " (", info, "), cycle ", dspCycle, " (+", (dspCycle - lastDspCycle), ")", " (sampleCount=", sampleCount, ")", " (sampleCycle=", sampleCycle, ")");
         lastDspCycle = dspCycle;
     }
 
@@ -438,6 +473,12 @@ public:
 
     std::array<Byte, size_t(Register::Count)> registers;
 
+    int sampleCycle = 0;
+    uint64_t sampleCount = 0;
+
+    int32_t leftSampleSum = 0;
+    int32_t rightSampleSum = 0;
+
 private:
     Output output;
 
@@ -462,6 +503,9 @@ private:
     Byte sourceDirectory;
     Byte echoRegionOffset;
     Byte echoDelay;
+
+    float leftOutput = 0;
+    float rightOutput = 0;
 
     void* stream;
 

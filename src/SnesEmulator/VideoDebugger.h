@@ -256,7 +256,7 @@ public:
             firstObjectIndex = video.oam.currentAddress * 2;
         }
         for (int i = 127; i >= 0; --i) {
-            Video::Object object = video.readObject((i + firstObjectIndex) % 128);
+            Video::Object object = video.readObject((i + firstObjectIndex) & 127);
             if (object.priority != priority) {
                 continue;
             }

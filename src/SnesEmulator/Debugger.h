@@ -563,7 +563,7 @@ public:
         //System::setOutputColor(output, System::DefaultColor, false);
         //int oamAddress = inspectedVideoMemory & 0xFF80;
         //int oamAuxAddress = oamAddress / 8;
-        //int oamAuxOffset = oamAddress % 8;
+        //int oamAuxOffset = oamAddress & 7;
         /*for (int i = OamViewer::firstObjectIndex; i < OamViewer::firstObjectIndex + 32; ++i) {
             Video::Object object = videoProcessor.readObject(i);
             output << i << ": ";

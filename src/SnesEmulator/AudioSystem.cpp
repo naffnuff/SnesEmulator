@@ -117,7 +117,7 @@ private:
 void AudioSystem::start()
 {
     processor.startStream();
-    //if (threaded)
+    if (threaded)
     {
         systemThread = std::thread(AudioSystemRunner(*this));
         systemThreadStarted = true;

@@ -10,7 +10,8 @@
 
 #pragma warning( disable : 26110 ) // Caller failing to hold lock <lock> before calling function <func>
 
-namespace Video {
+namespace Video
+{
 
 class Processor
 {
@@ -29,8 +30,10 @@ public:
             //return;
             video.renderer.title = gameTitle;
             video.renderer.initialize(fullscreen, aspectRatioCorrection);
-            while (run && video.renderer.isRunning()) {
-                if (video.renderer.toggleFullscreenRequested) {
+            while (run && video.renderer.isRunning())
+            {
+                if (video.renderer.toggleFullscreenRequested)
+                {
                     video.renderer.toggleFullscreenRequested = false;
                     fullscreen = !fullscreen;
                     video.renderer.setWindowProperties(fullscreen, aspectRatioCorrection);
@@ -71,7 +74,7 @@ public:
     Processor& operator=(const Processor&) = delete;
 
     void lockRenderer()
-	{
+    {
         rendererLock.lock();
     }
 
@@ -81,12 +84,12 @@ public:
     }
 
     bool tryUnlockRenderer()
-	{
-		if (rendererLock.owns_lock())
-		{
-			rendererLock.unlock();
+    {
+        if (rendererLock.owns_lock())
+        {
+            rendererLock.unlock();
             return true;
-		}
+        }
         else
         {
             return false;
@@ -121,31 +124,42 @@ public:
 
     void drawScanline(int vCounter)
     {
-        if (screenDisplay.getBit(7)) {
+        if (screenDisplay.getBit(7))
+        {
             renderer.clearScanline(vCounter - 1, 0);
             return;
         }
-        if (characterSize.getBits(4, 4) != 0) {
+        if (characterSize.getBits(4, 4) != 0)
+        {
             throw NotYetImplementedException("16x16 backgrounds");
         }
 
-        if (backgroundMode == 1) {
+        if (backgroundMode == 1)
+        {
             drawMode(mode1Extension ? mode1e : mode1, vCounter);
-        } else if (backgroundMode == 7) {
-            if (mode7HorizontalMirroring) {
+        }
+        else if (backgroundMode == 7)
+        {
+            if (mode7HorizontalMirroring)
+            {
                 throw NotYetImplementedException("Register 211a: Horizontal mirroring");
             }
-            if (mode7VerticalMirroring) {
+            if (mode7VerticalMirroring)
+            {
                 throw NotYetImplementedException("Register 211a: Vertical mirroring");
             }
-            if (mode7EmptySpaceFill) {
+            if (mode7EmptySpaceFill)
+            {
                 throw NotYetImplementedException("Register 211a: Empty space fill");
             }
-            if (directColorMode) {
+            if (directColorMode)
+            {
                 throw NotYetImplementedException("Direct color mode for 256-color BGs");
             }
             drawMode(mode7, vCounter, true);
-        } else if (backgroundMode != 0) {
+        }
+        else if (backgroundMode != 0)
+        {
             throw NotYetImplementedException("BG mode: ", backgroundMode, ", e: ", mode1Extension);
         }
     }
@@ -157,8 +171,10 @@ public:
 
         std::array<WindowSettings, 5> windowSettings;
         Byte windowMaskDesignations = mainScreenWindowMaskDesignation | subscreenWindowMaskDesignation;
-        for (int i = 0; i < windowSettings.size(); ++i) {
-            if (windowMaskDesignations.getBit(i)) {
+        for (int i = 0; i < windowSettings.size(); ++i)
+        {
+            if (windowMaskDesignations.getBit(i))
+            {
                 windowSettings[i].window1Enabled = windowMaskSettings.getBit(i * 4 + 1);
                 windowSettings[i].window1Inverted = windowMaskSettings.getBit(i * 4);
                 windowSettings[i].window2Enabled = windowMaskSettings.getBit(i * 4 + 3);
@@ -183,51 +199,66 @@ public:
         colorWindowSettings.window2Inverted = windowMaskSettings.getBit(22);
         colorWindowSettings.windowOperator = Byte(windowMaskLogic.getBits(10, 2));
 
-        for (int displayColumn = 0; displayColumn < rendererWidth; ++displayColumn) {
+        for (int displayColumn = 0; displayColumn < rendererWidth; ++displayColumn)
+        {
             Byte addendPixelIndex;
             Word addendPixel = fixedColor;
             bool disableHalfMath = false;
-            if (addSubscreen) {
+            if (addSubscreen)
+            {
                 addendPixelIndex = calculateSubscreenPixel(modeEntries, subscreenBackgroundLayers, subscreenDesignation, displayRow, displayColumn);
-                if (addendPixelIndex > 0) {
+                if (addendPixelIndex > 0)
+                {
                     addendPixel = cgram.getWord(Word(addendPixelIndex));
-                } else {
+                }
+                else
+                {
                     disableHalfMath = true;
                 }
             }
             Word mainScreenPixel = calculateMainScreenPixel(modeEntries, mainScreenBackgroundLayers, mainScreenDesignation, displayRow, displayColumn, backdropColor, addendPixel, currentColorMathDesignation, colorWindowSettings, disableHalfMath);
-            if (brightness != 0xf) {
+            if (brightness != 0xf)
+            {
                 mainScreenPixel = factorColors(mainScreenPixel, brightnessFactor);
             }
             renderer.setPixel(displayRow - 1, displayColumn, mainScreenPixel);
         }
     }
 
-    void createLayers(ScanlineBuffers& buffers, const std::vector<ModeEntry>& mode, int displayRow, Byte screenDesignation, Byte windowMaskDesignation, std::array<WindowSettings, 5> & windowSettings, bool isMode7)
+    void createLayers(ScanlineBuffers& buffers, const std::vector<ModeEntry>& mode, int displayRow, Byte screenDesignation, Byte windowMaskDesignation, std::array<WindowSettings, 5>& windowSettings, bool isMode7)
     {
         std::bitset<rendererWidth> backgroundsBufferMask;
-        for (const ModeEntry& modeEntry : mode) {
-            if (modeEntry.layer < Layer::BackgroundCount && screenDesignation.getBit(int(modeEntry.layer))) {
+        for (const ModeEntry& modeEntry : mode)
+        {
+            if (modeEntry.layer < Layer::BackgroundCount && screenDesignation.getBit(int(modeEntry.layer)))
+            {
                 ScanlineBuffer& buffer = buffers.getBuffer(Layer(modeEntry.layer), modeEntry.priority);
                 //buffer.data.fill(0);
-                if (isMode7) {
+                if (isMode7)
+                {
                     drawMode7Background(buffer, displayRow);
-                } else {
+                }
+                else
+                {
                     drawBackground(buffer, backgrounds[size_t(modeEntry.layer)], displayRow, modeEntry.priority, windowMaskDesignation.getBit(int(modeEntry.layer)), windowSettings[size_t(modeEntry.layer)], backgroundsBufferMask);
                 }
             }
         }
-        if (screenDesignation.getBit(int(Layer::Object))) {
-            for (int priority = 0; priority < 4; ++priority) {
+        if (screenDesignation.getBit(int(Layer::Object)))
+        {
+            for (int priority = 0; priority < 4; ++priority)
+            {
                 //buffers.getBuffer(ObjectLayer, priority).data.fill(0);
             }
             int firstObjectIndex = 0;
-            if (objectPriority) {
+            if (objectPriority)
+            {
                 firstObjectIndex = oam.currentAddress * 2;
             }
             std::bitset<rendererWidth> objectsBufferMask;
-            for (int i = firstObjectIndex; i < 128 + firstObjectIndex; ++i) {
-                Object object = readObject(i % 128);
+            for (int i = firstObjectIndex; i < 128 + firstObjectIndex; ++i)
+            {
+                Object object = readObject(i & 0x7f);
                 drawObject(buffers.getBuffer(Layer::Object, object.priority), object, displayRow, windowMaskDesignation.getBit(int(Layer::Object)), windowSettings[size_t(Layer::Object)], objectsBufferMask);
             }
         }
@@ -253,7 +284,8 @@ public:
             + ((D * y) & ~63) + ((D * CLIP(VOFS - CY)) & ~63)
             + (CY << 8);*/
         int vectorElement2 = displayRow + mode7VerticalScroll - mode7CenterY;
-        for (int displayColumn = 0; displayColumn < rendererWidth; ++displayColumn) {
+        for (int displayColumn = 0; displayColumn < rendererWidth; ++displayColumn)
+        {
             int vectorElement1 = displayColumn + mode7HorizontalScroll - mode7CenterX;
             int fieldColumn = ((mode7MatrixA * vectorElement1))
                 + ((mode7MatrixB * vectorElement2))
@@ -265,22 +297,31 @@ public:
             fieldColumn >>= 8;
             bool calculateTile = true;
             bool zeroPixel = false;
-            if (fieldRow < 0 || fieldRow >= 1024 || fieldColumn < 0 || fieldColumn >= 1024) {
+            if (fieldRow < 0 || fieldRow >= 1024 || fieldColumn < 0 || fieldColumn >= 1024)
+            {
                 fieldRow &= 1023;
                 fieldColumn &= 1023;
-                if (mode7PlayingFieldSize) {
-                    if (mode7EmptySpaceFill) {
+                if (mode7PlayingFieldSize)
+                {
+                    if (mode7EmptySpaceFill)
+                    {
                         calculateTile = false;
-                    } else {
+                    }
+                    else
+                    {
                         zeroPixel = true;
                     }
                 }
             }
-            if (zeroPixel) {
+            if (zeroPixel)
+            {
                 buffer.data[displayColumn] = 0;
-            } else {
+            }
+            else
+            {
                 Byte tileData;
-                if (calculateTile) {
+                if (calculateTile)
+                {
                     Word tileRow(fieldRow >> 3);
                     Word tileColumn(fieldColumn >> 3);
                     Word tileDataAddress((tileRow << 7) + tileColumn);
@@ -305,33 +346,42 @@ public:
         displayRow += background.verticalScroll.value;
         int tileRow = displayRow % backgroundHeight / tileSize;
         bool screenRow = false;
-        if (tileRow >= 32) {
+        if (tileRow >= 32)
+        {
             screenRow = background.verticalMirroring;
             tileRow %= 32;
         }
         int row = displayRow % tileSize;
         int columnOffset = background.horizontalScroll.value % tileSize;
-        for (int displayColumn = -columnOffset; displayColumn < rendererWidth; displayColumn += tileSize) {
+        for (int displayColumn = -columnOffset; displayColumn < rendererWidth; displayColumn += tileSize)
+        {
             int tileColumn = (displayColumn + columnOffset + background.horizontalScroll.value) % backgroundWidth / tileSize;
             bool screenColumn = false;
-            if (tileColumn >= 32) {
+            if (tileColumn >= 32)
+            {
                 screenColumn = background.horizontalMirroring;
                 tileColumn %= 32;
             }
             Word tileDataAddress(background.tilemapAddress + (tileRow << 5) + tileColumn);
-            if (screenRow) {
-                if (background.horizontalMirroring) {
+            if (screenRow)
+            {
+                if (background.horizontalMirroring)
+                {
                     tileDataAddress += 0x800;
-                } else {
+                }
+                else
+                {
                     tileDataAddress += 0x400;
                 }
             }
-            if (screenColumn) {
+            if (screenColumn)
+            {
                 tileDataAddress += 0x400;
             }
             Word tileData = vram.getWord(tileDataAddress);
             int tilePriority = tileData.getBits(13, 1);
-            if (priority == tilePriority) {
+            if (priority == tilePriority)
+            {
                 Word tileNumber = tileData.getBits(0, 10);
                 int palette = tileData.getBits(10, 3);
                 bool horizontalFlip = tileData.getBit(14);
@@ -346,7 +396,7 @@ public:
     {
         Word lowAddress(index * 2);
         Word highAddress(index / 8);
-        Byte highTableOffset = index % 8;
+        Byte highTableOffset = index & 7;
         Word firstWord = oam.getWord(lowAddress);
         Word secondWord = oam.getWord(lowAddress + 1);
         Word thirdWord = oam.getWord(0x100 | highAddress);
@@ -368,28 +418,35 @@ public:
         int objectSize = getObjectSize(object.sizeSelect);
         int objectY = object.y;
         int distanceFromTop = rendererWidth - objectY;
-        if (distanceFromTop >= 0 && distanceFromTop < objectSize) {
+        if (distanceFromTop >= 0 && distanceFromTop < objectSize)
+        {
             objectY -= rendererWidth;
         }
         int row = displayRow - objectY - 1;
-        if (row >= 0 && row < objectSize) {
-            if (object.verticalFlip) {
+        if (row >= 0 && row < objectSize)
+        {
+            if (object.verticalFlip)
+            {
                 row = objectSize - 1 - row;
             }
             int tileRow = 0;
-            while (row >= 8) {
+            while (row >= 8)
+            {
                 ++tileRow;
                 row -= 8;
             }
             int objectTileSize = objectSize / 8;
             int objectX = object.x;
-            if (objectX >= rendererWidth) {
+            if (objectX >= rendererWidth)
+            {
                 objectX -= rendererWidth * 2;
             }
-            for (int tileColumn = 0; tileColumn < objectTileSize; ++tileColumn) {
+            for (int tileColumn = 0; tileColumn < objectTileSize; ++tileColumn)
+            {
                 int tileIndex = object.tileIndex + tileRow * 0x10 + tileColumn;
                 Word tileAddress(nameBaseSelect + (tileIndex << 4));
-                if (object.nameTable) {
+                if (object.nameTable)
+                {
                     tileAddress += nameSelect;
                 }
                 tileAddress += row;
@@ -401,34 +458,44 @@ public:
 
     void drawTile(ScanlineBuffer& buffer, int displayStartColumn, int displayColumnOffset, Word tileAddress, Byte paletteAddress, int objectSize, bool horizontalFlip, int bitsPerPixel, bool windowEnabled, WindowSettings& windowSettings, std::bitset<rendererWidth>& bufferMask)
     {
-        for (int column = 0; column < 8; ++column) {
+        for (int column = 0; column < 8; ++column)
+        {
             int displayColumn;
-            if (horizontalFlip) {
+            if (horizontalFlip)
+            {
                 displayColumn = displayStartColumn - displayColumnOffset + objectSize - 1 - column;
-            } else {
+            }
+            else
+            {
                 displayColumn = displayStartColumn + displayColumnOffset + column;
             }
-            if (displayColumn < 0 || displayColumn >= rendererWidth) {
+            if (displayColumn < 0 || displayColumn >= rendererWidth)
+            {
                 continue;
             }
-            if (buffer.data[displayColumn] > 0) {
+            if (buffer.data[displayColumn] > 0)
+            {
                 continue;
             }
-            if (bufferMask[displayColumn]) {
+            if (bufferMask[displayColumn])
+            {
                 continue;
             }
             Byte paletteIndex;
             paletteIndex.setBit(0, vram.getByte(tileAddress, false).getBit(7 - column));
             paletteIndex.setBit(1, vram.getByte(tileAddress, true).getBit(7 - column));
-            if (bitsPerPixel >= 4) {
+            if (bitsPerPixel >= 4)
+            {
                 paletteIndex.setBit(2, vram.getByte(tileAddress + 8, false).getBit(7 - column));
                 paletteIndex.setBit(3, vram.getByte(tileAddress + 8, true).getBit(7 - column));
             }
-            if (paletteIndex > 0) {
+            if (paletteIndex > 0)
+            {
                 Byte colorAddress = paletteAddress + paletteIndex;
                 //int color = cgram.readWord(colorAddress);
                 bool masked = windowEnabled && insideWindow(displayColumn, windowSettings);
-                if (masked) {
+                if (masked)
+                {
                     continue;
                 }
                 buffer.data[displayColumn] = colorAddress;
@@ -439,10 +506,13 @@ public:
 
     Byte calculateSubscreenPixel(const std::vector<ModeEntry>& mode, ScanlineBuffers& buffers, Byte designation, int displayRow, int displayColumn)
     {
-        for (const ModeEntry& modeEntry : mode) {
-            if (designation.getBit(int(modeEntry.layer))) {
+        for (const ModeEntry& modeEntry : mode)
+        {
+            if (designation.getBit(int(modeEntry.layer)))
+            {
                 Byte colorIndex = buffers.getBuffer(modeEntry.layer, modeEntry.priority).data[displayColumn];
-                if (colorIndex > 0) {
+                if (colorIndex > 0)
+                {
                     return colorIndex;
                 }
             }
@@ -458,14 +528,20 @@ public:
         bool subtract = colorMathDesignation.getBit(7);
         bool halfMath = !disableHalfMath && !clipColor && colorMathDesignation.getBit(6);
 
-        for (const ModeEntry& modeEntry : mode) {
-            if (designation.getBit(int(modeEntry.layer))) {
+        for (const ModeEntry& modeEntry : mode)
+        {
+            if (designation.getBit(int(modeEntry.layer)))
+            {
                 Byte colorIndex = buffers.getBuffer(modeEntry.layer, modeEntry.priority).data[displayColumn];
-                if (colorIndex > 0) {
+                if (colorIndex > 0)
+                {
                     Word color = cgram.getWord(Word(colorIndex));
-                    if (modeEntry.layer == Layer::Object && colorIndex > 0x80 && colorIndex < 0xc0) {
+                    if (modeEntry.layer == Layer::Object && colorIndex > 0x80 && colorIndex < 0xc0)
+                    {
                         return color;
-                    } else {
+                    }
+                    else
+                    {
                         return applyColorMath(color, modeEntry.layer, addendPixel, colorMathDesignation, clipColor, clipMath, subtract, halfMath);
                     }
                 }
@@ -477,30 +553,44 @@ public:
     bool insideWindow(int column, const WindowSettings& settings)
     {
         bool inside = false;
-        if (!settings.window1Enabled && !settings.window2Enabled) {
+        if (!settings.window1Enabled && !settings.window2Enabled)
+        {
             inside = false;
-        } else if (settings.window1Enabled && settings.window2Enabled) {
+        }
+        else if (settings.window1Enabled && settings.window2Enabled)
+        {
             bool inside1 = column >= window1Left && column <= window1Right;
             bool inside2 = column >= window2Left && column <= window2Right;
-            if (settings.window1Inverted) {
+            if (settings.window1Inverted)
+            {
                 inside1 = !inside1;
             }
-            if (settings.window2Inverted) {
+            if (settings.window2Inverted)
+            {
                 inside2 = !inside2;
             }
-            if (settings.windowOperator == 0) {
+            if (settings.windowOperator == 0)
+            {
                 inside = inside1 || inside2;
-            } else {
+            }
+            else
+            {
                 throw NotYetImplementedException("Window operator ", settings.windowOperator);
             }
-        } else if (settings.window1Enabled) {
+        }
+        else if (settings.window1Enabled)
+        {
             inside = column >= window1Left && column <= window1Right;
-            if (settings.window1Inverted) {
+            if (settings.window1Inverted)
+            {
                 inside = !inside;
             }
-        } else if (settings.window2Enabled) {
+        }
+        else if (settings.window2Enabled)
+        {
             inside = column >= window2Left && column <= window2Right;
-            if (settings.window2Inverted) {
+            if (settings.window2Inverted)
+            {
                 inside = !inside;
             }
         }
@@ -509,7 +599,8 @@ public:
 
     bool setColorBlack(bool insideColorWindow)
     {
-        switch (clipColorToBlackMode) {
+        switch (clipColorToBlackMode)
+        {
         case ColorWindowMode::Never: return false;
         case ColorWindowMode::OutsideOnly: return !insideColorWindow;
         case ColorWindowMode::InsideOnly: return insideColorWindow;
@@ -519,7 +610,8 @@ public:
 
     bool preventColorMath(bool insideColorWindow)
     {
-        switch (clipColorMathMode) {
+        switch (clipColorMathMode)
+        {
         case ColorWindowMode::Never: return false;
         case ColorWindowMode::OutsideOnly: return !insideColorWindow;
         case ColorWindowMode::InsideOnly: return insideColorWindow;
@@ -530,14 +622,20 @@ public:
     Word applyColorMath(Word inputPixel, Layer layer, Word addendPixel, Byte colorMathDesignation, bool clipColor, bool clipMath, bool subtract, bool halfMath)
     {
         Word result = inputPixel;
-        if (colorMathDesignation.getBit(int(layer))) {
-            if (clipColor) {
+        if (colorMathDesignation.getBit(int(layer)))
+        {
+            if (clipColor)
+            {
                 result = 0;
             }
-            if (!clipMath) {
-                if (subtract) {
+            if (!clipMath)
+            {
+                if (subtract)
+                {
                     return subtractColors(Word(result), addendPixel, halfMath);
-                } else {
+                }
+                else
+                {
                     return addColors(Word(result), addendPixel, halfMath);
                 }
             }
@@ -551,7 +649,8 @@ public:
         c.red = a.red + b.red;
         c.green = a.green + b.green;
         c.blue = a.blue + b.blue;
-        if (halfMath) {
+        if (halfMath)
+        {
             c.red = c.red >> 1;
             c.green = c.green >> 1;
             c.blue = c.blue >> 1;
@@ -569,7 +668,8 @@ public:
         c.red = b.red < a.red ? a.red - b.red : 0;
         c.green = b.green < a.green ? a.green - b.green : 0;
         c.blue = b.blue < a.blue ? a.blue - b.blue : 0;
-        if (halfMath) {
+        if (halfMath)
+        {
             throw NotYetImplementedException("Subtraction half math");
             c.red = c.red >> 1;
             c.green = c.green >> 1;

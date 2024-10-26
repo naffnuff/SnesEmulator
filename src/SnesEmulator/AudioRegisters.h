@@ -100,6 +100,154 @@ public:
             spcMemory.createLocation<BootRomLocation>(address, Byte(0xff), bootRomData[i], std::ref(bootRomDataEnabled));
         }
 
+        //// DSP Registers
+        //for (int i = 0; i < processor.voices.size(); ++i)
+        //{
+        //    Byte voiceAddressStart(i << 4);
+        //    std::string voiceName("Voice ");
+        //    voiceName += char('0' + i);
+        //    voiceName += " ";
+        //    processor.makeWriteRegister(voiceAddressStart, voiceName + "Left Volume", false, processor.voices[i].leftVolume);
+        //    processor.makeWriteRegister(voiceAddressStart + 1, voiceName + "Right Volume", false, processor.voices[i].rightVolume);
+        //    processor.makeWriteRegister(voiceAddressStart + 2, voiceName + "Pitch low byte", false,
+        //        /*[this, i](Byte& value) {
+        //            value = processor.voices[i].pitch.getLowByte();
+        //        },*/
+        //        [this, i](Byte value)
+        //        {
+        //            processor.voices[i].pitch.setLowByte(value);
+        //        }
+        //    );
+        //    processor.makeWriteRegister(voiceAddressStart + 3, voiceName + "Pitch high byte", false,
+        //        /*[this, i](Byte& value) {
+        //            value = processor.voices[i].pitch.getHighByte();
+        //        },*/
+        //        [this, i](Byte value)
+        //        {
+        //            processor.voices[i].pitch.setHighByte(value.getBits(0, 6));
+        //        }
+        //    );
+        //    processor.makeWriteRegister(voiceAddressStart + 4, voiceName + "Source Number", false, processor.voices[i].sourceNumber);
+        //    processor.makeWriteRegister(voiceAddressStart + 5, voiceName + "ADSR low byte", false,
+        //        /*[this, i](Byte& value) {
+        //            value = processor.voices[i].attackRate | processor.voices[i].decayRate << 4 | processor.voices[i].envelopeType << 7;
+        //        },*/
+        //        [this, i](Byte value)
+        //        {
+        //            processor.voices[i].attackRate = value.getBits(0, 4);
+        //            processor.voices[i].decayRate = value.getBits(4, 3);
+        //            if (value.getBit(7))
+        //            {
+        //                processor.voices[i].envelopeType = Processor::Voice::EnvelopeType::ADSR;
+        //            }
+        //            else
+        //            {
+        //                processor.voices[i].envelopeType = Processor::Voice::EnvelopeType::Gain;
+        //                //throw NotYetImplementedException("Gain mode not supported");
+        //            }
+        //        }
+        //    );
+        //    processor.makeWriteRegister(voiceAddressStart + 6, voiceName + "ADSR high byte", false,
+        //        /*[this, i](Byte& value) {
+        //            value = processor.voices[i].sustainRate | processor.voices[i].sustainLevel << 5;
+        //        },*/
+        //        [this, i](Byte value)
+        //        {
+        //            processor.voices[i].sustainRate = value.getBits(0, 5);
+        //            processor.voices[i].sustainLevel = value.getBits(5, 3);
+        //        }
+        //    );
+        //    processor.makeWriteRegister(voiceAddressStart + 7, voiceName + "Gain", false,
+        //        /*[this, i](Byte& value) {
+        //            if (processor.voices[i].gainMode == Processor::Direct) {
+        //                value = processor.voices[i].gainLevel;
+        //            } else {
+        //                value = Byte(processor.voices[i].gainLevel | processor.voices[i].gainMode << 5 | 1 << 7);
+        //            }
+        //        },*/
+        //        [this, i](Byte value)
+        //        {
+        //            if (value.getBit(7))
+        //            {
+        //                processor.voices[i].gainMode = Processor::Voice::GainMode(uint8_t(value.getBits(5, 2)));
+        //                processor.voices[i].gainLevel = value.getBits(0, 5);
+        //            }
+        //            else
+        //            {
+        //                processor.voices[i].gainMode = Processor::Voice::GainMode::Direct;
+        //                processor.voices[i].gainLevel = value.getBits(0, 7);
+        //            }
+        //        }
+        //    );
+        //    //processor.makeReadRegister(voiceAddressStart + 8, voiceName + "Envelope", false, processor.renderer.data[i].envelope);
+        //    //processor.makeReadRegister(voiceAddressStart + 9, voiceName + "Output", false, processor.renderer.data[i].output);
+        //}
+        //processor.makeWriteRegister(0x0c, "Main Volume Left", false, processor.mainVolumeLeft);
+        //processor.makeWriteRegister(0x1c, "Main Volume Right", false, processor.mainVolumeRight);
+        //processor.makeWriteRegister(0x2c, "Echo Volume Left", false, processor.echoVolumeLeft);
+        //processor.makeWriteRegister(0x3c, "Echo Volume Right", false, processor.echoVolumeRight);
+        //processor.makeWriteRegister(0x4c, "Key On", false,
+        //    [this](Byte value)
+        //    {
+        //        std::bitset<8> bitSet(value);
+        //        for (int i = 0; i < 8; ++i)
+        //        {
+        //            bool oldKeyOn = processor.voices[i].keyOn;
+        //            processor.voices[i].keyOn = bitSet[i];
+        //            if (bitSet[i] && !oldKeyOn)
+        //            {
+        //                processor.voices[i].keyOnIsSet = true;
+        //            }
+        //        }
+        //    }
+        //);
+        //processor.makeVoiceBitWriteRegister<&Processor::Voice::keyOff>(0x5c, "Key Off", false);
+        //processor.makeWriteRegister(0x6c, "Flags", false,
+        //    /*[this](Byte& value) {
+        //        value = processor.reset << 7 | processor.mute << 6 | processor.echoOff << 5 | processor.noiseGeneratorClock;
+        //    },*/
+        //    [this](Byte value)
+        //    {
+        //        processor.reset = value.getBit(7);
+        //        processor.mute = value.getBit(6);
+        //        processor.echoOff = value.getBit(5);
+        //        processor.noiseGeneratorClock = value.getBits(0, 5);
+        //    }
+        //);
+        //processor.makeWriteRegister(0x7c, "Source End Block", true,
+        //    /*[this](Byte& value) {
+        //    },*/
+        //    [this](Byte value)
+        //    {
+        //        for (Processor::Voice& voice : processor.voices)
+        //        {
+        //            voice.sourceEndBlock = false;
+        //        }
+        //    }
+        //);
+        //processor.makeWriteRegister(0x0d, "Echo Feedback", false, processor.echoFeedback);
+        //processor.makeVoiceBitWriteRegister<&Processor::Voice::pitchModulation>(0x2d, "Pitch Modulation", false);
+        //processor.makeVoiceBitWriteRegister<&Processor::Voice::noiseOn>(0x3d, "Noise On", false);
+        //processor.makeVoiceBitWriteRegister<&Processor::Voice::echoOn>(0x4d, "Echo On", false);
+        //processor.makeWriteRegister(0x5d, "Source Directory Offset", true, processor.sourceDirectory);
+        //processor.makeWriteRegister(0x6d, "Echo Region Offset", false, processor.echoRegionOffset);
+        //processor.makeReadWriteRegister(0x7d, "Echo Delay", false,
+        //    [this](Byte& value)
+        //    {
+        //        value = processor.echoDelay;
+        //    },
+        //    [this](Byte value)
+        //    {
+        //        processor.echoDelay = value.getBits(0, 4);
+        //    }
+        //);
+        //for (int i = 0; i < processor.voiceCount; ++i)
+        //{
+        //    std::string coefficientName("Coefficient ");
+        //    coefficientName += char('0' + i);
+        //    processor.makeWriteRegister(Byte(i << 4 | 0x0f), coefficientName, false, processor.voices[i].coefficient);
+        //}
+
         // DSP Registers
         for (int i = 0; i < processor.voices.size(); ++i)
         {
@@ -122,7 +270,7 @@ public:
         processor.makeAudioWriteRegister<Processor::Register::MVOLR>(0x1c, "Main Volume Right", false);
         processor.makeAudioWriteRegister<Processor::Register::EVOLL>(0x2c, "Echo Volume Left", false);
         processor.makeAudioWriteRegister<Processor::Register::EVOLR>(0x3c, "Echo Volume Right", false);
-        processor.makeAudioWriteRegister<Processor::Register::KON>(0x4c, "Key On", false);
+        processor.makeAudioWriteRegister<Processor::Register::KON>(0x4c, "Key On", true);
         processor.makeAudioWriteRegister<Processor::Register::KOFF>(0x5c, "Key Off", false);
         processor.makeAudioWriteRegister<Processor::Register::FLG>(0x6c, "Flags", false);
         processor.makeAudioWriteRegister<Processor::Register::ENDX>(0x7c, "Source End Block", true);

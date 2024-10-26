@@ -222,7 +222,7 @@ public:
 
                 /*if (cgramHighTable) {
                     int row = cgramAddress / 0x10;
-                    int column = cgramAddress % 0x10;
+                    int column = cgramAddress & 0xf;
                     processor.cgramRenderer.setPixel(row, column, processor.cgram.readWord(cgramAddress));
                 }*/
             }
