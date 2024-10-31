@@ -179,9 +179,8 @@ void Processor::outputNextSample(float& leftChannel, float& rightChannel)
     leftChannel = leftOutput;
     rightChannel = rightOutput;
 
-    /*int32_t leftSampleSum = 0;
-    int32_t rightSampleSum = 0;
-    nextSample = 0;
+    /*leftSampleSum = 0;
+    rightSampleSum = 0;
     int i = 0;
     for (Audio::Processor::Voice& voice : voices)
 	{
@@ -190,8 +189,8 @@ void Processor::outputNextSample(float& leftChannel, float& rightChannel)
             //Audio::Processor::Voice& voice = voices[0];
 
             voice.calculateNextSample();
-            int16_t leftSample = voice.applyLeftVolume();
-            int16_t rightSample = voice.applyRightVolume();
+            int16_t leftSample = voice.applyVolume(voice.leftVolume);
+            int16_t rightSample = voice.applyVolume(voice.rightVolume);
             leftSampleSum = Types::signedClamp<16, int32_t>(leftSampleSum + leftSample);
             rightSampleSum = Types::signedClamp<16, int32_t>(rightSampleSum + rightSample);
         }
@@ -264,14 +263,9 @@ void Processor::Voice::calculateNextSample()
     }
 }
 
-int16_t Processor::Voice::applyLeftVolume()
+int16_t Processor::Voice::applyVolume(int8_t volume)
 {
-    return Types::signedClamp<16, int16_t>(nextSample * leftVolume >> 7);
-}
-
-int16_t Processor::Voice::applyRightVolume()
-{
-    return Types::signedClamp<16, int16_t>(nextSample * rightVolume >> 7);
+    return Types::signedClamp<16, int16_t>(nextSample * volume >> 7);
 }
 
 void Processor::Voice::readSampleAddress(bool loopAddress)
@@ -344,19 +338,12 @@ void Processor::Voice::decodeSampleSource()
             sampleBuffer[bufferIndex++] = Types::clip<16, int16_t>(expandedSample);
         }
     }
+
+    nextSampleAddress += 2;
 }
 
 void Processor::Voice::decodeNextBlock()
 {
-    header = processor.spcMemory.readByte(headerAddress);
-
-    for (Byte& byte : sampleSource)
-    {
-        byte = processor.spcMemory.readByte(nextSampleAddress++);
-    }
-
-    decodeSampleSource();
-
     if (nextSampleAddress - headerAddress > 8)
     {
         if (header.getBit(0))
@@ -374,6 +361,13 @@ void Processor::Voice::decodeNextBlock()
             ++nextSampleAddress;
         }
     }
+
+    header = processor.spcMemory.readByte(headerAddress);
+
+    sampleSource[0] = processor.spcMemory.readByte(nextSampleAddress);
+    sampleSource[1] = processor.spcMemory.readByte(nextSampleAddress + 1);
+
+    decodeSampleSource();
 }
 
 void Processor::Voice::setADSRStage(ADSRStage nextStage)
@@ -465,9 +459,30 @@ void Processor::Voice::doStep<2>()
 {
     //  1. Load the sample pointer(using previously loaded DIR and VxSRCN) if
     //  necessary.
-    if (sampleStage > SampleStage::Inactive)
+    if (sampleStage == SampleStage::AddressRead)
     {
         readSampleAddress(false);
+        endOfSample = false;
+        shouldLoop = false;
+    }
+    else
+    {
+        const bool endOfBlock = nextSampleAddress - headerAddress > 8;
+        if (endOfBlock)
+        {
+            endOfSample = header.getBit(0);
+            shouldLoop = header.getBit(1);
+
+            if (endOfSample)
+            {
+                readSampleAddress(true);
+            }
+            else
+            {
+                headerAddress = nextSampleAddress;
+                ++nextSampleAddress;
+            }
+        }
     }
 
     //  2. Load VxPITCHL register.
@@ -509,7 +524,7 @@ void Processor::Voice::doStep3b()
         header = processor.spcMemory.readByte(headerAddress);
 
         //  2. Read the first of the two BRR bytes that will be decoded.
-        sampleSource[0] = processor.spcMemory.readByte(nextSampleAddress++);
+        sampleSource[0] = processor.spcMemory.readByte(nextSampleAddress);
     }
 }
 
@@ -531,18 +546,61 @@ void Processor::Voice::doStep3c()
         // TODO
     }
 
-    //  4. Check BRR header 'e' and 'l' bits to determine if the voice ends.
-    // TODO
+    if (sampleStage > SampleStage::Inactive)
+    {
+        //  4. Check BRR header 'e' and 'l' bits to determine if the voice ends.
+        if (endOfSample && !shouldLoop)
+        { // loop bit not set
+            // TODO is this really immediate?
+            envelope = 0;
+            adsrStage = ADSRStage::Inactive;
+        }
+    }
 
     //  5. Handle KOFF and KON using previously loaded values. If KON, ENDX.x will
     //  be cleared in step S7.
-    // TODO
+    // TODO - ENDX.x
+    if (keyOnInternal)
+    {
+        envelope = 0;
+        adsrStage = ADSRStage::Inactive;
+        sampleStage = SampleStage::Reset;
+    }
+    if (keyOff)
+    {
+        sampleStage = SampleStage::Output;
+        setADSRStage(ADSRStage::Release);
+    }
 
     //  6. Load VxGAIN or VxADSR2 register depending on ADSR1.7.
-    // TODO
+    if (envelopeType == Processor::Voice::EnvelopeType::ADSR)
+    {
+        Byte adsr2 = registers[size_t(Register::VxADSR2)];
+        sustainRate = adsr2.getBits(0, 5);
+        sustainLevel = adsr2.getBits(5, 3);
+    }
+    else // envelopeType == Processor::Voice::EnvelopeType::GAIN
+    {
+        Byte gain = registers[size_t(Register::VxGAIN)];
+        if (gain.getBit(7))
+        {
+            gainMode = Processor::Voice::GainMode(uint8_t(gain.getBits(5, 2)));
+            gainLevel = gain.getBits(0, 5);
+        }
+        else
+        {
+            gainMode = Processor::Voice::GainMode::Direct;
+            gainLevel = gain.getBits(0, 7);
+        }
+    }
+
+    if (sampleStage == SampleStage::PrepareOutput)
+    {
+        setADSRStage(ADSRStage::Attack);
+    }
 
     //  7. Update the volume envelope, using previously loaded values.
-    // TODO
+    calculateEnvelope();
 }
 
 template<>
@@ -558,7 +616,7 @@ template<>
 void Processor::Voice::doStep<4>()
 {
     //  1. Load and apply VxVOLL register.
-    // TODO
+    leftVolume = registers[size_t(Register::VxVOLL)];
 
     //  2. If a new group of BRR samples is required, load the second BRR byte and
     //  decode the group of 4 BRR samples. This is definitely not done when not
@@ -566,12 +624,42 @@ void Processor::Voice::doStep<4>()
     //  flag the loop address for loading next step S2 and set ENDX.x in step S7.
     //  Note that this setting of ENDX.x will not override the clearing due to KON
     //  in step S3c, if both occur during the same sample.
+    if (sampleStage == SampleStage::FirstBRRGroup || sampleStage == SampleStage::SecondBRRGroup || sampleStage == SampleStage::ThirdBRRGroup)
+    {
+        sampleSource[1] = processor.spcMemory.readByte(nextSampleAddress + 1);
+
+        decodeSampleSource();
+    }
     // TODO
 
     //  3. Increment interpolation sample position as specified by pitch values.
     //  At any point from now until we next get to S3c, the next sample may be
     //  calculated using the interpolation position and BRR buffer contents.
-    // TODO
+    if (sampleStage == SampleStage::Output)
+    {
+        interpolationIndex += pitch;
+        if (interpolationIndex > 0x7fff)
+        {
+            interpolationIndex = 0x7fff;
+        }
+        if (interpolationIndex >= 0x4000)
+        {
+            sampleSource[1] = processor.spcMemory.readByte(nextSampleAddress + 1);
+
+            decodeSampleSource();
+
+            interpolationIndex -= 0x4000;
+        }
+        nextSample = sampleBuffer[interpolationIndex >> 12];
+        nextSample = Types::signedClamp<16, int16_t>(int(nextSample) * int(envelope) >> 11);
+
+        int16_t leftSample = applyVolume(leftVolume);
+        processor.leftSampleSum += leftSample;
+    }
+    else if(sampleStage != SampleStage::Inactive)
+    {
+        sampleStage = SampleStage(int(sampleStage) + 1);
+    }
 
 }
 
@@ -580,7 +668,12 @@ template<>
 void Processor::Voice::doStep<5>()
 {
     //  1. Load and apply VxVOLR register.
-    // TODO
+    rightVolume = registers[size_t(Register::VxVOLR)];
+    if (sampleStage == SampleStage::Output)
+    {
+        int16_t rightSample = applyVolume(rightVolume);
+        processor.leftSampleSum += rightSample;
+    }
 
     //  2. The new ENDX.x value is prepared, and can be overwritten. Reads will not
     //  see it yet.
@@ -626,6 +719,7 @@ void Processor::Voice::doStep<9>()
 {
     //  1. The new VxENVX value may now be read.
     // TODO
+
 
 }
 
@@ -1050,6 +1144,8 @@ void Processor::onSampleCycle<30>()
     //  4. Load FLG bits 0 - 4 and update noise sample if necessary.
     // TODO
 
+    leftSampleSum = 0;
+    rightSampleSum = 0;
 }
 
 //  31.
@@ -1094,11 +1190,11 @@ void Processor::tick()
         ++sampleCount;
     }
 
-    /*if (spcCycle & 15 == 0)
+    /*if ((spcCycle & 15) == 0)
     {
         for (int i = 0; i < 3; ++i)
         {
-            if (timers[i].enabled && (timers[i].highPrecision || spcCycle & 127 == 0))
+            if (timers[i].enabled && (timers[i].highPrecision || (spcCycle & 127) == 0))
             {
                 ++timers[i].tick;
                 if (timers[i].tick == timers[i].target)

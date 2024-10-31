@@ -119,21 +119,9 @@ public:
             VxPITCHL,
             VxPITCHH,
             VxSRCN,
-            VxADSR1, // 
-            VxADSR2, // 
-                            //processor.voices[i].sustainRate = value.getBits(0, 5);
-                            //processor.voices[i].sustainLevel = value.getBits(5, 3);
-            VxGAIN, // 
-                            /*if (value.getBit(7))
-                            {
-                                processor.voices[i].gainMode = Processor::Voice::GainMode(uint8_t(value.getBits(5, 2)));
-                                processor.voices[i].gainLevel = value.getBits(0, 5);
-                            }
-                            else
-                            {
-                                processor.voices[i].gainMode = Processor::Voice::GainMode::Direct;
-                                processor.voices[i].gainLevel = value.getBits(0, 7);
-                            }*/
+            VxADSR1,
+            VxADSR2,
+            VxGAIN,
             VxENV, // processor.renderer.data[i].envelope
             VxOUT, // processor.renderer.data[i].output
             FFCx, // processor.voices[i].coefficient
@@ -259,8 +247,7 @@ public:
         }
 
         void calculateNextSample();
-        int16_t applyLeftVolume();
-        int16_t applyRightVolume();
+        int16_t applyVolume(int8_t volume);
         void setADSRStage(ADSRStage nextStage);
         void calculateEnvelope();
         void readSampleAddress(bool loopAddress);
@@ -290,6 +277,8 @@ public:
         Word nextSampleAddress;
 
         Byte header;
+        bool endOfSample = false;
+        bool shouldLoop = false;
 
         std::array<Byte, 2> sampleSource = { 0 };
 
@@ -493,7 +482,7 @@ private:
 
     friend struct StreamHandler;
 
-    uint64_t spcCycle = 0;
+    //uint64_t spcCycle = 0;
 
     uint64_t dspCycle = 0;
 
