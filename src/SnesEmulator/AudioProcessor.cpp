@@ -513,17 +513,7 @@ void Processor::Voice::doStep3b()
     }
 }
 
-//  c.
-//  1. If applicable, replace the current sample with the noise sample.
-//  2. Apply the volume envelope.
-//  - This is the value used for modulating the next voice's pitch, if
-//  applicable.
-//  3. Check FLG bit 7 (NOT previously loaded).
-//  4. Check BRR header 'e' and 'l' bits to determine if the voice ends.
-//  5. Handle KOFF and KON using previously loaded values. If KON, ENDX.x will
-//  be cleared in step S7.
-//  6. Load VxGAIN or VxADSR2 register depending on ADSR1.7.
-//  7. Update the volume envelope, using previously loaded values.
+//  S3c.
 void Processor::Voice::doStep3c()
 {
     //  1. If applicable, replace the current sample with the noise sample.
@@ -542,11 +532,17 @@ void Processor::Voice::doStep3c()
     }
 
     //  4. Check BRR header 'e' and 'l' bits to determine if the voice ends.
+    // TODO
+
     //  5. Handle KOFF and KON using previously loaded values. If KON, ENDX.x will
     //  be cleared in step S7.
-    //  6. Load VxGAIN or VxADSR2 register depending on ADSR1.7.
-    //  7. Update the volume envelope, using previously loaded values.
+    // TODO
 
+    //  6. Load VxGAIN or VxADSR2 register depending on ADSR1.7.
+    // TODO
+
+    //  7. Update the volume envelope, using previously loaded values.
+    // TODO
 }
 
 template<>
@@ -562,15 +558,21 @@ template<>
 void Processor::Voice::doStep<4>()
 {
     //  1. Load and apply VxVOLL register.
+    // TODO
+
     //  2. If a new group of BRR samples is required, load the second BRR byte and
     //  decode the group of 4 BRR samples. This is definitely not done when not
     //  necessary. If necessary, adjust the BRR pointer to the next block, or
     //  flag the loop address for loading next step S2 and set ENDX.x in step S7.
     //  Note that this setting of ENDX.x will not override the clearing due to KON
     //  in step S3c, if both occur during the same sample.
+    // TODO
+
     //  3. Increment interpolation sample position as specified by pitch values.
     //  At any point from now until we next get to S3c, the next sample may be
     //  calculated using the interpolation position and BRR buffer contents.
+    // TODO
+
 }
 
 //  S5.
@@ -578,8 +580,12 @@ template<>
 void Processor::Voice::doStep<5>()
 {
     //  1. Load and apply VxVOLR register.
+    // TODO
+
     //  2. The new ENDX.x value is prepared, and can be overwritten. Reads will not
     //  see it yet.
+    // TODO
+
 }
 
 //  S6.
@@ -588,6 +594,8 @@ void Processor::Voice::doStep<6>()
 {
     //  1. The new VxOUTX value is prepared, and can be overwritten. Reads will not
     //  see it yet.
+    // TODO
+
 }
 
 //  S7.
@@ -595,8 +603,12 @@ template<>
 void Processor::Voice::doStep<7>()
 {
     //  1. The new ENDX.x value may now be read.
+    // TODO
+
     //  2. The new VxENVX value is prepared, and can be overwritten.Reads will not
     //  see it yet.
+    // TODO
+
 }
 
 //  S8.
@@ -604,6 +616,8 @@ template<>
 void Processor::Voice::doStep<8>()
 {
     //  1. The new VxOUTX value may now be read.
+    // TODO
+
 }
 
 //  S9.
@@ -611,6 +625,8 @@ template<>
 void Processor::Voice::doStep<9>()
 {
     //  1. The new VxENVX value may now be read.
+    // TODO
+
 }
 
 void Processor::tickTimers(bool tickAllTimers)
@@ -1026,8 +1042,14 @@ void Processor::onSampleCycle<30>()
     voices[0].doStep3c();
 
     //  2. Write right channel sample to the echo buffer, if allowed by ECENx.
+    // TODO
+
     //  3. Increment the echo offset, and set to 0 if it exceeds the buffer length.
+    // TODO
+
     //  4. Load FLG bits 0 - 4 and update noise sample if necessary.
+    // TODO
+
 }
 
 //  31.
