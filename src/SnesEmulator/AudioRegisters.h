@@ -196,7 +196,7 @@ public:
         //            processor.voices[i].keyOn = bitSet[i];
         //            if (bitSet[i] && !oldKeyOn)
         //            {
-        //                processor.voices[i].keyOnIsSet = true;
+        //                processor.voices[i].keyOnInternal = true;
         //            }
         //        }
         //    }

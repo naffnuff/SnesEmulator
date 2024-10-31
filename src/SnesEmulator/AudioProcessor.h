@@ -258,12 +258,13 @@ public:
             }
         }
 
-        void calculateNextSample(int16_t& nextSample);
-        int16_t applyLeftVolume(int16_t nextSample);
-        int16_t applyRightVolume(int16_t nextSample);
+        void calculateNextSample();
+        int16_t applyLeftVolume();
+        int16_t applyRightVolume();
         void setADSRStage(ADSRStage nextStage);
         void calculateEnvelope();
         void readSampleAddress(bool loopAddress);
+        void decodeSampleSource();
         void decodeNextBlock();
 
         void doStep3a();
@@ -276,14 +277,21 @@ public:
     public:
         std::array<Byte, size_t(Register::Count)> registers;
 
+        Voice* previousVoice = nullptr;
+
     private:
         Processor& processor;
+
         ADSRStage adsrStage = ADSRStage::Inactive;
 
         Word sourceAddress;
 
         Word headerAddress;
         Word nextSampleAddress;
+
+        Byte header;
+
+        std::array<Byte, 2> sampleSource = { 0 };
 
         std::array<int16_t, 12> sampleBuffer = { 0 };
 
@@ -300,6 +308,7 @@ public:
         Byte sourceNumber;
 
         int envelope;
+        int16_t nextSample = 0;
         Word output;
 
         int setupPhase = -1; // remove

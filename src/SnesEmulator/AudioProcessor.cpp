@@ -80,6 +80,13 @@ Processor::Processor(Output& output, Memory<Word>& spcMemory)
     , dspMemory(0x80)
 {
     timers[2].highPrecision = true;
+
+    Voice* previousVoice = nullptr;
+    for (Voice& voice : voices)
+    {
+        voice.previousVoice = previousVoice;
+        previousVoice = &voice;
+    }
 }
 
 Processor::~Processor()
@@ -174,7 +181,7 @@ void Processor::outputNextSample(float& leftChannel, float& rightChannel)
 
     /*int32_t leftSampleSum = 0;
     int32_t rightSampleSum = 0;
-    int16_t nextSample = 0;
+    nextSample = 0;
     int i = 0;
     for (Audio::Processor::Voice& voice : voices)
 	{
@@ -182,9 +189,9 @@ void Processor::outputNextSample(float& leftChannel, float& rightChannel)
         {
             //Audio::Processor::Voice& voice = voices[0];
 
-            voice.calculateNextSample(nextSample);
-            int16_t leftSample = voice.applyLeftVolume(nextSample);
-            int16_t rightSample = voice.applyRightVolume(nextSample);
+            voice.calculateNextSample();
+            int16_t leftSample = voice.applyLeftVolume();
+            int16_t rightSample = voice.applyRightVolume();
             leftSampleSum = Types::signedClamp<16, int32_t>(leftSampleSum + leftSample);
             rightSampleSum = Types::signedClamp<16, int32_t>(rightSampleSum + rightSample);
         }
@@ -203,7 +210,7 @@ void Processor::outputNextSample(float& leftChannel, float& rightChannel)
     rightChannel = float(rightSampleSum) / float(rightSampleSum < 0 ? 0x8000 : 0x7fff);*/
 }
 
-void Processor::Voice::calculateNextSample(int16_t& nextSample)
+void Processor::Voice::calculateNextSample()
 {
     if (keyOnInternal)
     {
@@ -227,7 +234,7 @@ void Processor::Voice::calculateNextSample(int16_t& nextSample)
         {
             setADSRStage(ADSRStage::Attack);
         }
-        else
+        else // 4, 3, 2
         {
             decodeNextBlock();
         }
@@ -257,12 +264,12 @@ void Processor::Voice::calculateNextSample(int16_t& nextSample)
     }
 }
 
-int16_t Processor::Voice::applyLeftVolume(int16_t nextSample)
+int16_t Processor::Voice::applyLeftVolume()
 {
     return Types::signedClamp<16, int16_t>(nextSample * leftVolume >> 7);
 }
 
-int16_t Processor::Voice::applyRightVolume(int16_t nextSample)
+int16_t Processor::Voice::applyRightVolume()
 {
     return Types::signedClamp<16, int16_t>(nextSample * rightVolume >> 7);
 }
@@ -288,20 +295,19 @@ void Processor::Voice::readSampleAddress(bool loopAddress)
     nextSampleAddress = headerAddress + 1;
 }
 
-void Processor::Voice::decodeNextBlock()
+void Processor::Voice::decodeSampleSource()
 {
     for (size_t i = 0; i < 8; ++i)
     {
         sampleBuffer[i] = sampleBuffer[i + 4];
     }
-    const Byte header = processor.spcMemory.readByte(headerAddress);
+
     const Byte filter = header.getBits(2, 2);
     const Byte range = header.getBits(4, 4);
     size_t bufferIndex = 8;
-    for (int i = 0; i < 2; ++i)
+    for (const Byte& byte : sampleSource)
     {
-        const Byte sampleSource = processor.spcMemory.readByte(nextSampleAddress++);
-        for (int8_t sample : { sampleSource.getBits(4, 4), sampleSource.getBits(0, 4) })
+        for (int8_t sample : { byte.getBits(4, 4), byte.getBits(0, 4) })
         {
             bool isNegative = false;
             if (sample >= 8)
@@ -338,6 +344,19 @@ void Processor::Voice::decodeNextBlock()
             sampleBuffer[bufferIndex++] = Types::clip<16, int16_t>(expandedSample);
         }
     }
+}
+
+void Processor::Voice::decodeNextBlock()
+{
+    header = processor.spcMemory.readByte(headerAddress);
+
+    for (Byte& byte : sampleSource)
+    {
+        byte = processor.spcMemory.readByte(nextSampleAddress++);
+    }
+
+    decodeSampleSource();
+
     if (nextSampleAddress - headerAddress > 8)
     {
         if (header.getBit(0))
@@ -433,28 +452,28 @@ void Processor::Voice::calculateEnvelope()
 }
 
 //  S1.
-//  1. Load VxSRCN register, if necessary.
 template<>
 void Processor::Voice::doStep<1>()
 {
+    //  1. Load VxSRCN register, if necessary.
     sourceNumber = registers[size_t(Register::VxSRCN)];
 }
 
 //  S2.
-//  1. Load the sample pointer(using previously loaded DIR and VxSRCN) if
-//  necessary.
-//  2. Load VxPITCHL register.
-//  3. Load VxADSR1 register.
 template<>
 void Processor::Voice::doStep<2>()
 {
-    if (sampleStage == SampleStage::AddressRead)
+    //  1. Load the sample pointer(using previously loaded DIR and VxSRCN) if
+    //  necessary.
+    if (sampleStage > SampleStage::Inactive)
     {
         readSampleAddress(false);
     }
 
+    //  2. Load VxPITCHL register.
     pitch.setLowByte(registers[size_t(Register::VxPITCHL)]);
 
+    //  3. Load VxADSR1 register.
     Byte adsr1 = registers[size_t(Register::VxADSR1)];
     attackRate = adsr1.getBits(0, 4);
     decayRate = adsr1.getBits(4, 3);
@@ -468,12 +487,10 @@ void Processor::Voice::doStep<2>()
     }
 }
 
-//  S3.
-//  a.
-//  1. Load VxPITCHH register.
-//  2. Apply pitch modulation if applicable.
+//  S3a.
 void Processor::Voice::doStep3a()
 {
+    //  1. Load VxPITCHH register.
     pitch.setHighByte(registers[size_t(Register::VxPITCHH)].getBits(0, 6));
 
     //  2. Apply pitch modulation if applicable.
@@ -483,11 +500,17 @@ void Processor::Voice::doStep3a()
     }
 }
 
-//  b.
-//  1. Load the BRR header byte (every time), and the first of the two BRR
-//  bytes that will be decoded.
+//  S3b.
 void Processor::Voice::doStep3b()
 {
+    if (sampleStage > SampleStage::Inactive)
+    {
+        //  1. Load the BRR header byte (every time)
+        header = processor.spcMemory.readByte(headerAddress);
+
+        //  2. Read the first of the two BRR bytes that will be decoded.
+        sampleSource[0] = processor.spcMemory.readByte(nextSampleAddress++);
+    }
 }
 
 //  c.
@@ -503,11 +526,27 @@ void Processor::Voice::doStep3b()
 //  7. Update the volume envelope, using previously loaded values.
 void Processor::Voice::doStep3c()
 {
+    //  1. If applicable, replace the current sample with the noise sample.
+    // TODO
+
+    //  2. Apply the volume envelope.
+    //  - This is the value used for modulating the next voice's pitch, if
+    //  applicable.
+    nextSample = Types::signedClamp<16, int16_t>(int(nextSample) * int(envelope) >> 11);
+
+    //  3. Check FLG bit 7 (NOT previously loaded).
     processor.reset = processor.registers[size_t(Processor::Register::FLG)].getBit(7);
     if (processor.reset)
     {
         // TODO
     }
+
+    //  4. Check BRR header 'e' and 'l' bits to determine if the voice ends.
+    //  5. Handle KOFF and KON using previously loaded values. If KON, ENDX.x will
+    //  be cleared in step S7.
+    //  6. Load VxGAIN or VxADSR2 register depending on ADSR1.7.
+    //  7. Update the volume envelope, using previously loaded values.
+
 }
 
 template<>
@@ -519,59 +558,59 @@ void Processor::Voice::doStep<3>()
 }
 
 //  S4.
-//  1. Load and apply VxVOLL register.
-//  2. If a new group of BRR samples is required, load the second BRR byte and
-//  decode the group of 4 BRR samples. This is definitely not done when not
-//  necessary. If necessary, adjust the BRR pointer to the next block, or
-//  flag the loop address for loading next step S2 and set ENDX.x in step S7.
-//  Note that this setting of ENDX.x will not override the clearing due to KON
-//  in step S3c, if both occur during the same sample.
-//  3. Increment interpolation sample position as specified by pitch values.
-//  At any point from now until we next get to S3c, the next sample may be
-//  calculated using the interpolation position and BRR buffer contents.
 template<>
 void Processor::Voice::doStep<4>()
 {
+    //  1. Load and apply VxVOLL register.
+    //  2. If a new group of BRR samples is required, load the second BRR byte and
+    //  decode the group of 4 BRR samples. This is definitely not done when not
+    //  necessary. If necessary, adjust the BRR pointer to the next block, or
+    //  flag the loop address for loading next step S2 and set ENDX.x in step S7.
+    //  Note that this setting of ENDX.x will not override the clearing due to KON
+    //  in step S3c, if both occur during the same sample.
+    //  3. Increment interpolation sample position as specified by pitch values.
+    //  At any point from now until we next get to S3c, the next sample may be
+    //  calculated using the interpolation position and BRR buffer contents.
 }
 
 //  S5.
-//  1. Load and apply VxVOLR register.
-//  2. The new ENDX.x value is prepared, and can be overwritten. Reads will not
-//  see it yet.
 template<>
 void Processor::Voice::doStep<5>()
 {
+    //  1. Load and apply VxVOLR register.
+    //  2. The new ENDX.x value is prepared, and can be overwritten. Reads will not
+    //  see it yet.
 }
 
 //  S6.
-//  1. The new VxOUTX value is prepared, and can be overwritten. Reads will not
-//  see it yet.
 template<>
 void Processor::Voice::doStep<6>()
 {
+    //  1. The new VxOUTX value is prepared, and can be overwritten. Reads will not
+    //  see it yet.
 }
 
 //  S7.
-//  1. The new ENDX.x value may now be read.
-//  2. The new VxENVX value is prepared, and can be overwritten.Reads will not
-//  see it yet.
 template<>
 void Processor::Voice::doStep<7>()
 {
+    //  1. The new ENDX.x value may now be read.
+    //  2. The new VxENVX value is prepared, and can be overwritten.Reads will not
+    //  see it yet.
 }
 
 //  S8.
-//  1. The new VxOUTX value may now be read.
 template<>
 void Processor::Voice::doStep<8>()
 {
+    //  1. The new VxOUTX value may now be read.
 }
 
 //  S9.
-//  1. The new VxENVX value may now be read.
 template<>
 void Processor::Voice::doStep<9>()
 {
+    //  1. The new VxENVX value may now be read.
 }
 
 void Processor::tickTimers(bool tickAllTimers)
@@ -591,15 +630,16 @@ void Processor::tickTimers(bool tickAllTimers)
 }
 
 //  0.
-//  1. Voice steps : V0:S5  V1 : S2
-//  2. Tick the SPC700 Stage 1 timers, always for T2 and every 4 samples for
-//  T0 and T1.
 template<>
 void Processor::onSampleCycle<0>()
 {
+    //  1. Voice steps : V0:S5  V1 : S2
+    //doSteps({ 0, 5 }, { 1, 2 });
     voices[0].doStep<5>();
     voices[1].doStep<2>();
 
+    //  2. Tick the SPC700 Stage 1 timers, always for T2 and every 4 samples for
+    //  T0 and T1.
     tickTimers((sampleCount & 3) == 0);
 
     ++dspCycle;
@@ -607,270 +647,274 @@ void Processor::onSampleCycle<0>()
 }
 
 //  1.
-//  1. Voice steps : V0:S6  V1 : S3
 template<>
 void Processor::onSampleCycle<1>()
 {
+    //  1. Voice steps : V0:S6  V1 : S3
     voices[0].doStep<6>();
     voices[1].doStep<3>();
 }
 
 //  2.
-//  1. Voice steps : V0:S7  V1 : S4         V3 : S1
 template<>
 void Processor::onSampleCycle<2>()
 {
+    //  1. Voice steps : V0:S7  V1 : S4         V3 : S1
     voices[0].doStep<7>();
     voices[1].doStep<4>();
     voices[3].doStep<1>();
 }
 
 //  3.
-//  1. Voice steps : V0:S8  V1 : S5  V2 : S2
 template<>
 void Processor::onSampleCycle<3>()
 {
+    //  1. Voice steps : V0:S8  V1 : S5  V2 : S2
     voices[0].doStep<8>();
     voices[1].doStep<5>();
     voices[2].doStep<2>();
 }
 
 //  4.
-//  1. Voice steps : V0:S9  V1 : S6  V2 : S3
 template<>
 void Processor::onSampleCycle<4>()
 {
+    //  1. Voice steps : V0:S9  V1 : S6  V2 : S3
     voices[0].doStep<9>();
     voices[1].doStep<6>();
     voices[2].doStep<3>();
 }
 
 //  5.
-//  1. Voice steps : V1:S7  V2 : S4         V4 : S1
 template<>
 void Processor::onSampleCycle<5>()
 {
+    //  1. Voice steps : V1:S7  V2 : S4         V4 : S1
     voices[1].doStep<7>();
     voices[2].doStep<4>();
     voices[4].doStep<1>();
 }
 
 //  6.
-//  1. Voice steps : V1:S8  V2 : S5  V3 : S2
 template<>
 void Processor::onSampleCycle<6>()
 {
+    //  1. Voice steps : V1:S8  V2 : S5  V3 : S2
     voices[1].doStep<8>();
     voices[2].doStep<5>();
     voices[3].doStep<2>();
 }
 
 //  7.
-//  1. Voice steps : V1:S9  V2 : S6  V3 : S3
 template<>
 void Processor::onSampleCycle<7>()
 {
+    //  1. Voice steps : V1:S9  V2 : S6  V3 : S3
     voices[1].doStep<9>();
     voices[2].doStep<6>();
     voices[3].doStep<3>();
 }
 
 //  8.
-//  1. Voice steps : V2:S7  V3 : S4         V5 : S1
 template<>
 void Processor::onSampleCycle<8>()
 {
+    //  1. Voice steps : V2:S7  V3 : S4         V5 : S1
     voices[2].doStep<7>();
     voices[3].doStep<4>();
     voices[5].doStep<1>();
 }
 
 //  9.
-//  1. Voice steps : V2:S8  V3 : S5  V4 : S2
 template<>
 void Processor::onSampleCycle<9>()
 {
+    //  1. Voice steps : V2:S8  V3 : S5  V4 : S2
     voices[2].doStep<8>();
     voices[3].doStep<5>();
     voices[4].doStep<2>();
 }
 
 //  10.
-//  1. Voice steps : V2:S9  V3 : S6  V4 : S3
 template<>
 void Processor::onSampleCycle<10>()
 {
+    //  1. Voice steps : V2:S9  V3 : S6  V4 : S3
     voices[2].doStep<9>();
     voices[3].doStep<6>();
     voices[4].doStep<3>();
 }
 
 //  11.
-//  1. Voice steps : V3:S7  V4 : S4         V6 : S1
 template<>
 void Processor::onSampleCycle<11>()
 {
+    //  1. Voice steps : V3:S7  V4 : S4         V6 : S1
     voices[3].doStep<7>();
     voices[4].doStep<4>();
     voices[6].doStep<1>();
 }
 
 //  12.
-//  1. Voice steps : V3:S8  V4 : S5  V5 : S2
 template<>
 void Processor::onSampleCycle<12>()
 {
+    //  1. Voice steps : V3:S8  V4 : S5  V5 : S2
     voices[3].doStep<8>();
     voices[4].doStep<5>();
     voices[5].doStep<2>();
 }
 
 //  13.
-//  1. Voice steps : V3:S9  V4 : S6  V5 : S3
 template<>
 void Processor::onSampleCycle<13>()
 {
+    //  1. Voice steps : V3:S9  V4 : S6  V5 : S3
     voices[3].doStep<9>();
     voices[4].doStep<6>();
     voices[5].doStep<3>();
 }
 
 //  14.
-//  1. Voice steps : V4:S7  V5 : S4         V7 : S1
 template<>
 void Processor::onSampleCycle<14>()
 {
+    //  1. Voice steps : V4:S7  V5 : S4         V7 : S1
     voices[4].doStep<7>();
     voices[5].doStep<4>();
     voices[7].doStep<1>();
 }
 
 //  15.
-//  1. Voice steps : V4:S8  V5 : S5  V6 : S2
 template<>
 void Processor::onSampleCycle<15>()
 {
+    //  1. Voice steps : V4:S8  V5 : S5  V6 : S2
     voices[4].doStep<8>();
     voices[5].doStep<5>();
     voices[6].doStep<2>();
 }
 
 //  16.
-//  1. Voice steps : V4:S9  V5 : S6  V6 : S3
-//  2. Tick the SPC700 Stage 1 timer for T2.
 template<>
 void Processor::onSampleCycle<16>()
 {
+    //  1. Voice steps : V4:S9  V5 : S6  V6 : S3
     voices[4].doStep<9>();
     voices[5].doStep<6>();
     voices[6].doStep<3>();
 
+    //  2. Tick the SPC700 Stage 1 timer for T2.
     tickTimers(false);
 }
 
 //  17.
-//  1. Voice steps : V0:S1                              V5 : S7  V6 : S4
 template<>
 void Processor::onSampleCycle<17>()
 {
+    //  1. Voice steps : V0:S1                              V5 : S7  V6 : S4
     voices[0].doStep<1>();
     voices[5].doStep<7>();
     voices[6].doStep<4>();
 }
 
 //  18.
-//  1. Voice steps : V5:S8  V6 : S5  V7 : S2
 template<>
 void Processor::onSampleCycle<18>()
 {
+    //  1. Voice steps : V5:S8  V6 : S5  V7 : S2
     voices[5].doStep<8>();
     voices[6].doStep<5>();
     voices[7].doStep<2>();
 }
 
 //  19.
-//  1. Voice steps : V5:S9  V6 : S6  V7 : S3
 template<>
 void Processor::onSampleCycle<19>()
 {
+    //  1. Voice steps : V5:S9  V6 : S6  V7 : S3
     voices[5].doStep<9>();
     voices[6].doStep<6>();
     voices[7].doStep<3>();
 }
 
 //  20.
-//  1. Voice steps : V1:S1                              V6 : S7  V7 : S4
 template<>
 void Processor::onSampleCycle<20>()
 {
+    //  1. Voice steps : V1:S1                              V6 : S7  V7 : S4
     voices[1].doStep<1>();
     voices[6].doStep<7>();
     voices[7].doStep<4>();
 }
 
 //  21.
-//  1. Voice steps : V0:S2                                     V6 : S8  V7 : S5
 template<>
 void Processor::onSampleCycle<21>()
 {
+    //  1. Voice steps : V0:S2                                     V6 : S8  V7 : S5
     voices[0].doStep<2>();
     voices[6].doStep<8>();
     voices[7].doStep<5>();
 }
 
 //  22.
-//  1. Voice steps : V0:S3a                                    V6 : S9  V7 : S6
-//  2. Apply ESA using the previously loaded value along with the previously
-//  calculated echo offset to calculate new echo pointer.
-//  3. Load left channel sample from the echo buffer.
-//  4. Load FFC0.
 template<>
 void Processor::onSampleCycle<22>()
 {
+    //  1. Voice steps : V0:S3a                                    V6 : S9  V7 : S6
     voices[0].doStep3a();
     voices[6].doStep<9>();
     voices[7].doStep<6>();
 
-    //    Apply ESA using the previously loaded value along with the previously
-    //    calculated echo offset to calculate new echo pointer.
-    //    Load left channel sample from the echo buffer.
-    //    Load FFC0.
+    //  2. Apply ESA using the previously loaded value along with the previously
+    //  calculated echo offset to calculate new echo pointer.
+    // TODO
+    
+    //  3. Load left channel sample from the echo buffer.
+    // TODO
+    
+    //  4. Load FFC0.
+    // TODO
+    
 }
 
 //  23.
-//  1. Voice steps : V7:S7
-//  2. Load right channel sample from the echo buffer.
-//  3. Load FFC1 and FFC2.
 template<>
 void Processor::onSampleCycle<23>()
 {
+    //  1. Voice steps : V7:S7
     voices[7].doStep<7>();
 
-    //    Load right channel sample from the echo buffer.
-    //    Load FFC1 and FFC2.
+    //  2. Load right channel sample from the echo buffer.
+    // TODO
+    
+    //  3. Load FFC1 and FFC2.
+    // TODO
+    
 }
 
 //  24.
-//  1. Voice steps : V7:S8
-//  2. Load FFC3, FFC4, and FFC5.
 template<>
 void Processor::onSampleCycle<24>()
 {
+    //  1. Voice steps : V7:S8
     voices[7].doStep<8>();
 
-    //    Load FFC3, FFC4, and FFC5.
+    //  2. Load FFC3, FFC4, and FFC5.
+    // TODO
 }
 
 //  25.
-//  1. Voice steps : V0:S3b                                           V7 : S9
-//  2. Load FFC6 and FFC7.
 template<>
 void Processor::onSampleCycle<25>()
 {
+    //  1. Voice steps : V0:S3b                                           V7 : S9
     voices[0].doStep3b();
     voices[7].doStep<9>();
 
-    //    Load FFC6 and FFC7.
+    //  2. Load FFC6 and FFC7.
+    // TODO
 }
 
 float applyMainVolume(int32_t& sample, int32_t mainVolume)
@@ -882,82 +926,88 @@ float applyMainVolume(int32_t& sample, int32_t mainVolume)
 }
 
 //  26.
-//  1. Load and apply MVOLL.
-//  2. Load and apply EVOLL.
-//  3. Output the left sample to the DAC.
-//  4. Load and apply EFB.
 template<>
 void Processor::onSampleCycle<26>()
 {
+    //  1. Load and apply MVOLL.
     mainVolumeLeft = registers[size_t(Register::MVOLL)];
-    echoVolumeLeft = registers[size_t(Register::EVOLL)];
-    //    Load and apply EVOLL.
 
+    //  2. Load and apply EVOLL.
+    echoVolumeLeft = registers[size_t(Register::EVOLL)];
+    // TODO
+
+    //  3. Output the left sample to the DAC.
     leftOutput = applyMainVolume(leftSampleSum, mainVolumeLeft);
 
-    //    Load and apply EFB.
+    //  4. Load and apply EFB.
+    // TODO
+    
 }
 
 //  27.
-//  1. Load and apply MVOLR.
-//  2. Load and apply EVOLR.
-//  3. Output the right sample to the DAC.
-//  4. Load PMON
 template<>
 void Processor::onSampleCycle<27>()
 {
+    //  1. Load and apply MVOLR.
     mainVolumeRight = registers[size_t(Register::MVOLR)];
-    echoVolumeRight = registers[size_t(Register::EVOLR)];
-    //    Load and apply EVOLR.
 
+    //  2. Load and apply EVOLR.
+    echoVolumeRight = registers[size_t(Register::EVOLR)];
+    // TODO
+
+    //  3. Output the right sample to the DAC.
     rightOutput = applyMainVolume(rightSampleSum, mainVolumeRight);
 
+    //  4. Load PMON
     setVoiceBits<&Processor::Voice::pitchModulation>(registers[size_t(Register::PMON)]);
 }
 
 //  28.
-//  1. Load NON, EON, and DIR.
-//  2. Load FLG bit 5 (ECENx) for application to the left channel.
 template<>
 void Processor::onSampleCycle<28>()
 {
-    //    28. Load NON and EON.
+    //  1. Load NON, EON, and DIR.
     sourceDirectory = registers[size_t(Register::DIR)];
-    //    Load FLG bit 5 (ECENx) for application to the left channel.
+    // TODO
+
+    //  2. Load FLG bit 5 (ECENx) for application to the left channel.
+    // TODO
 }
 
 //  29.
-//  1. Update global counter.
-//  2. Write left channel sample to the echo buffer, if allowed by ECENx.
-//  3. Load EDL - if the current echo offset is 0, apply EDL.
-//  4. Load ESA for future use.
-//  5. Load FLG bit 5 (ECENx)again for application to the right channel.
-//  6. ** Clear internal KON bits for any channels keyed on in the previous 2 samples.
 template<>
 void Processor::onSampleCycle<29>()
 {
-    //    29. Update global counter.
-    //    Write left channel sample to the echo buffer, if allowed by ECENx.
-    //    Load EDL - if the current echo offset is 0, apply EDL.
-    //    Load ESA for future use.
-    //    Load FLG bit 5 (ECENx)again for application to the right channel.
+    //  1. Update global counter.
+    // TODO
+
+    //  2. Write left channel sample to the echo buffer, if allowed by ECENx.
+    // TODO
+
+    //  3. Load EDL - if the current echo offset is 0, apply EDL.
+    // TODO
+
+    //  4. Load ESA for future use.
+    // TODO
+
+    //  5. Load FLG bit 5 (ECENx)again for application to the right channel.
+    // TODO
+
     if ((sampleCount & 1) == 1)
     {
+        //  6. ** Clear internal KON bits for any channels keyed on in the previous 2 samples.
         setVoiceBits<&Voice::keyOnInternal>(0);
     }
 }
 
 //  30.
-//  1. Voice steps : V0:S3c
-//  2. Write right channel sample to the echo buffer, if allowed by ECENx.
-//  3. Increment the echo offset, and set to 0 if it exceeds the buffer length.
-//  4. Load FLG bits 0 - 4 and update noise sample if necessary.
-//  5. ** Load KOFF and internal KON.
 template<>
 void Processor::onSampleCycle<30>()
 {
     if ((sampleCount & 1) == 1)
     {
+        //  5. ** Load KOFF and internal KON.
+        // Note: this presumably has to be done before voice step 3c, despite anomie's ordering
         Byte externalKeyOn = registers[size_t(Register::KON)];
         for (int i = 0; i < voices.size(); ++i)
         {
@@ -972,18 +1022,19 @@ void Processor::onSampleCycle<30>()
         setVoiceBits<&Voice::keyOff>(registers[size_t(Register::KOFF)]);
     }
 
+    //  1. Voice steps : V0:S3c
     voices[0].doStep3c();
 
-    //    Write right channel sample to the echo buffer, if allowed by ECENx.
-    //    Increment the echo offset, and set to 0 if it exceeds the buffer length.
-    //    Load FLG bits 0 - 4 and update noise sample if necessary.
+    //  2. Write right channel sample to the echo buffer, if allowed by ECENx.
+    //  3. Increment the echo offset, and set to 0 if it exceeds the buffer length.
+    //  4. Load FLG bits 0 - 4 and update noise sample if necessary.
 }
 
 //  31.
-//  1. Voice steps : V0:S4         V2 : S1
 template<>
 void Processor::onSampleCycle<31>()
 {
+    //  1. Voice steps : V0:S4         V2 : S1
     voices[0].doStep<4>();
     voices[2].doStep<1>();
 }
@@ -1003,9 +1054,17 @@ Processor::SampleCycleTable Processor::sampleCycleTable = getSampleCycleTable();
 
 void Processor::tick()
 {
-    //int sampleCycle = spcCycle & 31;
-    sampleCycleTable[sampleCycle](*this);
-    //++spcCycle;
+    try
+    {
+        sampleCycleTable[sampleCycle](*this);
+    }
+    catch (const std::exception& e)
+    {
+        output.error("Exception in sample cycle ", sampleCycle);
+        output.error(e.what());
+        throw RuntimeError();
+    }
+
 
     if (++sampleCycle == 32)
     {
@@ -1027,7 +1086,8 @@ void Processor::tick()
                 }
             }
         }
-    }*/
+    }
+	++spcCycle;*/
 }
 
 void Processor::printTimeInfo(double currentTime)
