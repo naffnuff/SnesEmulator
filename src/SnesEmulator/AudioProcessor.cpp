@@ -176,8 +176,28 @@ int hoy = 0;
 
 void Processor::outputNextSample(float& leftChannel, float& rightChannel)
 {
-    leftChannel = leftOutput;
-    rightChannel = rightOutput;
+    //leftChannel = leftOutput;
+    //rightChannel = rightOutput;
+
+    const size_t leftBufferSize = leftOutputBuffer.size();
+    const size_t rightBufferSize = rightOutputBuffer.size();
+
+    if (++hoy == 100000)
+    {
+        std::cout << "Oh no " << nextOuputIndex << " " << leftBufferSize << " " << rightBufferSize << std::endl;
+        std::cout << "Oh no " << nextOuputIndex << " " << leftBufferSize - nextOuputIndex << " " << rightBufferSize - nextOuputIndex << std::endl;
+        hoy = 0;
+    }
+
+    if (nextOuputIndex < leftBufferSize && nextOuputIndex < rightBufferSize)
+    {
+        leftChannel = leftOutputBuffer[nextOuputIndex];
+        rightChannel = rightOutputBuffer[nextOuputIndex++];
+    }
+    else
+    {
+        //std::cout << "DAMN! " << nextOuputIndex << " " << leftBufferSize << " " << rightBufferSize << std::endl;
+    }
 
     /*leftSampleSum = 0;
     rightSampleSum = 0;
@@ -441,6 +461,7 @@ void Processor::Voice::calculateEnvelope()
         {
             envelope = 0;
             setADSRStage(ADSRStage::Inactive);
+            sampleStage = SampleStage::Inactive;
         }
     }
 }
@@ -601,6 +622,7 @@ void Processor::Voice::doStep3c()
 
     //  7. Update the volume envelope, using previously loaded values.
     calculateEnvelope();
+
 }
 
 template<>
@@ -627,7 +649,6 @@ void Processor::Voice::doStep<4>()
     if (sampleStage == SampleStage::FirstBRRGroup || sampleStage == SampleStage::SecondBRRGroup || sampleStage == SampleStage::ThirdBRRGroup)
     {
         sampleSource[1] = processor.spcMemory.readByte(nextSampleAddress + 1);
-
         decodeSampleSource();
     }
     // TODO
@@ -645,7 +666,6 @@ void Processor::Voice::doStep<4>()
         if (interpolationIndex >= 0x4000)
         {
             sampleSource[1] = processor.spcMemory.readByte(nextSampleAddress + 1);
-
             decodeSampleSource();
 
             interpolationIndex -= 0x4000;
@@ -1047,7 +1067,8 @@ void Processor::onSampleCycle<26>()
     // TODO
 
     //  3. Output the left sample to the DAC.
-    leftOutput = applyMainVolume(leftSampleSum, mainVolumeLeft);
+    //leftOutput = applyMainVolume(leftSampleSum, mainVolumeLeft);
+    leftOutputBuffer.push_back(applyMainVolume(leftSampleSum, mainVolumeLeft));
 
     //  4. Load and apply EFB.
     // TODO
@@ -1066,7 +1087,8 @@ void Processor::onSampleCycle<27>()
     // TODO
 
     //  3. Output the right sample to the DAC.
-    rightOutput = applyMainVolume(rightSampleSum, mainVolumeRight);
+    //rightOutput = applyMainVolume(rightSampleSum, mainVolumeRight);
+    rightOutputBuffer.push_back(applyMainVolume(rightSampleSum, mainVolumeRight));
 
     //  4. Load PMON
     setVoiceBits<&Processor::Voice::pitchModulation>(registers[size_t(Register::PMON)]);

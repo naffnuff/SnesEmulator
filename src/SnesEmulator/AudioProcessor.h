@@ -502,8 +502,13 @@ private:
     Byte echoRegionOffset;
     Byte echoDelay;
 
-    float leftOutput = 0;
-    float rightOutput = 0;
+    //float leftOutput = 0;
+    //float rightOutput = 0;
+
+    std::vector<float> leftOutputBuffer;
+    std::vector<float> rightOutputBuffer;
+
+    size_t nextOuputIndex = 0;
 
     void* stream;
 
