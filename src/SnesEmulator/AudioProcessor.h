@@ -505,10 +505,16 @@ private:
     //float leftOutput = 0;
     //float rightOutput = 0;
 
-    std::vector<float> leftOutputBuffer;
-    std::vector<float> rightOutputBuffer;
+    static const size_t outputBufferSize = 1 << 12;
 
-    size_t nextOuputIndex = 0;
+    std::array<float, outputBufferSize> leftOutputBuffer;
+    std::array<float, outputBufferSize> rightOutputBuffer;
+
+    size_t maxOutputLag = 0;
+
+    size_t leftOutputCount = 0;
+    size_t rightOutputCount = 0;
+    size_t dspOutputCount = 0;
 
     void* stream;
 
