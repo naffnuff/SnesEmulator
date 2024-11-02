@@ -87,6 +87,9 @@ Processor::Processor(Output& output, Memory<Word>& spcMemory)
         voice.previousVoice = previousVoice;
         previousVoice = &voice;
     }
+
+    leftOutputBuffer.resize(outputBufferSize, 0);
+    rightOutputBuffer.resize(outputBufferSize, 0);
 }
 
 Processor::~Processor()
@@ -179,9 +182,25 @@ void Processor::outputNextSample(float& leftChannel, float& rightChannel)
     //leftChannel = leftOutput;
     //rightChannel = rightOutput;
 
-    if (dspOutputCount < leftOutputCount && dspOutputCount < rightOutputCount)
+    if (dspOutputCount <= leftOutputCount && dspOutputCount <= rightOutputCount)
     {
-        maxOutputLag = std::max<size_t>(maxOutputLag, leftOutputCount - dspOutputCount);
+        const size_t outputLag = leftOutputCount - dspOutputCount;
+        while (outputLag * 2 > outputBufferSize)
+        {
+            const size_t oldOutputBufferSize = outputBufferSize;
+            outputBufferSize <<= 1;
+            //std::cout << dspOutputCount << " outputBufferSize=" << outputBufferSize << std::endl;
+            leftOutputBuffer.resize(outputBufferSize);
+            rightOutputBuffer.resize(outputBufferSize);
+
+            for (int i = 0; i < oldOutputBufferSize; ++i)
+            {
+                leftOutputBuffer[i + oldOutputBufferSize] = leftOutputBuffer[i];
+                rightOutputBuffer[i + oldOutputBufferSize] = rightOutputBuffer[i];
+            }
+        }
+
+        maxOutputLag = std::max<size_t>(maxOutputLag, outputLag);
 
         const size_t outputIndex = dspOutputCount & (outputBufferSize - 1);
 
@@ -194,14 +213,21 @@ void Processor::outputNextSample(float& leftChannel, float& rightChannel)
         {
             std::cout << "Output count " << dspOutputCount << std::endl;
             std::cout << "Output index " << outputIndex << std::endl;
-            std::cout << "Current ouput lag " << leftOutputCount - dspOutputCount << std::endl;
+            std::cout << "Current ouput lag " << outputLag << std::endl;
             std::cout << "Max output lag " << maxOutputLag << std::endl;
             hoy = 0;
         }
     }
     else
     {
-        std::cout << "DAMN! " << dspOutputCount << " " << leftOutputCount << " " << rightOutputCount << std::endl;
+        leftChannel = 0.0f;
+        rightChannel = 0.0f;
+
+        if (++hoy == 100000)
+        {
+            std::cout << "DAMN! " << dspOutputCount << " " << leftOutputCount << " " << rightOutputCount << std::endl;
+            hoy = 0;
+        }
     }
 
     /*leftSampleSum = 0;
@@ -591,10 +617,11 @@ void Processor::Voice::doStep3c()
         envelope = 0;
         adsrStage = ADSRStage::Inactive;
         sampleStage = SampleStage::Reset;
+        processor.isPlaying = true;
     }
     if (keyOff)
     {
-        sampleStage = SampleStage::Output;
+        sampleStage = SampleStage::Playing;
         setADSRStage(ADSRStage::Release);
     }
 
@@ -620,7 +647,7 @@ void Processor::Voice::doStep3c()
         }
     }
 
-    if (sampleStage == SampleStage::PrepareOutput)
+    if (sampleStage == SampleStage::PreparePlay)
     {
         setADSRStage(ADSRStage::Attack);
     }
@@ -661,7 +688,7 @@ void Processor::Voice::doStep<4>()
     //  3. Increment interpolation sample position as specified by pitch values.
     //  At any point from now until we next get to S3c, the next sample may be
     //  calculated using the interpolation position and BRR buffer contents.
-    if (sampleStage == SampleStage::Output)
+    if (sampleStage == SampleStage::Playing)
     {
         interpolationIndex += pitch;
         if (interpolationIndex > 0x7fff)
@@ -694,7 +721,7 @@ void Processor::Voice::doStep<5>()
 {
     //  1. Load and apply VxVOLR register.
     rightVolume = registers[size_t(Register::VxVOLR)];
-    if (sampleStage == SampleStage::Output)
+    if (sampleStage == SampleStage::Playing)
     {
         int16_t rightSample = applyVolume(rightVolume);
         processor.leftSampleSum += rightSample;
@@ -1071,11 +1098,14 @@ void Processor::onSampleCycle<26>()
     echoVolumeLeft = registers[size_t(Register::EVOLL)];
     // TODO
 
-    //  3. Output the left sample to the DAC.
-    const float leftOutput = applyMainVolume(leftSampleSum, mainVolumeLeft);
-    const size_t outputIndex = leftOutputCount & (outputBufferSize - 1);
-    leftOutputBuffer[outputIndex] = leftOutput;
-    ++leftOutputCount;
+    if (isPlaying)
+    {
+        //  3. Output the left sample to the DAC.
+        const float leftOutput = applyMainVolume(leftSampleSum, mainVolumeLeft);
+        const size_t outputIndex = leftOutputCount & (outputBufferSize - 1);
+        leftOutputBuffer[outputIndex] = leftOutput;
+        ++leftOutputCount;
+    }
 
     //  4. Load and apply EFB.
     // TODO
@@ -1093,11 +1123,14 @@ void Processor::onSampleCycle<27>()
     echoVolumeRight = registers[size_t(Register::EVOLR)];
     // TODO
 
-    //  3. Output the right sample to the DAC.
-    const float rightOutput = applyMainVolume(rightSampleSum, mainVolumeRight);
-    const size_t outputIndex = rightOutputCount & (outputBufferSize - 1);
-    rightOutputBuffer[outputIndex] = rightOutput;
-    ++rightOutputCount;
+    if (isPlaying)
+    {
+        //  3. Output the right sample to the DAC.
+        const float rightOutput = applyMainVolume(rightSampleSum, mainVolumeRight);
+        const size_t outputIndex = rightOutputCount & (outputBufferSize - 1);
+        rightOutputBuffer[outputIndex] = rightOutput;
+        ++rightOutputCount;
+    }
 
     //  4. Load PMON
     setVoiceBits<&Processor::Voice::pitchModulation>(registers[size_t(Register::PMON)]);

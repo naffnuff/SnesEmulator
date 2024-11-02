@@ -178,10 +178,10 @@ public:
             /* #5 = Envelope updating begins. The sample output is still '0x0000', because of
                     the order in which voice operations are performed. The interpolation
                     position is still 0.*/
-            PrepareOutput = 5,
+            PreparePlay = 5,
             /* #6 = Finally, we see the first data sample. The first interpolation position
                     update is done during step S4.*/
-            Output = 6
+            Playing = 6
         };
 
         Voice(Processor& processor)
@@ -502,13 +502,15 @@ private:
     Byte echoRegionOffset;
     Byte echoDelay;
 
+    bool isPlaying = false;
+
     //float leftOutput = 0;
     //float rightOutput = 0;
 
-    static const size_t outputBufferSize = 1 << 12;
+    size_t outputBufferSize = 1 << 12;
 
-    std::array<float, outputBufferSize> leftOutputBuffer;
-    std::array<float, outputBufferSize> rightOutputBuffer;
+    std::vector<float> leftOutputBuffer;
+    std::vector<float> rightOutputBuffer;
 
     size_t maxOutputLag = 0;
 
