@@ -501,13 +501,14 @@ private:
     Byte sourceDirectory;
     Byte echoRegionOffset;
     Byte echoDelay;
+	
+	int lastDebugOutputCounter = 0;
+	
+	int outputBufferUnderrunCounter = 0;
 
-    bool isPlaying = false;
+    bool dspOutputStarted = false;
 
-    //float leftOutput = 0;
-    //float rightOutput = 0;
-
-    size_t outputBufferSize = 1 << 12;
+    size_t outputBufferSize = 1;
 
     std::vector<float> leftOutputBuffer;
     std::vector<float> rightOutputBuffer;

@@ -175,21 +175,27 @@ bool Processor::checkStreamStatus(unsigned long statusFlags)
     }
 }
 
-int hoy = 0;
-
 void Processor::outputNextSample(float& leftChannel, float& rightChannel)
 {
-    //leftChannel = leftOutput;
-    //rightChannel = rightOutput;
 
-    if (dspOutputCount <= leftOutputCount && dspOutputCount <= rightOutputCount)
+    if (!dspOutputStarted)
+    {
+        dspOutputStarted = true;
+
+        dspOutputCount = rightOutputCount;
+
+        output.debug("Starting dsp output cycle ", rightOutputCount);
+    }
+
+    if (dspOutputCount <= rightOutputCount)
     {
         const size_t outputLag = leftOutputCount - dspOutputCount;
+
+        const size_t oldOutputBufferSize = outputBufferSize;
+
         while (outputLag * 2 > outputBufferSize)
         {
-            const size_t oldOutputBufferSize = outputBufferSize;
             outputBufferSize <<= 1;
-            //std::cout << dspOutputCount << " outputBufferSize=" << outputBufferSize << std::endl;
             leftOutputBuffer.resize(outputBufferSize);
             rightOutputBuffer.resize(outputBufferSize);
 
@@ -198,6 +204,11 @@ void Processor::outputNextSample(float& leftChannel, float& rightChannel)
                 leftOutputBuffer[i + oldOutputBufferSize] = leftOutputBuffer[i];
                 rightOutputBuffer[i + oldOutputBufferSize] = rightOutputBuffer[i];
             }
+        }
+
+        if (oldOutputBufferSize != outputBufferSize)
+        {
+            output.debug("Iteration ", dspOutputCount, " New buffer size ", outputBufferSize);
         }
 
         maxOutputLag = std::max<size_t>(maxOutputLag, outputLag);
@@ -209,13 +220,14 @@ void Processor::outputNextSample(float& leftChannel, float& rightChannel)
 
         ++dspOutputCount;
 
-        if (++hoy == 100000)
+        if (lastDebugOutputCounter++ == 100000)
         {
-            std::cout << "Output count " << dspOutputCount << std::endl;
-            std::cout << "Output index " << outputIndex << std::endl;
-            std::cout << "Current ouput lag " << outputLag << std::endl;
-            std::cout << "Max output lag " << maxOutputLag << std::endl;
-            hoy = 0;
+            output.debug("Output count ", dspOutputCount);
+            output.debug("Output index ", outputIndex);
+            output.debug("Current ouput lag ", outputLag);
+            output.debug("Max output lag ", maxOutputLag);
+            output.debug("Buffer underrun counter ", outputBufferUnderrunCounter);
+            lastDebugOutputCounter = 0;
         }
     }
     else
@@ -223,11 +235,8 @@ void Processor::outputNextSample(float& leftChannel, float& rightChannel)
         leftChannel = 0.0f;
         rightChannel = 0.0f;
 
-        if (++hoy == 100000)
-        {
-            std::cout << "DAMN! " << dspOutputCount << " " << leftOutputCount << " " << rightOutputCount << std::endl;
-            hoy = 0;
-        }
+        ++outputBufferUnderrunCounter;
+
     }
 
     /*leftSampleSum = 0;
@@ -617,7 +626,6 @@ void Processor::Voice::doStep3c()
         envelope = 0;
         adsrStage = ADSRStage::Inactive;
         sampleStage = SampleStage::Reset;
-        processor.isPlaying = true;
     }
     if (keyOff)
     {
@@ -1098,14 +1106,11 @@ void Processor::onSampleCycle<26>()
     echoVolumeLeft = registers[size_t(Register::EVOLL)];
     // TODO
 
-    if (isPlaying)
-    {
-        //  3. Output the left sample to the DAC.
-        const float leftOutput = applyMainVolume(leftSampleSum, mainVolumeLeft);
-        const size_t outputIndex = leftOutputCount & (outputBufferSize - 1);
-        leftOutputBuffer[outputIndex] = leftOutput;
-        ++leftOutputCount;
-    }
+    //  3. Output the left sample to the DAC.
+    const float leftOutput = applyMainVolume(leftSampleSum, mainVolumeLeft);
+    const size_t outputIndex = leftOutputCount & (outputBufferSize - 1);
+    leftOutputBuffer[outputIndex] = leftOutput;
+    ++leftOutputCount;
 
     //  4. Load and apply EFB.
     // TODO
@@ -1123,14 +1128,11 @@ void Processor::onSampleCycle<27>()
     echoVolumeRight = registers[size_t(Register::EVOLR)];
     // TODO
 
-    if (isPlaying)
-    {
-        //  3. Output the right sample to the DAC.
-        const float rightOutput = applyMainVolume(rightSampleSum, mainVolumeRight);
-        const size_t outputIndex = rightOutputCount & (outputBufferSize - 1);
-        rightOutputBuffer[outputIndex] = rightOutput;
-        ++rightOutputCount;
-    }
+    //  3. Output the right sample to the DAC.
+    const float rightOutput = applyMainVolume(rightSampleSum, mainVolumeRight);
+    const size_t outputIndex = rightOutputCount & (outputBufferSize - 1);
+    rightOutputBuffer[outputIndex] = rightOutput;
+    ++rightOutputCount;
 
     //  4. Load PMON
     setVoiceBits<&Processor::Voice::pitchModulation>(registers[size_t(Register::PMON)]);
