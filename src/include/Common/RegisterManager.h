@@ -20,7 +20,8 @@ public:
 
     virtual void printMemoryRegister(bool write, Byte value, AddressType address, const std::string& info)
     {
-        if (supressOutput) {
+        if (supressOutput)
+        {
             return;
         }
         output.log(Log::Level::Debug, DebugColor, value != 0, (write ? "Write " : "Read "), value, " (", std::bitset<8>(value), ") @", address, " (", info, "), ");
@@ -28,17 +29,28 @@ public:
 
     void makeWriteRegister(AddressType address, const std::string& info, bool debug, std::function<void(Byte)> callback = nullptr, bool openBus = false)
     {
-        std::function<void(Byte, Byte)> onWrite = [this, address, callback, info, debug](Byte oldValue, Byte newValue) {
-            if (debug && /*newValue && */oldValue != newValue) {
-                printMemoryRegister(true, newValue, address, info);
-            }
-            if (callback) {
-                callback(newValue);
-            }
-        };
-        if (openBus) {
+        std::function<void(Byte, Byte)> onWrite = [this, address, callback, info, debug](Byte oldValue, Byte newValue)
+            {
+                if (debug && /*newValue && */oldValue != newValue)
+                {
+                    printMemoryRegister(true, newValue, address, info);
+                }
+
+                if (callback)
+                {
+                    callback(newValue);
+                }
+                else
+                {
+                    throw NotYetImplementedException("Register ", address, ": ", info);
+                }
+            };
+        if (openBus)
+        {
             memory.createLocation<OpenBusWriteRegister>(address, onWrite);
-        } else {
+        }
+        else
+        {
             memory.createLocation<WriteRegister>(address, onWrite);
         }
     }
@@ -74,11 +86,19 @@ public:
     void makeReadRegister(AddressType address, const std::string& info, bool debug, std::function<void(Byte&)> callback = nullptr, bool throwOnWrite = true)
     {
         memory.createLocation<ReadRegister>(address,
-            [this, address, callback, info, debug](Byte& value) {
-                if (callback) {
+            [this, address, callback, info, debug](Byte& value)
+            {
+                if (callback)
+                {
                     callback(value);
                 }
-                if (debug && value) {
+                else
+                {
+                    throw NotYetImplementedException("Register ", address, ": ", info);
+                }
+
+                if (debug && value)
+                {
                     printMemoryRegister(false, value, address, info);
                 }
             },
@@ -117,23 +137,29 @@ public:
     void makeReadWriteRegister(AddressType address, const std::string& info, bool debug, std::function<void(Byte&)> readCallback, std::function<void(Byte)> writeCallback)
     {
         memory.createLocation<ReadWriteRegister>(address,
-            [this, address, readCallback, info, debug](Byte& value) {
-                if (readCallback) {
+            [this, address, readCallback, info, debug](Byte& value)
+            {
+                if (readCallback)
+                {
                     readCallback(value);
                 }
-                if (debug/* && value*/) {
+                if (debug/* && value*/)
+                {
                     printMemoryRegister(false, value, address, info);
                 }
             },
-            [this, address, writeCallback, info, debug](Byte oldValue, Byte newValue) {
-                if (debug /*newValue && */ && oldValue != newValue) {
+            [this, address, writeCallback, info, debug](Byte oldValue, Byte newValue)
+            {
+                if (debug /*newValue && */ && oldValue != newValue)
+                {
                     printMemoryRegister(true, newValue, address, info);
                 }
-                if (writeCallback) {
+                if (writeCallback)
+                {
                     writeCallback(newValue);
                 }
             }
-            );
+        );
     };
 
     void makeReadWriteRegister(AddressType address, const std::string& info, bool debug, Byte& variable)
@@ -181,7 +207,8 @@ public:
         } outputSupressor(supressOutput);
 
         Byte readValue = memory.readByte(address);
-        if (readValue != expectedValue) {
+        if (readValue != expectedValue)
+        {
             throw AccessException("Verify memory failed @", address, ": ", "Expected value: ", expectedValue, ", ", "Read value: ", readValue);
         }
     }

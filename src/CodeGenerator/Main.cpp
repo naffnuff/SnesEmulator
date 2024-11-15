@@ -7,7 +7,7 @@ int main(int argc, char* argv[])
 {
     try {
         generateCpu();
-        generateSpc();
+        //generateSpc();
 
     } catch (const std::exception& e) {
 
