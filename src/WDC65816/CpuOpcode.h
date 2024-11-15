@@ -4209,7 +4209,7 @@ class TSC_3B : public AddressMode::Implied<Operator::TSC>
 {
     using Implied::Implied;
 
-    // 1   2           imp       *.....*. . TSC<<<<<<<
+    // 1   2           imp       *.....*. . TSC
     int execute() override
     {
         return 2 + applyOperand();
