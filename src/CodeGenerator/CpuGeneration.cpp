@@ -114,7 +114,7 @@ CycleModification getCycleModification(int remarkIndex)
     case 8: return { "true /*branch taken crosses page boundary*/", "cycles += 1;\n            throw std::runtime_error(\"TODO08\")" }; // Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1)
     case 9: return { "state.isNativeMode()", "cycles += 1" }; // Add 1 cycle for 65816 native mode (e=0)
     case 10: return { "state.is16Bit(State::x)", "cycles += 1" }; // Add 1 cycle if x=0 (16-bit index registers)
-    case 20: return { "", "throw std::runtime_error(\"TODO20\")" }; // Needs specialization in address mode
+    case 20: return { "", "throw NotYetImplementedException(\"TODO20\")" }; // Needs specialization in address mode
     case 21: return { "state.is16Bit(State::m)", "cycles -= 2" }; // Removed 2 cycles for the special case of Accumulator
     default: return {};
     }
@@ -208,7 +208,7 @@ void generateOpcode(std::ostream& output, Instruction& instruction, const Opcode
         const bool hasRemark = instruction.cyclesRemarks.find(20) != instruction.cyclesRemarks.end();
         if (hasRemark)
         {
-            //instruction.cyclesRemarks.erase(20);
+            instruction.cyclesRemarks.erase(20);
         }
         else
         {
@@ -771,7 +771,7 @@ void generateCpu()
 
     for (Instruction& instruction : instructions)
     {
-        std::cout << "Instruction: " << instruction.classname;
+        //std::cout << "Instruction: " << instruction.classname;
         std::set<int> removedRemarks;
         for (const AddressModeClassMap::value_type& kvp : addressModeClassMap)
         {
@@ -802,7 +802,7 @@ void generateCpu()
                 }
             }
         }
-        std::cout << std::endl;
+        //std::cout << std::endl;
     }
 
     generateOpcodes(instructions);

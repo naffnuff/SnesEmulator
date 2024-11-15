@@ -609,7 +609,6 @@ class ASL_1E : public AddressMode::AbsoluteIndexed<Operator::ASL, State::IndexRe
     using AbsoluteIndexed::AbsoluteIndexed;
 
     // 3   9-2*m       abs,X     m.....mm . ASL $9876,X
-    // §20: TODO manually add exception for 3
     int execute() override
     {
         return 7 + applyOperand();
@@ -1443,7 +1442,6 @@ class DEC_DE : public AddressMode::AbsoluteIndexed<Operator::DEC, State::IndexRe
     using AbsoluteIndexed::AbsoluteIndexed;
 
     // 3   9-2*m       abs,X     m.....m. . DEC $9876,X
-    // §20: TODO manually add exception for 3
     int execute() override
     {
         return 7 + applyOperand();
@@ -1822,7 +1820,6 @@ class INC_FE : public AddressMode::AbsoluteIndexed<Operator::INC, State::IndexRe
     using AbsoluteIndexed::AbsoluteIndexed;
 
     // 3   9-2*m       abs,X     m.....m. . INC $9876,X
-    // §20: TODO manually add exception for 3
     int execute() override
     {
         return 7 + applyOperand();
@@ -2519,7 +2516,6 @@ class LSR_5E : public AddressMode::AbsoluteIndexed<Operator::LSR, State::IndexRe
     using AbsoluteIndexed::AbsoluteIndexed;
 
     // 3   9-2*m       abs,X     0.....m* . LSR $9876,X
-    // §20: TODO manually add exception for 3
     int execute() override
     {
         return 7 + applyOperand();
@@ -3185,7 +3181,6 @@ class ROL_3E : public AddressMode::AbsoluteIndexed<Operator::ROL, State::IndexRe
     using AbsoluteIndexed::AbsoluteIndexed;
 
     // 3   9-2*m       abs,X     m.....mm . ROL $9876,X
-    // §20: TODO manually add exception for 3
     int execute() override
     {
         return 7 + applyOperand();
@@ -3266,7 +3261,6 @@ class ROR_7E : public AddressMode::AbsoluteIndexed<Operator::ROR, State::IndexRe
     using AbsoluteIndexed::AbsoluteIndexed;
 
     // 3   9-2*m       abs,X     m.....m* . ROR $9876,X
-    // §20: TODO manually add exception for 3
     int execute() override
     {
         return 7 + applyOperand();
@@ -3759,6 +3753,7 @@ class STA_91 : public AddressMode::DirectPageIndirectIndexedY<Operator::STA>
     // §20: TODO manually add exception for 3
     int execute() override
     {
+        throw NotYetImplementedException("TODO20");
         return 6 + applyOperand();
     }
 
@@ -3838,7 +3833,6 @@ class STA_99 : public AddressMode::AbsoluteIndexed<Operator::STA, State::IndexRe
     using AbsoluteIndexed::AbsoluteIndexed;
 
     // 3   6-m         abs,Y     ........ . STA $9876,Y
-    // §20: TODO manually add exception for 3
     int execute() override
     {
         return 5 + applyOperand();
@@ -4049,7 +4043,6 @@ class STZ_9E : public AddressMode::AbsoluteIndexed<Operator::STZ, State::IndexRe
     using AbsoluteIndexed::AbsoluteIndexed;
 
     // 3   6-m         abs,X     ........ . STZ $9876,X
-    // §20: TODO manually add exception for 3
     int execute() override
     {
         return 5 + applyOperand();
