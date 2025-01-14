@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35312.102
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SnesEmulator", "SnesEmulator\SnesEmulator.csproj", "{AE7B92E5-911C-4373-A365-B725A61CE28A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDC65816", "WDC65816\WDC65816.csproj", "{5E5ECBD0-A67D-4C58-A733-BB245CB7F254}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{9087FB22-9421-4B8C-90C6-641E20E2345E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AE7B92E5-911C-4373-A365-B725A61CE28A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE7B92E5-911C-4373-A365-B725A61CE28A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE7B92E5-911C-4373-A365-B725A61CE28A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE7B92E5-911C-4373-A365-B725A61CE28A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E5ECBD0-A67D-4C58-A733-BB245CB7F254}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E5ECBD0-A67D-4C58-A733-BB245CB7F254}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E5ECBD0-A67D-4C58-A733-BB245CB7F254}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E5ECBD0-A67D-4C58-A733-BB245CB7F254}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9087FB22-9421-4B8C-90C6-641E20E2345E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9087FB22-9421-4B8C-90C6-641E20E2345E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9087FB22-9421-4B8C-90C6-641E20E2345E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9087FB22-9421-4B8C-90C6-641E20E2345E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A4B4C04A-D8F9-4183-8920-9C1C96E6358B}
+	EndGlobalSection
+EndGlobal
