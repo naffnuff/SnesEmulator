@@ -1,6 +1,8 @@
 # SnesEmulator
+A working Super-Nintendo emulator.
+
 ## Purpose
-This is intended as a showcase of my abilities as a C++ programmer. The source code is, in design and execution, all my own creation.
+This is intended as a showcase of my abilities as a C++ programmer. The source code is, in design and implementation, all my own creation.
 
 ## Scope
 This emulator will probably never be able to run all or even most SNES games, let alone have all the features of some of the other emulators out there. I will be extremely pleased if some day I manage to finish my three favorite SNES games on it, namely
@@ -8,16 +10,16 @@ This emulator will probably never be able to run all or even most SNES games, le
 * The Legend of Zelda - A Link to the Past
 * Super Metroid
 
-As of now, these three games are playable, however, there is no audio (on master, there is on the experimental and not quite stable audio branch).
+As of now, these three games are playable, though the audio is limited in features.
 
 ## Build dependencies
-In order to build the source you will need a compiler capable of C++17. Visual Studio 2019 Community is the main tool I used, but I have also worked to keep compability with GCC (v7.3.1) and CMake (v3.10). You will also need
+In order to build the source you will need a compiler capable of C++20. Visual Studio 2022 Community is the main tool I use, but I have also worked to keep compability with GCC (v7.3.1) and CMake (v3.10). You will also need
 * GLFW (v3.3)
 * OpenGL (v3.2)
-* PortAudio (v19.6) (audio branch only)
+* PortAudio (v19.6)
 
 ## Sources and acknowledgements
-I read a lot to get me going with this project. So far I have found that the following documents contain all the information on the SNES I needed to write this emulator. Most of them are a product of the work of other enthusiasts who often had to reverse engineer the hardware themselves. Without them, this would have been a much harder task.
+I read a lot to get started with this project. So far I have found that the following documents contain all the information on the SNES I needed to write this emulator. Most of them are a product of the work of other enthusiasts who often had to reverse engineer the hardware themselves. Without them, this would have been a much harder task.
 ### WDC 65816 (CPU)
 #### Table of opcodes
 http://www.defence-force.org/computing/oric/coding/annexe_2/index.htm
