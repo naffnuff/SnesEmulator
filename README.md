@@ -35,9 +35,6 @@ https://github.com/naffnuff/SnesEmulator/blob/master/doc/Anomie's%20SPC700%20Doc
 #### DSP (Digital Signal Processor, part of the sound processor)
 ##### General
 https://github.com/naffnuff/SnesEmulator/blob/master/doc/Anomie's%20S-DSP%20Doc
-##### ADSR (Attack-Delay-Sustain-Release, or sound envelope)
-I found the official documentation especially lacking as to how the SNES produces its sound envelopes. Instead I ended up modelling it on a technique I found in the following blog posts (part 1-3):
-http://www.earlevel.com/main/2013/06/01/envelope-generators/
 ##### BRR (Bit-Rate Reduction)
 https://wiki.superfamicom.org/bit-rate-reduction-(brr)
 ### SNES
