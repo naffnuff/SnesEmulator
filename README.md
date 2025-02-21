@@ -14,9 +14,9 @@ As of now, these three games are playable, though the audio is limited in featur
 
 ## Build dependencies
 In order to build the source you will need a compiler capable of C++20. Visual Studio 2022 Community is the main tool I use, but I have also worked to keep compability with GCC (v7.3.1) and CMake (v3.10). You will also need
-* GLFW (v3.3)
 * OpenGL (v3.2)
-* PortAudio (v19.6)
+* [GLFW](https://github.com/glfw/glfw) (v3.4)
+* [PortAudio](https://github.com/PortAudio/portaudio) (v19.7)
 
 ## Sources and acknowledgements
 I read a lot to get started with this project. So far I have found that the following documents contain all the information on the SNES I needed to write this emulator. Most of them are a product of the work of other enthusiasts who often had to reverse engineer the hardware themselves. Without them, this would have been a much harder task.
