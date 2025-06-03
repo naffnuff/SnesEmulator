@@ -34,20 +34,24 @@ private:
     }
 
 public:
-    // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, Access& access)
     {
-        int cycles = 0;
         if (state.is16Bit(State::Flag::m))
         {
-            cycles += 1;
-            state.setAccumulatorC(add(state, state.getAccumulatorC(), access.readWord()));
+            return invoke16Bit(state, access);
         }
         else
         {
             state.setAccumulatorA(add(state, state.getAccumulatorA(), access.readByte()));
+            return 0;
         }
-        return cycles;
+    }
+
+    // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    static int invoke16Bit(State& state, Access& access)
+    {
+        state.setAccumulatorC(add(state, state.getAccumulatorC(), access.readWord()));
+        return 1;
     }
 
     static std::string toString() { return "ADC"; }
@@ -57,20 +61,24 @@ public:
 class AND
 {
 public:
-    // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, Access& access)
     {
-        int cycles = 0;
         if (state.is16Bit(State::Flag::m))
         {
-            cycles += 1;
-            state.setAccumulatorC(state.getAccumulatorC() & access.readWord());
+            return invoke16Bit(state, access);
         }
         else
         {
             state.setAccumulatorA(state.getAccumulatorA() & access.readByte());
+            return 0;
         }
-        return cycles;
+    }
+
+    // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    static int invoke16Bit(State& state, Access& access)
+    {
+        state.setAccumulatorC(state.getAccumulatorC() & access.readWord());
+        return 1;
     }
 
     static std::string toString() { return "AND"; }
@@ -177,35 +185,54 @@ template<bool ImmediateMode>
 class BIT
 {
 public:
-    // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, Access& access)
     {
-        int cycles = 0;
-        bool zFlag = false;
-        bool nFlag = false;
-        bool vFlag = false;
         if (state.is16Bit(State::Flag::m))
         {
-            cycles += 1;
-            Word data = access.readWord();
-            nFlag = data.isNegative();
-            vFlag = data.getBit(14);
-            zFlag = (state.getAccumulatorC() & data) == 0;
+            return invoke16Bit(state, access);
         }
         else
         {
+            bool zFlag = false;
+            bool nFlag = false;
+            bool vFlag = false;
+
             Byte data = access.readByte();
             nFlag = data.isNegative();
             vFlag = data.getBit(6);
             zFlag = (state.getAccumulatorA() & data) == 0;
+
+            if (!ImmediateMode)
+            {
+                state.setFlag(State::Flag::n, nFlag);
+                state.setFlag(State::Flag::v, vFlag);
+            }
+            state.setFlag(State::Flag::z, zFlag);
+
+            return 0;
         }
+    }
+
+    // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    static int invoke16Bit(State& state, Access& access)
+    {
+        bool zFlag = false;
+        bool nFlag = false;
+        bool vFlag = false;
+
+        Word data = access.readWord();
+        nFlag = data.isNegative();
+        vFlag = data.getBit(14);
+        zFlag = (state.getAccumulatorC() & data) == 0;
+
         if (!ImmediateMode)
         {
             state.setFlag(State::Flag::n, nFlag);
             state.setFlag(State::Flag::v, vFlag);
         }
         state.setFlag(State::Flag::z, zFlag);
-        return cycles;
+
+        return 1;
     }
 
     static std::string toString() { return "BIT"; }
@@ -329,17 +356,11 @@ public:
 class CMP
 {
 public:
-    // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, Access& access)
     {
-        int cycles = 0;
         if (state.is16Bit(State::Flag::m))
         {
-            cycles += 1;
-            Word accumulator = state.getAccumulatorC();
-            Word data = access.readWord();
-            state.setFlag(State::Flag::c, accumulator >= data);
-            state.updateSignFlags(Word(accumulator - data));
+            return invoke16Bit(state, access);
         }
         else
         {
@@ -347,8 +368,18 @@ public:
             Byte data = access.readByte();
             state.setFlag(State::Flag::c, accumulator >= data);
             state.updateSignFlags(Byte(accumulator - data));
+            return 0;
         }
-        return cycles;
+    }
+
+    // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    static int invoke16Bit(State& state, Access& access)
+    {
+        Word accumulator = state.getAccumulatorC();
+        Word data = access.readWord();
+        state.setFlag(State::Flag::c, accumulator >= data);
+        state.updateSignFlags(Word(accumulator - data));
+        return 1;
     }
 
     static std::string toString() { return "CMP"; }
@@ -378,17 +409,11 @@ template<State::IndexRegister Register>
 class CP_
 {
 public:
-    // §10: Add 1 cycle if x=0 (16-bit index registers)
     static int invoke(State& state, Access& access)
     {
-        int cycles = 0;
         if (state.is16Bit(State::Flag::x))
         {
-            cycles += 1;
-            Word indexRegister = state.getIndexRegister<Register>();
-            Word data = access.readWord();
-            state.setFlag(State::Flag::c, indexRegister >= data);
-            state.updateSignFlags(Word(indexRegister - data));
+            return invoke16Bit(state, access);
         }
         else
         {
@@ -396,8 +421,18 @@ public:
             Byte data = access.readByte();
             state.setFlag(State::Flag::c, indexRegister >= data);
             state.updateSignFlags(Byte(indexRegister - data));
+            return 0;
         }
-        return cycles;
+    }
+
+    // §10: Add 1 cycle if x=0 (16-bit index registers)
+    static int invoke16Bit(State& state, Access& access)
+    {
+        Word indexRegister = state.getIndexRegister<Register>();
+        Word data = access.readWord();
+        state.setFlag(State::Flag::c, indexRegister >= data);
+        state.updateSignFlags(Word(indexRegister - data));
+        return 1;
     }
 
     static std::string toString() { return "CP" + State::getIndexRegisterName<Register>(); }
@@ -459,20 +494,24 @@ public:
 class EOR
 {
 public:
-    // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, Access& access)
     {
-        int cycles = 0;
         if (state.is16Bit(State::Flag::m))
         {
-            cycles += 1;
-            state.setAccumulatorC(state.getAccumulatorC() ^ access.readWord());
+            return invoke16Bit(state, access);
         }
         else
         {
             state.setAccumulatorA(state.getAccumulatorA() ^ access.readByte());
+            return 0;
         }
-        return cycles;
+    }
+
+    // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    static int invoke16Bit(State& state, Access& access)
+    {
+        state.setAccumulatorC(state.getAccumulatorC() ^ access.readWord());
+        return 1;
     }
 
     static std::string toString() { return "EOR"; }
@@ -585,20 +624,24 @@ public:
 class LDA
 {
 public:
-    // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, Access& access)
     {
-        int cycles = 0;
         if (state.is16Bit(State::Flag::m))
         {
-            cycles += 1;
-            state.setAccumulatorC(access.readWord());
+            return invoke16Bit(state, access);
         }
         else
         {
             state.setAccumulatorA(access.readByte());
+            return 0;
         }
-        return cycles;
+    }
+
+    // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    static int invoke16Bit(State& state, Access& access)
+    {
+        state.setAccumulatorC(access.readWord());
+        return 1;
     }
 
     static std::string toString() { return "LDA"; }
@@ -609,20 +652,24 @@ template<State::IndexRegister Register>
 class LD_
 {
 public:
-    // §10: Add 1 cycle if x=0 (16-bit index registers)
     static int invoke(State& state, Access& access)
     {
-        int cycles = 0;
         if (state.is16Bit(State::Flag::x))
         {
-            state.setIndexRegister<Register>(access.readWord());
-            cycles += 1;
+            return invoke16Bit(state, access);
         }
         else
         {
             state.setIndexRegister<Register>(access.readByte());
+            return 0;
         }
-        return cycles;
+    }
+
+    // §10: Add 1 cycle if x=0 (16-bit index registers)
+    static int invoke16Bit(State& state, Access& access)
+    {
+        state.setIndexRegister<Register>(access.readWord());
+        return 1;
     }
 
     static std::string toString() { return "LD" + State::getIndexRegisterName<Register>(); }
@@ -712,20 +759,24 @@ public:
 class ORA
 {
 public:
-    // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, Access& access)
     {
-        int cycles = 0;
         if (state.is16Bit(State::Flag::m))
         {
-            cycles += 1;
-            state.setAccumulatorC(state.getAccumulatorC() | access.readWord());
+            return invoke16Bit(state, access);
         }
         else
         {
             state.setAccumulatorA(state.getAccumulatorA() | access.readByte());
+            return 0;
         }
-        return cycles;
+    }
+
+    // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    static int invoke16Bit(State& state, Access& access)
+    {
+        state.setAccumulatorC(state.getAccumulatorC() | access.readWord());
+        return 1;
     }
 
     static std::string toString() { return "ORA"; }
@@ -1099,20 +1150,24 @@ private:
     }
 
 public:
-    // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, Access& access)
     {
-        int cycles = 0;
         if (state.is16Bit(State::Flag::m))
         {
-            cycles += 1;
-            state.setAccumulatorC(subtract(state, state.getAccumulatorC(), access.readWord()));
+            return invoke16Bit(state, access);
         }
         else
         {
             state.setAccumulatorA(subtract(state, state.getAccumulatorA(), access.readByte()));
+            return 0;
         }
-        return cycles;
+    }
+
+    // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
+    static int invoke16Bit(State& state, Access& access)
+    {
+        state.setAccumulatorC(subtract(state, state.getAccumulatorC(), access.readWord()));
+        return 1;
     }
 
     static std::string toString() { return "SBC"; }

@@ -36,8 +36,7 @@ protected:
     int applyOperand()
     {
         applyByte<Byte>();
-        int cycles = applyArguments({ applyByte<Bytes>()... }, std::index_sequence_for<Bytes...>());
-        return cycles;
+        return applyArguments({ applyByte<Bytes>()... }, std::index_sequence_for<Bytes...>());
     }
 
     std::string operandToString() const

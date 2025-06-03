@@ -388,31 +388,18 @@ void generateOpcodes(std::vector<Instruction>& instructions)
 
 void generateOpcodeMap(const std::vector<Instruction>& instructions)
 {
-    std::ofstream output("..\\..\\..\\src\\SnesEmulator\\CPU\\CpuOpcodeMap.cpp");
+    std::ofstream output("..\\..\\..\\src\\WDC65816\\CpuInstructionDecoder.cpp");
 
-    output << "#include \"CpuOpcodeMap.h\"" << std::endl
-        << std::endl
-        << "#include <stdint.h>" << std::endl
+    //std::ostream& output = std::cout;
+
+    output << "#include \"CpuInstructionDecoder.h\"" << std::endl
         << std::endl
         << "#include \"CpuOpcode.h\"" << std::endl
         << std::endl
         << "namespace CPU {" << std::endl
         << std::endl;
 
-    output << "Instruction* OpcodeMap::getNextInstruction(const State& state) const" << std::endl
-        << "{" << std::endl
-        << "    Byte opcode = state.readProgramByte();" << std::endl
-        << "    if (state.is16Bit(State::m) && instructions16BitM[opcode]) {" << std::endl
-        << "        return instructions16BitM[opcode].get();" << std::endl
-        << "    } else if (state.is16Bit(State::x) && instructions16BitX[opcode]) {" << std::endl
-        << "        return instructions16BitX[opcode].get();" << std::endl
-        << "    } else {" << std::endl
-        << "        return instructions[opcode].get();" << std::endl
-        << "    }" << std::endl
-        << "}" << std::endl << std::endl;
-
-
-    output << "OpcodeMap::OpcodeMap(State& state)" << std::endl
+    output << "InstructionDecoder::InstructionDecoder(State& state)" << std::endl
         << "{" << std::endl;
     for (const Instruction& instruction : instructions)
     {
@@ -805,8 +792,8 @@ void generateCpu()
         //std::cout << std::endl;
     }
 
-    generateOpcodes(instructions);
-    //generateOpcodeMap(instructions);
+    //generateOpcodes(instructions);
+    generateOpcodeMap(instructions);
     //generateAddressModes(addressModeClassMap);
     //generateOperators(operatorMap);
 

@@ -503,7 +503,7 @@ class Immediate16Bit : public Instruction3Byte
         memory.createLocation<ReadOnlyMemory>(0, lowByte);
         memory.createLocation<ReadOnlyMemory>(1, highByte);
         MemoryAccess access(memory, 0);
-        return Operator::invoke(state, access);
+        return Operator::invoke16Bit(state, access);
     }
 
     std::string toString() const override
