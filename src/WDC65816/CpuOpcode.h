@@ -4326,7 +4326,7 @@ class WAI_CB : public AddressMode::Implied<Operator::WAI>
 };
 
 // WDM Reserved for Future Expansion [Flags affected: none (subject to change)]
-// WDM
+// WDM #const
 // Immediate (2-Byte)
 class WDM_42 : public AddressMode::Immediate<Operator::WDM>
 {
@@ -4339,7 +4339,7 @@ class WDM_42 : public AddressMode::Immediate<Operator::WDM>
         return 2 + applyOperand();
     }
 
-    std::string opcodeToString() const override { return "42: WDM"; }
+    std::string opcodeToString() const override { return "42: WDM #const"; }
 };
 
 // XBA Exchange B and A 8-bit Accumulators [Flags affected: n,z]

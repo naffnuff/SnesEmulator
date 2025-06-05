@@ -339,7 +339,7 @@ TYX	BB	Implied	1	2
 WAI Wait for Interrupt [Flags affected: none]
 WAI	CB	Implied	1	315
 WDM Reserved for Future Expansion [Flags affected: none (subject to change)]
-WDM	42	Immediate	2	216
+WDM #const	42	Immediate	2	216
 XBA Exchange B and A 8-bit Accumulators [Flags affected: n,z]
 XBA	EB	Implied	1	3
 XCE Exchange Carry and Emulation Flags [Flags affected: m,b/x,c,e]
