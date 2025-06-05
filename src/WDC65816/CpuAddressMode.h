@@ -37,6 +37,8 @@ class Absolute : public Instruction3Byte
     }
 };
 
+// Absolute (control flow)
+// addr
 template <typename Operator>
 class Absolute_ControlFlow : public Instruction3Byte
 {
@@ -173,6 +175,8 @@ class AbsoluteLong : public Instruction4Byte
     }
 };
 
+// Absolute Long (control flow)
+// long
 template <typename Operator>
 class AbsoluteLong_ControlFlow : public Instruction4Byte
 {
@@ -360,7 +364,7 @@ class DirectPageIndirect : public Instruction2Byte
     }
 };
 
-// Direct Page Indirect
+// Direct Page Indirect (control flow)
 // (dp)
 template <typename Operator>
 class DirectPageIndirect_ControlFlow : public Instruction2Byte
