@@ -53,26 +53,6 @@ class Absolute_ControlFlow : public Instruction3Byte
     }
 };
 
-// Absolute Indexed Indirect
-// (addr,X)
-template <typename Operator>
-class AbsoluteIndexedIndirect : public Instruction3Byte
-{
-    using Instruction3Byte::InstructionBase;
-
-    int invokeOperator(Byte lowByte, Byte highByte) override
-    {
-        Word indexedAddress = Word(lowByte, highByte) + state.getIndexRegister<State::IndexRegister::X>();
-        Long longAddress(indexedAddress, state.getProgramBank());
-        return Operator::invoke(state, state.readMemoryWord<State::MemoryType::WrappingMask::Bank>(longAddress));
-    }
-
-    std::string toString() const override
-    {
-        return Operator::toString() + " ($" + operandToString() + ",X)";
-    }
-};
-
 // Absolute Indexed, X/Y
 // addr,X/Y
 template <typename Operator, State::IndexRegister Register>
@@ -115,6 +95,26 @@ class AbsoluteIndexed_ExtraCycle : public AbsoluteIndexed<Operator, Register>
             cycles += 1;
         }
         return cycles;
+    }
+};
+
+// Absolute Indexed Indirect
+// (addr,X)
+template <typename Operator>
+class AbsoluteIndexedIndirect : public Instruction3Byte
+{
+    using Instruction3Byte::InstructionBase;
+
+    int invokeOperator(Byte lowByte, Byte highByte) override
+    {
+        Word indexedAddress = Word(lowByte, highByte) + state.getIndexRegister<State::IndexRegister::X>();
+        Long longAddress(indexedAddress, state.getProgramBank());
+        return Operator::invoke(state, state.readMemoryWord<State::MemoryType::WrappingMask::Bank>(longAddress));
+    }
+
+    std::string toString() const override
+    {
+        return Operator::toString() + " ($" + operandToString() + ",X)";
     }
 };
 
@@ -283,6 +283,31 @@ class DirectPage : public Instruction2Byte
     }
 };
 
+// Direct Page Indexed, X/Y
+// dp,X/Y
+template <typename Operator, State::IndexRegister Register>
+class DirectPageIndexed : public Instruction2Byte
+{
+    using Instruction2Byte::InstructionBase;
+
+    // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
+    int invokeOperator(Byte lowByte) override
+    {
+        int cycles = 0;
+        if (Byte(state.getDirectPageRegister()))
+        {
+            cycles += 1;
+        }
+        MemoryAccess access = state.getDirectMemoryAccess(lowByte, state.getIndexRegister<Register>());
+        return cycles + Operator::invoke(state, access);
+    }
+
+    std::string toString() const override
+    {
+        return Operator::toString() + " $" + operandToString() + "," + State::getIndexRegisterName<Register>();
+    }
+};
+
 // Direct Page Indexed Indirect, X
 // (dp,X)
 template <typename Operator>
@@ -306,31 +331,6 @@ class DirectPageIndexedIndirectX : public Instruction2Byte
     std::string toString() const override
     {
         return Operator::toString() + " $" + operandToString() + " TODO";
-    }
-};
-
-// Direct Page Indexed, X/Y
-// dp,X/Y
-template <typename Operator, State::IndexRegister Register>
-class DirectPageIndexed : public Instruction2Byte
-{
-    using Instruction2Byte::InstructionBase;
-
-    // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
-    int invokeOperator(Byte lowByte) override
-    {
-        int cycles = 0;
-        if (Byte(state.getDirectPageRegister()))
-        {
-            cycles += 1;
-        }
-        MemoryAccess access = state.getDirectMemoryAccess(lowByte, state.getIndexRegister<Register>());
-        return cycles + Operator::invoke(state, access);
-    }
-
-    std::string toString() const override
-    {
-        return Operator::toString() + " $" + operandToString() + "," + State::getIndexRegisterName<Register>();
     }
 };
 
