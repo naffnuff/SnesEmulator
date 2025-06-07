@@ -24,12 +24,14 @@
     <ClInclude Include="..\..\..\src\include\Common\Memory.h" />
     <ClInclude Include="..\..\..\src\include\Common\MemoryLocation.h" />
     <ClInclude Include="..\..\..\src\include\Common\Output.h" />
+    <ClInclude Include="..\..\..\src\include\Common\Profiler.h" />
     <ClInclude Include="..\..\..\src\include\Common\RegisterManager.h" />
     <ClInclude Include="..\..\..\src\include\Common\System.h" />
     <ClInclude Include="..\..\..\src\include\Common\Types.h" />
     <ClInclude Include="..\..\..\src\include\Common\Util.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\src\Common\Profiler.cpp" />
     <ClCompile Include="..\..\..\src\Common\System.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

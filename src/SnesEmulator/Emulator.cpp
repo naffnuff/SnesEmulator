@@ -12,6 +12,12 @@
 #include "DmaInstruction.h"
 #include "HdmaInstruction.h"
 
+#define PROFILING_ENABLED
+
+#include "Profiler.h"
+
+CREATE_PROFILER();
+
 template<typename State, typename OtherState>
 int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debugger::Context<State>& context, OtherState& otherState, Debugger::Context<OtherState>& otherContext, Output& output);
 
@@ -252,7 +258,12 @@ void Emulator::run()
                     debugger.printMemory(cpuState, cpuContext, audioSystem.state, audioSystem.context);
                 }
 
-                if (int cycles = executeNext(instruction, cpuState, debugger, cpuContext, audioSystem.state, audioSystem.context, output))
+                int cycles = 0;
+                {
+                    PROFILE_SCOPE("Execute CPU Instruction");
+                    cycles = executeNext(instruction, cpuState, debugger, cpuContext, audioSystem.state, audioSystem.context, output);
+                }
+                if (cycles)
                 {
                     nextCpu += CycleCount(cycles * 6);
                     cpuContext.nextInstruction = cpuInstructionDecoder.getNextInstruction(cpuState);
@@ -293,7 +304,12 @@ void Emulator::run()
                         debugger.printMemory(cpuState, cpuContext, audioSystem.state, audioSystem.context);
                     }
 
-                    if (int cycles = executeNext(instruction, audioSystem.state, debugger, audioSystem.context, cpuState, cpuContext, output))
+                    int cycles = 0;
+                    {
+                        PROFILE_SCOPE("Execute SPC Instruction");
+                        cycles = executeNext(instruction, audioSystem.state, debugger, audioSystem.context, cpuState, cpuContext, output);
+                    }
+                    if (cycles)
                     {
                         nextSpc += CycleCount(cycles * 16);
                         audioSystem.context.nextInstruction = audioSystem.instructionDecoder.getNextInstruction(audioSystem.state);
@@ -345,7 +361,7 @@ void Emulator::run()
             if (!audioSystem.threaded && masterCycle == nextAudioTick)
             {
                 //audioSystem.tick();
-                //nextAudioTick += CycleCount(21);
+                nextAudioTick += CycleCount(21);
             }
 
             if (increment)
@@ -367,11 +383,11 @@ void Emulator::run()
                     }
                     if (videoRegisters.vCounter == 224)
                     {
-                        static std::chrono::steady_clock::time_point previousTime = audioSystem.now;
+                        static std::chrono::steady_clock::time_point previousTime = std::chrono::steady_clock::now();
                         static uint32_t frameCount = 0;
                         static uint32_t totalFrameCount = 0;
 
-                        std::chrono::steady_clock::time_point currentTime = audioSystem.now;
+                        std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
                         ++frameCount;
                         ++totalFrameCount;
                         static uint32_t minFrameCount = uint32_t(-1);
@@ -393,6 +409,8 @@ void Emulator::run()
                                 output.debug("Avg. FPS: ", (totalFrameCount / elapsedTime));
                                 output.debug("Min. FPS: ", minFrameCount);
                                 output.debug("Max. FPS: ", maxFrameCount);
+
+                                GlobalProfiler::get().printEntries(output);
                             }
                         }
 
@@ -472,13 +490,14 @@ void Emulator::run()
             {
                 //std::this_thread::yield();
             }
-            static std::chrono::steady_clock::time_point lastTime = audioSystem.now;
-            if (audioSystem.now - lastTime > std::chrono::seconds(10))
+            static std::chrono::steady_clock::time_point lastTime = std::chrono::steady_clock::now();
+            std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
+            if (currentTime - lastTime > std::chrono::seconds(10))
             {
                 //lostCycles = std::chrono::duration_cast<CycleCount>(audioSystem.elapsedTime) - masterCycle;
                 output.debug("Video cycles: ", masterCycle.count(), " / ", iteration, " (", (100.0 * masterCycle.count() / iteration), "%)");
                 output.debug("Lost cycles: ", lostCycles.count());
-                lastTime = audioSystem.now;
+                lastTime = currentTime;
             }
             ++iteration;
         }

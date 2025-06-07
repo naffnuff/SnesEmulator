@@ -73,6 +73,8 @@ void check(PaError error)
     }
 }
 
+static constexpr Processor::SampleCycleTable createSampleCycleTable();
+
 Processor::Processor(Output& output, Memory<Word>& spcMemory)
     : RegisterManager(output, "audio", dspMemory)
     , output(output, "audio")
@@ -90,6 +92,8 @@ Processor::Processor(Output& output, Memory<Word>& spcMemory)
 
     leftOutputBuffer.resize(outputBufferSize, 0);
     rightOutputBuffer.resize(outputBufferSize, 0);
+
+    sampleCycleTable = createSampleCycleTable();
 }
 
 Processor::~Processor()
@@ -1107,9 +1111,9 @@ void Processor::onSampleCycle<26>()
     // TODO
 
     //  3. Output the left sample to the DAC.
-    const float leftOutput = applyMainVolume(leftSampleSum, mainVolumeLeft);
-    const size_t outputIndex = leftOutputCount & (outputBufferSize - 1);
-    leftOutputBuffer[outputIndex] = leftOutput;
+    //const float leftOutput = applyMainVolume(leftSampleSum, mainVolumeLeft);
+    //const size_t outputIndex = leftOutputCount & (outputBufferSize - 1);
+    //leftOutputBuffer[outputIndex] = leftOutput;
     ++leftOutputCount;
 
     //  4. Load and apply EFB.
@@ -1129,9 +1133,9 @@ void Processor::onSampleCycle<27>()
     // TODO
 
     //  3. Output the right sample to the DAC.
-    const float rightOutput = applyMainVolume(rightSampleSum, mainVolumeRight);
-    const size_t outputIndex = rightOutputCount & (outputBufferSize - 1);
-    rightOutputBuffer[outputIndex] = rightOutput;
+    //const float rightOutput = applyMainVolume(rightSampleSum, mainVolumeRight);
+    //const size_t outputIndex = rightOutputCount & (outputBufferSize - 1);
+    //rightOutputBuffer[outputIndex] = rightOutput;
     ++rightOutputCount;
 
     //  4. Load PMON
@@ -1224,17 +1228,15 @@ void Processor::onSampleCycle<31>()
 }
 
 template<int... Indices>
-static constexpr Processor::SampleCycleTable makeSampleCycleTable(std::integer_sequence<int, Indices...>)
+static constexpr Processor::SampleCycleTable defineSampleCycles(std::integer_sequence<int, Indices...>)
 {
     return { ([](Processor& processor) { processor.onSampleCycle<Indices>(); })... };
 }
 
-static constexpr Processor::SampleCycleTable getSampleCycleTable()
+static constexpr Processor::SampleCycleTable createSampleCycleTable()
 {
-    return makeSampleCycleTable(std::make_integer_sequence<int, 32>{});
+    return defineSampleCycles(std::make_integer_sequence<int, 32>{});
 }
-
-Processor::SampleCycleTable Processor::sampleCycleTable = getSampleCycleTable();
 
 void Processor::tick()
 {

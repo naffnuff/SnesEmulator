@@ -371,10 +371,10 @@ public:
 
     using SampleCycleTable = std::array<void(*)(Processor&), 32>;
 
-    static SampleCycleTable sampleCycleTable;
+    SampleCycleTable sampleCycleTable;
 
     //static constexpr int tableSize = 50;
-    static constexpr int voiceCount = 8;
+    static constexpr const int voiceCount = 8;
 
     Processor(Output& output, Memory<Word>& spcMemory);
 
