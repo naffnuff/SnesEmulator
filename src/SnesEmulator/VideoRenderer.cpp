@@ -128,6 +128,10 @@ void Renderer::initialize(bool fullscreen, bool aspectCorrection)
     {
         glfwSwapInterval(1);
     }
+    else
+    {
+        glfwSwapInterval(0);
+    }
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 

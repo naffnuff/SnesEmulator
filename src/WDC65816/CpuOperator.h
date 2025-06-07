@@ -3,11 +3,17 @@
 #include "Exception.h"
 #include "CpuState.h"
 
+#define PROFILING_ENABLED
+
+#include "Profiler.h"
+
 namespace CPU {
 
 namespace Operator {
 
-EXCEPTION(NotYetImplementedException, ::NotYetImplementedException)
+EXCEPTION(NotYetImplementedException, ::NotYetImplementedException);
+
+CREATE_PROFILER();
 
 // ADC Add With Carry [Flags affected: n,v,z,c]
 class ADC
