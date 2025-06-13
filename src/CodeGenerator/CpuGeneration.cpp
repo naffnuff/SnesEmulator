@@ -297,7 +297,9 @@ void generateOpcode(std::ostream& output, Instruction& instruction, const Opcode
         }
     }
     output << "    int execute() override" << std::endl
-        << "    {" << std::endl;
+        << "    {" << std::endl
+        << "        PROFILE_SCOPE(\"" << classname << "\");" << std::endl
+        << std::endl;
     if (opcode.notYetImplemented)
     {
         output << "        throw NotYetImplementedException(\"" + classname + "\");" << std::endl;
@@ -366,11 +368,15 @@ void generateOpcodes(std::vector<Instruction>& instructions)
         << "#include \"CpuAddressMode.h\"" << std::endl
         << "#include \"CpuOperator.h\"" << std::endl
         << std::endl
+        << "#include \"Profiler.h\"" << std::endl
+        << std::endl
         << "namespace CPU {" << std::endl
         << std::endl
         << "namespace Opcode {" << std::endl
         << std::endl
         << "EXCEPTION(NotYetImplementedException, ::NotYetImplementedException)" << std::endl
+        << std::endl
+        << "CREATE_PROFILER();" << std::endl
         << std::endl;
 
     for (Instruction& instruction : instructions)
@@ -468,7 +474,9 @@ void generateAddressMode(std::ofstream& output, const std::string& name, const A
         }
     }
     output << ") override" << std::endl
-        << "    {" << std::endl;
+        << "    {" << std::endl
+        << "        PROFILE_SCOPE(\"" << name << "\");" << std::endl
+        << std::endl;
     auto it = addressModeImplementations.find(name);
     if (it != addressModeImplementations.end())
     {
@@ -542,6 +550,8 @@ void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
         << "#include \"Memory.h\"" << std::endl
         << "#include \"CpuState.h\"" << std::endl
         << std::endl
+        << "#include \"Profiler.h\"" << std::endl
+        << std::endl
         << "#pragma warning( disable : 4702 ) // unreachable code" << std::endl
         << std::endl
         << "namespace CPU {" << std::endl
@@ -554,6 +564,8 @@ void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
         << "namespace AddressMode {" << std::endl
         << std::endl
         << "EXCEPTION(NotYetImplementedException, ::NotYetImplementedException)" << std::endl
+        << std::endl
+        << "CREATE_PROFILER();" << std::endl
         << std::endl;
 
     for (const AddressModeClassMap::value_type& kvp : addressModeClassMap)

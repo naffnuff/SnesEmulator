@@ -5,6 +5,8 @@
 #include "Memory.h"
 #include "CpuState.h"
 
+#include "Profiler.h"
+
 #pragma warning( disable : 4702 ) // unreachable code
 
 namespace CPU {
@@ -18,6 +20,8 @@ namespace AddressMode {
 
 EXCEPTION(NotYetImplementedException, ::NotYetImplementedException)
 
+CREATE_PROFILER();
+
 // Absolute
 // addr
 template <typename Operator>
@@ -27,6 +31,8 @@ class Absolute : public Instruction3Byte
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
+        PROFILE_SCOPE("Absolute");
+
         MemoryAccess access = state.getMemoryAccess(lowByte, highByte);
         return Operator::invoke(state, access);
     }
@@ -46,6 +52,8 @@ class Absolute_ControlFlow : public Instruction3Byte
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
+        PROFILE_SCOPE("Absolute_ControlFlow");
+
         return Operator::invoke(state, Word(lowByte, highByte));
     }
 
@@ -64,6 +72,8 @@ class AbsoluteIndexed : public Instruction3Byte
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
+        PROFILE_SCOPE("AbsoluteIndexed");
+
         Long staticAddress(lowByte, highByte, state.getDataBank());
         Long indexedAddress = staticAddress + state.getIndexRegister<Register>();
         MemoryAccess access = state.getMemoryAccess(indexedAddress);
@@ -109,6 +119,8 @@ class AbsoluteIndexedIndirect : public Instruction3Byte
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
+        PROFILE_SCOPE("AbsoluteIndexedIndirect");
+
         Word indexedAddress = Word(lowByte, highByte) + state.getIndexRegister<State::IndexRegister::X>();
         Long longAddress(indexedAddress, state.getProgramBank());
         return Operator::invoke(state, state.readMemoryWord<State::MemoryType::WrappingMask::Bank>(longAddress));
@@ -129,6 +141,8 @@ class AbsoluteIndirect : public Instruction3Byte
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
+        PROFILE_SCOPE("AbsoluteIndirect");
+
         return Operator::invoke(state, state.readMemoryWord<State::MemoryType::WrappingMask::Bank>(Long(lowByte, highByte, 0)));
     }
 
@@ -147,6 +161,8 @@ class AbsoluteIndirectLong : public Instruction3Byte
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
+        PROFILE_SCOPE("AbsoluteIndirectLong");
+
         return Operator::invoke(state, state.readMemoryLong<State::MemoryType::WrappingMask::Bank>(Long(lowByte, highByte, 0)));
     }
 
@@ -165,6 +181,8 @@ class AbsoluteLong : public Instruction4Byte
 
     int invokeOperator(Byte lowByte, Byte highByte, Byte bankByte) override
     {
+        PROFILE_SCOPE("AbsoluteLong");
+
         MemoryAccess access = state.getMemoryAccess(lowByte, highByte, bankByte);
         return Operator::invoke(state, access);
     }
@@ -184,6 +202,8 @@ class AbsoluteLong_ControlFlow : public Instruction4Byte
 
     int invokeOperator(Byte lowByte, Byte highByte, Byte bankByte) override
     {
+        PROFILE_SCOPE("AbsoluteLong_ControlFlow");
+
         return Operator::invoke(state, Long(lowByte, highByte, bankByte));
     }
 
@@ -202,6 +222,8 @@ class AbsoluteLongIndexedX : public Instruction4Byte
 
     int invokeOperator(Byte lowByte, Byte highByte, Byte bankByte) override
     {
+        PROFILE_SCOPE("AbsoluteLongIndexedX");
+
         MemoryAccess access = state.getMemoryAccess(lowByte, highByte, bankByte, state.getIndexRegister<State::IndexRegister::X>());
         return Operator::invoke(state, access);
     }
@@ -222,6 +244,8 @@ class Accumulator : public Instruction1Byte
     // §21: Remove 2 cycles for the special case of Accumulator
     int invokeOperator() override
     {
+        PROFILE_SCOPE("Accumulator");
+
         int cycles = 0;
         if (state.is16Bit(State::Flag::m))
         {
@@ -246,6 +270,8 @@ class BlockMove : public Instruction3Byte
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
+        PROFILE_SCOPE("BlockMove");
+
         Word byteCount = state.getAccumulatorC();
         if (byteCount != 0)
         {
@@ -272,6 +298,8 @@ class DirectPage : public Instruction2Byte
     // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int invokeOperator(Byte lowByte) override
     {
+        PROFILE_SCOPE("DirectPage");
+
         int cycles = 0;
         if (state.getDirectPageRegister().getLowByte() != 0)
         {
@@ -297,6 +325,8 @@ class DirectPageIndexed : public Instruction2Byte
     // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int invokeOperator(Byte lowByte) override
     {
+        PROFILE_SCOPE("DirectPageIndexed");
+
         int cycles = 0;
         if (Byte(state.getDirectPageRegister()))
         {
@@ -322,6 +352,8 @@ class DirectPageIndexedIndirectX : public Instruction2Byte
     // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int invokeOperator(Byte lowByte) override
     {
+        PROFILE_SCOPE("DirectPageIndexedIndirectX");
+
         throw NotYetImplementedException("DirectPageIndexedIndirectX");
         int cycles = 0;
         if ((Byte)state.getDirectPageRegister())
@@ -348,6 +380,8 @@ class DirectPageIndirect : public Instruction2Byte
     // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int invokeOperator(Byte lowByte) override
     {
+        PROFILE_SCOPE("DirectPageIndirect");
+
         int cycles = 0;
         if ((Byte)state.getDirectPageRegister())
         {
@@ -374,6 +408,8 @@ class DirectPageIndirect_ControlFlow : public Instruction2Byte
     // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int invokeOperator(Byte lowByte) override
     {
+        PROFILE_SCOPE("DirectPageIndirect_ControlFlow");
+
         int cycles = 0;
         if ((Byte)state.getDirectPageRegister())
         {
@@ -400,6 +436,8 @@ class DirectPageIndirectIndexedY : public Instruction2Byte
     // §3: Add 1 cycle if adding index crosses a page boundary
     int invokeOperator(Byte lowByte) override
     {
+        PROFILE_SCOPE("DirectPageIndirectIndexedY");
+
         int cycles = 0;
         if ((Byte)state.getDirectPageRegister())
         {
@@ -431,6 +469,8 @@ class DirectPageIndirectLong : public Instruction2Byte
     // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int invokeOperator(Byte lowByte) override
     {
+        PROFILE_SCOPE("DirectPageIndirectLong");
+
         int cycles = 0;
         if ((Byte)state.getDirectPageRegister())
         {
@@ -457,6 +497,8 @@ class DirectPageIndirectLongIndexedY : public Instruction2Byte
     // §2: Add 1 cycle if low byte of Direct Page Register is non-zero
     int invokeOperator(Byte lowByte) override
     {
+        PROFILE_SCOPE("DirectPageIndirectLongIndexedY");
+
         int cycles = 0;
         if ((Byte)state.getDirectPageRegister())
         {
@@ -482,6 +524,8 @@ class Immediate : public Instruction2Byte
 
     int invokeOperator(Byte lowByte) override
     {
+        PROFILE_SCOPE("Immediate");
+
         Memory<Byte> memory(1);
         memory.createLocation<ReadOnlyMemory>(0, lowByte);
         MemoryAccess<Memory<Byte>> access(memory, 0);
@@ -503,6 +547,8 @@ class Immediate16Bit : public Instruction3Byte
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
+        PROFILE_SCOPE("Immediate16Bit");
+
         Memory<Byte> memory(2);
         memory.createLocation<ReadOnlyMemory>(0, lowByte);
         memory.createLocation<ReadOnlyMemory>(1, highByte);
@@ -524,6 +570,8 @@ class Implied : public Instruction1Byte
 
     int invokeOperator() override
     {
+        PROFILE_SCOPE("Implied");
+
         return Operator::invoke(state);
     }
 
@@ -542,6 +590,8 @@ class ProgramCounterRelative : public Instruction2Byte
 
     int invokeOperator(Byte lowByte) override
     {
+        PROFILE_SCOPE("ProgramCounterRelative");
+
         return Operator::invoke(state, (int8_t)lowByte);
     }
 
@@ -563,6 +613,8 @@ class ProgramCounterRelativeLong : public Instruction3Byte
 
     int invokeOperator(Byte lowByte, Byte highByte) override
     {
+        PROFILE_SCOPE("ProgramCounterRelativeLong");
+
         return Operator::invoke(state, int16_t(highByte << 8 | lowByte));
     }
 
@@ -584,6 +636,8 @@ class StackRelative : public Instruction2Byte
 
     int invokeOperator(Byte lowByte) override
     {
+        PROFILE_SCOPE("StackRelative");
+
         MemoryAccess access = state.getMemoryAccess<State::MemoryType::WrappingMask::Bank>(Long(state.getStackPointer() + lowByte, 0));
         return Operator::invoke(state, access);
     }
@@ -603,6 +657,8 @@ class StackRelativeIndirectIndexedY : public Instruction2Byte
 
     int invokeOperator(Byte lowByte) override
     {
+        PROFILE_SCOPE("StackRelativeIndirectIndexedY");
+
         Word address = state.readMemoryWord<State::MemoryType::WrappingMask::Bank>(Long(state.getStackPointer() + lowByte, 0));
         MemoryAccess access = state.getMemoryAccess(Long(address, state.getDataBank()), state.getIndexRegister<State::IndexRegister::Y>());
         return Operator::invoke(state, access);
