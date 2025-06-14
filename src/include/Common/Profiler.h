@@ -16,7 +16,13 @@ class CompilationUnitProfiler;
 class GlobalProfiler
 {
 public:
-    using Entry = std::pair<const char*, std::chrono::nanoseconds>;
+    struct Entry
+    {
+        const char* name = nullptr;
+        std::chrono::nanoseconds time;
+        int count = 0;
+        std::chrono::nanoseconds averageTime;
+    };
 
     GlobalProfiler()
         : start(std::chrono::high_resolution_clock::now())
@@ -61,8 +67,9 @@ public:
             std::cout << unitName << " " << CompilationUnitProfilerCount::value << std::endl;
             entries.resize(CompilationUnitProfilerCount::value);
         }
-        entries[id].first = name;
-        entries[id].second += time;
+        entries[id].name = name;
+        entries[id].time += time;
+        ++entries[id].count;
     }
 
 public:
@@ -106,11 +113,13 @@ struct ScopeIdTracker
 #ifdef PROFILING_ENABLED
 #define CREATE_NAMED_PROFILER(name) namespace { static CompilationUnitProfiler compilationUnitProfiler(name); }
 #define CREATE_PROFILER() CREATE_NAMED_PROFILER(__FILE__)
-#define PROFILE_SCOPE(name) ScopeProfiler scopeProfiler(SCOPE_ID, name, compilationUnitProfiler);
+#define PROFILE_SCOPE_IMPL2(line, id, name) ScopeProfiler scopeProfiler##line(id, name, compilationUnitProfiler);
+#define PROFILE_SCOPE_IMPL(line, id, name) PROFILE_SCOPE_IMPL2(line, id, name)
+#define PROFILE_SCOPE(name) PROFILE_SCOPE_IMPL(__LINE__, SCOPE_ID, name)
 #define PROFILE_FUNCTION() PROFILE_SCOPE(__FUNCTION__)
 #else
 #define CREATE_NAMED_PROFILER(name)
 #define CREATE_PROFILER()
 #define PROFILE_SCOPE(name)
-#define PROFILE_FUNCTION() PROFILE_SCOPE(__FUNCTION__)
+#define PROFILE_FUNCTION()
 #endif

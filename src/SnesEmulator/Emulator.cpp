@@ -370,6 +370,8 @@ void Emulator::run()
                 ++videoRegisters.hCounter;
                 if (videoRegisters.hCounter == 274)
                 {
+                    PROFILE_SCOPE("videoRegisters.hCounter == 274");
+
                     if (videoRegisters.vCounter <= 224)
                     {
                         if (videoRegisters.vCounter > 0)
@@ -435,6 +437,8 @@ void Emulator::run()
                 }
                 else if (videoRegisters.hCounter == 1374)
                 {
+                    PROFILE_SCOPE("videoRegisters.hCounter == 1374");
+
                     videoRegisters.hCounter = 0;
                     videoRegisters.hBlank = false;
                     ++videoRegisters.vCounter;
@@ -488,7 +492,9 @@ void Emulator::run()
             }
             else
             {
-                //std::this_thread::yield();
+                PROFILE_SCOPE("yield");
+
+                std::this_thread::yield();
             }
             static std::chrono::steady_clock::time_point lastTime = std::chrono::steady_clock::now();
             std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();

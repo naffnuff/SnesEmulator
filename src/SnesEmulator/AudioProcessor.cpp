@@ -7,6 +7,12 @@
 #include "System.h"
 #include "Util.h"
 
+#define PROFILING_ENABLED
+
+#include "Profiler.h"
+
+CREATE_PROFILER();
+
 #ifndef M_PI
 #define M_PI 3.14159265358979323846264338327950288
 #endif
@@ -1240,6 +1246,8 @@ static constexpr Processor::SampleCycleTable createSampleCycleTable()
 
 void Processor::tick()
 {
+    PROFILE_SCOPE("Audio-Processor Tick");
+
     try
     {
         sampleCycleTable[sampleCycle](*this);

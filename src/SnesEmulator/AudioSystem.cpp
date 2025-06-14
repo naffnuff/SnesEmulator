@@ -3,6 +3,12 @@
 #include <iostream>
 #include <chrono>
 
+#define PROFILING_ENABLED
+
+#include "Profiler.h"
+
+CREATE_PROFILER();
+
 class AudioSystemRunner
 {
 public:
@@ -42,7 +48,13 @@ public:
                         break;
                     }
 
-                    if (int cycles = instruction->execute())
+
+                    int cycles = 0;
+                    {
+                        PROFILE_SCOPE("Execute SPC Instruction (threaded)");
+                        cycles = instruction->execute();
+                    }
+                    if (cycles)
                     {
                         system.nextSpc += AudioSystem::CycleCount(cycles);
                         system.context.nextInstruction = system.instructionDecoder.getNextInstruction(system.state);

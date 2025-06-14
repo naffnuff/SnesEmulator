@@ -1,5 +1,7 @@
 #include "CpuInstructionDecoder.h"
 
+//#define PROFILING_ENABLED
+
 #include "CpuOpcode.h"
 
 namespace CPU {
