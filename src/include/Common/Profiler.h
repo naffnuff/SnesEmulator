@@ -10,6 +10,7 @@ struct CompilationUnitProfilerCount
     static inline int value = 0;
 };
 
+template<bool>
 class ScopeProfiler;
 class CompilationUnitProfiler;
 
@@ -77,14 +78,22 @@ public:
     const char* unitName;
 };
 
+template<bool Enabled>
 class ScopeProfiler
+{
+public:
+    ScopeProfiler(int, const char*, CompilationUnitProfiler&) {}
+};
+
+template<>
+class ScopeProfiler<true>
 {
 public:
     ScopeProfiler(int id, const char* name, CompilationUnitProfiler& profiler)
         : id(id)
         , name(name)
-        , start(std::chrono::high_resolution_clock::now())
         , profiler(profiler)
+        , start(std::chrono::high_resolution_clock::now())
     {
     }
 
@@ -97,8 +106,8 @@ public:
 private:
     const int id;
     const char* name;
-    std::chrono::high_resolution_clock::time_point start;
     CompilationUnitProfiler& profiler;
+    std::chrono::high_resolution_clock::time_point start;
 };
 
 template<int N>
@@ -110,16 +119,20 @@ struct ScopeIdTracker
 
 #define SCOPE_ID (ScopeIdTracker<__COUNTER__>::value)
 
-#ifdef PROFILING_ENABLED
+#if PROFILING_ENABLED
+
 #define CREATE_NAMED_PROFILER(name) namespace { static CompilationUnitProfiler compilationUnitProfiler(name); }
 #define CREATE_PROFILER() CREATE_NAMED_PROFILER(__FILE__)
-#define PROFILE_SCOPE_IMPL2(line, id, name) ScopeProfiler scopeProfiler##line(id, name, compilationUnitProfiler);
-#define PROFILE_SCOPE_IMPL(line, id, name) PROFILE_SCOPE_IMPL2(line, id, name)
-#define PROFILE_SCOPE(name) PROFILE_SCOPE_IMPL(__LINE__, SCOPE_ID, name)
-#define PROFILE_FUNCTION() PROFILE_SCOPE(__FUNCTION__)
+
+#define PROFILE_SCOPE_IMPL2(condition, line, id, name) ScopeProfiler<condition> scopeProfiler##line(id, name, compilationUnitProfiler);
+#define PROFILE_SCOPE_IMPL(condition, line, id, name) PROFILE_SCOPE_IMPL2(condition, line, id, name)
+#define PROFILE_IF(condition, name) PROFILE_SCOPE_IMPL(condition, __LINE__, SCOPE_ID, name)
+#define PROFILE_SCOPE(name) PROFILE_IF(true, name)
+
 #else
+
 #define CREATE_NAMED_PROFILER(name)
 #define CREATE_PROFILER()
 #define PROFILE_SCOPE(name)
-#define PROFILE_FUNCTION()
+#define PROFILE_IF(condition, name)
 #endif

@@ -11,6 +11,10 @@ void GlobalProfiler::printEntries(Output& output) const
     Output::Lock lock(output);
     for (const auto& profiler : profilers)
     {
+        if (profiler.second->entries.empty())
+        {
+            continue;
+        }
         std::vector<Entry> entries = profiler.second->entries;
         for (Entry& entry : entries)
         {

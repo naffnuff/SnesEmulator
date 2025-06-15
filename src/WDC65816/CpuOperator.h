@@ -5,6 +5,8 @@
 
 #include "Profiler.h"
 
+#define PROFILE_OPERATORS false
+
 namespace CPU {
 
 namespace Operator {
@@ -40,7 +42,7 @@ private:
 public:
     static int invoke(State& state, Access& access)
     {
-        PROFILE_SCOPE("ADC");
+        PROFILE_IF(PROFILE_OPERATORS, "ADC");
 
         if (state.is16Bit(State::Flag::m))
         {
@@ -56,7 +58,7 @@ public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     static int invoke16Bit(State& state, Access& access)
     {
-        PROFILE_SCOPE("ADC 16-bit");
+        PROFILE_IF(PROFILE_OPERATORS, "ADC 16-bit");
 
         state.setAccumulatorC(add(state, state.getAccumulatorC(), access.readWord()));
         return 1;
@@ -71,7 +73,7 @@ class AND
 public:
     static int invoke(State& state, Access& access)
     {
-        PROFILE_SCOPE("AND");
+        PROFILE_IF(PROFILE_OPERATORS, "AND");
 
         if (state.is16Bit(State::Flag::m))
         {
@@ -87,7 +89,7 @@ public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     static int invoke16Bit(State& state, Access& access)
     {
-        PROFILE_SCOPE("AND 16-Bit");
+        PROFILE_IF(PROFILE_OPERATORS, "AND 16-Bit");
 
         state.setAccumulatorC(state.getAccumulatorC() & access.readWord());
         return 1;
@@ -113,7 +115,7 @@ public:
     // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, Access& access)
     {
-        PROFILE_SCOPE("ASL");
+        PROFILE_IF(PROFILE_OPERATORS, "ASL");
 
         int cycles = 0;
         if (state.is16Bit(State::Flag::m))
@@ -160,7 +162,7 @@ public:
     // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, int8_t offset)
     {
-        PROFILE_SCOPE("BCC");
+        PROFILE_IF(PROFILE_OPERATORS, "BCC");
 
         return branchIf(!state.getFlag(State::Flag::c), state, offset);
     }
@@ -176,7 +178,7 @@ public:
     // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, int8_t offset)
     {
-        PROFILE_SCOPE("BCS");
+        PROFILE_IF(PROFILE_OPERATORS, "BCS");
 
         return branchIf(state.getFlag(State::Flag::c), state, offset);
     }
@@ -192,7 +194,7 @@ public:
     // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, int8_t offset)
     {
-        PROFILE_SCOPE("BEQ");
+        PROFILE_IF(PROFILE_OPERATORS, "BEQ");
 
         return branchIf(state.getFlag(State::Flag::z), state, offset);
     }
@@ -207,7 +209,7 @@ class BIT
 public:
     static int invoke(State& state, Access& access)
     {
-        PROFILE_SCOPE("BIT");
+        PROFILE_IF(PROFILE_OPERATORS, "BIT");
 
         if (state.is16Bit(State::Flag::m))
         {
@@ -238,7 +240,7 @@ public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     static int invoke16Bit(State& state, Access& access)
     {
-        PROFILE_SCOPE("BIT 16-Bit");
+        PROFILE_IF(PROFILE_OPERATORS, "BIT 16-Bit");
 
         bool zFlag = false;
         bool nFlag = false;
@@ -270,7 +272,7 @@ public:
     // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, int8_t offset)
     {
-        PROFILE_SCOPE("BMI");
+        PROFILE_IF(PROFILE_OPERATORS, "BMI");
 
         return branchIf(state.getFlag(State::Flag::n), state, offset);
     }
@@ -286,7 +288,7 @@ public:
     // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, int8_t offset)
     {
-        PROFILE_SCOPE("BNE");
+        PROFILE_IF(PROFILE_OPERATORS, "BNE");
 
         return branchIf(!state.getFlag(State::Flag::z), state, offset);
     }
@@ -302,7 +304,7 @@ public:
     // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, int8_t offset)
     {
-        PROFILE_SCOPE("BPL");
+        PROFILE_IF(PROFILE_OPERATORS, "BPL");
 
         return branchIf(!state.getFlag(State::Flag::n), state, offset);
     }
@@ -317,7 +319,7 @@ public:
     // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, int8_t offset)
     {
-        PROFILE_SCOPE("BRA");
+        PROFILE_IF(PROFILE_OPERATORS, "BRA");
 
         return branchIf(true, state, offset);
     }
@@ -332,7 +334,7 @@ public:
     // §9: Add 1 cycle for 65816 native mode (e=0)
     static int invoke(State& state, const Access& access)
     {
-        PROFILE_SCOPE("BRK");
+        PROFILE_IF(PROFILE_OPERATORS, "BRK");
 
         throw NotYetImplementedException("BRK");
         int cycles = 0;
@@ -352,7 +354,7 @@ class BRL
 public:
     static int invoke(State& state, int16_t offset)
     {
-        PROFILE_SCOPE("BRL");
+        PROFILE_IF(PROFILE_OPERATORS, "BRL");
 
         return branchIf(true, state, offset);
     }
@@ -368,7 +370,7 @@ public:
     // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, int8_t offset)
     {
-        PROFILE_SCOPE("BVC");
+        PROFILE_IF(PROFILE_OPERATORS, "BVC");
 
         return branchIf(!state.getFlag(State::Flag::v), state, offset);
     }
@@ -384,7 +386,7 @@ public:
     // §8: Add 1 cycle if branch taken crosses page boundary on 6502, 65C02, or 65816's 6502 emulation mode (e=1) 
     static int invoke(State& state, int8_t offset)
     {
-        PROFILE_SCOPE("BVS");
+        PROFILE_IF(PROFILE_OPERATORS, "BVS");
 
         return branchIf(state.getFlag(State::Flag::v), state, offset);
     }
@@ -398,7 +400,7 @@ class CMP
 public:
     static int invoke(State& state, Access& access)
     {
-        PROFILE_SCOPE("CMP");
+        PROFILE_IF(PROFILE_OPERATORS, "CMP");
 
         if (state.is16Bit(State::Flag::m))
         {
@@ -417,7 +419,7 @@ public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     static int invoke16Bit(State& state, Access& access)
     {
-        PROFILE_SCOPE("CMP 16-Bit");
+        PROFILE_IF(PROFILE_OPERATORS, "CMP 16-Bit");
 
         Word accumulator = state.getAccumulatorC();
         Word data = access.readWord();
@@ -436,7 +438,7 @@ public:
     // §9: Add 1 cycle for 65816 native mode (e=0)
     static int invoke(State& state, const Access& access)
     {
-        PROFILE_SCOPE("COP");
+        PROFILE_IF(PROFILE_OPERATORS, "COP");
 
         throw NotYetImplementedException("COP");
         int cycles = 0;
@@ -457,7 +459,7 @@ class CP_
 public:
     static int invoke(State& state, Access& access)
     {
-        PROFILE_SCOPE("CP_");
+        PROFILE_IF(PROFILE_OPERATORS, "CP_");
 
         if (state.is16Bit(State::Flag::x))
         {
@@ -476,7 +478,7 @@ public:
     // §10: Add 1 cycle if x=0 (16-bit index registers)
     static int invoke16Bit(State& state, Access& access)
     {
-        PROFILE_SCOPE("CPX/Y 16-Bit");
+        PROFILE_IF(PROFILE_OPERATORS, "CPX/Y 16-Bit");
 
         Word indexRegister = state.getIndexRegister<Register>();
         Word data = access.readWord();
@@ -495,7 +497,7 @@ public:
     // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, Access& access)
     {
-        PROFILE_SCOPE("DEC");
+        PROFILE_IF(PROFILE_OPERATORS, "DEC");
 
         int cycles = 0;
         if (state.is16Bit(State::Flag::m))
@@ -524,7 +526,7 @@ class DE_
 public:
     static int invoke(State& state)
     {
-        PROFILE_SCOPE("DE_");
+        PROFILE_IF(PROFILE_OPERATORS, "DE_");
 
         int cycles = 0;
         if (state.is16Bit(State::Flag::x))
@@ -550,7 +552,7 @@ class EOR
 public:
     static int invoke(State& state, Access& access)
     {
-        PROFILE_SCOPE("EOR");
+        PROFILE_IF(PROFILE_OPERATORS, "EOR");
 
         if (state.is16Bit(State::Flag::m))
         {
@@ -566,7 +568,7 @@ public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     static int invoke16Bit(State& state, Access& access)
     {
-        PROFILE_SCOPE("EOR 16-Bit");
+        PROFILE_IF(PROFILE_OPERATORS, "EOR 16-Bit");
 
         state.setAccumulatorC(state.getAccumulatorC() ^ access.readWord());
         return 1;
@@ -582,7 +584,7 @@ public:
     // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, Access& access)
     {
-        PROFILE_SCOPE("INC");
+        PROFILE_IF(PROFILE_OPERATORS, "INC");
 
         int cycles = 0;
         if (state.is16Bit(State::Flag::m))
@@ -611,7 +613,7 @@ class IN_
 public:
     static int invoke(State& state)
     {
-        PROFILE_SCOPE("IN_");
+        PROFILE_IF(PROFILE_OPERATORS, "IN_");
 
         if (state.is16Bit(State::Flag::x))
         {
@@ -635,7 +637,7 @@ class JMP
 public:
     static int invoke(State& state, Word address)
     {
-        PROFILE_SCOPE("JMP");
+        PROFILE_IF(PROFILE_OPERATORS, "JMP");
 
         state.setProgramCounter(address);
         return 0;
@@ -649,7 +651,7 @@ class JML
 public:
     static int invoke(State& state, Long address)
     {
-        PROFILE_SCOPE("JML");
+        PROFILE_IF(PROFILE_OPERATORS, "JML");
 
         state.setProgramAddress(address);
         return 0;
@@ -664,7 +666,7 @@ class JSR
 public:
     static int invoke(State& state, Word address)
     {
-        PROFILE_SCOPE("JSR");
+        PROFILE_IF(PROFILE_OPERATORS, "JSR");
 
         state.pushWordToStack(state.getProgramCounter(-1));
         state.setProgramCounter(address);
@@ -679,7 +681,7 @@ class JSL
 public:
     static int invoke(State& state, Long address)
     {
-        PROFILE_SCOPE("JSL");
+        PROFILE_IF(PROFILE_OPERATORS, "JSL");
 
         state.pushToStack(state.getProgramBank());
         state.pushWordToStack(state.getProgramCounter(-1));
@@ -696,7 +698,7 @@ class LDA
 public:
     static int invoke(State& state, Access& access)
     {
-        PROFILE_SCOPE("LDA");
+        PROFILE_IF(PROFILE_OPERATORS, "LDA");
 
         if (state.is16Bit(State::Flag::m))
         {
@@ -712,7 +714,7 @@ public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     static int invoke16Bit(State& state, Access& access)
     {
-        PROFILE_SCOPE("LDA 16-Bit");
+        PROFILE_IF(PROFILE_OPERATORS, "LDA 16-Bit");
 
         state.setAccumulatorC(access.readWord());
         return 1;
@@ -728,7 +730,7 @@ class LD_
 public:
     static int invoke(State& state, Access& access)
     {
-        PROFILE_SCOPE("LD_");
+        PROFILE_IF(PROFILE_OPERATORS, "LD_");
 
         if (state.is16Bit(State::Flag::x))
         {
@@ -744,7 +746,7 @@ public:
     // §10: Add 1 cycle if x=0 (16-bit index registers)
     static int invoke16Bit(State& state, Access& access)
     {
-        PROFILE_SCOPE("LD_ 16-Bit");
+        PROFILE_IF(PROFILE_OPERATORS, "LD_ 16-Bit");
 
         state.setIndexRegister<Register>(access.readWord());
         return 1;
@@ -770,7 +772,7 @@ public:
     // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, Access& access)
     {
-        PROFILE_SCOPE("LSR");
+        PROFILE_IF(PROFILE_OPERATORS, "LSR");
 
         int cycles = 0;
         if (state.is16Bit(State::Flag::m))
@@ -795,7 +797,7 @@ public:
     // §13: 7 cycles per byte moved
     static int invoke(State& state, Byte sourceBank, Byte destinationBank, Word byteCount)
     {
-        PROFILE_SCOPE("MVN");
+        PROFILE_IF(PROFILE_OPERATORS, "MVN");
 
         Word sourceAddress = state.getIndexRegister<State::IndexRegister::X>();
         Word destinationAddress = state.getIndexRegister<State::IndexRegister::Y>();
@@ -818,7 +820,7 @@ public:
     // §13: 7 cycles per byte moved
     static int invoke(State& state, Byte sourceBank, Byte destinationBank, Word byteCount)
     {
-        PROFILE_SCOPE("MVP");
+        PROFILE_IF(PROFILE_OPERATORS, "MVP");
 
         throw NotYetImplementedException("MVP");
         return 0;
@@ -833,7 +835,7 @@ class NOP
 public:
     static int invoke(State& state)
     {
-        PROFILE_SCOPE("NOP");
+        PROFILE_IF(PROFILE_OPERATORS, "NOP");
 
         return 0;
     }
@@ -847,7 +849,7 @@ class ORA
 public:
     static int invoke(State& state, Access& access)
     {
-        PROFILE_SCOPE("ORA");
+        PROFILE_IF(PROFILE_OPERATORS, "ORA");
 
         if (state.is16Bit(State::Flag::m))
         {
@@ -863,7 +865,7 @@ public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     static int invoke16Bit(State& state, Access& access)
     {
-        PROFILE_SCOPE("ORA 16-Bit");
+        PROFILE_IF(PROFILE_OPERATORS, "ORA 16-Bit");
 
         state.setAccumulatorC(state.getAccumulatorC() | access.readWord());
         return 1;
@@ -879,7 +881,7 @@ class PE_
 public:
     static int invoke(State& state, Word address)
     {
-        PROFILE_SCOPE("PE_");
+        PROFILE_IF(PROFILE_OPERATORS, "PE_");
 
         state.pushWordToStack(address);
         return 0;
@@ -894,7 +896,7 @@ class PER
 public:
     static int invoke(State& state, int16_t offset)
     {
-        PROFILE_SCOPE("PER");
+        PROFILE_IF(PROFILE_OPERATORS, "PER");
 
         state.pushWordToStack(state.getProgramCounter(offset));
         return 0;
@@ -910,7 +912,7 @@ public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     static int invoke(State& state)
     {
-        PROFILE_SCOPE("PHA");
+        PROFILE_IF(PROFILE_OPERATORS, "PHA");
 
         int cycles = 0;
         if (state.is16Bit(State::Flag::m))
@@ -934,7 +936,7 @@ class PHB
 public:
     static int invoke(State& state)
     {
-        PROFILE_SCOPE("PHB");
+        PROFILE_IF(PROFILE_OPERATORS, "PHB");
 
         state.pushToStack(state.getDataBank());
         return 0;
@@ -949,7 +951,7 @@ class PHD
 public:
     static int invoke(State& state)
     {
-        PROFILE_SCOPE("PHD");
+        PROFILE_IF(PROFILE_OPERATORS, "PHD");
 
         state.pushWordToStack(state.getDirectPageRegister());
         return 0;
@@ -964,7 +966,7 @@ class PHK
 public:
     static int invoke(State& state)
     {
-        PROFILE_SCOPE("PHK");
+        PROFILE_IF(PROFILE_OPERATORS, "PHK");
 
         state.pushToStack(state.getProgramBank());
         return 0;
@@ -979,7 +981,7 @@ class PHP
 public:
     static int invoke(State& state)
     {
-        PROFILE_SCOPE("PHP");
+        PROFILE_IF(PROFILE_OPERATORS, "PHP");
 
         state.pushToStack(state.getFlags());
         return 0;
@@ -996,7 +998,7 @@ public:
     // §10: Add 1 cycle if x=0 (16-bit index registers)
     static int invoke(State& state)
     {
-        PROFILE_SCOPE("PH_");
+        PROFILE_IF(PROFILE_OPERATORS, "PH_");
 
         int cycles = 0;
         Word indexRegister = state.getIndexRegister<Register>();
@@ -1022,7 +1024,7 @@ public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     static int invoke(State& state)
     {
-        PROFILE_SCOPE("PLA");
+        PROFILE_IF(PROFILE_OPERATORS, "PLA");
 
         int cycles = 0;
         if (state.is16Bit(State::Flag::m))
@@ -1046,7 +1048,7 @@ class PLB
 public:
     static int invoke(State& state)
     {
-        PROFILE_SCOPE("PLB");
+        PROFILE_IF(PROFILE_OPERATORS, "PLB");
 
         state.setDataBank(state.pullFromStack());
         return 0;
@@ -1061,7 +1063,7 @@ class PLD
 public:
     static int invoke(State& state)
     {
-        PROFILE_SCOPE("PLD");
+        PROFILE_IF(PROFILE_OPERATORS, "PLD");
 
         state.setDirectPageRegister(state.pullWordFromStack());
         return 0;
@@ -1076,7 +1078,7 @@ class PLP
 public:
     static int invoke(State& state)
     {
-        PROFILE_SCOPE("PLP");
+        PROFILE_IF(PROFILE_OPERATORS, "PLP");
 
         state.setFlags(state.pullFromStack());
         return 0;
@@ -1093,7 +1095,7 @@ public:
     // §10: Add 1 cycle if x=0 (16-bit index registers)
     static int invoke(State& state)
     {
-        PROFILE_SCOPE("PL_");
+        PROFILE_IF(PROFILE_OPERATORS, "PL_");
 
         int cycles = 0;
         if (state.is16Bit(State::Flag::x))
@@ -1117,7 +1119,7 @@ class REP
 public:
     static int invoke(State& state, Access& access)
     {
-        PROFILE_SCOPE("REP");
+        PROFILE_IF(PROFILE_OPERATORS, "REP");
 
         state.setMultipleFlags(false, access.readByte());
         return 0;
@@ -1145,7 +1147,7 @@ public:
     // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, Access& access)
     {
-        PROFILE_SCOPE("ROL");
+        PROFILE_IF(PROFILE_OPERATORS, "ROL");
 
         int cycles = 0;
         if (state.is16Bit(State::Flag::m))
@@ -1182,7 +1184,7 @@ public:
     // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, Access& access)
     {
-        PROFILE_SCOPE("ROR");
+        PROFILE_IF(PROFILE_OPERATORS, "ROR");
 
         int cycles = 0;
         if (state.is16Bit(State::Flag::m))
@@ -1207,7 +1209,7 @@ public:
     // §9: Add 1 cycle for 65816 native mode (e=0)
     static int invoke(State& state)
     {
-        PROFILE_SCOPE("RTI");
+        PROFILE_IF(PROFILE_OPERATORS, "RTI");
 
         int cycles = 0;
         if (state.isNativeMode())
@@ -1227,7 +1229,7 @@ class RTL
 public:
     static int invoke(State& state)
     {
-        PROFILE_SCOPE("RTL");
+        PROFILE_IF(PROFILE_OPERATORS, "RTL");
 
         Word programCounter(state.pullWordFromStack() + 1);
         Byte programBank(state.pullFromStack());
@@ -1244,7 +1246,7 @@ class RTS
 public:
     static int invoke(State& state)
     {
-        PROFILE_SCOPE("RTS");
+        PROFILE_IF(PROFILE_OPERATORS, "RTS");
 
         state.setProgramCounter(Word(state.pullWordFromStack() + 1));
         return 0;
@@ -1280,7 +1282,7 @@ private:
 public:
     static int invoke(State& state, Access& access)
     {
-        PROFILE_SCOPE("SBC");
+        PROFILE_IF(PROFILE_OPERATORS, "SBC");
 
         if (state.is16Bit(State::Flag::m))
         {
@@ -1296,7 +1298,7 @@ public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     static int invoke16Bit(State& state, Access& access)
     {
-        PROFILE_SCOPE("SBC 16-Bit");
+        PROFILE_IF(PROFILE_OPERATORS, "SBC 16-Bit");
 
         state.setAccumulatorC(subtract(state, state.getAccumulatorC(), access.readWord()));
         return 1;
@@ -1318,7 +1320,7 @@ class SE_
 public:
     static int invoke(State& state)
     {
-        PROFILE_SCOPE("SE_");
+        PROFILE_IF(PROFILE_OPERATORS, "SE_");
 
         state.setFlag(Flag, Value);
         return 0;
@@ -1333,7 +1335,7 @@ class SEP
 public:
     static int invoke(State& state, Access& access)
     {
-        PROFILE_SCOPE("SEP");
+        PROFILE_IF(PROFILE_OPERATORS, "SEP");
 
         state.setMultipleFlags(true, access.readByte());
         return 0;
@@ -1349,7 +1351,7 @@ public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, Access& access)
     {
-        PROFILE_SCOPE("STA");
+        PROFILE_IF(PROFILE_OPERATORS, "STA");
 
         int cycles = 0;
         if (state.is16Bit(State::Flag::m))
@@ -1374,7 +1376,7 @@ public:
     // §14: Uses 3 cycles to shut the processor down; additional cycles are required by reset to restart it
     static int invoke(State& state)
     {
-        PROFILE_SCOPE("STP");
+        PROFILE_IF(PROFILE_OPERATORS, "STP");
 
         throw NotYetImplementedException("STP");
         return 0;
@@ -1391,7 +1393,7 @@ public:
     // §10: Add 1 cycle if x=0 (16-bit index registers)
     static int invoke(State& state, Access& access)
     {
-        PROFILE_SCOPE("ST_");
+        PROFILE_IF(PROFILE_OPERATORS, "ST_");
 
         int cycles = 0;
         if (state.is16Bit(State::Flag::x))
@@ -1416,7 +1418,7 @@ public:
     // §1: Add 1 cycle if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, Access& access)
     {
-        PROFILE_SCOPE("STZ");
+        PROFILE_IF(PROFILE_OPERATORS, "STZ");
 
         int cycles = 0;
 
@@ -1443,7 +1445,7 @@ class TA_
 public:
     static int invoke(State& state)
     {
-        PROFILE_SCOPE("TA_");
+        PROFILE_IF(PROFILE_OPERATORS, "TA_");
 
         if (state.is16Bit(State::Flag::x))
         {
@@ -1465,7 +1467,7 @@ class TCD
 public:
     static int invoke(State& state)
     {
-        PROFILE_SCOPE("TCD");
+        PROFILE_IF(PROFILE_OPERATORS, "TCD");
 
         state.setDirectPageRegister(state.getAccumulatorC());
         return 0;
@@ -1480,7 +1482,7 @@ class TCS
 public:
     static int invoke(State& state)
     {
-        PROFILE_SCOPE("TCS");
+        PROFILE_IF(PROFILE_OPERATORS, "TCS");
 
         state.setStackPointer(state.getAccumulatorC());
         return 0;
@@ -1495,7 +1497,7 @@ class TDC
 public:
     static int invoke(State& state)
     {
-        PROFILE_SCOPE("TDC");
+        PROFILE_IF(PROFILE_OPERATORS, "TDC");
 
         state.setAccumulatorC(state.getDirectPageRegister());
         return 0;
@@ -1519,7 +1521,7 @@ public:
     // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, Access& access)
     {
-        PROFILE_SCOPE("TRB");
+        PROFILE_IF(PROFILE_OPERATORS, "TRB");
 
         int cycles = 0;
         if (state.is16Bit(State::Flag::m))
@@ -1552,7 +1554,7 @@ public:
     // §5: Add 2 cycles if m=0 (16-bit memory/accumulator)
     static int invoke(State& state, Access& access)
     {
-        PROFILE_SCOPE("TSB");
+        PROFILE_IF(PROFILE_OPERATORS, "TSB");
 
         int cycles = 0;
         if (state.is16Bit(State::Flag::m))
@@ -1576,7 +1578,7 @@ class TSC
 public:
     static int invoke(State& state)
     {
-        PROFILE_SCOPE("TSC");
+        PROFILE_IF(PROFILE_OPERATORS, "TSC");
 
         state.setAccumulatorC(state.getStackPointer());
         return 0;
@@ -1591,7 +1593,7 @@ class TSX
 public:
     static int invoke(State& state)
     {
-        PROFILE_SCOPE("TSX");
+        PROFILE_IF(PROFILE_OPERATORS, "TSX");
 
         throw NotYetImplementedException("TSX");
         return 0;
@@ -1607,7 +1609,7 @@ class T_A
 public:
     static int invoke(State& state)
     {
-        PROFILE_SCOPE("T_A");
+        PROFILE_IF(PROFILE_OPERATORS, "T_A");
 
         if (state.is16Bit(State::Flag::m))
         {
@@ -1629,7 +1631,7 @@ class TXS
 public:
     static int invoke(State& state)
     {
-        PROFILE_SCOPE("TXS");
+        PROFILE_IF(PROFILE_OPERATORS, "TXS");
 
         state.setStackPointer(state.getIndexRegister<State::IndexRegister::X>());
         return 0;
@@ -1645,7 +1647,7 @@ class T__
 public:
     static int invoke(State& state)
     {
-        PROFILE_SCOPE("T__");
+        PROFILE_IF(PROFILE_OPERATORS, "T__");
 
         state.setIndexRegister<TargetRegister>(state.getIndexRegister<SourceRegister>());
         return 0;
@@ -1661,7 +1663,7 @@ public:
     // §15: Uses 3 cycles to shut the processor down; additional cycles are required by interrupt to restart it
     static int invoke(State& state)
     {
-        PROFILE_SCOPE("WAI");
+        PROFILE_IF(PROFILE_OPERATORS, "WAI");
 
         throw NotYetImplementedException("WAI");
         return 0;
@@ -1677,7 +1679,7 @@ public:
     // §16: Byte and cycle counts subject to change in future processors which expand WDM into 2-byte opcode portions of instructions of varying lengths
     static int invoke(State& state, const Access& access)
     {
-        PROFILE_SCOPE("WDM");
+        PROFILE_IF(PROFILE_OPERATORS, "WDM");
 
         throw NotYetImplementedException("WDM");
         return 0;
@@ -1692,7 +1694,7 @@ class XBA
 public:
     static int invoke(State& state)
     {
-        PROFILE_SCOPE("XBA");
+        PROFILE_IF(PROFILE_OPERATORS, "XBA");
 
         state.swapAccumulators();
         return 0;
@@ -1707,7 +1709,7 @@ class XCE
 public:
     static int invoke(State& state)
     {
-        PROFILE_SCOPE("XCE");
+        PROFILE_IF(PROFILE_OPERATORS, "XCE");
 
         state.exchangeCarryAndEmulationFlags();
         return 0;

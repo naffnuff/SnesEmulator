@@ -3,7 +3,7 @@
 #include <iostream>
 #include <chrono>
 
-#define PROFILING_ENABLED
+#define PROFILING_ENABLED true
 
 #include "Profiler.h"
 

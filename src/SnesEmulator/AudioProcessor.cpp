@@ -7,7 +7,7 @@
 #include "System.h"
 #include "Util.h"
 
-#define PROFILING_ENABLED
+#define PROFILING_ENABLED false
 
 #include "Profiler.h"
 

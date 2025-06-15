@@ -12,7 +12,7 @@
 #include "DmaInstruction.h"
 #include "HdmaInstruction.h"
 
-#define PROFILING_ENABLED
+#define PROFILING_ENABLED true
 
 #include "Profiler.h"
 
@@ -306,7 +306,7 @@ void Emulator::run()
 
                     int cycles = 0;
                     {
-                        PROFILE_SCOPE("Execute SPC Instruction");
+                        //PROFILE_SCOPE("Execute SPC Instruction");
                         cycles = executeNext(instruction, audioSystem.state, debugger, audioSystem.context, cpuState, cpuContext, output);
                     }
                     if (cycles)
@@ -360,7 +360,7 @@ void Emulator::run()
             }
             if (!audioSystem.threaded && masterCycle == nextAudioTick)
             {
-                //audioSystem.tick();
+                audioSystem.tick();
                 nextAudioTick += CycleCount(21);
             }
 
@@ -370,12 +370,11 @@ void Emulator::run()
                 ++videoRegisters.hCounter;
                 if (videoRegisters.hCounter == 274)
                 {
-                    PROFILE_SCOPE("videoRegisters.hCounter == 274");
-
                     if (videoRegisters.vCounter <= 224)
                     {
                         if (videoRegisters.vCounter > 0)
                         {
+                            //PROFILE_SCOPE("draw scanline");
                             videoProcessor.drawScanline(videoRegisters.vCounter);
                         }
                         if (hdmaInstruction.enabled() && !hdmaInstruction.isActive())
@@ -437,8 +436,6 @@ void Emulator::run()
                 }
                 else if (videoRegisters.hCounter == 1374)
                 {
-                    PROFILE_SCOPE("videoRegisters.hCounter == 1374");
-
                     videoRegisters.hCounter = 0;
                     videoRegisters.hBlank = false;
                     ++videoRegisters.vCounter;
@@ -492,8 +489,6 @@ void Emulator::run()
             }
             else
             {
-                PROFILE_SCOPE("yield");
-
                 std::this_thread::yield();
             }
             static std::chrono::steady_clock::time_point lastTime = std::chrono::steady_clock::now();

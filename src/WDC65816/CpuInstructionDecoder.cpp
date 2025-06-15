@@ -1,6 +1,6 @@
 #include "CpuInstructionDecoder.h"
 
-//#define PROFILING_ENABLED
+#define PROFILING_ENABLED false
 
 #include "CpuOpcode.h"
 

@@ -298,7 +298,7 @@ void generateOpcode(std::ostream& output, Instruction& instruction, const Opcode
     }
     output << "    int execute() override" << std::endl
         << "    {" << std::endl
-        << "        PROFILE_SCOPE(\"" << classname << "\");" << std::endl
+        << "        PROFILE_IF(PROFILE_OPCODES, \"" << classname << "\");" << std::endl
         << std::endl;
     if (opcode.notYetImplemented)
     {
@@ -370,6 +370,8 @@ void generateOpcodes(std::vector<Instruction>& instructions)
         << std::endl
         << "#include \"Profiler.h\"" << std::endl
         << std::endl
+        << "#define PROFILE_OPCODES false" << std::endl
+        << std::endl
         << "namespace CPU {" << std::endl
         << std::endl
         << "namespace Opcode {" << std::endl
@@ -402,6 +404,8 @@ void generateOpcodeMap(const std::vector<Instruction>& instructions)
     //std::ostream& output = std::cout;
 
     output << "#include \"CpuInstructionDecoder.h\"" << std::endl
+        << std::endl
+        << "#define PROFILING_ENABLED false" << std::endl
         << std::endl
         << "#include \"CpuOpcode.h\"" << std::endl
         << std::endl
@@ -475,7 +479,7 @@ void generateAddressMode(std::ofstream& output, const std::string& name, const A
     }
     output << ") override" << std::endl
         << "    {" << std::endl
-        << "        PROFILE_SCOPE(\"" << name << "\");" << std::endl
+        << "        PROFILE_IF(PROFILE_ADDRESS_MODES, \"" << name << "\");" << std::endl
         << std::endl;
     auto it = addressModeImplementations.find(name);
     if (it != addressModeImplementations.end())
@@ -551,6 +555,8 @@ void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
         << "#include \"CpuState.h\"" << std::endl
         << std::endl
         << "#include \"Profiler.h\"" << std::endl
+        << std::endl
+        << "#define PROFILE_ADDRESS_MODES false" << std::endl
         << std::endl
         << "#pragma warning( disable : 4702 ) // unreachable code" << std::endl
         << std::endl

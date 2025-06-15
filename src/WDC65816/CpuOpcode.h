@@ -7,6 +7,8 @@
 
 #include "Profiler.h"
 
+#define PROFILE_OPCODES false
+
 namespace CPU {
 
 namespace Opcode {
@@ -25,7 +27,7 @@ class ADC_61 : public AddressMode::DirectPageIndexedIndirectX<Operator::ADC>
     // 2   7-m+w       (dir,X)   mm....mm . ADC ($10,X)
     int execute() override
     {
-        PROFILE_SCOPE("ADC_61");
+        PROFILE_IF(PROFILE_OPCODES, "ADC_61");
 
         throw NotYetImplementedException("ADC_61");
         return 6 + applyOperand();
@@ -44,7 +46,7 @@ class ADC_63 : public AddressMode::StackRelative<Operator::ADC>
     // 2   5-m         stk,S     mm....mm . ADC $32,S
     int execute() override
     {
-        PROFILE_SCOPE("ADC_63");
+        PROFILE_IF(PROFILE_OPCODES, "ADC_63");
 
         return 4 + applyOperand();
     }
@@ -62,7 +64,7 @@ class ADC_65 : public AddressMode::DirectPage<Operator::ADC>
     // 2   4-m+w       dir       mm....mm . ADC $10
     int execute() override
     {
-        PROFILE_SCOPE("ADC_65");
+        PROFILE_IF(PROFILE_OPCODES, "ADC_65");
 
         return 3 + applyOperand();
     }
@@ -80,7 +82,7 @@ class ADC_67 : public AddressMode::DirectPageIndirectLong<Operator::ADC>
     // 2   7-m+w       [dir]     mm....mm . ADC [$10]
     int execute() override
     {
-        PROFILE_SCOPE("ADC_67");
+        PROFILE_IF(PROFILE_OPCODES, "ADC_67");
 
         return 6 + applyOperand();
     }
@@ -99,7 +101,7 @@ class ADC_69_16Bit : public AddressMode::Immediate16Bit<Operator::ADC>
     // 3-m 3-m         imm       mm....mm . ADC #$54
     int execute() override
     {
-        PROFILE_SCOPE("ADC_69_16Bit");
+        PROFILE_IF(PROFILE_OPCODES, "ADC_69_16Bit");
 
         return 2 + applyOperand();
     }
@@ -118,7 +120,7 @@ class ADC_69 : public AddressMode::Immediate<Operator::ADC>
     // 3-m 3-m         imm       mm....mm . ADC #$54
     int execute() override
     {
-        PROFILE_SCOPE("ADC_69");
+        PROFILE_IF(PROFILE_OPCODES, "ADC_69");
 
         return 2 + applyOperand();
     }
@@ -136,7 +138,7 @@ class ADC_6D : public AddressMode::Absolute<Operator::ADC>
     // 3   5-m         abs       mm....mm . ADC $9876
     int execute() override
     {
-        PROFILE_SCOPE("ADC_6D");
+        PROFILE_IF(PROFILE_OPCODES, "ADC_6D");
 
         return 4 + applyOperand();
     }
@@ -154,7 +156,7 @@ class ADC_6F : public AddressMode::AbsoluteLong<Operator::ADC>
     // 4   6-m         long      mm....mm . ADC $FEDBCA
     int execute() override
     {
-        PROFILE_SCOPE("ADC_6F");
+        PROFILE_IF(PROFILE_OPCODES, "ADC_6F");
 
         return 5 + applyOperand();
     }
@@ -172,7 +174,7 @@ class ADC_71 : public AddressMode::DirectPageIndirectIndexedY<Operator::ADC>
     // 2   7-m+w-x+x*p (dir),Y   mm....mm . ADC ($10),Y
     int execute() override
     {
-        PROFILE_SCOPE("ADC_71");
+        PROFILE_IF(PROFILE_OPCODES, "ADC_71");
 
         return 5 + applyOperand();
     }
@@ -190,7 +192,7 @@ class ADC_72 : public AddressMode::DirectPageIndirect<Operator::ADC>
     // 2   6-m+w       (dir)     mm....mm . ADC ($10)
     int execute() override
     {
-        PROFILE_SCOPE("ADC_72");
+        PROFILE_IF(PROFILE_OPCODES, "ADC_72");
 
         return 5 + applyOperand();
     }
@@ -208,7 +210,7 @@ class ADC_73 : public AddressMode::StackRelativeIndirectIndexedY<Operator::ADC>
     // 2   8-m         (stk,S),Y mm....mm . ADC ($32,S),Y
     int execute() override
     {
-        PROFILE_SCOPE("ADC_73");
+        PROFILE_IF(PROFILE_OPCODES, "ADC_73");
 
         throw NotYetImplementedException("ADC_73");
         return 7 + applyOperand();
@@ -227,7 +229,7 @@ class ADC_75 : public AddressMode::DirectPageIndexed<Operator::ADC, State::Index
     // 2   5-m+w       dir,X     mm....mm . ADC $10,X
     int execute() override
     {
-        PROFILE_SCOPE("ADC_75");
+        PROFILE_IF(PROFILE_OPCODES, "ADC_75");
 
         return 4 + applyOperand();
     }
@@ -245,7 +247,7 @@ class ADC_77 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::ADC>
     // 2   7-m+w       [dir],Y   mm....mm . ADC [$10],Y
     int execute() override
     {
-        PROFILE_SCOPE("ADC_77");
+        PROFILE_IF(PROFILE_OPCODES, "ADC_77");
 
         return 6 + applyOperand();
     }
@@ -263,7 +265,7 @@ class ADC_79 : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::ADC, Sta
     // 3   6-m-x+x*p   abs,Y     mm....mm . ADC $9876,Y
     int execute() override
     {
-        PROFILE_SCOPE("ADC_79");
+        PROFILE_IF(PROFILE_OPCODES, "ADC_79");
 
         return 4 + applyOperand();
     }
@@ -281,7 +283,7 @@ class ADC_7D : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::ADC, Sta
     // 3   6-m-x+x*p   abs,X     mm....mm . ADC $9876,X
     int execute() override
     {
-        PROFILE_SCOPE("ADC_7D");
+        PROFILE_IF(PROFILE_OPCODES, "ADC_7D");
 
         return 4 + applyOperand();
     }
@@ -299,7 +301,7 @@ class ADC_7F : public AddressMode::AbsoluteLongIndexedX<Operator::ADC>
     // 4   6-m         long,X    mm....mm . ADC $FEDCBA,X
     int execute() override
     {
-        PROFILE_SCOPE("ADC_7F");
+        PROFILE_IF(PROFILE_OPCODES, "ADC_7F");
 
         return 5 + applyOperand();
     }
@@ -317,7 +319,7 @@ class AND_21 : public AddressMode::DirectPageIndexedIndirectX<Operator::AND>
     // 2   7-m+w       (dir,X)   m.....m. . AND ($10,X)
     int execute() override
     {
-        PROFILE_SCOPE("AND_21");
+        PROFILE_IF(PROFILE_OPCODES, "AND_21");
 
         throw NotYetImplementedException("AND_21");
         return 6 + applyOperand();
@@ -336,7 +338,7 @@ class AND_23 : public AddressMode::StackRelative<Operator::AND>
     // 2   5-m         stk,S     m.....m. . AND $32,S
     int execute() override
     {
-        PROFILE_SCOPE("AND_23");
+        PROFILE_IF(PROFILE_OPCODES, "AND_23");
 
         throw NotYetImplementedException("AND_23");
         return 4 + applyOperand();
@@ -355,7 +357,7 @@ class AND_25 : public AddressMode::DirectPage<Operator::AND>
     // 2   4-m+w       dir       m.....m. . AND $10
     int execute() override
     {
-        PROFILE_SCOPE("AND_25");
+        PROFILE_IF(PROFILE_OPCODES, "AND_25");
 
         return 3 + applyOperand();
     }
@@ -373,7 +375,7 @@ class AND_27 : public AddressMode::DirectPageIndirectLong<Operator::AND>
     // 2   7-m+w       [dir]     m.....m. . AND [$10]
     int execute() override
     {
-        PROFILE_SCOPE("AND_27");
+        PROFILE_IF(PROFILE_OPCODES, "AND_27");
 
         throw NotYetImplementedException("AND_27");
         return 6 + applyOperand();
@@ -393,7 +395,7 @@ class AND_29_16Bit : public AddressMode::Immediate16Bit<Operator::AND>
     // 3-m 3-m         imm       m.....m. . AND #$54
     int execute() override
     {
-        PROFILE_SCOPE("AND_29_16Bit");
+        PROFILE_IF(PROFILE_OPCODES, "AND_29_16Bit");
 
         return 2 + applyOperand();
     }
@@ -412,7 +414,7 @@ class AND_29 : public AddressMode::Immediate<Operator::AND>
     // 3-m 3-m         imm       m.....m. . AND #$54
     int execute() override
     {
-        PROFILE_SCOPE("AND_29");
+        PROFILE_IF(PROFILE_OPCODES, "AND_29");
 
         return 2 + applyOperand();
     }
@@ -430,7 +432,7 @@ class AND_2D : public AddressMode::Absolute<Operator::AND>
     // 3   5-m         abs       m.....m. . AND $9876
     int execute() override
     {
-        PROFILE_SCOPE("AND_2D");
+        PROFILE_IF(PROFILE_OPCODES, "AND_2D");
 
         return 4 + applyOperand();
     }
@@ -448,7 +450,7 @@ class AND_2F : public AddressMode::AbsoluteLong<Operator::AND>
     // 4   6-m         long      m.....m. . AND $FEDBCA
     int execute() override
     {
-        PROFILE_SCOPE("AND_2F");
+        PROFILE_IF(PROFILE_OPCODES, "AND_2F");
 
         return 5 + applyOperand();
     }
@@ -466,7 +468,7 @@ class AND_31 : public AddressMode::DirectPageIndirectIndexedY<Operator::AND>
     // 2   7-m+w-x+x*p (dir),Y   m.....m. . AND ($10),Y
     int execute() override
     {
-        PROFILE_SCOPE("AND_31");
+        PROFILE_IF(PROFILE_OPCODES, "AND_31");
 
         throw NotYetImplementedException("AND_31");
         return 5 + applyOperand();
@@ -485,7 +487,7 @@ class AND_32 : public AddressMode::DirectPageIndirect<Operator::AND>
     // 2   6-m+w       (dir)     m.....m. . AND ($10)
     int execute() override
     {
-        PROFILE_SCOPE("AND_32");
+        PROFILE_IF(PROFILE_OPCODES, "AND_32");
 
         throw NotYetImplementedException("AND_32");
         return 5 + applyOperand();
@@ -504,7 +506,7 @@ class AND_33 : public AddressMode::StackRelativeIndirectIndexedY<Operator::AND>
     // 2   8-m         (stk,S),Y m.....m. . AND ($32,S),Y
     int execute() override
     {
-        PROFILE_SCOPE("AND_33");
+        PROFILE_IF(PROFILE_OPCODES, "AND_33");
 
         throw NotYetImplementedException("AND_33");
         return 7 + applyOperand();
@@ -523,7 +525,7 @@ class AND_35 : public AddressMode::DirectPageIndexed<Operator::AND, State::Index
     // 2   5-m+w       dir,X     m.....m. . AND $10,X
     int execute() override
     {
-        PROFILE_SCOPE("AND_35");
+        PROFILE_IF(PROFILE_OPCODES, "AND_35");
 
         throw NotYetImplementedException("AND_35");
         return 4 + applyOperand();
@@ -542,7 +544,7 @@ class AND_37 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::AND>
     // 2   7-m+w       [dir],Y   m.....m. . AND [$10],Y
     int execute() override
     {
-        PROFILE_SCOPE("AND_37");
+        PROFILE_IF(PROFILE_OPCODES, "AND_37");
 
         throw NotYetImplementedException("AND_37");
         return 6 + applyOperand();
@@ -561,7 +563,7 @@ class AND_39 : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::AND, Sta
     // 3   6-m-x+x*p   abs,Y     m.....m. . AND $9876,Y
     int execute() override
     {
-        PROFILE_SCOPE("AND_39");
+        PROFILE_IF(PROFILE_OPCODES, "AND_39");
 
         return 4 + applyOperand();
     }
@@ -579,7 +581,7 @@ class AND_3D : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::AND, Sta
     // 3   6-m-x+x*p   abs,X     m.....m. . AND $9876,X
     int execute() override
     {
-        PROFILE_SCOPE("AND_3D");
+        PROFILE_IF(PROFILE_OPCODES, "AND_3D");
 
         return 4 + applyOperand();
     }
@@ -597,7 +599,7 @@ class AND_3F : public AddressMode::AbsoluteLongIndexedX<Operator::AND>
     // 4   6-m         long,X    m.....m. . AND $FEDCBA,X
     int execute() override
     {
-        PROFILE_SCOPE("AND_3F");
+        PROFILE_IF(PROFILE_OPCODES, "AND_3F");
 
         return 5 + applyOperand();
     }
@@ -615,7 +617,7 @@ class ASL_06 : public AddressMode::DirectPage<Operator::ASL>
     // 2   7-2*m+w     dir       m.....mm . ASL $10
     int execute() override
     {
-        PROFILE_SCOPE("ASL_06");
+        PROFILE_IF(PROFILE_OPCODES, "ASL_06");
 
         return 5 + applyOperand();
     }
@@ -633,7 +635,7 @@ class ASL_0A : public AddressMode::Accumulator<Operator::ASL>
     // 1   2           acc       m.....mm . ASL
     int execute() override
     {
-        PROFILE_SCOPE("ASL_0A");
+        PROFILE_IF(PROFILE_OPCODES, "ASL_0A");
 
         return 2 + applyOperand();
     }
@@ -651,7 +653,7 @@ class ASL_0E : public AddressMode::Absolute<Operator::ASL>
     // 3   8-2*m       abs       m.....mm . ASL $9876
     int execute() override
     {
-        PROFILE_SCOPE("ASL_0E");
+        PROFILE_IF(PROFILE_OPCODES, "ASL_0E");
 
         return 6 + applyOperand();
     }
@@ -669,7 +671,7 @@ class ASL_16 : public AddressMode::DirectPageIndexed<Operator::ASL, State::Index
     // 2   8-2*m+w     dir,X     m.....mm . ASL $10,X
     int execute() override
     {
-        PROFILE_SCOPE("ASL_16");
+        PROFILE_IF(PROFILE_OPCODES, "ASL_16");
 
         return 6 + applyOperand();
     }
@@ -687,7 +689,7 @@ class ASL_1E : public AddressMode::AbsoluteIndexed<Operator::ASL, State::IndexRe
     // 3   9-2*m       abs,X     m.....mm . ASL $9876,X
     int execute() override
     {
-        PROFILE_SCOPE("ASL_1E");
+        PROFILE_IF(PROFILE_OPCODES, "ASL_1E");
 
         return 7 + applyOperand();
     }
@@ -705,7 +707,7 @@ class BCC_90 : public AddressMode::ProgramCounterRelative<Operator::BCC>
     // 2   2+t+t*e*p   rel8      ........ . BCC LABEL
     int execute() override
     {
-        PROFILE_SCOPE("BCC_90");
+        PROFILE_IF(PROFILE_OPCODES, "BCC_90");
 
         return 2 + applyOperand();
     }
@@ -723,7 +725,7 @@ class BCS_B0 : public AddressMode::ProgramCounterRelative<Operator::BCS>
     // 2   2+t+t*e*p   rel8      ........ . BCS LABEL
     int execute() override
     {
-        PROFILE_SCOPE("BCS_B0");
+        PROFILE_IF(PROFILE_OPCODES, "BCS_B0");
 
         return 2 + applyOperand();
     }
@@ -741,7 +743,7 @@ class BEQ_F0 : public AddressMode::ProgramCounterRelative<Operator::BEQ>
     // 2   2+t+t*e*p   rel8      ........ . BEQ LABEL
     int execute() override
     {
-        PROFILE_SCOPE("BEQ_F0");
+        PROFILE_IF(PROFILE_OPCODES, "BEQ_F0");
 
         return 2 + applyOperand();
     }
@@ -759,7 +761,7 @@ class BIT_24 : public AddressMode::DirectPage<Operator::BIT<false>>
     // 2   4-m+w       dir       mm....m. . BIT $10
     int execute() override
     {
-        PROFILE_SCOPE("BIT_24");
+        PROFILE_IF(PROFILE_OPCODES, "BIT_24");
 
         return 3 + applyOperand();
     }
@@ -777,7 +779,7 @@ class BIT_2C : public AddressMode::Absolute<Operator::BIT<false>>
     // 3   5-m         abs       mm....m. . BIT $9876
     int execute() override
     {
-        PROFILE_SCOPE("BIT_2C");
+        PROFILE_IF(PROFILE_OPCODES, "BIT_2C");
 
         return 4 + applyOperand();
     }
@@ -795,7 +797,7 @@ class BIT_34 : public AddressMode::DirectPageIndexed<Operator::BIT<false>, State
     // 2   5-m+w       dir,X     mm....m. . BIT $10,X
     int execute() override
     {
-        PROFILE_SCOPE("BIT_34");
+        PROFILE_IF(PROFILE_OPCODES, "BIT_34");
 
         return 4 + applyOperand();
     }
@@ -813,7 +815,7 @@ class BIT_3C : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::BIT<fals
     // 3   6-m-x+x*p   abs,X     mm....m. . BIT $9876,X
     int execute() override
     {
-        PROFILE_SCOPE("BIT_3C");
+        PROFILE_IF(PROFILE_OPCODES, "BIT_3C");
 
         return 4 + applyOperand();
     }
@@ -832,7 +834,7 @@ class BIT_89_16Bit : public AddressMode::Immediate16Bit<Operator::BIT<true>>
     // 3-m 3-m         imm       ......m. . BIT #$54
     int execute() override
     {
-        PROFILE_SCOPE("BIT_89_16Bit");
+        PROFILE_IF(PROFILE_OPCODES, "BIT_89_16Bit");
 
         return 2 + applyOperand();
     }
@@ -851,7 +853,7 @@ class BIT_89 : public AddressMode::Immediate<Operator::BIT<true>>
     // 3-m 3-m         imm       ......m. . BIT #$54
     int execute() override
     {
-        PROFILE_SCOPE("BIT_89");
+        PROFILE_IF(PROFILE_OPCODES, "BIT_89");
 
         return 2 + applyOperand();
     }
@@ -869,7 +871,7 @@ class BMI_30 : public AddressMode::ProgramCounterRelative<Operator::BMI>
     // 2   2+t+t*e*p   rel8      ........ . BMI LABEL
     int execute() override
     {
-        PROFILE_SCOPE("BMI_30");
+        PROFILE_IF(PROFILE_OPCODES, "BMI_30");
 
         return 2 + applyOperand();
     }
@@ -887,7 +889,7 @@ class BNE_D0 : public AddressMode::ProgramCounterRelative<Operator::BNE>
     // 2   2+t+t*e*p   rel8      ........ . BNE LABEL
     int execute() override
     {
-        PROFILE_SCOPE("BNE_D0");
+        PROFILE_IF(PROFILE_OPCODES, "BNE_D0");
 
         return 2 + applyOperand();
     }
@@ -905,7 +907,7 @@ class BPL_10 : public AddressMode::ProgramCounterRelative<Operator::BPL>
     // 2   2+t+t*e*p   rel8      ........ . BPL LABEL
     int execute() override
     {
-        PROFILE_SCOPE("BPL_10");
+        PROFILE_IF(PROFILE_OPCODES, "BPL_10");
 
         return 2 + applyOperand();
     }
@@ -923,7 +925,7 @@ class BRA_80 : public AddressMode::ProgramCounterRelative<Operator::BRA>
     // 2   3+e*p       rel8      ........ . BRA LABEL
     int execute() override
     {
-        PROFILE_SCOPE("BRA_80");
+        PROFILE_IF(PROFILE_OPCODES, "BRA_80");
 
         return 3 + applyOperand();
     }
@@ -942,7 +944,7 @@ class BRK_00 : public AddressMode::Immediate<Operator::BRK>
     // 1   8-e         imp       ....01.. . BRK
     int execute() override
     {
-        PROFILE_SCOPE("BRK_00");
+        PROFILE_IF(PROFILE_OPCODES, "BRK_00");
 
         throw NotYetImplementedException("BRK_00");
         return 7 + applyOperand();
@@ -961,7 +963,7 @@ class BRL_82 : public AddressMode::ProgramCounterRelativeLong<Operator::BRL>
     // 3   4           rel16     ........ . BRL LABEL
     int execute() override
     {
-        PROFILE_SCOPE("BRL_82");
+        PROFILE_IF(PROFILE_OPCODES, "BRL_82");
 
         return 4 + applyOperand();
     }
@@ -979,7 +981,7 @@ class BVC_50 : public AddressMode::ProgramCounterRelative<Operator::BVC>
     // 2   2+t+t*e*p   rel8      ........ . BVC LABEL
     int execute() override
     {
-        PROFILE_SCOPE("BVC_50");
+        PROFILE_IF(PROFILE_OPCODES, "BVC_50");
 
         return 2 + applyOperand();
     }
@@ -997,7 +999,7 @@ class BVS_70 : public AddressMode::ProgramCounterRelative<Operator::BVS>
     // 2   2+t+t*e*p   rel8      ........ . BVS LABEL
     int execute() override
     {
-        PROFILE_SCOPE("BVS_70");
+        PROFILE_IF(PROFILE_OPCODES, "BVS_70");
 
         return 2 + applyOperand();
     }
@@ -1015,7 +1017,7 @@ class CLC_18 : public AddressMode::Implied<Operator::SE_<State::Flag::c, false>>
     // 1   2           imp       .......0 . CLC
     int execute() override
     {
-        PROFILE_SCOPE("CLC_18");
+        PROFILE_IF(PROFILE_OPCODES, "CLC_18");
 
         return 2 + applyOperand();
     }
@@ -1033,7 +1035,7 @@ class CLD_D8 : public AddressMode::Implied<Operator::SE_<State::Flag::d, false>>
     // 1   2           imp       ....0... . CLD
     int execute() override
     {
-        PROFILE_SCOPE("CLD_D8");
+        PROFILE_IF(PROFILE_OPCODES, "CLD_D8");
 
         return 2 + applyOperand();
     }
@@ -1051,7 +1053,7 @@ class CLI_58 : public AddressMode::Implied<Operator::SE_<State::Flag::i, false>>
     // 1   2           imp       .....0.. . CLI
     int execute() override
     {
-        PROFILE_SCOPE("CLI_58");
+        PROFILE_IF(PROFILE_OPCODES, "CLI_58");
 
         return 2 + applyOperand();
     }
@@ -1069,7 +1071,7 @@ class CLV_B8 : public AddressMode::Implied<Operator::SE_<State::Flag::v, false>>
     // 1   2           imp       .0...... . CLV
     int execute() override
     {
-        PROFILE_SCOPE("CLV_B8");
+        PROFILE_IF(PROFILE_OPCODES, "CLV_B8");
 
         throw NotYetImplementedException("CLV_B8");
         return 2 + applyOperand();
@@ -1088,7 +1090,7 @@ class CMP_C1 : public AddressMode::DirectPageIndexedIndirectX<Operator::CMP>
     // 2   7-m+w       (dir,X)   m.....mm . CMP ($10,X)
     int execute() override
     {
-        PROFILE_SCOPE("CMP_C1");
+        PROFILE_IF(PROFILE_OPCODES, "CMP_C1");
 
         throw NotYetImplementedException("CMP_C1");
         return 6 + applyOperand();
@@ -1107,7 +1109,7 @@ class CMP_C3 : public AddressMode::StackRelative<Operator::CMP>
     // 2   5-m         stk,S     m.....mm . CMP $32,S
     int execute() override
     {
-        PROFILE_SCOPE("CMP_C3");
+        PROFILE_IF(PROFILE_OPCODES, "CMP_C3");
 
         return 4 + applyOperand();
     }
@@ -1125,7 +1127,7 @@ class CMP_C5 : public AddressMode::DirectPage<Operator::CMP>
     // 2   4-m+w       dir       m.....mm . CMP $10
     int execute() override
     {
-        PROFILE_SCOPE("CMP_C5");
+        PROFILE_IF(PROFILE_OPCODES, "CMP_C5");
 
         return 3 + applyOperand();
     }
@@ -1143,7 +1145,7 @@ class CMP_C7 : public AddressMode::DirectPageIndirectLong<Operator::CMP>
     // 2   7-m+w       [dir]     m.....mm . CMP [$10]
     int execute() override
     {
-        PROFILE_SCOPE("CMP_C7");
+        PROFILE_IF(PROFILE_OPCODES, "CMP_C7");
 
         return 6 + applyOperand();
     }
@@ -1162,7 +1164,7 @@ class CMP_C9_16Bit : public AddressMode::Immediate16Bit<Operator::CMP>
     // 3-m 3-m         imm       m.....mm . CMP #$54
     int execute() override
     {
-        PROFILE_SCOPE("CMP_C9_16Bit");
+        PROFILE_IF(PROFILE_OPCODES, "CMP_C9_16Bit");
 
         return 2 + applyOperand();
     }
@@ -1181,7 +1183,7 @@ class CMP_C9 : public AddressMode::Immediate<Operator::CMP>
     // 3-m 3-m         imm       m.....mm . CMP #$54
     int execute() override
     {
-        PROFILE_SCOPE("CMP_C9");
+        PROFILE_IF(PROFILE_OPCODES, "CMP_C9");
 
         return 2 + applyOperand();
     }
@@ -1199,7 +1201,7 @@ class CMP_CD : public AddressMode::Absolute<Operator::CMP>
     // 3   5-m         abs       m.....mm . CMP $9876
     int execute() override
     {
-        PROFILE_SCOPE("CMP_CD");
+        PROFILE_IF(PROFILE_OPCODES, "CMP_CD");
 
         return 4 + applyOperand();
     }
@@ -1217,7 +1219,7 @@ class CMP_CF : public AddressMode::AbsoluteLong<Operator::CMP>
     // 4   6-m         long      m.....mm . CMP $FEDBCA
     int execute() override
     {
-        PROFILE_SCOPE("CMP_CF");
+        PROFILE_IF(PROFILE_OPCODES, "CMP_CF");
 
         return 5 + applyOperand();
     }
@@ -1235,7 +1237,7 @@ class CMP_D1 : public AddressMode::DirectPageIndirectIndexedY<Operator::CMP>
     // 2   7-m+w-x+x*p (dir),Y   m.....mm . CMP ($10),Y
     int execute() override
     {
-        PROFILE_SCOPE("CMP_D1");
+        PROFILE_IF(PROFILE_OPCODES, "CMP_D1");
 
         throw NotYetImplementedException("CMP_D1");
         return 5 + applyOperand();
@@ -1254,7 +1256,7 @@ class CMP_D2 : public AddressMode::DirectPageIndirect<Operator::CMP>
     // 2   6-m+w       (dir)     m.....mm . CMP ($10)
     int execute() override
     {
-        PROFILE_SCOPE("CMP_D2");
+        PROFILE_IF(PROFILE_OPCODES, "CMP_D2");
 
         throw NotYetImplementedException("CMP_D2");
         return 5 + applyOperand();
@@ -1273,7 +1275,7 @@ class CMP_D3 : public AddressMode::StackRelativeIndirectIndexedY<Operator::CMP>
     // 2   8-m         (stk,S),Y m.....mm . CMP ($32,S),Y
     int execute() override
     {
-        PROFILE_SCOPE("CMP_D3");
+        PROFILE_IF(PROFILE_OPCODES, "CMP_D3");
 
         throw NotYetImplementedException("CMP_D3");
         return 7 + applyOperand();
@@ -1292,7 +1294,7 @@ class CMP_D5 : public AddressMode::DirectPageIndexed<Operator::CMP, State::Index
     // 2   5-m+w       dir,X     m.....mm . CMP $10,X
     int execute() override
     {
-        PROFILE_SCOPE("CMP_D5");
+        PROFILE_IF(PROFILE_OPCODES, "CMP_D5");
 
         return 4 + applyOperand();
     }
@@ -1310,7 +1312,7 @@ class CMP_D7 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::CMP>
     // 2   7-m+w       [dir],Y   m.....mm . CMP [$10],Y
     int execute() override
     {
-        PROFILE_SCOPE("CMP_D7");
+        PROFILE_IF(PROFILE_OPCODES, "CMP_D7");
 
         return 6 + applyOperand();
     }
@@ -1328,7 +1330,7 @@ class CMP_D9 : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::CMP, Sta
     // 3   6-m-x+x*p   abs,Y     m.....mm . CMP $9876,Y
     int execute() override
     {
-        PROFILE_SCOPE("CMP_D9");
+        PROFILE_IF(PROFILE_OPCODES, "CMP_D9");
 
         return 4 + applyOperand();
     }
@@ -1346,7 +1348,7 @@ class CMP_DD : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::CMP, Sta
     // 3   6-m-x+x*p   abs,X     m.....mm . CMP $9876,X
     int execute() override
     {
-        PROFILE_SCOPE("CMP_DD");
+        PROFILE_IF(PROFILE_OPCODES, "CMP_DD");
 
         return 4 + applyOperand();
     }
@@ -1364,7 +1366,7 @@ class CMP_DF : public AddressMode::AbsoluteLongIndexedX<Operator::CMP>
     // 4   6-m         long,X    m.....mm . CMP $FEDCBA,X
     int execute() override
     {
-        PROFILE_SCOPE("CMP_DF");
+        PROFILE_IF(PROFILE_OPCODES, "CMP_DF");
 
         return 5 + applyOperand();
     }
@@ -1383,7 +1385,7 @@ class COP_02 : public AddressMode::Immediate<Operator::COP>
     // 2   8-e         imm       ....01.. . COP #$12
     int execute() override
     {
-        PROFILE_SCOPE("COP_02");
+        PROFILE_IF(PROFILE_OPCODES, "COP_02");
 
         throw NotYetImplementedException("COP_02");
         return 7 + applyOperand();
@@ -1403,7 +1405,7 @@ class CPX_E0_16Bit : public AddressMode::Immediate16Bit<Operator::CP_<State::Ind
     // 3-x 3-x         imm       x.....xx . CPX #$54
     int execute() override
     {
-        PROFILE_SCOPE("CPX_E0_16Bit");
+        PROFILE_IF(PROFILE_OPCODES, "CPX_E0_16Bit");
 
         return 2 + applyOperand();
     }
@@ -1422,7 +1424,7 @@ class CPX_E0 : public AddressMode::Immediate<Operator::CP_<State::IndexRegister:
     // 3-x 3-x         imm       x.....xx . CPX #$54
     int execute() override
     {
-        PROFILE_SCOPE("CPX_E0");
+        PROFILE_IF(PROFILE_OPCODES, "CPX_E0");
 
         return 2 + applyOperand();
     }
@@ -1440,7 +1442,7 @@ class CPX_E4 : public AddressMode::DirectPage<Operator::CP_<State::IndexRegister
     // 2   4-x+w       dir       x.....xx . CPX $10
     int execute() override
     {
-        PROFILE_SCOPE("CPX_E4");
+        PROFILE_IF(PROFILE_OPCODES, "CPX_E4");
 
         return 3 + applyOperand();
     }
@@ -1458,7 +1460,7 @@ class CPX_EC : public AddressMode::Absolute<Operator::CP_<State::IndexRegister::
     // 3   5-x         abs       x.....xx . CPX $9876
     int execute() override
     {
-        PROFILE_SCOPE("CPX_EC");
+        PROFILE_IF(PROFILE_OPCODES, "CPX_EC");
 
         return 4 + applyOperand();
     }
@@ -1477,7 +1479,7 @@ class CPY_C0_16Bit : public AddressMode::Immediate16Bit<Operator::CP_<State::Ind
     // 3-x 3-x         imm       x.....xx . CPY #$54
     int execute() override
     {
-        PROFILE_SCOPE("CPY_C0_16Bit");
+        PROFILE_IF(PROFILE_OPCODES, "CPY_C0_16Bit");
 
         return 2 + applyOperand();
     }
@@ -1496,7 +1498,7 @@ class CPY_C0 : public AddressMode::Immediate<Operator::CP_<State::IndexRegister:
     // 3-x 3-x         imm       x.....xx . CPY #$54
     int execute() override
     {
-        PROFILE_SCOPE("CPY_C0");
+        PROFILE_IF(PROFILE_OPCODES, "CPY_C0");
 
         return 2 + applyOperand();
     }
@@ -1514,7 +1516,7 @@ class CPY_C4 : public AddressMode::DirectPage<Operator::CP_<State::IndexRegister
     // 2   4-x+w       dir       x.....xx . CPY $10
     int execute() override
     {
-        PROFILE_SCOPE("CPY_C4");
+        PROFILE_IF(PROFILE_OPCODES, "CPY_C4");
 
         return 3 + applyOperand();
     }
@@ -1532,7 +1534,7 @@ class CPY_CC : public AddressMode::Absolute<Operator::CP_<State::IndexRegister::
     // 3   5-x         abs       x.....xx . CPY $9876
     int execute() override
     {
-        PROFILE_SCOPE("CPY_CC");
+        PROFILE_IF(PROFILE_OPCODES, "CPY_CC");
 
         return 4 + applyOperand();
     }
@@ -1550,7 +1552,7 @@ class DEC_3A : public AddressMode::Accumulator<Operator::DEC>
     // 1   2           acc       m.....m. . DEC
     int execute() override
     {
-        PROFILE_SCOPE("DEC_3A");
+        PROFILE_IF(PROFILE_OPCODES, "DEC_3A");
 
         return 2 + applyOperand();
     }
@@ -1568,7 +1570,7 @@ class DEC_C6 : public AddressMode::DirectPage<Operator::DEC>
     // 2   7-2*m+w     dir       m.....m. . DEC $10
     int execute() override
     {
-        PROFILE_SCOPE("DEC_C6");
+        PROFILE_IF(PROFILE_OPCODES, "DEC_C6");
 
         return 5 + applyOperand();
     }
@@ -1586,7 +1588,7 @@ class DEC_CE : public AddressMode::Absolute<Operator::DEC>
     // 3   8-2*m       abs       m.....m. . DEC $9876
     int execute() override
     {
-        PROFILE_SCOPE("DEC_CE");
+        PROFILE_IF(PROFILE_OPCODES, "DEC_CE");
 
         return 6 + applyOperand();
     }
@@ -1604,7 +1606,7 @@ class DEC_D6 : public AddressMode::DirectPageIndexed<Operator::DEC, State::Index
     // 2   8-2*m+w     dir,X     m.....m. . DEC $10,X
     int execute() override
     {
-        PROFILE_SCOPE("DEC_D6");
+        PROFILE_IF(PROFILE_OPCODES, "DEC_D6");
 
         return 6 + applyOperand();
     }
@@ -1622,7 +1624,7 @@ class DEC_DE : public AddressMode::AbsoluteIndexed<Operator::DEC, State::IndexRe
     // 3   9-2*m       abs,X     m.....m. . DEC $9876,X
     int execute() override
     {
-        PROFILE_SCOPE("DEC_DE");
+        PROFILE_IF(PROFILE_OPCODES, "DEC_DE");
 
         return 7 + applyOperand();
     }
@@ -1640,7 +1642,7 @@ class DEX_CA : public AddressMode::Implied<Operator::DE_<State::IndexRegister::X
     // 1   2           imp       x.....x. . DEX
     int execute() override
     {
-        PROFILE_SCOPE("DEX_CA");
+        PROFILE_IF(PROFILE_OPCODES, "DEX_CA");
 
         return 2 + applyOperand();
     }
@@ -1658,7 +1660,7 @@ class DEY_88 : public AddressMode::Implied<Operator::DE_<State::IndexRegister::Y
     // 1   2           imp       x.....x. . DEY
     int execute() override
     {
-        PROFILE_SCOPE("DEY_88");
+        PROFILE_IF(PROFILE_OPCODES, "DEY_88");
 
         return 2 + applyOperand();
     }
@@ -1676,7 +1678,7 @@ class EOR_41 : public AddressMode::DirectPageIndexedIndirectX<Operator::EOR>
     // 2   7-m+w       (dir,X)   m.....m. . EOR ($10,X)
     int execute() override
     {
-        PROFILE_SCOPE("EOR_41");
+        PROFILE_IF(PROFILE_OPCODES, "EOR_41");
 
         throw NotYetImplementedException("EOR_41");
         return 6 + applyOperand();
@@ -1695,7 +1697,7 @@ class EOR_43 : public AddressMode::StackRelative<Operator::EOR>
     // 2   5-m         stk,S     m.....m. . EOR $32,S
     int execute() override
     {
-        PROFILE_SCOPE("EOR_43");
+        PROFILE_IF(PROFILE_OPCODES, "EOR_43");
 
         return 4 + applyOperand();
     }
@@ -1713,7 +1715,7 @@ class EOR_45 : public AddressMode::DirectPage<Operator::EOR>
     // 2   4-m+w       dir       m.....m. . EOR $10
     int execute() override
     {
-        PROFILE_SCOPE("EOR_45");
+        PROFILE_IF(PROFILE_OPCODES, "EOR_45");
 
         return 3 + applyOperand();
     }
@@ -1731,7 +1733,7 @@ class EOR_47 : public AddressMode::DirectPageIndirectLong<Operator::EOR>
     // 2   7-m+w       [dir]     m.....m. . EOR [$10]
     int execute() override
     {
-        PROFILE_SCOPE("EOR_47");
+        PROFILE_IF(PROFILE_OPCODES, "EOR_47");
 
         throw NotYetImplementedException("EOR_47");
         return 6 + applyOperand();
@@ -1751,7 +1753,7 @@ class EOR_49_16Bit : public AddressMode::Immediate16Bit<Operator::EOR>
     // 3-m 3-m         imm       m.....m. . EOR #$54
     int execute() override
     {
-        PROFILE_SCOPE("EOR_49_16Bit");
+        PROFILE_IF(PROFILE_OPCODES, "EOR_49_16Bit");
 
         return 2 + applyOperand();
     }
@@ -1770,7 +1772,7 @@ class EOR_49 : public AddressMode::Immediate<Operator::EOR>
     // 3-m 3-m         imm       m.....m. . EOR #$54
     int execute() override
     {
-        PROFILE_SCOPE("EOR_49");
+        PROFILE_IF(PROFILE_OPCODES, "EOR_49");
 
         return 2 + applyOperand();
     }
@@ -1788,7 +1790,7 @@ class EOR_4D : public AddressMode::Absolute<Operator::EOR>
     // 3   5-m         abs       m.....m. . EOR $9876
     int execute() override
     {
-        PROFILE_SCOPE("EOR_4D");
+        PROFILE_IF(PROFILE_OPCODES, "EOR_4D");
 
         return 4 + applyOperand();
     }
@@ -1806,7 +1808,7 @@ class EOR_4F : public AddressMode::AbsoluteLong<Operator::EOR>
     // 4   6-m         long      m.....m. . EOR $FEDBCA
     int execute() override
     {
-        PROFILE_SCOPE("EOR_4F");
+        PROFILE_IF(PROFILE_OPCODES, "EOR_4F");
 
         throw NotYetImplementedException("EOR_4F");
         return 5 + applyOperand();
@@ -1825,7 +1827,7 @@ class EOR_51 : public AddressMode::DirectPageIndirectIndexedY<Operator::EOR>
     // 2   7-m+w-x+x*p (dir),Y   m.....m. . EOR ($10),Y
     int execute() override
     {
-        PROFILE_SCOPE("EOR_51");
+        PROFILE_IF(PROFILE_OPCODES, "EOR_51");
 
         throw NotYetImplementedException("EOR_51");
         return 5 + applyOperand();
@@ -1844,7 +1846,7 @@ class EOR_52 : public AddressMode::DirectPageIndirect<Operator::EOR>
     // 2   6-m+w       (dir)     m.....m. . EOR ($10)
     int execute() override
     {
-        PROFILE_SCOPE("EOR_52");
+        PROFILE_IF(PROFILE_OPCODES, "EOR_52");
 
         throw NotYetImplementedException("EOR_52");
         return 5 + applyOperand();
@@ -1863,7 +1865,7 @@ class EOR_53 : public AddressMode::StackRelativeIndirectIndexedY<Operator::EOR>
     // 2   8-m         (stk,S),Y m.....m. . EOR ($32,S),Y
     int execute() override
     {
-        PROFILE_SCOPE("EOR_53");
+        PROFILE_IF(PROFILE_OPCODES, "EOR_53");
 
         throw NotYetImplementedException("EOR_53");
         return 7 + applyOperand();
@@ -1882,7 +1884,7 @@ class EOR_55 : public AddressMode::DirectPageIndexed<Operator::EOR, State::Index
     // 2   5-m+w       dir,X     m.....m. . EOR $10,X
     int execute() override
     {
-        PROFILE_SCOPE("EOR_55");
+        PROFILE_IF(PROFILE_OPCODES, "EOR_55");
 
         return 4 + applyOperand();
     }
@@ -1900,7 +1902,7 @@ class EOR_57 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::EOR>
     // 2   7-m+w       [dir],Y   m.....m. . EOR [$10],Y
     int execute() override
     {
-        PROFILE_SCOPE("EOR_57");
+        PROFILE_IF(PROFILE_OPCODES, "EOR_57");
 
         throw NotYetImplementedException("EOR_57");
         return 6 + applyOperand();
@@ -1919,7 +1921,7 @@ class EOR_59 : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::EOR, Sta
     // 3   6-m-x+x*p   abs,Y     m.....m. . EOR $9876,Y
     int execute() override
     {
-        PROFILE_SCOPE("EOR_59");
+        PROFILE_IF(PROFILE_OPCODES, "EOR_59");
 
         return 4 + applyOperand();
     }
@@ -1937,7 +1939,7 @@ class EOR_5D : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::EOR, Sta
     // 3   6-m-x+x*p   abs,X     m.....m. . EOR $9876,X
     int execute() override
     {
-        PROFILE_SCOPE("EOR_5D");
+        PROFILE_IF(PROFILE_OPCODES, "EOR_5D");
 
         return 4 + applyOperand();
     }
@@ -1955,7 +1957,7 @@ class EOR_5F : public AddressMode::AbsoluteLongIndexedX<Operator::EOR>
     // 4   6-m         long,X    m.....m. . EOR $FEDCBA,X
     int execute() override
     {
-        PROFILE_SCOPE("EOR_5F");
+        PROFILE_IF(PROFILE_OPCODES, "EOR_5F");
 
         throw NotYetImplementedException("EOR_5F");
         return 5 + applyOperand();
@@ -1974,7 +1976,7 @@ class INC_1A : public AddressMode::Accumulator<Operator::INC>
     // 1   2           acc       m.....m. . INC
     int execute() override
     {
-        PROFILE_SCOPE("INC_1A");
+        PROFILE_IF(PROFILE_OPCODES, "INC_1A");
 
         return 2 + applyOperand();
     }
@@ -1992,7 +1994,7 @@ class INC_E6 : public AddressMode::DirectPage<Operator::INC>
     // 2   7-2*m+w     dir       m.....m. . INC $10
     int execute() override
     {
-        PROFILE_SCOPE("INC_E6");
+        PROFILE_IF(PROFILE_OPCODES, "INC_E6");
 
         return 5 + applyOperand();
     }
@@ -2010,7 +2012,7 @@ class INC_EE : public AddressMode::Absolute<Operator::INC>
     // 3   8-2*m       abs       m.....m. . INC $9876
     int execute() override
     {
-        PROFILE_SCOPE("INC_EE");
+        PROFILE_IF(PROFILE_OPCODES, "INC_EE");
 
         return 6 + applyOperand();
     }
@@ -2028,7 +2030,7 @@ class INC_F6 : public AddressMode::DirectPageIndexed<Operator::INC, State::Index
     // 2   8-2*m+w     dir,X     m.....m. . INC $10,X
     int execute() override
     {
-        PROFILE_SCOPE("INC_F6");
+        PROFILE_IF(PROFILE_OPCODES, "INC_F6");
 
         return 6 + applyOperand();
     }
@@ -2046,7 +2048,7 @@ class INC_FE : public AddressMode::AbsoluteIndexed<Operator::INC, State::IndexRe
     // 3   9-2*m       abs,X     m.....m. . INC $9876,X
     int execute() override
     {
-        PROFILE_SCOPE("INC_FE");
+        PROFILE_IF(PROFILE_OPCODES, "INC_FE");
 
         return 7 + applyOperand();
     }
@@ -2064,7 +2066,7 @@ class INX_E8 : public AddressMode::Implied<Operator::IN_<State::IndexRegister::X
     // 1   2           imp       x.....x. . INX
     int execute() override
     {
-        PROFILE_SCOPE("INX_E8");
+        PROFILE_IF(PROFILE_OPCODES, "INX_E8");
 
         return 2 + applyOperand();
     }
@@ -2082,7 +2084,7 @@ class INY_C8 : public AddressMode::Implied<Operator::IN_<State::IndexRegister::Y
     // 1   2           imp       x.....x. . INY
     int execute() override
     {
-        PROFILE_SCOPE("INY_C8");
+        PROFILE_IF(PROFILE_OPCODES, "INY_C8");
 
         return 2 + applyOperand();
     }
@@ -2100,7 +2102,7 @@ class JMP_4C : public AddressMode::Absolute_ControlFlow<Operator::JMP>
     // 3   3           abs       ........ . JMP $1234
     int execute() override
     {
-        PROFILE_SCOPE("JMP_4C");
+        PROFILE_IF(PROFILE_OPCODES, "JMP_4C");
 
         return 3 + applyOperand();
     }
@@ -2118,7 +2120,7 @@ class JMP_5C : public AddressMode::AbsoluteLong_ControlFlow<Operator::JML>
     // 4   4           long      ........ . JMP $FEDCBA
     int execute() override
     {
-        PROFILE_SCOPE("JMP_5C");
+        PROFILE_IF(PROFILE_OPCODES, "JMP_5C");
 
         return 4 + applyOperand();
     }
@@ -2136,7 +2138,7 @@ class JMP_6C : public AddressMode::AbsoluteIndirect<Operator::JMP>
     // 3   5           (abs)     ........ . JMP ($1234)
     int execute() override
     {
-        PROFILE_SCOPE("JMP_6C");
+        PROFILE_IF(PROFILE_OPCODES, "JMP_6C");
 
         return 5 + applyOperand();
     }
@@ -2154,7 +2156,7 @@ class JMP_7C : public AddressMode::AbsoluteIndexedIndirect<Operator::JMP>
     // 3   6           (abs,X)   ........ . JMP ($1234,X)
     int execute() override
     {
-        PROFILE_SCOPE("JMP_7C");
+        PROFILE_IF(PROFILE_OPCODES, "JMP_7C");
 
         return 6 + applyOperand();
     }
@@ -2172,7 +2174,7 @@ class JMP_DC : public AddressMode::AbsoluteIndirectLong<Operator::JML>
     // 3   6           [abs]     ........ . JMP [$1234]
     int execute() override
     {
-        PROFILE_SCOPE("JMP_DC");
+        PROFILE_IF(PROFILE_OPCODES, "JMP_DC");
 
         return 6 + applyOperand();
     }
@@ -2190,7 +2192,7 @@ class JSR_20 : public AddressMode::Absolute_ControlFlow<Operator::JSR>
     // 3   6           abs       ........ . JSR $1234
     int execute() override
     {
-        PROFILE_SCOPE("JSR_20");
+        PROFILE_IF(PROFILE_OPCODES, "JSR_20");
 
         return 6 + applyOperand();
     }
@@ -2208,7 +2210,7 @@ class JSR_22 : public AddressMode::AbsoluteLong_ControlFlow<Operator::JSL>
     // 4   8           long      ........ . JSL $123456
     int execute() override
     {
-        PROFILE_SCOPE("JSR_22");
+        PROFILE_IF(PROFILE_OPCODES, "JSR_22");
 
         return 8 + applyOperand();
     }
@@ -2226,7 +2228,7 @@ class JSR_FC : public AddressMode::AbsoluteIndexedIndirect<Operator::JSR>
     // 3   8           (abs,X)   ........ . JSR ($1234,X)
     int execute() override
     {
-        PROFILE_SCOPE("JSR_FC");
+        PROFILE_IF(PROFILE_OPCODES, "JSR_FC");
 
         return 8 + applyOperand();
     }
@@ -2244,7 +2246,7 @@ class LDA_A1 : public AddressMode::DirectPageIndexedIndirectX<Operator::LDA>
     // 2   7-m+w       (dir,X)   m.....m. . LDA ($10,X)
     int execute() override
     {
-        PROFILE_SCOPE("LDA_A1");
+        PROFILE_IF(PROFILE_OPCODES, "LDA_A1");
 
         throw NotYetImplementedException("LDA_A1");
         return 6 + applyOperand();
@@ -2263,7 +2265,7 @@ class LDA_A3 : public AddressMode::StackRelative<Operator::LDA>
     // 2   5-m         stk,S     m.....m. . LDA $32,S
     int execute() override
     {
-        PROFILE_SCOPE("LDA_A3");
+        PROFILE_IF(PROFILE_OPCODES, "LDA_A3");
 
         return 4 + applyOperand();
     }
@@ -2281,7 +2283,7 @@ class LDA_A5 : public AddressMode::DirectPage<Operator::LDA>
     // 2   4-m+w       dir       m.....m. . LDA $10
     int execute() override
     {
-        PROFILE_SCOPE("LDA_A5");
+        PROFILE_IF(PROFILE_OPCODES, "LDA_A5");
 
         return 3 + applyOperand();
     }
@@ -2299,7 +2301,7 @@ class LDA_A7 : public AddressMode::DirectPageIndirectLong<Operator::LDA>
     // 2   7-m+w       [dir]     m.....m. . LDA [$10]
     int execute() override
     {
-        PROFILE_SCOPE("LDA_A7");
+        PROFILE_IF(PROFILE_OPCODES, "LDA_A7");
 
         return 6 + applyOperand();
     }
@@ -2318,7 +2320,7 @@ class LDA_A9_16Bit : public AddressMode::Immediate16Bit<Operator::LDA>
     // 3-m 3-m         imm       m.....m. . LDA #$54
     int execute() override
     {
-        PROFILE_SCOPE("LDA_A9_16Bit");
+        PROFILE_IF(PROFILE_OPCODES, "LDA_A9_16Bit");
 
         return 2 + applyOperand();
     }
@@ -2337,7 +2339,7 @@ class LDA_A9 : public AddressMode::Immediate<Operator::LDA>
     // 3-m 3-m         imm       m.....m. . LDA #$54
     int execute() override
     {
-        PROFILE_SCOPE("LDA_A9");
+        PROFILE_IF(PROFILE_OPCODES, "LDA_A9");
 
         return 2 + applyOperand();
     }
@@ -2355,7 +2357,7 @@ class LDA_AD : public AddressMode::Absolute<Operator::LDA>
     // 3   5-m         abs       m.....m. . LDA $9876
     int execute() override
     {
-        PROFILE_SCOPE("LDA_AD");
+        PROFILE_IF(PROFILE_OPCODES, "LDA_AD");
 
         return 4 + applyOperand();
     }
@@ -2373,7 +2375,7 @@ class LDA_AF : public AddressMode::AbsoluteLong<Operator::LDA>
     // 4   6-m         long      m.....m. . LDA $FEDBCA
     int execute() override
     {
-        PROFILE_SCOPE("LDA_AF");
+        PROFILE_IF(PROFILE_OPCODES, "LDA_AF");
 
         return 5 + applyOperand();
     }
@@ -2391,7 +2393,7 @@ class LDA_B1 : public AddressMode::DirectPageIndirectIndexedY<Operator::LDA>
     // 2   7-m+w-x+x*p (dir),Y   m.....m. . LDA ($10),Y
     int execute() override
     {
-        PROFILE_SCOPE("LDA_B1");
+        PROFILE_IF(PROFILE_OPCODES, "LDA_B1");
 
         return 5 + applyOperand();
     }
@@ -2409,7 +2411,7 @@ class LDA_B2 : public AddressMode::DirectPageIndirect<Operator::LDA>
     // 2   6-m+w       (dir)     m.....m. . LDA ($10)
     int execute() override
     {
-        PROFILE_SCOPE("LDA_B2");
+        PROFILE_IF(PROFILE_OPCODES, "LDA_B2");
 
         return 5 + applyOperand();
     }
@@ -2427,7 +2429,7 @@ class LDA_B3 : public AddressMode::StackRelativeIndirectIndexedY<Operator::LDA>
     // 2   8-m         (stk,S),Y m.....m. . LDA ($32,S),Y
     int execute() override
     {
-        PROFILE_SCOPE("LDA_B3");
+        PROFILE_IF(PROFILE_OPCODES, "LDA_B3");
 
         return 7 + applyOperand();
     }
@@ -2445,7 +2447,7 @@ class LDA_B5 : public AddressMode::DirectPageIndexed<Operator::LDA, State::Index
     // 2   5-m+w       dir,X     m.....m. . LDA $10,X
     int execute() override
     {
-        PROFILE_SCOPE("LDA_B5");
+        PROFILE_IF(PROFILE_OPCODES, "LDA_B5");
 
         return 4 + applyOperand();
     }
@@ -2463,7 +2465,7 @@ class LDA_B7 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::LDA>
     // 2   7-m+w       [dir],Y   m.....m. . LDA [$10],Y
     int execute() override
     {
-        PROFILE_SCOPE("LDA_B7");
+        PROFILE_IF(PROFILE_OPCODES, "LDA_B7");
 
         return 6 + applyOperand();
     }
@@ -2481,7 +2483,7 @@ class LDA_B9 : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::LDA, Sta
     // 3   6-m-x+x*p   abs,Y     m.....m. . LDA $9876,Y
     int execute() override
     {
-        PROFILE_SCOPE("LDA_B9");
+        PROFILE_IF(PROFILE_OPCODES, "LDA_B9");
 
         return 4 + applyOperand();
     }
@@ -2499,7 +2501,7 @@ class LDA_BD : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::LDA, Sta
     // 3   6-m-x+x*p   abs,X     m.....m. . LDA $9876,X
     int execute() override
     {
-        PROFILE_SCOPE("LDA_BD");
+        PROFILE_IF(PROFILE_OPCODES, "LDA_BD");
 
         return 4 + applyOperand();
     }
@@ -2517,7 +2519,7 @@ class LDA_BF : public AddressMode::AbsoluteLongIndexedX<Operator::LDA>
     // 4   6-m         long,X    m.....m. . LDA $FEDCBA,X
     int execute() override
     {
-        PROFILE_SCOPE("LDA_BF");
+        PROFILE_IF(PROFILE_OPCODES, "LDA_BF");
 
         return 5 + applyOperand();
     }
@@ -2536,7 +2538,7 @@ class LDX_A2_16Bit : public AddressMode::Immediate16Bit<Operator::LD_<State::Ind
     // 3-x 3-x         imm       x.....x. . LDX #$54
     int execute() override
     {
-        PROFILE_SCOPE("LDX_A2_16Bit");
+        PROFILE_IF(PROFILE_OPCODES, "LDX_A2_16Bit");
 
         return 2 + applyOperand();
     }
@@ -2555,7 +2557,7 @@ class LDX_A2 : public AddressMode::Immediate<Operator::LD_<State::IndexRegister:
     // 3-x 3-x         imm       x.....x. . LDX #$54
     int execute() override
     {
-        PROFILE_SCOPE("LDX_A2");
+        PROFILE_IF(PROFILE_OPCODES, "LDX_A2");
 
         return 2 + applyOperand();
     }
@@ -2573,7 +2575,7 @@ class LDX_A6 : public AddressMode::DirectPage<Operator::LD_<State::IndexRegister
     // 2   4-x+w       dir       x.....x. . LDX $10
     int execute() override
     {
-        PROFILE_SCOPE("LDX_A6");
+        PROFILE_IF(PROFILE_OPCODES, "LDX_A6");
 
         return 3 + applyOperand();
     }
@@ -2591,7 +2593,7 @@ class LDX_AE : public AddressMode::Absolute<Operator::LD_<State::IndexRegister::
     // 3   5-x         abs       x.....x. . LDX $9876
     int execute() override
     {
-        PROFILE_SCOPE("LDX_AE");
+        PROFILE_IF(PROFILE_OPCODES, "LDX_AE");
 
         return 4 + applyOperand();
     }
@@ -2609,7 +2611,7 @@ class LDX_B6 : public AddressMode::DirectPageIndexed<Operator::LD_<State::IndexR
     // 2   5-x+w       dir,Y     x.....x. . LDX $10,Y
     int execute() override
     {
-        PROFILE_SCOPE("LDX_B6");
+        PROFILE_IF(PROFILE_OPCODES, "LDX_B6");
 
         return 4 + applyOperand();
     }
@@ -2627,7 +2629,7 @@ class LDX_BE : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::LD_<Stat
     // 3   6-2*x+x*p   abs,Y     x.....x. . LDX $9876,Y
     int execute() override
     {
-        PROFILE_SCOPE("LDX_BE");
+        PROFILE_IF(PROFILE_OPCODES, "LDX_BE");
 
         return 4 + applyOperand();
     }
@@ -2646,7 +2648,7 @@ class LDY_A0_16Bit : public AddressMode::Immediate16Bit<Operator::LD_<State::Ind
     // 3-x 3-x         imm       x.....x. . LDY #$54
     int execute() override
     {
-        PROFILE_SCOPE("LDY_A0_16Bit");
+        PROFILE_IF(PROFILE_OPCODES, "LDY_A0_16Bit");
 
         return 2 + applyOperand();
     }
@@ -2665,7 +2667,7 @@ class LDY_A0 : public AddressMode::Immediate<Operator::LD_<State::IndexRegister:
     // 3-x 3-x         imm       x.....x. . LDY #$54
     int execute() override
     {
-        PROFILE_SCOPE("LDY_A0");
+        PROFILE_IF(PROFILE_OPCODES, "LDY_A0");
 
         return 2 + applyOperand();
     }
@@ -2683,7 +2685,7 @@ class LDY_A4 : public AddressMode::DirectPage<Operator::LD_<State::IndexRegister
     // 2   4-x+w       dir       x.....x. . LDY $10
     int execute() override
     {
-        PROFILE_SCOPE("LDY_A4");
+        PROFILE_IF(PROFILE_OPCODES, "LDY_A4");
 
         return 3 + applyOperand();
     }
@@ -2701,7 +2703,7 @@ class LDY_AC : public AddressMode::Absolute<Operator::LD_<State::IndexRegister::
     // 3   5-x         abs       x.....x. . LDY $9876
     int execute() override
     {
-        PROFILE_SCOPE("LDY_AC");
+        PROFILE_IF(PROFILE_OPCODES, "LDY_AC");
 
         return 4 + applyOperand();
     }
@@ -2719,7 +2721,7 @@ class LDY_B4 : public AddressMode::DirectPageIndexed<Operator::LD_<State::IndexR
     // 2   5-x+w       dir,X     x.....x. . LDY $10,X
     int execute() override
     {
-        PROFILE_SCOPE("LDY_B4");
+        PROFILE_IF(PROFILE_OPCODES, "LDY_B4");
 
         return 4 + applyOperand();
     }
@@ -2737,7 +2739,7 @@ class LDY_BC : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::LD_<Stat
     // 3   6-2*x+x*p   abs,X     x.....x. . LDY $9876,X
     int execute() override
     {
-        PROFILE_SCOPE("LDY_BC");
+        PROFILE_IF(PROFILE_OPCODES, "LDY_BC");
 
         return 4 + applyOperand();
     }
@@ -2755,7 +2757,7 @@ class LSR_46 : public AddressMode::DirectPage<Operator::LSR>
     // 2   7-2*m+w     dir       0.....m* . LSR $10
     int execute() override
     {
-        PROFILE_SCOPE("LSR_46");
+        PROFILE_IF(PROFILE_OPCODES, "LSR_46");
 
         return 5 + applyOperand();
     }
@@ -2773,7 +2775,7 @@ class LSR_4A : public AddressMode::Accumulator<Operator::LSR>
     // 1   2           acc       0.....m* . LSR
     int execute() override
     {
-        PROFILE_SCOPE("LSR_4A");
+        PROFILE_IF(PROFILE_OPCODES, "LSR_4A");
 
         return 2 + applyOperand();
     }
@@ -2791,7 +2793,7 @@ class LSR_4E : public AddressMode::Absolute<Operator::LSR>
     // 3   8-2*m       abs       0.....m* . LSR $9876
     int execute() override
     {
-        PROFILE_SCOPE("LSR_4E");
+        PROFILE_IF(PROFILE_OPCODES, "LSR_4E");
 
         return 6 + applyOperand();
     }
@@ -2809,7 +2811,7 @@ class LSR_56 : public AddressMode::DirectPageIndexed<Operator::LSR, State::Index
     // 2   8-2*m+w     dir,X     0.....m* . LSR $10,X
     int execute() override
     {
-        PROFILE_SCOPE("LSR_56");
+        PROFILE_IF(PROFILE_OPCODES, "LSR_56");
 
         throw NotYetImplementedException("LSR_56");
         return 6 + applyOperand();
@@ -2828,7 +2830,7 @@ class LSR_5E : public AddressMode::AbsoluteIndexed<Operator::LSR, State::IndexRe
     // 3   9-2*m       abs,X     0.....m* . LSR $9876,X
     int execute() override
     {
-        PROFILE_SCOPE("LSR_5E");
+        PROFILE_IF(PROFILE_OPCODES, "LSR_5E");
 
         return 7 + applyOperand();
     }
@@ -2846,7 +2848,7 @@ class MVN_54 : public AddressMode::BlockMove<Operator::MVN>
     // 3   7           src,dest  ........ . MVN #$12,#$34
     int execute() override
     {
-        PROFILE_SCOPE("MVN_54");
+        PROFILE_IF(PROFILE_OPCODES, "MVN_54");
 
         return 7 + applyOperand();
     }
@@ -2864,7 +2866,7 @@ class MVP_44 : public AddressMode::BlockMove<Operator::MVP>
     // 3   7           src,dest  ........ . MVP #$12,#$34
     int execute() override
     {
-        PROFILE_SCOPE("MVP_44");
+        PROFILE_IF(PROFILE_OPCODES, "MVP_44");
 
         throw NotYetImplementedException("MVP_44");
         return 7 + applyOperand();
@@ -2883,7 +2885,7 @@ class NOP_EA : public AddressMode::Implied<Operator::NOP>
     // 1   2           imp       ........ . NOP
     int execute() override
     {
-        PROFILE_SCOPE("NOP_EA");
+        PROFILE_IF(PROFILE_OPCODES, "NOP_EA");
 
         return 2 + applyOperand();
     }
@@ -2901,7 +2903,7 @@ class ORA_01 : public AddressMode::DirectPageIndexedIndirectX<Operator::ORA>
     // 2   7-m+w       (dir,X)   m.....m. . ORA ($10,X)
     int execute() override
     {
-        PROFILE_SCOPE("ORA_01");
+        PROFILE_IF(PROFILE_OPCODES, "ORA_01");
 
         throw NotYetImplementedException("ORA_01");
         return 6 + applyOperand();
@@ -2920,7 +2922,7 @@ class ORA_03 : public AddressMode::StackRelative<Operator::ORA>
     // 2   5-m         stk,S     m.....m. . ORA $32,S
     int execute() override
     {
-        PROFILE_SCOPE("ORA_03");
+        PROFILE_IF(PROFILE_OPCODES, "ORA_03");
 
         return 4 + applyOperand();
     }
@@ -2938,7 +2940,7 @@ class ORA_05 : public AddressMode::DirectPage<Operator::ORA>
     // 2   4-m+w       dir       m.....m. . ORA $10
     int execute() override
     {
-        PROFILE_SCOPE("ORA_05");
+        PROFILE_IF(PROFILE_OPCODES, "ORA_05");
 
         return 3 + applyOperand();
     }
@@ -2956,7 +2958,7 @@ class ORA_07 : public AddressMode::DirectPageIndirectLong<Operator::ORA>
     // 2   7-m+w       [dir]     m.....m. . ORA [$10]
     int execute() override
     {
-        PROFILE_SCOPE("ORA_07");
+        PROFILE_IF(PROFILE_OPCODES, "ORA_07");
 
         return 6 + applyOperand();
     }
@@ -2975,7 +2977,7 @@ class ORA_09_16Bit : public AddressMode::Immediate16Bit<Operator::ORA>
     // 3-m 3-m         imm       m.....m. . ORA #$54
     int execute() override
     {
-        PROFILE_SCOPE("ORA_09_16Bit");
+        PROFILE_IF(PROFILE_OPCODES, "ORA_09_16Bit");
 
         return 2 + applyOperand();
     }
@@ -2994,7 +2996,7 @@ class ORA_09 : public AddressMode::Immediate<Operator::ORA>
     // 3-m 3-m         imm       m.....m. . ORA #$54
     int execute() override
     {
-        PROFILE_SCOPE("ORA_09");
+        PROFILE_IF(PROFILE_OPCODES, "ORA_09");
 
         return 2 + applyOperand();
     }
@@ -3012,7 +3014,7 @@ class ORA_0D : public AddressMode::Absolute<Operator::ORA>
     // 3   5-m         abs       m.....m. . ORA $9876
     int execute() override
     {
-        PROFILE_SCOPE("ORA_0D");
+        PROFILE_IF(PROFILE_OPCODES, "ORA_0D");
 
         return 4 + applyOperand();
     }
@@ -3030,7 +3032,7 @@ class ORA_0F : public AddressMode::AbsoluteLong<Operator::ORA>
     // 4   6-m         long      m.....m. . ORA $FEDBCA
     int execute() override
     {
-        PROFILE_SCOPE("ORA_0F");
+        PROFILE_IF(PROFILE_OPCODES, "ORA_0F");
 
         return 5 + applyOperand();
     }
@@ -3048,7 +3050,7 @@ class ORA_11 : public AddressMode::DirectPageIndirectIndexedY<Operator::ORA>
     // 2   7-m+w-x+x*p (dir),Y   m.....m. . ORA ($10),Y
     int execute() override
     {
-        PROFILE_SCOPE("ORA_11");
+        PROFILE_IF(PROFILE_OPCODES, "ORA_11");
 
         throw NotYetImplementedException("ORA_11");
         return 5 + applyOperand();
@@ -3067,7 +3069,7 @@ class ORA_12 : public AddressMode::DirectPageIndirect<Operator::ORA>
     // 2   6-m+w       (dir)     m.....m. . ORA ($10)
     int execute() override
     {
-        PROFILE_SCOPE("ORA_12");
+        PROFILE_IF(PROFILE_OPCODES, "ORA_12");
 
         throw NotYetImplementedException("ORA_12");
         return 5 + applyOperand();
@@ -3086,7 +3088,7 @@ class ORA_13 : public AddressMode::StackRelativeIndirectIndexedY<Operator::ORA>
     // 2   8-m         (stk,S),Y m.....m. . ORA ($32,S),Y
     int execute() override
     {
-        PROFILE_SCOPE("ORA_13");
+        PROFILE_IF(PROFILE_OPCODES, "ORA_13");
 
         throw NotYetImplementedException("ORA_13");
         return 7 + applyOperand();
@@ -3105,7 +3107,7 @@ class ORA_15 : public AddressMode::DirectPageIndexed<Operator::ORA, State::Index
     // 2   5-m+w       dir,X     m.....m. . ORA $10,X
     int execute() override
     {
-        PROFILE_SCOPE("ORA_15");
+        PROFILE_IF(PROFILE_OPCODES, "ORA_15");
 
         return 4 + applyOperand();
     }
@@ -3123,7 +3125,7 @@ class ORA_17 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::ORA>
     // 2   7-m+w       [dir],Y   m.....m. . ORA [$10],Y
     int execute() override
     {
-        PROFILE_SCOPE("ORA_17");
+        PROFILE_IF(PROFILE_OPCODES, "ORA_17");
 
         throw NotYetImplementedException("ORA_17");
         return 6 + applyOperand();
@@ -3142,7 +3144,7 @@ class ORA_19 : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::ORA, Sta
     // 3   6-m-x+x*p   abs,Y     m.....m. . ORA $9876,Y
     int execute() override
     {
-        PROFILE_SCOPE("ORA_19");
+        PROFILE_IF(PROFILE_OPCODES, "ORA_19");
 
         return 4 + applyOperand();
     }
@@ -3160,7 +3162,7 @@ class ORA_1D : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::ORA, Sta
     // 3   6-m-x+x*p   abs,X     m.....m. . ORA $9876,X
     int execute() override
     {
-        PROFILE_SCOPE("ORA_1D");
+        PROFILE_IF(PROFILE_OPCODES, "ORA_1D");
 
         return 4 + applyOperand();
     }
@@ -3178,7 +3180,7 @@ class ORA_1F : public AddressMode::AbsoluteLongIndexedX<Operator::ORA>
     // 4   6-m         long,X    m.....m. . ORA $FEDCBA,X
     int execute() override
     {
-        PROFILE_SCOPE("ORA_1F");
+        PROFILE_IF(PROFILE_OPCODES, "ORA_1F");
 
         return 5 + applyOperand();
     }
@@ -3196,7 +3198,7 @@ class PEA_F4 : public AddressMode::Absolute_ControlFlow<Operator::PE_<'A'>>
     // 3   5           imm       ........ . PEA #$1234
     int execute() override
     {
-        PROFILE_SCOPE("PEA_F4");
+        PROFILE_IF(PROFILE_OPCODES, "PEA_F4");
 
         return 5 + applyOperand();
     }
@@ -3214,7 +3216,7 @@ class PEI_D4 : public AddressMode::DirectPageIndirect_ControlFlow<Operator::PE_<
     // 2   6+w         dir       ........ . PEI $12
     int execute() override
     {
-        PROFILE_SCOPE("PEI_D4");
+        PROFILE_IF(PROFILE_OPCODES, "PEI_D4");
 
         return 6 + applyOperand();
     }
@@ -3232,7 +3234,7 @@ class PER_62 : public AddressMode::ProgramCounterRelativeLong<Operator::PER>
     // 3   6           imm       ........ . PER LABEL
     int execute() override
     {
-        PROFILE_SCOPE("PER_62");
+        PROFILE_IF(PROFILE_OPCODES, "PER_62");
 
         return 6 + applyOperand();
     }
@@ -3250,7 +3252,7 @@ class PHA_48 : public AddressMode::Implied<Operator::PHA>
     // 1   4-m         imp       ........ . PHA
     int execute() override
     {
-        PROFILE_SCOPE("PHA_48");
+        PROFILE_IF(PROFILE_OPCODES, "PHA_48");
 
         return 3 + applyOperand();
     }
@@ -3268,7 +3270,7 @@ class PHB_8B : public AddressMode::Implied<Operator::PHB>
     // 1   3           imp       ........ . PHB
     int execute() override
     {
-        PROFILE_SCOPE("PHB_8B");
+        PROFILE_IF(PROFILE_OPCODES, "PHB_8B");
 
         return 3 + applyOperand();
     }
@@ -3286,7 +3288,7 @@ class PHD_0B : public AddressMode::Implied<Operator::PHD>
     // 1   4           imp       ........ . PHD
     int execute() override
     {
-        PROFILE_SCOPE("PHD_0B");
+        PROFILE_IF(PROFILE_OPCODES, "PHD_0B");
 
         return 4 + applyOperand();
     }
@@ -3304,7 +3306,7 @@ class PHK_4B : public AddressMode::Implied<Operator::PHK>
     // 1   3           imp       ........ . PHK
     int execute() override
     {
-        PROFILE_SCOPE("PHK_4B");
+        PROFILE_IF(PROFILE_OPCODES, "PHK_4B");
 
         return 3 + applyOperand();
     }
@@ -3322,7 +3324,7 @@ class PHP_08 : public AddressMode::Implied<Operator::PHP>
     // 1   3           imp       ........ . PHP
     int execute() override
     {
-        PROFILE_SCOPE("PHP_08");
+        PROFILE_IF(PROFILE_OPCODES, "PHP_08");
 
         return 3 + applyOperand();
     }
@@ -3340,7 +3342,7 @@ class PHX_DA : public AddressMode::Implied<Operator::PH_<State::IndexRegister::X
     // 1   4-x         imp       ........ . PHX
     int execute() override
     {
-        PROFILE_SCOPE("PHX_DA");
+        PROFILE_IF(PROFILE_OPCODES, "PHX_DA");
 
         return 3 + applyOperand();
     }
@@ -3358,7 +3360,7 @@ class PHY_5A : public AddressMode::Implied<Operator::PH_<State::IndexRegister::Y
     // 1   4-x         imp       ........ . PHY
     int execute() override
     {
-        PROFILE_SCOPE("PHY_5A");
+        PROFILE_IF(PROFILE_OPCODES, "PHY_5A");
 
         return 3 + applyOperand();
     }
@@ -3376,7 +3378,7 @@ class PLA_68 : public AddressMode::Implied<Operator::PLA>
     // 1   5-m         imp       m.....m. . PLA
     int execute() override
     {
-        PROFILE_SCOPE("PLA_68");
+        PROFILE_IF(PROFILE_OPCODES, "PLA_68");
 
         return 4 + applyOperand();
     }
@@ -3394,7 +3396,7 @@ class PLB_AB : public AddressMode::Implied<Operator::PLB>
     // 1   4           imp       *.....*. . PLB
     int execute() override
     {
-        PROFILE_SCOPE("PLB_AB");
+        PROFILE_IF(PROFILE_OPCODES, "PLB_AB");
 
         return 4 + applyOperand();
     }
@@ -3412,7 +3414,7 @@ class PLD_2B : public AddressMode::Implied<Operator::PLD>
     // 1   5           imp       *.....*. . PLD
     int execute() override
     {
-        PROFILE_SCOPE("PLD_2B");
+        PROFILE_IF(PROFILE_OPCODES, "PLD_2B");
 
         return 5 + applyOperand();
     }
@@ -3430,7 +3432,7 @@ class PLP_28 : public AddressMode::Implied<Operator::PLP>
     // 1   4           imp       ******** . PLP
     int execute() override
     {
-        PROFILE_SCOPE("PLP_28");
+        PROFILE_IF(PROFILE_OPCODES, "PLP_28");
 
         return 4 + applyOperand();
     }
@@ -3448,7 +3450,7 @@ class PLX_FA : public AddressMode::Implied<Operator::PL_<State::IndexRegister::X
     // 1   5-x         imp       x.....x. . PLX
     int execute() override
     {
-        PROFILE_SCOPE("PLX_FA");
+        PROFILE_IF(PROFILE_OPCODES, "PLX_FA");
 
         return 4 + applyOperand();
     }
@@ -3466,7 +3468,7 @@ class PLY_7A : public AddressMode::Implied<Operator::PL_<State::IndexRegister::Y
     // 1   5-x         imp       x.....x. . PLY
     int execute() override
     {
-        PROFILE_SCOPE("PLY_7A");
+        PROFILE_IF(PROFILE_OPCODES, "PLY_7A");
 
         return 4 + applyOperand();
     }
@@ -3484,7 +3486,7 @@ class REP_C2 : public AddressMode::Immediate<Operator::REP>
     // 2   3           imm       ******** . REP #$12
     int execute() override
     {
-        PROFILE_SCOPE("REP_C2");
+        PROFILE_IF(PROFILE_OPCODES, "REP_C2");
 
         return 3 + applyOperand();
     }
@@ -3502,7 +3504,7 @@ class ROL_26 : public AddressMode::DirectPage<Operator::ROL>
     // 2   7-2*m+w     dir       m.....mm . ROL $10
     int execute() override
     {
-        PROFILE_SCOPE("ROL_26");
+        PROFILE_IF(PROFILE_OPCODES, "ROL_26");
 
         return 5 + applyOperand();
     }
@@ -3520,7 +3522,7 @@ class ROL_2A : public AddressMode::Accumulator<Operator::ROL>
     // 1   2           acc       m.....mm . ROL
     int execute() override
     {
-        PROFILE_SCOPE("ROL_2A");
+        PROFILE_IF(PROFILE_OPCODES, "ROL_2A");
 
         return 2 + applyOperand();
     }
@@ -3538,7 +3540,7 @@ class ROL_2E : public AddressMode::Absolute<Operator::ROL>
     // 3   8-2*m       abs       m.....mm . ROL $9876
     int execute() override
     {
-        PROFILE_SCOPE("ROL_2E");
+        PROFILE_IF(PROFILE_OPCODES, "ROL_2E");
 
         return 6 + applyOperand();
     }
@@ -3556,7 +3558,7 @@ class ROL_36 : public AddressMode::DirectPageIndexed<Operator::ROL, State::Index
     // 2   8-2*m+w     dir,X     m.....mm . ROL $10,X
     int execute() override
     {
-        PROFILE_SCOPE("ROL_36");
+        PROFILE_IF(PROFILE_OPCODES, "ROL_36");
 
         throw NotYetImplementedException("ROL_36");
         return 6 + applyOperand();
@@ -3575,7 +3577,7 @@ class ROL_3E : public AddressMode::AbsoluteIndexed<Operator::ROL, State::IndexRe
     // 3   9-2*m       abs,X     m.....mm . ROL $9876,X
     int execute() override
     {
-        PROFILE_SCOPE("ROL_3E");
+        PROFILE_IF(PROFILE_OPCODES, "ROL_3E");
 
         return 7 + applyOperand();
     }
@@ -3593,7 +3595,7 @@ class ROR_66 : public AddressMode::DirectPage<Operator::ROR>
     // 2   7-2*m+w     dir       m.....m* . ROR $10
     int execute() override
     {
-        PROFILE_SCOPE("ROR_66");
+        PROFILE_IF(PROFILE_OPCODES, "ROR_66");
 
         return 5 + applyOperand();
     }
@@ -3611,7 +3613,7 @@ class ROR_6A : public AddressMode::Accumulator<Operator::ROR>
     // 1   2           acc       m.....m* . ROR
     int execute() override
     {
-        PROFILE_SCOPE("ROR_6A");
+        PROFILE_IF(PROFILE_OPCODES, "ROR_6A");
 
         return 2 + applyOperand();
     }
@@ -3629,7 +3631,7 @@ class ROR_6E : public AddressMode::Absolute<Operator::ROR>
     // 3   8-2*m       abs       m.....m* . ROR $9876
     int execute() override
     {
-        PROFILE_SCOPE("ROR_6E");
+        PROFILE_IF(PROFILE_OPCODES, "ROR_6E");
 
         return 6 + applyOperand();
     }
@@ -3647,7 +3649,7 @@ class ROR_76 : public AddressMode::DirectPageIndexed<Operator::ROR, State::Index
     // 2   8-2*m+w     dir,X     m.....m* . ROR $10,X
     int execute() override
     {
-        PROFILE_SCOPE("ROR_76");
+        PROFILE_IF(PROFILE_OPCODES, "ROR_76");
 
         return 6 + applyOperand();
     }
@@ -3665,7 +3667,7 @@ class ROR_7E : public AddressMode::AbsoluteIndexed<Operator::ROR, State::IndexRe
     // 3   9-2*m       abs,X     m.....m* . ROR $9876,X
     int execute() override
     {
-        PROFILE_SCOPE("ROR_7E");
+        PROFILE_IF(PROFILE_OPCODES, "ROR_7E");
 
         return 7 + applyOperand();
     }
@@ -3683,7 +3685,7 @@ class RTI_40 : public AddressMode::Implied<Operator::RTI>
     // 1   7-e         imp       ******** . RTI
     int execute() override
     {
-        PROFILE_SCOPE("RTI_40");
+        PROFILE_IF(PROFILE_OPCODES, "RTI_40");
 
         return 6 + applyOperand();
     }
@@ -3701,7 +3703,7 @@ class RTL_6B : public AddressMode::Implied<Operator::RTL>
     // 1   6           imp       ........ . RTL
     int execute() override
     {
-        PROFILE_SCOPE("RTL_6B");
+        PROFILE_IF(PROFILE_OPCODES, "RTL_6B");
 
         return 6 + applyOperand();
     }
@@ -3719,7 +3721,7 @@ class RTS_60 : public AddressMode::Implied<Operator::RTS>
     // 1   6           imp       ........ . RTS
     int execute() override
     {
-        PROFILE_SCOPE("RTS_60");
+        PROFILE_IF(PROFILE_OPCODES, "RTS_60");
 
         return 6 + applyOperand();
     }
@@ -3737,7 +3739,7 @@ class SBC_E1 : public AddressMode::DirectPageIndexedIndirectX<Operator::SBC>
     // 2   7-m+w       (dir,X)   mm....mm . SBC ($10,X)
     int execute() override
     {
-        PROFILE_SCOPE("SBC_E1");
+        PROFILE_IF(PROFILE_OPCODES, "SBC_E1");
 
         throw NotYetImplementedException("SBC_E1");
         return 6 + applyOperand();
@@ -3756,7 +3758,7 @@ class SBC_E3 : public AddressMode::StackRelative<Operator::SBC>
     // 2   5-m         stk,S     mm....mm . SBC $32,S
     int execute() override
     {
-        PROFILE_SCOPE("SBC_E3");
+        PROFILE_IF(PROFILE_OPCODES, "SBC_E3");
 
         return 4 + applyOperand();
     }
@@ -3774,7 +3776,7 @@ class SBC_E5 : public AddressMode::DirectPage<Operator::SBC>
     // 2   4-m+w       dir       mm....mm . SBC $10
     int execute() override
     {
-        PROFILE_SCOPE("SBC_E5");
+        PROFILE_IF(PROFILE_OPCODES, "SBC_E5");
 
         return 3 + applyOperand();
     }
@@ -3792,7 +3794,7 @@ class SBC_E7 : public AddressMode::DirectPageIndirectLong<Operator::SBC>
     // 2   7-m+w       [dir]     mm....mm . SBC [$10]
     int execute() override
     {
-        PROFILE_SCOPE("SBC_E7");
+        PROFILE_IF(PROFILE_OPCODES, "SBC_E7");
 
         throw NotYetImplementedException("SBC_E7");
         return 6 + applyOperand();
@@ -3812,7 +3814,7 @@ class SBC_E9_16Bit : public AddressMode::Immediate16Bit<Operator::SBC>
     // 3-m 3-m         imm       mm....mm . SBC #$54
     int execute() override
     {
-        PROFILE_SCOPE("SBC_E9_16Bit");
+        PROFILE_IF(PROFILE_OPCODES, "SBC_E9_16Bit");
 
         return 2 + applyOperand();
     }
@@ -3831,7 +3833,7 @@ class SBC_E9 : public AddressMode::Immediate<Operator::SBC>
     // 3-m 3-m         imm       mm....mm . SBC #$54
     int execute() override
     {
-        PROFILE_SCOPE("SBC_E9");
+        PROFILE_IF(PROFILE_OPCODES, "SBC_E9");
 
         return 2 + applyOperand();
     }
@@ -3849,7 +3851,7 @@ class SBC_ED : public AddressMode::Absolute<Operator::SBC>
     // 3   5-m         abs       mm....mm . SBC $9876
     int execute() override
     {
-        PROFILE_SCOPE("SBC_ED");
+        PROFILE_IF(PROFILE_OPCODES, "SBC_ED");
 
         return 4 + applyOperand();
     }
@@ -3867,7 +3869,7 @@ class SBC_EF : public AddressMode::AbsoluteLong<Operator::SBC>
     // 4   6-m         long      mm....mm . SBC $FEDBCA
     int execute() override
     {
-        PROFILE_SCOPE("SBC_EF");
+        PROFILE_IF(PROFILE_OPCODES, "SBC_EF");
 
         return 5 + applyOperand();
     }
@@ -3885,7 +3887,7 @@ class SBC_F1 : public AddressMode::DirectPageIndirectIndexedY<Operator::SBC>
     // 2   7-m+w-x+x*p (dir),Y   mm....mm . SBC ($10),Y
     int execute() override
     {
-        PROFILE_SCOPE("SBC_F1");
+        PROFILE_IF(PROFILE_OPCODES, "SBC_F1");
 
         throw NotYetImplementedException("SBC_F1");
         return 5 + applyOperand();
@@ -3904,7 +3906,7 @@ class SBC_F2 : public AddressMode::DirectPageIndirect<Operator::SBC>
     // 2   6-m+w       (dir)     mm....mm . SBC ($10)
     int execute() override
     {
-        PROFILE_SCOPE("SBC_F2");
+        PROFILE_IF(PROFILE_OPCODES, "SBC_F2");
 
         throw NotYetImplementedException("SBC_F2");
         return 5 + applyOperand();
@@ -3923,7 +3925,7 @@ class SBC_F3 : public AddressMode::StackRelativeIndirectIndexedY<Operator::SBC>
     // 2   8-m         (stk,S),Y mm....mm . SBC ($32,S),Y
     int execute() override
     {
-        PROFILE_SCOPE("SBC_F3");
+        PROFILE_IF(PROFILE_OPCODES, "SBC_F3");
 
         throw NotYetImplementedException("SBC_F3");
         return 7 + applyOperand();
@@ -3942,7 +3944,7 @@ class SBC_F5 : public AddressMode::DirectPageIndexed<Operator::SBC, State::Index
     // 2   5-m+w       dir,X     mm....mm . SBC $10,X
     int execute() override
     {
-        PROFILE_SCOPE("SBC_F5");
+        PROFILE_IF(PROFILE_OPCODES, "SBC_F5");
 
         return 4 + applyOperand();
     }
@@ -3960,7 +3962,7 @@ class SBC_F7 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::SBC>
     // 2   7-m+w       [dir],Y   mm....mm . SBC [$10],Y
     int execute() override
     {
-        PROFILE_SCOPE("SBC_F7");
+        PROFILE_IF(PROFILE_OPCODES, "SBC_F7");
 
         throw NotYetImplementedException("SBC_F7");
         return 6 + applyOperand();
@@ -3979,7 +3981,7 @@ class SBC_F9 : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::SBC, Sta
     // 3   6-m-x+x*p   abs,Y     mm....mm . SBC $9876,Y
     int execute() override
     {
-        PROFILE_SCOPE("SBC_F9");
+        PROFILE_IF(PROFILE_OPCODES, "SBC_F9");
 
         return 4 + applyOperand();
     }
@@ -3997,7 +3999,7 @@ class SBC_FD : public AddressMode::AbsoluteIndexed_ExtraCycle<Operator::SBC, Sta
     // 3   6-m-x+x*p   abs,X     mm....mm . SBC $9876,X
     int execute() override
     {
-        PROFILE_SCOPE("SBC_FD");
+        PROFILE_IF(PROFILE_OPCODES, "SBC_FD");
 
         return 4 + applyOperand();
     }
@@ -4015,7 +4017,7 @@ class SBC_FF : public AddressMode::AbsoluteLongIndexedX<Operator::SBC>
     // 4   6-m         long,X    mm....mm . SBC $FEDCBA,X
     int execute() override
     {
-        PROFILE_SCOPE("SBC_FF");
+        PROFILE_IF(PROFILE_OPCODES, "SBC_FF");
 
         return 5 + applyOperand();
     }
@@ -4033,7 +4035,7 @@ class SEC_38 : public AddressMode::Implied<Operator::SE_<State::Flag::c, true>>
     // 1   2           imp       .......1 . SEC
     int execute() override
     {
-        PROFILE_SCOPE("SEC_38");
+        PROFILE_IF(PROFILE_OPCODES, "SEC_38");
 
         return 2 + applyOperand();
     }
@@ -4051,7 +4053,7 @@ class SED_F8 : public AddressMode::Implied<Operator::SE_<State::Flag::d, true>>
     // 1   2           imp       ....1... . SED
     int execute() override
     {
-        PROFILE_SCOPE("SED_F8");
+        PROFILE_IF(PROFILE_OPCODES, "SED_F8");
 
         return 2 + applyOperand();
     }
@@ -4069,7 +4071,7 @@ class SEI_78 : public AddressMode::Implied<Operator::SE_<State::Flag::i, true>>
     // 1   2           imp       .....1.. . SEI
     int execute() override
     {
-        PROFILE_SCOPE("SEI_78");
+        PROFILE_IF(PROFILE_OPCODES, "SEI_78");
 
         return 2 + applyOperand();
     }
@@ -4087,7 +4089,7 @@ class SEP_E2 : public AddressMode::Immediate<Operator::SEP>
     // 2   3           imm       ******** . SEP #$12
     int execute() override
     {
-        PROFILE_SCOPE("SEP_E2");
+        PROFILE_IF(PROFILE_OPCODES, "SEP_E2");
 
         return 3 + applyOperand();
     }
@@ -4105,7 +4107,7 @@ class STA_81 : public AddressMode::DirectPageIndexedIndirectX<Operator::STA>
     // 2   7-m+w       (dir,X)   ........ . STA ($10,X)
     int execute() override
     {
-        PROFILE_SCOPE("STA_81");
+        PROFILE_IF(PROFILE_OPCODES, "STA_81");
 
         throw NotYetImplementedException("STA_81");
         return 6 + applyOperand();
@@ -4124,7 +4126,7 @@ class STA_83 : public AddressMode::StackRelative<Operator::STA>
     // 2   5-m         stk,S     ........ . STA $32,S
     int execute() override
     {
-        PROFILE_SCOPE("STA_83");
+        PROFILE_IF(PROFILE_OPCODES, "STA_83");
 
         return 4 + applyOperand();
     }
@@ -4142,7 +4144,7 @@ class STA_85 : public AddressMode::DirectPage<Operator::STA>
     // 2   4-m+w       dir       ........ . STA $10
     int execute() override
     {
-        PROFILE_SCOPE("STA_85");
+        PROFILE_IF(PROFILE_OPCODES, "STA_85");
 
         return 3 + applyOperand();
     }
@@ -4160,7 +4162,7 @@ class STA_87 : public AddressMode::DirectPageIndirectLong<Operator::STA>
     // 2   7-m+w       [dir]     ........ . STA [$10]
     int execute() override
     {
-        PROFILE_SCOPE("STA_87");
+        PROFILE_IF(PROFILE_OPCODES, "STA_87");
 
         return 6 + applyOperand();
     }
@@ -4178,7 +4180,7 @@ class STA_8D : public AddressMode::Absolute<Operator::STA>
     // 3   5-m         abs       ........ . STA $9876
     int execute() override
     {
-        PROFILE_SCOPE("STA_8D");
+        PROFILE_IF(PROFILE_OPCODES, "STA_8D");
 
         return 4 + applyOperand();
     }
@@ -4196,7 +4198,7 @@ class STA_8F : public AddressMode::AbsoluteLong<Operator::STA>
     // 4   6-m         long      ........ . STA $FEDBCA
     int execute() override
     {
-        PROFILE_SCOPE("STA_8F");
+        PROFILE_IF(PROFILE_OPCODES, "STA_8F");
 
         return 5 + applyOperand();
     }
@@ -4215,7 +4217,7 @@ class STA_91 : public AddressMode::DirectPageIndirectIndexedY<Operator::STA>
     // §20: TODO manually add exception for 3
     int execute() override
     {
-        PROFILE_SCOPE("STA_91");
+        PROFILE_IF(PROFILE_OPCODES, "STA_91");
 
         throw NotYetImplementedException("TODO20");
         return 6 + applyOperand();
@@ -4234,7 +4236,7 @@ class STA_92 : public AddressMode::DirectPageIndirect<Operator::STA>
     // 2   6-m+w       (dir)     ........ . STA ($10)
     int execute() override
     {
-        PROFILE_SCOPE("STA_92");
+        PROFILE_IF(PROFILE_OPCODES, "STA_92");
 
         return 5 + applyOperand();
     }
@@ -4252,7 +4254,7 @@ class STA_93 : public AddressMode::StackRelativeIndirectIndexedY<Operator::STA>
     // 2   8-m         (stk,S),Y ........ . STA ($32,S),Y
     int execute() override
     {
-        PROFILE_SCOPE("STA_93");
+        PROFILE_IF(PROFILE_OPCODES, "STA_93");
 
         throw NotYetImplementedException("STA_93");
         return 7 + applyOperand();
@@ -4271,7 +4273,7 @@ class STA_95 : public AddressMode::DirectPageIndexed<Operator::STA, State::Index
     // 2   5-m+w       dir,X     ........ . STA $10,X
     int execute() override
     {
-        PROFILE_SCOPE("STA_95");
+        PROFILE_IF(PROFILE_OPCODES, "STA_95");
 
         return 4 + applyOperand();
     }
@@ -4289,7 +4291,7 @@ class STA_97 : public AddressMode::DirectPageIndirectLongIndexedY<Operator::STA>
     // 2   7-m+w       [dir],Y   ........ . STA [$10],Y
     int execute() override
     {
-        PROFILE_SCOPE("STA_97");
+        PROFILE_IF(PROFILE_OPCODES, "STA_97");
 
         return 6 + applyOperand();
     }
@@ -4307,7 +4309,7 @@ class STA_99 : public AddressMode::AbsoluteIndexed<Operator::STA, State::IndexRe
     // 3   6-m         abs,Y     ........ . STA $9876,Y
     int execute() override
     {
-        PROFILE_SCOPE("STA_99");
+        PROFILE_IF(PROFILE_OPCODES, "STA_99");
 
         return 5 + applyOperand();
     }
@@ -4325,7 +4327,7 @@ class STA_9D : public AddressMode::AbsoluteIndexed<Operator::STA, State::IndexRe
     // 3   6-m         abs,X     ........ . STA $9876,X
     int execute() override
     {
-        PROFILE_SCOPE("STA_9D");
+        PROFILE_IF(PROFILE_OPCODES, "STA_9D");
 
         return 5 + applyOperand();
     }
@@ -4343,7 +4345,7 @@ class STA_9F : public AddressMode::AbsoluteLongIndexedX<Operator::STA>
     // 4   6-m         long,X    ........ . STA $FEDCBA,X
     int execute() override
     {
-        PROFILE_SCOPE("STA_9F");
+        PROFILE_IF(PROFILE_OPCODES, "STA_9F");
 
         return 5 + applyOperand();
     }
@@ -4361,7 +4363,7 @@ class STP_DB : public AddressMode::Implied<Operator::STP>
     // 1   3           imp       ........ . STP
     int execute() override
     {
-        PROFILE_SCOPE("STP_DB");
+        PROFILE_IF(PROFILE_OPCODES, "STP_DB");
 
         throw NotYetImplementedException("STP_DB");
         return 3 + applyOperand();
@@ -4380,7 +4382,7 @@ class STX_86 : public AddressMode::DirectPage<Operator::ST_<State::IndexRegister
     // 2   4-x+w       dir       ........ . STX $10
     int execute() override
     {
-        PROFILE_SCOPE("STX_86");
+        PROFILE_IF(PROFILE_OPCODES, "STX_86");
 
         return 3 + applyOperand();
     }
@@ -4398,7 +4400,7 @@ class STX_8E : public AddressMode::Absolute<Operator::ST_<State::IndexRegister::
     // 3   5-x         abs       ........ . STX $9876
     int execute() override
     {
-        PROFILE_SCOPE("STX_8E");
+        PROFILE_IF(PROFILE_OPCODES, "STX_8E");
 
         return 4 + applyOperand();
     }
@@ -4416,7 +4418,7 @@ class STX_96 : public AddressMode::DirectPageIndexed<Operator::ST_<State::IndexR
     // 2   5-x+w       dir,Y     ........ . STX $10,Y
     int execute() override
     {
-        PROFILE_SCOPE("STX_96");
+        PROFILE_IF(PROFILE_OPCODES, "STX_96");
 
         throw NotYetImplementedException("STX_96");
         return 4 + applyOperand();
@@ -4435,7 +4437,7 @@ class STY_84 : public AddressMode::DirectPage<Operator::ST_<State::IndexRegister
     // 2   4-x+w       dir       ........ . STY $10
     int execute() override
     {
-        PROFILE_SCOPE("STY_84");
+        PROFILE_IF(PROFILE_OPCODES, "STY_84");
 
         return 3 + applyOperand();
     }
@@ -4453,7 +4455,7 @@ class STY_8C : public AddressMode::Absolute<Operator::ST_<State::IndexRegister::
     // 3   5-x         abs       ........ . STY $9876
     int execute() override
     {
-        PROFILE_SCOPE("STY_8C");
+        PROFILE_IF(PROFILE_OPCODES, "STY_8C");
 
         return 4 + applyOperand();
     }
@@ -4471,7 +4473,7 @@ class STY_94 : public AddressMode::DirectPageIndexed<Operator::ST_<State::IndexR
     // 2   5-x+w       dir,X     ........ . STY $10,X
     int execute() override
     {
-        PROFILE_SCOPE("STY_94");
+        PROFILE_IF(PROFILE_OPCODES, "STY_94");
 
         return 4 + applyOperand();
     }
@@ -4489,7 +4491,7 @@ class STZ_64 : public AddressMode::DirectPage<Operator::STZ>
     // 2   4-m+w       dir       ........ . STZ $10
     int execute() override
     {
-        PROFILE_SCOPE("STZ_64");
+        PROFILE_IF(PROFILE_OPCODES, "STZ_64");
 
         return 3 + applyOperand();
     }
@@ -4507,7 +4509,7 @@ class STZ_74 : public AddressMode::DirectPageIndexed<Operator::STZ, State::Index
     // 2   5-m+w       dir,X     ........ . STZ $10,X
     int execute() override
     {
-        PROFILE_SCOPE("STZ_74");
+        PROFILE_IF(PROFILE_OPCODES, "STZ_74");
 
         return 4 + applyOperand();
     }
@@ -4525,7 +4527,7 @@ class STZ_9C : public AddressMode::Absolute<Operator::STZ>
     // 3   5-m         abs       ........ . STZ $9876
     int execute() override
     {
-        PROFILE_SCOPE("STZ_9C");
+        PROFILE_IF(PROFILE_OPCODES, "STZ_9C");
 
         return 4 + applyOperand();
     }
@@ -4543,7 +4545,7 @@ class STZ_9E : public AddressMode::AbsoluteIndexed<Operator::STZ, State::IndexRe
     // 3   6-m         abs,X     ........ . STZ $9876,X
     int execute() override
     {
-        PROFILE_SCOPE("STZ_9E");
+        PROFILE_IF(PROFILE_OPCODES, "STZ_9E");
 
         return 5 + applyOperand();
     }
@@ -4561,7 +4563,7 @@ class TAX_AA : public AddressMode::Implied<Operator::TA_<State::IndexRegister::X
     // 1   2           imp       x.....x. . TAX
     int execute() override
     {
-        PROFILE_SCOPE("TAX_AA");
+        PROFILE_IF(PROFILE_OPCODES, "TAX_AA");
 
         return 2 + applyOperand();
     }
@@ -4579,7 +4581,7 @@ class TAY_A8 : public AddressMode::Implied<Operator::TA_<State::IndexRegister::Y
     // 1   2           imp       x.....x. . TAY
     int execute() override
     {
-        PROFILE_SCOPE("TAY_A8");
+        PROFILE_IF(PROFILE_OPCODES, "TAY_A8");
 
         return 2 + applyOperand();
     }
@@ -4597,7 +4599,7 @@ class TCD_5B : public AddressMode::Implied<Operator::TCD>
     // 1   2           imp       *.....*. . TCD
     int execute() override
     {
-        PROFILE_SCOPE("TCD_5B");
+        PROFILE_IF(PROFILE_OPCODES, "TCD_5B");
 
         return 2 + applyOperand();
     }
@@ -4615,7 +4617,7 @@ class TCS_1B : public AddressMode::Implied<Operator::TCS>
     // 1   2           imp       ........ . TCS
     int execute() override
     {
-        PROFILE_SCOPE("TCS_1B");
+        PROFILE_IF(PROFILE_OPCODES, "TCS_1B");
 
         return 2 + applyOperand();
     }
@@ -4633,7 +4635,7 @@ class TDC_7B : public AddressMode::Implied<Operator::TDC>
     // 1   2           imp       *.....*. . TDC
     int execute() override
     {
-        PROFILE_SCOPE("TDC_7B");
+        PROFILE_IF(PROFILE_OPCODES, "TDC_7B");
 
         return 2 + applyOperand();
     }
@@ -4651,7 +4653,7 @@ class TRB_14 : public AddressMode::DirectPage<Operator::TRB>
     // 2   7-2*m+w     dir       ......m. . TRB $10
     int execute() override
     {
-        PROFILE_SCOPE("TRB_14");
+        PROFILE_IF(PROFILE_OPCODES, "TRB_14");
 
         return 5 + applyOperand();
     }
@@ -4669,7 +4671,7 @@ class TRB_1C : public AddressMode::Absolute<Operator::TRB>
     // 3   8-2*m       abs       ......m. . TRB $9876
     int execute() override
     {
-        PROFILE_SCOPE("TRB_1C");
+        PROFILE_IF(PROFILE_OPCODES, "TRB_1C");
 
         return 6 + applyOperand();
     }
@@ -4687,7 +4689,7 @@ class TSB_04 : public AddressMode::DirectPage<Operator::TSB>
     // 2   7-2*m+w     dir       ......m. . TSB $10
     int execute() override
     {
-        PROFILE_SCOPE("TSB_04");
+        PROFILE_IF(PROFILE_OPCODES, "TSB_04");
 
         return 5 + applyOperand();
     }
@@ -4705,7 +4707,7 @@ class TSB_0C : public AddressMode::Absolute<Operator::TSB>
     // 3   8-2*m       abs       ......m. . TSB $9876
     int execute() override
     {
-        PROFILE_SCOPE("TSB_0C");
+        PROFILE_IF(PROFILE_OPCODES, "TSB_0C");
 
         return 6 + applyOperand();
     }
@@ -4723,7 +4725,7 @@ class TSC_3B : public AddressMode::Implied<Operator::TSC>
     // 1   2           imp       *.....*. . TSC
     int execute() override
     {
-        PROFILE_SCOPE("TSC_3B");
+        PROFILE_IF(PROFILE_OPCODES, "TSC_3B");
 
         return 2 + applyOperand();
     }
@@ -4741,7 +4743,7 @@ class TSX_BA : public AddressMode::Implied<Operator::TSX>
     // 1   2           imp       x.....x. . TSX
     int execute() override
     {
-        PROFILE_SCOPE("TSX_BA");
+        PROFILE_IF(PROFILE_OPCODES, "TSX_BA");
 
         throw NotYetImplementedException("TSX_BA");
         return 2 + applyOperand();
@@ -4760,7 +4762,7 @@ class TXA_8A : public AddressMode::Implied<Operator::T_A<State::IndexRegister::X
     // 1   2           imp       m.....m. . TXA
     int execute() override
     {
-        PROFILE_SCOPE("TXA_8A");
+        PROFILE_IF(PROFILE_OPCODES, "TXA_8A");
 
         return 2 + applyOperand();
     }
@@ -4778,7 +4780,7 @@ class TXS_9A : public AddressMode::Implied<Operator::TXS>
     // 1   2           imp       ........ . TXS
     int execute() override
     {
-        PROFILE_SCOPE("TXS_9A");
+        PROFILE_IF(PROFILE_OPCODES, "TXS_9A");
 
         return 2 + applyOperand();
     }
@@ -4796,7 +4798,7 @@ class TXY_9B : public AddressMode::Implied<Operator::T__<State::IndexRegister::X
     // 1   2           imp       x.....x. . TXY
     int execute() override
     {
-        PROFILE_SCOPE("TXY_9B");
+        PROFILE_IF(PROFILE_OPCODES, "TXY_9B");
 
         return 2 + applyOperand();
     }
@@ -4814,7 +4816,7 @@ class TYA_98 : public AddressMode::Implied<Operator::T_A<State::IndexRegister::Y
     // 1   2           imp       m.....m. . TYA
     int execute() override
     {
-        PROFILE_SCOPE("TYA_98");
+        PROFILE_IF(PROFILE_OPCODES, "TYA_98");
 
         return 2 + applyOperand();
     }
@@ -4832,7 +4834,7 @@ class TYX_BB : public AddressMode::Implied<Operator::T__<State::IndexRegister::Y
     // 1   2           imp       x.....x. . TYX
     int execute() override
     {
-        PROFILE_SCOPE("TYX_BB");
+        PROFILE_IF(PROFILE_OPCODES, "TYX_BB");
 
         return 2 + applyOperand();
     }
@@ -4850,7 +4852,7 @@ class WAI_CB : public AddressMode::Implied<Operator::WAI>
     // 1   3           imp       ........ . WAI
     int execute() override
     {
-        PROFILE_SCOPE("WAI_CB");
+        PROFILE_IF(PROFILE_OPCODES, "WAI_CB");
 
         throw NotYetImplementedException("WAI_CB");
         return 3 + applyOperand();
@@ -4869,7 +4871,7 @@ class WDM_42 : public AddressMode::Immediate<Operator::WDM>
     // 2   2           imm       ........ . WDM
     int execute() override
     {
-        PROFILE_SCOPE("WDM_42");
+        PROFILE_IF(PROFILE_OPCODES, "WDM_42");
 
         throw NotYetImplementedException("WDM_42");
         return 2 + applyOperand();
@@ -4888,7 +4890,7 @@ class XBA_EB : public AddressMode::Implied<Operator::XBA>
     // 1   3           imp       *.....*. . XBA
     int execute() override
     {
-        PROFILE_SCOPE("XBA_EB");
+        PROFILE_IF(PROFILE_OPCODES, "XBA_EB");
 
         return 3 + applyOperand();
     }
@@ -4906,7 +4908,7 @@ class XCE_FB : public AddressMode::Implied<Operator::XCE>
     // 1   2           imp       .......* * XCE
     int execute() override
     {
-        PROFILE_SCOPE("XCE_FB");
+        PROFILE_IF(PROFILE_OPCODES, "XCE_FB");
 
         return 2 + applyOperand();
     }
