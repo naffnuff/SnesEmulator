@@ -12,20 +12,22 @@
 #include "DmaInstruction.h"
 #include "HdmaInstruction.h"
 
-#define PROFILING_ENABLED true
+#define PROFILING_ENABLED false
 
 #include "Profiler.h"
 
 CREATE_PROFILER();
 
 template<typename State, typename OtherState>
-int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debugger::Context<State>& context, OtherState& otherState, Debugger::Context<OtherState>& otherContext, Output& output);
+int executeNext(Instruction<State>* instruction, State& state, Debugger& debugger, Debugger::Context<State>& context, OtherState& otherState, Debugger::Context<OtherState>& otherContext, Output& output);
 
 void Emulator::initialize()
 {
     videoRegisters.initialize();
 
     rom.storeToMemory(cpuState);
+
+    std::cout << "executeNext state: " << &cpuState << std::endl;
 
     CPU::State::MemoryType& cpuMemory = cpuState.getMemory();
 
@@ -220,14 +222,14 @@ void Emulator::run()
                     nextCpu += CycleCount(9 * 8); // TODO: check the correct cycles for interrupt
                 }
 
-                Instruction* instruction = cpuInstructionDecoder.getNextInstruction(cpuState);
+                Instruction<CPU::State>* instruction = cpuInstructionDecoder.getNextInstruction(cpuState);
 
                 bool dmaPicked = false;
                 if (dmaInstruction.enabled())
                 {
                     //cpuContext.setPaused(true);
                     dmaInstruction.blockedInstruction = instruction;
-                    instruction = static_cast<Instruction*>(&dmaInstruction);
+                    instruction = static_cast<Instruction<CPU::State>*>(&dmaInstruction);
                     dmaPicked = true;
                     if (!videoRegisters.vBlank)
                     {
@@ -239,7 +241,7 @@ void Emulator::run()
                 if (hdmaInstruction.isActive())
                 {
                     hdmaInstruction.blockedInstruction = instruction;
-                    instruction = static_cast<Instruction*>(&hdmaInstruction);
+                    instruction = static_cast<Instruction<CPU::State>*>(&hdmaInstruction);
                     if (dmaPicked)
                     {
                         output.info("HDMA interrupts DMA");
@@ -248,7 +250,7 @@ void Emulator::run()
 
                 cpuContext.nextInstruction = instruction;
 
-                instruction->applyBreakpoints();
+                instruction->applyBreakpoints(cpuState);
 
                 if (cpuContext.isStepMode())
                 {
@@ -292,10 +294,10 @@ void Emulator::run()
             {
                 if (masterCycle == nextSpc)
                 {
-                    Instruction* instruction = audioSystem.instructionDecoder.getNextInstruction(audioSystem.state);
+                    Instruction<SPC::State>* instruction = audioSystem.instructionDecoder.getNextInstruction(audioSystem.state);
                     audioSystem.context.nextInstruction = instruction;
 
-                    instruction->applyBreakpoints();
+                    instruction->applyBreakpoints(audioSystem.state);
 
                     if (audioSystem.context.isStepMode())
                     {
@@ -517,7 +519,7 @@ void Emulator::run()
 }
 
 template<typename State, typename OtherState>
-int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debugger::Context<State>& context, OtherState& otherState, Debugger::Context<OtherState>& otherContext, Output& output)
+int executeNext(Instruction<State>* instruction, State& state, Debugger& debugger, Debugger::Context<State>& context, OtherState& otherState, Debugger::Context<OtherState>& otherContext, Output& output)
 {
     context.addKnownAddress(state.getProgramAddress());
     try
@@ -528,7 +530,7 @@ int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debu
 
             if (debugger.awaitCommand(context, state, otherContext, otherState))
             {
-                int cycles = instruction->execute();
+                int cycles = instruction->execute(state);
                 if (debugger.isPaused())
                 {
                     debugger.printRegisters(state, context);
@@ -538,7 +540,7 @@ int executeNext(Instruction* instruction, State& state, Debugger& debugger, Debu
         }
         else
         {
-            return instruction->execute();
+            return instruction->execute(state);
         }
     }
     catch (const NotYetImplementedException& e)

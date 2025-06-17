@@ -12,33 +12,33 @@ namespace CPU {
 class InstructionDecoder
 {
 public:
-    SHARED InstructionDecoder(State& state);
+    SHARED InstructionDecoder() {}
 
     InstructionDecoder(const InstructionDecoder&) = delete;
     InstructionDecoder& operator=(const InstructionDecoder&) = delete;
 
-    Instruction* getNextInstruction(State& state) const
+    Instruction<State>* getNextInstruction(State& state) const
     {
-        return getInstruction(state, state.inspectProgramByte());
+        return getInstruction(state.inspectProgramByte());
     }
 
-    Instruction* getInstruction(const State& state, Byte opcode) const
+    Instruction<State>* getInstruction(Byte opcode) const
     {
-        if (state.is16Bit(State::Flag::m) && instructions16BitM[opcode]) {
-            return instructions16BitM[opcode].get();
-        }
-        else if (state.is16Bit(State::Flag::x) && instructions16BitX[opcode]) {
-            return instructions16BitX[opcode].get();
-        }
-        else {
-            return instructions[opcode].get();
-        }
+        return instructions[opcode];
     }
 
 private:
-    std::array<std::unique_ptr<Instruction>, Byte::spaceSize> instructions;
-    std::array<std::unique_ptr<Instruction>, Byte::spaceSize> instructions16BitM;
-    std::array<std::unique_ptr<Instruction>, Byte::spaceSize> instructions16BitX;
+    static std::array<Instruction<State>*, Byte::spaceSize> instructions;
+};
+
+// Alternative 1: lookup struct
+
+struct InstructionInfo
+{
+    int (*execute)(State& state) = nullptr;
+    const char* (*opcodeToString)() = nullptr;
+    std::string(*toString)(const State& state) = nullptr;
+    void (*applyBreakpoints)(const State& state) = nullptr;
 };
 
 }

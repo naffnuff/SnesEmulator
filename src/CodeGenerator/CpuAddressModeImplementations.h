@@ -13,7 +13,7 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
                 "return Operator::invoke(state, access);"
             },
             {
-                R"(return Operator::toString() + " $" + operandToString();)"
+                R"(return Operator::toString() + " $" + Type::operandToString(state);)"
             }
         }
     },
@@ -24,7 +24,7 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
                 "return Operator::invoke(state, Word(lowByte, highByte));"
             },
             {
-                R"(return Operator::toString() + " $" + operandToString();)"
+                R"(return Operator::toString() + " $" + Type::operandToString(state);)"
             }
         }
     },
@@ -35,10 +35,15 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
                 "Long staticAddress(lowByte, highByte, state.getDataBank());",
                 "Long indexedAddress = staticAddress + state.getIndexRegister<Register>();",
                 "MemoryAccess access = state.getMemoryAccess(indexedAddress);",
-                "return getCycles(staticAddress, indexedAddress) + Operator::invoke(state, access);"
+                "int cycles = 0;",
+                "if (ExtraCycles)",
+                "{",
+                "    cycles += getExtraCycles(staticAddress, indexedAddress);",
+                "}",
+                "return cycles + Operator::invoke(state, access);"
             },
             {
-                R"(return Operator::toString() + " $" + operandToString() + "," + state.getIndexRegisterName<Register>();)"
+                R"(return Operator::toString() + " $" + Type::operandToString(state) + "," + state.getIndexRegisterName<Register>();)"
             }
         }
     },
@@ -51,7 +56,7 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
                 "return Operator::invoke(state, state.readMemoryWord<State::MemoryType::WrappingMask::Bank>(longAddress));"
             },
             {
-                R"CODE(return Operator::toString() + " ($" + operandToString() + ",X)";)CODE"
+                R"CODE(return Operator::toString() + " ($" + Type::operandToString(state) + ",X)";)CODE"
             }
         }
     },
@@ -62,7 +67,7 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
                 "return Operator::invoke(state, state.readMemoryWord<State::MemoryType::WrappingMask::Bank>(Long(lowByte, highByte, 0)));"
             },
             {
-                R"CODE(return Operator::toString() + " ($" + operandToString() + ")";)CODE"
+                R"CODE(return Operator::toString() + " ($" + Type::operandToString(state) + ")";)CODE"
             }
         }
     },
@@ -73,7 +78,7 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
                 "return Operator::invoke(state, state.readMemoryLong<State::MemoryType::WrappingMask::Bank>(Long(lowByte, highByte, 0)));"
             },
             {
-                R"(return Operator::toString() + " $" + operandToString();)"
+                R"(return Operator::toString() + " $" + Type::operandToString(state);)"
             }
         }
     },
@@ -85,7 +90,7 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
                 "return Operator::invoke(state, access);"
             },
             {
-                R"(return Operator::toString() + " $" + operandToString();)"
+                R"(return Operator::toString() + " $" + Type::operandToString(state);)"
             }
         }
     },
@@ -96,7 +101,7 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
                 "return Operator::invoke(state, Long(lowByte, highByte, bankByte));"
             },
             {
-                R"(return Operator::toString() + " $" + operandToString();)"
+                R"(return Operator::toString() + " $" + Type::operandToString(state);)"
             }
         }
     },
@@ -108,7 +113,7 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
                 "return Operator::invoke(state, access);"
             },
             {
-                R"(return Operator::toString() + " $" + operandToString() + ",X";)"
+                R"(return Operator::toString() + " $" + Type::operandToString(state) + ",X";)"
             }
         }
     },
@@ -136,13 +141,13 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
                 "Word byteCount = state.getAccumulatorC();",
                 "if (byteCount != 0)",
                 "{",
-                "    state.incrementProgramCounter(Word(-size()));",
+                "    state.incrementProgramCounter(Word(-Type::size()));",
                 "}",
                 "state.setAccumulatorC(byteCount - 1);",
                 "return Operator::invoke(state, highByte, lowByte, byteCount);"
             },
             {
-                "std::string operands = operandToString();",
+                "std::string operands = Type::operandToString(state);",
                 R"(return Operator::toString() + " $" + operands.substr(0, 2) + ",$" + operands.substr(2, 2);)"
             }
         }
@@ -160,7 +165,7 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
                 "return cycles + Operator::invoke(state, access);"
             },
             {
-                R"(return Operator::toString() + " $" + operandToString();)"
+                R"(return Operator::toString() + " $" + Type::operandToString(state);)"
             }
         }
     },
@@ -177,7 +182,7 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
                 "return cycles + Operator::invoke(state, access);"
             },
             {
-                R"(return Operator::toString() + " $" + operandToString() + "," + State::getIndexRegisterName<Register>();)"
+                R"(return Operator::toString() + " $" + Type::operandToString(state) + "," + State::getIndexRegisterName<Register>();)"
             }
         }
     },
@@ -195,7 +200,7 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
                 "return cycles + Operator::invoke(state, access);"
             },
             {
-                R"(return Operator::toString() + " $" + operandToString() + " TODO";)"
+                R"(return Operator::toString() + " $" + Type::operandToString(state) + " TODO";)"
             }
         }
     },
@@ -213,7 +218,7 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
                 "return cycles + Operator::invoke(state, access);"
             },
             {
-                R"CODE(return Operator::toString() + " ($" + operandToString() + ")";)CODE"
+                R"CODE(return Operator::toString() + " ($" + Type::operandToString(state) + ")";)CODE"
             }
         }
     },
@@ -230,7 +235,7 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
                 "return cycles + Operator::invoke(state, address);"
             },
             {
-                R"CODE(return Operator::toString() + " ($" + operandToString() + ")";)CODE"
+                R"CODE(return Operator::toString() + " ($" + Type::operandToString(state) + ")";)CODE"
             }
         }
     },
@@ -253,7 +258,7 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
                 "return cycles + Operator::invoke(state, access);"
             },
             {
-                R"(return Operator::toString() + " ($" + operandToString() + "),Y";)"
+                R"(return Operator::toString() + " ($" + Type::operandToString(state) + "),Y";)"
             }
         }
     },
@@ -271,7 +276,7 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
                 "return cycles + Operator::invoke(state, access);"
             },
             {
-                R"(return Operator::toString() + " [$" + operandToString() + "]";)"
+                R"(return Operator::toString() + " [$" + Type::operandToString(state) + "]";)"
             }
         }
     },
@@ -289,7 +294,7 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
                 "return cycles + Operator::invoke(state, access);"
             },
             {
-                R"(return Operator::toString() + " [$" + operandToString() + "], Y";)"
+                R"(return Operator::toString() + " [$" + Type::operandToString(state) + "], Y";)"
             }
         }
     },
@@ -303,7 +308,7 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
                 "return Operator::invoke(state, access);"
             },
             {
-                R"(return Operator::toString() + " #$" + operandToString();)"
+                R"(return Operator::toString() + " #$" + Type::operandToString(state);)"
             }
         }
     },
@@ -318,7 +323,7 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
                 "return Operator::invoke16Bit(state, access);"
             },
             {
-                R"(return Operator::toString() + " #$" + operandToString();)"
+                R"(return Operator::toString() + " #$" + Type::operandToString(state);)"
             }
         }
     },
@@ -342,7 +347,7 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
             {
                 "std::ostringstream ss;",
                 R"(ss << Operator::toString() + " $";)",
-                "ss << state.getProgramCounter(int((int8_t)size() + (int8_t)state.inspectProgramByte(1)));",
+                "ss << state.getProgramCounter(int((int8_t)Type::size() + (int8_t)state.inspectProgramByte(1)));",
                 "return ss.str();"
             }
         }
@@ -356,7 +361,7 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
             {
                 "std::ostringstream ss;",
                 R"(ss << Operator::toString() + " $";)",
-                "ss << state.getProgramCounter(int((int8_t)size() + int16_t(state.inspectProgramByte(2) << 8 | state.inspectProgramByte(1))));",
+                "ss << state.getProgramCounter(int((int8_t)Type::size() + int16_t(state.inspectProgramByte(2) << 8 | state.inspectProgramByte(1))));",
                 "return ss.str();"
             }
         }
@@ -369,7 +374,7 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
                 "return Operator::invoke(state, access);"
             },
             {
-                R"(return Operator::toString() + " $" + operandToString() + ",S";)"
+                R"(return Operator::toString() + " $" + Type::operandToString(state) + ",S";)"
             }
         }
     },
@@ -382,7 +387,7 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
                 "return Operator::invoke(state, access);"
             },
             {
-                R"(return Operator::toString() + " ($" + operandToString() + ",S), Y";)"
+                R"(return Operator::toString() + " ($" + Type::operandToString(state) + ",S), Y";)"
             }
         }
     }

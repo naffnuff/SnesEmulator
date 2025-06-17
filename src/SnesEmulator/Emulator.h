@@ -66,7 +66,7 @@ public:
         : output(output, "emulator")
         , rom(rom)
         , cpuState()
-        , cpuInstructionDecoder(cpuState)
+        , cpuInstructionDecoder()
         , videoRegisters(output, cpuState)
         , videoProcessor(videoRegisters.processor)
         , audioSystem(output, debugger)

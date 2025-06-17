@@ -18,7 +18,6 @@ struct Instruction
     std::string mnemonic;
     std::string comment;
     std::string code;
-    std::string classname;
     std::string addressMode;
     std::string addressModeClass;
     std::string size;
@@ -38,11 +37,6 @@ struct Instruction
         if (mnemonic.empty())
         {
             throw std::runtime_error("Instruction " + name + ": shortname is empty");
-        }
-
-        if (classname.empty())
-        {
-            throw std::runtime_error("Instruction " + name + ": handlername is empty");
         }
 
         if (code.size() != 2)
@@ -162,7 +156,7 @@ bool hasCycleModification(const std::set<int>& remarks)
     return false;
 }
 
-void addCycleModifications(std::ostream& output, const std::set<int>& remarks)
+void addCycleModifications(std::ostream& output, const std::set<int>& remarks, const std::string& indentation)
 {
     for (int remark : remarks)
     {
@@ -171,22 +165,22 @@ void addCycleModifications(std::ostream& output, const std::set<int>& remarks)
         {
             if (!cycleModification.modification.empty())
             {
-                output << "        " << cycleModification.modification << ";" << std::endl;
+                output << indentation << "        " << cycleModification.modification << ";" << std::endl;
             }
         }
         else
         {
-            output << "        if (" << cycleModification.condition << ") {" << std::endl;
+            output << indentation << "        if (" << cycleModification.condition << ") {" << std::endl;
             if (!cycleModification.modification.empty())
             {
-                output << "            " << cycleModification.modification << ";" << std::endl;
+                output << indentation << "            " << cycleModification.modification << ";" << std::endl;
             }
-            output << "        }" << std::endl;
+            output << indentation << "        }" << std::endl;
         }
     }
 }
 
-void generateOpcode(std::ostream& output, Instruction& instruction, const Opcode& opcode, bool is16Bit)
+void generateOpcode(std::ostream& output, Instruction& instruction, const Opcode& opcode, std::string flag16Bit)
 {
     int operandSize = stoi(instruction.size) - 1;
 
@@ -205,6 +199,8 @@ void generateOpcode(std::ostream& output, Instruction& instruction, const Opcode
 
     int sizeRemark = 0;
 
+    bool extraCycles = false;
+
     std::string addressModeClass = instruction.addressModeClass;
     if (instruction.extraCycleForPageBoundary && addressModeClass == "AbsoluteIndexed")
     {
@@ -215,7 +211,7 @@ void generateOpcode(std::ostream& output, Instruction& instruction, const Opcode
         }
         else
         {
-            addressModeClass += "_ExtraCycle";
+            extraCycles = true;
         }
     }
 
@@ -266,29 +262,36 @@ void generateOpcode(std::ostream& output, Instruction& instruction, const Opcode
         }
     }
 
-    if (is16Bit)
-    {
-        addressModeClass += "16Bit";
-    }
-
     if (!instruction.sizeRemark.empty())
     {
         sizeRemark = stoi(instruction.sizeRemark);
         output << "// " << getRemark(sizeRemark) << std::endl;
     }
 
-    std::string classname = instruction.classname + (is16Bit ? "_16Bit" : "");
-
-    output << "class " << classname
-        << " : public AddressMode::" << addressModeClass << "<Operator::" << operatorName;
+    output << "template<>" << std::endl;
+    output << "struct Opcode<State, 0x" << instruction.code << ">" << std::endl;
+    output << "{" << std::endl;
+    output << "    using Instruction = AddressMode::" << addressModeClass << "<Operator::" << operatorName;
     if (!instruction.addressModeClassArg.empty())
     {
         output << ", " << instruction.addressModeClassArg;
     }
-    output << ">" << std::endl
-        << "{" << std::endl
-        << "    using " << addressModeClass << "::" << addressModeClass << ";" << std::endl << std::endl
-        << "    // " << opcode.comment << std::endl;
+    if (addressModeClass == "AbsoluteIndexed")
+    {
+        output << ", " << (extraCycles ? "true" : "false");
+    }
+    output << ">;" << std::endl;
+    if (!flag16Bit.empty())
+    {
+        output << "    using Instruction16Bit = AddressMode::" << addressModeClass << "16Bit<Operator::" << operatorName;
+        if (!instruction.addressModeClassArg.empty())
+        {
+            output << ", " << instruction.addressModeClassArg;
+        }
+        output << ">;" << std::endl;
+    }
+    output << std::endl;
+    output << "    // " << opcode.comment << std::endl;
     for (int remark : instruction.cyclesRemarks)
     {
         if (!getRemark(remark).empty())
@@ -296,33 +299,55 @@ void generateOpcode(std::ostream& output, Instruction& instruction, const Opcode
             output << "    // " << getRemark(remark) << std::endl;
         }
     }
-    output << "    int execute() override" << std::endl
+    output << "    static int execute(State& state)" << std::endl
         << "    {" << std::endl
-        << "        PROFILE_IF(PROFILE_OPCODES, \"" << classname << "\");" << std::endl
+        << "        PROFILE_IF(PROFILE_OPCODES, \"" << instruction.code << ": " << instruction.name << "\");" << std::endl
         << std::endl;
     if (opcode.notYetImplemented)
     {
-        output << "        throw NotYetImplementedException(\"" + classname + "\");" << std::endl;
+        output << "        throw NotYetImplementedException(\"" + instruction.code + "\");" << std::endl;
+    }
+    std::string indentation = "";
+    if (!flag16Bit.empty())
+    {
+        output << "        if (state.is16Bit(State::Flag::" + flag16Bit + "))" << std::endl;
+        output << "        {" << std::endl;
+        indentation = "        ";
+        if (hasCycleModification(instruction.cyclesRemarks))
+        {
+            output << indentation << "        int cycles = " << instruction.cycles << ";" << std::endl;
+            addCycleModifications(output, instruction.cyclesRemarks, indentation);
+            output << indentation << "        return cycles";
+        }
+        else
+        {
+            addCycleModifications(output, instruction.cyclesRemarks, indentation);
+            output << indentation << "        return " << instruction.cycles;
+        }
+        output << " + Instruction16Bit::Type::applyOperand<Instruction16Bit>(state);" << std::endl;
+        output << "        }" << std::endl;
+        output << "        else" << std::endl;
+        output << "        {" << std::endl;
     }
     if (hasCycleModification(instruction.cyclesRemarks))
     {
-        output << "        int cycles = " << instruction.cycles << ";" << std::endl;
-        addCycleModifications(output, instruction.cyclesRemarks);
-        output << "        return cycles";
+        output << indentation << "        int cycles = " << instruction.cycles << ";" << std::endl;
+        addCycleModifications(output, instruction.cyclesRemarks, indentation);
+        output << indentation << "        return cycles";
     }
     else
     {
-        addCycleModifications(output, instruction.cyclesRemarks);
-        output << "        return " << instruction.cycles;
+        addCycleModifications(output, instruction.cyclesRemarks, indentation);
+        output << indentation << "        return " << instruction.cycles;
     }
-    output << " + applyOperand();" << std::endl
-        << "    }" << std::endl
-        << std::endl
-        << "    std::string opcodeToString() const override { return \"" << instruction.code << ": " << instruction.name;
-    if (is16Bit)
+    output << " + Instruction::Type::applyOperand<Instruction>(state);" << std::endl;
+    if (!flag16Bit.empty())
     {
-        output << " (16-bit)";
+        output << "        }" << std::endl;
     }
+    output << "    }" << std::endl
+        << std::endl
+        << "    static std::string opcodeToString() { return \"" << instruction.code << ": " << instruction.name;
     output << "\"; }" << std::endl
         << "};" << std::endl
         << std::endl;
@@ -374,8 +399,6 @@ void generateOpcodes(std::vector<Instruction>& instructions)
         << std::endl
         << "namespace CPU {" << std::endl
         << std::endl
-        << "namespace Opcode {" << std::endl
-        << std::endl
         << "EXCEPTION(NotYetImplementedException, ::NotYetImplementedException)" << std::endl
         << std::endl
         << "CREATE_PROFILER();" << std::endl
@@ -386,15 +409,12 @@ void generateOpcodes(std::vector<Instruction>& instructions)
         std::string flag = "";
         if (instruction.sizeRemark == "17" || instruction.sizeRemark == "19")
         {
-            generateOpcode(output, instruction, opcodeMap[instruction.code], true);
             flag = instruction.sizeRemark == "17" ? "m" : "x";
         }
-        generateOpcode(output, instruction, opcodeMap[instruction.code], false);
+        generateOpcode(output, instruction, opcodeMap[instruction.code], flag);
     }
 
-    output << "}" << std::endl
-        << std::endl
-        << "}" << std::endl;
+    output << "}" << std::endl;
 }
 
 void generateOpcodeMap(const std::vector<Instruction>& instructions)
@@ -416,15 +436,7 @@ void generateOpcodeMap(const std::vector<Instruction>& instructions)
         << "{" << std::endl;
     for (const Instruction& instruction : instructions)
     {
-        output << "    instructions[0x" << instruction.code << "] = std::make_unique<Opcode::" << instruction.classname << ">(state);" << std::endl;
-        if (instruction.sizeRemark == "17")
-        {
-            output << "    instructions16BitM[0x" << instruction.code << "] = std::make_unique<Opcode::" << instruction.classname << "_16Bit>(state);" << std::endl;
-        }
-        else if (instruction.sizeRemark == "19")
-        {
-            output << "    instructions16BitX[0x" << instruction.code << "] = std::make_unique<Opcode::" << instruction.classname << "_16Bit>(state);" << std::endl;
-        }
+        output << "    instructions[0x" << instruction.code << "] = new Opcode<" << instruction.code << ">(state);" << std::endl;
     }
     output << "}" << std::endl
         << std::endl
@@ -443,18 +455,19 @@ void generateAddressMode(std::ofstream& output, const std::string& name, const A
     {
         output << ", State::IndexRegister Register";
     }
+    if (name == "AbsoluteIndexed")
+    {
+        output << ", bool ExtraCycles";
+    }
     output << ">" << std::endl;
 
-    output << "class " << name << " : public ";
+    output << "struct " << name;
 
     int actualSize = args.instructionSize + (is16Bit ? 1 : 0);
 
-    std::ostringstream superclassStream;
-    superclassStream << "Instruction" << actualSize << "Byte";
+    output << std::endl << "{" << std::endl;
 
-    output << superclassStream.str() << std::endl << "{" << std::endl;
-
-    output << "    using " << superclassStream.str() << "::InstructionBase;" << std::endl << std::endl;
+    output << "    using Type = Instruction" << actualSize << "Byte;" << std::endl << std::endl;
 
     if (name != "AbsoluteIndexed")
     {
@@ -464,10 +477,10 @@ void generateAddressMode(std::ofstream& output, const std::string& name, const A
         }
     }
 
-    output << "    int invokeOperator(";
+    output << "    static int invokeOperator(State& state";
     if (actualSize >= 2)
     {
-        output << "Byte lowByte";
+        output << ", Byte lowByte";
         if (actualSize >= 3)
         {
             output << ", Byte highByte";
@@ -477,7 +490,7 @@ void generateAddressMode(std::ofstream& output, const std::string& name, const A
             }
         }
     }
-    output << ") override" << std::endl
+    output << ")" << std::endl
         << "    {" << std::endl
         << "        PROFILE_IF(PROFILE_ADDRESS_MODES, \"" << name << "\");" << std::endl
         << std::endl;
@@ -489,45 +502,13 @@ void generateAddressMode(std::ofstream& output, const std::string& name, const A
             output << "        " << codeLine << std::endl;
         }
     }
-    output << "    }" << std::endl
-        << std::endl;
-
-    output << "    std::string toString() const override" << std::endl
-        << "    {" << std::endl;
-    if (it != addressModeImplementations.end())
-    {
-        for (const std::string codeLine : std::get<1>(it->second))
-        {
-            output << "        " << codeLine << std::endl;
-        }
-    }
     output << "    }" << std::endl;
+
     if (name == "AbsoluteIndexed")
     {
         output << std::endl
-            << "    virtual int getCycles(Long, Long) const" << std::endl
-            << "    {" << std::endl
-            << "        return 0;" << std::endl
-            << "    }" << std::endl;
-    }
-    output << "};" << std::endl
-        << std::endl;
-
-    if (name == "Absolute" || name == "AbsoluteLong" || name == "DirectPageIndirect")
-    {
-        AddressModeClassArgs controlFlowArgs = args;
-        controlFlowArgs.comment += " (control flow)";
-        generateAddressMode(output, name + "_ControlFlow", controlFlowArgs, is16Bit);
-    }
-    else if (name == "AbsoluteIndexed")
-    {
-        output << "template <typename Operator, State::IndexRegister Register>" << std::endl
-            << "class AbsoluteIndexed_ExtraCycle : public AbsoluteIndexed<Operator, Register>" << std::endl
-            << "{" << std::endl
-            << "    using AbsoluteIndexed<Operator, Register>::AbsoluteIndexed;" << std::endl
-            << std::endl
             << "    // §3: Add 1 cycle if adding index crosses a page boundary" << std::endl
-            << "    int getCycles(Long staticAddress, Long indexedAddress) const override" << std::endl
+            << "    static int getExtraCycles(Long staticAddress, Long indexedAddress)" << std::endl
             << "    {" << std::endl
             << "        int cycles = 0;" << std::endl
             << "        Word addressPage(staticAddress >> 8);" << std::endl
@@ -537,8 +518,28 @@ void generateAddressMode(std::ofstream& output, const std::string& name, const A
             << "            cycles += 1;" << std::endl
             << "        }" << std::endl
             << "        return cycles;" << std::endl
-            << "    }" << std::endl
-            << "};" << std::endl << std::endl;
+            << "    }" << std::endl;
+    }
+
+    output << std::endl
+        << "    static std::string toString(const State& state)" << std::endl
+        << "    {" << std::endl;
+    if (it != addressModeImplementations.end())
+    {
+        for (const std::string codeLine : std::get<1>(it->second))
+        {
+            output << "        " << codeLine << std::endl;
+        }
+    }
+    output << "    }" << std::endl;
+    output << "};" << std::endl
+        << std::endl;
+
+    if (name == "Absolute" || name == "AbsoluteLong" || name == "DirectPageIndirect")
+    {
+        AddressModeClassArgs controlFlowArgs = args;
+        controlFlowArgs.comment += " (control flow)";
+        generateAddressMode(output, name + "_ControlFlow", controlFlowArgs, is16Bit);
     }
 }
 
@@ -562,16 +563,16 @@ void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
         << std::endl
         << "namespace CPU {" << std::endl
         << std::endl
-        << "typedef InstructionBase<State> Instruction1Byte;" << std::endl
-        << "typedef InstructionBase<State, Byte> Instruction2Byte;" << std::endl
-        << "typedef InstructionBase<State, Byte, Byte> Instruction3Byte;" << std::endl
-        << "typedef InstructionBase<State, Byte, Byte, Byte> Instruction4Byte;" << std::endl
+        << "using Instruction1Byte = InstructionType<State>;" << std::endl
+        << "using Instruction2Byte = InstructionType<State, Byte>;" << std::endl
+        << "using Instruction3Byte = InstructionType<State, Byte, Byte>;" << std::endl
+        << "using Instruction4Byte = InstructionType<State, Byte, Byte, Byte>;" << std::endl
         << std::endl
         << "namespace AddressMode {" << std::endl
         << std::endl
-        << "EXCEPTION(NotYetImplementedException, ::NotYetImplementedException)" << std::endl
-        << std::endl
         << "CREATE_PROFILER();" << std::endl
+        << std::endl
+        << "EXCEPTION(NotYetImplementedException, ::NotYetImplementedException)" << std::endl
         << std::endl;
 
     for (const AddressModeClassMap::value_type& kvp : addressModeClassMap)
@@ -593,9 +594,20 @@ void generateOperators(const OperatorMap& operatorMap)
 
     output << "#pragma once" << std::endl
         << std::endl
-        << "#include \"State.h\"" << std::endl
+        << "#include \"Exception.h\"" << std::endl
+        << "#include \"CpuState.h\"" << std::endl
+        << std::endl
+        << "#include \"Profiler.h\"" << std::endl
+        << std::endl
+        << "#define PROFILE_OPERATORS false" << std::endl
+        << std::endl
+        << "namespace CPU {" << std::endl
         << std::endl
         << "namespace Operator {" << std::endl
+        << std::endl
+        << "EXCEPTION(NotYetImplementedException, ::NotYetImplementedException);" << std::endl
+        << std::endl
+        << "CREATE_PROFILER();" << std::endl
         << std::endl;
 
     for (const OperatorMap::value_type& kvp : operatorMap)
@@ -623,7 +635,7 @@ void generateOperators(const OperatorMap& operatorMap)
         if (hasCycleModification(kvp.second.cycleRemarks))
         {
             output << "        int cycles = 0;" << std::endl;
-            addCycleModifications(output, kvp.second.cycleRemarks);
+            addCycleModifications(output, kvp.second.cycleRemarks, "");
         }
 
         output << "        return ";
@@ -811,7 +823,6 @@ void generateCpu()
                 mnemonic,
                 comment,
                 opcode,
-                classname,
                 addressMode,
                 addressModeClass,
                 size,
@@ -859,7 +870,7 @@ void generateCpu()
                     //std::cout << std::endl << remark << " goes to operator";
                     if (removedRemarks.find(remark) != removedRemarks.end())
                     {
-                        std::cout << "Nope, remark removed twice from " << instruction.classname << ": " << remark << ", " << instruction.mnemonic << ", " << instruction.addressModeClass << std::endl;
+                        std::cout << "Nope, remark removed twice from " << instruction.code << ": " << remark << ", " << instruction.mnemonic << ", " << instruction.addressModeClass << std::endl;
                     }
                 }
             }
@@ -868,7 +879,7 @@ void generateCpu()
     }
 
     generateOpcodes(instructions);
-    generateOpcodeMap(instructions);
+    //generateOpcodeMap(instructions);
     generateAddressModes(addressModeClassMap);
     //generateOperators(operatorMap);
 

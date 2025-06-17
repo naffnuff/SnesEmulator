@@ -17,13 +17,13 @@ public:
     InstructionDecoder(const InstructionDecoder&) = delete;
     InstructionDecoder& operator=(const InstructionDecoder&) = delete;
 
-    Instruction* getNextInstruction(State& state) const
+    Instruction<State>* getNextInstruction(State& state) const
     {
         return instructions[state.inspectProgramByte()].get();
     }
 
 private:
-    std::array<std::unique_ptr<Instruction>, 1 << 8> instructions;
+    std::array<std::unique_ptr<Instruction<State>>, Byte::spaceSize> instructions;
 };
 
 }

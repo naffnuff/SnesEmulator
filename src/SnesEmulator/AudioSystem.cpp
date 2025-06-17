@@ -36,10 +36,10 @@ public:
 
                 if (system.threaded && masterCycle == system.nextSpc)
                 {
-                    Instruction* instruction = system.instructionDecoder.getNextInstruction(system.state);
+                    Instruction<SPC::State>* instruction = system.instructionDecoder.getNextInstruction(system.state);
                     system.context.nextInstruction = instruction;
 
-                    instruction->applyBreakpoints();
+                    instruction->applyBreakpoints(system.state);
 
                     system.context.addKnownAddress(system.state.getProgramAddress());
 
@@ -52,7 +52,7 @@ public:
                     int cycles = 0;
                     {
                         PROFILE_SCOPE("Execute SPC Instruction (threaded)");
-                        cycles = instruction->execute();
+                        cycles = instruction->execute(system.state);
                     }
                     if (cycles)
                     {

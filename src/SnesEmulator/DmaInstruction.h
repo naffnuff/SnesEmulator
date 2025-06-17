@@ -9,7 +9,7 @@
 
 #include "VideoRegisters.h"
 
-class DmaInstruction : public Instruction
+class DmaInstruction : public Instruction<CPU::State>
 {
 EXCEPTION(NotYetImplementedException, ::NotYetImplementedException
 )
@@ -25,10 +25,10 @@ public:
     DmaInstruction(const DmaInstruction&) = delete;
     DmaInstruction& operator=(const DmaInstruction&) = delete;
 
-    std::string toString() const override
+    std::string toString(const CPU::State& state) const override
     {
         std::stringstream ss;
-        ss << blockedInstruction->toString() << " (blocked by DMA)" << std::endl;
+        ss << blockedInstruction->toString(state) << " (blocked by DMA)" << std::endl;
         ss << "Enabled: " << std::bitset<8>(registers.dmaEnabled) << std::endl;
         ss << "DMA ";
         if (registers.dmaEnabled) {
@@ -54,7 +54,7 @@ public:
         return blockedInstruction->opcodeToString();
     }
 
-    int execute() override
+    int execute(CPU::State&) override
     {
         int cycles = 0;
         if (registers.dmaEnabled) {
@@ -143,12 +143,12 @@ public:
         }
     }
 
-    void applyBreakpoints() const override
+    void applyBreakpoints(const CPU::State&) const override
     {
     }
 
 public:
-    Instruction* blockedInstruction = nullptr;
+    Instruction<CPU::State>* blockedInstruction = nullptr;
 
 private:
     CPU::State::MemoryType& memory;

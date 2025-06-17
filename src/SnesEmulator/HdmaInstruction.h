@@ -7,7 +7,7 @@
 
 #include "WDC65816/CpuState.h"
 
-class HdmaInstruction : public Instruction
+class HdmaInstruction : public Instruction<CPU::State>
 {
 EXCEPTION(NotYetImplementedException, ::NotYetImplementedException)
 
@@ -22,10 +22,10 @@ public:
     HdmaInstruction(const HdmaInstruction&) = delete;
     HdmaInstruction& operator=(const HdmaInstruction&) = delete;
 
-    std::string toString() const override
+    std::string toString(const CPU::State& state) const override
     {
         std::stringstream ss;
-        ss << blockedInstruction->toString() << " (blocked by HDMA)" << std::endl;
+        ss << blockedInstruction->toString(state) << " (blocked by HDMA)" << std::endl;
         ss << "HDMA ";
         if (registers.hdmaEnabled) {
             ss << "Enabled: " << std::bitset<8>(registers.hdmaEnabled) << std::endl;
@@ -56,7 +56,7 @@ public:
         return blockedInstruction->opcodeToString();
     }
 
-    int execute() override
+    int execute(CPU::State&) override
     {
         int cycles = 0;
         if (registers.hdmaEnabled) {
@@ -178,12 +178,12 @@ public:
         return active;
     }
 
-    void applyBreakpoints() const override
+    void applyBreakpoints(const CPU::State&) const override
     {
     }
 
 public:
-    Instruction* blockedInstruction = nullptr;
+    Instruction<CPU::State>* blockedInstruction = nullptr;
 
 private:
     CPU::State::MemoryType& memory;

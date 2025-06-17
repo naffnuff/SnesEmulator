@@ -125,7 +125,6 @@ public:
         Long inspectedAddress = 0;
         bool watchMode = true;
         Output::Color debugColor;
-        const Instruction* nextInstruction = nullptr;
     };
 
     template<typename State>
@@ -177,6 +176,9 @@ public:
         {
             return stepMode;
         }
+
+    public:
+        const Instruction<State>* nextInstruction = nullptr;
 
     private:
         bool stepMode = false;
@@ -274,7 +276,7 @@ public:
                         output.print(lock, " while executing ");
                         {
                             Output::ColorScope colorScope(lock, context.stepMode ? context.debugColor : Output::Color::Red, true);
-                            output.print(lock, context.nextInstruction->toString());
+                            output.print(lock, context.nextInstruction->toString(state));
                         }
                         output.printLine(lock, " @", context.getLastKnownAddress());
                         state.setProgramAddress(programAddress);
@@ -525,7 +527,7 @@ public:
         output.printLine(lock);
         output.printLine(lock, context.nextInstruction->opcodeToString());
         output.print(lock, state.inspectProgramByte(), ": ");
-        output.print(lock, context.nextInstruction->toString());
+        output.print(lock, context.nextInstruction->toString(state));
         output.printLine(lock, " #", state.getMemory().getApplicationCount(state.getProgramAddress()));
     }
 
