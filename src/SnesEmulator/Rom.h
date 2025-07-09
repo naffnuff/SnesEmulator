@@ -23,7 +23,7 @@ public:
     Rom(const Rom&) = delete;
     Rom& operator=(const Rom&) = delete;
 
-    void loadFromFile(const std::string& path)
+    void loadFromFile(const std::filesystem::path& path)
     {
         output.debug("Reading ", path);
 
@@ -31,7 +31,7 @@ public:
 
         std::ifstream ifs(path, std::ios::binary | std::ios::ate);
         if (!ifs) {
-            throw std::runtime_error("Could not read " + path);
+            throw std::runtime_error("Could not read " + path.string());
         }
         std::ifstream::pos_type pos = ifs.tellg();
 

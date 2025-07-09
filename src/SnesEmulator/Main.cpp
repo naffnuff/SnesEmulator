@@ -22,11 +22,11 @@ int main(int, char**)
                 std::string pickedTitle;
                 {
                     Output::Lock lock(output);
-                    output.printLine(lock, "Welcome to Naffnuff's SNES emulator!");
+                    output.printLine(lock, "Welcome to Naffnuff's SNES emulator!\n");
                     std::vector<std::string> titles;
                     while (titles.empty())
                     {
-                        for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator("."))
+                        for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(System::getRomLibraryPath()))
                         {
                             std::string extension = entry.path().extension().string();
                             if (entry.is_regular_file() && (extension == ".smc" || extension == ".sfc"))
@@ -38,7 +38,8 @@ int main(int, char**)
                         }
                         if (titles.empty())
                         {
-                            output.printLine(lock, "Put some ROM images in the same folder as the application file and press enter!");
+                            output.printLine(lock, "Put your ROM images (*.smc or *.sfc files) in a folder called SnesRoms and");
+                            output.printLine(lock, "place that folder either beside or above SnesEmulator.exe in the file system.");
                             int dummy = std::getchar();
                             dummy = dummy;
                         }
@@ -49,7 +50,7 @@ int main(int, char**)
                         output.printLine(lock, "Enter command or game index (h for help): ");
                         std::string command = "43";
                         command = "18";
-                        //std::getline(std::cin, command);
+                        std::getline(std::cin, command);
                         try
                         {
                             if (command.empty())
@@ -89,7 +90,7 @@ int main(int, char**)
                         }
                     }
                 }
-                rom.loadFromFile(pickedTitle);
+                rom.loadFromFile(System::getRomLibraryPath() / pickedTitle);
             }
 
             Emulator emulator(output, rom);

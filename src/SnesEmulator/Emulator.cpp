@@ -27,8 +27,6 @@ void Emulator::initialize()
 
     rom.storeToMemory(cpuState);
 
-    std::cout << "executeNext state: " << &cpuState << std::endl;
-
     CPU::State::MemoryType& cpuMemory = cpuState.getMemory();
 
     if (rom.isLowRom())

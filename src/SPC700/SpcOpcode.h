@@ -11,8 +11,7 @@
 
 namespace SPC {
 
-namespace Opcode
-{
+namespace Opcode {
 
 EXCEPTION(NotYetImplementedException, ::NotYetImplementedException)
 

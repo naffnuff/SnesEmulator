@@ -532,6 +532,8 @@ void generateOpcodes(const std::vector<Instruction>& instructions)
         << std::endl
         << "namespace SPC {" << std::endl
         << std::endl
+        << "namespace Opcode {" << std::endl
+        << std::endl
         << "EXCEPTION(NotYetImplementedException, ::NotYetImplementedException)" << std::endl
         << std::endl
         << "CREATE_PROFILER();" << std::endl
@@ -542,7 +544,7 @@ void generateOpcodes(const std::vector<Instruction>& instructions)
         generateOpcode(output, instruction, false);
     }
 
-    output << "}" << std::endl;
+    output << "}" << std::endl << std::endl << "}" << std::endl;
 }
 
 void generateOpcodeMap(const std::vector<Instruction>& instructions)
