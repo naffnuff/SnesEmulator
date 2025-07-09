@@ -95,7 +95,6 @@ struct Opcode<State, 0x67>
 // ADC Add With Carry [Flags affected: n,v,z,c]
 // ADC #const
 // Immediate (2-Byte [17])
-// ¤17: Add 1 byte if m=0 (16-bit memory/accumulator)
 template<>
 struct Opcode<State, 0x69>
 {
@@ -103,6 +102,7 @@ struct Opcode<State, 0x69>
     using Instruction16Bit = AddressMode::Immediate16Bit<Operator::ADC>;
 
     // 3-m 3-m         imm       mm....mm . ADC #$54
+    // ¤17: Add 1 byte if m=0 (16-bit memory/accumulator)
     static int execute(State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "69: ADC #const");
@@ -393,7 +393,6 @@ struct Opcode<State, 0x27>
 // AND AND Accumulator With Memory [Flags affected: n,z]
 // AND #const
 // Immediate (2-Byte [17])
-// ¤17: Add 1 byte if m=0 (16-bit memory/accumulator)
 template<>
 struct Opcode<State, 0x29>
 {
@@ -401,6 +400,7 @@ struct Opcode<State, 0x29>
     using Instruction16Bit = AddressMode::Immediate16Bit<Operator::AND>;
 
     // 3-m 3-m         imm       m.....m. . AND #$54
+    // ¤17: Add 1 byte if m=0 (16-bit memory/accumulator)
     static int execute(State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "29: AND #const");
@@ -844,7 +844,6 @@ struct Opcode<State, 0x3C>
 // BIT Test Bits [Flags affected: z (immediate mode) n,v,z (non-immediate modes)]
 // BIT #const
 // Immediate (2-Byte [17])
-// ¤17: Add 1 byte if m=0 (16-bit memory/accumulator)
 template<>
 struct Opcode<State, 0x89>
 {
@@ -852,6 +851,7 @@ struct Opcode<State, 0x89>
     using Instruction16Bit = AddressMode::Immediate16Bit<Operator::BIT<true>>;
 
     // 3-m 3-m         imm       ......m. . BIT #$54
+    // ¤17: Add 1 byte if m=0 (16-bit memory/accumulator)
     static int execute(State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "89: BIT #const");
@@ -948,13 +948,13 @@ struct Opcode<State, 0x80>
 // BRK Break [Flags affected: b,i (6502) b,d,i (65C02/65816 Emulation) d,i (65816 Native)]
 // BRK
 // Immediate (2-Byte [18])
-// ¤18: Opcode is 1 byte, but program counter value pushed onto stack is incremented by 2 allowing for optional signature byte
 template<>
 struct Opcode<State, 0x00>
 {
     using Instruction = AddressMode::Immediate<Operator::BRK>;
 
     // 1   8-e         imp       ....01.. . BRK
+    // ¤18: Opcode is 1 byte, but program counter value pushed onto stack is incremented by 2 allowing for optional signature byte
     static int execute(State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "00: BRK");
@@ -1180,7 +1180,6 @@ struct Opcode<State, 0xC7>
 // CMP Compare Accumulator With Memory [Flags affected: n,z,c]
 // CMP #const
 // Immediate (2-Byte [17])
-// ¤17: Add 1 byte if m=0 (16-bit memory/accumulator)
 template<>
 struct Opcode<State, 0xC9>
 {
@@ -1188,6 +1187,7 @@ struct Opcode<State, 0xC9>
     using Instruction16Bit = AddressMode::Immediate16Bit<Operator::CMP>;
 
     // 3-m 3-m         imm       m.....mm . CMP #$54
+    // ¤17: Add 1 byte if m=0 (16-bit memory/accumulator)
     static int execute(State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "C9: CMP #const");
@@ -1401,13 +1401,13 @@ struct Opcode<State, 0xDF>
 // COP Co-Processor Enable [Flags affected: d,i]
 // COP const
 // Immediate (2-Byte [18])
-// ¤18: Opcode is 1 byte, but program counter value pushed onto stack is incremented by 2 allowing for optional signature byte
 template<>
 struct Opcode<State, 0x02>
 {
     using Instruction = AddressMode::Immediate<Operator::COP>;
 
     // 2   8-e         imm       ....01.. . COP #$12
+    // ¤18: Opcode is 1 byte, but program counter value pushed onto stack is incremented by 2 allowing for optional signature byte
     static int execute(State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "02: COP const");
@@ -1422,7 +1422,6 @@ struct Opcode<State, 0x02>
 // CPX Compare Index Register X with Memory [Flags affected: n,z,c]
 // CPX #const
 // Immediate (2-Byte [19])
-// ¤19: Add 1 byte if x=0 (16-bit index registers)
 template<>
 struct Opcode<State, 0xE0>
 {
@@ -1430,6 +1429,7 @@ struct Opcode<State, 0xE0>
     using Instruction16Bit = AddressMode::Immediate16Bit<Operator::CP_<State::IndexRegister::X>>;
 
     // 3-x 3-x         imm       x.....xx . CPX #$54
+    // ¤19: Add 1 byte if x=0 (16-bit index registers)
     static int execute(State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "E0: CPX #const");
@@ -1488,7 +1488,6 @@ struct Opcode<State, 0xEC>
 // CPY Compare Index Register Y with Memory [Flags affected: n,z,c]
 // CPY #const
 // Immediate (2-Byte [19])
-// ¤19: Add 1 byte if x=0 (16-bit index registers)
 template<>
 struct Opcode<State, 0xC0>
 {
@@ -1496,6 +1495,7 @@ struct Opcode<State, 0xC0>
     using Instruction16Bit = AddressMode::Immediate16Bit<Operator::CP_<State::IndexRegister::Y>>;
 
     // 3-x 3-x         imm       x.....xx . CPY #$54
+    // ¤19: Add 1 byte if x=0 (16-bit index registers)
     static int execute(State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "C0: CPY #const");
@@ -1765,7 +1765,6 @@ struct Opcode<State, 0x47>
 // EOR Exclusive-OR Accumulator with Memory [Flags affected: n,z]
 // EOR #const
 // Immediate (2-Byte [17])
-// ¤17: Add 1 byte if m=0 (16-bit memory/accumulator)
 template<>
 struct Opcode<State, 0x49>
 {
@@ -1773,6 +1772,7 @@ struct Opcode<State, 0x49>
     using Instruction16Bit = AddressMode::Immediate16Bit<Operator::EOR>;
 
     // 3-m 3-m         imm       m.....m. . EOR #$54
+    // ¤17: Add 1 byte if m=0 (16-bit memory/accumulator)
     static int execute(State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "49: EOR #const");
@@ -2351,7 +2351,6 @@ struct Opcode<State, 0xA7>
 // LDA Load Accumulator from Memory [Flags affected: n,z]
 // LDA #const
 // Immediate (2-Byte [17])
-// ¤17: Add 1 byte if m=0 (16-bit memory/accumulator)
 template<>
 struct Opcode<State, 0xA9>
 {
@@ -2359,6 +2358,7 @@ struct Opcode<State, 0xA9>
     using Instruction16Bit = AddressMode::Immediate16Bit<Operator::LDA>;
 
     // 3-m 3-m         imm       m.....m. . LDA #$54
+    // ¤17: Add 1 byte if m=0 (16-bit memory/accumulator)
     static int execute(State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "A9: LDA #const");
@@ -2569,7 +2569,6 @@ struct Opcode<State, 0xBF>
 // LDX Load Index Register X from Memory [Flags affected: n,z]
 // LDX #const
 // Immediate (2-Byte [19])
-// ¤19: Add 1 byte if x=0 (16-bit index registers)
 template<>
 struct Opcode<State, 0xA2>
 {
@@ -2577,6 +2576,7 @@ struct Opcode<State, 0xA2>
     using Instruction16Bit = AddressMode::Immediate16Bit<Operator::LD_<State::IndexRegister::X>>;
 
     // 3-x 3-x         imm       x.....x. . LDX #$54
+    // ¤19: Add 1 byte if x=0 (16-bit index registers)
     static int execute(State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "A2: LDX #const");
@@ -2673,7 +2673,6 @@ struct Opcode<State, 0xBE>
 // LDY Load Index Register Y from Memory [Flags affected: n,z]
 // LDY #const
 // Immediate (2-Byte [19])
-// ¤19: Add 1 byte if x=0 (16-bit index registers)
 template<>
 struct Opcode<State, 0xA0>
 {
@@ -2681,6 +2680,7 @@ struct Opcode<State, 0xA0>
     using Instruction16Bit = AddressMode::Immediate16Bit<Operator::LD_<State::IndexRegister::Y>>;
 
     // 3-x 3-x         imm       x.....x. . LDY #$54
+    // ¤19: Add 1 byte if x=0 (16-bit index registers)
     static int execute(State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "A0: LDY #const");
@@ -3008,7 +3008,6 @@ struct Opcode<State, 0x07>
 // ORA OR Accumulator with Memory [Flags affected: n,z]
 // ORA #const
 // Immediate (2-Byte [17])
-// ¤17: Add 1 byte if m=0 (16-bit memory/accumulator)
 template<>
 struct Opcode<State, 0x09>
 {
@@ -3016,6 +3015,7 @@ struct Opcode<State, 0x09>
     using Instruction16Bit = AddressMode::Immediate16Bit<Operator::ORA>;
 
     // 3-m 3-m         imm       m.....m. . ORA #$54
+    // ¤17: Add 1 byte if m=0 (16-bit memory/accumulator)
     static int execute(State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "09: ORA #const");
@@ -3879,7 +3879,6 @@ struct Opcode<State, 0xE7>
 // SBC Subtract with Borrow from Accumulator [Flags affected: n,v,z,c]
 // SBC #const
 // Immediate (2-Byte [17])
-// ¤17: Add 1 byte if m=0 (16-bit memory/accumulator)
 template<>
 struct Opcode<State, 0xE9>
 {
@@ -3887,6 +3886,7 @@ struct Opcode<State, 0xE9>
     using Instruction16Bit = AddressMode::Immediate16Bit<Operator::SBC>;
 
     // 3-m 3-m         imm       mm....mm . SBC #$54
+    // ¤17: Add 1 byte if m=0 (16-bit memory/accumulator)
     static int execute(State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "E9: SBC #const");

@@ -262,12 +262,6 @@ void generateOpcode(std::ostream& output, Instruction& instruction, const Opcode
         }
     }
 
-    if (!instruction.sizeRemark.empty())
-    {
-        sizeRemark = stoi(instruction.sizeRemark);
-        output << "// " << getRemark(sizeRemark) << std::endl;
-    }
-
     output << "template<>" << std::endl;
     output << "struct Opcode<State, 0x" << instruction.code << ">" << std::endl;
     output << "{" << std::endl;
@@ -292,6 +286,12 @@ void generateOpcode(std::ostream& output, Instruction& instruction, const Opcode
     }
     output << std::endl;
     output << "    // " << opcode.comment << std::endl;
+
+    if (!instruction.sizeRemark.empty())
+    {
+        sizeRemark = stoi(instruction.sizeRemark);
+        output << "    // " << getRemark(sizeRemark) << std::endl;
+    }
     for (int remark : instruction.cyclesRemarks)
     {
         if (!getRemark(remark).empty())
@@ -355,7 +355,7 @@ void generateOpcode(std::ostream& output, Instruction& instruction, const Opcode
 
 void generateOpcodes(std::vector<Instruction>& instructions)
 {
-    std::ifstream opcodeTableFile("..\\..\\..\\src\\CodeGenerator\\cpuOpcodeTable.txt");
+    std::ifstream opcodeTableFile("../../../src/CodeGenerator/cpuOpcodeTable.txt");
     if (!opcodeTableFile)
     {
         throw std::runtime_error("Cannot find opcode table file");
@@ -384,7 +384,7 @@ void generateOpcodes(std::vector<Instruction>& instructions)
     }
     std::cout << std::endl;
 
-    std::ofstream output("..\\..\\..\\src\\WDC65816\\CpuOpcode.h");
+    std::ofstream output("../../../src/WDC65816/CpuOpcode.h");
 
     output << "#pragma once" << std::endl
         << std::endl
@@ -419,7 +419,7 @@ void generateOpcodes(std::vector<Instruction>& instructions)
 
 void generateOpcodeMap(const std::vector<Instruction>& instructions)
 {
-    std::ofstream output("..\\..\\..\\src\\WDC65816\\CpuInstructionDecoder.cpp");
+    std::ofstream output("../../../src/WDC65816/CpuInstructionDecoder.cpp");
 
     //std::ostream& output = std::cout;
 
@@ -546,7 +546,7 @@ void generateAddressMode(std::ofstream& output, const std::string& name, const A
 typedef std::map<std::string, AddressModeClassArgs> AddressModeClassMap;
 void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
 {
-    std::ofstream output("..\\..\\..\\src\\WDC65816\\CpuAddressMode.h");
+    std::ofstream output("../../../src/WDC65816/CpuAddressMode.h");
 
     output << "#pragma once" << std::endl
         << std::endl
@@ -590,7 +590,7 @@ void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
 typedef std::map<std::string, OperatorArgs> OperatorMap;
 void generateOperators(const OperatorMap& operatorMap)
 {
-    std::ofstream output("..\\..\\..\\src\\WDC65816\\CpuOperator.h");
+    std::ofstream output("../../../src/WDC65816/CpuOperator.h");
 
     output << "#pragma once" << std::endl
         << std::endl
@@ -627,11 +627,13 @@ void generateOperators(const OperatorMap& operatorMap)
         output << "    static int invoke(State& state";
         if (kvp.second.hasOperand)
         {
-            output << ", Byte* data";
+            output << ", Access& access";
         }
         output << ")" << std::endl
             << "    {" << std::endl
-            << "        throw std::runtime_error(\"" + kvp.first + " is not implemented\");" << std::endl;
+            << "        PROFILE_IF(PROFILE_OPERATORS, \"" << kvp.first << "\");" << std::endl
+            << std::endl
+            << "        throw NotYetImplementedException(\"" << kvp.first << "\"));" << std::endl;
         if (hasCycleModification(kvp.second.cycleRemarks))
         {
             output << "        int cycles = 0;" << std::endl;
@@ -662,7 +664,7 @@ void generateOperators(const OperatorMap& operatorMap)
 
 void generateCpu()
 {
-    std::ifstream instructionsFile("..\\..\\..\\src\\CodeGenerator\\cpuInstructions.txt");
+    std::ifstream instructionsFile("../../../src/CodeGenerator/cpuInstructions.txt");
 
     if (!instructionsFile)
     {

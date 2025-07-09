@@ -7,6 +7,8 @@
 #include <string>
 #include <algorithm>
 
+#include "SpcAddressModeImplementations.h"
+
 namespace {
 
 struct Instruction
@@ -22,6 +24,8 @@ struct Instruction
     std::string cycles;
     std::set<int> cyclesRemarks;
     std::string addressModeClassArg;
+    bool controlFlow = false;
+    bool notYetImplemented = false;
 
     void validate()
     {
@@ -66,12 +70,10 @@ struct OperatorArgs
 struct TemplateConfig
 {
     TemplateConfig()
-        : bitMask(false)
-        , index(false)
+        : index(false)
         , oneRegister(false)
         , twoRegister(false)
     { }
-    bool bitMask;
     bool index;
     bool oneRegister;
     bool twoRegister;
@@ -98,260 +100,259 @@ struct AddressMode
     std::string name;
     std::string templateArg;
     TemplateConfig config;
+    bool controlFlow = false;
 };
 
-AddressMode getAddressMode(const std::string& code)
+AddressMode getAddressMode(const std::string& code, const std::string& mnemonic)
 {
     AddressMode mode;
 
     if (code == "A, #i") {
         mode.name = "Register Immediate";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::A";
+        mode.templateArg = "State::Register::A";
     }
     else if (code == "X, #i") {
         mode.name = "Register Immediate";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::X";
+        mode.templateArg = "State::Register::X";
     }
     else if (code == "Y, #i") {
         mode.name = "Register Immediate";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::Y";
+        mode.templateArg = "State::Register::Y";
     }
     else if (code == "A, d") {
         mode.name = "Register Direct";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::A";
+        mode.templateArg = "State::Register::A";
     }
     else if (code == "X, d") {
         mode.name = "Register Direct";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::X";
+        mode.templateArg = "State::Register::X";
     }
     else if (code == "Y, d") {
         mode.name = "Register Direct";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::Y";
+        mode.templateArg = "State::Register::Y";
     }
     else if (code == "A, !a") {
         mode.name = "Register Absolute";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::A";
+        mode.templateArg = "State::Register::A";
     }
     else if (code == "X, !a") {
         mode.name = "Register Absolute";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::X";
+        mode.templateArg = "State::Register::X";
     }
     else if (code == "Y, !a") {
         mode.name = "Register Absolute";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::Y";
+        mode.templateArg = "State::Register::Y";
     }
     else if (code == "A") {
         mode.name = "Register";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::A";
+        mode.templateArg = "State::Register::A";
     }
     else if (code == "X") {
         mode.name = "Register";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::X";
+        mode.templateArg = "State::Register::X";
     }
     else if (code == "Y") {
         mode.name = "Register";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::Y";
+        mode.templateArg = "State::Register::Y";
     }
     else if (code == "PSW") {
         mode.name = "Register";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::PSW";
+        mode.templateArg = "State::Register::PSW";
     }
     else if (code == "d, A") {
         mode.name = "Direct Register";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::A";
+        mode.templateArg = "State::Register::A";
     }
     else if (code == "d, X") {
         mode.name = "Direct Register";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::X";
+        mode.templateArg = "State::Register::X";
     }
     else if (code == "d, Y") {
         mode.name = "Direct Register";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::Y";
+        mode.templateArg = "State::Register::Y";
     }
     else if (code == "!a, A") {
         mode.name = "Absolute Register";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::A";
+        mode.templateArg = "State::Register::A";
     }
     else if (code == "!a, X") {
         mode.name = "Absolute Register";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::X";
+        mode.templateArg = "State::Register::X";
     }
     else if (code == "!a, Y") {
         mode.name = "Absolute Register";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::Y";
+        mode.templateArg = "State::Register::Y";
     }
     else if (code == "d+X") {
         mode.name = "Direct Indexed";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::X";
+        mode.templateArg = "State::Register::X";
     }
     else if (code == "d+X, r") {
         mode.name = "Direct Indexed Program Counter Relative";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::X";
+        mode.templateArg = "State::Register::X";
     }
     else if (code == "Y, r") {
         mode.name = "Register Program Counter Relative";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::Y";
+        mode.templateArg = "State::Register::Y";
     }
     else if (code == "YA, X") {
         mode.name = "Y Accumulator Index";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::X";
+        mode.templateArg = "State::Register::X";
     }
     else if (code == "[!a+X]") {
         mode.name = "Absolute Indexed Indirect";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::X";
+        mode.templateArg = "State::Register::X";
     }
     else if (code == "A, [d]+Y") {
         mode.name = "Register Direct Indirect Indexed";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::A, State::Y";
+        mode.templateArg = "State::Register::A, State::Register::Y";
     }
     else if (code == "A, [d+X]") {
         mode.name = "Register Direct Indexed Indirect";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::A, State::X";
+        mode.templateArg = "State::Register::A, State::Register::X";
     }
     else if (code == "A, d+X") {
         mode.name = "Register Direct Indexed";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::A, State::X";
+        mode.templateArg = "State::Register::A, State::Register::X";
     }
     else if (code == "X, d+Y") {
         mode.name = "Register Direct Indexed";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::X, State::Y";
+        mode.templateArg = "State::Register::X, State::Register::Y";
     }
     else if (code == "Y, d+X") {
         mode.name = "Register Direct Indexed";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::Y, State::X";
+        mode.templateArg = "State::Register::Y, State::Register::X";
     }
     else if (code == "A, X") {
         mode.name = "Register Register";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::A, State::X";
+        mode.templateArg = "State::Register::A, State::Register::X";
     }
     else if (code == "A, Y") {
         mode.name = "Register Register";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::A, State::Y";
+        mode.templateArg = "State::Register::A, State::Register::Y";
     }
     else if (code == "SP, X") {
         mode.name = "Register Register";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::SP, State::X";
+        mode.templateArg = "State::Register::SP, State::Register::X";
     }
     else if (code == "X, A") {
         mode.name = "Register Register";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::X, State::A";
+        mode.templateArg = "State::Register::X, State::Register::A";
     }
     else if (code == "X, SP") {
         mode.name = "Register Register";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::X, State::SP";
+        mode.templateArg = "State::Register::X, State::Register::SP";
     }
     else if (code == "Y, A") {
         mode.name = "Register Register";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::Y, State::A";
+        mode.templateArg = "State::Register::Y, State::Register::A";
     }
     else if (code == "d+X, A") {
         mode.name = "Direct Indexed Register";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::X, State::A";
+        mode.templateArg = "State::Register::X, State::Register::A";
     }
     else if (code == "d+X, Y") {
         mode.name = "Direct Indexed Register";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::X, State::Y";
+        mode.templateArg = "State::Register::X, State::Register::Y";
     }
     else if (code == "d+Y, X") {
         mode.name = "Direct Indexed Register";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::Y, State::X";
+        mode.templateArg = "State::Register::Y, State::Register::X";
     }
     else if (code == "A, !a+X") {
         mode.name = "Register Absolute Indexed";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::A, State::X";
+        mode.templateArg = "State::Register::A, State::Register::X";
     }
     else if (code == "A, !a+Y") {
         mode.name = "Register Absolute Indexed";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::A, State::Y";
+        mode.templateArg = "State::Register::A, State::Register::Y";
     }
     else if (code == "!a+X, A") {
         mode.name = "Absolute Indexed Register";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::X, State::A";
+        mode.templateArg = "State::Register::X, State::Register::A";
     }
     else if (code == "!a+Y, A") {
         mode.name = "Absolute Indexed Register";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::Y, State::A";
+        mode.templateArg = "State::Register::Y, State::Register::A";
     }
     else if (code == "A, (X)") {
         mode.name = "Register Register Indirect";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::A, State::X";
+        mode.templateArg = "State::Register::A, State::Register::X";
     }
     else if (code == "(X)+, A") {
         mode.name = "Register Indirect Increment Register";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::X, State::A";
+        mode.templateArg = "State::Register::X, State::Register::A";
     }
     else if (code == "(X), A") {
         mode.name = "Register Indirect Register";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::X, State::A";
+        mode.templateArg = "State::Register::X, State::Register::A";
     }
     else if (code == "[d]+Y, A") {
         mode.name = "Direct Indirect Indexed Register";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::Y, State::A";
+        mode.templateArg = "State::Register::Y, State::Register::A";
     }
     else if (code == "[d+X], A") {
         mode.name = "Direct Indexed Indirect Register";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::X, State::A";
+        mode.templateArg = "State::Register::X, State::Register::A";
     }
     else if (code == "A, (X)+") {
         mode.name = "Register Register Indirect Increment";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::A, State::X";
+        mode.templateArg = "State::Register::A, State::Register::X";
     }
     else if (code.substr(0, 2) == "d.") {
-        mode.config.bitMask = true;
-        mode.templateArg = "1 << " + code.substr(2, 1);
         if (code.size() == 3) {
-            mode.name = "Direct Bit";
+            mode.name = "Direct";
         }
         else {
-            mode.name = "Direct Bit Program Counter Relative";
+            mode.name = "Direct Program Counter Relative";
         }
     }
     else if (code == "(X), (Y)") {
@@ -376,6 +377,10 @@ AddressMode getAddressMode(const std::string& code)
         mode.name = "Direct";
     }
     else if (code == "!a") {
+        if (mnemonic == "CALL" || mnemonic == "JMP")
+        {
+            mode.controlFlow = true;
+        }
         mode.name = "Absolute";
     }
     else if (code == "r") {
@@ -413,7 +418,7 @@ AddressMode getAddressMode(const std::string& code)
 std::string getRemark(int remarkIndex)
 {
     switch (remarkIndex) {
-    case 1: return "§1: Add 1 cycle if branch is taken";
+    case 1: return "§1: Add 2 cycles if branch is taken";
     default: return "";
     }
 }
@@ -477,6 +482,10 @@ void generateOpcode(std::ostream& output, const Instruction& instruction, bool i
     if (is16Bit) {
         addressModeClass += "16Bit";
     }
+    if (instruction.controlFlow)
+    {
+        addressModeClass += "_ControlFlow";
+    }
 
     output << "class " << classname
         << " : public AddressMode::" << addressModeClass
@@ -487,22 +496,13 @@ void generateOpcode(std::ostream& output, const Instruction& instruction, bool i
     output << ">" << std::endl
         << "{" << std::endl
         << "    using " << addressModeClass << "::" << addressModeClass << ";" << std::endl << std::endl;
-    for (int remark : instruction.cyclesRemarks) {
-        if (!getRemark(remark).empty()) {
-            output << "    // " << getRemark(remark) << std::endl;
-        }
+    output << "    int execute(State& state) override" << std::endl
+        << "    {" << std::endl;
+    if (instruction.notYetImplemented)
+    {
+        output << "        throw NotYetImplementedException(\"" + classname + "\");" << std::endl;
     }
-    output << "    int execute() override" << std::endl
-        << "    {" << std::endl
-        << "        throw std::runtime_error(\"" + classname + " is not implemented\");" << std::endl;
-    if (hasCycleModification(instruction.cyclesRemarks)) {
-        output << "        int cycles = " << instruction.cycles << ";" << std::endl;
-        addCycleModifications(output, instruction.cyclesRemarks);
-        output << "        return cycles";
-    } else {
-        addCycleModifications(output, instruction.cyclesRemarks);
-        output << "        return " << instruction.cycles;
-    }
+    output << "        return " << instruction.cycles;
     output << " + applyOperand();" << std::endl
         << "    }" << std::endl
         << std::endl
@@ -517,20 +517,24 @@ void generateOpcode(std::ostream& output, const Instruction& instruction, bool i
 
 void generateOpcodes(const std::vector<Instruction>& instructions)
 {
-    std::ofstream output("..\\..\\..\\src\\SnesEmulator\\SPC\\SpcOpcode.h");
+    std::ofstream output("../../../src/SPC700/SpcOpcode.h");
 
     output << "#pragma once" << std::endl
         << std::endl
-        << "#include <stdint.h>" << std::endl
-        << std::endl
-        << "#include \"../Instruction.h\"" << std::endl
+        << "#include \"Exception.h\"" << std::endl
         << "#include \"SpcState.h\"" << std::endl
         << "#include \"SpcAddressMode.h\"" << std::endl
         << "#include \"SpcOperator.h\"" << std::endl
         << std::endl
+        << "#include \"Profiler.h\"" << std::endl
+        << std::endl
+        << "#define PROFILE_OPCODES false" << std::endl
+        << std::endl
         << "namespace SPC {" << std::endl
         << std::endl
-        << "namespace Opcode {" << std::endl
+        << "EXCEPTION(NotYetImplementedException, ::NotYetImplementedException)" << std::endl
+        << std::endl
+        << "CREATE_PROFILER();" << std::endl
         << std::endl;
 
     for (const Instruction& instruction : instructions) {
@@ -538,32 +542,21 @@ void generateOpcodes(const std::vector<Instruction>& instructions)
         generateOpcode(output, instruction, false);
     }
 
-    output << "}" << std::endl
-        << std::endl
-        << "}" << std::endl;
+    output << "}" << std::endl;
 }
 
 void generateOpcodeMap(const std::vector<Instruction>& instructions)
 {
-    std::ofstream output("..\\..\\..\\src\\SnesEmulator\\SPC\\SpcOpcodeMap.cpp");
+    std::ofstream output("../../../src/SPC700/SpcInstructionDecoder.cpp");
 
-    output << "#include \"SpcOpcodeMap.h\"" << std::endl
+    output << "#include \"SpcInstructionDecoder.h\"" << std::endl
         << std::endl
-        << "#include <stdint.h>" << std::endl
-        << std::endl
-        << "#include \"SpcState.h\"" << std::endl
         << "#include \"SpcOpcode.h\"" << std::endl
         << std::endl
         << "namespace SPC {" << std::endl
         << std::endl;
 
-    output << "Instruction* OpcodeMap::getNextInstruction(const State& state) const" << std::endl
-        << "{" << std::endl
-        << "    return instructions[state.readProgramByte()].get();" << std::endl
-        << "}" << std::endl << std::endl;
-
-
-    output << "OpcodeMap::OpcodeMap(State& state)" << std::endl
+    output << "InstructionDecoder::InstructionDecoder(State& state)" << std::endl
         << "{" << std::endl;
     for (const Instruction& instruction : instructions) {
         output << "    instructions[0x" << instruction.code << "] = std::make_unique<Opcode::" << instruction.classname << ">(state);" << std::endl;
@@ -573,13 +566,15 @@ void generateOpcodeMap(const std::vector<Instruction>& instructions)
         << "}";
 }
 
-void generateAddressMode(std::ofstream& output, const std::string& name, const AddressModeClassArgs& args, bool is16Bit = false)
+void generateAddressMode(std::ofstream& output, std::string name, bool controlFlow, const AddressModeClassArgs& args, bool is16Bit = false)
 {
-    output << "// " << args.comment << std::endl << "template <typename Operator";
-    if (args.config.bitMask) {
-        output << ", uint8_t BitMask";
+    if (controlFlow)
+    {
+        name += "_ControlFlow";
     }
-    else if (args.config.index)
+
+    output << "// " << args.comment << std::endl << "template <typename Operator";
+    if (args.config.index)
     {
         output << ", uint8_t Index";
     }
@@ -601,7 +596,7 @@ void generateAddressMode(std::ofstream& output, const std::string& name, const A
 
     output << superclassStream.str() << std::endl << "{" << std::endl;
 
-    output << "    using " << superclassStream.str() << "::" << superclassStream.str() << ";" << std::endl << std::endl;
+    output << "    using " << superclassStream.str() << "::InstructionBase;" << std::endl << std::endl;
 
     for (int cycleRemark : args.cycleRemarks) {
         output << "    // " << getRemark(cycleRemark) << std::endl;
@@ -618,65 +613,70 @@ void generateAddressMode(std::ofstream& output, const std::string& name, const A
         }
     }
     output << ") override" << std::endl
-        << "    {" << std::endl
-        << "        throw std::runtime_error(\"" + name + " is not implemented\");" << std::endl;
-    if (hasCycleModification(args.cycleRemarks)) {
-        output << "        int cycles = 0;" << std::endl;
-        addCycleModifications(output, args.cycleRemarks);
+        << "    {" << std::endl;
+
+    auto it = addressModeImplementations.find(name);
+    if (it != addressModeImplementations.end())
+    {
+        for (const std::string codeLine : std::get<0>(it->second))
+        {
+            output << "        " << codeLine << std::endl;
+        }
     }
 
-    if (name != "Implied") {
-        output << "        Byte* data = nullptr;" << std::endl;
-    }
-    output << "        return ";
-    if (hasCycleModification(args.cycleRemarks)) {
-        output << "cycles + ";
-    }
-    output << "Operator::invoke(state";
-    if (name != "Implied") {
-        output << ", *data, 0";
-    }
-    output << ");" << std::endl
-        << "    }" << std::endl
+    output << "    }" << std::endl
         << std::endl;
 
-    output << "    std::string toString() const override" << std::endl
-        << "    {" << std::endl
-        << "        return Operator::toString()";
-    if (actualSize > 1) {
-        output << " + \" $\" + " << "operandToString()";
+    output << "    std::string toString(const State& state) const override" << std::endl
+        << "    {" << std::endl;
+
+    if (it != addressModeImplementations.end())
+    {
+        for (const std::string codeLine : std::get<1>(it->second))
+        {
+            output << "        " << codeLine << std::endl;
+        }
     }
-    output << " + \" TODO\";" << std::endl
-        << "    }" << std::endl
+
+    output << "    }" << std::endl
         << "};" << std::endl
         << std::endl;
 }
 
-typedef std::map<std::string, AddressModeClassArgs> AddressModeClassMap;
+typedef std::map<std::pair<std::string, bool>, AddressModeClassArgs> AddressModeClassMap;
 void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
 {
-    std::ofstream output("..\\..\\..\\src\\SnesEmulator\\SPC\\SpcAddressMode.h");
+    std::ofstream output("../../../src/SPC700/SpcAddressMode.h");
 
     output << "#pragma once" << std::endl
         << std::endl
-        << "#include <stdint.h>" << std::endl
-        << std::endl
-        << "#include \"../Instruction.h\"" << std::endl
+        << "#include \"Exception.h\"" << std::endl
+        << "#include \"Instruction.h\"" << std::endl
         << "#include \"SpcState.h\"" << std::endl
+        << std::endl
+        << "#include \"Profiler.h\"" << std::endl
+        << std::endl
+        << "#define PROFILE_ADDRESS_MODES false" << std::endl
+        << std::endl
+        << "#pragma warning( disable : 4702 ) // unreachable code" << std::endl
         << std::endl
         << "namespace SPC {" << std::endl
         << std::endl
-        << "typedef InstructionBase<State> Instruction1Byte;" << std::endl
-        << "typedef InstructionBase<State, Byte> Instruction2Byte;" << std::endl
-        << "typedef InstructionBase<State, Byte, Byte> Instruction3Byte;" << std::endl
+        << "using Instruction1Byte = InstructionBase<State>;" << std::endl
+        << "using Instruction2Byte = InstructionBase<State, Byte>;" << std::endl
+        << "using Instruction3Byte = InstructionBase<State, Byte, Byte>;" << std::endl
         << std::endl
         << "namespace AddressMode {" << std::endl
+        << std::endl
+        << "CREATE_PROFILER();" << std::endl
+        << std::endl
+        << "EXCEPTION(NotYetImplementedException, ::NotYetImplementedException)" << std::endl
         << std::endl;
 
     for (const AddressModeClassMap::value_type& kvp : addressModeClassMap) {
-        generateAddressMode(output, kvp.first, kvp.second);
-        if (kvp.first == "Immediate") {
-            generateAddressMode(output, kvp.first + "16Bit", kvp.second, true);
+        generateAddressMode(output, kvp.first.first, kvp.first.second, kvp.second);
+        if (kvp.first.first == "Immediate") {
+            generateAddressMode(output, kvp.first.first + "16Bit", kvp.first.second, kvp.second, true);
         }
     }
 
@@ -689,15 +689,18 @@ void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
 typedef std::map<std::string, OperatorArgs> OperatorMap;
 void generateOperators(const OperatorMap& operatorMap)
 {
-    std::ofstream output("..\\..\\..\\src\\SnesEmulator\\SPC\\SpcOperator.h");
+    std::ofstream output("../../../src/SPC700/SpcOperator.h");
 
     output << "#pragma once" << std::endl
         << std::endl
+        << "#include \"Exception.h\"" << std::endl
         << "#include \"SpcState.h\"" << std::endl
         << std::endl
         << "namespace SPC {" << std::endl
         << std::endl
         << "namespace Operator {" << std::endl
+        << std::endl
+        << "EXCEPTION(NotYetImplementedException, ::NotYetImplementedException)" << std::endl
         << std::endl;
 
     for (const OperatorMap::value_type& kvp : operatorMap) {
@@ -714,11 +717,11 @@ void generateOperators(const OperatorMap& operatorMap)
 
         output << "    static int invoke(State& state";
         if (kvp.second.hasOperand) {
-            output << ", Byte& leftOperand, const Byte& rightOperand";
+            output << ", Access& leftOperand, Byte rightOperand";
         }
         output << ")" << std::endl
             << "    {" << std::endl
-            << "        throw std::runtime_error(\"" + kvp.first + " is not implemented\");" << std::endl;
+            << "        throw NotYetImplementedException(\"" + kvp.first + "\");" << std::endl;
         if (hasCycleModification(kvp.second.cycleRemarks)) {
             output << "        int cycles = 0;" << std::endl;
             addCycleModifications(output, kvp.second.cycleRemarks);
@@ -747,7 +750,7 @@ void generateOperators(const OperatorMap& operatorMap)
 
 void generateSpc()
 {
-    std::ifstream instructionsFile("..\\..\\..\\src\\CodeGenerator\\spcInstructions.txt");
+    std::ifstream instructionsFile("../../../src/CodeGenerator/spcInstructions.txt");
 
     if (!instructionsFile) {
         throw std::runtime_error("Cannot find instruction definitions");
@@ -770,7 +773,7 @@ void generateSpc()
 
     std::vector<Instruction> instructions;
 
-    typedef std::map<std::string, std::vector<std::string>> AddressModeMap;
+    typedef std::map<std::pair<std::string, bool>, std::vector<std::string>> AddressModeMap;
     AddressModeMap addressModeMap;
 
     AddressModeClassMap addressModeClassMap;
@@ -781,7 +784,7 @@ void generateSpc()
     std::string comment;
 
     for (std::vector<std::string> line : lines) {
-        if (line.size() == 7) {
+        if (line.size() >= 7) {
             for (int i = 0; i < 7; ++i) {
                 std::cout << line[i] << '\t';
             }
@@ -800,12 +803,12 @@ void generateSpc()
 
             std::string classname = mnemonic + "_" + opcode;
 
-            AddressMode addressMode = getAddressMode(addressModeCode);
+            AddressMode addressMode = getAddressMode(addressModeCode, mnemonic);
 
             comment = line[5] + "    \t[" + line[6] + "]";
 
             std::string operatorName = mnemonic;
-            if (operatorName == "MOV" && line[6] == "N.....Z.") {
+            if ((operatorName == "MOV" || operatorName == "MOVW") && line[6] == "N.....Z.") {
                 operatorName += "_SignedResult";
             }
 
@@ -835,11 +838,11 @@ void generateSpc()
             std::set<int> cyclesRemarks;
             OperatorArgs& operatorArgs = operatorMap[operatorName];
             std::set<int> operatorIntersection;
-            AddressModeClassArgs& addressModeClassArgs = addressModeClassMap[addressModeClass];
+            AddressModeClassArgs& addressModeClassArgs = addressModeClassMap[{ addressModeClass, addressMode.controlFlow }];
 
             std::string addressModeComment = addressModeClassArgs.comment;
             if (addressModeComment.empty()) {
-                addressModeComment = addressMode.name;
+                addressModeComment = addressMode.name + (addressMode.controlFlow ? " (control flow)" : "");
             }
             addressModeComment += "\n// " + mnemonic + " " + addressModeCode + ":     \t" + comment;
 
@@ -885,7 +888,40 @@ void generateSpc()
             addressModeClassArgs.comment = addressModeComment;
             addressModeClassArgs.config = addressMode.config;
 
-            Instruction instruction { name, operatorName, comment, opcode, classname, addressMode.name, addressModeClass, size, cycles, cyclesRemarks, addressMode.templateArg };
+            auto toString = [](bool value) -> std::string { return (value ? "true" : "false"); };
+
+            std::string operatorUsageName = operatorName;
+            if (operatorName[0] == 'B')
+            {
+                switch (operatorName[1])
+                {
+                case 'B':
+                    operatorUsageName = std::string("BB_<") + addressModeCode[2] + ", " + toString(operatorName[2] == 'S') + ">";
+                    break;
+                case 'C':
+                case 'V':
+                    operatorUsageName = std::string("B__<State::Flag::") + char(std::tolower(operatorName[1])) + ", " + toString(operatorName[2] == 'S') + ">";
+                    break;
+
+                default:
+                    break;
+                }
+            }
+            else if ((operatorName.substr(0, 3) == "SET" || operatorName.substr(0, 3) == "CLR"))
+            {
+                operatorUsageName = std::string("SET");
+                if (operatorName[3] == '1')
+                {
+                    operatorUsageName += std::string("1<") + addressModeCode[2];
+                }
+                else
+                {
+                    operatorUsageName += std::string("<") + "State::Flag::" + char(std::tolower(operatorName[3]));
+                }
+                operatorUsageName += std::string(", ") + (operatorName.substr(0, 3) == "SET" ? "true" : "false") + ">";
+            }
+
+            Instruction instruction { name, operatorUsageName, comment, opcode, classname, addressMode.name, addressModeClass, size, cycles, cyclesRemarks, addressMode.templateArg, addressMode.controlFlow, line.size() == 8 };
             instruction.validate();
             instructions.push_back(instruction);
 
@@ -899,7 +935,7 @@ void generateSpc()
     for (Instruction& instruction : instructions) {
         std::set<int> removedRemarks;
         for (const AddressModeClassMap::value_type& kvp : addressModeClassMap) {
-            if (kvp.first == instruction.addressModeClass) {
+            if (kvp.first.first == instruction.addressModeClass) {
                 for (int remark : kvp.second.cycleRemarks) {
                     if (instruction.cyclesRemarks.erase(remark)) {
                         removedRemarks.insert(remark);
@@ -919,9 +955,9 @@ void generateSpc()
         }
     }
 
-    //generateOpcodes(instructions);
-    //generateOpcodeMap(instructions);
-    //generateAddressModes(addressModeClassMap);
+    generateOpcodes(instructions);
+    generateOpcodeMap(instructions);
+    generateAddressModes(addressModeClassMap);
     //generateOperators(operatorMap);
 
     int i = 0;

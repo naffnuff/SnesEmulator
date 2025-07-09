@@ -127,6 +127,7 @@ public:
     static std::string toString() { return "ASL"; }
 };
 
+// §1: Add 1 cycle if branch is taken
 static int branchIf(bool condition, State& state, int8_t offset)
 {
     int cycles = 0;
@@ -138,27 +139,26 @@ static int branchIf(bool condition, State& state, int8_t offset)
 }
 
 // BBS/C
-// d.0, r: PC+=r  if d.0 == 0    	[........]
-// d.1, r: PC+=r  if d.1 == 0    	[........]
-// d.2, r: PC+=r  if d.2 == 0    	[........]
-// d.3, r: PC+=r  if d.3 == 0    	[........]
-// d.4, r: PC+=r  if d.4 == 0    	[........]
-// d.5, r: PC+=r  if d.5 == 0    	[........]
-// d.6, r: PC+=r  if d.6 == 0    	[........]
-// d.7, r: PC+=r  if d.7 == 0    	[........]
-// d.0, r: PC+=r  if d.0 == 1    	[........]
-// d.1, r: PC+=r  if d.1 == 1    	[........]
-// d.2, r: PC+=r  if d.2 == 1    	[........]
-// d.3, r: PC+=r  if d.3 == 1    	[........]
-// d.4, r: PC+=r  if d.4 == 1    	[........]
-// d.5, r: PC+=r  if d.5 == 1    	[........]
-// d.6, r: PC+=r  if d.6 == 1    	[........]
-// d.7, r: PC+=r  if d.7 == 1    	[........]
+// BBC d.0, r:     	PC+=r  if d.0 == 0    	[........]
+// BBC d.1, r:     	PC+=r  if d.1 == 0    	[........]
+// BBC d.2, r:     	PC+=r  if d.2 == 0    	[........]
+// BBC d.3, r:     	PC+=r  if d.3 == 0    	[........]
+// BBC d.4, r:     	PC+=r  if d.4 == 0    	[........]
+// BBC d.5, r:     	PC+=r  if d.5 == 0    	[........]
+// BBC d.6, r:     	PC+=r  if d.6 == 0    	[........]
+// BBC d.7, r:     	PC+=r  if d.7 == 0    	[........]
+// BBS d.0, r:     	PC+=r  if d.0 == 1    	[........]
+// BBS d.1, r:     	PC+=r  if d.1 == 1    	[........]
+// BBS d.2, r:     	PC+=r  if d.2 == 1    	[........]
+// BBS d.3, r:     	PC+=r  if d.3 == 1    	[........]
+// BBS d.4, r:     	PC+=r  if d.4 == 1    	[........]
+// BBS d.5, r:     	PC+=r  if d.5 == 1    	[........]
+// BBS d.6, r:     	PC+=r  if d.6 == 1    	[........]
+// BBS d.7, r:     	PC+=r  if d.7 == 1    	[........]
 template <int BitIndex, bool BitValue>
-class BB
+class BB_
 {
 public:
-    // §1: Add 1 cycle if branch is taken
     static int invoke(State& state, Access& operand, int8_t offset)
     {
         return branchIf(operand.readByte().getBit(BitIndex) == BitValue, state, offset);
@@ -172,12 +172,14 @@ public:
 };
 
 // B[C/V][S/C]
-// r: PC+=r  if C == 0    	[........]
+// BCC r:     	PC+=r  if C == 0    	[........]
+// BCS r:     	PC+=r  if C == 1    	[........]
+// BVC r:     	PC+=r  if V == 0    	[........]
+// BVS r:     	PC+=r  if V == 1    	[........]
 template <State::Flag Flag, bool Value>
-class B
+class B__
 {
 public:
-    // §1: Add 1 cycle if branch is taken
     static int invoke(State& state, int8_t offset)
     {
         return branchIf(state.getFlag(Flag) == Value, state, offset);
@@ -191,7 +193,6 @@ public:
 class BEQ
 {
 public:
-    // §1: Add 1 cycle if branch is taken
     static int invoke(State& state, int8_t offset)
     {
         return branchIf(state.getFlag(State::Flag::z), state, offset);
@@ -205,7 +206,6 @@ public:
 class BMI
 {
 public:
-    // §1: Add 1 cycle if branch is taken
     static int invoke(State& state, int8_t offset)
     {
         return branchIf(state.getFlag(State::Flag::n), state, offset);
@@ -219,7 +219,6 @@ public:
 class BNE
 {
 public:
-    // §1: Add 1 cycle if branch is taken
     static int invoke(State& state, int8_t offset)
     {
         return branchIf(!state.getFlag(State::Flag::z), state, offset);
@@ -233,7 +232,6 @@ public:
 class BPL
 {
 public:
-    // §1: Add 1 cycle if branch is taken
     static int invoke(State& state, int8_t offset)
     {
         return branchIf(!state.getFlag(State::Flag::n), state, offset);
@@ -247,7 +245,6 @@ public:
 class BRA
 {
 public:
-    // §1: Add 1 cycle if branch is taken
     static int invoke(State& state, int8_t offset)
     {
         return branchIf(true, state, offset);
@@ -291,27 +288,12 @@ public:
 class CBNE
 {
 public:
-    // §1: Add 1 cycle if branch is taken
     static int invoke(State& state, Access& access, int8_t offset)
     {
         return branchIf(state.readRegister<State::Register::A>() != access.readByte(), state, offset);
     }
 
     static std::string toString() { return "CBNE"; }
-};
-
-// CLRV
-// : V = 0, H = 0    	[.0..0...]
-class CLRV
-{
-public:
-    static int invoke(State& state)
-    {
-        throw NotYetImplementedException("CLRV");
-        return 0;
-    }
-
-    static std::string toString() { return "CLRV"; }
 };
 
 // CMP
@@ -395,7 +377,6 @@ public:
 class DBNZ
 {
 public:
-    // §1: Add 1 cycle if branch is taken
     static int invoke(State& state, Access& access, int8_t offset)
     {
         Byte value = access.readByte() - 1;
@@ -699,6 +680,7 @@ public:
     static std::string toString() { return "MOVW"; }
 };
 
+// MOVW_SignedResult
 // YA, d: YA = word (d)    	[N.....Z.]
 class MOVW_SignedResult : public MOVW
 {
@@ -724,16 +706,6 @@ public:
 
     static std::string toString() { return "MUL"; }
 };
-
-std::vector<int> njefs()
-{
-    std::vector<int> values;
-    for (int i = 0; i < 0x10000; ++i) {
-        values.push_back(i);
-        values.push_back(i);
-    }
-    return values;
-}
 
 // NOP
 // : do nothing    	[........]
@@ -1013,11 +985,10 @@ public:
     }
 };
 
-// SET/CLR C/P
-// : C = 0    	[.......0]
-// : P = 0    	[..0.....]
-// : C = 1    	[.......1]
-// : P = 1    	[..1.....]
+// CLRC: C = 0    	[.......0]
+// CLRP: P = 0    	[..0.....]
+// SETC: C = 1    	[.......1]
+// SETP: P = 1    	[..1.....]
 template <State::Flag Flag, bool Value>
 class SET
 {
@@ -1029,6 +1000,20 @@ public:
     }
 
     static std::string toString() { return (Value ? "SET" : "CLR") + State::getFlagName<Flag>(); }
+};
+
+// CLRV: V = 0, H = 0    	[.0..0...]
+template <>
+class SET<State::Flag::v, false>
+{
+public:
+    static int invoke(State& state)
+    {
+        throw NotYetImplementedException("CLRV");
+        return 0;
+    }
+
+    static std::string toString() { return "CLRV"; }
 };
 
 // SLEEP

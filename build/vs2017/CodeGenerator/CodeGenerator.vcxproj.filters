@@ -38,7 +38,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\CodeGenerator\CpuAddressModeImplementations.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\CodeGenerator\SpcAddressModeImplementations.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

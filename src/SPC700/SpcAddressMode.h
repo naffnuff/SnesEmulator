@@ -48,6 +48,7 @@ class Absolute : public Instruction3Byte
     }
 };
 
+// Absolute (control flow)
 // CALL !a:     	(SP--)=PCh, (SP--)=PCl, PC=a    	[........]
 // JMP !a:     	PC = a    	[........]
 template <typename Operator>
@@ -173,13 +174,6 @@ class CarryNegatedMemoryBit : public Instruction3Byte
 
 // Direct
 // ASL d:     	Left shift (d) as above    	[N.....ZC]
-// DEC d:     	(d)--    	[N.....Z.]
-// DECW d:     	Word (d)--    	[N.....Z.]
-// INC d:     	(d)++    	[N.....Z.]
-// INCW d:     	Word (d)++    	[N.....Z.]
-// LSR d:     	Right shift (d) as above    	[N.....ZC]
-// ROL d:     	Left shift (d) as above    	[N.....ZC]
-// ROR d:     	Right shift (d) as above    	[N.....ZC]
 // CLR1 d.0:     	d.0 = 0    	[........]
 // CLR1 d.1:     	d.1 = 0    	[........]
 // CLR1 d.2:     	d.2 = 0    	[........]
@@ -188,6 +182,13 @@ class CarryNegatedMemoryBit : public Instruction3Byte
 // CLR1 d.5:     	d.5 = 0    	[........]
 // CLR1 d.6:     	d.6 = 0    	[........]
 // CLR1 d.7:     	d.7 = 0    	[........]
+// DEC d:     	(d)--    	[N.....Z.]
+// DECW d:     	Word (d)--    	[N.....Z.]
+// INC d:     	(d)++    	[N.....Z.]
+// INCW d:     	Word (d)++    	[N.....Z.]
+// LSR d:     	Right shift (d) as above    	[N.....ZC]
+// ROL d:     	Left shift (d) as above    	[N.....ZC]
+// ROR d:     	Right shift (d) as above    	[N.....ZC]
 // SET1 d.0:     	d.0 = 1    	[........]
 // SET1 d.1:     	d.1 = 1    	[........]
 // SET1 d.2:     	d.2 = 1    	[........]
@@ -1050,7 +1051,7 @@ class YAccumulatorDirect : public Instruction2Byte
 // Y Accumulator Index
 // DIV YA, X:     	A=YA/X, Y=mod(YA,X)    	[NV..H.Z.]
 template <typename Operator, State::Register RegisterIndex>
-class YAccumulatorRegister : public Instruction1Byte
+class YAccumulatorIndex : public Instruction1Byte
 {
     using Instruction1Byte::InstructionBase;
 

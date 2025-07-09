@@ -5,11 +5,18 @@
 #include "SpcAddressMode.h"
 #include "SpcOperator.h"
 
+#include "Profiler.h"
+
+#define PROFILE_OPCODES false
+
 namespace SPC {
 
-namespace Opcode {
+namespace Opcode
+{
 
 EXCEPTION(NotYetImplementedException, ::NotYetImplementedException)
+
+CREATE_PROFILER();
 
 // ADC (X), (Y)
 // (X) = (X)+(Y)+C    	[NV..H.ZC]
@@ -492,8 +499,8 @@ class ASL_0C : public AddressMode::Absolute<Operator::ASL>
 
 // BBC d.0, r
 // PC+=r  if d.0 == 0    	[........]
-// Direct Bit Program Counter Relative (3-Byte)
-class BBC_13 : public AddressMode::DirectProgramCounterRelative<Operator::BB<0, false>>
+// Direct Program Counter Relative (3-Byte)
+class BBC_13 : public AddressMode::DirectProgramCounterRelative<Operator::BB_<0, false>>
 {
     using DirectProgramCounterRelative::DirectProgramCounterRelative;
 
@@ -507,8 +514,8 @@ class BBC_13 : public AddressMode::DirectProgramCounterRelative<Operator::BB<0, 
 
 // BBC d.1, r
 // PC+=r  if d.1 == 0    	[........]
-// Direct Bit Program Counter Relative (3-Byte)
-class BBC_33 : public AddressMode::DirectProgramCounterRelative<Operator::BB<1, false>>
+// Direct Program Counter Relative (3-Byte)
+class BBC_33 : public AddressMode::DirectProgramCounterRelative<Operator::BB_<1, false>>
 {
     using DirectProgramCounterRelative::DirectProgramCounterRelative;
 
@@ -522,8 +529,8 @@ class BBC_33 : public AddressMode::DirectProgramCounterRelative<Operator::BB<1, 
 
 // BBC d.2, r
 // PC+=r  if d.2 == 0    	[........]
-// Direct Bit Program Counter Relative (3-Byte)
-class BBC_53 : public AddressMode::DirectProgramCounterRelative<Operator::BB<2, false>>
+// Direct Program Counter Relative (3-Byte)
+class BBC_53 : public AddressMode::DirectProgramCounterRelative<Operator::BB_<2, false>>
 {
     using DirectProgramCounterRelative::DirectProgramCounterRelative;
 
@@ -538,8 +545,8 @@ class BBC_53 : public AddressMode::DirectProgramCounterRelative<Operator::BB<2, 
 
 // BBC d.3, r
 // PC+=r  if d.3 == 0    	[........]
-// Direct Bit Program Counter Relative (3-Byte)
-class BBC_73 : public AddressMode::DirectProgramCounterRelative<Operator::BB<3, false>>
+// Direct Program Counter Relative (3-Byte)
+class BBC_73 : public AddressMode::DirectProgramCounterRelative<Operator::BB_<3, false>>
 {
     using DirectProgramCounterRelative::DirectProgramCounterRelative;
 
@@ -554,8 +561,8 @@ class BBC_73 : public AddressMode::DirectProgramCounterRelative<Operator::BB<3, 
 
 // BBC d.4, r
 // PC+=r  if d.4 == 0    	[........]
-// Direct Bit Program Counter Relative (3-Byte)
-class BBC_93 : public AddressMode::DirectProgramCounterRelative<Operator::BB<4, false>>
+// Direct Program Counter Relative (3-Byte)
+class BBC_93 : public AddressMode::DirectProgramCounterRelative<Operator::BB_<4, false>>
 {
     using DirectProgramCounterRelative::DirectProgramCounterRelative;
 
@@ -570,8 +577,8 @@ class BBC_93 : public AddressMode::DirectProgramCounterRelative<Operator::BB<4, 
 
 // BBC d.5, r
 // PC+=r  if d.5 == 0    	[........]
-// Direct Bit Program Counter Relative (3-Byte)
-class BBC_B3 : public AddressMode::DirectProgramCounterRelative<Operator::BB<5, false>>
+// Direct Program Counter Relative (3-Byte)
+class BBC_B3 : public AddressMode::DirectProgramCounterRelative<Operator::BB_<5, false>>
 {
     using DirectProgramCounterRelative::DirectProgramCounterRelative;
 
@@ -585,8 +592,8 @@ class BBC_B3 : public AddressMode::DirectProgramCounterRelative<Operator::BB<5, 
 
 // BBC d.6, r
 // PC+=r  if d.6 == 0    	[........]
-// Direct Bit Program Counter Relative (3-Byte)
-class BBC_D3 : public AddressMode::DirectProgramCounterRelative<Operator::BB<6, false>>
+// Direct Program Counter Relative (3-Byte)
+class BBC_D3 : public AddressMode::DirectProgramCounterRelative<Operator::BB_<6, false>>
 {
     using DirectProgramCounterRelative::DirectProgramCounterRelative;
 
@@ -601,8 +608,8 @@ class BBC_D3 : public AddressMode::DirectProgramCounterRelative<Operator::BB<6, 
 
 // BBC d.7, r
 // PC+=r  if d.7 == 0    	[........]
-// Direct Bit Program Counter Relative (3-Byte)
-class BBC_F3 : public AddressMode::DirectProgramCounterRelative<Operator::BB<7, false>>
+// Direct Program Counter Relative (3-Byte)
+class BBC_F3 : public AddressMode::DirectProgramCounterRelative<Operator::BB_<7, false>>
 {
     using DirectProgramCounterRelative::DirectProgramCounterRelative;
 
@@ -616,8 +623,8 @@ class BBC_F3 : public AddressMode::DirectProgramCounterRelative<Operator::BB<7, 
 
 // BBS d.0, r
 // PC+=r  if d.0 == 1    	[........]
-// Direct Bit Program Counter Relative (3-Byte)
-class BBS_03 : public AddressMode::DirectProgramCounterRelative<Operator::BB<0, true>>
+// Direct Program Counter Relative (3-Byte)
+class BBS_03 : public AddressMode::DirectProgramCounterRelative<Operator::BB_<0, true>>
 {
     using DirectProgramCounterRelative::DirectProgramCounterRelative;
 
@@ -632,8 +639,8 @@ class BBS_03 : public AddressMode::DirectProgramCounterRelative<Operator::BB<0, 
 
 // BBS d.1, r
 // PC+=r  if d.1 == 1    	[........]
-// Direct Bit Program Counter Relative (3-Byte)
-class BBS_23 : public AddressMode::DirectProgramCounterRelative<Operator::BB<1, true>>
+// Direct Program Counter Relative (3-Byte)
+class BBS_23 : public AddressMode::DirectProgramCounterRelative<Operator::BB_<1, true>>
 {
     using DirectProgramCounterRelative::DirectProgramCounterRelative;
 
@@ -647,8 +654,8 @@ class BBS_23 : public AddressMode::DirectProgramCounterRelative<Operator::BB<1, 
 
 // BBS d.2, r
 // PC+=r  if d.2 == 1    	[........]
-// Direct Bit Program Counter Relative (3-Byte)
-class BBS_43 : public AddressMode::DirectProgramCounterRelative<Operator::BB<2, true>>
+// Direct Program Counter Relative (3-Byte)
+class BBS_43 : public AddressMode::DirectProgramCounterRelative<Operator::BB_<2, true>>
 {
     using DirectProgramCounterRelative::DirectProgramCounterRelative;
 
@@ -663,8 +670,8 @@ class BBS_43 : public AddressMode::DirectProgramCounterRelative<Operator::BB<2, 
 
 // BBS d.3, r
 // PC+=r  if d.3 == 1    	[........]
-// Direct Bit Program Counter Relative (3-Byte)
-class BBS_63 : public AddressMode::DirectProgramCounterRelative<Operator::BB<3, true>>
+// Direct Program Counter Relative (3-Byte)
+class BBS_63 : public AddressMode::DirectProgramCounterRelative<Operator::BB_<3, true>>
 {
     using DirectProgramCounterRelative::DirectProgramCounterRelative;
 
@@ -679,8 +686,8 @@ class BBS_63 : public AddressMode::DirectProgramCounterRelative<Operator::BB<3, 
 
 // BBS d.4, r
 // PC+=r  if d.4 == 1    	[........]
-// Direct Bit Program Counter Relative (3-Byte)
-class BBS_83 : public AddressMode::DirectProgramCounterRelative<Operator::BB<4, true>>
+// Direct Program Counter Relative (3-Byte)
+class BBS_83 : public AddressMode::DirectProgramCounterRelative<Operator::BB_<4, true>>
 {
     using DirectProgramCounterRelative::DirectProgramCounterRelative;
 
@@ -695,8 +702,8 @@ class BBS_83 : public AddressMode::DirectProgramCounterRelative<Operator::BB<4, 
 
 // BBS d.5, r
 // PC+=r  if d.5 == 1    	[........]
-// Direct Bit Program Counter Relative (3-Byte)
-class BBS_A3 : public AddressMode::DirectProgramCounterRelative<Operator::BB<5, true>>
+// Direct Program Counter Relative (3-Byte)
+class BBS_A3 : public AddressMode::DirectProgramCounterRelative<Operator::BB_<5, true>>
 {
     using DirectProgramCounterRelative::DirectProgramCounterRelative;
 
@@ -710,8 +717,8 @@ class BBS_A3 : public AddressMode::DirectProgramCounterRelative<Operator::BB<5, 
 
 // BBS d.6, r
 // PC+=r  if d.6 == 1    	[........]
-// Direct Bit Program Counter Relative (3-Byte)
-class BBS_C3 : public AddressMode::DirectProgramCounterRelative<Operator::BB<6, true>>
+// Direct Program Counter Relative (3-Byte)
+class BBS_C3 : public AddressMode::DirectProgramCounterRelative<Operator::BB_<6, true>>
 {
     using DirectProgramCounterRelative::DirectProgramCounterRelative;
 
@@ -725,8 +732,8 @@ class BBS_C3 : public AddressMode::DirectProgramCounterRelative<Operator::BB<6, 
 
 // BBS d.7, r
 // PC+=r  if d.7 == 1    	[........]
-// Direct Bit Program Counter Relative (3-Byte)
-class BBS_E3 : public AddressMode::DirectProgramCounterRelative<Operator::BB<7, true>>
+// Direct Program Counter Relative (3-Byte)
+class BBS_E3 : public AddressMode::DirectProgramCounterRelative<Operator::BB_<7, true>>
 {
     using DirectProgramCounterRelative::DirectProgramCounterRelative;
 
@@ -741,7 +748,7 @@ class BBS_E3 : public AddressMode::DirectProgramCounterRelative<Operator::BB<7, 
 // BCC r
 // PC+=r  if C == 0    	[........]
 // Program Counter Relative (2-Byte)
-class BCC_90 : public AddressMode::ProgramCounterRelative<Operator::B<State::Flag::c, false>>
+class BCC_90 : public AddressMode::ProgramCounterRelative<Operator::B__<State::Flag::c, false>>
 {
     using ProgramCounterRelative::ProgramCounterRelative;
 
@@ -756,7 +763,7 @@ class BCC_90 : public AddressMode::ProgramCounterRelative<Operator::B<State::Fla
 // BCS r
 // PC+=r  if C == 1    	[........]
 // Program Counter Relative (2-Byte)
-class BCS_B0 : public AddressMode::ProgramCounterRelative<Operator::B<State::Flag::c, true>>
+class BCS_B0 : public AddressMode::ProgramCounterRelative<Operator::B__<State::Flag::c, true>>
 {
     using ProgramCounterRelative::ProgramCounterRelative;
 
@@ -831,7 +838,7 @@ class BPL_10 : public AddressMode::ProgramCounterRelative<Operator::BPL>
 // BVC r
 // PC+=r  if V == 0    	[........]
 // Program Counter Relative (2-Byte)
-class BVC_50 : public AddressMode::ProgramCounterRelative<Operator::B<State::Flag::v, false>>
+class BVC_50 : public AddressMode::ProgramCounterRelative<Operator::B__<State::Flag::v, false>>
 {
     using ProgramCounterRelative::ProgramCounterRelative;
 
@@ -847,7 +854,7 @@ class BVC_50 : public AddressMode::ProgramCounterRelative<Operator::B<State::Fla
 // BVS r
 // PC+=r  if V == 1    	[........]
 // Program Counter Relative (2-Byte)
-class BVS_70 : public AddressMode::ProgramCounterRelative<Operator::B<State::Flag::v, true>>
+class BVS_70 : public AddressMode::ProgramCounterRelative<Operator::B__<State::Flag::v, true>>
 {
     using ProgramCounterRelative::ProgramCounterRelative;
 
@@ -938,7 +945,7 @@ class CBNE_2E : public AddressMode::DirectProgramCounterRelative<Operator::CBNE>
 
 // CLR1 d.0
 // d.0 = 0    	[........]
-// Direct Bit (2-Byte)
+// Direct (2-Byte)
 class CLR1_12 : public AddressMode::Direct<Operator::SET1<0, false>>
 {
     using Direct::Direct;
@@ -953,7 +960,7 @@ class CLR1_12 : public AddressMode::Direct<Operator::SET1<0, false>>
 
 // CLR1 d.1
 // d.1 = 0    	[........]
-// Direct Bit (2-Byte)
+// Direct (2-Byte)
 class CLR1_32 : public AddressMode::Direct<Operator::SET1<1, false>>
 {
     using Direct::Direct;
@@ -968,7 +975,7 @@ class CLR1_32 : public AddressMode::Direct<Operator::SET1<1, false>>
 
 // CLR1 d.2
 // d.2 = 0    	[........]
-// Direct Bit (2-Byte)
+// Direct (2-Byte)
 class CLR1_52 : public AddressMode::Direct<Operator::SET1<2, false>>
 {
     using Direct::Direct;
@@ -984,7 +991,7 @@ class CLR1_52 : public AddressMode::Direct<Operator::SET1<2, false>>
 
 // CLR1 d.3
 // d.3 = 0    	[........]
-// Direct Bit (2-Byte)
+// Direct (2-Byte)
 class CLR1_72 : public AddressMode::Direct<Operator::SET1<3, false>>
 {
     using Direct::Direct;
@@ -999,7 +1006,7 @@ class CLR1_72 : public AddressMode::Direct<Operator::SET1<3, false>>
 
 // CLR1 d.4
 // d.4 = 0    	[........]
-// Direct Bit (2-Byte)
+// Direct (2-Byte)
 class CLR1_92 : public AddressMode::Direct<Operator::SET1<4, false>>
 {
     using Direct::Direct;
@@ -1014,7 +1021,7 @@ class CLR1_92 : public AddressMode::Direct<Operator::SET1<4, false>>
 
 // CLR1 d.5
 // d.5 = 0    	[........]
-// Direct Bit (2-Byte)
+// Direct (2-Byte)
 class CLR1_B2 : public AddressMode::Direct<Operator::SET1<5, false>>
 {
     using Direct::Direct;
@@ -1029,7 +1036,7 @@ class CLR1_B2 : public AddressMode::Direct<Operator::SET1<5, false>>
 
 // CLR1 d.6
 // d.6 = 0    	[........]
-// Direct Bit (2-Byte)
+// Direct (2-Byte)
 class CLR1_D2 : public AddressMode::Direct<Operator::SET1<6, false>>
 {
     using Direct::Direct;
@@ -1044,7 +1051,7 @@ class CLR1_D2 : public AddressMode::Direct<Operator::SET1<6, false>>
 
 // CLR1 d.7
 // d.7 = 0    	[........]
-// Direct Bit (2-Byte)
+// Direct (2-Byte)
 class CLR1_F2 : public AddressMode::Direct<Operator::SET1<7, false>>
 {
     using Direct::Direct;
@@ -1090,7 +1097,7 @@ class CLRP_20 : public AddressMode::Implied<Operator::SET<State::Flag::p, false>
 // CLRV 
 // V = 0, H = 0    	[.0..0...]
 // Implied (1-Byte)
-class CLRV_E0 : public AddressMode::Implied<Operator::CLRV>
+class CLRV_E0 : public AddressMode::Implied<Operator::SET<State::Flag::v, false>>
 {
     using Implied::Implied;
 
@@ -1580,9 +1587,9 @@ class DI_C0 : public AddressMode::Implied<Operator::DI>
 // DIV YA, X
 // A=YA/X, Y=mod(YA,X)    	[NV..H.Z.]
 // Y Accumulator Index (1-Byte)
-class DIV_9E : public AddressMode::YAccumulatorRegister<Operator::DIV, State::Register::X>
+class DIV_9E : public AddressMode::YAccumulatorIndex<Operator::DIV, State::Register::X>
 {
-    using YAccumulatorRegister::YAccumulatorRegister;
+    using YAccumulatorIndex::YAccumulatorIndex;
 
     int execute(State& state) override
     {
@@ -3449,7 +3456,7 @@ class SBC_B8 : public AddressMode::DirectImmediate<Operator::SBC>
 
 // SET1 d.0
 // d.0 = 1    	[........]
-// Direct Bit (2-Byte)
+// Direct (2-Byte)
 class SET1_02 : public AddressMode::Direct<Operator::SET1<0, true>>
 {
     using Direct::Direct;
@@ -3465,7 +3472,7 @@ class SET1_02 : public AddressMode::Direct<Operator::SET1<0, true>>
 
 // SET1 d.1
 // d.1 = 1    	[........]
-// Direct Bit (2-Byte)
+// Direct (2-Byte)
 class SET1_22 : public AddressMode::Direct<Operator::SET1<1, true>>
 {
     using Direct::Direct;
@@ -3480,7 +3487,7 @@ class SET1_22 : public AddressMode::Direct<Operator::SET1<1, true>>
 
 // SET1 d.2
 // d.2 = 1    	[........]
-// Direct Bit (2-Byte)
+// Direct (2-Byte)
 class SET1_42 : public AddressMode::Direct<Operator::SET1<2, true>>
 {
     using Direct::Direct;
@@ -3496,7 +3503,7 @@ class SET1_42 : public AddressMode::Direct<Operator::SET1<2, true>>
 
 // SET1 d.3
 // d.3 = 1    	[........]
-// Direct Bit (2-Byte)
+// Direct (2-Byte)
 class SET1_62 : public AddressMode::Direct<Operator::SET1<3, true>>
 {
     using Direct::Direct;
@@ -3511,7 +3518,7 @@ class SET1_62 : public AddressMode::Direct<Operator::SET1<3, true>>
 
 // SET1 d.4
 // d.4 = 1    	[........]
-// Direct Bit (2-Byte)
+// Direct (2-Byte)
 class SET1_82 : public AddressMode::Direct<Operator::SET1<4, true>>
 {
     using Direct::Direct;
@@ -3526,7 +3533,7 @@ class SET1_82 : public AddressMode::Direct<Operator::SET1<4, true>>
 
 // SET1 d.5
 // d.5 = 1    	[........]
-// Direct Bit (2-Byte)
+// Direct (2-Byte)
 class SET1_A2 : public AddressMode::Direct<Operator::SET1<5, true>>
 {
     using Direct::Direct;
@@ -3541,7 +3548,7 @@ class SET1_A2 : public AddressMode::Direct<Operator::SET1<5, true>>
 
 // SET1 d.6
 // d.6 = 1    	[........]
-// Direct Bit (2-Byte)
+// Direct (2-Byte)
 class SET1_C2 : public AddressMode::Direct<Operator::SET1<6, true>>
 {
     using Direct::Direct;
@@ -3556,7 +3563,7 @@ class SET1_C2 : public AddressMode::Direct<Operator::SET1<6, true>>
 
 // SET1 d.7
 // d.7 = 1    	[........]
-// Direct Bit (2-Byte)
+// Direct (2-Byte)
 class SET1_E2 : public AddressMode::Direct<Operator::SET1<7, true>>
 {
     using Direct::Direct;
