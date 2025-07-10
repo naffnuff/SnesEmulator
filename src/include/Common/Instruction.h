@@ -15,66 +15,8 @@ public:
     virtual std::string toString(const State& state) const = 0;
     virtual std::string opcodeToString() const = 0;
     virtual void applyBreakpoints(const State& state) const = 0;
-    virtual int execute(State& state) /*const*/ = 0;
+    virtual int execute(State& state) = 0;
     virtual int size() const = 0;
-};
-
-template<typename State, typename... Bytes>
-class InstructionBase : public Instruction<State>
-{
-public:
-    InstructionBase(State& state)
-        : obsoleteState(state)
-    {
-    }
-
-    InstructionBase(const InstructionBase&) = delete;
-    InstructionBase& operator=(const InstructionBase&) = delete;
-
-protected:
-    virtual int invokeOperator(Bytes...) = 0;
-
-    int applyOperand()
-    {
-        applyByte<Byte>();
-        return applyArguments({ applyByte<Bytes>()... }, std::index_sequence_for<Bytes...>());
-    }
-
-    std::string operandToString() const
-    {
-        std::ostringstream ss;
-        for (int i = size() - 1; i > 0; --i) {
-            obsoleteState.printProgramByte(i, ss);
-        }
-        return ss.str();
-    }
-
-    int size() const
-    {
-        return sizeof...(Bytes) + 1;
-    }
-
-    State& obsoleteState;
-
-private:
-    void applyBreakpoints(const State& state) const override
-    {
-        for (int i = 0; i < size(); ++i) {
-            state.applyBreakpoint(i);
-        }
-    }
-
-    template <typename Byte>
-    Byte applyByte()
-    {
-        return obsoleteState.applyProgramByte();
-    }
-
-    template<std::size_t... Indices>
-    int applyArguments(const std::tuple<Bytes...>& arguments, std::index_sequence<Indices...>)
-    {
-        return invokeOperator(std::get<Indices>(arguments)...);
-    }
 };
 
 template<typename State, typename... Bytes>

@@ -9,7 +9,7 @@ namespace CPU {
 template<int Code>
 struct OpcodeWrapper : Instruction<State>
 {
-    int execute(State& state) /*const*/ override
+    int execute(State& state) override
     {
         return Opcode<State, Code>::execute(state);
     }

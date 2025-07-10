@@ -9,11 +9,11 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
         "Absolute",
         {
             {
-                "MemoryAccess access = obsoleteState.getMemoryAccess(lowByte, highByte);",
-                "return Operator::invoke(obsoleteState, access);"
+                "MemoryAccess access = state.getMemoryAccess(lowByte, highByte);",
+                "return Operator::invoke(state, access);"
             },
             {
-                R"(return Operator::toString() + " $" + operandToString();)"
+                R"(return Operator::toString() + " $" + Type::operandToString(state);)"
             }
         }
     },
@@ -21,10 +21,10 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
         "Absolute_ControlFlow",
         {
             {
-                "return Operator::invoke(obsoleteState, Word(lowByte, highByte));"
+                "return Operator::invoke(state, Word(lowByte, highByte));"
             },
             {
-                R"(return Operator::toString() + " $" + operandToString();)"
+                R"(return Operator::toString() + " $" + Type::operandToString(state);)"
             }
         }
     },
@@ -33,11 +33,11 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
         {
             {
                 "Word address(lowByte, highByte);",
-                "address += Word(obsoleteState.readRegister<State::Register::X>());",
-                "return Operator::invoke(obsoleteState, obsoleteState.readMemoryWord(address));"
+                "address += Word(state.readRegister<State::Register::X>());",
+                "return Operator::invoke(state, state.readMemoryWord(address));"
             },
             {
-                R"(return Operator::toString() + " [$" + operandToString() + "+X]";)"
+                R"(return Operator::toString() + " [$" + Type::operandToString(state) + "+X]";)"
             }
         }
     },
@@ -45,11 +45,11 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
         "AbsoluteIndexedRegister",
         {
             {
-                "MemoryAccess access = obsoleteState.getMemoryAccess(Word(Word(lowByte, highByte) + obsoleteState.readRegister<FirstRegister>()));",
-                "return Operator::invoke(obsoleteState, access, obsoleteState.readRegister<SecondRegister>());"
+                "MemoryAccess access = state.getMemoryAccess(Word(Word(lowByte, highByte) + state.readRegister<FirstRegister>()));",
+                "return Operator::invoke(state, access, state.readRegister<SecondRegister>());"
             },
             {
-                R"(return Operator::toString() + " $" + operandToString() + "+" + State::getRegisterName<FirstRegister>() + ", " + State::getRegisterName<SecondRegister>();)"
+                R"(return Operator::toString() + " $" + Type::operandToString(state) + "+" + State::getRegisterName<FirstRegister>() + ", " + State::getRegisterName<SecondRegister>();)"
             }
         }
     },
@@ -57,11 +57,11 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
         "AbsoluteRegister",
         {
             {
-                "MemoryAccess access = obsoleteState.getMemoryAccess(lowByte, highByte);",
-                "return Operator::invoke(obsoleteState, access, obsoleteState.readRegister<RegisterIndex>());"
+                "MemoryAccess access = state.getMemoryAccess(lowByte, highByte);",
+                "return Operator::invoke(state, access, state.readRegister<RegisterIndex>());"
             },
             {
-                R"(return Operator::toString() + " $" + operandToString() + ", " + State::getRegisterName<RegisterIndex>();)"
+                R"(return Operator::toString() + " $" + Type::operandToString(state) + ", " + State::getRegisterName<RegisterIndex>();)"
             }
         }
     },
@@ -69,12 +69,12 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
         "CarryMemoryBit",
         {
             {
-                R"(throw NotYetImplementedException("CarryMemoryBit");)",
-                "MemoryAccess access = obsoleteState.getMemoryAccess(0);",
-                "return Operator::invoke(obsoleteState, access, 0);"
+                R"(throw NotYetImplementedException("SPC::AddressMode::CarryMemoryBit");)",
+                "MemoryAccess access = state.getMemoryAccess(0);",
+                "return Operator::invoke(state, access, 0);"
             },
             {
-                R"(return Operator::toString() + " $" + operandToString() + " TODO";)"
+                R"(return Operator::toString() + " $" + Type::operandToString(state) + " TODO";)"
             }
         }
     },
@@ -82,12 +82,12 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
         "CarryNegatedMemoryBit",
         {
             {
-                R"(throw NotYetImplementedException("CarryNegatedMemoryBit");)",
-                "MemoryAccess access = obsoleteState.getMemoryAccess(0);",
-                "return Operator::invoke(obsoleteState, access, 0);"
+                R"(throw NotYetImplementedException("SPC::AddressMode::CarryNegatedMemoryBit");)",
+                "MemoryAccess access = state.getMemoryAccess(0);",
+                "return Operator::invoke(state, access, 0);"
             },
             {
-                R"(return Operator::toString() + " $" + operandToString() + " TODO";)"
+                R"(return Operator::toString() + " $" + Type::operandToString(state) + " TODO";)"
             }
         }
     },
@@ -95,11 +95,11 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
         "Direct",
         {
             {
-                "MemoryAccess access = obsoleteState.getDirectMemoryAccess(lowByte);",
-                "return Operator::invoke(obsoleteState, access);"
+                "MemoryAccess access = state.getDirectMemoryAccess(lowByte);",
+                "return Operator::invoke(state, access);"
             },
             {
-                R"(return Operator::toString() + " $" + operandToString();)"
+                R"(return Operator::toString() + " $" + Type::operandToString(state);)"
             }
         }
     },
@@ -107,11 +107,11 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
         "DirectDirect",
         {
             {
-                "MemoryAccess access = obsoleteState.getDirectMemoryAccess(highByte);",
-                "return Operator::invoke(obsoleteState, access, obsoleteState.readDirectMemoryByte(lowByte));"
+                "MemoryAccess access = state.getDirectMemoryAccess(highByte);",
+                "return Operator::invoke(state, access, state.readDirectMemoryByte(lowByte));"
             },
             {
-                "std::string o = operandToString();",
+                "std::string o = Type::operandToString(state);",
                 R"(return Operator::toString() + " $" + o.substr(0, 2) + ", $" + o.substr(2, 2);)"
             }
         }
@@ -120,11 +120,11 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
         "DirectImmediate",
         {
             {
-                "MemoryAccess access = obsoleteState.getDirectMemoryAccess(highByte);",
-                "return Operator::invoke(obsoleteState, access, lowByte);"
+                "MemoryAccess access = state.getDirectMemoryAccess(highByte);",
+                "return Operator::invoke(state, access, lowByte);"
             },
             {
-                "std::string operand = operandToString();",
+                "std::string operand = Type::operandToString(state);",
                 R"(return Operator::toString() + " $" + operand.substr(0, 2) + ", #$" + operand.substr(2, 2);)"
             }
         }
@@ -133,11 +133,11 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
         "DirectIndexed",
         {
             {
-                "MemoryAccess access = obsoleteState.getDirectMemoryAccess(lowByte + obsoleteState.readRegister<RegisterIndex>());",
-                "return Operator::invoke(obsoleteState, access);"
+                "MemoryAccess access = state.getDirectMemoryAccess(lowByte + state.readRegister<RegisterIndex>());",
+                "return Operator::invoke(state, access);"
             },
             {
-                R"(return Operator::toString() + " $" + operandToString() + "+" + State::getRegisterName<RegisterIndex>();)"
+                R"(return Operator::toString() + " $" + Type::operandToString(state) + "+" + State::getRegisterName<RegisterIndex>();)"
             }
         }
     },
@@ -145,12 +145,12 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
         "DirectIndexedIndirectRegister",
         {
             {
-                "Word address = obsoleteState.readDirectMemoryWord(lowByte + obsoleteState.readRegister<FirstRegister>());",
-                "MemoryAccess access = obsoleteState.getMemoryAccess(address);",
-                "return Operator::invoke(obsoleteState, access, obsoleteState.readRegister<SecondRegister>());"
+                "Word address = state.readDirectMemoryWord(lowByte + state.readRegister<FirstRegister>());",
+                "MemoryAccess access = state.getMemoryAccess(address);",
+                "return Operator::invoke(state, access, state.readRegister<SecondRegister>());"
             },
             {
-                R"(return Operator::toString() + " [$" + operandToString() + "+" + State::getRegisterName<FirstRegister>() + "], " + State::getRegisterName<SecondRegister>();)"
+                R"(return Operator::toString() + " [$" + Type::operandToString(state) + "+" + State::getRegisterName<FirstRegister>() + "], " + State::getRegisterName<SecondRegister>();)"
             }
         }
     },
@@ -158,14 +158,14 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
         "DirectIndexedProgramCounterRelative",
         {
             {
-                "MemoryAccess access = obsoleteState.getDirectMemoryAccess(lowByte + obsoleteState.readRegister<RegisterIndex>());",
-                "return Operator::invoke(obsoleteState, access, highByte);"
+                "MemoryAccess access = state.getDirectMemoryAccess(lowByte + state.readRegister<RegisterIndex>());",
+                "return Operator::invoke(state, access, highByte);"
             },
             {
                 "std::ostringstream ss;",
                 R"(ss << Operator::toString() + " $";)",
-                R"(ss << obsoleteState.inspectProgramByte(1) << "+X, $";)",
-                "ss << obsoleteState.getProgramCounter(int((int8_t)size() + (int8_t)obsoleteState.inspectProgramByte(2)));",
+                R"(ss << state.inspectProgramByte(1) << "+X, $";)",
+                "ss << state.getProgramCounter(int((int8_t)Type::size() + (int8_t)state.inspectProgramByte(2)));",
                 "return ss.str();"
             }
         }
@@ -174,11 +174,11 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
         "DirectIndexedRegister",
         {
             {
-                "MemoryAccess access = obsoleteState.getDirectMemoryAccess(lowByte + obsoleteState.readRegister<FirstRegister>());",
-                "return Operator::invoke(obsoleteState, access, obsoleteState.readRegister<SecondRegister>());"
+                "MemoryAccess access = state.getDirectMemoryAccess(lowByte + state.readRegister<FirstRegister>());",
+                "return Operator::invoke(state, access, state.readRegister<SecondRegister>());"
             },
             {
-                R"(return Operator::toString() + " $" + operandToString() + "+" + State::getRegisterName<FirstRegister>() + ", " + State::getRegisterName<SecondRegister>();)"
+                R"(return Operator::toString() + " $" + Type::operandToString(state) + "+" + State::getRegisterName<FirstRegister>() + ", " + State::getRegisterName<SecondRegister>();)"
             }
         }
     },
@@ -186,12 +186,12 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
         "DirectIndirectIndexedRegister",
         {
             {
-                "Word address = obsoleteState.readDirectMemoryWord(lowByte) + obsoleteState.readRegister<FirstRegister>();",
-                "MemoryAccess access = obsoleteState.getMemoryAccess(address);",
-                "return Operator::invoke(obsoleteState, access, obsoleteState.readRegister<SecondRegister>());"
+                "Word address = state.readDirectMemoryWord(lowByte) + state.readRegister<FirstRegister>();",
+                "MemoryAccess access = state.getMemoryAccess(address);",
+                "return Operator::invoke(state, access, state.readRegister<SecondRegister>());"
             },
             {
-                R"(return Operator::toString() + " [$" + operandToString() + "]+" + State::getRegisterName<FirstRegister>() + ", " + State::getRegisterName<SecondRegister>();)"
+                R"(return Operator::toString() + " [$" + Type::operandToString(state) + "]+" + State::getRegisterName<FirstRegister>() + ", " + State::getRegisterName<SecondRegister>();)"
             }
         }
     },
@@ -199,14 +199,14 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
         "DirectProgramCounterRelative",
         {
             {
-                "MemoryAccess access = obsoleteState.getDirectMemoryAccess(lowByte);",
-                "return Operator::invoke(obsoleteState, access, highByte);"
+                "MemoryAccess access = state.getDirectMemoryAccess(lowByte);",
+                "return Operator::invoke(state, access, highByte);"
             },
             {
                 "std::ostringstream ss;",
                 R"(ss << Operator::toString() + " $";)",
-                R"(ss << obsoleteState.inspectProgramByte(1) << ", $";)",
-                "ss << obsoleteState.getProgramCounter(int((int8_t)size() + (int8_t)obsoleteState.inspectProgramByte(2)));",
+                R"(ss << state.inspectProgramByte(1) << ", $";)",
+                "ss << state.getProgramCounter(int((int8_t)Type::size() + (int8_t)state.inspectProgramByte(2)));",
                 "return ss.str();"
             }
         }
@@ -215,11 +215,11 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
         "DirectRegister",
         {
             {
-                "MemoryAccess access = obsoleteState.getDirectMemoryAccess(lowByte);",
-                "return Operator::invoke(obsoleteState, access, obsoleteState.readRegister<RegisterIndex>());"
+                "MemoryAccess access = state.getDirectMemoryAccess(lowByte);",
+                "return Operator::invoke(state, access, state.readRegister<RegisterIndex>());"
             },
             {
-                R"(return Operator::toString() + " $" + operandToString() + ", " + State::getRegisterName<RegisterIndex>();)"
+                R"(return Operator::toString() + " $" + Type::operandToString(state) + ", " + State::getRegisterName<RegisterIndex>();)"
             }
         }
     },
@@ -227,11 +227,11 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
         "DirectYAccumulator",
         {
             {
-                "MemoryAccess access = obsoleteState.getDirectMemoryAccess(lowByte);",
-                "return Operator::invoke(obsoleteState, access, obsoleteState.getYAccumulator());"
+                "MemoryAccess access = state.getDirectMemoryAccess(lowByte);",
+                "return Operator::invoke(state, access, state.getYAccumulator());"
             },
             {
-                R"(return Operator::toString() + " $" + operandToString() + ", YA";)"
+                R"(return Operator::toString() + " $" + Type::operandToString(state) + ", YA";)"
             }
         }
     },
@@ -239,7 +239,7 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
         "Implied",
         {
             {
-                "return Operator::invoke(obsoleteState);"
+                "return Operator::invoke(state);"
             },
             {
                 R"(return Operator::toString();)"
@@ -250,9 +250,9 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
         "IndirectIndirect",
         {
             {
-                R"(throw NotYetImplementedException("IndirectIndirect");)",
-                "MemoryAccess access = obsoleteState.getMemoryAccess(0);",
-                "return Operator::invoke(obsoleteState, access, 0);"
+                R"(throw NotYetImplementedException("SPC::AddressMode::IndirectIndirect");)",
+                "MemoryAccess access = state.getMemoryAccess(0);",
+                "return Operator::invoke(state, access, 0);"
             },
             {
                 R"(return Operator::toString() + " TODO";)"
@@ -263,12 +263,12 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
         "MemoryBit",
         {
             {
-                R"(throw NotYetImplementedException("MemoryBit");)",
-                "MemoryAccess access = obsoleteState.getMemoryAccess(0);",
-                "return Operator::invoke(obsoleteState, access, 0);"
+                R"(throw NotYetImplementedException("SPC::AddressMode::MemoryBit");)",
+                "MemoryAccess access = state.getMemoryAccess(0);",
+                "return Operator::invoke(state, access, 0);"
             },
             {
-                R"(return Operator::toString() + " $" + operandToString() + " TODO";)"
+                R"(return Operator::toString() + " $" + Type::operandToString(state) + " TODO";)"
             }
         }
     },
@@ -276,12 +276,12 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
         "MemoryBitCarry",
         {
             {
-                R"(throw NotYetImplementedException("MemoryBitCarry");)",
-                "MemoryAccess access = obsoleteState.getMemoryAccess(0);",
-                "return Operator::invoke(obsoleteState, access, 0);"
+                R"(throw NotYetImplementedException("SPC::AddressMode::MemoryBitCarry");)",
+                "MemoryAccess access = state.getMemoryAccess(0);",
+                "return Operator::invoke(state, access, 0);"
             },
             {
-                R"(return Operator::toString() + " $" + operandToString() + " TODO";)"
+                R"(return Operator::toString() + " $" + Type::operandToString(state) + " TODO";)"
             }
         }
     },
@@ -289,12 +289,12 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
         "ProgramCounterRelative",
         {
             {
-                "return Operator::invoke(obsoleteState, lowByte);"
+                "return Operator::invoke(state, lowByte);"
             },
             {
                 "std::ostringstream ss;",
                 R"(ss << Operator::toString() + " $";)",
-                "ss << obsoleteState.getProgramCounter(int((int8_t)size() + (int8_t)obsoleteState.inspectProgramByte(1)));",
+                "ss << state.getProgramCounter(int((int8_t)Type::size() + (int8_t)state.inspectProgramByte(1)));",
                 "return ss.str();"
             }
         }
@@ -303,8 +303,8 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
         "Register",
         {
             {
-                "State::RegisterAccess access = obsoleteState.getRegisterAccess<RegisterIndex>();",
-                "return Operator::invoke(obsoleteState, access);"
+                "State::RegisterAccess access = state.getRegisterAccess<RegisterIndex>();",
+                "return Operator::invoke(state, access);"
             },
             {
                 R"(return Operator::toString() + " " + State::getRegisterName<RegisterIndex>();)"
@@ -315,11 +315,11 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
         "RegisterAbsolute",
         {
             {
-                "State::RegisterAccess registerAccess = obsoleteState.getRegisterAccess<RegisterIndex>();",
-                "return Operator::invoke(obsoleteState, registerAccess, obsoleteState.readMemoryByte(lowByte, highByte));"
+                "State::RegisterAccess registerAccess = state.getRegisterAccess<RegisterIndex>();",
+                "return Operator::invoke(state, registerAccess, state.readMemoryByte(lowByte, highByte));"
             },
             {
-                R"(return Operator::toString() + " " + State::getRegisterName<RegisterIndex>() + ", $" + operandToString();)"
+                R"(return Operator::toString() + " " + State::getRegisterName<RegisterIndex>() + ", $" + Type::operandToString(state);)"
             }
         }
     },
@@ -327,13 +327,13 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
         "RegisterAbsoluteIndexed",
         {
             {
-                "State::RegisterAccess registerAccess = obsoleteState.getRegisterAccess<FirstRegister>();",
+                "State::RegisterAccess registerAccess = state.getRegisterAccess<FirstRegister>();",
                 "Word address(lowByte, highByte);",
-                "address += Word(obsoleteState.readRegister<SecondRegister>());",
-                "return Operator::invoke(obsoleteState, registerAccess, obsoleteState.readMemoryByte(address));"
+                "address += Word(state.readRegister<SecondRegister>());",
+                "return Operator::invoke(state, registerAccess, state.readMemoryByte(address));"
             },
             {
-                R"(return Operator::toString() + " " + State::getRegisterName<FirstRegister>() + ", $" + operandToString() + "+" + State::getRegisterName<SecondRegister>();)"
+                R"(return Operator::toString() + " " + State::getRegisterName<FirstRegister>() + ", $" + Type::operandToString(state) + "+" + State::getRegisterName<SecondRegister>();)"
             }
         }
     },
@@ -341,11 +341,11 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
         "RegisterDirect",
         {
             {
-                "State::RegisterAccess registerAccess = obsoleteState.getRegisterAccess<RegisterIndex>();",
-                "return Operator::invoke(obsoleteState, registerAccess, obsoleteState.readDirectMemoryByte(lowByte));"
+                "State::RegisterAccess registerAccess = state.getRegisterAccess<RegisterIndex>();",
+                "return Operator::invoke(state, registerAccess, state.readDirectMemoryByte(lowByte));"
             },
             {
-                R"(return Operator::toString() + " " + State::getRegisterName<RegisterIndex>() + ", $" + operandToString();)"
+                R"(return Operator::toString() + " " + State::getRegisterName<RegisterIndex>() + ", $" + Type::operandToString(state);)"
             }
         }
     },
@@ -353,11 +353,11 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
         "RegisterDirectIndexed",
         {
             {
-                "State::RegisterAccess registerAccess = obsoleteState.getRegisterAccess<FirstRegister>();",
-                "return Operator::invoke(obsoleteState, registerAccess, obsoleteState.readDirectMemoryByte(lowByte + obsoleteState.readRegister<SecondRegister>()));"
+                "State::RegisterAccess registerAccess = state.getRegisterAccess<FirstRegister>();",
+                "return Operator::invoke(state, registerAccess, state.readDirectMemoryByte(lowByte + state.readRegister<SecondRegister>()));"
             },
             {
-                R"(return Operator::toString() + " " + State::getRegisterName<FirstRegister>() + ", $" + operandToString() + "+X";)"
+                R"(return Operator::toString() + " " + State::getRegisterName<FirstRegister>() + ", $" + Type::operandToString(state) + "+X";)"
             }
         }
     },
@@ -365,12 +365,12 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
         "RegisterDirectIndexedIndirect",
         {
             {
-                "State::RegisterAccess registerAccess = obsoleteState.getRegisterAccess<FirstRegister>();",
-                "Word address = obsoleteState.readDirectMemoryWord(lowByte + obsoleteState.readRegister<SecondRegister>());",
-                "return Operator::invoke(obsoleteState, registerAccess, obsoleteState.readMemoryByte(address));"
+                "State::RegisterAccess registerAccess = state.getRegisterAccess<FirstRegister>();",
+                "Word address = state.readDirectMemoryWord(lowByte + state.readRegister<SecondRegister>());",
+                "return Operator::invoke(state, registerAccess, state.readMemoryByte(address));"
             },
             {
-                R"(return Operator::toString() + " " + State::getRegisterName<FirstRegister>() + ", [$" + operandToString() + "+" + State::getRegisterName<SecondRegister>() + "]";)"
+                R"(return Operator::toString() + " " + State::getRegisterName<FirstRegister>() + ", [$" + Type::operandToString(state) + "+" + State::getRegisterName<SecondRegister>() + "]";)"
             }
         }
     },
@@ -378,12 +378,12 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
         "RegisterDirectIndirectIndexed",
         {
             {
-                "State::RegisterAccess registerAccess = obsoleteState.getRegisterAccess<FirstRegister>();",
-                "Word indexedAddress = obsoleteState.readDirectMemoryWord(lowByte) + obsoleteState.readRegister<SecondRegister>();",
-                "return Operator::invoke(obsoleteState, registerAccess, obsoleteState.readMemoryByte(indexedAddress));"
+                "State::RegisterAccess registerAccess = state.getRegisterAccess<FirstRegister>();",
+                "Word indexedAddress = state.readDirectMemoryWord(lowByte) + state.readRegister<SecondRegister>();",
+                "return Operator::invoke(state, registerAccess, state.readMemoryByte(indexedAddress));"
             },
             {
-                R"(return Operator::toString() + " " + State::getRegisterName<FirstRegister>() + ", [$" + operandToString() + "]+" + State::getRegisterName<SecondRegister>();)"
+                R"(return Operator::toString() + " " + State::getRegisterName<FirstRegister>() + ", [$" + Type::operandToString(state) + "]+" + State::getRegisterName<SecondRegister>();)"
             }
         }
     },
@@ -391,11 +391,11 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
         "RegisterImmediate",
         {
             {
-                "State::RegisterAccess registerAccess = obsoleteState.getRegisterAccess<RegisterIndex>();",
-                "return Operator::invoke(obsoleteState, registerAccess, lowByte);"
+                "State::RegisterAccess registerAccess = state.getRegisterAccess<RegisterIndex>();",
+                "return Operator::invoke(state, registerAccess, lowByte);"
             },
             {
-                R"(return Operator::toString() + " " + State::getRegisterName<RegisterIndex>() + ", #$" + operandToString();)"
+                R"(return Operator::toString() + " " + State::getRegisterName<RegisterIndex>() + ", #$" + Type::operandToString(state);)"
             }
         }
     },
@@ -403,11 +403,11 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
         "RegisterIndirectIncrementRegister",
         {
             {
-                "State::RegisterAccess registerAccess = obsoleteState.getRegisterAccess<FirstRegister>();",
+                "State::RegisterAccess registerAccess = state.getRegisterAccess<FirstRegister>();",
                 "Byte firstRegisterValue = registerAccess.readByte();",
-                "MemoryAccess access = obsoleteState.getDirectMemoryAccess(firstRegisterValue);",
+                "MemoryAccess access = state.getDirectMemoryAccess(firstRegisterValue);",
                 "registerAccess.writeByte(firstRegisterValue + 1);",
-                "return Operator::invoke(obsoleteState, access, obsoleteState.readRegister<SecondRegister>());"
+                "return Operator::invoke(state, access, state.readRegister<SecondRegister>());"
             },
             {
                 R"(return Operator::toString() + " (" + State::getRegisterName<FirstRegister>() + ")+, " + State::getRegisterName<SecondRegister>();)"
@@ -418,8 +418,8 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
         "RegisterIndirectRegister",
         {
             {
-                "MemoryAccess access = obsoleteState.getDirectMemoryAccess(obsoleteState.readRegister<FirstRegister>());",
-                "return Operator::invoke(obsoleteState, access, obsoleteState.readRegister<SecondRegister>());"
+                "MemoryAccess access = state.getDirectMemoryAccess(state.readRegister<FirstRegister>());",
+                "return Operator::invoke(state, access, state.readRegister<SecondRegister>());"
             },
             {
                 R"(return Operator::toString() + " (" + State::getRegisterName<FirstRegister>() + "), " + State::getRegisterName<SecondRegister>();)"
@@ -430,13 +430,13 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
         "RegisterProgramCounterRelative",
         {
             {
-                "State::RegisterAccess registerAccess = obsoleteState.getRegisterAccess<RegisterIndex>();",
-                "return Operator::invoke(obsoleteState, registerAccess, lowByte);"
+                "State::RegisterAccess registerAccess = state.getRegisterAccess<RegisterIndex>();",
+                "return Operator::invoke(state, registerAccess, lowByte);"
             },
             {
                 "std::ostringstream ss;",
                 R"(ss << Operator::toString() + " " + State::getRegisterName<RegisterIndex>() + ", $";)",
-                "ss << obsoleteState.getProgramCounter(int((int8_t)size() + (int8_t)obsoleteState.inspectProgramByte(1)));",
+                "ss << state.getProgramCounter(int((int8_t)Type::size() + (int8_t)state.inspectProgramByte(1)));",
                 "return ss.str();"
             }
         }
@@ -445,8 +445,8 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
         "RegisterRegister",
         {
             {
-                "State::RegisterAccess registerAccess = obsoleteState.getRegisterAccess<FirstRegister>();",
-                "return Operator::invoke(obsoleteState, registerAccess, obsoleteState.readRegister<SecondRegister>());"
+                "State::RegisterAccess registerAccess = state.getRegisterAccess<FirstRegister>();",
+                "return Operator::invoke(state, registerAccess, state.readRegister<SecondRegister>());"
             },
             {
                 R"(return Operator::toString() + " " + State::getRegisterName<FirstRegister>() + ", " + State::getRegisterName<SecondRegister>();)"
@@ -457,9 +457,9 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
         "RegisterRegisterIndirect",
         {
             {
-                "State::RegisterAccess registerAccess = obsoleteState.getRegisterAccess<FirstRegister>();",
-                "Byte value = obsoleteState.readDirectMemoryByte(obsoleteState.readRegister<SecondRegister>());",
-                "return Operator::invoke(obsoleteState, registerAccess, value);"
+                "State::RegisterAccess registerAccess = state.getRegisterAccess<FirstRegister>();",
+                "Byte value = state.readDirectMemoryByte(state.readRegister<SecondRegister>());",
+                "return Operator::invoke(state, registerAccess, value);"
             },
             {
                 R"CODE(return Operator::toString() + " " + State::getRegisterName<FirstRegister>() + ", (" + State::getRegisterName<SecondRegister>() + ")";)CODE"
@@ -470,9 +470,9 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
         "RegisterRegisterIndirectIncrement",
         {
             {
-                R"(throw NotYetImplementedException("RegisterRegisterIndirectIncrement");)",
-                "MemoryAccess access = obsoleteState.getMemoryAccess(0);",
-                "return Operator::invoke(obsoleteState, access, 0);"
+                R"(throw NotYetImplementedException("SPC::AddressMode::RegisterRegisterIndirectIncrement");)",
+                "MemoryAccess access = state.getMemoryAccess(0);",
+                "return Operator::invoke(state, access, 0);"
             },
             {
                 R"(return Operator::toString() + " TODO";)"
@@ -483,9 +483,9 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
         "Table",
         {
             {
-                R"(throw NotYetImplementedException("Table");)",
-                "MemoryAccess access = obsoleteState.getMemoryAccess(0);",
-                "return Operator::invoke(obsoleteState, access, 0);"
+                R"(throw NotYetImplementedException("SPC::AddressMode::Table");)",
+                "MemoryAccess access = state.getMemoryAccess(0);",
+                "return Operator::invoke(state, access, 0);"
             },
             {
                 R"(return Operator::toString() + " TODO";)"
@@ -496,12 +496,12 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
         "UPage",
         {
             {
-                R"(throw NotYetImplementedException("UPage");)",
-                "MemoryAccess access = obsoleteState.getMemoryAccess(0);",
-                "return Operator::invoke(obsoleteState, access, 0);"
+                R"(throw NotYetImplementedException("SPC::AddressMode::UPage");)",
+                "MemoryAccess access = state.getMemoryAccess(0);",
+                "return Operator::invoke(state, access, 0);"
             },
             {
-                R"(return Operator::toString() + " $" + operandToString() + " TODO";)"
+                R"(return Operator::toString() + " $" + Type::operandToString(state) + " TODO";)"
             }
         }
     },
@@ -509,9 +509,9 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
         "YAccumulator",
         {
             {
-                "State::RegisterAccess firstRegisterAccess = obsoleteState.getRegisterAccess<State::Register::A>();",
-                "State::RegisterAccess secondRegisterAccess = obsoleteState.getRegisterAccess<State::Register::Y>();",
-                "return Operator::invoke(obsoleteState, firstRegisterAccess, secondRegisterAccess);"
+                "State::RegisterAccess firstRegisterAccess = state.getRegisterAccess<State::Register::A>();",
+                "State::RegisterAccess secondRegisterAccess = state.getRegisterAccess<State::Register::Y>();",
+                "return Operator::invoke(state, firstRegisterAccess, secondRegisterAccess);"
             },
             {
                 R"(return Operator::toString() + " YA";)"
@@ -522,11 +522,11 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
         "YAccumulatorDirect",
         {
             {
-                "State::RegisterAccess access = obsoleteState.getRegisterAccess<State::Register::A>();",
-                "return Operator::invoke(obsoleteState, access, obsoleteState.readDirectMemoryWord(lowByte));"
+                "State::RegisterAccess access = state.getRegisterAccess<State::Register::A>();",
+                "return Operator::invoke(state, access, state.readDirectMemoryWord(lowByte));"
             },
             {
-                R"(return Operator::toString() + " YA, $" + operandToString();)"
+                R"(return Operator::toString() + " YA, $" + Type::operandToString(state);)"
             }
         }
     },
@@ -534,8 +534,8 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
         "YAccumulatorIndex",
         {
             {
-                "State::RegisterAccess access = obsoleteState.getRegisterAccess<State::Register::A>();",
-                "return Operator::invoke(obsoleteState, access, obsoleteState.readRegister<RegisterIndex>());"
+                "State::RegisterAccess access = state.getRegisterAccess<State::Register::A>();",
+                "return Operator::invoke(state, access, state.readRegister<RegisterIndex>());"
             },
             {
                 R"(return Operator::toString() + " YA, " + State::getRegisterName<RegisterIndex>();)"

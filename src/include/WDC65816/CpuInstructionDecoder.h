@@ -17,7 +17,7 @@ public:
     InstructionDecoder(const InstructionDecoder&) = delete;
     InstructionDecoder& operator=(const InstructionDecoder&) = delete;
 
-    Instruction<State>* getNextInstruction(State& state) const
+    Instruction<State>* getNextInstruction(const State& state) const
     {
         return getInstruction(state.inspectProgramByte());
     }
@@ -29,16 +29,6 @@ public:
 
 private:
     static std::array<Instruction<State>*, Byte::spaceSize> instructions;
-};
-
-// Alternative 1: lookup struct
-
-struct InstructionInfo
-{
-    int (*execute)(State& state) = nullptr;
-    const char* (*opcodeToString)() = nullptr;
-    std::string(*toString)(const State& state) = nullptr;
-    void (*applyBreakpoints)(const State& state) = nullptr;
 };
 
 }

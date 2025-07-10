@@ -465,7 +465,7 @@ void addCycleModifications(std::ostream& output, const std::set<int>& remarks)
     }
 }
 
-void generateOpcode(std::ostream& output, const Instruction& instruction, bool is16Bit)
+void generateOpcode(std::ostream& output, const Instruction& instruction)
 {
     int operandSize = stoi(instruction.size) - 1;
 
@@ -476,40 +476,35 @@ void generateOpcode(std::ostream& output, const Instruction& instruction, bool i
 
     int sizeRemark = 0;
 
-    std::string classname = instruction.classname + (is16Bit ? "_16Bit" : "");
-
     std::string addressModeClass = instruction.addressModeClass;
-    if (is16Bit) {
-        addressModeClass += "16Bit";
-    }
     if (instruction.controlFlow)
     {
         addressModeClass += "_ControlFlow";
     }
 
-    output << "class " << classname
-        << " : public AddressMode::" << addressModeClass
+    output << "template<>" << std::endl
+        << "struct Opcode<State, 0x" << instruction.code << ">" << std::endl
+        << "{" << std::endl
+        << "    using Instruction = " << "AddressMode::" << addressModeClass
         << "<Operator::" << instruction.operatorName;
-    if (!instruction.addressModeClassArg.empty()) {
+    if (!instruction.addressModeClassArg.empty())
+    {
         output << ", " << instruction.addressModeClassArg;
     }
-    output << ">" << std::endl
-        << "{" << std::endl
-        << "    using " << addressModeClass << "::" << addressModeClass << ";" << std::endl << std::endl;
-    output << "    int execute(State& state) override" << std::endl
-        << "    {" << std::endl;
+    output << ">;" << std::endl << std::endl;
+    output << "    static int execute(State& state)" << std::endl
+        << "    {" << std::endl
+        << "        PROFILE_IF(PROFILE_OPCODES, \"" << instruction.code << ": " << instruction.name << "\");" << std::endl
+        << std::endl;
     if (instruction.notYetImplemented)
     {
-        output << "        throw NotYetImplementedException(\"" + classname + "\");" << std::endl;
+        output << "        throw NotYetImplementedException(\"SPC::Opcode<SPC::State, 0x" + instruction.code + ">\");" << std::endl;
     }
     output << "        return " << instruction.cycles;
-    output << " + applyOperand();" << std::endl
+    output << " + Instruction::Type::applyOperand<Instruction>(state);" << std::endl
         << "    }" << std::endl
         << std::endl
-        << "    std::string opcodeToString() const override { return \"" << instruction.code << ": " << instruction.name;
-    if (is16Bit) {
-        output << " (16-bit)";
-    }
+        << "    static std::string opcodeToString() { return \"" << instruction.code << ": " << instruction.name;
     output << "\"; }" << std::endl
         << "};" << std::endl
         << std::endl;
@@ -532,8 +527,6 @@ void generateOpcodes(const std::vector<Instruction>& instructions)
         << std::endl
         << "namespace SPC {" << std::endl
         << std::endl
-        << "namespace Opcode {" << std::endl
-        << std::endl
         << "EXCEPTION(NotYetImplementedException, ::NotYetImplementedException)" << std::endl
         << std::endl
         << "CREATE_PROFILER();" << std::endl
@@ -541,10 +534,10 @@ void generateOpcodes(const std::vector<Instruction>& instructions)
 
     for (const Instruction& instruction : instructions) {
         std::string flag = "";
-        generateOpcode(output, instruction, false);
+        generateOpcode(output, instruction);
     }
 
-    output << "}" << std::endl << std::endl << "}" << std::endl;
+    output << "}" << std::endl;
 }
 
 void generateOpcodeMap(const std::vector<Instruction>& instructions)
@@ -589,24 +582,23 @@ void generateAddressMode(std::ofstream& output, std::string name, bool controlFl
     }
     output << ">" << std::endl;
 
-    output << "class " << name << " : public ";
+    output << "struct " << name << std::endl
+        << "{" << std::endl;
 
     int actualSize = args.instructionSize + (is16Bit ? 1 : 0);
 
-    std::ostringstream superclassStream;
-    superclassStream << "Instruction" << actualSize << "Byte";
+    std::ostringstream instructionType;
+    instructionType << "Instruction" << actualSize << "Byte";
 
-    output << superclassStream.str() << std::endl << "{" << std::endl;
-
-    output << "    using " << superclassStream.str() << "::InstructionBase;" << std::endl << std::endl;
+    output << "    using Type = " << instructionType.str() << ";" << std::endl << std::endl;
 
     for (int cycleRemark : args.cycleRemarks) {
         output << "    // " << getRemark(cycleRemark) << std::endl;
     }
 
-    output << "    int invokeOperator(";
+    output << "    static int invokeOperator(State& state";
     if (actualSize >= 2) {
-        output << "Byte lowByte";
+        output << ", Byte lowByte";
         if (actualSize >= 3) {
             output << ", Byte highByte";
             if (actualSize >= 4) {
@@ -614,8 +606,10 @@ void generateAddressMode(std::ofstream& output, std::string name, bool controlFl
             }
         }
     }
-    output << ") override" << std::endl
-        << "    {" << std::endl;
+    output << ")" << std::endl
+        << "    {" << std::endl
+        << "        PROFILE_IF(PROFILE_ADDRESS_MODES, \"" << name << "\");" << std::endl
+        << std::endl;
 
     auto it = addressModeImplementations.find(name);
     if (it != addressModeImplementations.end())
@@ -629,7 +623,7 @@ void generateAddressMode(std::ofstream& output, std::string name, bool controlFl
     output << "    }" << std::endl
         << std::endl;
 
-    output << "    std::string toString(const State& state) const override" << std::endl
+    output << "    static std::string toString(const State& state)" << std::endl
         << "    {" << std::endl;
 
     if (it != addressModeImplementations.end())
@@ -654,6 +648,7 @@ void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
         << std::endl
         << "#include \"Exception.h\"" << std::endl
         << "#include \"Instruction.h\"" << std::endl
+        << "#include \"Memory.h\"" << std::endl
         << "#include \"SpcState.h\"" << std::endl
         << std::endl
         << "#include \"Profiler.h\"" << std::endl
@@ -664,9 +659,9 @@ void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
         << std::endl
         << "namespace SPC {" << std::endl
         << std::endl
-        << "using Instruction1Byte = InstructionBase<State>;" << std::endl
-        << "using Instruction2Byte = InstructionBase<State, Byte>;" << std::endl
-        << "using Instruction3Byte = InstructionBase<State, Byte, Byte>;" << std::endl
+        << "using Instruction1Byte = InstructionType<State>;" << std::endl
+        << "using Instruction2Byte = InstructionType<State, Byte>;" << std::endl
+        << "using Instruction3Byte = InstructionType<State, Byte, Byte>;" << std::endl
         << std::endl
         << "namespace AddressMode {" << std::endl
         << std::endl
@@ -723,7 +718,7 @@ void generateOperators(const OperatorMap& operatorMap)
         }
         output << ")" << std::endl
             << "    {" << std::endl
-            << "        throw NotYetImplementedException(\"" + kvp.first + "\");" << std::endl;
+            << "        throw NotYetImplementedException(\"SPC::Operator::" + kvp.first + "\");" << std::endl;
         if (hasCycleModification(kvp.second.cycleRemarks)) {
             output << "        int cycles = 0;" << std::endl;
             addCycleModifications(output, kvp.second.cycleRemarks);
@@ -958,7 +953,7 @@ void generateSpc()
     }
 
     generateOpcodes(instructions);
-    generateOpcodeMap(instructions);
+    //generateOpcodeMap(instructions);
     generateAddressModes(addressModeClassMap);
     //generateOperators(operatorMap);
 

@@ -305,7 +305,7 @@ void generateOpcode(std::ostream& output, Instruction& instruction, const Opcode
         << std::endl;
     if (opcode.notYetImplemented)
     {
-        output << "        throw NotYetImplementedException(\"" + instruction.code + "\");" << std::endl;
+        output << "        throw NotYetImplementedException(\"CPU::Opcode<CPU::State, 0x" + instruction.code + ">\");" << std::endl;
     }
     std::string indentation = "";
     if (!flag16Bit.empty())

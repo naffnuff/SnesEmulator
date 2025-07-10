@@ -12,7 +12,7 @@
 #include "DmaInstruction.h"
 #include "HdmaInstruction.h"
 
-#define PROFILING_ENABLED false
+#define PROFILING_ENABLED true
 
 #include "Profiler.h"
 

@@ -190,7 +190,7 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
         "DirectPageIndexedIndirectX",
         {
             {
-                R"(throw NotYetImplementedException("DirectPageIndexedIndirectX");)",
+                R"(throw NotYetImplementedException("CPU::AddressMode::DirectPageIndexedIndirectX");)",
                 "int cycles = 0;",
                 "if ((Byte)state.getDirectPageRegister())",
                 "{",

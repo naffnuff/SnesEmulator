@@ -12,18 +12,23 @@ namespace SPC {
 class InstructionDecoder
 {
 public:
-    SHARED InstructionDecoder(State& state);
+    SHARED InstructionDecoder() {}
 
     InstructionDecoder(const InstructionDecoder&) = delete;
     InstructionDecoder& operator=(const InstructionDecoder&) = delete;
 
-    Instruction<State>* getNextInstruction(State& state) const
+    Instruction<State>* getNextInstruction(const State& state) const
     {
-        return instructions[state.inspectProgramByte()].get();
+        return getInstruction(state.inspectProgramByte());
+    }
+
+    Instruction<State>* getInstruction(Byte opcode) const
+    {
+        return instructions[opcode];
     }
 
 private:
-    std::array<std::unique_ptr<Instruction<State>>, Byte::spaceSize> instructions;
+    static std::array<Instruction<State>*, Byte::spaceSize> instructions;
 };
 
 }

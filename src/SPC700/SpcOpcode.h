@@ -11,8 +11,6 @@
 
 namespace SPC {
 
-namespace Opcode {
-
 EXCEPTION(NotYetImplementedException, ::NotYetImplementedException)
 
 CREATE_PROFILER();
@@ -20,3939 +18,4705 @@ CREATE_PROFILER();
 // ADC (X), (Y)
 // (X) = (X)+(Y)+C    	[NV..H.ZC]
 // Indirect Indirect (1-Byte)
-class ADC_99 : public AddressMode::IndirectIndirect<Operator::ADC>
+template<>
+struct Opcode<State, 0x99>
 {
-    using IndirectIndirect::IndirectIndirect;
+    using Instruction = AddressMode::IndirectIndirect<Operator::ADC>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("ADC_99");
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "99: ADC (X), (Y)");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x99>");
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "99: ADC (X), (Y)"; }
+    static std::string opcodeToString() { return "99: ADC (X), (Y)"; }
 };
 
 // ADC A, #i
 // A = A+i+C    	[NV..H.ZC]
 // Register Immediate (2-Byte)
-class ADC_88 : public AddressMode::RegisterImmediate<Operator::ADC, State::Register::A>
+template<>
+struct Opcode<State, 0x88>
 {
-    using RegisterImmediate::RegisterImmediate;
+    using Instruction = AddressMode::RegisterImmediate<Operator::ADC, State::Register::A>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  2 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "88: ADC A, #i");
+
+        return  2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "88: ADC A, #i"; }
+    static std::string opcodeToString() { return "88: ADC A, #i"; }
 };
 
 // ADC A, (X)
 // A = A+(X)+C    	[NV..H.ZC]
 // Register Register Indirect (1-Byte)
-class ADC_86 : public AddressMode::RegisterRegisterIndirect<Operator::ADC, State::Register::A, State::Register::X>
+template<>
+struct Opcode<State, 0x86>
 {
-    using RegisterRegisterIndirect::RegisterRegisterIndirect;
+    using Instruction = AddressMode::RegisterRegisterIndirect<Operator::ADC, State::Register::A, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("ADC_86");
-        return  3 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "86: ADC A, (X)");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x86>");
+        return  3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "86: ADC A, (X)"; }
+    static std::string opcodeToString() { return "86: ADC A, (X)"; }
 };
 
 // ADC A, [d]+Y
 // A = A+([d]+Y)+C    	[NV..H.ZC]
 // Register Direct Indirect Indexed (2-Byte)
-class ADC_97 : public AddressMode::RegisterDirectIndirectIndexed<Operator::ADC, State::Register::A, State::Register::Y>
+template<>
+struct Opcode<State, 0x97>
 {
-    using RegisterDirectIndirectIndexed::RegisterDirectIndirectIndexed;
+    using Instruction = AddressMode::RegisterDirectIndirectIndexed<Operator::ADC, State::Register::A, State::Register::Y>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  6 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "97: ADC A, [d]+Y");
+
+        return  6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "97: ADC A, [d]+Y"; }
+    static std::string opcodeToString() { return "97: ADC A, [d]+Y"; }
 };
 
 // ADC A, [d+X]
 // A = A+([d+X])+C    	[NV..H.ZC]
 // Register Direct Indexed Indirect (2-Byte)
-class ADC_87 : public AddressMode::RegisterDirectIndexedIndirect<Operator::ADC, State::Register::A, State::Register::X>
+template<>
+struct Opcode<State, 0x87>
 {
-    using RegisterDirectIndexedIndirect::RegisterDirectIndexedIndirect;
+    using Instruction = AddressMode::RegisterDirectIndexedIndirect<Operator::ADC, State::Register::A, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("ADC_87");
-        return  6 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "87: ADC A, [d+X]");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x87>");
+        return  6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "87: ADC A, [d+X]"; }
+    static std::string opcodeToString() { return "87: ADC A, [d+X]"; }
 };
 
 // ADC A, d
 // A = A+(d)+C    	[NV..H.ZC]
 // Register Direct (2-Byte)
-class ADC_84 : public AddressMode::RegisterDirect<Operator::ADC, State::Register::A>
+template<>
+struct Opcode<State, 0x84>
 {
-    using RegisterDirect::RegisterDirect;
+    using Instruction = AddressMode::RegisterDirect<Operator::ADC, State::Register::A>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  3 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "84: ADC A, d");
+
+        return  3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "84: ADC A, d"; }
+    static std::string opcodeToString() { return "84: ADC A, d"; }
 };
 
 // ADC A, d+X
 // A = A+(d+X)+C    	[NV..H.ZC]
 // Register Direct Indexed (2-Byte)
-class ADC_94 : public AddressMode::RegisterDirectIndexed<Operator::ADC, State::Register::A, State::Register::X>
+template<>
+struct Opcode<State, 0x94>
 {
-    using RegisterDirectIndexed::RegisterDirectIndexed;
+    using Instruction = AddressMode::RegisterDirectIndexed<Operator::ADC, State::Register::A, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "94: ADC A, d+X");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "94: ADC A, d+X"; }
+    static std::string opcodeToString() { return "94: ADC A, d+X"; }
 };
 
 // ADC A, !a
 // A = A+(a)+C    	[NV..H.ZC]
 // Register Absolute (3-Byte)
-class ADC_85 : public AddressMode::RegisterAbsolute<Operator::ADC, State::Register::A>
+template<>
+struct Opcode<State, 0x85>
 {
-    using RegisterAbsolute::RegisterAbsolute;
+    using Instruction = AddressMode::RegisterAbsolute<Operator::ADC, State::Register::A>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "85: ADC A, !a");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "85: ADC A, !a"; }
+    static std::string opcodeToString() { return "85: ADC A, !a"; }
 };
 
 // ADC A, !a+X
 // A = A+(a+X)+C    	[NV..H.ZC]
 // Register Absolute Indexed (3-Byte)
-class ADC_95 : public AddressMode::RegisterAbsoluteIndexed<Operator::ADC, State::Register::A, State::Register::X>
+template<>
+struct Opcode<State, 0x95>
 {
-    using RegisterAbsoluteIndexed::RegisterAbsoluteIndexed;
+    using Instruction = AddressMode::RegisterAbsoluteIndexed<Operator::ADC, State::Register::A, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "95: ADC A, !a+X");
+
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "95: ADC A, !a+X"; }
+    static std::string opcodeToString() { return "95: ADC A, !a+X"; }
 };
 
 // ADC A, !a+Y
 // A = A+(a+Y)+C    	[NV..H.ZC]
 // Register Absolute Indexed (3-Byte)
-class ADC_96 : public AddressMode::RegisterAbsoluteIndexed<Operator::ADC, State::Register::A, State::Register::Y>
+template<>
+struct Opcode<State, 0x96>
 {
-    using RegisterAbsoluteIndexed::RegisterAbsoluteIndexed;
+    using Instruction = AddressMode::RegisterAbsoluteIndexed<Operator::ADC, State::Register::A, State::Register::Y>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "96: ADC A, !a+Y");
+
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "96: ADC A, !a+Y"; }
+    static std::string opcodeToString() { return "96: ADC A, !a+Y"; }
 };
 
 // ADC dd, ds
 // (dd) = (dd)+(d)+C    	[NV..H.ZC]
 // Direct Direct (3-Byte)
-class ADC_89 : public AddressMode::DirectDirect<Operator::ADC>
+template<>
+struct Opcode<State, 0x89>
 {
-    using DirectDirect::DirectDirect;
+    using Instruction = AddressMode::DirectDirect<Operator::ADC>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("ADC_89");
-        return  6 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "89: ADC dd, ds");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x89>");
+        return  6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "89: ADC dd, ds"; }
+    static std::string opcodeToString() { return "89: ADC dd, ds"; }
 };
 
 // ADC d, #i
 // (d) = (d)+i+C    	[NV..H.ZC]
 // Direct Immediate (3-Byte)
-class ADC_98 : public AddressMode::DirectImmediate<Operator::ADC>
+template<>
+struct Opcode<State, 0x98>
 {
-    using DirectImmediate::DirectImmediate;
+    using Instruction = AddressMode::DirectImmediate<Operator::ADC>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "98: ADC d, #i");
+
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "98: ADC d, #i"; }
+    static std::string opcodeToString() { return "98: ADC d, #i"; }
 };
 
 // ADDW YA, d
 // YA  = YA + (d), H on high byte    	[NV..H.ZC]
 // Y Accumulator Direct (2-Byte)
-class ADDW_7A : public AddressMode::YAccumulatorDirect<Operator::ADDW>
+template<>
+struct Opcode<State, 0x7A>
 {
-    using YAccumulatorDirect::YAccumulatorDirect;
+    using Instruction = AddressMode::YAccumulatorDirect<Operator::ADDW>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "7A: ADDW YA, d");
+
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "7A: ADDW YA, d"; }
+    static std::string opcodeToString() { return "7A: ADDW YA, d"; }
 };
 
 // AND (X), (Y)
 // (X) = (X) & (Y)    	[N.....Z.]
 // Indirect Indirect (1-Byte)
-class AND_39 : public AddressMode::IndirectIndirect<Operator::AND>
+template<>
+struct Opcode<State, 0x39>
 {
-    using IndirectIndirect::IndirectIndirect;
+    using Instruction = AddressMode::IndirectIndirect<Operator::AND>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("AND_39");
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "39: AND (X), (Y)");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x39>");
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "39: AND (X), (Y)"; }
+    static std::string opcodeToString() { return "39: AND (X), (Y)"; }
 };
 
 // AND A, #i
 // A = A & i    	[N.....Z.]
 // Register Immediate (2-Byte)
-class AND_28 : public AddressMode::RegisterImmediate<Operator::AND, State::Register::A>
+template<>
+struct Opcode<State, 0x28>
 {
-    using RegisterImmediate::RegisterImmediate;
+    using Instruction = AddressMode::RegisterImmediate<Operator::AND, State::Register::A>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  2 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "28: AND A, #i");
+
+        return  2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "28: AND A, #i"; }
+    static std::string opcodeToString() { return "28: AND A, #i"; }
 };
 
 // AND A, (X)
 // A = A & (X)    	[N.....Z.]
 // Register Register Indirect (1-Byte)
-class AND_26 : public AddressMode::RegisterRegisterIndirect<Operator::AND, State::Register::A, State::Register::X>
+template<>
+struct Opcode<State, 0x26>
 {
-    using RegisterRegisterIndirect::RegisterRegisterIndirect;
+    using Instruction = AddressMode::RegisterRegisterIndirect<Operator::AND, State::Register::A, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  3 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "26: AND A, (X)");
+
+        return  3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "26: AND A, (X)"; }
+    static std::string opcodeToString() { return "26: AND A, (X)"; }
 };
 
 // AND A, [d]+Y
 // A = A & ([d]+Y)    	[N.....Z.]
 // Register Direct Indirect Indexed (2-Byte)
-class AND_37 : public AddressMode::RegisterDirectIndirectIndexed<Operator::AND, State::Register::A, State::Register::Y>
+template<>
+struct Opcode<State, 0x37>
 {
-    using RegisterDirectIndirectIndexed::RegisterDirectIndirectIndexed;
+    using Instruction = AddressMode::RegisterDirectIndirectIndexed<Operator::AND, State::Register::A, State::Register::Y>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("AND_37");
-        return  6 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "37: AND A, [d]+Y");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x37>");
+        return  6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "37: AND A, [d]+Y"; }
+    static std::string opcodeToString() { return "37: AND A, [d]+Y"; }
 };
 
 // AND A, [d+X]
 // A = A & ([d+X])    	[N.....Z.]
 // Register Direct Indexed Indirect (2-Byte)
-class AND_27 : public AddressMode::RegisterDirectIndexedIndirect<Operator::AND, State::Register::A, State::Register::X>
+template<>
+struct Opcode<State, 0x27>
 {
-    using RegisterDirectIndexedIndirect::RegisterDirectIndexedIndirect;
+    using Instruction = AddressMode::RegisterDirectIndexedIndirect<Operator::AND, State::Register::A, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("AND_27");
-        return  6 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "27: AND A, [d+X]");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x27>");
+        return  6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "27: AND A, [d+X]"; }
+    static std::string opcodeToString() { return "27: AND A, [d+X]"; }
 };
 
 // AND A, d
 // A = A & (d)    	[N.....Z.]
 // Register Direct (2-Byte)
-class AND_24 : public AddressMode::RegisterDirect<Operator::AND, State::Register::A>
+template<>
+struct Opcode<State, 0x24>
 {
-    using RegisterDirect::RegisterDirect;
+    using Instruction = AddressMode::RegisterDirect<Operator::AND, State::Register::A>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  3 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "24: AND A, d");
+
+        return  3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "24: AND A, d"; }
+    static std::string opcodeToString() { return "24: AND A, d"; }
 };
 
 // AND A, d+X
 // A = A & (d+X)    	[N.....Z.]
 // Register Direct Indexed (2-Byte)
-class AND_34 : public AddressMode::RegisterDirectIndexed<Operator::AND, State::Register::A, State::Register::X>
+template<>
+struct Opcode<State, 0x34>
 {
-    using RegisterDirectIndexed::RegisterDirectIndexed;
+    using Instruction = AddressMode::RegisterDirectIndexed<Operator::AND, State::Register::A, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("AND_34");
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "34: AND A, d+X");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x34>");
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "34: AND A, d+X"; }
+    static std::string opcodeToString() { return "34: AND A, d+X"; }
 };
 
 // AND A, !a
 // A = A & (a)    	[N.....Z.]
 // Register Absolute (3-Byte)
-class AND_25 : public AddressMode::RegisterAbsolute<Operator::AND, State::Register::A>
+template<>
+struct Opcode<State, 0x25>
 {
-    using RegisterAbsolute::RegisterAbsolute;
+    using Instruction = AddressMode::RegisterAbsolute<Operator::AND, State::Register::A>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "25: AND A, !a");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "25: AND A, !a"; }
+    static std::string opcodeToString() { return "25: AND A, !a"; }
 };
 
 // AND A, !a+X
 // A = A & (a+X)    	[N.....Z.]
 // Register Absolute Indexed (3-Byte)
-class AND_35 : public AddressMode::RegisterAbsoluteIndexed<Operator::AND, State::Register::A, State::Register::X>
+template<>
+struct Opcode<State, 0x35>
 {
-    using RegisterAbsoluteIndexed::RegisterAbsoluteIndexed;
+    using Instruction = AddressMode::RegisterAbsoluteIndexed<Operator::AND, State::Register::A, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("AND_35");
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "35: AND A, !a+X");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x35>");
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "35: AND A, !a+X"; }
+    static std::string opcodeToString() { return "35: AND A, !a+X"; }
 };
 
 // AND A, !a+Y
 // A = A & (a+Y)    	[N.....Z.]
 // Register Absolute Indexed (3-Byte)
-class AND_36 : public AddressMode::RegisterAbsoluteIndexed<Operator::AND, State::Register::A, State::Register::Y>
+template<>
+struct Opcode<State, 0x36>
 {
-    using RegisterAbsoluteIndexed::RegisterAbsoluteIndexed;
+    using Instruction = AddressMode::RegisterAbsoluteIndexed<Operator::AND, State::Register::A, State::Register::Y>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("AND_36");
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "36: AND A, !a+Y");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x36>");
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "36: AND A, !a+Y"; }
+    static std::string opcodeToString() { return "36: AND A, !a+Y"; }
 };
 
 // AND dd, ds
 // (dd) = (dd) & (ds)    	[N.....Z.]
 // Direct Direct (3-Byte)
-class AND_29 : public AddressMode::DirectDirect<Operator::AND>
+template<>
+struct Opcode<State, 0x29>
 {
-    using DirectDirect::DirectDirect;
+    using Instruction = AddressMode::DirectDirect<Operator::AND>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  6 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "29: AND dd, ds");
+
+        return  6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "29: AND dd, ds"; }
+    static std::string opcodeToString() { return "29: AND dd, ds"; }
 };
 
 // AND d, #i
 // (d) = (d) & i    	[N.....Z.]
 // Direct Immediate (3-Byte)
-class AND_38 : public AddressMode::DirectImmediate<Operator::AND>
+template<>
+struct Opcode<State, 0x38>
 {
-    using DirectImmediate::DirectImmediate;
+    using Instruction = AddressMode::DirectImmediate<Operator::AND>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("AND_38");
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "38: AND d, #i");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x38>");
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "38: AND d, #i"; }
+    static std::string opcodeToString() { return "38: AND d, #i"; }
 };
 
 // AND1 C, /m.b
 // C = C & ~(m.b)    	[.......C]
 // Carry Negated Memory Bit (3-Byte)
-class AND1_6A : public AddressMode::CarryNegatedMemoryBit<Operator::AND1>
+template<>
+struct Opcode<State, 0x6A>
 {
-    using CarryNegatedMemoryBit::CarryNegatedMemoryBit;
+    using Instruction = AddressMode::CarryNegatedMemoryBit<Operator::AND1>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("AND1_6A");
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "6A: AND1 C, /m.b");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x6A>");
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "6A: AND1 C, /m.b"; }
+    static std::string opcodeToString() { return "6A: AND1 C, /m.b"; }
 };
 
 // AND1 C, m.b
 // C = C & (m.b)    	[.......C]
 // Carry Memory Bit (3-Byte)
-class AND1_4A : public AddressMode::CarryMemoryBit<Operator::AND1>
+template<>
+struct Opcode<State, 0x4A>
 {
-    using CarryMemoryBit::CarryMemoryBit;
+    using Instruction = AddressMode::CarryMemoryBit<Operator::AND1>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("AND1_4A");
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "4A: AND1 C, m.b");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x4A>");
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "4A: AND1 C, m.b"; }
+    static std::string opcodeToString() { return "4A: AND1 C, m.b"; }
 };
 
 // ASL A
 // Left shift A: high->C, 0->low    	[N.....ZC]
 // Register (1-Byte)
-class ASL_1C : public AddressMode::Register<Operator::ASL, State::Register::A>
+template<>
+struct Opcode<State, 0x1C>
 {
-    using Register::Register;
+    using Instruction = AddressMode::Register<Operator::ASL, State::Register::A>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  2 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "1C: ASL A");
+
+        return  2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "1C: ASL A"; }
+    static std::string opcodeToString() { return "1C: ASL A"; }
 };
 
 // ASL d
 // Left shift (d) as above    	[N.....ZC]
 // Direct (2-Byte)
-class ASL_0B : public AddressMode::Direct<Operator::ASL>
+template<>
+struct Opcode<State, 0x0B>
 {
-    using Direct::Direct;
+    using Instruction = AddressMode::Direct<Operator::ASL>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "0B: ASL d");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "0B: ASL d"; }
+    static std::string opcodeToString() { return "0B: ASL d"; }
 };
 
 // ASL d+X
 // Left shift (d+X) as above    	[N.....ZC]
 // Direct Indexed (2-Byte)
-class ASL_1B : public AddressMode::DirectIndexed<Operator::ASL, State::Register::X>
+template<>
+struct Opcode<State, 0x1B>
 {
-    using DirectIndexed::DirectIndexed;
+    using Instruction = AddressMode::DirectIndexed<Operator::ASL, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("ASL_1B");
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "1B: ASL d+X");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x1B>");
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "1B: ASL d+X"; }
+    static std::string opcodeToString() { return "1B: ASL d+X"; }
 };
 
 // ASL !a
 // Left shift (a) as above    	[N.....ZC]
 // Absolute (3-Byte)
-class ASL_0C : public AddressMode::Absolute<Operator::ASL>
+template<>
+struct Opcode<State, 0x0C>
 {
-    using Absolute::Absolute;
+    using Instruction = AddressMode::Absolute<Operator::ASL>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "0C: ASL !a");
+
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "0C: ASL !a"; }
+    static std::string opcodeToString() { return "0C: ASL !a"; }
 };
 
 // BBC d.0, r
 // PC+=r  if d.0 == 0    	[........]
 // Direct Program Counter Relative (3-Byte)
-class BBC_13 : public AddressMode::DirectProgramCounterRelative<Operator::BB_<0, false>>
+template<>
+struct Opcode<State, 0x13>
 {
-    using DirectProgramCounterRelative::DirectProgramCounterRelative;
+    using Instruction = AddressMode::DirectProgramCounterRelative<Operator::BB_<0, false>>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return 5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "13: BBC d.0, r");
+
+        return 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "13: BBC d.0, r"; }
+    static std::string opcodeToString() { return "13: BBC d.0, r"; }
 };
 
 // BBC d.1, r
 // PC+=r  if d.1 == 0    	[........]
 // Direct Program Counter Relative (3-Byte)
-class BBC_33 : public AddressMode::DirectProgramCounterRelative<Operator::BB_<1, false>>
+template<>
+struct Opcode<State, 0x33>
 {
-    using DirectProgramCounterRelative::DirectProgramCounterRelative;
+    using Instruction = AddressMode::DirectProgramCounterRelative<Operator::BB_<1, false>>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return 5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "33: BBC d.1, r");
+
+        return 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "33: BBC d.1, r"; }
+    static std::string opcodeToString() { return "33: BBC d.1, r"; }
 };
 
 // BBC d.2, r
 // PC+=r  if d.2 == 0    	[........]
 // Direct Program Counter Relative (3-Byte)
-class BBC_53 : public AddressMode::DirectProgramCounterRelative<Operator::BB_<2, false>>
+template<>
+struct Opcode<State, 0x53>
 {
-    using DirectProgramCounterRelative::DirectProgramCounterRelative;
+    using Instruction = AddressMode::DirectProgramCounterRelative<Operator::BB_<2, false>>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("BBC_53");
-        return 5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "53: BBC d.2, r");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x53>");
+        return 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "53: BBC d.2, r"; }
+    static std::string opcodeToString() { return "53: BBC d.2, r"; }
 };
 
 // BBC d.3, r
 // PC+=r  if d.3 == 0    	[........]
 // Direct Program Counter Relative (3-Byte)
-class BBC_73 : public AddressMode::DirectProgramCounterRelative<Operator::BB_<3, false>>
+template<>
+struct Opcode<State, 0x73>
 {
-    using DirectProgramCounterRelative::DirectProgramCounterRelative;
+    using Instruction = AddressMode::DirectProgramCounterRelative<Operator::BB_<3, false>>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("BBC_73");
-        return 5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "73: BBC d.3, r");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x73>");
+        return 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "73: BBC d.3, r"; }
+    static std::string opcodeToString() { return "73: BBC d.3, r"; }
 };
 
 // BBC d.4, r
 // PC+=r  if d.4 == 0    	[........]
 // Direct Program Counter Relative (3-Byte)
-class BBC_93 : public AddressMode::DirectProgramCounterRelative<Operator::BB_<4, false>>
+template<>
+struct Opcode<State, 0x93>
 {
-    using DirectProgramCounterRelative::DirectProgramCounterRelative;
+    using Instruction = AddressMode::DirectProgramCounterRelative<Operator::BB_<4, false>>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("BBC_93");
-        return 5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "93: BBC d.4, r");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x93>");
+        return 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "93: BBC d.4, r"; }
+    static std::string opcodeToString() { return "93: BBC d.4, r"; }
 };
 
 // BBC d.5, r
 // PC+=r  if d.5 == 0    	[........]
 // Direct Program Counter Relative (3-Byte)
-class BBC_B3 : public AddressMode::DirectProgramCounterRelative<Operator::BB_<5, false>>
+template<>
+struct Opcode<State, 0xB3>
 {
-    using DirectProgramCounterRelative::DirectProgramCounterRelative;
+    using Instruction = AddressMode::DirectProgramCounterRelative<Operator::BB_<5, false>>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return 5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "B3: BBC d.5, r");
+
+        return 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "B3: BBC d.5, r"; }
+    static std::string opcodeToString() { return "B3: BBC d.5, r"; }
 };
 
 // BBC d.6, r
 // PC+=r  if d.6 == 0    	[........]
 // Direct Program Counter Relative (3-Byte)
-class BBC_D3 : public AddressMode::DirectProgramCounterRelative<Operator::BB_<6, false>>
+template<>
+struct Opcode<State, 0xD3>
 {
-    using DirectProgramCounterRelative::DirectProgramCounterRelative;
+    using Instruction = AddressMode::DirectProgramCounterRelative<Operator::BB_<6, false>>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("BBC_D3");
-        return 5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "D3: BBC d.6, r");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0xD3>");
+        return 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "D3: BBC d.6, r"; }
+    static std::string opcodeToString() { return "D3: BBC d.6, r"; }
 };
 
 // BBC d.7, r
 // PC+=r  if d.7 == 0    	[........]
 // Direct Program Counter Relative (3-Byte)
-class BBC_F3 : public AddressMode::DirectProgramCounterRelative<Operator::BB_<7, false>>
+template<>
+struct Opcode<State, 0xF3>
 {
-    using DirectProgramCounterRelative::DirectProgramCounterRelative;
+    using Instruction = AddressMode::DirectProgramCounterRelative<Operator::BB_<7, false>>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return 5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "F3: BBC d.7, r");
+
+        return 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "F3: BBC d.7, r"; }
+    static std::string opcodeToString() { return "F3: BBC d.7, r"; }
 };
 
 // BBS d.0, r
 // PC+=r  if d.0 == 1    	[........]
 // Direct Program Counter Relative (3-Byte)
-class BBS_03 : public AddressMode::DirectProgramCounterRelative<Operator::BB_<0, true>>
+template<>
+struct Opcode<State, 0x03>
 {
-    using DirectProgramCounterRelative::DirectProgramCounterRelative;
+    using Instruction = AddressMode::DirectProgramCounterRelative<Operator::BB_<0, true>>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("BBS_03");
-        return 5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "03: BBS d.0, r");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x03>");
+        return 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "03: BBS d.0, r"; }
+    static std::string opcodeToString() { return "03: BBS d.0, r"; }
 };
 
 // BBS d.1, r
 // PC+=r  if d.1 == 1    	[........]
 // Direct Program Counter Relative (3-Byte)
-class BBS_23 : public AddressMode::DirectProgramCounterRelative<Operator::BB_<1, true>>
+template<>
+struct Opcode<State, 0x23>
 {
-    using DirectProgramCounterRelative::DirectProgramCounterRelative;
+    using Instruction = AddressMode::DirectProgramCounterRelative<Operator::BB_<1, true>>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return 5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "23: BBS d.1, r");
+
+        return 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "23: BBS d.1, r"; }
+    static std::string opcodeToString() { return "23: BBS d.1, r"; }
 };
 
 // BBS d.2, r
 // PC+=r  if d.2 == 1    	[........]
 // Direct Program Counter Relative (3-Byte)
-class BBS_43 : public AddressMode::DirectProgramCounterRelative<Operator::BB_<2, true>>
+template<>
+struct Opcode<State, 0x43>
 {
-    using DirectProgramCounterRelative::DirectProgramCounterRelative;
+    using Instruction = AddressMode::DirectProgramCounterRelative<Operator::BB_<2, true>>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("BBS_43");
-        return 5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "43: BBS d.2, r");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x43>");
+        return 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "43: BBS d.2, r"; }
+    static std::string opcodeToString() { return "43: BBS d.2, r"; }
 };
 
 // BBS d.3, r
 // PC+=r  if d.3 == 1    	[........]
 // Direct Program Counter Relative (3-Byte)
-class BBS_63 : public AddressMode::DirectProgramCounterRelative<Operator::BB_<3, true>>
+template<>
+struct Opcode<State, 0x63>
 {
-    using DirectProgramCounterRelative::DirectProgramCounterRelative;
+    using Instruction = AddressMode::DirectProgramCounterRelative<Operator::BB_<3, true>>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("BBS_63");
-        return 5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "63: BBS d.3, r");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x63>");
+        return 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "63: BBS d.3, r"; }
+    static std::string opcodeToString() { return "63: BBS d.3, r"; }
 };
 
 // BBS d.4, r
 // PC+=r  if d.4 == 1    	[........]
 // Direct Program Counter Relative (3-Byte)
-class BBS_83 : public AddressMode::DirectProgramCounterRelative<Operator::BB_<4, true>>
+template<>
+struct Opcode<State, 0x83>
 {
-    using DirectProgramCounterRelative::DirectProgramCounterRelative;
+    using Instruction = AddressMode::DirectProgramCounterRelative<Operator::BB_<4, true>>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("BBS_83");
-        return 5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "83: BBS d.4, r");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x83>");
+        return 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "83: BBS d.4, r"; }
+    static std::string opcodeToString() { return "83: BBS d.4, r"; }
 };
 
 // BBS d.5, r
 // PC+=r  if d.5 == 1    	[........]
 // Direct Program Counter Relative (3-Byte)
-class BBS_A3 : public AddressMode::DirectProgramCounterRelative<Operator::BB_<5, true>>
+template<>
+struct Opcode<State, 0xA3>
 {
-    using DirectProgramCounterRelative::DirectProgramCounterRelative;
+    using Instruction = AddressMode::DirectProgramCounterRelative<Operator::BB_<5, true>>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return 5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "A3: BBS d.5, r");
+
+        return 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "A3: BBS d.5, r"; }
+    static std::string opcodeToString() { return "A3: BBS d.5, r"; }
 };
 
 // BBS d.6, r
 // PC+=r  if d.6 == 1    	[........]
 // Direct Program Counter Relative (3-Byte)
-class BBS_C3 : public AddressMode::DirectProgramCounterRelative<Operator::BB_<6, true>>
+template<>
+struct Opcode<State, 0xC3>
 {
-    using DirectProgramCounterRelative::DirectProgramCounterRelative;
+    using Instruction = AddressMode::DirectProgramCounterRelative<Operator::BB_<6, true>>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return 5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "C3: BBS d.6, r");
+
+        return 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "C3: BBS d.6, r"; }
+    static std::string opcodeToString() { return "C3: BBS d.6, r"; }
 };
 
 // BBS d.7, r
 // PC+=r  if d.7 == 1    	[........]
 // Direct Program Counter Relative (3-Byte)
-class BBS_E3 : public AddressMode::DirectProgramCounterRelative<Operator::BB_<7, true>>
+template<>
+struct Opcode<State, 0xE3>
 {
-    using DirectProgramCounterRelative::DirectProgramCounterRelative;
+    using Instruction = AddressMode::DirectProgramCounterRelative<Operator::BB_<7, true>>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return 5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "E3: BBS d.7, r");
+
+        return 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "E3: BBS d.7, r"; }
+    static std::string opcodeToString() { return "E3: BBS d.7, r"; }
 };
 
 // BCC r
 // PC+=r  if C == 0    	[........]
 // Program Counter Relative (2-Byte)
-class BCC_90 : public AddressMode::ProgramCounterRelative<Operator::B__<State::Flag::c, false>>
+template<>
+struct Opcode<State, 0x90>
 {
-    using ProgramCounterRelative::ProgramCounterRelative;
+    using Instruction = AddressMode::ProgramCounterRelative<Operator::B__<State::Flag::c, false>>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return 2 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "90: BCC r");
+
+        return 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "90: BCC r"; }
+    static std::string opcodeToString() { return "90: BCC r"; }
 };
 
 // BCS r
 // PC+=r  if C == 1    	[........]
 // Program Counter Relative (2-Byte)
-class BCS_B0 : public AddressMode::ProgramCounterRelative<Operator::B__<State::Flag::c, true>>
+template<>
+struct Opcode<State, 0xB0>
 {
-    using ProgramCounterRelative::ProgramCounterRelative;
+    using Instruction = AddressMode::ProgramCounterRelative<Operator::B__<State::Flag::c, true>>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return 2 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "B0: BCS r");
+
+        return 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "B0: BCS r"; }
+    static std::string opcodeToString() { return "B0: BCS r"; }
 };
 
 // BEQ r
 // PC+=r  if Z == 1    	[........]
 // Program Counter Relative (2-Byte)
-class BEQ_F0 : public AddressMode::ProgramCounterRelative<Operator::BEQ>
+template<>
+struct Opcode<State, 0xF0>
 {
-    using ProgramCounterRelative::ProgramCounterRelative;
+    using Instruction = AddressMode::ProgramCounterRelative<Operator::BEQ>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return 2 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "F0: BEQ r");
+
+        return 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "F0: BEQ r"; }
+    static std::string opcodeToString() { return "F0: BEQ r"; }
 };
 
 // BMI r
 // PC+=r  if N == 1    	[........]
 // Program Counter Relative (2-Byte)
-class BMI_30 : public AddressMode::ProgramCounterRelative<Operator::BMI>
+template<>
+struct Opcode<State, 0x30>
 {
-    using ProgramCounterRelative::ProgramCounterRelative;
+    using Instruction = AddressMode::ProgramCounterRelative<Operator::BMI>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return 2 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "30: BMI r");
+
+        return 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "30: BMI r"; }
+    static std::string opcodeToString() { return "30: BMI r"; }
 };
 
 // BNE r
 // PC+=r  if Z == 0    	[........]
 // Program Counter Relative (2-Byte)
-class BNE_D0 : public AddressMode::ProgramCounterRelative<Operator::BNE>
+template<>
+struct Opcode<State, 0xD0>
 {
-    using ProgramCounterRelative::ProgramCounterRelative;
+    using Instruction = AddressMode::ProgramCounterRelative<Operator::BNE>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return 2 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "D0: BNE r");
+
+        return 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "D0: BNE r"; }
+    static std::string opcodeToString() { return "D0: BNE r"; }
 };
 
 // BPL r
 // PC+=r  if N == 0    	[........]
 // Program Counter Relative (2-Byte)
-class BPL_10 : public AddressMode::ProgramCounterRelative<Operator::BPL>
+template<>
+struct Opcode<State, 0x10>
 {
-    using ProgramCounterRelative::ProgramCounterRelative;
+    using Instruction = AddressMode::ProgramCounterRelative<Operator::BPL>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return 2 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "10: BPL r");
+
+        return 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "10: BPL r"; }
+    static std::string opcodeToString() { return "10: BPL r"; }
 };
 
 // BVC r
 // PC+=r  if V == 0    	[........]
 // Program Counter Relative (2-Byte)
-class BVC_50 : public AddressMode::ProgramCounterRelative<Operator::B__<State::Flag::v, false>>
+template<>
+struct Opcode<State, 0x50>
 {
-    using ProgramCounterRelative::ProgramCounterRelative;
+    using Instruction = AddressMode::ProgramCounterRelative<Operator::B__<State::Flag::v, false>>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("BVC_50");
-        return 2 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "50: BVC r");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x50>");
+        return 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "50: BVC r"; }
+    static std::string opcodeToString() { return "50: BVC r"; }
 };
 
 // BVS r
 // PC+=r  if V == 1    	[........]
 // Program Counter Relative (2-Byte)
-class BVS_70 : public AddressMode::ProgramCounterRelative<Operator::B__<State::Flag::v, true>>
+template<>
+struct Opcode<State, 0x70>
 {
-    using ProgramCounterRelative::ProgramCounterRelative;
+    using Instruction = AddressMode::ProgramCounterRelative<Operator::B__<State::Flag::v, true>>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("BVS_70");
-        return 2 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "70: BVS r");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x70>");
+        return 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "70: BVS r"; }
+    static std::string opcodeToString() { return "70: BVS r"; }
 };
 
 // BRA r
 // PC+=r    	[........]
 // Program Counter Relative (2-Byte)
-class BRA_2F : public AddressMode::ProgramCounterRelative<Operator::BRA>
+template<>
+struct Opcode<State, 0x2F>
 {
-    using ProgramCounterRelative::ProgramCounterRelative;
+    using Instruction = AddressMode::ProgramCounterRelative<Operator::BRA>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return 2 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "2F: BRA r");
+
+        return 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "2F: BRA r"; }
+    static std::string opcodeToString() { return "2F: BRA r"; }
 };
 
 // BRK 
 // Push PC and Flags, PC = [$FFDE]    	[...1.0..]
 // Implied (1-Byte)
-class BRK_0F : public AddressMode::Implied<Operator::BRK>
+template<>
+struct Opcode<State, 0x0F>
 {
-    using Implied::Implied;
+    using Instruction = AddressMode::Implied<Operator::BRK>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("BRK_0F");
-        return  8 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "0F: BRK ");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x0F>");
+        return  8 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "0F: BRK "; }
+    static std::string opcodeToString() { return "0F: BRK "; }
 };
 
 // CALL !a
 // (SP--)=PCh, (SP--)=PCl, PC=a    	[........]
 // Absolute (3-Byte)
-class CALL_3F : public AddressMode::Absolute_ControlFlow<Operator::CALL>
+template<>
+struct Opcode<State, 0x3F>
 {
-    using Absolute_ControlFlow::Absolute_ControlFlow;
+    using Instruction = AddressMode::Absolute_ControlFlow<Operator::CALL>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  8 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "3F: CALL !a");
+
+        return  8 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "3F: CALL !a"; }
+    static std::string opcodeToString() { return "3F: CALL !a"; }
 };
 
 // CBNE d+X, r
 // CMP A, (d+X) then BNE    	[........]
 // Direct Indexed Program Counter Relative (3-Byte)
-class CBNE_DE : public AddressMode::DirectIndexedProgramCounterRelative<Operator::CBNE, State::Register::X>
+template<>
+struct Opcode<State, 0xDE>
 {
-    using DirectIndexedProgramCounterRelative::DirectIndexedProgramCounterRelative;
+    using Instruction = AddressMode::DirectIndexedProgramCounterRelative<Operator::CBNE, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return 6 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "DE: CBNE d+X, r");
+
+        return 6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "DE: CBNE d+X, r"; }
+    static std::string opcodeToString() { return "DE: CBNE d+X, r"; }
 };
 
 // CBNE d, r
 // CMP A, (d) then BNE    	[........]
 // Direct Program Counter Relative (3-Byte)
-class CBNE_2E : public AddressMode::DirectProgramCounterRelative<Operator::CBNE>
+template<>
+struct Opcode<State, 0x2E>
 {
-    using DirectProgramCounterRelative::DirectProgramCounterRelative;
+    using Instruction = AddressMode::DirectProgramCounterRelative<Operator::CBNE>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return 5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "2E: CBNE d, r");
+
+        return 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "2E: CBNE d, r"; }
+    static std::string opcodeToString() { return "2E: CBNE d, r"; }
 };
 
 // CLR1 d.0
 // d.0 = 0    	[........]
 // Direct (2-Byte)
-class CLR1_12 : public AddressMode::Direct<Operator::SET1<0, false>>
+template<>
+struct Opcode<State, 0x12>
 {
-    using Direct::Direct;
+    using Instruction = AddressMode::Direct<Operator::SET1<0, false>>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "12: CLR1 d.0");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "12: CLR1 d.0"; }
+    static std::string opcodeToString() { return "12: CLR1 d.0"; }
 };
 
 // CLR1 d.1
 // d.1 = 0    	[........]
 // Direct (2-Byte)
-class CLR1_32 : public AddressMode::Direct<Operator::SET1<1, false>>
+template<>
+struct Opcode<State, 0x32>
 {
-    using Direct::Direct;
+    using Instruction = AddressMode::Direct<Operator::SET1<1, false>>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "32: CLR1 d.1");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "32: CLR1 d.1"; }
+    static std::string opcodeToString() { return "32: CLR1 d.1"; }
 };
 
 // CLR1 d.2
 // d.2 = 0    	[........]
 // Direct (2-Byte)
-class CLR1_52 : public AddressMode::Direct<Operator::SET1<2, false>>
+template<>
+struct Opcode<State, 0x52>
 {
-    using Direct::Direct;
+    using Instruction = AddressMode::Direct<Operator::SET1<2, false>>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("CLR1_52");
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "52: CLR1 d.2");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x52>");
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "52: CLR1 d.2"; }
+    static std::string opcodeToString() { return "52: CLR1 d.2"; }
 };
 
 // CLR1 d.3
 // d.3 = 0    	[........]
 // Direct (2-Byte)
-class CLR1_72 : public AddressMode::Direct<Operator::SET1<3, false>>
+template<>
+struct Opcode<State, 0x72>
 {
-    using Direct::Direct;
+    using Instruction = AddressMode::Direct<Operator::SET1<3, false>>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "72: CLR1 d.3");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "72: CLR1 d.3"; }
+    static std::string opcodeToString() { return "72: CLR1 d.3"; }
 };
 
 // CLR1 d.4
 // d.4 = 0    	[........]
 // Direct (2-Byte)
-class CLR1_92 : public AddressMode::Direct<Operator::SET1<4, false>>
+template<>
+struct Opcode<State, 0x92>
 {
-    using Direct::Direct;
+    using Instruction = AddressMode::Direct<Operator::SET1<4, false>>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "92: CLR1 d.4");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "92: CLR1 d.4"; }
+    static std::string opcodeToString() { return "92: CLR1 d.4"; }
 };
 
 // CLR1 d.5
 // d.5 = 0    	[........]
 // Direct (2-Byte)
-class CLR1_B2 : public AddressMode::Direct<Operator::SET1<5, false>>
+template<>
+struct Opcode<State, 0xB2>
 {
-    using Direct::Direct;
+    using Instruction = AddressMode::Direct<Operator::SET1<5, false>>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "B2: CLR1 d.5");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "B2: CLR1 d.5"; }
+    static std::string opcodeToString() { return "B2: CLR1 d.5"; }
 };
 
 // CLR1 d.6
 // d.6 = 0    	[........]
 // Direct (2-Byte)
-class CLR1_D2 : public AddressMode::Direct<Operator::SET1<6, false>>
+template<>
+struct Opcode<State, 0xD2>
 {
-    using Direct::Direct;
+    using Instruction = AddressMode::Direct<Operator::SET1<6, false>>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "D2: CLR1 d.6");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "D2: CLR1 d.6"; }
+    static std::string opcodeToString() { return "D2: CLR1 d.6"; }
 };
 
 // CLR1 d.7
 // d.7 = 0    	[........]
 // Direct (2-Byte)
-class CLR1_F2 : public AddressMode::Direct<Operator::SET1<7, false>>
+template<>
+struct Opcode<State, 0xF2>
 {
-    using Direct::Direct;
+    using Instruction = AddressMode::Direct<Operator::SET1<7, false>>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "F2: CLR1 d.7");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "F2: CLR1 d.7"; }
+    static std::string opcodeToString() { return "F2: CLR1 d.7"; }
 };
 
 // CLRC 
 // C = 0    	[.......0]
 // Implied (1-Byte)
-class CLRC_60 : public AddressMode::Implied<Operator::SET<State::Flag::c, false>>
+template<>
+struct Opcode<State, 0x60>
 {
-    using Implied::Implied;
+    using Instruction = AddressMode::Implied<Operator::SET<State::Flag::c, false>>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  2 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "60: CLRC ");
+
+        return  2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "60: CLRC "; }
+    static std::string opcodeToString() { return "60: CLRC "; }
 };
 
 // CLRP 
 // P = 0    	[..0.....]
 // Implied (1-Byte)
-class CLRP_20 : public AddressMode::Implied<Operator::SET<State::Flag::p, false>>
+template<>
+struct Opcode<State, 0x20>
 {
-    using Implied::Implied;
+    using Instruction = AddressMode::Implied<Operator::SET<State::Flag::p, false>>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  2 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "20: CLRP ");
+
+        return  2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "20: CLRP "; }
+    static std::string opcodeToString() { return "20: CLRP "; }
 };
 
 // CLRV 
 // V = 0, H = 0    	[.0..0...]
 // Implied (1-Byte)
-class CLRV_E0 : public AddressMode::Implied<Operator::SET<State::Flag::v, false>>
+template<>
+struct Opcode<State, 0xE0>
 {
-    using Implied::Implied;
+    using Instruction = AddressMode::Implied<Operator::SET<State::Flag::v, false>>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("CLRV_E0");
-        return  2 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "E0: CLRV ");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0xE0>");
+        return  2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "E0: CLRV "; }
+    static std::string opcodeToString() { return "E0: CLRV "; }
 };
 
 // CMP (X), (Y)
 // (X) - (Y)    	[N.....ZC]
 // Indirect Indirect (1-Byte)
-class CMP_79 : public AddressMode::IndirectIndirect<Operator::CMP>
+template<>
+struct Opcode<State, 0x79>
 {
-    using IndirectIndirect::IndirectIndirect;
+    using Instruction = AddressMode::IndirectIndirect<Operator::CMP>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("CMP_79");
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "79: CMP (X), (Y)");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x79>");
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "79: CMP (X), (Y)"; }
+    static std::string opcodeToString() { return "79: CMP (X), (Y)"; }
 };
 
 // CMP A, #i
 // A - i    	[N.....ZC]
 // Register Immediate (2-Byte)
-class CMP_68 : public AddressMode::RegisterImmediate<Operator::CMP, State::Register::A>
+template<>
+struct Opcode<State, 0x68>
 {
-    using RegisterImmediate::RegisterImmediate;
+    using Instruction = AddressMode::RegisterImmediate<Operator::CMP, State::Register::A>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  2 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "68: CMP A, #i");
+
+        return  2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "68: CMP A, #i"; }
+    static std::string opcodeToString() { return "68: CMP A, #i"; }
 };
 
 // CMP A, (X)
 // A - (X)    	[N.....ZC]
 // Register Register Indirect (1-Byte)
-class CMP_66 : public AddressMode::RegisterRegisterIndirect<Operator::CMP, State::Register::A, State::Register::X>
+template<>
+struct Opcode<State, 0x66>
 {
-    using RegisterRegisterIndirect::RegisterRegisterIndirect;
+    using Instruction = AddressMode::RegisterRegisterIndirect<Operator::CMP, State::Register::A, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("CMP_66");
-        return  3 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "66: CMP A, (X)");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x66>");
+        return  3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "66: CMP A, (X)"; }
+    static std::string opcodeToString() { return "66: CMP A, (X)"; }
 };
 
 // CMP A, [d]+Y
 // A - ([d]+Y)    	[N.....ZC]
 // Register Direct Indirect Indexed (2-Byte)
-class CMP_77 : public AddressMode::RegisterDirectIndirectIndexed<Operator::CMP, State::Register::A, State::Register::Y>
+template<>
+struct Opcode<State, 0x77>
 {
-    using RegisterDirectIndirectIndexed::RegisterDirectIndirectIndexed;
+    using Instruction = AddressMode::RegisterDirectIndirectIndexed<Operator::CMP, State::Register::A, State::Register::Y>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("CMP_77");
-        return  6 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "77: CMP A, [d]+Y");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x77>");
+        return  6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "77: CMP A, [d]+Y"; }
+    static std::string opcodeToString() { return "77: CMP A, [d]+Y"; }
 };
 
 // CMP A, [d+X]
 // A - ([d+X])    	[N.....ZC]
 // Register Direct Indexed Indirect (2-Byte)
-class CMP_67 : public AddressMode::RegisterDirectIndexedIndirect<Operator::CMP, State::Register::A, State::Register::X>
+template<>
+struct Opcode<State, 0x67>
 {
-    using RegisterDirectIndexedIndirect::RegisterDirectIndexedIndirect;
+    using Instruction = AddressMode::RegisterDirectIndexedIndirect<Operator::CMP, State::Register::A, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("CMP_67");
-        return  6 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "67: CMP A, [d+X]");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x67>");
+        return  6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "67: CMP A, [d+X]"; }
+    static std::string opcodeToString() { return "67: CMP A, [d+X]"; }
 };
 
 // CMP A, d
 // A - (d)    	[N.....ZC]
 // Register Direct (2-Byte)
-class CMP_64 : public AddressMode::RegisterDirect<Operator::CMP, State::Register::A>
+template<>
+struct Opcode<State, 0x64>
 {
-    using RegisterDirect::RegisterDirect;
+    using Instruction = AddressMode::RegisterDirect<Operator::CMP, State::Register::A>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  3 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "64: CMP A, d");
+
+        return  3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "64: CMP A, d"; }
+    static std::string opcodeToString() { return "64: CMP A, d"; }
 };
 
 // CMP A, d+X
 // A - (d+X)    	[N.....ZC]
 // Register Direct Indexed (2-Byte)
-class CMP_74 : public AddressMode::RegisterDirectIndexed<Operator::CMP, State::Register::A, State::Register::X>
+template<>
+struct Opcode<State, 0x74>
 {
-    using RegisterDirectIndexed::RegisterDirectIndexed;
+    using Instruction = AddressMode::RegisterDirectIndexed<Operator::CMP, State::Register::A, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "74: CMP A, d+X");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "74: CMP A, d+X"; }
+    static std::string opcodeToString() { return "74: CMP A, d+X"; }
 };
 
 // CMP A, !a
 // A - (a)    	[N.....ZC]
 // Register Absolute (3-Byte)
-class CMP_65 : public AddressMode::RegisterAbsolute<Operator::CMP, State::Register::A>
+template<>
+struct Opcode<State, 0x65>
 {
-    using RegisterAbsolute::RegisterAbsolute;
+    using Instruction = AddressMode::RegisterAbsolute<Operator::CMP, State::Register::A>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "65: CMP A, !a");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "65: CMP A, !a"; }
+    static std::string opcodeToString() { return "65: CMP A, !a"; }
 };
 
 // CMP A, !a+X
 // A - (a+X)    	[N.....ZC]
 // Register Absolute Indexed (3-Byte)
-class CMP_75 : public AddressMode::RegisterAbsoluteIndexed<Operator::CMP, State::Register::A, State::Register::X>
+template<>
+struct Opcode<State, 0x75>
 {
-    using RegisterAbsoluteIndexed::RegisterAbsoluteIndexed;
+    using Instruction = AddressMode::RegisterAbsoluteIndexed<Operator::CMP, State::Register::A, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "75: CMP A, !a+X");
+
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "75: CMP A, !a+X"; }
+    static std::string opcodeToString() { return "75: CMP A, !a+X"; }
 };
 
 // CMP A, !a+Y
 // A - (a+Y)    	[N.....ZC]
 // Register Absolute Indexed (3-Byte)
-class CMP_76 : public AddressMode::RegisterAbsoluteIndexed<Operator::CMP, State::Register::A, State::Register::Y>
+template<>
+struct Opcode<State, 0x76>
 {
-    using RegisterAbsoluteIndexed::RegisterAbsoluteIndexed;
+    using Instruction = AddressMode::RegisterAbsoluteIndexed<Operator::CMP, State::Register::A, State::Register::Y>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("CMP_76");
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "76: CMP A, !a+Y");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x76>");
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "76: CMP A, !a+Y"; }
+    static std::string opcodeToString() { return "76: CMP A, !a+Y"; }
 };
 
 // CMP X, #i
 // X - i    	[N.....ZC]
 // Register Immediate (2-Byte)
-class CMP_C8 : public AddressMode::RegisterImmediate<Operator::CMP, State::Register::X>
+template<>
+struct Opcode<State, 0xC8>
 {
-    using RegisterImmediate::RegisterImmediate;
+    using Instruction = AddressMode::RegisterImmediate<Operator::CMP, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  2 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "C8: CMP X, #i");
+
+        return  2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "C8: CMP X, #i"; }
+    static std::string opcodeToString() { return "C8: CMP X, #i"; }
 };
 
 // CMP X, d
 // X - (d)    	[N.....ZC]
 // Register Direct (2-Byte)
-class CMP_3E : public AddressMode::RegisterDirect<Operator::CMP, State::Register::X>
+template<>
+struct Opcode<State, 0x3E>
 {
-    using RegisterDirect::RegisterDirect;
+    using Instruction = AddressMode::RegisterDirect<Operator::CMP, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  3 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "3E: CMP X, d");
+
+        return  3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "3E: CMP X, d"; }
+    static std::string opcodeToString() { return "3E: CMP X, d"; }
 };
 
 // CMP X, !a
 // X - (a)    	[N.....ZC]
 // Register Absolute (3-Byte)
-class CMP_1E : public AddressMode::RegisterAbsolute<Operator::CMP, State::Register::X>
+template<>
+struct Opcode<State, 0x1E>
 {
-    using RegisterAbsolute::RegisterAbsolute;
+    using Instruction = AddressMode::RegisterAbsolute<Operator::CMP, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("CMP_1E");
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "1E: CMP X, !a");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x1E>");
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "1E: CMP X, !a"; }
+    static std::string opcodeToString() { return "1E: CMP X, !a"; }
 };
 
 // CMP Y, #i
 // Y - i    	[N.....ZC]
 // Register Immediate (2-Byte)
-class CMP_AD : public AddressMode::RegisterImmediate<Operator::CMP, State::Register::Y>
+template<>
+struct Opcode<State, 0xAD>
 {
-    using RegisterImmediate::RegisterImmediate;
+    using Instruction = AddressMode::RegisterImmediate<Operator::CMP, State::Register::Y>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  2 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "AD: CMP Y, #i");
+
+        return  2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "AD: CMP Y, #i"; }
+    static std::string opcodeToString() { return "AD: CMP Y, #i"; }
 };
 
 // CMP Y, d
 // Y - (d)    	[N.....ZC]
 // Register Direct (2-Byte)
-class CMP_7E : public AddressMode::RegisterDirect<Operator::CMP, State::Register::Y>
+template<>
+struct Opcode<State, 0x7E>
 {
-    using RegisterDirect::RegisterDirect;
+    using Instruction = AddressMode::RegisterDirect<Operator::CMP, State::Register::Y>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  3 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "7E: CMP Y, d");
+
+        return  3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "7E: CMP Y, d"; }
+    static std::string opcodeToString() { return "7E: CMP Y, d"; }
 };
 
 // CMP Y, !a
 // Y - (a)    	[N.....ZC]
 // Register Absolute (3-Byte)
-class CMP_5E : public AddressMode::RegisterAbsolute<Operator::CMP, State::Register::Y>
+template<>
+struct Opcode<State, 0x5E>
 {
-    using RegisterAbsolute::RegisterAbsolute;
+    using Instruction = AddressMode::RegisterAbsolute<Operator::CMP, State::Register::Y>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "5E: CMP Y, !a");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "5E: CMP Y, !a"; }
+    static std::string opcodeToString() { return "5E: CMP Y, !a"; }
 };
 
 // CMP dd, ds
 // (dd) - (ds)    	[N.....ZC]
 // Direct Direct (3-Byte)
-class CMP_69 : public AddressMode::DirectDirect<Operator::CMP>
+template<>
+struct Opcode<State, 0x69>
 {
-    using DirectDirect::DirectDirect;
+    using Instruction = AddressMode::DirectDirect<Operator::CMP>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  6 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "69: CMP dd, ds");
+
+        return  6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "69: CMP dd, ds"; }
+    static std::string opcodeToString() { return "69: CMP dd, ds"; }
 };
 
 // CMP d, #i
 // (d) - i    	[N.....ZC]
 // Direct Immediate (3-Byte)
-class CMP_78 : public AddressMode::DirectImmediate<Operator::CMP>
+template<>
+struct Opcode<State, 0x78>
 {
-    using DirectImmediate::DirectImmediate;
+    using Instruction = AddressMode::DirectImmediate<Operator::CMP>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "78: CMP d, #i");
+
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "78: CMP d, #i"; }
+    static std::string opcodeToString() { return "78: CMP d, #i"; }
 };
 
 // CMPW YA, d
 // YA - (d)    	[N.....ZC]
 // Y Accumulator Direct (2-Byte)
-class CMPW_5A : public AddressMode::YAccumulatorDirect<Operator::CMPW>
+template<>
+struct Opcode<State, 0x5A>
 {
-    using YAccumulatorDirect::YAccumulatorDirect;
+    using Instruction = AddressMode::YAccumulatorDirect<Operator::CMPW>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "5A: CMPW YA, d");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "5A: CMPW YA, d"; }
+    static std::string opcodeToString() { return "5A: CMPW YA, d"; }
 };
 
 // DAA A
 // decimal adjust for addition    	[N.....ZC]
 // Register (1-Byte)
-class DAA_DF : public AddressMode::Register<Operator::DAA, State::Register::A>
+template<>
+struct Opcode<State, 0xDF>
 {
-    using Register::Register;
+    using Instruction = AddressMode::Register<Operator::DAA, State::Register::A>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("DAA_DF");
-        return  3 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "DF: DAA A");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0xDF>");
+        return  3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "DF: DAA A"; }
+    static std::string opcodeToString() { return "DF: DAA A"; }
 };
 
 // DAS A
 // decimal adjust for subtraction    	[N.....ZC]
 // Register (1-Byte)
-class DAS_BE : public AddressMode::Register<Operator::DAS, State::Register::A>
+template<>
+struct Opcode<State, 0xBE>
 {
-    using Register::Register;
+    using Instruction = AddressMode::Register<Operator::DAS, State::Register::A>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("DAS_BE");
-        return  3 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "BE: DAS A");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0xBE>");
+        return  3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "BE: DAS A"; }
+    static std::string opcodeToString() { return "BE: DAS A"; }
 };
 
 // DBNZ Y, r
 // Y-- then JNZ    	[........]
 // Register Program Counter Relative (2-Byte)
-class DBNZ_FE : public AddressMode::RegisterProgramCounterRelative<Operator::DBNZ, State::Register::Y>
+template<>
+struct Opcode<State, 0xFE>
 {
-    using RegisterProgramCounterRelative::RegisterProgramCounterRelative;
+    using Instruction = AddressMode::RegisterProgramCounterRelative<Operator::DBNZ, State::Register::Y>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return 4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "FE: DBNZ Y, r");
+
+        return 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "FE: DBNZ Y, r"; }
+    static std::string opcodeToString() { return "FE: DBNZ Y, r"; }
 };
 
 // DBNZ d, r
 // (d)-- then JNZ    	[........]
 // Direct Program Counter Relative (3-Byte)
-class DBNZ_6E : public AddressMode::DirectProgramCounterRelative<Operator::DBNZ>
+template<>
+struct Opcode<State, 0x6E>
 {
-    using DirectProgramCounterRelative::DirectProgramCounterRelative;
+    using Instruction = AddressMode::DirectProgramCounterRelative<Operator::DBNZ>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return 5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "6E: DBNZ d, r");
+
+        return 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "6E: DBNZ d, r"; }
+    static std::string opcodeToString() { return "6E: DBNZ d, r"; }
 };
 
 // DEC A
 // A--    	[N.....Z.]
 // Register (1-Byte)
-class DEC_9C : public AddressMode::Register<Operator::DEC, State::Register::A>
+template<>
+struct Opcode<State, 0x9C>
 {
-    using Register::Register;
+    using Instruction = AddressMode::Register<Operator::DEC, State::Register::A>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  2 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "9C: DEC A");
+
+        return  2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "9C: DEC A"; }
+    static std::string opcodeToString() { return "9C: DEC A"; }
 };
 
 // DEC X
 // X--    	[N.....Z.]
 // Register (1-Byte)
-class DEC_1D : public AddressMode::Register<Operator::DEC, State::Register::X>
+template<>
+struct Opcode<State, 0x1D>
 {
-    using Register::Register;
+    using Instruction = AddressMode::Register<Operator::DEC, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  2 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "1D: DEC X");
+
+        return  2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "1D: DEC X"; }
+    static std::string opcodeToString() { return "1D: DEC X"; }
 };
 
 // DEC Y
 // Y--    	[N.....Z.]
 // Register (1-Byte)
-class DEC_DC : public AddressMode::Register<Operator::DEC, State::Register::Y>
+template<>
+struct Opcode<State, 0xDC>
 {
-    using Register::Register;
+    using Instruction = AddressMode::Register<Operator::DEC, State::Register::Y>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  2 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "DC: DEC Y");
+
+        return  2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "DC: DEC Y"; }
+    static std::string opcodeToString() { return "DC: DEC Y"; }
 };
 
 // DEC d
 // (d)--    	[N.....Z.]
 // Direct (2-Byte)
-class DEC_8B : public AddressMode::Direct<Operator::DEC>
+template<>
+struct Opcode<State, 0x8B>
 {
-    using Direct::Direct;
+    using Instruction = AddressMode::Direct<Operator::DEC>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "8B: DEC d");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "8B: DEC d"; }
+    static std::string opcodeToString() { return "8B: DEC d"; }
 };
 
 // DEC d+X
 // (d+X)--    	[N.....Z.]
 // Direct Indexed (2-Byte)
-class DEC_9B : public AddressMode::DirectIndexed<Operator::DEC, State::Register::X>
+template<>
+struct Opcode<State, 0x9B>
 {
-    using DirectIndexed::DirectIndexed;
+    using Instruction = AddressMode::DirectIndexed<Operator::DEC, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "9B: DEC d+X");
+
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "9B: DEC d+X"; }
+    static std::string opcodeToString() { return "9B: DEC d+X"; }
 };
 
 // DEC !a
 // (a)--    	[N.....Z.]
 // Absolute (3-Byte)
-class DEC_8C : public AddressMode::Absolute<Operator::DEC>
+template<>
+struct Opcode<State, 0x8C>
 {
-    using Absolute::Absolute;
+    using Instruction = AddressMode::Absolute<Operator::DEC>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "8C: DEC !a");
+
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "8C: DEC !a"; }
+    static std::string opcodeToString() { return "8C: DEC !a"; }
 };
 
 // DECW d
 // Word (d)--    	[N.....Z.]
 // Direct (2-Byte)
-class DECW_1A : public AddressMode::Direct<Operator::DECW>
+template<>
+struct Opcode<State, 0x1A>
 {
-    using Direct::Direct;
+    using Instruction = AddressMode::Direct<Operator::DECW>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  6 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "1A: DECW d");
+
+        return  6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "1A: DECW d"; }
+    static std::string opcodeToString() { return "1A: DECW d"; }
 };
 
 // DI 
 // I = 0    	[.....0..]
 // Implied (1-Byte)
-class DI_C0 : public AddressMode::Implied<Operator::DI>
+template<>
+struct Opcode<State, 0xC0>
 {
-    using Implied::Implied;
+    using Instruction = AddressMode::Implied<Operator::DI>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("DI_C0");
-        return  3 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "C0: DI ");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0xC0>");
+        return  3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "C0: DI "; }
+    static std::string opcodeToString() { return "C0: DI "; }
 };
 
 // DIV YA, X
 // A=YA/X, Y=mod(YA,X)    	[NV..H.Z.]
 // Y Accumulator Index (1-Byte)
-class DIV_9E : public AddressMode::YAccumulatorIndex<Operator::DIV, State::Register::X>
+template<>
+struct Opcode<State, 0x9E>
 {
-    using YAccumulatorIndex::YAccumulatorIndex;
+    using Instruction = AddressMode::YAccumulatorIndex<Operator::DIV, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return 12 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "9E: DIV YA, X");
+
+        return 12 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "9E: DIV YA, X"; }
+    static std::string opcodeToString() { return "9E: DIV YA, X"; }
 };
 
 // EI 
 // I = 1    	[.....1..]
 // Implied (1-Byte)
-class EI_A0 : public AddressMode::Implied<Operator::EI>
+template<>
+struct Opcode<State, 0xA0>
 {
-    using Implied::Implied;
+    using Instruction = AddressMode::Implied<Operator::EI>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("EI_A0");
-        return  3 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "A0: EI ");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0xA0>");
+        return  3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "A0: EI "; }
+    static std::string opcodeToString() { return "A0: EI "; }
 };
 
 // EOR (X), (Y)
 // (X) = (X) EOR (Y)    	[N.....Z.]
 // Indirect Indirect (1-Byte)
-class EOR_59 : public AddressMode::IndirectIndirect<Operator::EOR>
+template<>
+struct Opcode<State, 0x59>
 {
-    using IndirectIndirect::IndirectIndirect;
+    using Instruction = AddressMode::IndirectIndirect<Operator::EOR>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("EOR_59");
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "59: EOR (X), (Y)");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x59>");
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "59: EOR (X), (Y)"; }
+    static std::string opcodeToString() { return "59: EOR (X), (Y)"; }
 };
 
 // EOR A, #i
 // A = A EOR i    	[N.....Z.]
 // Register Immediate (2-Byte)
-class EOR_48 : public AddressMode::RegisterImmediate<Operator::EOR, State::Register::A>
+template<>
+struct Opcode<State, 0x48>
 {
-    using RegisterImmediate::RegisterImmediate;
+    using Instruction = AddressMode::RegisterImmediate<Operator::EOR, State::Register::A>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  2 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "48: EOR A, #i");
+
+        return  2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "48: EOR A, #i"; }
+    static std::string opcodeToString() { return "48: EOR A, #i"; }
 };
 
 // EOR A, (X)
 // A = A EOR (X)    	[N.....Z.]
 // Register Register Indirect (1-Byte)
-class EOR_46 : public AddressMode::RegisterRegisterIndirect<Operator::EOR, State::Register::A, State::Register::X>
+template<>
+struct Opcode<State, 0x46>
 {
-    using RegisterRegisterIndirect::RegisterRegisterIndirect;
+    using Instruction = AddressMode::RegisterRegisterIndirect<Operator::EOR, State::Register::A, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("EOR_46");
-        return  3 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "46: EOR A, (X)");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x46>");
+        return  3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "46: EOR A, (X)"; }
+    static std::string opcodeToString() { return "46: EOR A, (X)"; }
 };
 
 // EOR A, [d]+Y
 // A = A EOR ([d]+Y)    	[N.....Z.]
 // Register Direct Indirect Indexed (2-Byte)
-class EOR_57 : public AddressMode::RegisterDirectIndirectIndexed<Operator::EOR, State::Register::A, State::Register::Y>
+template<>
+struct Opcode<State, 0x57>
 {
-    using RegisterDirectIndirectIndexed::RegisterDirectIndirectIndexed;
+    using Instruction = AddressMode::RegisterDirectIndirectIndexed<Operator::EOR, State::Register::A, State::Register::Y>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("EOR_57");
-        return  6 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "57: EOR A, [d]+Y");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x57>");
+        return  6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "57: EOR A, [d]+Y"; }
+    static std::string opcodeToString() { return "57: EOR A, [d]+Y"; }
 };
 
 // EOR A, [d+X]
 // A = A EOR ([d+X])    	[N.....Z.]
 // Register Direct Indexed Indirect (2-Byte)
-class EOR_47 : public AddressMode::RegisterDirectIndexedIndirect<Operator::EOR, State::Register::A, State::Register::X>
+template<>
+struct Opcode<State, 0x47>
 {
-    using RegisterDirectIndexedIndirect::RegisterDirectIndexedIndirect;
+    using Instruction = AddressMode::RegisterDirectIndexedIndirect<Operator::EOR, State::Register::A, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("EOR_47");
-        return  6 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "47: EOR A, [d+X]");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x47>");
+        return  6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "47: EOR A, [d+X]"; }
+    static std::string opcodeToString() { return "47: EOR A, [d+X]"; }
 };
 
 // EOR A, d
 // A = A EOR (d)    	[N.....Z.]
 // Register Direct (2-Byte)
-class EOR_44 : public AddressMode::RegisterDirect<Operator::EOR, State::Register::A>
+template<>
+struct Opcode<State, 0x44>
 {
-    using RegisterDirect::RegisterDirect;
+    using Instruction = AddressMode::RegisterDirect<Operator::EOR, State::Register::A>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  3 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "44: EOR A, d");
+
+        return  3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "44: EOR A, d"; }
+    static std::string opcodeToString() { return "44: EOR A, d"; }
 };
 
 // EOR A, d+X
 // A = A EOR (d+X)    	[N.....Z.]
 // Register Direct Indexed (2-Byte)
-class EOR_54 : public AddressMode::RegisterDirectIndexed<Operator::EOR, State::Register::A, State::Register::X>
+template<>
+struct Opcode<State, 0x54>
 {
-    using RegisterDirectIndexed::RegisterDirectIndexed;
+    using Instruction = AddressMode::RegisterDirectIndexed<Operator::EOR, State::Register::A, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "54: EOR A, d+X");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "54: EOR A, d+X"; }
+    static std::string opcodeToString() { return "54: EOR A, d+X"; }
 };
 
 // EOR A, !a
 // A = A EOR (a)    	[N.....Z.]
 // Register Absolute (3-Byte)
-class EOR_45 : public AddressMode::RegisterAbsolute<Operator::EOR, State::Register::A>
+template<>
+struct Opcode<State, 0x45>
 {
-    using RegisterAbsolute::RegisterAbsolute;
+    using Instruction = AddressMode::RegisterAbsolute<Operator::EOR, State::Register::A>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("EOR_45");
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "45: EOR A, !a");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x45>");
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "45: EOR A, !a"; }
+    static std::string opcodeToString() { return "45: EOR A, !a"; }
 };
 
 // EOR A, !a+X
 // A = A EOR (a+X)    	[N.....Z.]
 // Register Absolute Indexed (3-Byte)
-class EOR_55 : public AddressMode::RegisterAbsoluteIndexed<Operator::EOR, State::Register::A, State::Register::X>
+template<>
+struct Opcode<State, 0x55>
 {
-    using RegisterAbsoluteIndexed::RegisterAbsoluteIndexed;
+    using Instruction = AddressMode::RegisterAbsoluteIndexed<Operator::EOR, State::Register::A, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("EOR_55");
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "55: EOR A, !a+X");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x55>");
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "55: EOR A, !a+X"; }
+    static std::string opcodeToString() { return "55: EOR A, !a+X"; }
 };
 
 // EOR A, !a+Y
 // A = A EOR (a+Y)    	[N.....Z.]
 // Register Absolute Indexed (3-Byte)
-class EOR_56 : public AddressMode::RegisterAbsoluteIndexed<Operator::EOR, State::Register::A, State::Register::Y>
+template<>
+struct Opcode<State, 0x56>
 {
-    using RegisterAbsoluteIndexed::RegisterAbsoluteIndexed;
+    using Instruction = AddressMode::RegisterAbsoluteIndexed<Operator::EOR, State::Register::A, State::Register::Y>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("EOR_56");
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "56: EOR A, !a+Y");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x56>");
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "56: EOR A, !a+Y"; }
+    static std::string opcodeToString() { return "56: EOR A, !a+Y"; }
 };
 
 // EOR dd, ds
 // (dd) = (dd) EOR (ds)    	[N.....Z.]
 // Direct Direct (3-Byte)
-class EOR_49 : public AddressMode::DirectDirect<Operator::EOR>
+template<>
+struct Opcode<State, 0x49>
 {
-    using DirectDirect::DirectDirect;
+    using Instruction = AddressMode::DirectDirect<Operator::EOR>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("EOR_49");
-        return  6 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "49: EOR dd, ds");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x49>");
+        return  6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "49: EOR dd, ds"; }
+    static std::string opcodeToString() { return "49: EOR dd, ds"; }
 };
 
 // EOR d, #i
 // (d) = (d) EOR i    	[N.....Z.]
 // Direct Immediate (3-Byte)
-class EOR_58 : public AddressMode::DirectImmediate<Operator::EOR>
+template<>
+struct Opcode<State, 0x58>
 {
-    using DirectImmediate::DirectImmediate;
+    using Instruction = AddressMode::DirectImmediate<Operator::EOR>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "58: EOR d, #i");
+
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "58: EOR d, #i"; }
+    static std::string opcodeToString() { return "58: EOR d, #i"; }
 };
 
 // EOR1 C, m.b
 // C = C EOR (m.b)    	[.......C]
 // Carry Memory Bit (3-Byte)
-class EOR1_8A : public AddressMode::CarryMemoryBit<Operator::EOR1>
+template<>
+struct Opcode<State, 0x8A>
 {
-    using CarryMemoryBit::CarryMemoryBit;
+    using Instruction = AddressMode::CarryMemoryBit<Operator::EOR1>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("EOR1_8A");
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "8A: EOR1 C, m.b");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x8A>");
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "8A: EOR1 C, m.b"; }
+    static std::string opcodeToString() { return "8A: EOR1 C, m.b"; }
 };
 
 // INC A
 // A++    	[N.....Z.]
 // Register (1-Byte)
-class INC_BC : public AddressMode::Register<Operator::INC, State::Register::A>
+template<>
+struct Opcode<State, 0xBC>
 {
-    using Register::Register;
+    using Instruction = AddressMode::Register<Operator::INC, State::Register::A>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  2 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "BC: INC A");
+
+        return  2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "BC: INC A"; }
+    static std::string opcodeToString() { return "BC: INC A"; }
 };
 
 // INC X
 // X++    	[N.....Z.]
 // Register (1-Byte)
-class INC_3D : public AddressMode::Register<Operator::INC, State::Register::X>
+template<>
+struct Opcode<State, 0x3D>
 {
-    using Register::Register;
+    using Instruction = AddressMode::Register<Operator::INC, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  2 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "3D: INC X");
+
+        return  2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "3D: INC X"; }
+    static std::string opcodeToString() { return "3D: INC X"; }
 };
 
 // INC Y
 // Y++    	[N.....Z.]
 // Register (1-Byte)
-class INC_FC : public AddressMode::Register<Operator::INC, State::Register::Y>
+template<>
+struct Opcode<State, 0xFC>
 {
-    using Register::Register;
+    using Instruction = AddressMode::Register<Operator::INC, State::Register::Y>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  2 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "FC: INC Y");
+
+        return  2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "FC: INC Y"; }
+    static std::string opcodeToString() { return "FC: INC Y"; }
 };
 
 // INC d
 // (d)++    	[N.....Z.]
 // Direct (2-Byte)
-class INC_AB : public AddressMode::Direct<Operator::INC>
+template<>
+struct Opcode<State, 0xAB>
 {
-    using Direct::Direct;
+    using Instruction = AddressMode::Direct<Operator::INC>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "AB: INC d");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "AB: INC d"; }
+    static std::string opcodeToString() { return "AB: INC d"; }
 };
 
 // INC d+X
 // (d+X)++    	[N.....Z.]
 // Direct Indexed (2-Byte)
-class INC_BB : public AddressMode::DirectIndexed<Operator::INC, State::Register::X>
+template<>
+struct Opcode<State, 0xBB>
 {
-    using DirectIndexed::DirectIndexed;
+    using Instruction = AddressMode::DirectIndexed<Operator::INC, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "BB: INC d+X");
+
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "BB: INC d+X"; }
+    static std::string opcodeToString() { return "BB: INC d+X"; }
 };
 
 // INC !a
 // (a)++    	[N.....Z.]
 // Absolute (3-Byte)
-class INC_AC : public AddressMode::Absolute<Operator::INC>
+template<>
+struct Opcode<State, 0xAC>
 {
-    using Absolute::Absolute;
+    using Instruction = AddressMode::Absolute<Operator::INC>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "AC: INC !a");
+
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "AC: INC !a"; }
+    static std::string opcodeToString() { return "AC: INC !a"; }
 };
 
 // INCW d
 // Word (d)++    	[N.....Z.]
 // Direct (2-Byte)
-class INCW_3A : public AddressMode::Direct<Operator::INCW>
+template<>
+struct Opcode<State, 0x3A>
 {
-    using Direct::Direct;
+    using Instruction = AddressMode::Direct<Operator::INCW>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  6 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "3A: INCW d");
+
+        return  6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "3A: INCW d"; }
+    static std::string opcodeToString() { return "3A: INCW d"; }
 };
 
 // JMP [!a+X]
 // PC = [a+X]    	[........]
 // Absolute Indexed Indirect (3-Byte)
-class JMP_1F : public AddressMode::AbsoluteIndexedIndirect<Operator::JMP, State::Register::X>
+template<>
+struct Opcode<State, 0x1F>
 {
-    using AbsoluteIndexedIndirect::AbsoluteIndexedIndirect;
+    using Instruction = AddressMode::AbsoluteIndexedIndirect<Operator::JMP, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  6 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "1F: JMP [!a+X]");
+
+        return  6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "1F: JMP [!a+X]"; }
+    static std::string opcodeToString() { return "1F: JMP [!a+X]"; }
 };
 
 // JMP !a
 // PC = a    	[........]
 // Absolute (3-Byte)
-class JMP_5F : public AddressMode::Absolute_ControlFlow<Operator::JMP>
+template<>
+struct Opcode<State, 0x5F>
 {
-    using Absolute_ControlFlow::Absolute_ControlFlow;
+    using Instruction = AddressMode::Absolute_ControlFlow<Operator::JMP>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  3 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "5F: JMP !a");
+
+        return  3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "5F: JMP !a"; }
+    static std::string opcodeToString() { return "5F: JMP !a"; }
 };
 
 // LSR A
 // Right shift A: 0->high, low->C    	[N.....ZC]
 // Register (1-Byte)
-class LSR_5C : public AddressMode::Register<Operator::LSR, State::Register::A>
+template<>
+struct Opcode<State, 0x5C>
 {
-    using Register::Register;
+    using Instruction = AddressMode::Register<Operator::LSR, State::Register::A>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  2 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "5C: LSR A");
+
+        return  2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "5C: LSR A"; }
+    static std::string opcodeToString() { return "5C: LSR A"; }
 };
 
 // LSR d
 // Right shift (d) as above    	[N.....ZC]
 // Direct (2-Byte)
-class LSR_4B : public AddressMode::Direct<Operator::LSR>
+template<>
+struct Opcode<State, 0x4B>
 {
-    using Direct::Direct;
+    using Instruction = AddressMode::Direct<Operator::LSR>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "4B: LSR d");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "4B: LSR d"; }
+    static std::string opcodeToString() { return "4B: LSR d"; }
 };
 
 // LSR d+X
 // Right shift (d+X) as above    	[N.....ZC]
 // Direct Indexed (2-Byte)
-class LSR_5B : public AddressMode::DirectIndexed<Operator::LSR, State::Register::X>
+template<>
+struct Opcode<State, 0x5B>
 {
-    using DirectIndexed::DirectIndexed;
+    using Instruction = AddressMode::DirectIndexed<Operator::LSR, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("LSR_5B");
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "5B: LSR d+X");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x5B>");
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "5B: LSR d+X"; }
+    static std::string opcodeToString() { return "5B: LSR d+X"; }
 };
 
 // LSR !a
 // Right shift (a) as above    	[N.....ZC]
 // Absolute (3-Byte)
-class LSR_4C : public AddressMode::Absolute<Operator::LSR>
+template<>
+struct Opcode<State, 0x4C>
 {
-    using Absolute::Absolute;
+    using Instruction = AddressMode::Absolute<Operator::LSR>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "4C: LSR !a");
+
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "4C: LSR !a"; }
+    static std::string opcodeToString() { return "4C: LSR !a"; }
 };
 
 // MOV (X)+, A
 // (X++) = A      (no read)    	[........]
 // Register Indirect Increment Register (1-Byte)
-class MOV_AF : public AddressMode::RegisterIndirectIncrementRegister<Operator::MOV, State::Register::X, State::Register::A>
+template<>
+struct Opcode<State, 0xAF>
 {
-    using RegisterIndirectIncrementRegister::RegisterIndirectIncrementRegister;
+    using Instruction = AddressMode::RegisterIndirectIncrementRegister<Operator::MOV, State::Register::X, State::Register::A>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "AF: MOV (X)+, A");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "AF: MOV (X)+, A"; }
+    static std::string opcodeToString() { return "AF: MOV (X)+, A"; }
 };
 
 // MOV (X), A
 // (X) = A        (read)    	[........]
 // Register Indirect Register (1-Byte)
-class MOV_C6 : public AddressMode::RegisterIndirectRegister<Operator::MOV, State::Register::X, State::Register::A>
+template<>
+struct Opcode<State, 0xC6>
 {
-    using RegisterIndirectRegister::RegisterIndirectRegister;
+    using Instruction = AddressMode::RegisterIndirectRegister<Operator::MOV, State::Register::X, State::Register::A>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "C6: MOV (X), A");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "C6: MOV (X), A"; }
+    static std::string opcodeToString() { return "C6: MOV (X), A"; }
 };
 
 // MOV [d]+Y, A
 // ([d]+Y) = A    (read)    	[........]
 // Direct Indirect Indexed Register (2-Byte)
-class MOV_D7 : public AddressMode::DirectIndirectIndexedRegister<Operator::MOV, State::Register::Y, State::Register::A>
+template<>
+struct Opcode<State, 0xD7>
 {
-    using DirectIndirectIndexedRegister::DirectIndirectIndexedRegister;
+    using Instruction = AddressMode::DirectIndirectIndexedRegister<Operator::MOV, State::Register::Y, State::Register::A>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  7 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "D7: MOV [d]+Y, A");
+
+        return  7 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "D7: MOV [d]+Y, A"; }
+    static std::string opcodeToString() { return "D7: MOV [d]+Y, A"; }
 };
 
 // MOV [d+X], A
 // ([d+X]) = A    (read)    	[........]
 // Direct Indexed Indirect Register (2-Byte)
-class MOV_C7 : public AddressMode::DirectIndexedIndirectRegister<Operator::MOV, State::Register::X, State::Register::A>
+template<>
+struct Opcode<State, 0xC7>
 {
-    using DirectIndexedIndirectRegister::DirectIndexedIndirectRegister;
+    using Instruction = AddressMode::DirectIndexedIndirectRegister<Operator::MOV, State::Register::X, State::Register::A>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  7 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "C7: MOV [d+X], A");
+
+        return  7 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "C7: MOV [d+X], A"; }
+    static std::string opcodeToString() { return "C7: MOV [d+X], A"; }
 };
 
 // MOV A, #i
 // A = i    	[N.....Z.]
 // Register Immediate (2-Byte)
-class MOV_E8 : public AddressMode::RegisterImmediate<Operator::MOV_SignedResult, State::Register::A>
+template<>
+struct Opcode<State, 0xE8>
 {
-    using RegisterImmediate::RegisterImmediate;
+    using Instruction = AddressMode::RegisterImmediate<Operator::MOV_SignedResult, State::Register::A>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  2 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "E8: MOV A, #i");
+
+        return  2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "E8: MOV A, #i"; }
+    static std::string opcodeToString() { return "E8: MOV A, #i"; }
 };
 
 // MOV A, (X)
 // A = (X)    	[N.....Z.]
 // Register Register Indirect (1-Byte)
-class MOV_E6 : public AddressMode::RegisterRegisterIndirect<Operator::MOV_SignedResult, State::Register::A, State::Register::X>
+template<>
+struct Opcode<State, 0xE6>
 {
-    using RegisterRegisterIndirect::RegisterRegisterIndirect;
+    using Instruction = AddressMode::RegisterRegisterIndirect<Operator::MOV_SignedResult, State::Register::A, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  3 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "E6: MOV A, (X)");
+
+        return  3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "E6: MOV A, (X)"; }
+    static std::string opcodeToString() { return "E6: MOV A, (X)"; }
 };
 
 // MOV A, (X)+
 // A = (X++)    	[N.....Z.]
 // Register Register Indirect Increment (1-Byte)
-class MOV_BF : public AddressMode::RegisterRegisterIndirectIncrement<Operator::MOV_SignedResult, State::Register::A, State::Register::X>
+template<>
+struct Opcode<State, 0xBF>
 {
-    using RegisterRegisterIndirectIncrement::RegisterRegisterIndirectIncrement;
+    using Instruction = AddressMode::RegisterRegisterIndirectIncrement<Operator::MOV_SignedResult, State::Register::A, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("MOV_BF");
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "BF: MOV A, (X)+");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0xBF>");
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "BF: MOV A, (X)+"; }
+    static std::string opcodeToString() { return "BF: MOV A, (X)+"; }
 };
 
 // MOV A, [d]+Y
 // A = ([d]+Y)    	[N.....Z.]
 // Register Direct Indirect Indexed (2-Byte)
-class MOV_F7 : public AddressMode::RegisterDirectIndirectIndexed<Operator::MOV_SignedResult, State::Register::A, State::Register::Y>
+template<>
+struct Opcode<State, 0xF7>
 {
-    using RegisterDirectIndirectIndexed::RegisterDirectIndirectIndexed;
+    using Instruction = AddressMode::RegisterDirectIndirectIndexed<Operator::MOV_SignedResult, State::Register::A, State::Register::Y>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  6 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "F7: MOV A, [d]+Y");
+
+        return  6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "F7: MOV A, [d]+Y"; }
+    static std::string opcodeToString() { return "F7: MOV A, [d]+Y"; }
 };
 
 // MOV A, [d+X]
 // A = ([d+X])    	[N.....Z.]
 // Register Direct Indexed Indirect (2-Byte)
-class MOV_E7 : public AddressMode::RegisterDirectIndexedIndirect<Operator::MOV_SignedResult, State::Register::A, State::Register::X>
+template<>
+struct Opcode<State, 0xE7>
 {
-    using RegisterDirectIndexedIndirect::RegisterDirectIndexedIndirect;
+    using Instruction = AddressMode::RegisterDirectIndexedIndirect<Operator::MOV_SignedResult, State::Register::A, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  6 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "E7: MOV A, [d+X]");
+
+        return  6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "E7: MOV A, [d+X]"; }
+    static std::string opcodeToString() { return "E7: MOV A, [d+X]"; }
 };
 
 // MOV A, X
 // A = X    	[N.....Z.]
 // Register Register (1-Byte)
-class MOV_7D : public AddressMode::RegisterRegister<Operator::MOV_SignedResult, State::Register::A, State::Register::X>
+template<>
+struct Opcode<State, 0x7D>
 {
-    using RegisterRegister::RegisterRegister;
+    using Instruction = AddressMode::RegisterRegister<Operator::MOV_SignedResult, State::Register::A, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  2 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "7D: MOV A, X");
+
+        return  2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "7D: MOV A, X"; }
+    static std::string opcodeToString() { return "7D: MOV A, X"; }
 };
 
 // MOV A, Y
 // A = Y    	[N.....Z.]
 // Register Register (1-Byte)
-class MOV_DD : public AddressMode::RegisterRegister<Operator::MOV_SignedResult, State::Register::A, State::Register::Y>
+template<>
+struct Opcode<State, 0xDD>
 {
-    using RegisterRegister::RegisterRegister;
+    using Instruction = AddressMode::RegisterRegister<Operator::MOV_SignedResult, State::Register::A, State::Register::Y>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  2 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "DD: MOV A, Y");
+
+        return  2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "DD: MOV A, Y"; }
+    static std::string opcodeToString() { return "DD: MOV A, Y"; }
 };
 
 // MOV A, d
 // A = (d)    	[N.....Z.]
 // Register Direct (2-Byte)
-class MOV_E4 : public AddressMode::RegisterDirect<Operator::MOV_SignedResult, State::Register::A>
+template<>
+struct Opcode<State, 0xE4>
 {
-    using RegisterDirect::RegisterDirect;
+    using Instruction = AddressMode::RegisterDirect<Operator::MOV_SignedResult, State::Register::A>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  3 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "E4: MOV A, d");
+
+        return  3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "E4: MOV A, d"; }
+    static std::string opcodeToString() { return "E4: MOV A, d"; }
 };
 
 // MOV A, d+X
 // A = (d+X)    	[N.....Z.]
 // Register Direct Indexed (2-Byte)
-class MOV_F4 : public AddressMode::RegisterDirectIndexed<Operator::MOV_SignedResult, State::Register::A, State::Register::X>
+template<>
+struct Opcode<State, 0xF4>
 {
-    using RegisterDirectIndexed::RegisterDirectIndexed;
+    using Instruction = AddressMode::RegisterDirectIndexed<Operator::MOV_SignedResult, State::Register::A, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "F4: MOV A, d+X");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "F4: MOV A, d+X"; }
+    static std::string opcodeToString() { return "F4: MOV A, d+X"; }
 };
 
 // MOV A, !a
 // A = (a)    	[N.....Z.]
 // Register Absolute (3-Byte)
-class MOV_E5 : public AddressMode::RegisterAbsolute<Operator::MOV_SignedResult, State::Register::A>
+template<>
+struct Opcode<State, 0xE5>
 {
-    using RegisterAbsolute::RegisterAbsolute;
+    using Instruction = AddressMode::RegisterAbsolute<Operator::MOV_SignedResult, State::Register::A>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "E5: MOV A, !a");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "E5: MOV A, !a"; }
+    static std::string opcodeToString() { return "E5: MOV A, !a"; }
 };
 
 // MOV A, !a+X
 // A = (a+X)    	[N.....Z.]
 // Register Absolute Indexed (3-Byte)
-class MOV_F5 : public AddressMode::RegisterAbsoluteIndexed<Operator::MOV_SignedResult, State::Register::A, State::Register::X>
+template<>
+struct Opcode<State, 0xF5>
 {
-    using RegisterAbsoluteIndexed::RegisterAbsoluteIndexed;
+    using Instruction = AddressMode::RegisterAbsoluteIndexed<Operator::MOV_SignedResult, State::Register::A, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "F5: MOV A, !a+X");
+
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "F5: MOV A, !a+X"; }
+    static std::string opcodeToString() { return "F5: MOV A, !a+X"; }
 };
 
 // MOV A, !a+Y
 // A = (a+Y)    	[N.....Z.]
 // Register Absolute Indexed (3-Byte)
-class MOV_F6 : public AddressMode::RegisterAbsoluteIndexed<Operator::MOV_SignedResult, State::Register::A, State::Register::Y>
+template<>
+struct Opcode<State, 0xF6>
 {
-    using RegisterAbsoluteIndexed::RegisterAbsoluteIndexed;
+    using Instruction = AddressMode::RegisterAbsoluteIndexed<Operator::MOV_SignedResult, State::Register::A, State::Register::Y>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "F6: MOV A, !a+Y");
+
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "F6: MOV A, !a+Y"; }
+    static std::string opcodeToString() { return "F6: MOV A, !a+Y"; }
 };
 
 // MOV SP, X
 // SP = X    	[........]
 // Register Register (1-Byte)
-class MOV_BD : public AddressMode::RegisterRegister<Operator::MOV, State::Register::SP, State::Register::X>
+template<>
+struct Opcode<State, 0xBD>
 {
-    using RegisterRegister::RegisterRegister;
+    using Instruction = AddressMode::RegisterRegister<Operator::MOV, State::Register::SP, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  2 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "BD: MOV SP, X");
+
+        return  2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "BD: MOV SP, X"; }
+    static std::string opcodeToString() { return "BD: MOV SP, X"; }
 };
 
 // MOV X, #i
 // X = i    	[N.....Z.]
 // Register Immediate (2-Byte)
-class MOV_CD : public AddressMode::RegisterImmediate<Operator::MOV_SignedResult, State::Register::X>
+template<>
+struct Opcode<State, 0xCD>
 {
-    using RegisterImmediate::RegisterImmediate;
+    using Instruction = AddressMode::RegisterImmediate<Operator::MOV_SignedResult, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  2 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "CD: MOV X, #i");
+
+        return  2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "CD: MOV X, #i"; }
+    static std::string opcodeToString() { return "CD: MOV X, #i"; }
 };
 
 // MOV X, A
 // X = A    	[N.....Z.]
 // Register Register (1-Byte)
-class MOV_5D : public AddressMode::RegisterRegister<Operator::MOV_SignedResult, State::Register::X, State::Register::A>
+template<>
+struct Opcode<State, 0x5D>
 {
-    using RegisterRegister::RegisterRegister;
+    using Instruction = AddressMode::RegisterRegister<Operator::MOV_SignedResult, State::Register::X, State::Register::A>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  2 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "5D: MOV X, A");
+
+        return  2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "5D: MOV X, A"; }
+    static std::string opcodeToString() { return "5D: MOV X, A"; }
 };
 
 // MOV X, SP
 // X = SP    	[N.....Z.]
 // Register Register (1-Byte)
-class MOV_9D : public AddressMode::RegisterRegister<Operator::MOV_SignedResult, State::Register::X, State::Register::SP>
+template<>
+struct Opcode<State, 0x9D>
 {
-    using RegisterRegister::RegisterRegister;
+    using Instruction = AddressMode::RegisterRegister<Operator::MOV_SignedResult, State::Register::X, State::Register::SP>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("MOV_9D");
-        return  2 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "9D: MOV X, SP");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x9D>");
+        return  2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "9D: MOV X, SP"; }
+    static std::string opcodeToString() { return "9D: MOV X, SP"; }
 };
 
 // MOV X, d
 // X = (d)    	[N.....Z.]
 // Register Direct (2-Byte)
-class MOV_F8 : public AddressMode::RegisterDirect<Operator::MOV_SignedResult, State::Register::X>
+template<>
+struct Opcode<State, 0xF8>
 {
-    using RegisterDirect::RegisterDirect;
+    using Instruction = AddressMode::RegisterDirect<Operator::MOV_SignedResult, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  3 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "F8: MOV X, d");
+
+        return  3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "F8: MOV X, d"; }
+    static std::string opcodeToString() { return "F8: MOV X, d"; }
 };
 
 // MOV X, d+Y
 // X = (d+Y)    	[N.....Z.]
 // Register Direct Indexed (2-Byte)
-class MOV_F9 : public AddressMode::RegisterDirectIndexed<Operator::MOV_SignedResult, State::Register::X, State::Register::Y>
+template<>
+struct Opcode<State, 0xF9>
 {
-    using RegisterDirectIndexed::RegisterDirectIndexed;
+    using Instruction = AddressMode::RegisterDirectIndexed<Operator::MOV_SignedResult, State::Register::X, State::Register::Y>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("MOV_F9");
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "F9: MOV X, d+Y");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0xF9>");
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "F9: MOV X, d+Y"; }
+    static std::string opcodeToString() { return "F9: MOV X, d+Y"; }
 };
 
 // MOV X, !a
 // X = (a)    	[N.....Z.]
 // Register Absolute (3-Byte)
-class MOV_E9 : public AddressMode::RegisterAbsolute<Operator::MOV_SignedResult, State::Register::X>
+template<>
+struct Opcode<State, 0xE9>
 {
-    using RegisterAbsolute::RegisterAbsolute;
+    using Instruction = AddressMode::RegisterAbsolute<Operator::MOV_SignedResult, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "E9: MOV X, !a");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "E9: MOV X, !a"; }
+    static std::string opcodeToString() { return "E9: MOV X, !a"; }
 };
 
 // MOV Y, #i
 // Y = i    	[N.....Z.]
 // Register Immediate (2-Byte)
-class MOV_8D : public AddressMode::RegisterImmediate<Operator::MOV_SignedResult, State::Register::Y>
+template<>
+struct Opcode<State, 0x8D>
 {
-    using RegisterImmediate::RegisterImmediate;
+    using Instruction = AddressMode::RegisterImmediate<Operator::MOV_SignedResult, State::Register::Y>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  2 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "8D: MOV Y, #i");
+
+        return  2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "8D: MOV Y, #i"; }
+    static std::string opcodeToString() { return "8D: MOV Y, #i"; }
 };
 
 // MOV Y, A
 // Y = A    	[N.....Z.]
 // Register Register (1-Byte)
-class MOV_FD : public AddressMode::RegisterRegister<Operator::MOV_SignedResult, State::Register::Y, State::Register::A>
+template<>
+struct Opcode<State, 0xFD>
 {
-    using RegisterRegister::RegisterRegister;
+    using Instruction = AddressMode::RegisterRegister<Operator::MOV_SignedResult, State::Register::Y, State::Register::A>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  2 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "FD: MOV Y, A");
+
+        return  2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "FD: MOV Y, A"; }
+    static std::string opcodeToString() { return "FD: MOV Y, A"; }
 };
 
 // MOV Y, d
 // Y = (d)    	[N.....Z.]
 // Register Direct (2-Byte)
-class MOV_EB : public AddressMode::RegisterDirect<Operator::MOV_SignedResult, State::Register::Y>
+template<>
+struct Opcode<State, 0xEB>
 {
-    using RegisterDirect::RegisterDirect;
+    using Instruction = AddressMode::RegisterDirect<Operator::MOV_SignedResult, State::Register::Y>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  3 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "EB: MOV Y, d");
+
+        return  3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "EB: MOV Y, d"; }
+    static std::string opcodeToString() { return "EB: MOV Y, d"; }
 };
 
 // MOV Y, d+X
 // Y = (d+X)    	[N.....Z.]
 // Register Direct Indexed (2-Byte)
-class MOV_FB : public AddressMode::RegisterDirectIndexed<Operator::MOV_SignedResult, State::Register::Y, State::Register::X>
+template<>
+struct Opcode<State, 0xFB>
 {
-    using RegisterDirectIndexed::RegisterDirectIndexed;
+    using Instruction = AddressMode::RegisterDirectIndexed<Operator::MOV_SignedResult, State::Register::Y, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "FB: MOV Y, d+X");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "FB: MOV Y, d+X"; }
+    static std::string opcodeToString() { return "FB: MOV Y, d+X"; }
 };
 
 // MOV Y, !a
 // Y = (a)    	[N.....Z.]
 // Register Absolute (3-Byte)
-class MOV_EC : public AddressMode::RegisterAbsolute<Operator::MOV_SignedResult, State::Register::Y>
+template<>
+struct Opcode<State, 0xEC>
 {
-    using RegisterAbsolute::RegisterAbsolute;
+    using Instruction = AddressMode::RegisterAbsolute<Operator::MOV_SignedResult, State::Register::Y>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "EC: MOV Y, !a");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "EC: MOV Y, !a"; }
+    static std::string opcodeToString() { return "EC: MOV Y, !a"; }
 };
 
 // MOV dd, ds
 // (dd) = (ds)    (no read)    	[........]
 // Direct Direct (3-Byte)
-class MOV_FA : public AddressMode::DirectDirect<Operator::MOV>
+template<>
+struct Opcode<State, 0xFA>
 {
-    using DirectDirect::DirectDirect;
+    using Instruction = AddressMode::DirectDirect<Operator::MOV>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "FA: MOV dd, ds");
+
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "FA: MOV dd, ds"; }
+    static std::string opcodeToString() { return "FA: MOV dd, ds"; }
 };
 
 // MOV d+X, A
 // (d+X) = A      (read)    	[........]
 // Direct Indexed Register (2-Byte)
-class MOV_D4 : public AddressMode::DirectIndexedRegister<Operator::MOV, State::Register::X, State::Register::A>
+template<>
+struct Opcode<State, 0xD4>
 {
-    using DirectIndexedRegister::DirectIndexedRegister;
+    using Instruction = AddressMode::DirectIndexedRegister<Operator::MOV, State::Register::X, State::Register::A>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "D4: MOV d+X, A");
+
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "D4: MOV d+X, A"; }
+    static std::string opcodeToString() { return "D4: MOV d+X, A"; }
 };
 
 // MOV d+X, Y
 // (d+X) = Y      (read)    	[........]
 // Direct Indexed Register (2-Byte)
-class MOV_DB : public AddressMode::DirectIndexedRegister<Operator::MOV, State::Register::X, State::Register::Y>
+template<>
+struct Opcode<State, 0xDB>
 {
-    using DirectIndexedRegister::DirectIndexedRegister;
+    using Instruction = AddressMode::DirectIndexedRegister<Operator::MOV, State::Register::X, State::Register::Y>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "DB: MOV d+X, Y");
+
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "DB: MOV d+X, Y"; }
+    static std::string opcodeToString() { return "DB: MOV d+X, Y"; }
 };
 
 // MOV d+Y, X
 // (d+Y) = X      (read)    	[........]
 // Direct Indexed Register (2-Byte)
-class MOV_D9 : public AddressMode::DirectIndexedRegister<Operator::MOV, State::Register::Y, State::Register::X>
+template<>
+struct Opcode<State, 0xD9>
 {
-    using DirectIndexedRegister::DirectIndexedRegister;
+    using Instruction = AddressMode::DirectIndexedRegister<Operator::MOV, State::Register::Y, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("MOV_D9");
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "D9: MOV d+Y, X");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0xD9>");
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "D9: MOV d+Y, X"; }
+    static std::string opcodeToString() { return "D9: MOV d+Y, X"; }
 };
 
 // MOV d, #i
 // (d) = i        (read)    	[........]
 // Direct Immediate (3-Byte)
-class MOV_8F : public AddressMode::DirectImmediate<Operator::MOV>
+template<>
+struct Opcode<State, 0x8F>
 {
-    using DirectImmediate::DirectImmediate;
+    using Instruction = AddressMode::DirectImmediate<Operator::MOV>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "8F: MOV d, #i");
+
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "8F: MOV d, #i"; }
+    static std::string opcodeToString() { return "8F: MOV d, #i"; }
 };
 
 // MOV d, A
 // (d) = A        (read)    	[........]
 // Direct Register (2-Byte)
-class MOV_C4 : public AddressMode::DirectRegister<Operator::MOV, State::Register::A>
+template<>
+struct Opcode<State, 0xC4>
 {
-    using DirectRegister::DirectRegister;
+    using Instruction = AddressMode::DirectRegister<Operator::MOV, State::Register::A>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "C4: MOV d, A");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "C4: MOV d, A"; }
+    static std::string opcodeToString() { return "C4: MOV d, A"; }
 };
 
 // MOV d, X
 // (d) = X        (read)    	[........]
 // Direct Register (2-Byte)
-class MOV_D8 : public AddressMode::DirectRegister<Operator::MOV, State::Register::X>
+template<>
+struct Opcode<State, 0xD8>
 {
-    using DirectRegister::DirectRegister;
+    using Instruction = AddressMode::DirectRegister<Operator::MOV, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "D8: MOV d, X");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "D8: MOV d, X"; }
+    static std::string opcodeToString() { return "D8: MOV d, X"; }
 };
 
 // MOV d, Y
 // (d) = Y        (read)    	[........]
 // Direct Register (2-Byte)
-class MOV_CB : public AddressMode::DirectRegister<Operator::MOV, State::Register::Y>
+template<>
+struct Opcode<State, 0xCB>
 {
-    using DirectRegister::DirectRegister;
+    using Instruction = AddressMode::DirectRegister<Operator::MOV, State::Register::Y>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "CB: MOV d, Y");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "CB: MOV d, Y"; }
+    static std::string opcodeToString() { return "CB: MOV d, Y"; }
 };
 
 // MOV !a+X, A
 // (a+X) = A      (read)    	[........]
 // Absolute Indexed Register (3-Byte)
-class MOV_D5 : public AddressMode::AbsoluteIndexedRegister<Operator::MOV, State::Register::X, State::Register::A>
+template<>
+struct Opcode<State, 0xD5>
 {
-    using AbsoluteIndexedRegister::AbsoluteIndexedRegister;
+    using Instruction = AddressMode::AbsoluteIndexedRegister<Operator::MOV, State::Register::X, State::Register::A>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  6 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "D5: MOV !a+X, A");
+
+        return  6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "D5: MOV !a+X, A"; }
+    static std::string opcodeToString() { return "D5: MOV !a+X, A"; }
 };
 
 // MOV !a+Y, A
 // (a+Y) = A      (read)    	[........]
 // Absolute Indexed Register (3-Byte)
-class MOV_D6 : public AddressMode::AbsoluteIndexedRegister<Operator::MOV, State::Register::Y, State::Register::A>
+template<>
+struct Opcode<State, 0xD6>
 {
-    using AbsoluteIndexedRegister::AbsoluteIndexedRegister;
+    using Instruction = AddressMode::AbsoluteIndexedRegister<Operator::MOV, State::Register::Y, State::Register::A>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  6 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "D6: MOV !a+Y, A");
+
+        return  6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "D6: MOV !a+Y, A"; }
+    static std::string opcodeToString() { return "D6: MOV !a+Y, A"; }
 };
 
 // MOV !a, A
 // (a) = A        (read)    	[........]
 // Absolute Register (3-Byte)
-class MOV_C5 : public AddressMode::AbsoluteRegister<Operator::MOV, State::Register::A>
+template<>
+struct Opcode<State, 0xC5>
 {
-    using AbsoluteRegister::AbsoluteRegister;
+    using Instruction = AddressMode::AbsoluteRegister<Operator::MOV, State::Register::A>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "C5: MOV !a, A");
+
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "C5: MOV !a, A"; }
+    static std::string opcodeToString() { return "C5: MOV !a, A"; }
 };
 
 // MOV !a, X
 // (a) = X        (read)    	[........]
 // Absolute Register (3-Byte)
-class MOV_C9 : public AddressMode::AbsoluteRegister<Operator::MOV, State::Register::X>
+template<>
+struct Opcode<State, 0xC9>
 {
-    using AbsoluteRegister::AbsoluteRegister;
+    using Instruction = AddressMode::AbsoluteRegister<Operator::MOV, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "C9: MOV !a, X");
+
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "C9: MOV !a, X"; }
+    static std::string opcodeToString() { return "C9: MOV !a, X"; }
 };
 
 // MOV !a, Y
 // (a) = Y        (read)    	[........]
 // Absolute Register (3-Byte)
-class MOV_CC : public AddressMode::AbsoluteRegister<Operator::MOV, State::Register::Y>
+template<>
+struct Opcode<State, 0xCC>
 {
-    using AbsoluteRegister::AbsoluteRegister;
+    using Instruction = AddressMode::AbsoluteRegister<Operator::MOV, State::Register::Y>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "CC: MOV !a, Y");
+
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "CC: MOV !a, Y"; }
+    static std::string opcodeToString() { return "CC: MOV !a, Y"; }
 };
 
 // MOV1 C, m.b
 // C = (m.b)    	[.......C]
 // Carry Memory Bit (3-Byte)
-class MOV1_AA : public AddressMode::CarryMemoryBit<Operator::MOV1>
+template<>
+struct Opcode<State, 0xAA>
 {
-    using CarryMemoryBit::CarryMemoryBit;
+    using Instruction = AddressMode::CarryMemoryBit<Operator::MOV1>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("MOV1_AA");
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "AA: MOV1 C, m.b");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0xAA>");
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "AA: MOV1 C, m.b"; }
+    static std::string opcodeToString() { return "AA: MOV1 C, m.b"; }
 };
 
 // MOV1 m.b, C
 // (m.b) = C    	[........]
 // Memory Bit Carry (3-Byte)
-class MOV1_CA : public AddressMode::MemoryBitCarry<Operator::MOV1>
+template<>
+struct Opcode<State, 0xCA>
 {
-    using MemoryBitCarry::MemoryBitCarry;
+    using Instruction = AddressMode::MemoryBitCarry<Operator::MOV1>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("MOV1_CA");
-        return  6 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "CA: MOV1 m.b, C");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0xCA>");
+        return  6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "CA: MOV1 m.b, C"; }
+    static std::string opcodeToString() { return "CA: MOV1 m.b, C"; }
 };
 
 // MOVW YA, d
 // YA = word (d)    	[N.....Z.]
 // Y Accumulator Direct (2-Byte)
-class MOVW_BA : public AddressMode::YAccumulatorDirect<Operator::MOVW_SignedResult>
+template<>
+struct Opcode<State, 0xBA>
 {
-    using YAccumulatorDirect::YAccumulatorDirect;
+    using Instruction = AddressMode::YAccumulatorDirect<Operator::MOVW_SignedResult>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "BA: MOVW YA, d");
+
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "BA: MOVW YA, d"; }
+    static std::string opcodeToString() { return "BA: MOVW YA, d"; }
 };
 
 // MOVW d, YA
 // word (d) = YA  (read low only)    	[........]
 // Direct Y Accumulator (2-Byte)
-class MOVW_DA : public AddressMode::DirectYAccumulator<Operator::MOVW>
+template<>
+struct Opcode<State, 0xDA>
 {
-    using DirectYAccumulator::DirectYAccumulator;
+    using Instruction = AddressMode::DirectYAccumulator<Operator::MOVW>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "DA: MOVW d, YA");
+
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "DA: MOVW d, YA"; }
+    static std::string opcodeToString() { return "DA: MOVW d, YA"; }
 };
 
 // MUL YA
 // YA = Y * A, NZ on Y only    	[N.....Z.]
 // Y Accumulator (1-Byte)
-class MUL_CF : public AddressMode::YAccumulator<Operator::MUL>
+template<>
+struct Opcode<State, 0xCF>
 {
-    using YAccumulator::YAccumulator;
+    using Instruction = AddressMode::YAccumulator<Operator::MUL>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  9 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "CF: MUL YA");
+
+        return  9 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "CF: MUL YA"; }
+    static std::string opcodeToString() { return "CF: MUL YA"; }
 };
 
 // NOP 
 // do nothing    	[........]
 // Implied (1-Byte)
-class NOP_00 : public AddressMode::Implied<Operator::NOP>
+template<>
+struct Opcode<State, 0x00>
 {
-    using Implied::Implied;
+    using Instruction = AddressMode::Implied<Operator::NOP>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  2 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "00: NOP ");
+
+        return  2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "00: NOP "; }
+    static std::string opcodeToString() { return "00: NOP "; }
 };
 
 // NOT1 m.b
 // m.b = ~m.b    	[........]
 // Memory Bit (3-Byte)
-class NOT1_EA : public AddressMode::MemoryBit<Operator::NOT1>
+template<>
+struct Opcode<State, 0xEA>
 {
-    using MemoryBit::MemoryBit;
+    using Instruction = AddressMode::MemoryBit<Operator::NOT1>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("NOT1_EA");
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "EA: NOT1 m.b");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0xEA>");
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "EA: NOT1 m.b"; }
+    static std::string opcodeToString() { return "EA: NOT1 m.b"; }
 };
 
 // NOTC 
 // C = !C    	[.......C]
 // Implied (1-Byte)
-class NOTC_ED : public AddressMode::Implied<Operator::NOTC>
+template<>
+struct Opcode<State, 0xED>
 {
-    using Implied::Implied;
+    using Instruction = AddressMode::Implied<Operator::NOTC>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  3 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "ED: NOTC ");
+
+        return  3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "ED: NOTC "; }
+    static std::string opcodeToString() { return "ED: NOTC "; }
 };
 
 // OR (X), (Y)
 // (X) = (X) | (Y)    	[N.....Z.]
 // Indirect Indirect (1-Byte)
-class OR_19 : public AddressMode::IndirectIndirect<Operator::OR>
+template<>
+struct Opcode<State, 0x19>
 {
-    using IndirectIndirect::IndirectIndirect;
+    using Instruction = AddressMode::IndirectIndirect<Operator::OR>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("OR_19");
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "19: OR (X), (Y)");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x19>");
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "19: OR (X), (Y)"; }
+    static std::string opcodeToString() { return "19: OR (X), (Y)"; }
 };
 
 // OR A, #i
 // A = A | i    	[N.....Z.]
 // Register Immediate (2-Byte)
-class OR_08 : public AddressMode::RegisterImmediate<Operator::OR, State::Register::A>
+template<>
+struct Opcode<State, 0x08>
 {
-    using RegisterImmediate::RegisterImmediate;
+    using Instruction = AddressMode::RegisterImmediate<Operator::OR, State::Register::A>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  2 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "08: OR A, #i");
+
+        return  2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "08: OR A, #i"; }
+    static std::string opcodeToString() { return "08: OR A, #i"; }
 };
 
 // OR A, (X)
 // A = A | (X)    	[N.....Z.]
 // Register Register Indirect (1-Byte)
-class OR_06 : public AddressMode::RegisterRegisterIndirect<Operator::OR, State::Register::A, State::Register::X>
+template<>
+struct Opcode<State, 0x06>
 {
-    using RegisterRegisterIndirect::RegisterRegisterIndirect;
+    using Instruction = AddressMode::RegisterRegisterIndirect<Operator::OR, State::Register::A, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("OR_06");
-        return  3 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "06: OR A, (X)");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x06>");
+        return  3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "06: OR A, (X)"; }
+    static std::string opcodeToString() { return "06: OR A, (X)"; }
 };
 
 // OR A, [d]+Y
 // A = A | ([d]+Y)    	[N.....Z.]
 // Register Direct Indirect Indexed (2-Byte)
-class OR_17 : public AddressMode::RegisterDirectIndirectIndexed<Operator::OR, State::Register::A, State::Register::Y>
+template<>
+struct Opcode<State, 0x17>
 {
-    using RegisterDirectIndirectIndexed::RegisterDirectIndirectIndexed;
+    using Instruction = AddressMode::RegisterDirectIndirectIndexed<Operator::OR, State::Register::A, State::Register::Y>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("OR_17");
-        return  6 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "17: OR A, [d]+Y");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x17>");
+        return  6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "17: OR A, [d]+Y"; }
+    static std::string opcodeToString() { return "17: OR A, [d]+Y"; }
 };
 
 // OR A, [d+X]
 // A = A | ([d+X])    	[N.....Z.]
 // Register Direct Indexed Indirect (2-Byte)
-class OR_07 : public AddressMode::RegisterDirectIndexedIndirect<Operator::OR, State::Register::A, State::Register::X>
+template<>
+struct Opcode<State, 0x07>
 {
-    using RegisterDirectIndexedIndirect::RegisterDirectIndexedIndirect;
+    using Instruction = AddressMode::RegisterDirectIndexedIndirect<Operator::OR, State::Register::A, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("OR_07");
-        return  6 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "07: OR A, [d+X]");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x07>");
+        return  6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "07: OR A, [d+X]"; }
+    static std::string opcodeToString() { return "07: OR A, [d+X]"; }
 };
 
 // OR A, d
 // A = A | (d)    	[N.....Z.]
 // Register Direct (2-Byte)
-class OR_04 : public AddressMode::RegisterDirect<Operator::OR, State::Register::A>
+template<>
+struct Opcode<State, 0x04>
 {
-    using RegisterDirect::RegisterDirect;
+    using Instruction = AddressMode::RegisterDirect<Operator::OR, State::Register::A>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  3 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "04: OR A, d");
+
+        return  3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "04: OR A, d"; }
+    static std::string opcodeToString() { return "04: OR A, d"; }
 };
 
 // OR A, d+X
 // A = A | (d+X)    	[N.....Z.]
 // Register Direct Indexed (2-Byte)
-class OR_14 : public AddressMode::RegisterDirectIndexed<Operator::OR, State::Register::A, State::Register::X>
+template<>
+struct Opcode<State, 0x14>
 {
-    using RegisterDirectIndexed::RegisterDirectIndexed;
+    using Instruction = AddressMode::RegisterDirectIndexed<Operator::OR, State::Register::A, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "14: OR A, d+X");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "14: OR A, d+X"; }
+    static std::string opcodeToString() { return "14: OR A, d+X"; }
 };
 
 // OR A, !a
 // A = A | (a)    	[N.....Z.]
 // Register Absolute (3-Byte)
-class OR_05 : public AddressMode::RegisterAbsolute<Operator::OR, State::Register::A>
+template<>
+struct Opcode<State, 0x05>
 {
-    using RegisterAbsolute::RegisterAbsolute;
+    using Instruction = AddressMode::RegisterAbsolute<Operator::OR, State::Register::A>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "05: OR A, !a");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "05: OR A, !a"; }
+    static std::string opcodeToString() { return "05: OR A, !a"; }
 };
 
 // OR A, !a+X
 // A = A | (a+X)    	[N.....Z.]
 // Register Absolute Indexed (3-Byte)
-class OR_15 : public AddressMode::RegisterAbsoluteIndexed<Operator::OR, State::Register::A, State::Register::X>
+template<>
+struct Opcode<State, 0x15>
 {
-    using RegisterAbsoluteIndexed::RegisterAbsoluteIndexed;
+    using Instruction = AddressMode::RegisterAbsoluteIndexed<Operator::OR, State::Register::A, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "15: OR A, !a+X");
+
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "15: OR A, !a+X"; }
+    static std::string opcodeToString() { return "15: OR A, !a+X"; }
 };
 
 // OR A, !a+Y
 // A = A | (a+Y)    	[N.....Z.]
 // Register Absolute Indexed (3-Byte)
-class OR_16 : public AddressMode::RegisterAbsoluteIndexed<Operator::OR, State::Register::A, State::Register::Y>
+template<>
+struct Opcode<State, 0x16>
 {
-    using RegisterAbsoluteIndexed::RegisterAbsoluteIndexed;
+    using Instruction = AddressMode::RegisterAbsoluteIndexed<Operator::OR, State::Register::A, State::Register::Y>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("OR_16");
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "16: OR A, !a+Y");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x16>");
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "16: OR A, !a+Y"; }
+    static std::string opcodeToString() { return "16: OR A, !a+Y"; }
 };
 
 // OR dd, ds
 // (dd) = (dd) | (ds)    	[N.....Z.]
 // Direct Direct (3-Byte)
-class OR_09 : public AddressMode::DirectDirect<Operator::OR>
+template<>
+struct Opcode<State, 0x09>
 {
-    using DirectDirect::DirectDirect;
+    using Instruction = AddressMode::DirectDirect<Operator::OR>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  6 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "09: OR dd, ds");
+
+        return  6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "09: OR dd, ds"; }
+    static std::string opcodeToString() { return "09: OR dd, ds"; }
 };
 
 // OR d, #i
 // (d) = (d) | i    	[N.....Z.]
 // Direct Immediate (3-Byte)
-class OR_18 : public AddressMode::DirectImmediate<Operator::OR>
+template<>
+struct Opcode<State, 0x18>
 {
-    using DirectImmediate::DirectImmediate;
+    using Instruction = AddressMode::DirectImmediate<Operator::OR>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("OR_18");
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "18: OR d, #i");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x18>");
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "18: OR d, #i"; }
+    static std::string opcodeToString() { return "18: OR d, #i"; }
 };
 
 // OR1 C, /m.b
 // C = C | ~(m.b)    	[.......C]
 // Carry Negated Memory Bit (3-Byte)
-class OR1_2A : public AddressMode::CarryNegatedMemoryBit<Operator::OR1>
+template<>
+struct Opcode<State, 0x2A>
 {
-    using CarryNegatedMemoryBit::CarryNegatedMemoryBit;
+    using Instruction = AddressMode::CarryNegatedMemoryBit<Operator::OR1>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("OR1_2A");
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "2A: OR1 C, /m.b");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x2A>");
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "2A: OR1 C, /m.b"; }
+    static std::string opcodeToString() { return "2A: OR1 C, /m.b"; }
 };
 
 // OR1 C, m.b
 // C = C | (m.b)    	[.......C]
 // Carry Memory Bit (3-Byte)
-class OR1_0A : public AddressMode::CarryMemoryBit<Operator::OR1>
+template<>
+struct Opcode<State, 0x0A>
 {
-    using CarryMemoryBit::CarryMemoryBit;
+    using Instruction = AddressMode::CarryMemoryBit<Operator::OR1>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("OR1_0A");
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "0A: OR1 C, m.b");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x0A>");
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "0A: OR1 C, m.b"; }
+    static std::string opcodeToString() { return "0A: OR1 C, m.b"; }
 };
 
 // PCALL u
 // CALL $FF00+u    	[........]
 // U Page (2-Byte)
-class PCALL_4F : public AddressMode::UPage<Operator::PCALL>
+template<>
+struct Opcode<State, 0x4F>
 {
-    using UPage::UPage;
+    using Instruction = AddressMode::UPage<Operator::PCALL>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("PCALL_4F");
-        return  6 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "4F: PCALL u");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x4F>");
+        return  6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "4F: PCALL u"; }
+    static std::string opcodeToString() { return "4F: PCALL u"; }
 };
 
 // POP A
 // A = (++SP)    	[........]
 // Register (1-Byte)
-class POP_AE : public AddressMode::Register<Operator::POP, State::Register::A>
+template<>
+struct Opcode<State, 0xAE>
 {
-    using Register::Register;
+    using Instruction = AddressMode::Register<Operator::POP, State::Register::A>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "AE: POP A");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "AE: POP A"; }
+    static std::string opcodeToString() { return "AE: POP A"; }
 };
 
 // POP PSW
 // Flags = (++SP)    	[NVPBHIZC]
 // Register (1-Byte)
-class POP_8E : public AddressMode::Register<Operator::POP, State::Register::PSW>
+template<>
+struct Opcode<State, 0x8E>
 {
-    using Register::Register;
+    using Instruction = AddressMode::Register<Operator::POP, State::Register::PSW>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "8E: POP PSW");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "8E: POP PSW"; }
+    static std::string opcodeToString() { return "8E: POP PSW"; }
 };
 
 // POP X
 // X = (++SP)    	[........]
 // Register (1-Byte)
-class POP_CE : public AddressMode::Register<Operator::POP, State::Register::X>
+template<>
+struct Opcode<State, 0xCE>
 {
-    using Register::Register;
+    using Instruction = AddressMode::Register<Operator::POP, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "CE: POP X");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "CE: POP X"; }
+    static std::string opcodeToString() { return "CE: POP X"; }
 };
 
 // POP Y
 // Y = (++SP)    	[........]
 // Register (1-Byte)
-class POP_EE : public AddressMode::Register<Operator::POP, State::Register::Y>
+template<>
+struct Opcode<State, 0xEE>
 {
-    using Register::Register;
+    using Instruction = AddressMode::Register<Operator::POP, State::Register::Y>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "EE: POP Y");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "EE: POP Y"; }
+    static std::string opcodeToString() { return "EE: POP Y"; }
 };
 
 // PUSH A
 // (SP--) = A    	[........]
 // Register (1-Byte)
-class PUSH_2D : public AddressMode::Register<Operator::PUSH, State::Register::A>
+template<>
+struct Opcode<State, 0x2D>
 {
-    using Register::Register;
+    using Instruction = AddressMode::Register<Operator::PUSH, State::Register::A>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "2D: PUSH A");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "2D: PUSH A"; }
+    static std::string opcodeToString() { return "2D: PUSH A"; }
 };
 
 // PUSH PSW
 // (SP--) = Flags    	[........]
 // Register (1-Byte)
-class PUSH_0D : public AddressMode::Register<Operator::PUSH, State::Register::PSW>
+template<>
+struct Opcode<State, 0x0D>
 {
-    using Register::Register;
+    using Instruction = AddressMode::Register<Operator::PUSH, State::Register::PSW>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "0D: PUSH PSW");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "0D: PUSH PSW"; }
+    static std::string opcodeToString() { return "0D: PUSH PSW"; }
 };
 
 // PUSH X
 // (SP--) = X    	[........]
 // Register (1-Byte)
-class PUSH_4D : public AddressMode::Register<Operator::PUSH, State::Register::X>
+template<>
+struct Opcode<State, 0x4D>
 {
-    using Register::Register;
+    using Instruction = AddressMode::Register<Operator::PUSH, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "4D: PUSH X");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "4D: PUSH X"; }
+    static std::string opcodeToString() { return "4D: PUSH X"; }
 };
 
 // PUSH Y
 // (SP--) = Y    	[........]
 // Register (1-Byte)
-class PUSH_6D : public AddressMode::Register<Operator::PUSH, State::Register::Y>
+template<>
+struct Opcode<State, 0x6D>
 {
-    using Register::Register;
+    using Instruction = AddressMode::Register<Operator::PUSH, State::Register::Y>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "6D: PUSH Y");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "6D: PUSH Y"; }
+    static std::string opcodeToString() { return "6D: PUSH Y"; }
 };
 
 // RET 
 // Pop PC    	[........]
 // Implied (1-Byte)
-class RET_6F : public AddressMode::Implied<Operator::RET>
+template<>
+struct Opcode<State, 0x6F>
 {
-    using Implied::Implied;
+    using Instruction = AddressMode::Implied<Operator::RET>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "6F: RET ");
+
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "6F: RET "; }
+    static std::string opcodeToString() { return "6F: RET "; }
 };
 
 // RET1 
 // Pop Flags, PC    	[NVPBHIZC]
 // Implied (1-Byte)
-class RET1_7F : public AddressMode::Implied<Operator::RET1>
+template<>
+struct Opcode<State, 0x7F>
 {
-    using Implied::Implied;
+    using Instruction = AddressMode::Implied<Operator::RET1>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("RET1_7F");
-        return  6 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "7F: RET1 ");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x7F>");
+        return  6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "7F: RET1 "; }
+    static std::string opcodeToString() { return "7F: RET1 "; }
 };
 
 // ROL A
 // Left shift A: low=C, C=high    	[N.....ZC]
 // Register (1-Byte)
-class ROL_3C : public AddressMode::Register<Operator::ROL, State::Register::A>
+template<>
+struct Opcode<State, 0x3C>
 {
-    using Register::Register;
+    using Instruction = AddressMode::Register<Operator::ROL, State::Register::A>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("ROL_3C");
-        return  2 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "3C: ROL A");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x3C>");
+        return  2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "3C: ROL A"; }
+    static std::string opcodeToString() { return "3C: ROL A"; }
 };
 
 // ROL d
 // Left shift (d) as above    	[N.....ZC]
 // Direct (2-Byte)
-class ROL_2B : public AddressMode::Direct<Operator::ROL>
+template<>
+struct Opcode<State, 0x2B>
 {
-    using Direct::Direct;
+    using Instruction = AddressMode::Direct<Operator::ROL>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "2B: ROL d");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "2B: ROL d"; }
+    static std::string opcodeToString() { return "2B: ROL d"; }
 };
 
 // ROL d+X
 // Left shift (d+X) as above    	[N.....ZC]
 // Direct Indexed (2-Byte)
-class ROL_3B : public AddressMode::DirectIndexed<Operator::ROL, State::Register::X>
+template<>
+struct Opcode<State, 0x3B>
 {
-    using DirectIndexed::DirectIndexed;
+    using Instruction = AddressMode::DirectIndexed<Operator::ROL, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("ROL_3B");
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "3B: ROL d+X");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x3B>");
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "3B: ROL d+X"; }
+    static std::string opcodeToString() { return "3B: ROL d+X"; }
 };
 
 // ROL !a
 // Left shift (a) as above    	[N.....ZC]
 // Absolute (3-Byte)
-class ROL_2C : public AddressMode::Absolute<Operator::ROL>
+template<>
+struct Opcode<State, 0x2C>
 {
-    using Absolute::Absolute;
+    using Instruction = AddressMode::Absolute<Operator::ROL>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("ROL_2C");
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "2C: ROL !a");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x2C>");
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "2C: ROL !a"; }
+    static std::string opcodeToString() { return "2C: ROL !a"; }
 };
 
 // ROR A
 // Right shift A: high=C, C=low    	[N.....ZC]
 // Register (1-Byte)
-class ROR_7C : public AddressMode::Register<Operator::ROR, State::Register::A>
+template<>
+struct Opcode<State, 0x7C>
 {
-    using Register::Register;
+    using Instruction = AddressMode::Register<Operator::ROR, State::Register::A>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  2 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "7C: ROR A");
+
+        return  2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "7C: ROR A"; }
+    static std::string opcodeToString() { return "7C: ROR A"; }
 };
 
 // ROR d
 // Right shift (d) as above    	[N.....ZC]
 // Direct (2-Byte)
-class ROR_6B : public AddressMode::Direct<Operator::ROR>
+template<>
+struct Opcode<State, 0x6B>
 {
-    using Direct::Direct;
+    using Instruction = AddressMode::Direct<Operator::ROR>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "6B: ROR d");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "6B: ROR d"; }
+    static std::string opcodeToString() { return "6B: ROR d"; }
 };
 
 // ROR d+X
 // Right shift (d+X) as above    	[N.....ZC]
 // Direct Indexed (2-Byte)
-class ROR_7B : public AddressMode::DirectIndexed<Operator::ROR, State::Register::X>
+template<>
+struct Opcode<State, 0x7B>
 {
-    using DirectIndexed::DirectIndexed;
+    using Instruction = AddressMode::DirectIndexed<Operator::ROR, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("ROR_7B");
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "7B: ROR d+X");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x7B>");
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "7B: ROR d+X"; }
+    static std::string opcodeToString() { return "7B: ROR d+X"; }
 };
 
 // ROR !a
 // Right shift (a) as above    	[N.....ZC]
 // Absolute (3-Byte)
-class ROR_6C : public AddressMode::Absolute<Operator::ROR>
+template<>
+struct Opcode<State, 0x6C>
 {
-    using Absolute::Absolute;
+    using Instruction = AddressMode::Absolute<Operator::ROR>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("ROR_6C");
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "6C: ROR !a");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x6C>");
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "6C: ROR !a"; }
+    static std::string opcodeToString() { return "6C: ROR !a"; }
 };
 
 // SBC (X), (Y)
 // (X) = (X)-(Y)-!C    	[NV..H.ZC]
 // Indirect Indirect (1-Byte)
-class SBC_B9 : public AddressMode::IndirectIndirect<Operator::SBC>
+template<>
+struct Opcode<State, 0xB9>
 {
-    using IndirectIndirect::IndirectIndirect;
+    using Instruction = AddressMode::IndirectIndirect<Operator::SBC>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("SBC_B9");
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "B9: SBC (X), (Y)");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0xB9>");
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "B9: SBC (X), (Y)"; }
+    static std::string opcodeToString() { return "B9: SBC (X), (Y)"; }
 };
 
 // SBC A, #i
 // A = A-i-!C    	[NV..H.ZC]
 // Register Immediate (2-Byte)
-class SBC_A8 : public AddressMode::RegisterImmediate<Operator::SBC, State::Register::A>
+template<>
+struct Opcode<State, 0xA8>
 {
-    using RegisterImmediate::RegisterImmediate;
+    using Instruction = AddressMode::RegisterImmediate<Operator::SBC, State::Register::A>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  2 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "A8: SBC A, #i");
+
+        return  2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "A8: SBC A, #i"; }
+    static std::string opcodeToString() { return "A8: SBC A, #i"; }
 };
 
 // SBC A, (X)
 // A = A-(X)-!C    	[NV..H.ZC]
 // Register Register Indirect (1-Byte)
-class SBC_A6 : public AddressMode::RegisterRegisterIndirect<Operator::SBC, State::Register::A, State::Register::X>
+template<>
+struct Opcode<State, 0xA6>
 {
-    using RegisterRegisterIndirect::RegisterRegisterIndirect;
+    using Instruction = AddressMode::RegisterRegisterIndirect<Operator::SBC, State::Register::A, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("SBC_A6");
-        return  3 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "A6: SBC A, (X)");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0xA6>");
+        return  3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "A6: SBC A, (X)"; }
+    static std::string opcodeToString() { return "A6: SBC A, (X)"; }
 };
 
 // SBC A, [d]+Y
 // A = A-([d]+Y)-!C    	[NV..H.ZC]
 // Register Direct Indirect Indexed (2-Byte)
-class SBC_B7 : public AddressMode::RegisterDirectIndirectIndexed<Operator::SBC, State::Register::A, State::Register::Y>
+template<>
+struct Opcode<State, 0xB7>
 {
-    using RegisterDirectIndirectIndexed::RegisterDirectIndirectIndexed;
+    using Instruction = AddressMode::RegisterDirectIndirectIndexed<Operator::SBC, State::Register::A, State::Register::Y>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("SBC_B7");
-        return  6 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "B7: SBC A, [d]+Y");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0xB7>");
+        return  6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "B7: SBC A, [d]+Y"; }
+    static std::string opcodeToString() { return "B7: SBC A, [d]+Y"; }
 };
 
 // SBC A, [d+X]
 // A = A-([d+X])-!C    	[NV..H.ZC]
 // Register Direct Indexed Indirect (2-Byte)
-class SBC_A7 : public AddressMode::RegisterDirectIndexedIndirect<Operator::SBC, State::Register::A, State::Register::X>
+template<>
+struct Opcode<State, 0xA7>
 {
-    using RegisterDirectIndexedIndirect::RegisterDirectIndexedIndirect;
+    using Instruction = AddressMode::RegisterDirectIndexedIndirect<Operator::SBC, State::Register::A, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("SBC_A7");
-        return  6 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "A7: SBC A, [d+X]");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0xA7>");
+        return  6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "A7: SBC A, [d+X]"; }
+    static std::string opcodeToString() { return "A7: SBC A, [d+X]"; }
 };
 
 // SBC A, d
 // A = A-(d)-!C    	[NV..H.ZC]
 // Register Direct (2-Byte)
-class SBC_A4 : public AddressMode::RegisterDirect<Operator::SBC, State::Register::A>
+template<>
+struct Opcode<State, 0xA4>
 {
-    using RegisterDirect::RegisterDirect;
+    using Instruction = AddressMode::RegisterDirect<Operator::SBC, State::Register::A>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  3 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "A4: SBC A, d");
+
+        return  3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "A4: SBC A, d"; }
+    static std::string opcodeToString() { return "A4: SBC A, d"; }
 };
 
 // SBC A, d+X
 // A = A-(d+X)-!C    	[NV..H.ZC]
 // Register Direct Indexed (2-Byte)
-class SBC_B4 : public AddressMode::RegisterDirectIndexed<Operator::SBC, State::Register::A, State::Register::X>
+template<>
+struct Opcode<State, 0xB4>
 {
-    using RegisterDirectIndexed::RegisterDirectIndexed;
+    using Instruction = AddressMode::RegisterDirectIndexed<Operator::SBC, State::Register::A, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("SBC_B4");
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "B4: SBC A, d+X");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0xB4>");
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "B4: SBC A, d+X"; }
+    static std::string opcodeToString() { return "B4: SBC A, d+X"; }
 };
 
 // SBC A, !a
 // A = A-(a)-!C    	[NV..H.ZC]
 // Register Absolute (3-Byte)
-class SBC_A5 : public AddressMode::RegisterAbsolute<Operator::SBC, State::Register::A>
+template<>
+struct Opcode<State, 0xA5>
 {
-    using RegisterAbsolute::RegisterAbsolute;
+    using Instruction = AddressMode::RegisterAbsolute<Operator::SBC, State::Register::A>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "A5: SBC A, !a");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "A5: SBC A, !a"; }
+    static std::string opcodeToString() { return "A5: SBC A, !a"; }
 };
 
 // SBC A, !a+X
 // A = A-(a+X)-!C    	[NV..H.ZC]
 // Register Absolute Indexed (3-Byte)
-class SBC_B5 : public AddressMode::RegisterAbsoluteIndexed<Operator::SBC, State::Register::A, State::Register::X>
+template<>
+struct Opcode<State, 0xB5>
 {
-    using RegisterAbsoluteIndexed::RegisterAbsoluteIndexed;
+    using Instruction = AddressMode::RegisterAbsoluteIndexed<Operator::SBC, State::Register::A, State::Register::X>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "B5: SBC A, !a+X");
+
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "B5: SBC A, !a+X"; }
+    static std::string opcodeToString() { return "B5: SBC A, !a+X"; }
 };
 
 // SBC A, !a+Y
 // A = A-(a+Y)-!C    	[NV..H.ZC]
 // Register Absolute Indexed (3-Byte)
-class SBC_B6 : public AddressMode::RegisterAbsoluteIndexed<Operator::SBC, State::Register::A, State::Register::Y>
+template<>
+struct Opcode<State, 0xB6>
 {
-    using RegisterAbsoluteIndexed::RegisterAbsoluteIndexed;
+    using Instruction = AddressMode::RegisterAbsoluteIndexed<Operator::SBC, State::Register::A, State::Register::Y>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "B6: SBC A, !a+Y");
+
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "B6: SBC A, !a+Y"; }
+    static std::string opcodeToString() { return "B6: SBC A, !a+Y"; }
 };
 
 // SBC dd, ds
 // (dd) = (dd)-(ds)-!C    	[NV..H.ZC]
 // Direct Direct (3-Byte)
-class SBC_A9 : public AddressMode::DirectDirect<Operator::SBC>
+template<>
+struct Opcode<State, 0xA9>
 {
-    using DirectDirect::DirectDirect;
+    using Instruction = AddressMode::DirectDirect<Operator::SBC>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("SBC_A9");
-        return  6 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "A9: SBC dd, ds");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0xA9>");
+        return  6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "A9: SBC dd, ds"; }
+    static std::string opcodeToString() { return "A9: SBC dd, ds"; }
 };
 
 // SBC d, #i
 // (d) = (d)-i-!C    	[NV..H.ZC]
 // Direct Immediate (3-Byte)
-class SBC_B8 : public AddressMode::DirectImmediate<Operator::SBC>
+template<>
+struct Opcode<State, 0xB8>
 {
-    using DirectImmediate::DirectImmediate;
+    using Instruction = AddressMode::DirectImmediate<Operator::SBC>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("SBC_B8");
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "B8: SBC d, #i");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0xB8>");
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "B8: SBC d, #i"; }
+    static std::string opcodeToString() { return "B8: SBC d, #i"; }
 };
 
 // SET1 d.0
 // d.0 = 1    	[........]
 // Direct (2-Byte)
-class SET1_02 : public AddressMode::Direct<Operator::SET1<0, true>>
+template<>
+struct Opcode<State, 0x02>
 {
-    using Direct::Direct;
+    using Instruction = AddressMode::Direct<Operator::SET1<0, true>>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("SET1_02");
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "02: SET1 d.0");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x02>");
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "02: SET1 d.0"; }
+    static std::string opcodeToString() { return "02: SET1 d.0"; }
 };
 
 // SET1 d.1
 // d.1 = 1    	[........]
 // Direct (2-Byte)
-class SET1_22 : public AddressMode::Direct<Operator::SET1<1, true>>
+template<>
+struct Opcode<State, 0x22>
 {
-    using Direct::Direct;
+    using Instruction = AddressMode::Direct<Operator::SET1<1, true>>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "22: SET1 d.1");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "22: SET1 d.1"; }
+    static std::string opcodeToString() { return "22: SET1 d.1"; }
 };
 
 // SET1 d.2
 // d.2 = 1    	[........]
 // Direct (2-Byte)
-class SET1_42 : public AddressMode::Direct<Operator::SET1<2, true>>
+template<>
+struct Opcode<State, 0x42>
 {
-    using Direct::Direct;
+    using Instruction = AddressMode::Direct<Operator::SET1<2, true>>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("SET1_42");
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "42: SET1 d.2");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x42>");
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "42: SET1 d.2"; }
+    static std::string opcodeToString() { return "42: SET1 d.2"; }
 };
 
 // SET1 d.3
 // d.3 = 1    	[........]
 // Direct (2-Byte)
-class SET1_62 : public AddressMode::Direct<Operator::SET1<3, true>>
+template<>
+struct Opcode<State, 0x62>
 {
-    using Direct::Direct;
+    using Instruction = AddressMode::Direct<Operator::SET1<3, true>>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "62: SET1 d.3");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "62: SET1 d.3"; }
+    static std::string opcodeToString() { return "62: SET1 d.3"; }
 };
 
 // SET1 d.4
 // d.4 = 1    	[........]
 // Direct (2-Byte)
-class SET1_82 : public AddressMode::Direct<Operator::SET1<4, true>>
+template<>
+struct Opcode<State, 0x82>
 {
-    using Direct::Direct;
+    using Instruction = AddressMode::Direct<Operator::SET1<4, true>>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "82: SET1 d.4");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "82: SET1 d.4"; }
+    static std::string opcodeToString() { return "82: SET1 d.4"; }
 };
 
 // SET1 d.5
 // d.5 = 1    	[........]
 // Direct (2-Byte)
-class SET1_A2 : public AddressMode::Direct<Operator::SET1<5, true>>
+template<>
+struct Opcode<State, 0xA2>
 {
-    using Direct::Direct;
+    using Instruction = AddressMode::Direct<Operator::SET1<5, true>>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "A2: SET1 d.5");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "A2: SET1 d.5"; }
+    static std::string opcodeToString() { return "A2: SET1 d.5"; }
 };
 
 // SET1 d.6
 // d.6 = 1    	[........]
 // Direct (2-Byte)
-class SET1_C2 : public AddressMode::Direct<Operator::SET1<6, true>>
+template<>
+struct Opcode<State, 0xC2>
 {
-    using Direct::Direct;
+    using Instruction = AddressMode::Direct<Operator::SET1<6, true>>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "C2: SET1 d.6");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "C2: SET1 d.6"; }
+    static std::string opcodeToString() { return "C2: SET1 d.6"; }
 };
 
 // SET1 d.7
 // d.7 = 1    	[........]
 // Direct (2-Byte)
-class SET1_E2 : public AddressMode::Direct<Operator::SET1<7, true>>
+template<>
+struct Opcode<State, 0xE2>
 {
-    using Direct::Direct;
+    using Instruction = AddressMode::Direct<Operator::SET1<7, true>>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  4 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "E2: SET1 d.7");
+
+        return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "E2: SET1 d.7"; }
+    static std::string opcodeToString() { return "E2: SET1 d.7"; }
 };
 
 // SETC 
 // C = 1    	[.......1]
 // Implied (1-Byte)
-class SETC_80 : public AddressMode::Implied<Operator::SET<State::Flag::c, true>>
+template<>
+struct Opcode<State, 0x80>
 {
-    using Implied::Implied;
+    using Instruction = AddressMode::Implied<Operator::SET<State::Flag::c, true>>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  2 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "80: SETC ");
+
+        return  2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "80: SETC "; }
+    static std::string opcodeToString() { return "80: SETC "; }
 };
 
 // SETP 
 // P = 1    	[..1.....]
 // Implied (1-Byte)
-class SETP_40 : public AddressMode::Implied<Operator::SET<State::Flag::p, true>>
+template<>
+struct Opcode<State, 0x40>
 {
-    using Implied::Implied;
+    using Instruction = AddressMode::Implied<Operator::SET<State::Flag::p, true>>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  2 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "40: SETP ");
+
+        return  2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "40: SETP "; }
+    static std::string opcodeToString() { return "40: SETP "; }
 };
 
 // SLEEP 
 // Halts the processor    	[........]
 // Implied (1-Byte)
-class SLEEP_EF : public AddressMode::Implied<Operator::SLEEP>
+template<>
+struct Opcode<State, 0xEF>
 {
-    using Implied::Implied;
+    using Instruction = AddressMode::Implied<Operator::SLEEP>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("SLEEP_EF");
-        return  3 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "EF: SLEEP ");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0xEF>");
+        return  3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "EF: SLEEP "; }
+    static std::string opcodeToString() { return "EF: SLEEP "; }
 };
 
 // STOP 
 // Halts the processor    	[........]
 // Implied (1-Byte)
-class STOP_FF : public AddressMode::Implied<Operator::STOP>
+template<>
+struct Opcode<State, 0xFF>
 {
-    using Implied::Implied;
+    using Instruction = AddressMode::Implied<Operator::STOP>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("STOP_FF");
-        return  3 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "FF: STOP ");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0xFF>");
+        return  3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "FF: STOP "; }
+    static std::string opcodeToString() { return "FF: STOP "; }
 };
 
 // SUBW YA, d
 // YA  = YA - (d), H on high byte    	[NV..H.ZC]
 // Y Accumulator Direct (2-Byte)
-class SUBW_9A : public AddressMode::YAccumulatorDirect<Operator::SUBW>
+template<>
+struct Opcode<State, 0x9A>
 {
-    using YAccumulatorDirect::YAccumulatorDirect;
+    using Instruction = AddressMode::YAccumulatorDirect<Operator::SUBW>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "9A: SUBW YA, d");
+
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "9A: SUBW YA, d"; }
+    static std::string opcodeToString() { return "9A: SUBW YA, d"; }
 };
 
 // TCALL 0
 // CALL [$FFDE]    	[........]
 // Table (1-Byte)
-class TCALL_01 : public AddressMode::Table<Operator::TCALL, 0>
+template<>
+struct Opcode<State, 0x01>
 {
-    using Table::Table;
+    using Instruction = AddressMode::Table<Operator::TCALL, 0>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("TCALL_01");
-        return  8 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "01: TCALL 0");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x01>");
+        return  8 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "01: TCALL 0"; }
+    static std::string opcodeToString() { return "01: TCALL 0"; }
 };
 
 // TCALL 1
 // CALL [$FFDC]    	[........]
 // Table (1-Byte)
-class TCALL_11 : public AddressMode::Table<Operator::TCALL, 1>
+template<>
+struct Opcode<State, 0x11>
 {
-    using Table::Table;
+    using Instruction = AddressMode::Table<Operator::TCALL, 1>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("TCALL_11");
-        return  8 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "11: TCALL 1");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x11>");
+        return  8 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "11: TCALL 1"; }
+    static std::string opcodeToString() { return "11: TCALL 1"; }
 };
 
 // TCALL 2
 // CALL [$FFDA]    	[........]
 // Table (1-Byte)
-class TCALL_21 : public AddressMode::Table<Operator::TCALL, 2>
+template<>
+struct Opcode<State, 0x21>
 {
-    using Table::Table;
+    using Instruction = AddressMode::Table<Operator::TCALL, 2>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("TCALL_21");
-        return  8 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "21: TCALL 2");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x21>");
+        return  8 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "21: TCALL 2"; }
+    static std::string opcodeToString() { return "21: TCALL 2"; }
 };
 
 // TCALL 3
 // CALL [$FFD8]    	[........]
 // Table (1-Byte)
-class TCALL_31 : public AddressMode::Table<Operator::TCALL, 3>
+template<>
+struct Opcode<State, 0x31>
 {
-    using Table::Table;
+    using Instruction = AddressMode::Table<Operator::TCALL, 3>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("TCALL_31");
-        return  8 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "31: TCALL 3");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x31>");
+        return  8 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "31: TCALL 3"; }
+    static std::string opcodeToString() { return "31: TCALL 3"; }
 };
 
 // TCALL 4
 // CALL [$FFD6]    	[........]
 // Table (1-Byte)
-class TCALL_41 : public AddressMode::Table<Operator::TCALL, 4>
+template<>
+struct Opcode<State, 0x41>
 {
-    using Table::Table;
+    using Instruction = AddressMode::Table<Operator::TCALL, 4>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("TCALL_41");
-        return  8 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "41: TCALL 4");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x41>");
+        return  8 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "41: TCALL 4"; }
+    static std::string opcodeToString() { return "41: TCALL 4"; }
 };
 
 // TCALL 5
 // CALL [$FFD4]    	[........]
 // Table (1-Byte)
-class TCALL_51 : public AddressMode::Table<Operator::TCALL, 5>
+template<>
+struct Opcode<State, 0x51>
 {
-    using Table::Table;
+    using Instruction = AddressMode::Table<Operator::TCALL, 5>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("TCALL_51");
-        return  8 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "51: TCALL 5");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x51>");
+        return  8 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "51: TCALL 5"; }
+    static std::string opcodeToString() { return "51: TCALL 5"; }
 };
 
 // TCALL 6
 // CALL [$FFD2]    	[........]
 // Table (1-Byte)
-class TCALL_61 : public AddressMode::Table<Operator::TCALL, 6>
+template<>
+struct Opcode<State, 0x61>
 {
-    using Table::Table;
+    using Instruction = AddressMode::Table<Operator::TCALL, 6>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("TCALL_61");
-        return  8 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "61: TCALL 6");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x61>");
+        return  8 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "61: TCALL 6"; }
+    static std::string opcodeToString() { return "61: TCALL 6"; }
 };
 
 // TCALL 7
 // CALL [$FFD0]    	[........]
 // Table (1-Byte)
-class TCALL_71 : public AddressMode::Table<Operator::TCALL, 7>
+template<>
+struct Opcode<State, 0x71>
 {
-    using Table::Table;
+    using Instruction = AddressMode::Table<Operator::TCALL, 7>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("TCALL_71");
-        return  8 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "71: TCALL 7");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x71>");
+        return  8 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "71: TCALL 7"; }
+    static std::string opcodeToString() { return "71: TCALL 7"; }
 };
 
 // TCALL 8
 // CALL [$FFCE]    	[........]
 // Table (1-Byte)
-class TCALL_81 : public AddressMode::Table<Operator::TCALL, 8>
+template<>
+struct Opcode<State, 0x81>
 {
-    using Table::Table;
+    using Instruction = AddressMode::Table<Operator::TCALL, 8>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("TCALL_81");
-        return  8 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "81: TCALL 8");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x81>");
+        return  8 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "81: TCALL 8"; }
+    static std::string opcodeToString() { return "81: TCALL 8"; }
 };
 
 // TCALL 9
 // CALL [$FFCC]    	[........]
 // Table (1-Byte)
-class TCALL_91 : public AddressMode::Table<Operator::TCALL, 9>
+template<>
+struct Opcode<State, 0x91>
 {
-    using Table::Table;
+    using Instruction = AddressMode::Table<Operator::TCALL, 9>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("TCALL_91");
-        return  8 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "91: TCALL 9");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x91>");
+        return  8 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "91: TCALL 9"; }
+    static std::string opcodeToString() { return "91: TCALL 9"; }
 };
 
 // TCALL 10
 // CALL [$FFCA]    	[........]
 // Table (1-Byte)
-class TCALL_A1 : public AddressMode::Table<Operator::TCALL, 10>
+template<>
+struct Opcode<State, 0xA1>
 {
-    using Table::Table;
+    using Instruction = AddressMode::Table<Operator::TCALL, 10>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("TCALL_A1");
-        return  8 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "A1: TCALL 10");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0xA1>");
+        return  8 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "A1: TCALL 10"; }
+    static std::string opcodeToString() { return "A1: TCALL 10"; }
 };
 
 // TCALL 11
 // CALL [$FFC8]    	[........]
 // Table (1-Byte)
-class TCALL_B1 : public AddressMode::Table<Operator::TCALL, 11>
+template<>
+struct Opcode<State, 0xB1>
 {
-    using Table::Table;
+    using Instruction = AddressMode::Table<Operator::TCALL, 11>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("TCALL_B1");
-        return  8 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "B1: TCALL 11");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0xB1>");
+        return  8 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "B1: TCALL 11"; }
+    static std::string opcodeToString() { return "B1: TCALL 11"; }
 };
 
 // TCALL 12
 // CALL [$FFC6]    	[........]
 // Table (1-Byte)
-class TCALL_C1 : public AddressMode::Table<Operator::TCALL, 12>
+template<>
+struct Opcode<State, 0xC1>
 {
-    using Table::Table;
+    using Instruction = AddressMode::Table<Operator::TCALL, 12>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("TCALL_C1");
-        return  8 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "C1: TCALL 12");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0xC1>");
+        return  8 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "C1: TCALL 12"; }
+    static std::string opcodeToString() { return "C1: TCALL 12"; }
 };
 
 // TCALL 13
 // CALL [$FFC4]    	[........]
 // Table (1-Byte)
-class TCALL_D1 : public AddressMode::Table<Operator::TCALL, 13>
+template<>
+struct Opcode<State, 0xD1>
 {
-    using Table::Table;
+    using Instruction = AddressMode::Table<Operator::TCALL, 13>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("TCALL_D1");
-        return  8 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "D1: TCALL 13");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0xD1>");
+        return  8 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "D1: TCALL 13"; }
+    static std::string opcodeToString() { return "D1: TCALL 13"; }
 };
 
 // TCALL 14
 // CALL [$FFC2]    	[........]
 // Table (1-Byte)
-class TCALL_E1 : public AddressMode::Table<Operator::TCALL, 14>
+template<>
+struct Opcode<State, 0xE1>
 {
-    using Table::Table;
+    using Instruction = AddressMode::Table<Operator::TCALL, 14>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("TCALL_E1");
-        return  8 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "E1: TCALL 14");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0xE1>");
+        return  8 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "E1: TCALL 14"; }
+    static std::string opcodeToString() { return "E1: TCALL 14"; }
 };
 
 // TCALL 15
 // CALL [$FFC0]    	[........]
 // Table (1-Byte)
-class TCALL_F1 : public AddressMode::Table<Operator::TCALL, 15>
+template<>
+struct Opcode<State, 0xF1>
 {
-    using Table::Table;
+    using Instruction = AddressMode::Table<Operator::TCALL, 15>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        throw NotYetImplementedException("TCALL_F1");
-        return  8 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "F1: TCALL 15");
+
+        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0xF1>");
+        return  8 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "F1: TCALL 15"; }
+    static std::string opcodeToString() { return "F1: TCALL 15"; }
 };
 
 // TCLR1 !a
 // (a) = (a)&~A, ZN as for A-(a)    	[N.....Z.]
 // Absolute (3-Byte)
-class TCLR1_4E : public AddressMode::Absolute<Operator::TCLR1>
+template<>
+struct Opcode<State, 0x4E>
 {
-    using Absolute::Absolute;
+    using Instruction = AddressMode::Absolute<Operator::TCLR1>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  6 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "4E: TCLR1 !a");
+
+        return  6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "4E: TCLR1 !a"; }
+    static std::string opcodeToString() { return "4E: TCLR1 !a"; }
 };
 
 // TSET1 !a
 // (a) = (a)|A, ZN as for A-(a)    	[N.....Z.]
 // Absolute (3-Byte)
-class TSET1_0E : public AddressMode::Absolute<Operator::TSET1>
+template<>
+struct Opcode<State, 0x0E>
 {
-    using Absolute::Absolute;
+    using Instruction = AddressMode::Absolute<Operator::TSET1>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  6 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "0E: TSET1 !a");
+
+        return  6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "0E: TSET1 !a"; }
+    static std::string opcodeToString() { return "0E: TSET1 !a"; }
 };
 
 // XCN A
 // A = (A>>4) | (A<<4)    	[N.....Z.]
 // Register (1-Byte)
-class XCN_9F : public AddressMode::Register<Operator::XCN, State::Register::A>
+template<>
+struct Opcode<State, 0x9F>
 {
-    using Register::Register;
+    using Instruction = AddressMode::Register<Operator::XCN, State::Register::A>;
 
-    int execute(State& state) override
+    static int execute(State& state)
     {
-        return  5 + applyOperand();
+        PROFILE_IF(PROFILE_OPCODES, "9F: XCN A");
+
+        return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
-    std::string opcodeToString() const override { return "9F: XCN A"; }
+    static std::string opcodeToString() { return "9F: XCN A"; }
 };
-
-}
 
 }

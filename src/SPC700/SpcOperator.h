@@ -99,7 +99,7 @@ class AND1
 public:
     static int invoke(State& state, Access& leftOperand, Byte rightOperand)
     {
-        throw NotYetImplementedException("AND1");
+        throw NotYetImplementedException("SPC::Operator::AND1");
         return 0;
     }
 
@@ -260,7 +260,7 @@ class BRK
 public:
     static int invoke(State& state)
     {
-        throw NotYetImplementedException("BRK");
+        throw NotYetImplementedException("SPC::Operator::BRK");
         return 0;
     }
 
@@ -350,7 +350,7 @@ class DAA
 public:
     static int invoke(State& state, Access& operand)
     {
-        throw NotYetImplementedException("DAA");
+        throw NotYetImplementedException("SPC::Operator::DAA");
         return 0;
     }
 
@@ -364,7 +364,7 @@ class DAS
 public:
     static int invoke(State& state, Access& operand)
     {
-        throw NotYetImplementedException("DAS");
+        throw NotYetImplementedException("SPC::Operator::DAS");
         return 0;
     }
 
@@ -431,7 +431,7 @@ class DI
 public:
     static int invoke(State& state)
     {
-        throw NotYetImplementedException("DI");
+        throw NotYetImplementedException("SPC::Operator::DI");
         return 0;
     }
 
@@ -465,7 +465,7 @@ class EI
 public:
     static int invoke(State& state)
     {
-        throw NotYetImplementedException("EI");
+        throw NotYetImplementedException("SPC::Operator::EI");
         return 0;
     }
 
@@ -506,7 +506,7 @@ class EOR1
 public:
     static int invoke(State& state, Access& leftOperand, Byte rightOperand)
     {
-        throw NotYetImplementedException("EOR1");
+        throw NotYetImplementedException("SPC::Operator::EOR1");
         return 0;
     }
 
@@ -659,7 +659,7 @@ class MOV1
 public:
     static int invoke(State& state, Access& leftOperand, Byte rightOperand)
     {
-        throw NotYetImplementedException("MOV1");
+        throw NotYetImplementedException("SPC::Operator::MOV1");
         return 0;
     }
 
@@ -727,7 +727,7 @@ class NOT1
 public:
     static int invoke(State& state, Access& leftOperand, Byte rightOperand)
     {
-        throw NotYetImplementedException("NOT1");
+        throw NotYetImplementedException("SPC::Operator::NOT1");
         return 0;
     }
 
@@ -783,7 +783,7 @@ class OR1
 public:
     static int invoke(State& state, Access& leftOperand, Byte rightOperand)
     {
-        throw NotYetImplementedException("OR1");
+        throw NotYetImplementedException("SPC::Operator::OR1");
     }
 
     static std::string toString() { return "OR1"; }
@@ -796,7 +796,7 @@ class PCALL
 public:
     static int invoke(State& state, Access& leftOperand, Byte rightOperand)
     {
-        throw NotYetImplementedException("PCALL");
+        throw NotYetImplementedException("SPC::Operator::PCALL");
     }
 
     static std::string toString() { return "PCALL"; }
@@ -857,7 +857,7 @@ class RET1
 public:
     static int invoke(State& state)
     {
-        throw NotYetImplementedException("RET1");
+        throw NotYetImplementedException("SPC::Operator::RET1");
     }
 
     static std::string toString() { return "RET1"; }
@@ -1009,7 +1009,7 @@ class SET<State::Flag::v, false>
 public:
     static int invoke(State& state)
     {
-        throw NotYetImplementedException("CLRV");
+        throw NotYetImplementedException("SPC::Operator::CLRV");
         return 0;
     }
 
@@ -1023,7 +1023,7 @@ class SLEEP
 public:
     static int invoke(State& state)
     {
-        throw NotYetImplementedException("SLEEP");
+        throw NotYetImplementedException("SPC::Operator::SLEEP");
     }
 
     static std::string toString() { return "SLEEP"; }
@@ -1036,7 +1036,7 @@ class STOP
 public:
     static int invoke(State& state)
     {
-        throw NotYetImplementedException("STOP");
+        throw NotYetImplementedException("SPC::Operator::STOP");
     }
 
     static std::string toString() { return "STOP"; }
@@ -1086,7 +1086,7 @@ class TCALL
 public:
     static int invoke(State& state, Access& leftOperand, Byte rightOperand)
     {
-        throw NotYetImplementedException("TCALL");
+        throw NotYetImplementedException("SPC::Operator::TCALL");
     }
 
     static std::string toString() { return "TCALL"; }

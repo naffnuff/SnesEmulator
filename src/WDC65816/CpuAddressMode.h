@@ -350,7 +350,7 @@ struct DirectPageIndexedIndirectX
     {
         PROFILE_IF(PROFILE_ADDRESS_MODES, "DirectPageIndexedIndirectX");
 
-        throw NotYetImplementedException("DirectPageIndexedIndirectX");
+        throw NotYetImplementedException("CPU::AddressMode::DirectPageIndexedIndirectX");
         int cycles = 0;
         if ((Byte)state.getDirectPageRegister())
         {

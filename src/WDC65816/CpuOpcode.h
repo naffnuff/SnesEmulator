@@ -28,7 +28,7 @@ struct Opcode<State, 0x61>
     {
         PROFILE_IF(PROFILE_OPCODES, "61: ADC (dp,X)");
 
-        throw NotYetImplementedException("61");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x61>");
         return 6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -209,7 +209,7 @@ struct Opcode<State, 0x73>
     {
         PROFILE_IF(PROFILE_OPCODES, "73: ADC (sr,S),Y");
 
-        throw NotYetImplementedException("73");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x73>");
         return 7 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -324,7 +324,7 @@ struct Opcode<State, 0x21>
     {
         PROFILE_IF(PROFILE_OPCODES, "21: AND (dp,X)");
 
-        throw NotYetImplementedException("21");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x21>");
         return 6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -344,7 +344,7 @@ struct Opcode<State, 0x23>
     {
         PROFILE_IF(PROFILE_OPCODES, "23: AND sr,S");
 
-        throw NotYetImplementedException("23");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x23>");
         return 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -383,7 +383,7 @@ struct Opcode<State, 0x27>
     {
         PROFILE_IF(PROFILE_OPCODES, "27: AND [dp]");
 
-        throw NotYetImplementedException("27");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x27>");
         return 6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -469,7 +469,7 @@ struct Opcode<State, 0x31>
     {
         PROFILE_IF(PROFILE_OPCODES, "31: AND (dp),Y");
 
-        throw NotYetImplementedException("31");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x31>");
         return 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -489,7 +489,7 @@ struct Opcode<State, 0x32>
     {
         PROFILE_IF(PROFILE_OPCODES, "32: AND (dp)");
 
-        throw NotYetImplementedException("32");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x32>");
         return 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -509,7 +509,7 @@ struct Opcode<State, 0x33>
     {
         PROFILE_IF(PROFILE_OPCODES, "33: AND (sr,S),Y");
 
-        throw NotYetImplementedException("33");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x33>");
         return 7 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -529,7 +529,7 @@ struct Opcode<State, 0x35>
     {
         PROFILE_IF(PROFILE_OPCODES, "35: AND dp,X");
 
-        throw NotYetImplementedException("35");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x35>");
         return 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -549,7 +549,7 @@ struct Opcode<State, 0x37>
     {
         PROFILE_IF(PROFILE_OPCODES, "37: AND [dp],Y");
 
-        throw NotYetImplementedException("37");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x37>");
         return 6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -959,7 +959,7 @@ struct Opcode<State, 0x00>
     {
         PROFILE_IF(PROFILE_OPCODES, "00: BRK");
 
-        throw NotYetImplementedException("00");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x00>");
         return 7 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -1093,7 +1093,7 @@ struct Opcode<State, 0xB8>
     {
         PROFILE_IF(PROFILE_OPCODES, "B8: CLV");
 
-        throw NotYetImplementedException("B8");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0xB8>");
         return 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -1113,7 +1113,7 @@ struct Opcode<State, 0xC1>
     {
         PROFILE_IF(PROFILE_OPCODES, "C1: CMP (dp,X)");
 
-        throw NotYetImplementedException("C1");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0xC1>");
         return 6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -1256,7 +1256,7 @@ struct Opcode<State, 0xD1>
     {
         PROFILE_IF(PROFILE_OPCODES, "D1: CMP (dp),Y");
 
-        throw NotYetImplementedException("D1");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0xD1>");
         return 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -1276,7 +1276,7 @@ struct Opcode<State, 0xD2>
     {
         PROFILE_IF(PROFILE_OPCODES, "D2: CMP (dp)");
 
-        throw NotYetImplementedException("D2");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0xD2>");
         return 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -1296,7 +1296,7 @@ struct Opcode<State, 0xD3>
     {
         PROFILE_IF(PROFILE_OPCODES, "D3: CMP (sr,S),Y");
 
-        throw NotYetImplementedException("D3");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0xD3>");
         return 7 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -1412,7 +1412,7 @@ struct Opcode<State, 0x02>
     {
         PROFILE_IF(PROFILE_OPCODES, "02: COP const");
 
-        throw NotYetImplementedException("02");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x02>");
         return 7 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -1697,7 +1697,7 @@ struct Opcode<State, 0x41>
     {
         PROFILE_IF(PROFILE_OPCODES, "41: EOR (dp,X)");
 
-        throw NotYetImplementedException("41");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x41>");
         return 6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -1755,7 +1755,7 @@ struct Opcode<State, 0x47>
     {
         PROFILE_IF(PROFILE_OPCODES, "47: EOR [dp]");
 
-        throw NotYetImplementedException("47");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x47>");
         return 6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -1822,7 +1822,7 @@ struct Opcode<State, 0x4F>
     {
         PROFILE_IF(PROFILE_OPCODES, "4F: EOR long");
 
-        throw NotYetImplementedException("4F");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x4F>");
         return 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -1842,7 +1842,7 @@ struct Opcode<State, 0x51>
     {
         PROFILE_IF(PROFILE_OPCODES, "51: EOR (dp),Y");
 
-        throw NotYetImplementedException("51");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x51>");
         return 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -1862,7 +1862,7 @@ struct Opcode<State, 0x52>
     {
         PROFILE_IF(PROFILE_OPCODES, "52: EOR (dp)");
 
-        throw NotYetImplementedException("52");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x52>");
         return 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -1882,7 +1882,7 @@ struct Opcode<State, 0x53>
     {
         PROFILE_IF(PROFILE_OPCODES, "53: EOR (sr,S),Y");
 
-        throw NotYetImplementedException("53");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x53>");
         return 7 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -1921,7 +1921,7 @@ struct Opcode<State, 0x57>
     {
         PROFILE_IF(PROFILE_OPCODES, "57: EOR [dp],Y");
 
-        throw NotYetImplementedException("57");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x57>");
         return 6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -1979,7 +1979,7 @@ struct Opcode<State, 0x5F>
     {
         PROFILE_IF(PROFILE_OPCODES, "5F: EOR long,X");
 
-        throw NotYetImplementedException("5F");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x5F>");
         return 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -2284,7 +2284,7 @@ struct Opcode<State, 0xA1>
     {
         PROFILE_IF(PROFILE_OPCODES, "A1: LDA (dp,X)");
 
-        throw NotYetImplementedException("A1");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0xA1>");
         return 6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -2844,7 +2844,7 @@ struct Opcode<State, 0x56>
     {
         PROFILE_IF(PROFILE_OPCODES, "56: LSR dp,X");
 
-        throw NotYetImplementedException("56");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x56>");
         return 6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -2902,7 +2902,7 @@ struct Opcode<State, 0x44>
     {
         PROFILE_IF(PROFILE_OPCODES, "44: MVP srcbk,destbk");
 
-        throw NotYetImplementedException("44");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x44>");
         return 7 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -2941,7 +2941,7 @@ struct Opcode<State, 0x01>
     {
         PROFILE_IF(PROFILE_OPCODES, "01: ORA (dp,X)");
 
-        throw NotYetImplementedException("01");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x01>");
         return 6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -3084,7 +3084,7 @@ struct Opcode<State, 0x11>
     {
         PROFILE_IF(PROFILE_OPCODES, "11: ORA (dp),Y");
 
-        throw NotYetImplementedException("11");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x11>");
         return 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -3104,7 +3104,7 @@ struct Opcode<State, 0x12>
     {
         PROFILE_IF(PROFILE_OPCODES, "12: ORA (dp)");
 
-        throw NotYetImplementedException("12");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x12>");
         return 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -3124,7 +3124,7 @@ struct Opcode<State, 0x13>
     {
         PROFILE_IF(PROFILE_OPCODES, "13: ORA (sr,S),Y");
 
-        throw NotYetImplementedException("13");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x13>");
         return 7 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -3163,7 +3163,7 @@ struct Opcode<State, 0x17>
     {
         PROFILE_IF(PROFILE_OPCODES, "17: ORA [dp],Y");
 
-        throw NotYetImplementedException("17");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x17>");
         return 6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -3620,7 +3620,7 @@ struct Opcode<State, 0x36>
     {
         PROFILE_IF(PROFILE_OPCODES, "36: ROL dp,X");
 
-        throw NotYetImplementedException("36");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x36>");
         return 6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -3811,7 +3811,7 @@ struct Opcode<State, 0xE1>
     {
         PROFILE_IF(PROFILE_OPCODES, "E1: SBC (dp,X)");
 
-        throw NotYetImplementedException("E1");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0xE1>");
         return 6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -3869,7 +3869,7 @@ struct Opcode<State, 0xE7>
     {
         PROFILE_IF(PROFILE_OPCODES, "E7: SBC [dp]");
 
-        throw NotYetImplementedException("E7");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0xE7>");
         return 6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -3955,7 +3955,7 @@ struct Opcode<State, 0xF1>
     {
         PROFILE_IF(PROFILE_OPCODES, "F1: SBC (dp),Y");
 
-        throw NotYetImplementedException("F1");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0xF1>");
         return 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -3975,7 +3975,7 @@ struct Opcode<State, 0xF2>
     {
         PROFILE_IF(PROFILE_OPCODES, "F2: SBC (dp)");
 
-        throw NotYetImplementedException("F2");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0xF2>");
         return 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -3995,7 +3995,7 @@ struct Opcode<State, 0xF3>
     {
         PROFILE_IF(PROFILE_OPCODES, "F3: SBC (sr,S),Y");
 
-        throw NotYetImplementedException("F3");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0xF3>");
         return 7 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -4034,7 +4034,7 @@ struct Opcode<State, 0xF7>
     {
         PROFILE_IF(PROFILE_OPCODES, "F7: SBC [dp],Y");
 
-        throw NotYetImplementedException("F7");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0xF7>");
         return 6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -4187,7 +4187,7 @@ struct Opcode<State, 0x81>
     {
         PROFILE_IF(PROFILE_OPCODES, "81: STA (dp,X)");
 
-        throw NotYetImplementedException("81");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x81>");
         return 6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -4342,7 +4342,7 @@ struct Opcode<State, 0x93>
     {
         PROFILE_IF(PROFILE_OPCODES, "93: STA (sr,S),Y");
 
-        throw NotYetImplementedException("93");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x93>");
         return 7 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -4457,7 +4457,7 @@ struct Opcode<State, 0xDB>
     {
         PROFILE_IF(PROFILE_OPCODES, "DB: STP");
 
-        throw NotYetImplementedException("DB");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0xDB>");
         return 3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -4515,7 +4515,7 @@ struct Opcode<State, 0x96>
     {
         PROFILE_IF(PROFILE_OPCODES, "96: STX dp,Y");
 
-        throw NotYetImplementedException("96");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x96>");
         return 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -4858,7 +4858,7 @@ struct Opcode<State, 0xBA>
     {
         PROFILE_IF(PROFILE_OPCODES, "BA: TSX");
 
-        throw NotYetImplementedException("BA");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0xBA>");
         return 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -4973,7 +4973,7 @@ struct Opcode<State, 0xCB>
     {
         PROFILE_IF(PROFILE_OPCODES, "CB: WAI");
 
-        throw NotYetImplementedException("CB");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0xCB>");
         return 3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -4993,7 +4993,7 @@ struct Opcode<State, 0x42>
     {
         PROFILE_IF(PROFILE_OPCODES, "42: WDM #const");
 
-        throw NotYetImplementedException("42");
+        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x42>");
         return 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 

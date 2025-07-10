@@ -336,7 +336,7 @@ public:
     {
         PROFILE_IF(PROFILE_OPERATORS, "BRK");
 
-        throw NotYetImplementedException("BRK");
+        throw NotYetImplementedException("CPU::Operator::BRK");
         int cycles = 0;
         if (state.isNativeMode())
         {
@@ -440,7 +440,7 @@ public:
     {
         PROFILE_IF(PROFILE_OPERATORS, "COP");
 
-        throw NotYetImplementedException("COP");
+        throw NotYetImplementedException("CPU::Operator::COP");
         int cycles = 0;
         if (state.isNativeMode())
         {
@@ -822,7 +822,7 @@ public:
     {
         PROFILE_IF(PROFILE_OPERATORS, "MVP");
 
-        throw NotYetImplementedException("MVP");
+        throw NotYetImplementedException("CPU::Operator::MVP");
         return 0;
     }
 
@@ -1378,7 +1378,7 @@ public:
     {
         PROFILE_IF(PROFILE_OPERATORS, "STP");
 
-        throw NotYetImplementedException("STP");
+        throw NotYetImplementedException("CPU::Operator::STP");
         return 0;
     }
 
@@ -1595,7 +1595,7 @@ public:
     {
         PROFILE_IF(PROFILE_OPERATORS, "TSX");
 
-        throw NotYetImplementedException("TSX");
+        throw NotYetImplementedException("CPU::Operator::TSX");
         return 0;
     }
 
@@ -1665,7 +1665,7 @@ public:
     {
         PROFILE_IF(PROFILE_OPERATORS, "WAI");
 
-        throw NotYetImplementedException("WAI");
+        throw NotYetImplementedException("CPU::Operator::WAI");
         return 0;
     }
 
@@ -1681,7 +1681,7 @@ public:
     {
         PROFILE_IF(PROFILE_OPERATORS, "WDM");
 
-        throw NotYetImplementedException("WDM");
+        throw NotYetImplementedException("CPU::Operator::WDM");
         return 0;
     }
 
