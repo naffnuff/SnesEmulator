@@ -67,7 +67,7 @@ public:
         , rom(rom)
         , cpuState()
         , cpuInstructionDecoder()
-        , videoRegisters(output, cpuState)
+        , videoRegisters(output, cpuState, rom.gameTitle)
         , videoProcessor(videoRegisters.processor)
         , audioSystem(output, debugger)
         , debugger(output, videoRegisters, audioSystem.getRegisters(), running)

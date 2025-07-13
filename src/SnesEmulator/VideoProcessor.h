@@ -18,7 +18,7 @@ class Processor
 public:
     struct RendererRunner
     {
-        RendererRunner(Processor& video, Output& output)
+        RendererRunner(Processor& video, Output& output, const std::string& gameTitle)
             : video(video)
             , gameTitle(gameTitle)
         {
@@ -50,13 +50,13 @@ public:
         bool aspectRatioCorrection = true;
     };
 
-    Processor(Output& output)
+    Processor(Output& output, const std::string& gameTitle)
         : output(output, "video")
         , vram(0x8000)
         , cgram(0x100)
         , oam(0x110)
         , renderer(1000, 40, rendererWidth, rendererHeight, 3.f, true, output)
-        , rendererRunner(*this, output)
+        , rendererRunner(*this, output, gameTitle)
         , backgrounds(4)
         , rendererLock(renderer.pixelBufferMutex)
         , rendererThread(std::ref(rendererRunner))

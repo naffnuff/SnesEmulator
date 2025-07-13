@@ -116,18 +116,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\src\CodeGenerator\CpuGeneration.cpp" />
-    <ClCompile Include="..\..\..\src\CodeGenerator\Main.cpp" />
-    <ClCompile Include="..\..\..\src\CodeGenerator\SpcGeneration.cpp" />
+    <ClCompile Include="..\..\..\tools\CodeGenerator\CpuGeneration.cpp" />
+    <ClCompile Include="..\..\..\tools\CodeGenerator\Main.cpp" />
+    <ClCompile Include="..\..\..\tools\CodeGenerator\SpcGeneration.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="..\..\..\src\CodeGenerator\cpuInstructions.txt" />
-    <Text Include="..\..\..\src\CodeGenerator\cpuOpcodeTable.txt" />
-    <Text Include="..\..\..\src\CodeGenerator\spcInstructions.txt" />
+    <Text Include="..\..\..\tools\CodeGenerator\cpuInstructions.txt" />
+    <Text Include="..\..\..\tools\CodeGenerator\cpuOpcodeTable.txt" />
+    <Text Include="..\..\..\tools\CodeGenerator\spcInstructions.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\src\CodeGenerator\CpuAddressModeImplementations.h" />
-    <ClInclude Include="..\..\..\src\CodeGenerator\SpcAddressModeImplementations.h" />
+    <ClInclude Include="..\..\..\tools\CodeGenerator\CpuAddressModeImplementations.h" />
+    <ClInclude Include="..\..\..\tools\CodeGenerator\SpcAddressModeImplementations.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

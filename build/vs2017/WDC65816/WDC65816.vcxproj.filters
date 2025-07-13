@@ -20,12 +20,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\src\include\WDC65816\CpuInstructionDecoder.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\include\WDC65816\CpuState.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\WDC65816\CpuAddressMode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -33,6 +27,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\WDC65816\CpuOperator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\WDC65816\CpuInstructionDecoder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\WDC65816\CpuState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -483,11 +483,11 @@ inline std::ostream& operator<<(std::ostream& out, const ConstLocationAccess& ac
     return out;
 }
 
-template<typename AddressType>
+template<typename Type>
 class Memory
 {
 public:
-    typedef AddressType AddressType;
+    using AddressType = Type;
 
     enum class WrappingMask
     {

@@ -423,7 +423,7 @@ public:
             {
                 try
                 {
-                    breakpoint.address = State::AddressType(stoi(command.substr(2), 0, 16));
+                    breakpoint.address = typename State::AddressType(stoi(command.substr(2), 0, 16));
                 }
                 catch (const std::exception& e)
                 {

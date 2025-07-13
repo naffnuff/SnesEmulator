@@ -1,0 +1,24 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "CMake Build Release",
+            "type": "shell",
+            "command": "cmake",
+            "args": ["--build", "out/build/release"],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "CMake Build Debug",
+            "type": "shell", 
+            "command": "cmake",
+            "args": ["--build", "out/build/debug"],
+            "group": "build",
+            "problemMatcher": "$msCompile"
+        }
+    ]
+}

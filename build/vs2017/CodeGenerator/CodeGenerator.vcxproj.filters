@@ -15,32 +15,32 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\src\CodeGenerator\Main.cpp">
+    <ClCompile Include="..\..\..\tools\CodeGenerator\CpuGeneration.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\CodeGenerator\CpuGeneration.cpp">
+    <ClCompile Include="..\..\..\tools\CodeGenerator\Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\CodeGenerator\SpcGeneration.cpp">
+    <ClCompile Include="..\..\..\tools\CodeGenerator\SpcGeneration.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="..\..\..\src\CodeGenerator\cpuOpcodeTable.txt">
+    <Text Include="..\..\..\tools\CodeGenerator\cpuInstructions.txt">
       <Filter>Resource Files</Filter>
     </Text>
-    <Text Include="..\..\..\src\CodeGenerator\cpuInstructions.txt">
+    <Text Include="..\..\..\tools\CodeGenerator\cpuOpcodeTable.txt">
       <Filter>Resource Files</Filter>
     </Text>
-    <Text Include="..\..\..\src\CodeGenerator\spcInstructions.txt">
+    <Text Include="..\..\..\tools\CodeGenerator\spcInstructions.txt">
       <Filter>Resource Files</Filter>
     </Text>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\src\CodeGenerator\CpuAddressModeImplementations.h">
+    <ClInclude Include="..\..\..\tools\CodeGenerator\CpuAddressModeImplementations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\CodeGenerator\SpcAddressModeImplementations.h">
+    <ClInclude Include="..\..\..\tools\CodeGenerator\SpcAddressModeImplementations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

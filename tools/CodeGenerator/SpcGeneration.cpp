@@ -110,242 +110,242 @@ AddressMode getAddressMode(const std::string& code, const std::string& mnemonic)
     if (code == "A, #i") {
         mode.name = "Register Immediate";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::Register::A";
+        mode.templateArg = "SPC::State::Register::A";
     }
     else if (code == "X, #i") {
         mode.name = "Register Immediate";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::Register::X";
+        mode.templateArg = "SPC::State::Register::X";
     }
     else if (code == "Y, #i") {
         mode.name = "Register Immediate";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::Register::Y";
+        mode.templateArg = "SPC::State::Register::Y";
     }
     else if (code == "A, d") {
         mode.name = "Register Direct";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::Register::A";
+        mode.templateArg = "SPC::State::Register::A";
     }
     else if (code == "X, d") {
         mode.name = "Register Direct";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::Register::X";
+        mode.templateArg = "SPC::State::Register::X";
     }
     else if (code == "Y, d") {
         mode.name = "Register Direct";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::Register::Y";
+        mode.templateArg = "SPC::State::Register::Y";
     }
     else if (code == "A, !a") {
         mode.name = "Register Absolute";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::Register::A";
+        mode.templateArg = "SPC::State::Register::A";
     }
     else if (code == "X, !a") {
         mode.name = "Register Absolute";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::Register::X";
+        mode.templateArg = "SPC::State::Register::X";
     }
     else if (code == "Y, !a") {
         mode.name = "Register Absolute";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::Register::Y";
+        mode.templateArg = "SPC::State::Register::Y";
     }
     else if (code == "A") {
         mode.name = "Register";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::Register::A";
+        mode.templateArg = "SPC::State::Register::A";
     }
     else if (code == "X") {
         mode.name = "Register";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::Register::X";
+        mode.templateArg = "SPC::State::Register::X";
     }
     else if (code == "Y") {
         mode.name = "Register";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::Register::Y";
+        mode.templateArg = "SPC::State::Register::Y";
     }
     else if (code == "PSW") {
         mode.name = "Register";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::Register::PSW";
+        mode.templateArg = "SPC::State::Register::PSW";
     }
     else if (code == "d, A") {
         mode.name = "Direct Register";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::Register::A";
+        mode.templateArg = "SPC::State::Register::A";
     }
     else if (code == "d, X") {
         mode.name = "Direct Register";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::Register::X";
+        mode.templateArg = "SPC::State::Register::X";
     }
     else if (code == "d, Y") {
         mode.name = "Direct Register";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::Register::Y";
+        mode.templateArg = "SPC::State::Register::Y";
     }
     else if (code == "!a, A") {
         mode.name = "Absolute Register";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::Register::A";
+        mode.templateArg = "SPC::State::Register::A";
     }
     else if (code == "!a, X") {
         mode.name = "Absolute Register";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::Register::X";
+        mode.templateArg = "SPC::State::Register::X";
     }
     else if (code == "!a, Y") {
         mode.name = "Absolute Register";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::Register::Y";
+        mode.templateArg = "SPC::State::Register::Y";
     }
     else if (code == "d+X") {
         mode.name = "Direct Indexed";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::Register::X";
+        mode.templateArg = "SPC::State::Register::X";
     }
     else if (code == "d+X, r") {
         mode.name = "Direct Indexed Program Counter Relative";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::Register::X";
+        mode.templateArg = "SPC::State::Register::X";
     }
     else if (code == "Y, r") {
         mode.name = "Register Program Counter Relative";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::Register::Y";
+        mode.templateArg = "SPC::State::Register::Y";
     }
     else if (code == "YA, X") {
         mode.name = "Y Accumulator Index";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::Register::X";
+        mode.templateArg = "SPC::State::Register::X";
     }
     else if (code == "[!a+X]") {
         mode.name = "Absolute Indexed Indirect";
         mode.config.oneRegister = true;
-        mode.templateArg = "State::Register::X";
+        mode.templateArg = "SPC::State::Register::X";
     }
     else if (code == "A, [d]+Y") {
         mode.name = "Register Direct Indirect Indexed";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::Register::A, State::Register::Y";
+        mode.templateArg = "SPC::State::Register::A, SPC::State::Register::Y";
     }
     else if (code == "A, [d+X]") {
         mode.name = "Register Direct Indexed Indirect";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::Register::A, State::Register::X";
+        mode.templateArg = "SPC::State::Register::A, SPC::State::Register::X";
     }
     else if (code == "A, d+X") {
         mode.name = "Register Direct Indexed";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::Register::A, State::Register::X";
+        mode.templateArg = "SPC::State::Register::A, SPC::State::Register::X";
     }
     else if (code == "X, d+Y") {
         mode.name = "Register Direct Indexed";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::Register::X, State::Register::Y";
+        mode.templateArg = "SPC::State::Register::X, SPC::State::Register::Y";
     }
     else if (code == "Y, d+X") {
         mode.name = "Register Direct Indexed";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::Register::Y, State::Register::X";
+        mode.templateArg = "SPC::State::Register::Y, SPC::State::Register::X";
     }
     else if (code == "A, X") {
         mode.name = "Register Register";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::Register::A, State::Register::X";
+        mode.templateArg = "SPC::State::Register::A, SPC::State::Register::X";
     }
     else if (code == "A, Y") {
         mode.name = "Register Register";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::Register::A, State::Register::Y";
+        mode.templateArg = "SPC::State::Register::A, SPC::State::Register::Y";
     }
     else if (code == "SP, X") {
         mode.name = "Register Register";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::Register::SP, State::Register::X";
+        mode.templateArg = "SPC::State::Register::SP, SPC::State::Register::X";
     }
     else if (code == "X, A") {
         mode.name = "Register Register";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::Register::X, State::Register::A";
+        mode.templateArg = "SPC::State::Register::X, SPC::State::Register::A";
     }
     else if (code == "X, SP") {
         mode.name = "Register Register";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::Register::X, State::Register::SP";
+        mode.templateArg = "SPC::State::Register::X, SPC::State::Register::SP";
     }
     else if (code == "Y, A") {
         mode.name = "Register Register";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::Register::Y, State::Register::A";
+        mode.templateArg = "SPC::State::Register::Y, SPC::State::Register::A";
     }
     else if (code == "d+X, A") {
         mode.name = "Direct Indexed Register";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::Register::X, State::Register::A";
+        mode.templateArg = "SPC::State::Register::X, SPC::State::Register::A";
     }
     else if (code == "d+X, Y") {
         mode.name = "Direct Indexed Register";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::Register::X, State::Register::Y";
+        mode.templateArg = "SPC::State::Register::X, SPC::State::Register::Y";
     }
     else if (code == "d+Y, X") {
         mode.name = "Direct Indexed Register";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::Register::Y, State::Register::X";
+        mode.templateArg = "SPC::State::Register::Y, SPC::State::Register::X";
     }
     else if (code == "A, !a+X") {
         mode.name = "Register Absolute Indexed";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::Register::A, State::Register::X";
+        mode.templateArg = "SPC::State::Register::A, SPC::State::Register::X";
     }
     else if (code == "A, !a+Y") {
         mode.name = "Register Absolute Indexed";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::Register::A, State::Register::Y";
+        mode.templateArg = "SPC::State::Register::A, SPC::State::Register::Y";
     }
     else if (code == "!a+X, A") {
         mode.name = "Absolute Indexed Register";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::Register::X, State::Register::A";
+        mode.templateArg = "SPC::State::Register::X, SPC::State::Register::A";
     }
     else if (code == "!a+Y, A") {
         mode.name = "Absolute Indexed Register";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::Register::Y, State::Register::A";
+        mode.templateArg = "SPC::State::Register::Y, SPC::State::Register::A";
     }
     else if (code == "A, (X)") {
         mode.name = "Register Register Indirect";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::Register::A, State::Register::X";
+        mode.templateArg = "SPC::State::Register::A, SPC::State::Register::X";
     }
     else if (code == "(X)+, A") {
         mode.name = "Register Indirect Increment Register";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::Register::X, State::Register::A";
+        mode.templateArg = "SPC::State::Register::X, SPC::State::Register::A";
     }
     else if (code == "(X), A") {
         mode.name = "Register Indirect Register";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::Register::X, State::Register::A";
+        mode.templateArg = "SPC::State::Register::X, SPC::State::Register::A";
     }
     else if (code == "[d]+Y, A") {
         mode.name = "Direct Indirect Indexed Register";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::Register::Y, State::Register::A";
+        mode.templateArg = "SPC::State::Register::Y, SPC::State::Register::A";
     }
     else if (code == "[d+X], A") {
         mode.name = "Direct Indexed Indirect Register";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::Register::X, State::Register::A";
+        mode.templateArg = "SPC::State::Register::X, SPC::State::Register::A";
     }
     else if (code == "A, (X)+") {
         mode.name = "Register Register Indirect Increment";
         mode.config.twoRegister = true;
-        mode.templateArg = "State::Register::A, State::Register::X";
+        mode.templateArg = "SPC::State::Register::A, SPC::State::Register::X";
     }
     else if (code.substr(0, 2) == "d.") {
         if (code.size() == 3) {
@@ -483,16 +483,16 @@ void generateOpcode(std::ostream& output, const Instruction& instruction)
     }
 
     output << "template<>" << std::endl
-        << "struct Opcode<State, 0x" << instruction.code << ">" << std::endl
+        << "struct Opcode<SPC::State, 0x" << instruction.code << ">" << std::endl
         << "{" << std::endl
-        << "    using Instruction = " << "AddressMode::" << addressModeClass
-        << "<Operator::" << instruction.operatorName;
+        << "    using Instruction = SPC::AddressMode::" << addressModeClass
+        << "<SPC::Operator::" << instruction.operatorName;
     if (!instruction.addressModeClassArg.empty())
     {
         output << ", " << instruction.addressModeClassArg;
     }
     output << ">;" << std::endl << std::endl;
-    output << "    static int execute(State& state)" << std::endl
+    output << "    static int execute(SPC::State& state)" << std::endl
         << "    {" << std::endl
         << "        PROFILE_IF(PROFILE_OPCODES, \"" << instruction.code << ": " << instruction.name << "\");" << std::endl
         << std::endl;
@@ -530,14 +530,14 @@ void generateOpcodes(const std::vector<Instruction>& instructions)
         << "EXCEPTION(NotYetImplementedException, ::NotYetImplementedException)" << std::endl
         << std::endl
         << "CREATE_PROFILER();" << std::endl
+        << std::endl
+        << "}" << std::endl
         << std::endl;
 
     for (const Instruction& instruction : instructions) {
         std::string flag = "";
         generateOpcode(output, instruction);
     }
-
-    output << "}" << std::endl;
 }
 
 void generateOpcodeMap(const std::vector<Instruction>& instructions)
@@ -897,7 +897,7 @@ void generateSpc()
                     break;
                 case 'C':
                 case 'V':
-                    operatorUsageName = std::string("B__<State::Flag::") + char(std::tolower(operatorName[1])) + ", " + toString(operatorName[2] == 'S') + ">";
+                    operatorUsageName = std::string("B__<SPC::State::Flag::") + char(std::tolower(operatorName[1])) + ", " + toString(operatorName[2] == 'S') + ">";
                     break;
 
                 default:
@@ -913,7 +913,7 @@ void generateSpc()
                 }
                 else
                 {
-                    operatorUsageName += std::string("<") + "State::Flag::" + char(std::tolower(operatorName[3]));
+                    operatorUsageName += std::string("<") + "SPC::State::Flag::" + char(std::tolower(operatorName[3]));
                 }
                 operatorUsageName += std::string(", ") + (operatorName.substr(0, 3) == "SET" ? "true" : "false") + ">";
             }

@@ -38,7 +38,12 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
                 "int cycles = 0;",
                 "if (ExtraCycles)",
                 "{",
-                "    cycles += getExtraCycles(staticAddress, indexedAddress);",
+                "    Word addressPage(staticAddress >> 8);",
+                "    Word indexedAddressPage(indexedAddress >> 8);",
+                "    if (addressPage != indexedAddressPage)",
+                "    {",
+                "        cycles += 1;",
+                "    }",
                 "}",
                 "return cycles + Operator::invoke(state, access);"
             },

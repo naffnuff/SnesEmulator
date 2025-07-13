@@ -242,7 +242,7 @@ public:
     {
         if (logLevel > Log::Level::None) {
             std::ostream& outputStream = system.outputStream;
-            (outputStream << ... << std::forward<Ts>(values));
+            (void)(outputStream << ... << std::forward<Ts>(values));
         }
     }
 
@@ -251,7 +251,7 @@ public:
     {
         if (logLevel > Log::Level::None) {
             std::ostream& outputStream = system.outputStream;
-            (outputStream << ... << std::forward<Ts>(values));
+            (void)(outputStream << ... << std::forward<Ts>(values));
         }
     }
 
@@ -260,7 +260,7 @@ public:
     {
         if (logLevel > Log::Level::None) {
             std::ostream& outputStream = system.outputStream;
-            (outputStream << ... << std::forward<Ts>(values));
+            (void)(outputStream << ... << std::forward<Ts>(values));
             outputStream << std::endl;
         }
     }

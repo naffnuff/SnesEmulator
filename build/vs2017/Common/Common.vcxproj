@@ -19,16 +19,16 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\src\include\Common\Exception.h" />
-    <ClInclude Include="..\..\..\src\include\Common\Instruction.h" />
-    <ClInclude Include="..\..\..\src\include\Common\Memory.h" />
-    <ClInclude Include="..\..\..\src\include\Common\MemoryLocation.h" />
-    <ClInclude Include="..\..\..\src\include\Common\Output.h" />
-    <ClInclude Include="..\..\..\src\include\Common\Profiler.h" />
-    <ClInclude Include="..\..\..\src\include\Common\RegisterManager.h" />
-    <ClInclude Include="..\..\..\src\include\Common\System.h" />
-    <ClInclude Include="..\..\..\src\include\Common\Types.h" />
-    <ClInclude Include="..\..\..\src\include\Common\Util.h" />
+    <ClInclude Include="..\..\..\src\Common\Exception.h" />
+    <ClInclude Include="..\..\..\src\Common\Instruction.h" />
+    <ClInclude Include="..\..\..\src\Common\Memory.h" />
+    <ClInclude Include="..\..\..\src\Common\MemoryLocation.h" />
+    <ClInclude Include="..\..\..\src\Common\Output.h" />
+    <ClInclude Include="..\..\..\src\Common\Profiler.h" />
+    <ClInclude Include="..\..\..\src\Common\RegisterManager.h" />
+    <ClInclude Include="..\..\..\src\Common\System.h" />
+    <ClInclude Include="..\..\..\src\Common\Types.h" />
+    <ClInclude Include="..\..\..\src\Common\Util.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\Common\Profiler.cpp" />
@@ -90,6 +90,9 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />
+  <PropertyGroup Label="Vcpkg">
+    <VcpkgEnableManifest>true</VcpkgEnableManifest>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -98,7 +101,8 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\..\src\include\Common\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -112,7 +116,8 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\..\src\include\Common\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
@@ -122,7 +127,8 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\..\src\include\Common\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
@@ -134,7 +140,8 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\..\src\include\Common\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>

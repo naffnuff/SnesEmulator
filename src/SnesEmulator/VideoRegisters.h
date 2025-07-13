@@ -49,12 +49,12 @@ public:
         bool hdmaDoTransfer = false;
     };
 
-    Registers(Output& output, CPU::State& state)
+    Registers(Output& output, CPU::State& state, const std::string& gameTitle)
         : RegisterManager(output, "video", state.getMemory())
         , output(output, "video")
         , state(state)
         , memory(state.getMemory())
-        , processor(output)
+        , processor(output, gameTitle)
     {
     }
 

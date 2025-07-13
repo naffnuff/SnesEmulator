@@ -47,11 +47,11 @@ public:
             };
         if (openBus)
         {
-            memory.createLocation<OpenBusWriteRegister>(address, onWrite);
+            memory.template createLocation<OpenBusWriteRegister>(address, onWrite);
         }
         else
         {
-            memory.createLocation<WriteRegister>(address, onWrite);
+            memory.template createLocation<WriteRegister>(address, onWrite);
         }
     }
 
@@ -85,7 +85,7 @@ public:
 
     void makeReadRegister(AddressType address, const std::string& info, bool debug, std::function<void(Byte&)> callback = nullptr, bool throwOnWrite = true)
     {
-        memory.createLocation<ReadRegister>(address,
+        memory.template createLocation<ReadRegister>(address,
             [this, address, callback, info, debug](Byte& value)
             {
                 if (callback)
@@ -136,7 +136,7 @@ public:
 
     void makeReadWriteRegister(AddressType address, const std::string& info, bool debug, std::function<void(Byte&)> readCallback, std::function<void(Byte)> writeCallback)
     {
-        memory.createLocation<ReadWriteRegister>(address,
+        memory.template createLocation<ReadWriteRegister>(address,
             [this, address, readCallback, info, debug](Byte& value)
             {
                 if (readCallback)

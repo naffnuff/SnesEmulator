@@ -22,11 +22,11 @@
     <ClCompile Include="..\..\..\src\WDC65816\CpuInstructionDecoder.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\src\include\WDC65816\CpuInstructionDecoder.h" />
-    <ClInclude Include="..\..\..\src\include\WDC65816\CpuState.h" />
     <ClInclude Include="..\..\..\src\WDC65816\CpuAddressMode.h" />
+    <ClInclude Include="..\..\..\src\WDC65816\CpuInstructionDecoder.h" />
     <ClInclude Include="..\..\..\src\WDC65816\CpuOpcode.h" />
     <ClInclude Include="..\..\..\src\WDC65816\CpuOperator.h" />
+    <ClInclude Include="..\..\..\src\WDC65816\CpuState.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -84,6 +84,9 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />
+  <PropertyGroup Label="Vcpkg">
+    <VcpkgEnableManifest>true</VcpkgEnableManifest>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -92,7 +95,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\..\src\include\WDC65816\;..\..\..\src\include\Common\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\src\Common\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -106,7 +109,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\..\src\include\WDC65816\;..\..\..\src\include\Common\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\src\Common\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
@@ -116,7 +119,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\..\src\include\WDC65816\;..\..\..\src\include\Common\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\src\Common\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
@@ -128,7 +131,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\..\src\include\WDC65816\;..\..\..\src\include\Common\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\src\Common\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>

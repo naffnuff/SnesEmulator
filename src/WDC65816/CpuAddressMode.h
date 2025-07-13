@@ -72,6 +72,7 @@ struct AbsoluteIndexed
 {
     using Type = Instruction3Byte;
 
+    // §3: Add 1 cycle if adding index crosses a page boundary
     static int invokeOperator(State& state, Byte lowByte, Byte highByte)
     {
         PROFILE_IF(PROFILE_ADDRESS_MODES, "AbsoluteIndexed");
@@ -80,24 +81,16 @@ struct AbsoluteIndexed
         Long indexedAddress = staticAddress + state.getIndexRegister<Register>();
         MemoryAccess access = state.getMemoryAccess(indexedAddress);
         int cycles = 0;
-        if (ExtraCycles)
+        if constexpr (ExtraCycles)
         {
-            cycles += getExtraCycles(staticAddress, indexedAddress);
+            Word addressPage(staticAddress >> 8);
+            Word indexedAddressPage(indexedAddress >> 8);
+            if (addressPage != indexedAddressPage)
+            {
+                cycles += 1;
+            }
         }
         return cycles + Operator::invoke(state, access);
-    }
-
-    // §3: Add 1 cycle if adding index crosses a page boundary
-    static int getExtraCycles(Long staticAddress, Long indexedAddress)
-    {
-        int cycles = 0;
-        Word addressPage(staticAddress >> 8);
-        Word indexedAddressPage(indexedAddress >> 8);
-        if (addressPage != indexedAddressPage)
-        {
-            cycles += 1;
-        }
-        return cycles;
     }
 
     static std::string toString(const State& state)
@@ -423,7 +416,7 @@ struct DirectPageIndirect_ControlFlow
 
 // Direct Page Indirect Indexed, Y
 // (dp),Y
-template <typename Operator>
+template <typename Operator, bool ExtraCycles>
 struct DirectPageIndirectIndexedY
 {
     using Type = Instruction2Byte;
@@ -441,9 +434,12 @@ struct DirectPageIndirectIndexedY
         }
         Long address(state.getDirectMemoryAccess(lowByte).readWord(), state.getDataBank());
         Long indexedAddress = address + state.getIndexRegister<State::IndexRegister::Y>();
-        if (address >> 8 != indexedAddress >> 8)
+        if constexpr (ExtraCycles)
         {
-            cycles += 1;
+            if (address >> 8 != indexedAddress >> 8)
+            {
+                cycles += 1;
+            }
         }
         MemoryAccess access = state.getMemoryAccess(indexedAddress);
         return cycles + Operator::invoke(state, access);

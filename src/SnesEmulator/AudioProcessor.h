@@ -75,7 +75,7 @@ private:
         {
             if (index < 0 || index >= frequencyTableSize)
             {
-                throw RuntimeError(__FUNCTION__ ": Frequency index is out-of-bounds");
+                throw RuntimeError("FrequencyCounter::changeFrequency: Frequency index is out-of-bounds");
             }
             frequency = frequencyTable[index];
             counter = 0;
@@ -89,7 +89,7 @@ private:
             }
             if (counter >= frequency)
             {
-                throw RuntimeError(__FUNCTION__ ": Counter is beyond frequency: counter: ", counter, ", frequency: ", frequency);
+                throw RuntimeError("FrequencyCounter::tick: Counter is beyond frequency: counter: ", counter, ", frequency: ", frequency);
             }
             if (++counter == frequency)
             {

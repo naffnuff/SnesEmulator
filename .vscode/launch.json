@@ -1,0 +1,29 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Release",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/out/build/release/SnesEmulator.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/out/build/release",
+            "environment": [],
+            "console": "integratedTerminal",
+            "preLaunchTask": "CMake Build Release"
+        },
+        {
+            "name": "Debug",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/out/build/debug/SnesEmulator.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/out/build/debug",
+            "environment": [],
+            "console": "integratedTerminal",
+            "preLaunchTask": "CMake Build Debug"
+        }
+    ]
+}

@@ -15,16 +15,18 @@ EXCEPTION(NotYetImplementedException, ::NotYetImplementedException)
 
 CREATE_PROFILER();
 
+}
+
 // ADC Add With Carry [Flags affected: n,v,z,c]
 // ADC (dp,X)
 // Direct Page Indexed Indirect, X (2-Byte)
 template<>
-struct Opcode<State, 0x61>
+struct Opcode<CPU::State, 0x61>
 {
-    using Instruction = AddressMode::DirectPageIndexedIndirectX<Operator::ADC>;
+    using Instruction = CPU::AddressMode::DirectPageIndexedIndirectX<CPU::Operator::ADC>;
 
     // 2   7-m+w       (dir,X)   mm....mm . ADC ($10,X)
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "61: ADC (dp,X)");
 
@@ -39,12 +41,12 @@ struct Opcode<State, 0x61>
 // ADC sr,S
 // Stack Relative (2-Byte)
 template<>
-struct Opcode<State, 0x63>
+struct Opcode<CPU::State, 0x63>
 {
-    using Instruction = AddressMode::StackRelative<Operator::ADC>;
+    using Instruction = CPU::AddressMode::StackRelative<CPU::Operator::ADC>;
 
     // 2   5-m         stk,S     mm....mm . ADC $32,S
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "63: ADC sr,S");
 
@@ -58,12 +60,12 @@ struct Opcode<State, 0x63>
 // ADC dp
 // Direct Page (2-Byte)
 template<>
-struct Opcode<State, 0x65>
+struct Opcode<CPU::State, 0x65>
 {
-    using Instruction = AddressMode::DirectPage<Operator::ADC>;
+    using Instruction = CPU::AddressMode::DirectPage<CPU::Operator::ADC>;
 
     // 2   4-m+w       dir       mm....mm . ADC $10
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "65: ADC dp");
 
@@ -77,12 +79,12 @@ struct Opcode<State, 0x65>
 // ADC [dp]
 // Direct Page Indirect Long (2-Byte)
 template<>
-struct Opcode<State, 0x67>
+struct Opcode<CPU::State, 0x67>
 {
-    using Instruction = AddressMode::DirectPageIndirectLong<Operator::ADC>;
+    using Instruction = CPU::AddressMode::DirectPageIndirectLong<CPU::Operator::ADC>;
 
     // 2   7-m+w       [dir]     mm....mm . ADC [$10]
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "67: ADC [dp]");
 
@@ -96,18 +98,18 @@ struct Opcode<State, 0x67>
 // ADC #const
 // Immediate (2-Byte [17])
 template<>
-struct Opcode<State, 0x69>
+struct Opcode<CPU::State, 0x69>
 {
-    using Instruction = AddressMode::Immediate<Operator::ADC>;
-    using Instruction16Bit = AddressMode::Immediate16Bit<Operator::ADC>;
+    using Instruction = CPU::AddressMode::Immediate<CPU::Operator::ADC>;
+    using Instruction16Bit = CPU::AddressMode::Immediate16Bit<CPU::Operator::ADC>;
 
     // 3-m 3-m         imm       mm....mm . ADC #$54
     // ¤17: Add 1 byte if m=0 (16-bit memory/accumulator)
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "69: ADC #const");
 
-        if (state.is16Bit(State::Flag::m))
+        if (state.is16Bit(CPU::State::Flag::m))
         {
                 return 2 + Instruction16Bit::Type::applyOperand<Instruction16Bit>(state);
         }
@@ -124,12 +126,12 @@ struct Opcode<State, 0x69>
 // ADC addr
 // Absolute (3-Byte)
 template<>
-struct Opcode<State, 0x6D>
+struct Opcode<CPU::State, 0x6D>
 {
-    using Instruction = AddressMode::Absolute<Operator::ADC>;
+    using Instruction = CPU::AddressMode::Absolute<CPU::Operator::ADC>;
 
     // 3   5-m         abs       mm....mm . ADC $9876
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "6D: ADC addr");
 
@@ -143,12 +145,12 @@ struct Opcode<State, 0x6D>
 // ADC long
 // Absolute Long (4-Byte)
 template<>
-struct Opcode<State, 0x6F>
+struct Opcode<CPU::State, 0x6F>
 {
-    using Instruction = AddressMode::AbsoluteLong<Operator::ADC>;
+    using Instruction = CPU::AddressMode::AbsoluteLong<CPU::Operator::ADC>;
 
     // 4   6-m         long      mm....mm . ADC $FEDBCA
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "6F: ADC long");
 
@@ -162,12 +164,12 @@ struct Opcode<State, 0x6F>
 // ADC (dp),Y
 // Direct Page Indirect Indexed, Y (2-Byte)
 template<>
-struct Opcode<State, 0x71>
+struct Opcode<CPU::State, 0x71>
 {
-    using Instruction = AddressMode::DirectPageIndirectIndexedY<Operator::ADC>;
+    using Instruction = CPU::AddressMode::DirectPageIndirectIndexedY<CPU::Operator::ADC, true>;
 
     // 2   7-m+w-x+x*p (dir),Y   mm....mm . ADC ($10),Y
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "71: ADC (dp),Y");
 
@@ -181,12 +183,12 @@ struct Opcode<State, 0x71>
 // ADC (dp)
 // Direct Page Indirect (2-Byte)
 template<>
-struct Opcode<State, 0x72>
+struct Opcode<CPU::State, 0x72>
 {
-    using Instruction = AddressMode::DirectPageIndirect<Operator::ADC>;
+    using Instruction = CPU::AddressMode::DirectPageIndirect<CPU::Operator::ADC>;
 
     // 2   6-m+w       (dir)     mm....mm . ADC ($10)
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "72: ADC (dp)");
 
@@ -200,12 +202,12 @@ struct Opcode<State, 0x72>
 // ADC (sr,S),Y
 // Stack Relative Indirect Indexed, Y (2-Byte)
 template<>
-struct Opcode<State, 0x73>
+struct Opcode<CPU::State, 0x73>
 {
-    using Instruction = AddressMode::StackRelativeIndirectIndexedY<Operator::ADC>;
+    using Instruction = CPU::AddressMode::StackRelativeIndirectIndexedY<CPU::Operator::ADC>;
 
     // 2   8-m         (stk,S),Y mm....mm . ADC ($32,S),Y
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "73: ADC (sr,S),Y");
 
@@ -220,12 +222,12 @@ struct Opcode<State, 0x73>
 // ADC dp,X
 // Direct Page Indexed, X (2-Byte)
 template<>
-struct Opcode<State, 0x75>
+struct Opcode<CPU::State, 0x75>
 {
-    using Instruction = AddressMode::DirectPageIndexed<Operator::ADC, State::IndexRegister::X>;
+    using Instruction = CPU::AddressMode::DirectPageIndexed<CPU::Operator::ADC, CPU::State::IndexRegister::X>;
 
     // 2   5-m+w       dir,X     mm....mm . ADC $10,X
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "75: ADC dp,X");
 
@@ -239,12 +241,12 @@ struct Opcode<State, 0x75>
 // ADC [dp],Y
 // Direct Page Indirect Long Indexed, Y (2-Byte)
 template<>
-struct Opcode<State, 0x77>
+struct Opcode<CPU::State, 0x77>
 {
-    using Instruction = AddressMode::DirectPageIndirectLongIndexedY<Operator::ADC>;
+    using Instruction = CPU::AddressMode::DirectPageIndirectLongIndexedY<CPU::Operator::ADC>;
 
     // 2   7-m+w       [dir],Y   mm....mm . ADC [$10],Y
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "77: ADC [dp],Y");
 
@@ -258,12 +260,12 @@ struct Opcode<State, 0x77>
 // ADC addr,Y
 // Absolute Indexed, Y (3-Byte)
 template<>
-struct Opcode<State, 0x79>
+struct Opcode<CPU::State, 0x79>
 {
-    using Instruction = AddressMode::AbsoluteIndexed<Operator::ADC, State::IndexRegister::Y, true>;
+    using Instruction = CPU::AddressMode::AbsoluteIndexed<CPU::Operator::ADC, CPU::State::IndexRegister::Y, true>;
 
     // 3   6-m-x+x*p   abs,Y     mm....mm . ADC $9876,Y
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "79: ADC addr,Y");
 
@@ -277,12 +279,12 @@ struct Opcode<State, 0x79>
 // ADC addr,X
 // Absolute Indexed, X (3-Byte)
 template<>
-struct Opcode<State, 0x7D>
+struct Opcode<CPU::State, 0x7D>
 {
-    using Instruction = AddressMode::AbsoluteIndexed<Operator::ADC, State::IndexRegister::X, true>;
+    using Instruction = CPU::AddressMode::AbsoluteIndexed<CPU::Operator::ADC, CPU::State::IndexRegister::X, true>;
 
     // 3   6-m-x+x*p   abs,X     mm....mm . ADC $9876,X
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "7D: ADC addr,X");
 
@@ -296,12 +298,12 @@ struct Opcode<State, 0x7D>
 // ADC long,X
 // Absolute Long Indexed, X (4-Byte)
 template<>
-struct Opcode<State, 0x7F>
+struct Opcode<CPU::State, 0x7F>
 {
-    using Instruction = AddressMode::AbsoluteLongIndexedX<Operator::ADC>;
+    using Instruction = CPU::AddressMode::AbsoluteLongIndexedX<CPU::Operator::ADC>;
 
     // 4   6-m         long,X    mm....mm . ADC $FEDCBA,X
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "7F: ADC long,X");
 
@@ -315,12 +317,12 @@ struct Opcode<State, 0x7F>
 // AND (dp,X)
 // Direct Page Indexed Indirect, X (2-Byte)
 template<>
-struct Opcode<State, 0x21>
+struct Opcode<CPU::State, 0x21>
 {
-    using Instruction = AddressMode::DirectPageIndexedIndirectX<Operator::AND>;
+    using Instruction = CPU::AddressMode::DirectPageIndexedIndirectX<CPU::Operator::AND>;
 
     // 2   7-m+w       (dir,X)   m.....m. . AND ($10,X)
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "21: AND (dp,X)");
 
@@ -335,12 +337,12 @@ struct Opcode<State, 0x21>
 // AND sr,S
 // Stack Relative (2-Byte)
 template<>
-struct Opcode<State, 0x23>
+struct Opcode<CPU::State, 0x23>
 {
-    using Instruction = AddressMode::StackRelative<Operator::AND>;
+    using Instruction = CPU::AddressMode::StackRelative<CPU::Operator::AND>;
 
     // 2   5-m         stk,S     m.....m. . AND $32,S
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "23: AND sr,S");
 
@@ -355,12 +357,12 @@ struct Opcode<State, 0x23>
 // AND dp
 // Direct Page (2-Byte)
 template<>
-struct Opcode<State, 0x25>
+struct Opcode<CPU::State, 0x25>
 {
-    using Instruction = AddressMode::DirectPage<Operator::AND>;
+    using Instruction = CPU::AddressMode::DirectPage<CPU::Operator::AND>;
 
     // 2   4-m+w       dir       m.....m. . AND $10
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "25: AND dp");
 
@@ -374,12 +376,12 @@ struct Opcode<State, 0x25>
 // AND [dp]
 // Direct Page Indirect Long (2-Byte)
 template<>
-struct Opcode<State, 0x27>
+struct Opcode<CPU::State, 0x27>
 {
-    using Instruction = AddressMode::DirectPageIndirectLong<Operator::AND>;
+    using Instruction = CPU::AddressMode::DirectPageIndirectLong<CPU::Operator::AND>;
 
     // 2   7-m+w       [dir]     m.....m. . AND [$10]
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "27: AND [dp]");
 
@@ -394,18 +396,18 @@ struct Opcode<State, 0x27>
 // AND #const
 // Immediate (2-Byte [17])
 template<>
-struct Opcode<State, 0x29>
+struct Opcode<CPU::State, 0x29>
 {
-    using Instruction = AddressMode::Immediate<Operator::AND>;
-    using Instruction16Bit = AddressMode::Immediate16Bit<Operator::AND>;
+    using Instruction = CPU::AddressMode::Immediate<CPU::Operator::AND>;
+    using Instruction16Bit = CPU::AddressMode::Immediate16Bit<CPU::Operator::AND>;
 
     // 3-m 3-m         imm       m.....m. . AND #$54
     // ¤17: Add 1 byte if m=0 (16-bit memory/accumulator)
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "29: AND #const");
 
-        if (state.is16Bit(State::Flag::m))
+        if (state.is16Bit(CPU::State::Flag::m))
         {
                 return 2 + Instruction16Bit::Type::applyOperand<Instruction16Bit>(state);
         }
@@ -422,12 +424,12 @@ struct Opcode<State, 0x29>
 // AND addr
 // Absolute (3-Byte)
 template<>
-struct Opcode<State, 0x2D>
+struct Opcode<CPU::State, 0x2D>
 {
-    using Instruction = AddressMode::Absolute<Operator::AND>;
+    using Instruction = CPU::AddressMode::Absolute<CPU::Operator::AND>;
 
     // 3   5-m         abs       m.....m. . AND $9876
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "2D: AND addr");
 
@@ -441,12 +443,12 @@ struct Opcode<State, 0x2D>
 // AND long
 // Absolute Long (4-Byte)
 template<>
-struct Opcode<State, 0x2F>
+struct Opcode<CPU::State, 0x2F>
 {
-    using Instruction = AddressMode::AbsoluteLong<Operator::AND>;
+    using Instruction = CPU::AddressMode::AbsoluteLong<CPU::Operator::AND>;
 
     // 4   6-m         long      m.....m. . AND $FEDBCA
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "2F: AND long");
 
@@ -460,12 +462,12 @@ struct Opcode<State, 0x2F>
 // AND (dp),Y
 // Direct Page Indirect Indexed, Y (2-Byte)
 template<>
-struct Opcode<State, 0x31>
+struct Opcode<CPU::State, 0x31>
 {
-    using Instruction = AddressMode::DirectPageIndirectIndexedY<Operator::AND>;
+    using Instruction = CPU::AddressMode::DirectPageIndirectIndexedY<CPU::Operator::AND, true>;
 
     // 2   7-m+w-x+x*p (dir),Y   m.....m. . AND ($10),Y
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "31: AND (dp),Y");
 
@@ -480,12 +482,12 @@ struct Opcode<State, 0x31>
 // AND (dp)
 // Direct Page Indirect (2-Byte)
 template<>
-struct Opcode<State, 0x32>
+struct Opcode<CPU::State, 0x32>
 {
-    using Instruction = AddressMode::DirectPageIndirect<Operator::AND>;
+    using Instruction = CPU::AddressMode::DirectPageIndirect<CPU::Operator::AND>;
 
     // 2   6-m+w       (dir)     m.....m. . AND ($10)
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "32: AND (dp)");
 
@@ -500,12 +502,12 @@ struct Opcode<State, 0x32>
 // AND (sr,S),Y
 // Stack Relative Indirect Indexed, Y (2-Byte)
 template<>
-struct Opcode<State, 0x33>
+struct Opcode<CPU::State, 0x33>
 {
-    using Instruction = AddressMode::StackRelativeIndirectIndexedY<Operator::AND>;
+    using Instruction = CPU::AddressMode::StackRelativeIndirectIndexedY<CPU::Operator::AND>;
 
     // 2   8-m         (stk,S),Y m.....m. . AND ($32,S),Y
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "33: AND (sr,S),Y");
 
@@ -520,12 +522,12 @@ struct Opcode<State, 0x33>
 // AND dp,X
 // Direct Page Indexed, X (2-Byte)
 template<>
-struct Opcode<State, 0x35>
+struct Opcode<CPU::State, 0x35>
 {
-    using Instruction = AddressMode::DirectPageIndexed<Operator::AND, State::IndexRegister::X>;
+    using Instruction = CPU::AddressMode::DirectPageIndexed<CPU::Operator::AND, CPU::State::IndexRegister::X>;
 
     // 2   5-m+w       dir,X     m.....m. . AND $10,X
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "35: AND dp,X");
 
@@ -540,12 +542,12 @@ struct Opcode<State, 0x35>
 // AND [dp],Y
 // Direct Page Indirect Long Indexed, Y (2-Byte)
 template<>
-struct Opcode<State, 0x37>
+struct Opcode<CPU::State, 0x37>
 {
-    using Instruction = AddressMode::DirectPageIndirectLongIndexedY<Operator::AND>;
+    using Instruction = CPU::AddressMode::DirectPageIndirectLongIndexedY<CPU::Operator::AND>;
 
     // 2   7-m+w       [dir],Y   m.....m. . AND [$10],Y
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "37: AND [dp],Y");
 
@@ -560,12 +562,12 @@ struct Opcode<State, 0x37>
 // AND addr,Y
 // Absolute Indexed, Y (3-Byte)
 template<>
-struct Opcode<State, 0x39>
+struct Opcode<CPU::State, 0x39>
 {
-    using Instruction = AddressMode::AbsoluteIndexed<Operator::AND, State::IndexRegister::Y, true>;
+    using Instruction = CPU::AddressMode::AbsoluteIndexed<CPU::Operator::AND, CPU::State::IndexRegister::Y, true>;
 
     // 3   6-m-x+x*p   abs,Y     m.....m. . AND $9876,Y
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "39: AND addr,Y");
 
@@ -579,12 +581,12 @@ struct Opcode<State, 0x39>
 // AND addr,X
 // Absolute Indexed, X (3-Byte)
 template<>
-struct Opcode<State, 0x3D>
+struct Opcode<CPU::State, 0x3D>
 {
-    using Instruction = AddressMode::AbsoluteIndexed<Operator::AND, State::IndexRegister::X, true>;
+    using Instruction = CPU::AddressMode::AbsoluteIndexed<CPU::Operator::AND, CPU::State::IndexRegister::X, true>;
 
     // 3   6-m-x+x*p   abs,X     m.....m. . AND $9876,X
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "3D: AND addr,X");
 
@@ -598,12 +600,12 @@ struct Opcode<State, 0x3D>
 // AND long,X
 // Absolute Long Indexed, X (4-Byte)
 template<>
-struct Opcode<State, 0x3F>
+struct Opcode<CPU::State, 0x3F>
 {
-    using Instruction = AddressMode::AbsoluteLongIndexedX<Operator::AND>;
+    using Instruction = CPU::AddressMode::AbsoluteLongIndexedX<CPU::Operator::AND>;
 
     // 4   6-m         long,X    m.....m. . AND $FEDCBA,X
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "3F: AND long,X");
 
@@ -617,12 +619,12 @@ struct Opcode<State, 0x3F>
 // ASL dp
 // Direct Page (2-Byte)
 template<>
-struct Opcode<State, 0x06>
+struct Opcode<CPU::State, 0x06>
 {
-    using Instruction = AddressMode::DirectPage<Operator::ASL>;
+    using Instruction = CPU::AddressMode::DirectPage<CPU::Operator::ASL>;
 
     // 2   7-2*m+w     dir       m.....mm . ASL $10
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "06: ASL dp");
 
@@ -636,12 +638,12 @@ struct Opcode<State, 0x06>
 // ASL A
 // Accumulator (1-Byte)
 template<>
-struct Opcode<State, 0x0A>
+struct Opcode<CPU::State, 0x0A>
 {
-    using Instruction = AddressMode::Accumulator<Operator::ASL>;
+    using Instruction = CPU::AddressMode::Accumulator<CPU::Operator::ASL>;
 
     // 1   2           acc       m.....mm . ASL
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "0A: ASL A");
 
@@ -655,12 +657,12 @@ struct Opcode<State, 0x0A>
 // ASL addr
 // Absolute (3-Byte)
 template<>
-struct Opcode<State, 0x0E>
+struct Opcode<CPU::State, 0x0E>
 {
-    using Instruction = AddressMode::Absolute<Operator::ASL>;
+    using Instruction = CPU::AddressMode::Absolute<CPU::Operator::ASL>;
 
     // 3   8-2*m       abs       m.....mm . ASL $9876
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "0E: ASL addr");
 
@@ -674,12 +676,12 @@ struct Opcode<State, 0x0E>
 // ASL dp,X
 // Direct Page Indexed, X (2-Byte)
 template<>
-struct Opcode<State, 0x16>
+struct Opcode<CPU::State, 0x16>
 {
-    using Instruction = AddressMode::DirectPageIndexed<Operator::ASL, State::IndexRegister::X>;
+    using Instruction = CPU::AddressMode::DirectPageIndexed<CPU::Operator::ASL, CPU::State::IndexRegister::X>;
 
     // 2   8-2*m+w     dir,X     m.....mm . ASL $10,X
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "16: ASL dp,X");
 
@@ -693,12 +695,12 @@ struct Opcode<State, 0x16>
 // ASL addr,X
 // Absolute Indexed, X (3-Byte)
 template<>
-struct Opcode<State, 0x1E>
+struct Opcode<CPU::State, 0x1E>
 {
-    using Instruction = AddressMode::AbsoluteIndexed<Operator::ASL, State::IndexRegister::X, false>;
+    using Instruction = CPU::AddressMode::AbsoluteIndexed<CPU::Operator::ASL, CPU::State::IndexRegister::X, false>;
 
     // 3   9-2*m       abs,X     m.....mm . ASL $9876,X
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "1E: ASL addr,X");
 
@@ -712,12 +714,12 @@ struct Opcode<State, 0x1E>
 // BCC nearlabel
 // Program Counter Relative (2-Byte)
 template<>
-struct Opcode<State, 0x90>
+struct Opcode<CPU::State, 0x90>
 {
-    using Instruction = AddressMode::ProgramCounterRelative<Operator::BCC>;
+    using Instruction = CPU::AddressMode::ProgramCounterRelative<CPU::Operator::BCC>;
 
     // 2   2+t+t*e*p   rel8      ........ . BCC LABEL
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "90: BCC nearlabel");
 
@@ -731,12 +733,12 @@ struct Opcode<State, 0x90>
 // BCS nearlabel
 // Program Counter Relative (2-Byte)
 template<>
-struct Opcode<State, 0xB0>
+struct Opcode<CPU::State, 0xB0>
 {
-    using Instruction = AddressMode::ProgramCounterRelative<Operator::BCS>;
+    using Instruction = CPU::AddressMode::ProgramCounterRelative<CPU::Operator::BCS>;
 
     // 2   2+t+t*e*p   rel8      ........ . BCS LABEL
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "B0: BCS nearlabel");
 
@@ -750,12 +752,12 @@ struct Opcode<State, 0xB0>
 // BEQ nearlabel
 // Program Counter Relative (2-Byte)
 template<>
-struct Opcode<State, 0xF0>
+struct Opcode<CPU::State, 0xF0>
 {
-    using Instruction = AddressMode::ProgramCounterRelative<Operator::BEQ>;
+    using Instruction = CPU::AddressMode::ProgramCounterRelative<CPU::Operator::BEQ>;
 
     // 2   2+t+t*e*p   rel8      ........ . BEQ LABEL
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "F0: BEQ nearlabel");
 
@@ -769,12 +771,12 @@ struct Opcode<State, 0xF0>
 // BIT dp
 // Direct Page (2-Byte)
 template<>
-struct Opcode<State, 0x24>
+struct Opcode<CPU::State, 0x24>
 {
-    using Instruction = AddressMode::DirectPage<Operator::BIT<false>>;
+    using Instruction = CPU::AddressMode::DirectPage<CPU::Operator::BIT<false>>;
 
     // 2   4-m+w       dir       mm....m. . BIT $10
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "24: BIT dp");
 
@@ -788,12 +790,12 @@ struct Opcode<State, 0x24>
 // BIT addr
 // Absolute (3-Byte)
 template<>
-struct Opcode<State, 0x2C>
+struct Opcode<CPU::State, 0x2C>
 {
-    using Instruction = AddressMode::Absolute<Operator::BIT<false>>;
+    using Instruction = CPU::AddressMode::Absolute<CPU::Operator::BIT<false>>;
 
     // 3   5-m         abs       mm....m. . BIT $9876
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "2C: BIT addr");
 
@@ -807,12 +809,12 @@ struct Opcode<State, 0x2C>
 // BIT dp,X
 // Direct Page Indexed, X (2-Byte)
 template<>
-struct Opcode<State, 0x34>
+struct Opcode<CPU::State, 0x34>
 {
-    using Instruction = AddressMode::DirectPageIndexed<Operator::BIT<false>, State::IndexRegister::X>;
+    using Instruction = CPU::AddressMode::DirectPageIndexed<CPU::Operator::BIT<false>, CPU::State::IndexRegister::X>;
 
     // 2   5-m+w       dir,X     mm....m. . BIT $10,X
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "34: BIT dp,X");
 
@@ -826,12 +828,12 @@ struct Opcode<State, 0x34>
 // BIT addr,X
 // Absolute Indexed, X (3-Byte)
 template<>
-struct Opcode<State, 0x3C>
+struct Opcode<CPU::State, 0x3C>
 {
-    using Instruction = AddressMode::AbsoluteIndexed<Operator::BIT<false>, State::IndexRegister::X, true>;
+    using Instruction = CPU::AddressMode::AbsoluteIndexed<CPU::Operator::BIT<false>, CPU::State::IndexRegister::X, true>;
 
     // 3   6-m-x+x*p   abs,X     mm....m. . BIT $9876,X
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "3C: BIT addr,X");
 
@@ -845,18 +847,18 @@ struct Opcode<State, 0x3C>
 // BIT #const
 // Immediate (2-Byte [17])
 template<>
-struct Opcode<State, 0x89>
+struct Opcode<CPU::State, 0x89>
 {
-    using Instruction = AddressMode::Immediate<Operator::BIT<true>>;
-    using Instruction16Bit = AddressMode::Immediate16Bit<Operator::BIT<true>>;
+    using Instruction = CPU::AddressMode::Immediate<CPU::Operator::BIT<true>>;
+    using Instruction16Bit = CPU::AddressMode::Immediate16Bit<CPU::Operator::BIT<true>>;
 
     // 3-m 3-m         imm       ......m. . BIT #$54
     // ¤17: Add 1 byte if m=0 (16-bit memory/accumulator)
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "89: BIT #const");
 
-        if (state.is16Bit(State::Flag::m))
+        if (state.is16Bit(CPU::State::Flag::m))
         {
                 return 2 + Instruction16Bit::Type::applyOperand<Instruction16Bit>(state);
         }
@@ -873,12 +875,12 @@ struct Opcode<State, 0x89>
 // BMI nearlabel
 // Program Counter Relative (2-Byte)
 template<>
-struct Opcode<State, 0x30>
+struct Opcode<CPU::State, 0x30>
 {
-    using Instruction = AddressMode::ProgramCounterRelative<Operator::BMI>;
+    using Instruction = CPU::AddressMode::ProgramCounterRelative<CPU::Operator::BMI>;
 
     // 2   2+t+t*e*p   rel8      ........ . BMI LABEL
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "30: BMI nearlabel");
 
@@ -892,12 +894,12 @@ struct Opcode<State, 0x30>
 // BNE nearlabel
 // Program Counter Relative (2-Byte)
 template<>
-struct Opcode<State, 0xD0>
+struct Opcode<CPU::State, 0xD0>
 {
-    using Instruction = AddressMode::ProgramCounterRelative<Operator::BNE>;
+    using Instruction = CPU::AddressMode::ProgramCounterRelative<CPU::Operator::BNE>;
 
     // 2   2+t+t*e*p   rel8      ........ . BNE LABEL
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "D0: BNE nearlabel");
 
@@ -911,12 +913,12 @@ struct Opcode<State, 0xD0>
 // BPL nearlabel
 // Program Counter Relative (2-Byte)
 template<>
-struct Opcode<State, 0x10>
+struct Opcode<CPU::State, 0x10>
 {
-    using Instruction = AddressMode::ProgramCounterRelative<Operator::BPL>;
+    using Instruction = CPU::AddressMode::ProgramCounterRelative<CPU::Operator::BPL>;
 
     // 2   2+t+t*e*p   rel8      ........ . BPL LABEL
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "10: BPL nearlabel");
 
@@ -930,12 +932,12 @@ struct Opcode<State, 0x10>
 // BRA nearlabel
 // Program Counter Relative (2-Byte)
 template<>
-struct Opcode<State, 0x80>
+struct Opcode<CPU::State, 0x80>
 {
-    using Instruction = AddressMode::ProgramCounterRelative<Operator::BRA>;
+    using Instruction = CPU::AddressMode::ProgramCounterRelative<CPU::Operator::BRA>;
 
     // 2   3+e*p       rel8      ........ . BRA LABEL
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "80: BRA nearlabel");
 
@@ -949,13 +951,13 @@ struct Opcode<State, 0x80>
 // BRK
 // Immediate (2-Byte [18])
 template<>
-struct Opcode<State, 0x00>
+struct Opcode<CPU::State, 0x00>
 {
-    using Instruction = AddressMode::Immediate<Operator::BRK>;
+    using Instruction = CPU::AddressMode::Immediate<CPU::Operator::BRK>;
 
     // 1   8-e         imp       ....01.. . BRK
     // ¤18: Opcode is 1 byte, but program counter value pushed onto stack is incremented by 2 allowing for optional signature byte
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "00: BRK");
 
@@ -970,12 +972,12 @@ struct Opcode<State, 0x00>
 // BRL label
 // Program Counter Relative Long (3-Byte)
 template<>
-struct Opcode<State, 0x82>
+struct Opcode<CPU::State, 0x82>
 {
-    using Instruction = AddressMode::ProgramCounterRelativeLong<Operator::BRL>;
+    using Instruction = CPU::AddressMode::ProgramCounterRelativeLong<CPU::Operator::BRL>;
 
     // 3   4           rel16     ........ . BRL LABEL
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "82: BRL label");
 
@@ -989,12 +991,12 @@ struct Opcode<State, 0x82>
 // BVC nearlabel
 // Program Counter Relative (2-Byte)
 template<>
-struct Opcode<State, 0x50>
+struct Opcode<CPU::State, 0x50>
 {
-    using Instruction = AddressMode::ProgramCounterRelative<Operator::BVC>;
+    using Instruction = CPU::AddressMode::ProgramCounterRelative<CPU::Operator::BVC>;
 
     // 2   2+t+t*e*p   rel8      ........ . BVC LABEL
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "50: BVC nearlabel");
 
@@ -1008,12 +1010,12 @@ struct Opcode<State, 0x50>
 // BVS nearlabel
 // Program Counter Relative (2-Byte)
 template<>
-struct Opcode<State, 0x70>
+struct Opcode<CPU::State, 0x70>
 {
-    using Instruction = AddressMode::ProgramCounterRelative<Operator::BVS>;
+    using Instruction = CPU::AddressMode::ProgramCounterRelative<CPU::Operator::BVS>;
 
     // 2   2+t+t*e*p   rel8      ........ . BVS LABEL
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "70: BVS nearlabel");
 
@@ -1027,12 +1029,12 @@ struct Opcode<State, 0x70>
 // CLC
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0x18>
+struct Opcode<CPU::State, 0x18>
 {
-    using Instruction = AddressMode::Implied<Operator::SE_<State::Flag::c, false>>;
+    using Instruction = CPU::AddressMode::Implied<CPU::Operator::SE_<CPU::State::Flag::c, false>>;
 
     // 1   2           imp       .......0 . CLC
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "18: CLC");
 
@@ -1046,12 +1048,12 @@ struct Opcode<State, 0x18>
 // CLD
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0xD8>
+struct Opcode<CPU::State, 0xD8>
 {
-    using Instruction = AddressMode::Implied<Operator::SE_<State::Flag::d, false>>;
+    using Instruction = CPU::AddressMode::Implied<CPU::Operator::SE_<CPU::State::Flag::d, false>>;
 
     // 1   2           imp       ....0... . CLD
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "D8: CLD");
 
@@ -1065,12 +1067,12 @@ struct Opcode<State, 0xD8>
 // CLI
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0x58>
+struct Opcode<CPU::State, 0x58>
 {
-    using Instruction = AddressMode::Implied<Operator::SE_<State::Flag::i, false>>;
+    using Instruction = CPU::AddressMode::Implied<CPU::Operator::SE_<CPU::State::Flag::i, false>>;
 
     // 1   2           imp       .....0.. . CLI
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "58: CLI");
 
@@ -1084,12 +1086,12 @@ struct Opcode<State, 0x58>
 // CLV
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0xB8>
+struct Opcode<CPU::State, 0xB8>
 {
-    using Instruction = AddressMode::Implied<Operator::SE_<State::Flag::v, false>>;
+    using Instruction = CPU::AddressMode::Implied<CPU::Operator::SE_<CPU::State::Flag::v, false>>;
 
     // 1   2           imp       .0...... . CLV
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "B8: CLV");
 
@@ -1104,12 +1106,12 @@ struct Opcode<State, 0xB8>
 // CMP (dp,X)
 // Direct Page Indexed Indirect,X (2-Byte)
 template<>
-struct Opcode<State, 0xC1>
+struct Opcode<CPU::State, 0xC1>
 {
-    using Instruction = AddressMode::DirectPageIndexedIndirectX<Operator::CMP>;
+    using Instruction = CPU::AddressMode::DirectPageIndexedIndirectX<CPU::Operator::CMP>;
 
     // 2   7-m+w       (dir,X)   m.....mm . CMP ($10,X)
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "C1: CMP (dp,X)");
 
@@ -1124,12 +1126,12 @@ struct Opcode<State, 0xC1>
 // CMP sr,S
 // Stack Relative (2-Byte)
 template<>
-struct Opcode<State, 0xC3>
+struct Opcode<CPU::State, 0xC3>
 {
-    using Instruction = AddressMode::StackRelative<Operator::CMP>;
+    using Instruction = CPU::AddressMode::StackRelative<CPU::Operator::CMP>;
 
     // 2   5-m         stk,S     m.....mm . CMP $32,S
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "C3: CMP sr,S");
 
@@ -1143,12 +1145,12 @@ struct Opcode<State, 0xC3>
 // CMP dp
 // Direct Page (2-Byte)
 template<>
-struct Opcode<State, 0xC5>
+struct Opcode<CPU::State, 0xC5>
 {
-    using Instruction = AddressMode::DirectPage<Operator::CMP>;
+    using Instruction = CPU::AddressMode::DirectPage<CPU::Operator::CMP>;
 
     // 2   4-m+w       dir       m.....mm . CMP $10
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "C5: CMP dp");
 
@@ -1162,12 +1164,12 @@ struct Opcode<State, 0xC5>
 // CMP [dp]
 // Direct Page Indirect Long (2-Byte)
 template<>
-struct Opcode<State, 0xC7>
+struct Opcode<CPU::State, 0xC7>
 {
-    using Instruction = AddressMode::DirectPageIndirectLong<Operator::CMP>;
+    using Instruction = CPU::AddressMode::DirectPageIndirectLong<CPU::Operator::CMP>;
 
     // 2   7-m+w       [dir]     m.....mm . CMP [$10]
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "C7: CMP [dp]");
 
@@ -1181,18 +1183,18 @@ struct Opcode<State, 0xC7>
 // CMP #const
 // Immediate (2-Byte [17])
 template<>
-struct Opcode<State, 0xC9>
+struct Opcode<CPU::State, 0xC9>
 {
-    using Instruction = AddressMode::Immediate<Operator::CMP>;
-    using Instruction16Bit = AddressMode::Immediate16Bit<Operator::CMP>;
+    using Instruction = CPU::AddressMode::Immediate<CPU::Operator::CMP>;
+    using Instruction16Bit = CPU::AddressMode::Immediate16Bit<CPU::Operator::CMP>;
 
     // 3-m 3-m         imm       m.....mm . CMP #$54
     // ¤17: Add 1 byte if m=0 (16-bit memory/accumulator)
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "C9: CMP #const");
 
-        if (state.is16Bit(State::Flag::m))
+        if (state.is16Bit(CPU::State::Flag::m))
         {
                 return 2 + Instruction16Bit::Type::applyOperand<Instruction16Bit>(state);
         }
@@ -1209,12 +1211,12 @@ struct Opcode<State, 0xC9>
 // CMP addr
 // Absolute (3-Byte)
 template<>
-struct Opcode<State, 0xCD>
+struct Opcode<CPU::State, 0xCD>
 {
-    using Instruction = AddressMode::Absolute<Operator::CMP>;
+    using Instruction = CPU::AddressMode::Absolute<CPU::Operator::CMP>;
 
     // 3   5-m         abs       m.....mm . CMP $9876
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "CD: CMP addr");
 
@@ -1228,12 +1230,12 @@ struct Opcode<State, 0xCD>
 // CMP long
 // Absolute Long (4-Byte)
 template<>
-struct Opcode<State, 0xCF>
+struct Opcode<CPU::State, 0xCF>
 {
-    using Instruction = AddressMode::AbsoluteLong<Operator::CMP>;
+    using Instruction = CPU::AddressMode::AbsoluteLong<CPU::Operator::CMP>;
 
     // 4   6-m         long      m.....mm . CMP $FEDBCA
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "CF: CMP long");
 
@@ -1247,12 +1249,12 @@ struct Opcode<State, 0xCF>
 // CMP (dp),Y
 // Direct Page Indirect Indexed, Y (2-Byte)
 template<>
-struct Opcode<State, 0xD1>
+struct Opcode<CPU::State, 0xD1>
 {
-    using Instruction = AddressMode::DirectPageIndirectIndexedY<Operator::CMP>;
+    using Instruction = CPU::AddressMode::DirectPageIndirectIndexedY<CPU::Operator::CMP, true>;
 
     // 2   7-m+w-x+x*p (dir),Y   m.....mm . CMP ($10),Y
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "D1: CMP (dp),Y");
 
@@ -1267,12 +1269,12 @@ struct Opcode<State, 0xD1>
 // CMP (dp)
 // Direct Page Indirect (2-Byte)
 template<>
-struct Opcode<State, 0xD2>
+struct Opcode<CPU::State, 0xD2>
 {
-    using Instruction = AddressMode::DirectPageIndirect<Operator::CMP>;
+    using Instruction = CPU::AddressMode::DirectPageIndirect<CPU::Operator::CMP>;
 
     // 2   6-m+w       (dir)     m.....mm . CMP ($10)
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "D2: CMP (dp)");
 
@@ -1287,12 +1289,12 @@ struct Opcode<State, 0xD2>
 // CMP (sr,S),Y
 // Stack Relative Indirect Indexed, Y (2-Byte)
 template<>
-struct Opcode<State, 0xD3>
+struct Opcode<CPU::State, 0xD3>
 {
-    using Instruction = AddressMode::StackRelativeIndirectIndexedY<Operator::CMP>;
+    using Instruction = CPU::AddressMode::StackRelativeIndirectIndexedY<CPU::Operator::CMP>;
 
     // 2   8-m         (stk,S),Y m.....mm . CMP ($32,S),Y
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "D3: CMP (sr,S),Y");
 
@@ -1307,12 +1309,12 @@ struct Opcode<State, 0xD3>
 // CMP dp,X
 // Direct Page Indexed, X (2-Byte)
 template<>
-struct Opcode<State, 0xD5>
+struct Opcode<CPU::State, 0xD5>
 {
-    using Instruction = AddressMode::DirectPageIndexed<Operator::CMP, State::IndexRegister::X>;
+    using Instruction = CPU::AddressMode::DirectPageIndexed<CPU::Operator::CMP, CPU::State::IndexRegister::X>;
 
     // 2   5-m+w       dir,X     m.....mm . CMP $10,X
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "D5: CMP dp,X");
 
@@ -1326,12 +1328,12 @@ struct Opcode<State, 0xD5>
 // CMP [dp],Y
 // Direct Page Indirect Long Indexed, Y (2-Byte)
 template<>
-struct Opcode<State, 0xD7>
+struct Opcode<CPU::State, 0xD7>
 {
-    using Instruction = AddressMode::DirectPageIndirectLongIndexedY<Operator::CMP>;
+    using Instruction = CPU::AddressMode::DirectPageIndirectLongIndexedY<CPU::Operator::CMP>;
 
     // 2   7-m+w       [dir],Y   m.....mm . CMP [$10],Y
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "D7: CMP [dp],Y");
 
@@ -1345,12 +1347,12 @@ struct Opcode<State, 0xD7>
 // CMP addr,Y
 // Absolute Indexed, Y (3-Byte)
 template<>
-struct Opcode<State, 0xD9>
+struct Opcode<CPU::State, 0xD9>
 {
-    using Instruction = AddressMode::AbsoluteIndexed<Operator::CMP, State::IndexRegister::Y, true>;
+    using Instruction = CPU::AddressMode::AbsoluteIndexed<CPU::Operator::CMP, CPU::State::IndexRegister::Y, true>;
 
     // 3   6-m-x+x*p   abs,Y     m.....mm . CMP $9876,Y
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "D9: CMP addr,Y");
 
@@ -1364,12 +1366,12 @@ struct Opcode<State, 0xD9>
 // CMP addr,X
 // Absolute Indexed, X (3-Byte)
 template<>
-struct Opcode<State, 0xDD>
+struct Opcode<CPU::State, 0xDD>
 {
-    using Instruction = AddressMode::AbsoluteIndexed<Operator::CMP, State::IndexRegister::X, true>;
+    using Instruction = CPU::AddressMode::AbsoluteIndexed<CPU::Operator::CMP, CPU::State::IndexRegister::X, true>;
 
     // 3   6-m-x+x*p   abs,X     m.....mm . CMP $9876,X
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "DD: CMP addr,X");
 
@@ -1383,12 +1385,12 @@ struct Opcode<State, 0xDD>
 // CMP long,X
 // Absolute Long Indexed, X (4-Byte)
 template<>
-struct Opcode<State, 0xDF>
+struct Opcode<CPU::State, 0xDF>
 {
-    using Instruction = AddressMode::AbsoluteLongIndexedX<Operator::CMP>;
+    using Instruction = CPU::AddressMode::AbsoluteLongIndexedX<CPU::Operator::CMP>;
 
     // 4   6-m         long,X    m.....mm . CMP $FEDCBA,X
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "DF: CMP long,X");
 
@@ -1402,13 +1404,13 @@ struct Opcode<State, 0xDF>
 // COP const
 // Immediate (2-Byte [18])
 template<>
-struct Opcode<State, 0x02>
+struct Opcode<CPU::State, 0x02>
 {
-    using Instruction = AddressMode::Immediate<Operator::COP>;
+    using Instruction = CPU::AddressMode::Immediate<CPU::Operator::COP>;
 
     // 2   8-e         imm       ....01.. . COP #$12
     // ¤18: Opcode is 1 byte, but program counter value pushed onto stack is incremented by 2 allowing for optional signature byte
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "02: COP const");
 
@@ -1423,18 +1425,18 @@ struct Opcode<State, 0x02>
 // CPX #const
 // Immediate (2-Byte [19])
 template<>
-struct Opcode<State, 0xE0>
+struct Opcode<CPU::State, 0xE0>
 {
-    using Instruction = AddressMode::Immediate<Operator::CP_<State::IndexRegister::X>>;
-    using Instruction16Bit = AddressMode::Immediate16Bit<Operator::CP_<State::IndexRegister::X>>;
+    using Instruction = CPU::AddressMode::Immediate<CPU::Operator::CP_<CPU::State::IndexRegister::X>>;
+    using Instruction16Bit = CPU::AddressMode::Immediate16Bit<CPU::Operator::CP_<CPU::State::IndexRegister::X>>;
 
     // 3-x 3-x         imm       x.....xx . CPX #$54
     // ¤19: Add 1 byte if x=0 (16-bit index registers)
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "E0: CPX #const");
 
-        if (state.is16Bit(State::Flag::x))
+        if (state.is16Bit(CPU::State::Flag::x))
         {
                 return 2 + Instruction16Bit::Type::applyOperand<Instruction16Bit>(state);
         }
@@ -1451,12 +1453,12 @@ struct Opcode<State, 0xE0>
 // CPX dp
 // Direct Page (2-Byte)
 template<>
-struct Opcode<State, 0xE4>
+struct Opcode<CPU::State, 0xE4>
 {
-    using Instruction = AddressMode::DirectPage<Operator::CP_<State::IndexRegister::X>>;
+    using Instruction = CPU::AddressMode::DirectPage<CPU::Operator::CP_<CPU::State::IndexRegister::X>>;
 
     // 2   4-x+w       dir       x.....xx . CPX $10
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "E4: CPX dp");
 
@@ -1470,12 +1472,12 @@ struct Opcode<State, 0xE4>
 // CPX addr
 // Absolute (3-Byte)
 template<>
-struct Opcode<State, 0xEC>
+struct Opcode<CPU::State, 0xEC>
 {
-    using Instruction = AddressMode::Absolute<Operator::CP_<State::IndexRegister::X>>;
+    using Instruction = CPU::AddressMode::Absolute<CPU::Operator::CP_<CPU::State::IndexRegister::X>>;
 
     // 3   5-x         abs       x.....xx . CPX $9876
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "EC: CPX addr");
 
@@ -1489,18 +1491,18 @@ struct Opcode<State, 0xEC>
 // CPY #const
 // Immediate (2-Byte [19])
 template<>
-struct Opcode<State, 0xC0>
+struct Opcode<CPU::State, 0xC0>
 {
-    using Instruction = AddressMode::Immediate<Operator::CP_<State::IndexRegister::Y>>;
-    using Instruction16Bit = AddressMode::Immediate16Bit<Operator::CP_<State::IndexRegister::Y>>;
+    using Instruction = CPU::AddressMode::Immediate<CPU::Operator::CP_<CPU::State::IndexRegister::Y>>;
+    using Instruction16Bit = CPU::AddressMode::Immediate16Bit<CPU::Operator::CP_<CPU::State::IndexRegister::Y>>;
 
     // 3-x 3-x         imm       x.....xx . CPY #$54
     // ¤19: Add 1 byte if x=0 (16-bit index registers)
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "C0: CPY #const");
 
-        if (state.is16Bit(State::Flag::x))
+        if (state.is16Bit(CPU::State::Flag::x))
         {
                 return 2 + Instruction16Bit::Type::applyOperand<Instruction16Bit>(state);
         }
@@ -1517,12 +1519,12 @@ struct Opcode<State, 0xC0>
 // CPY dp
 // Direct Page (2-Byte)
 template<>
-struct Opcode<State, 0xC4>
+struct Opcode<CPU::State, 0xC4>
 {
-    using Instruction = AddressMode::DirectPage<Operator::CP_<State::IndexRegister::Y>>;
+    using Instruction = CPU::AddressMode::DirectPage<CPU::Operator::CP_<CPU::State::IndexRegister::Y>>;
 
     // 2   4-x+w       dir       x.....xx . CPY $10
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "C4: CPY dp");
 
@@ -1536,12 +1538,12 @@ struct Opcode<State, 0xC4>
 // CPY addr
 // Absolute (3-Byte)
 template<>
-struct Opcode<State, 0xCC>
+struct Opcode<CPU::State, 0xCC>
 {
-    using Instruction = AddressMode::Absolute<Operator::CP_<State::IndexRegister::Y>>;
+    using Instruction = CPU::AddressMode::Absolute<CPU::Operator::CP_<CPU::State::IndexRegister::Y>>;
 
     // 3   5-x         abs       x.....xx . CPY $9876
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "CC: CPY addr");
 
@@ -1555,12 +1557,12 @@ struct Opcode<State, 0xCC>
 // DEC A
 // Accumulator (1-Byte)
 template<>
-struct Opcode<State, 0x3A>
+struct Opcode<CPU::State, 0x3A>
 {
-    using Instruction = AddressMode::Accumulator<Operator::DEC>;
+    using Instruction = CPU::AddressMode::Accumulator<CPU::Operator::DEC>;
 
     // 1   2           acc       m.....m. . DEC
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "3A: DEC A");
 
@@ -1574,12 +1576,12 @@ struct Opcode<State, 0x3A>
 // DEC dp
 // Direct Page (2-Byte)
 template<>
-struct Opcode<State, 0xC6>
+struct Opcode<CPU::State, 0xC6>
 {
-    using Instruction = AddressMode::DirectPage<Operator::DEC>;
+    using Instruction = CPU::AddressMode::DirectPage<CPU::Operator::DEC>;
 
     // 2   7-2*m+w     dir       m.....m. . DEC $10
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "C6: DEC dp");
 
@@ -1593,12 +1595,12 @@ struct Opcode<State, 0xC6>
 // DEC addr
 // Absolute (3-Byte)
 template<>
-struct Opcode<State, 0xCE>
+struct Opcode<CPU::State, 0xCE>
 {
-    using Instruction = AddressMode::Absolute<Operator::DEC>;
+    using Instruction = CPU::AddressMode::Absolute<CPU::Operator::DEC>;
 
     // 3   8-2*m       abs       m.....m. . DEC $9876
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "CE: DEC addr");
 
@@ -1612,12 +1614,12 @@ struct Opcode<State, 0xCE>
 // DEC dp,X
 // Direct Page Indexed, X (2-Byte)
 template<>
-struct Opcode<State, 0xD6>
+struct Opcode<CPU::State, 0xD6>
 {
-    using Instruction = AddressMode::DirectPageIndexed<Operator::DEC, State::IndexRegister::X>;
+    using Instruction = CPU::AddressMode::DirectPageIndexed<CPU::Operator::DEC, CPU::State::IndexRegister::X>;
 
     // 2   8-2*m+w     dir,X     m.....m. . DEC $10,X
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "D6: DEC dp,X");
 
@@ -1631,12 +1633,12 @@ struct Opcode<State, 0xD6>
 // DEC addr,X
 // Absolute Indexed, X (3-Byte)
 template<>
-struct Opcode<State, 0xDE>
+struct Opcode<CPU::State, 0xDE>
 {
-    using Instruction = AddressMode::AbsoluteIndexed<Operator::DEC, State::IndexRegister::X, false>;
+    using Instruction = CPU::AddressMode::AbsoluteIndexed<CPU::Operator::DEC, CPU::State::IndexRegister::X, false>;
 
     // 3   9-2*m       abs,X     m.....m. . DEC $9876,X
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "DE: DEC addr,X");
 
@@ -1650,12 +1652,12 @@ struct Opcode<State, 0xDE>
 // DEX
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0xCA>
+struct Opcode<CPU::State, 0xCA>
 {
-    using Instruction = AddressMode::Implied<Operator::DE_<State::IndexRegister::X>>;
+    using Instruction = CPU::AddressMode::Implied<CPU::Operator::DE_<CPU::State::IndexRegister::X>>;
 
     // 1   2           imp       x.....x. . DEX
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "CA: DEX");
 
@@ -1669,12 +1671,12 @@ struct Opcode<State, 0xCA>
 // DEY
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0x88>
+struct Opcode<CPU::State, 0x88>
 {
-    using Instruction = AddressMode::Implied<Operator::DE_<State::IndexRegister::Y>>;
+    using Instruction = CPU::AddressMode::Implied<CPU::Operator::DE_<CPU::State::IndexRegister::Y>>;
 
     // 1   2           imp       x.....x. . DEY
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "88: DEY");
 
@@ -1688,12 +1690,12 @@ struct Opcode<State, 0x88>
 // EOR (dp,X)
 // Direct Page Indexed Indirect,X (2-Byte)
 template<>
-struct Opcode<State, 0x41>
+struct Opcode<CPU::State, 0x41>
 {
-    using Instruction = AddressMode::DirectPageIndexedIndirectX<Operator::EOR>;
+    using Instruction = CPU::AddressMode::DirectPageIndexedIndirectX<CPU::Operator::EOR>;
 
     // 2   7-m+w       (dir,X)   m.....m. . EOR ($10,X)
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "41: EOR (dp,X)");
 
@@ -1708,12 +1710,12 @@ struct Opcode<State, 0x41>
 // EOR sr,S
 // Stack Relative (2-Byte)
 template<>
-struct Opcode<State, 0x43>
+struct Opcode<CPU::State, 0x43>
 {
-    using Instruction = AddressMode::StackRelative<Operator::EOR>;
+    using Instruction = CPU::AddressMode::StackRelative<CPU::Operator::EOR>;
 
     // 2   5-m         stk,S     m.....m. . EOR $32,S
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "43: EOR sr,S");
 
@@ -1727,12 +1729,12 @@ struct Opcode<State, 0x43>
 // EOR dp
 // Direct Page (2-Byte)
 template<>
-struct Opcode<State, 0x45>
+struct Opcode<CPU::State, 0x45>
 {
-    using Instruction = AddressMode::DirectPage<Operator::EOR>;
+    using Instruction = CPU::AddressMode::DirectPage<CPU::Operator::EOR>;
 
     // 2   4-m+w       dir       m.....m. . EOR $10
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "45: EOR dp");
 
@@ -1746,12 +1748,12 @@ struct Opcode<State, 0x45>
 // EOR [dp]
 // Direct Page Indirect Long (2-Byte)
 template<>
-struct Opcode<State, 0x47>
+struct Opcode<CPU::State, 0x47>
 {
-    using Instruction = AddressMode::DirectPageIndirectLong<Operator::EOR>;
+    using Instruction = CPU::AddressMode::DirectPageIndirectLong<CPU::Operator::EOR>;
 
     // 2   7-m+w       [dir]     m.....m. . EOR [$10]
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "47: EOR [dp]");
 
@@ -1766,18 +1768,18 @@ struct Opcode<State, 0x47>
 // EOR #const
 // Immediate (2-Byte [17])
 template<>
-struct Opcode<State, 0x49>
+struct Opcode<CPU::State, 0x49>
 {
-    using Instruction = AddressMode::Immediate<Operator::EOR>;
-    using Instruction16Bit = AddressMode::Immediate16Bit<Operator::EOR>;
+    using Instruction = CPU::AddressMode::Immediate<CPU::Operator::EOR>;
+    using Instruction16Bit = CPU::AddressMode::Immediate16Bit<CPU::Operator::EOR>;
 
     // 3-m 3-m         imm       m.....m. . EOR #$54
     // ¤17: Add 1 byte if m=0 (16-bit memory/accumulator)
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "49: EOR #const");
 
-        if (state.is16Bit(State::Flag::m))
+        if (state.is16Bit(CPU::State::Flag::m))
         {
                 return 2 + Instruction16Bit::Type::applyOperand<Instruction16Bit>(state);
         }
@@ -1794,12 +1796,12 @@ struct Opcode<State, 0x49>
 // EOR addr
 // Absolute (3-Byte)
 template<>
-struct Opcode<State, 0x4D>
+struct Opcode<CPU::State, 0x4D>
 {
-    using Instruction = AddressMode::Absolute<Operator::EOR>;
+    using Instruction = CPU::AddressMode::Absolute<CPU::Operator::EOR>;
 
     // 3   5-m         abs       m.....m. . EOR $9876
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "4D: EOR addr");
 
@@ -1813,12 +1815,12 @@ struct Opcode<State, 0x4D>
 // EOR long
 // Absolute Long (4-Byte)
 template<>
-struct Opcode<State, 0x4F>
+struct Opcode<CPU::State, 0x4F>
 {
-    using Instruction = AddressMode::AbsoluteLong<Operator::EOR>;
+    using Instruction = CPU::AddressMode::AbsoluteLong<CPU::Operator::EOR>;
 
     // 4   6-m         long      m.....m. . EOR $FEDBCA
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "4F: EOR long");
 
@@ -1833,12 +1835,12 @@ struct Opcode<State, 0x4F>
 // EOR (dp),Y
 // Direct Page Indirect Indexed, Y (2-Byte)
 template<>
-struct Opcode<State, 0x51>
+struct Opcode<CPU::State, 0x51>
 {
-    using Instruction = AddressMode::DirectPageIndirectIndexedY<Operator::EOR>;
+    using Instruction = CPU::AddressMode::DirectPageIndirectIndexedY<CPU::Operator::EOR, true>;
 
     // 2   7-m+w-x+x*p (dir),Y   m.....m. . EOR ($10),Y
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "51: EOR (dp),Y");
 
@@ -1853,12 +1855,12 @@ struct Opcode<State, 0x51>
 // EOR (dp)
 // Direct Page Indirect (2-Byte)
 template<>
-struct Opcode<State, 0x52>
+struct Opcode<CPU::State, 0x52>
 {
-    using Instruction = AddressMode::DirectPageIndirect<Operator::EOR>;
+    using Instruction = CPU::AddressMode::DirectPageIndirect<CPU::Operator::EOR>;
 
     // 2   6-m+w       (dir)     m.....m. . EOR ($10)
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "52: EOR (dp)");
 
@@ -1873,12 +1875,12 @@ struct Opcode<State, 0x52>
 // EOR (sr,S),Y
 // Stack Relative Indirect Indexed, Y (2-Byte)
 template<>
-struct Opcode<State, 0x53>
+struct Opcode<CPU::State, 0x53>
 {
-    using Instruction = AddressMode::StackRelativeIndirectIndexedY<Operator::EOR>;
+    using Instruction = CPU::AddressMode::StackRelativeIndirectIndexedY<CPU::Operator::EOR>;
 
     // 2   8-m         (stk,S),Y m.....m. . EOR ($32,S),Y
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "53: EOR (sr,S),Y");
 
@@ -1893,12 +1895,12 @@ struct Opcode<State, 0x53>
 // EOR dp,X
 // Direct Page Indexed, X (2-Byte)
 template<>
-struct Opcode<State, 0x55>
+struct Opcode<CPU::State, 0x55>
 {
-    using Instruction = AddressMode::DirectPageIndexed<Operator::EOR, State::IndexRegister::X>;
+    using Instruction = CPU::AddressMode::DirectPageIndexed<CPU::Operator::EOR, CPU::State::IndexRegister::X>;
 
     // 2   5-m+w       dir,X     m.....m. . EOR $10,X
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "55: EOR dp,X");
 
@@ -1912,12 +1914,12 @@ struct Opcode<State, 0x55>
 // EOR [dp],Y
 // Direct Page Indirect Long Indexed, Y (2-Byte)
 template<>
-struct Opcode<State, 0x57>
+struct Opcode<CPU::State, 0x57>
 {
-    using Instruction = AddressMode::DirectPageIndirectLongIndexedY<Operator::EOR>;
+    using Instruction = CPU::AddressMode::DirectPageIndirectLongIndexedY<CPU::Operator::EOR>;
 
     // 2   7-m+w       [dir],Y   m.....m. . EOR [$10],Y
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "57: EOR [dp],Y");
 
@@ -1932,12 +1934,12 @@ struct Opcode<State, 0x57>
 // EOR addr,Y
 // Absolute Indexed, Y (3-Byte)
 template<>
-struct Opcode<State, 0x59>
+struct Opcode<CPU::State, 0x59>
 {
-    using Instruction = AddressMode::AbsoluteIndexed<Operator::EOR, State::IndexRegister::Y, true>;
+    using Instruction = CPU::AddressMode::AbsoluteIndexed<CPU::Operator::EOR, CPU::State::IndexRegister::Y, true>;
 
     // 3   6-m-x+x*p   abs,Y     m.....m. . EOR $9876,Y
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "59: EOR addr,Y");
 
@@ -1951,12 +1953,12 @@ struct Opcode<State, 0x59>
 // EOR addr,X
 // Absolute Indexed, X (3-Byte)
 template<>
-struct Opcode<State, 0x5D>
+struct Opcode<CPU::State, 0x5D>
 {
-    using Instruction = AddressMode::AbsoluteIndexed<Operator::EOR, State::IndexRegister::X, true>;
+    using Instruction = CPU::AddressMode::AbsoluteIndexed<CPU::Operator::EOR, CPU::State::IndexRegister::X, true>;
 
     // 3   6-m-x+x*p   abs,X     m.....m. . EOR $9876,X
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "5D: EOR addr,X");
 
@@ -1970,12 +1972,12 @@ struct Opcode<State, 0x5D>
 // EOR long,X
 // Absolute Long Indexed, X (4-Byte)
 template<>
-struct Opcode<State, 0x5F>
+struct Opcode<CPU::State, 0x5F>
 {
-    using Instruction = AddressMode::AbsoluteLongIndexedX<Operator::EOR>;
+    using Instruction = CPU::AddressMode::AbsoluteLongIndexedX<CPU::Operator::EOR>;
 
     // 4   6-m         long,X    m.....m. . EOR $FEDCBA,X
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "5F: EOR long,X");
 
@@ -1990,12 +1992,12 @@ struct Opcode<State, 0x5F>
 // INC A
 // Accumulator (1-Byte)
 template<>
-struct Opcode<State, 0x1A>
+struct Opcode<CPU::State, 0x1A>
 {
-    using Instruction = AddressMode::Accumulator<Operator::INC>;
+    using Instruction = CPU::AddressMode::Accumulator<CPU::Operator::INC>;
 
     // 1   2           acc       m.....m. . INC
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "1A: INC A");
 
@@ -2009,12 +2011,12 @@ struct Opcode<State, 0x1A>
 // INC dp
 // Direct Page (2-Byte)
 template<>
-struct Opcode<State, 0xE6>
+struct Opcode<CPU::State, 0xE6>
 {
-    using Instruction = AddressMode::DirectPage<Operator::INC>;
+    using Instruction = CPU::AddressMode::DirectPage<CPU::Operator::INC>;
 
     // 2   7-2*m+w     dir       m.....m. . INC $10
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "E6: INC dp");
 
@@ -2028,12 +2030,12 @@ struct Opcode<State, 0xE6>
 // INC addr
 // Absolute (3-Byte)
 template<>
-struct Opcode<State, 0xEE>
+struct Opcode<CPU::State, 0xEE>
 {
-    using Instruction = AddressMode::Absolute<Operator::INC>;
+    using Instruction = CPU::AddressMode::Absolute<CPU::Operator::INC>;
 
     // 3   8-2*m       abs       m.....m. . INC $9876
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "EE: INC addr");
 
@@ -2047,12 +2049,12 @@ struct Opcode<State, 0xEE>
 // INC dp,X
 // Direct Page Indexed, X (2-Byte)
 template<>
-struct Opcode<State, 0xF6>
+struct Opcode<CPU::State, 0xF6>
 {
-    using Instruction = AddressMode::DirectPageIndexed<Operator::INC, State::IndexRegister::X>;
+    using Instruction = CPU::AddressMode::DirectPageIndexed<CPU::Operator::INC, CPU::State::IndexRegister::X>;
 
     // 2   8-2*m+w     dir,X     m.....m. . INC $10,X
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "F6: INC dp,X");
 
@@ -2066,12 +2068,12 @@ struct Opcode<State, 0xF6>
 // INC addr,X
 // Absolute Indexed, X (3-Byte)
 template<>
-struct Opcode<State, 0xFE>
+struct Opcode<CPU::State, 0xFE>
 {
-    using Instruction = AddressMode::AbsoluteIndexed<Operator::INC, State::IndexRegister::X, false>;
+    using Instruction = CPU::AddressMode::AbsoluteIndexed<CPU::Operator::INC, CPU::State::IndexRegister::X, false>;
 
     // 3   9-2*m       abs,X     m.....m. . INC $9876,X
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "FE: INC addr,X");
 
@@ -2085,12 +2087,12 @@ struct Opcode<State, 0xFE>
 // INX
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0xE8>
+struct Opcode<CPU::State, 0xE8>
 {
-    using Instruction = AddressMode::Implied<Operator::IN_<State::IndexRegister::X>>;
+    using Instruction = CPU::AddressMode::Implied<CPU::Operator::IN_<CPU::State::IndexRegister::X>>;
 
     // 1   2           imp       x.....x. . INX
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "E8: INX");
 
@@ -2104,12 +2106,12 @@ struct Opcode<State, 0xE8>
 // INY
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0xC8>
+struct Opcode<CPU::State, 0xC8>
 {
-    using Instruction = AddressMode::Implied<Operator::IN_<State::IndexRegister::Y>>;
+    using Instruction = CPU::AddressMode::Implied<CPU::Operator::IN_<CPU::State::IndexRegister::Y>>;
 
     // 1   2           imp       x.....x. . INY
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "C8: INY");
 
@@ -2123,12 +2125,12 @@ struct Opcode<State, 0xC8>
 // JMP addr
 // Absolute (3-Byte)
 template<>
-struct Opcode<State, 0x4C>
+struct Opcode<CPU::State, 0x4C>
 {
-    using Instruction = AddressMode::Absolute_ControlFlow<Operator::JMP>;
+    using Instruction = CPU::AddressMode::Absolute_ControlFlow<CPU::Operator::JMP>;
 
     // 3   3           abs       ........ . JMP $1234
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "4C: JMP addr");
 
@@ -2142,12 +2144,12 @@ struct Opcode<State, 0x4C>
 // JMP long
 // Absolute Long (4-Byte)
 template<>
-struct Opcode<State, 0x5C>
+struct Opcode<CPU::State, 0x5C>
 {
-    using Instruction = AddressMode::AbsoluteLong_ControlFlow<Operator::JML>;
+    using Instruction = CPU::AddressMode::AbsoluteLong_ControlFlow<CPU::Operator::JML>;
 
     // 4   4           long      ........ . JMP $FEDCBA
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "5C: JMP long");
 
@@ -2161,12 +2163,12 @@ struct Opcode<State, 0x5C>
 // JMP (addr)
 // Absolute Indirect (3-Byte)
 template<>
-struct Opcode<State, 0x6C>
+struct Opcode<CPU::State, 0x6C>
 {
-    using Instruction = AddressMode::AbsoluteIndirect<Operator::JMP>;
+    using Instruction = CPU::AddressMode::AbsoluteIndirect<CPU::Operator::JMP>;
 
     // 3   5           (abs)     ........ . JMP ($1234)
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "6C: JMP (addr)");
 
@@ -2180,12 +2182,12 @@ struct Opcode<State, 0x6C>
 // JMP (addr,X)
 // Absolute Indexed Indirect (3-Byte)
 template<>
-struct Opcode<State, 0x7C>
+struct Opcode<CPU::State, 0x7C>
 {
-    using Instruction = AddressMode::AbsoluteIndexedIndirect<Operator::JMP>;
+    using Instruction = CPU::AddressMode::AbsoluteIndexedIndirect<CPU::Operator::JMP>;
 
     // 3   6           (abs,X)   ........ . JMP ($1234,X)
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "7C: JMP (addr,X)");
 
@@ -2199,12 +2201,12 @@ struct Opcode<State, 0x7C>
 // JMP [addr]
 // Absolute Indirect Long (3-Byte)
 template<>
-struct Opcode<State, 0xDC>
+struct Opcode<CPU::State, 0xDC>
 {
-    using Instruction = AddressMode::AbsoluteIndirectLong<Operator::JML>;
+    using Instruction = CPU::AddressMode::AbsoluteIndirectLong<CPU::Operator::JML>;
 
     // 3   6           [abs]     ........ . JMP [$1234]
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "DC: JMP [addr]");
 
@@ -2218,12 +2220,12 @@ struct Opcode<State, 0xDC>
 // JSR addr
 // Absolute (3-Byte)
 template<>
-struct Opcode<State, 0x20>
+struct Opcode<CPU::State, 0x20>
 {
-    using Instruction = AddressMode::Absolute_ControlFlow<Operator::JSR>;
+    using Instruction = CPU::AddressMode::Absolute_ControlFlow<CPU::Operator::JSR>;
 
     // 3   6           abs       ........ . JSR $1234
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "20: JSR addr");
 
@@ -2237,12 +2239,12 @@ struct Opcode<State, 0x20>
 // JSR long
 // Absolute Long (4-Byte)
 template<>
-struct Opcode<State, 0x22>
+struct Opcode<CPU::State, 0x22>
 {
-    using Instruction = AddressMode::AbsoluteLong_ControlFlow<Operator::JSL>;
+    using Instruction = CPU::AddressMode::AbsoluteLong_ControlFlow<CPU::Operator::JSL>;
 
     // 4   8           long      ........ . JSL $123456
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "22: JSR long");
 
@@ -2256,12 +2258,12 @@ struct Opcode<State, 0x22>
 // JSR (addr,X)
 // Absolute Indexed Indirect (3-Byte)
 template<>
-struct Opcode<State, 0xFC>
+struct Opcode<CPU::State, 0xFC>
 {
-    using Instruction = AddressMode::AbsoluteIndexedIndirect<Operator::JSR>;
+    using Instruction = CPU::AddressMode::AbsoluteIndexedIndirect<CPU::Operator::JSR>;
 
     // 3   8           (abs,X)   ........ . JSR ($1234,X)
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "FC: JSR (addr,X)");
 
@@ -2275,12 +2277,12 @@ struct Opcode<State, 0xFC>
 // LDA (dp,X)
 // Direct Page Indexed Indirect, X (2-Byte)
 template<>
-struct Opcode<State, 0xA1>
+struct Opcode<CPU::State, 0xA1>
 {
-    using Instruction = AddressMode::DirectPageIndexedIndirectX<Operator::LDA>;
+    using Instruction = CPU::AddressMode::DirectPageIndexedIndirectX<CPU::Operator::LDA>;
 
     // 2   7-m+w       (dir,X)   m.....m. . LDA ($10,X)
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "A1: LDA (dp,X)");
 
@@ -2295,12 +2297,12 @@ struct Opcode<State, 0xA1>
 // LDA sr,S
 // Stack Relative (2-Byte)
 template<>
-struct Opcode<State, 0xA3>
+struct Opcode<CPU::State, 0xA3>
 {
-    using Instruction = AddressMode::StackRelative<Operator::LDA>;
+    using Instruction = CPU::AddressMode::StackRelative<CPU::Operator::LDA>;
 
     // 2   5-m         stk,S     m.....m. . LDA $32,S
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "A3: LDA sr,S");
 
@@ -2314,12 +2316,12 @@ struct Opcode<State, 0xA3>
 // LDA dp
 // Direct Page (2-Byte)
 template<>
-struct Opcode<State, 0xA5>
+struct Opcode<CPU::State, 0xA5>
 {
-    using Instruction = AddressMode::DirectPage<Operator::LDA>;
+    using Instruction = CPU::AddressMode::DirectPage<CPU::Operator::LDA>;
 
     // 2   4-m+w       dir       m.....m. . LDA $10
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "A5: LDA dp");
 
@@ -2333,12 +2335,12 @@ struct Opcode<State, 0xA5>
 // LDA [dp]
 // Direct Page Indirect Long (2-Byte)
 template<>
-struct Opcode<State, 0xA7>
+struct Opcode<CPU::State, 0xA7>
 {
-    using Instruction = AddressMode::DirectPageIndirectLong<Operator::LDA>;
+    using Instruction = CPU::AddressMode::DirectPageIndirectLong<CPU::Operator::LDA>;
 
     // 2   7-m+w       [dir]     m.....m. . LDA [$10]
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "A7: LDA [dp]");
 
@@ -2352,18 +2354,18 @@ struct Opcode<State, 0xA7>
 // LDA #const
 // Immediate (2-Byte [17])
 template<>
-struct Opcode<State, 0xA9>
+struct Opcode<CPU::State, 0xA9>
 {
-    using Instruction = AddressMode::Immediate<Operator::LDA>;
-    using Instruction16Bit = AddressMode::Immediate16Bit<Operator::LDA>;
+    using Instruction = CPU::AddressMode::Immediate<CPU::Operator::LDA>;
+    using Instruction16Bit = CPU::AddressMode::Immediate16Bit<CPU::Operator::LDA>;
 
     // 3-m 3-m         imm       m.....m. . LDA #$54
     // ¤17: Add 1 byte if m=0 (16-bit memory/accumulator)
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "A9: LDA #const");
 
-        if (state.is16Bit(State::Flag::m))
+        if (state.is16Bit(CPU::State::Flag::m))
         {
                 return 2 + Instruction16Bit::Type::applyOperand<Instruction16Bit>(state);
         }
@@ -2380,12 +2382,12 @@ struct Opcode<State, 0xA9>
 // LDA addr
 // Absolute (3-Byte)
 template<>
-struct Opcode<State, 0xAD>
+struct Opcode<CPU::State, 0xAD>
 {
-    using Instruction = AddressMode::Absolute<Operator::LDA>;
+    using Instruction = CPU::AddressMode::Absolute<CPU::Operator::LDA>;
 
     // 3   5-m         abs       m.....m. . LDA $9876
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "AD: LDA addr");
 
@@ -2399,12 +2401,12 @@ struct Opcode<State, 0xAD>
 // LDA long
 // Absolute Long (4-Byte)
 template<>
-struct Opcode<State, 0xAF>
+struct Opcode<CPU::State, 0xAF>
 {
-    using Instruction = AddressMode::AbsoluteLong<Operator::LDA>;
+    using Instruction = CPU::AddressMode::AbsoluteLong<CPU::Operator::LDA>;
 
     // 4   6-m         long      m.....m. . LDA $FEDBCA
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "AF: LDA long");
 
@@ -2418,12 +2420,12 @@ struct Opcode<State, 0xAF>
 // LDA (dp),Y
 // Direct Page Indirect Indexed, Y (2-Byte)
 template<>
-struct Opcode<State, 0xB1>
+struct Opcode<CPU::State, 0xB1>
 {
-    using Instruction = AddressMode::DirectPageIndirectIndexedY<Operator::LDA>;
+    using Instruction = CPU::AddressMode::DirectPageIndirectIndexedY<CPU::Operator::LDA, true>;
 
     // 2   7-m+w-x+x*p (dir),Y   m.....m. . LDA ($10),Y
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "B1: LDA (dp),Y");
 
@@ -2437,12 +2439,12 @@ struct Opcode<State, 0xB1>
 // LDA (dp)
 // Direct Page Indirect (2-Byte)
 template<>
-struct Opcode<State, 0xB2>
+struct Opcode<CPU::State, 0xB2>
 {
-    using Instruction = AddressMode::DirectPageIndirect<Operator::LDA>;
+    using Instruction = CPU::AddressMode::DirectPageIndirect<CPU::Operator::LDA>;
 
     // 2   6-m+w       (dir)     m.....m. . LDA ($10)
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "B2: LDA (dp)");
 
@@ -2456,12 +2458,12 @@ struct Opcode<State, 0xB2>
 // LDA (sr,S),Y
 // Stack Relative Indirect Indexed, Y (2-Byte)
 template<>
-struct Opcode<State, 0xB3>
+struct Opcode<CPU::State, 0xB3>
 {
-    using Instruction = AddressMode::StackRelativeIndirectIndexedY<Operator::LDA>;
+    using Instruction = CPU::AddressMode::StackRelativeIndirectIndexedY<CPU::Operator::LDA>;
 
     // 2   8-m         (stk,S),Y m.....m. . LDA ($32,S),Y
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "B3: LDA (sr,S),Y");
 
@@ -2475,12 +2477,12 @@ struct Opcode<State, 0xB3>
 // LDA dp,X
 // Direct Page Indexed, X (2-Byte)
 template<>
-struct Opcode<State, 0xB5>
+struct Opcode<CPU::State, 0xB5>
 {
-    using Instruction = AddressMode::DirectPageIndexed<Operator::LDA, State::IndexRegister::X>;
+    using Instruction = CPU::AddressMode::DirectPageIndexed<CPU::Operator::LDA, CPU::State::IndexRegister::X>;
 
     // 2   5-m+w       dir,X     m.....m. . LDA $10,X
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "B5: LDA dp,X");
 
@@ -2494,12 +2496,12 @@ struct Opcode<State, 0xB5>
 // LDA [dp],Y
 // Direct Page Indirect Long Indexed, Y (2-Byte)
 template<>
-struct Opcode<State, 0xB7>
+struct Opcode<CPU::State, 0xB7>
 {
-    using Instruction = AddressMode::DirectPageIndirectLongIndexedY<Operator::LDA>;
+    using Instruction = CPU::AddressMode::DirectPageIndirectLongIndexedY<CPU::Operator::LDA>;
 
     // 2   7-m+w       [dir],Y   m.....m. . LDA [$10],Y
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "B7: LDA [dp],Y");
 
@@ -2513,12 +2515,12 @@ struct Opcode<State, 0xB7>
 // LDA addr,Y
 // Absolute Indexed, Y (3-Byte)
 template<>
-struct Opcode<State, 0xB9>
+struct Opcode<CPU::State, 0xB9>
 {
-    using Instruction = AddressMode::AbsoluteIndexed<Operator::LDA, State::IndexRegister::Y, true>;
+    using Instruction = CPU::AddressMode::AbsoluteIndexed<CPU::Operator::LDA, CPU::State::IndexRegister::Y, true>;
 
     // 3   6-m-x+x*p   abs,Y     m.....m. . LDA $9876,Y
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "B9: LDA addr,Y");
 
@@ -2532,12 +2534,12 @@ struct Opcode<State, 0xB9>
 // LDA addr,X
 // Absolute Indexed, X (3-Byte)
 template<>
-struct Opcode<State, 0xBD>
+struct Opcode<CPU::State, 0xBD>
 {
-    using Instruction = AddressMode::AbsoluteIndexed<Operator::LDA, State::IndexRegister::X, true>;
+    using Instruction = CPU::AddressMode::AbsoluteIndexed<CPU::Operator::LDA, CPU::State::IndexRegister::X, true>;
 
     // 3   6-m-x+x*p   abs,X     m.....m. . LDA $9876,X
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "BD: LDA addr,X");
 
@@ -2551,12 +2553,12 @@ struct Opcode<State, 0xBD>
 // LDA long,X
 // Absolute Long Indexed, X (4-Byte)
 template<>
-struct Opcode<State, 0xBF>
+struct Opcode<CPU::State, 0xBF>
 {
-    using Instruction = AddressMode::AbsoluteLongIndexedX<Operator::LDA>;
+    using Instruction = CPU::AddressMode::AbsoluteLongIndexedX<CPU::Operator::LDA>;
 
     // 4   6-m         long,X    m.....m. . LDA $FEDCBA,X
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "BF: LDA long,X");
 
@@ -2570,18 +2572,18 @@ struct Opcode<State, 0xBF>
 // LDX #const
 // Immediate (2-Byte [19])
 template<>
-struct Opcode<State, 0xA2>
+struct Opcode<CPU::State, 0xA2>
 {
-    using Instruction = AddressMode::Immediate<Operator::LD_<State::IndexRegister::X>>;
-    using Instruction16Bit = AddressMode::Immediate16Bit<Operator::LD_<State::IndexRegister::X>>;
+    using Instruction = CPU::AddressMode::Immediate<CPU::Operator::LD_<CPU::State::IndexRegister::X>>;
+    using Instruction16Bit = CPU::AddressMode::Immediate16Bit<CPU::Operator::LD_<CPU::State::IndexRegister::X>>;
 
     // 3-x 3-x         imm       x.....x. . LDX #$54
     // ¤19: Add 1 byte if x=0 (16-bit index registers)
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "A2: LDX #const");
 
-        if (state.is16Bit(State::Flag::x))
+        if (state.is16Bit(CPU::State::Flag::x))
         {
                 return 2 + Instruction16Bit::Type::applyOperand<Instruction16Bit>(state);
         }
@@ -2598,12 +2600,12 @@ struct Opcode<State, 0xA2>
 // LDX dp
 // Direct Page (2-Byte)
 template<>
-struct Opcode<State, 0xA6>
+struct Opcode<CPU::State, 0xA6>
 {
-    using Instruction = AddressMode::DirectPage<Operator::LD_<State::IndexRegister::X>>;
+    using Instruction = CPU::AddressMode::DirectPage<CPU::Operator::LD_<CPU::State::IndexRegister::X>>;
 
     // 2   4-x+w       dir       x.....x. . LDX $10
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "A6: LDX dp");
 
@@ -2617,12 +2619,12 @@ struct Opcode<State, 0xA6>
 // LDX addr
 // Absolute (3-Byte)
 template<>
-struct Opcode<State, 0xAE>
+struct Opcode<CPU::State, 0xAE>
 {
-    using Instruction = AddressMode::Absolute<Operator::LD_<State::IndexRegister::X>>;
+    using Instruction = CPU::AddressMode::Absolute<CPU::Operator::LD_<CPU::State::IndexRegister::X>>;
 
     // 3   5-x         abs       x.....x. . LDX $9876
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "AE: LDX addr");
 
@@ -2636,12 +2638,12 @@ struct Opcode<State, 0xAE>
 // LDX dp,Y
 // Direct Page Indexed, Y (2-Byte)
 template<>
-struct Opcode<State, 0xB6>
+struct Opcode<CPU::State, 0xB6>
 {
-    using Instruction = AddressMode::DirectPageIndexed<Operator::LD_<State::IndexRegister::X>, State::IndexRegister::Y>;
+    using Instruction = CPU::AddressMode::DirectPageIndexed<CPU::Operator::LD_<CPU::State::IndexRegister::X>, CPU::State::IndexRegister::Y>;
 
     // 2   5-x+w       dir,Y     x.....x. . LDX $10,Y
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "B6: LDX dp,Y");
 
@@ -2655,12 +2657,12 @@ struct Opcode<State, 0xB6>
 // LDX addr,Y
 // Absolute Indexed, Y (3-Byte)
 template<>
-struct Opcode<State, 0xBE>
+struct Opcode<CPU::State, 0xBE>
 {
-    using Instruction = AddressMode::AbsoluteIndexed<Operator::LD_<State::IndexRegister::X>, State::IndexRegister::Y, true>;
+    using Instruction = CPU::AddressMode::AbsoluteIndexed<CPU::Operator::LD_<CPU::State::IndexRegister::X>, CPU::State::IndexRegister::Y, true>;
 
     // 3   6-2*x+x*p   abs,Y     x.....x. . LDX $9876,Y
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "BE: LDX addr,Y");
 
@@ -2674,18 +2676,18 @@ struct Opcode<State, 0xBE>
 // LDY #const
 // Immediate (2-Byte [19])
 template<>
-struct Opcode<State, 0xA0>
+struct Opcode<CPU::State, 0xA0>
 {
-    using Instruction = AddressMode::Immediate<Operator::LD_<State::IndexRegister::Y>>;
-    using Instruction16Bit = AddressMode::Immediate16Bit<Operator::LD_<State::IndexRegister::Y>>;
+    using Instruction = CPU::AddressMode::Immediate<CPU::Operator::LD_<CPU::State::IndexRegister::Y>>;
+    using Instruction16Bit = CPU::AddressMode::Immediate16Bit<CPU::Operator::LD_<CPU::State::IndexRegister::Y>>;
 
     // 3-x 3-x         imm       x.....x. . LDY #$54
     // ¤19: Add 1 byte if x=0 (16-bit index registers)
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "A0: LDY #const");
 
-        if (state.is16Bit(State::Flag::x))
+        if (state.is16Bit(CPU::State::Flag::x))
         {
                 return 2 + Instruction16Bit::Type::applyOperand<Instruction16Bit>(state);
         }
@@ -2702,12 +2704,12 @@ struct Opcode<State, 0xA0>
 // LDY dp
 // Direct Page (2-Byte)
 template<>
-struct Opcode<State, 0xA4>
+struct Opcode<CPU::State, 0xA4>
 {
-    using Instruction = AddressMode::DirectPage<Operator::LD_<State::IndexRegister::Y>>;
+    using Instruction = CPU::AddressMode::DirectPage<CPU::Operator::LD_<CPU::State::IndexRegister::Y>>;
 
     // 2   4-x+w       dir       x.....x. . LDY $10
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "A4: LDY dp");
 
@@ -2721,12 +2723,12 @@ struct Opcode<State, 0xA4>
 // LDY addr
 // Absolute (3-Byte)
 template<>
-struct Opcode<State, 0xAC>
+struct Opcode<CPU::State, 0xAC>
 {
-    using Instruction = AddressMode::Absolute<Operator::LD_<State::IndexRegister::Y>>;
+    using Instruction = CPU::AddressMode::Absolute<CPU::Operator::LD_<CPU::State::IndexRegister::Y>>;
 
     // 3   5-x         abs       x.....x. . LDY $9876
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "AC: LDY addr");
 
@@ -2740,12 +2742,12 @@ struct Opcode<State, 0xAC>
 // LDY dp,X
 // Direct Page Indexed, X (2-Byte)
 template<>
-struct Opcode<State, 0xB4>
+struct Opcode<CPU::State, 0xB4>
 {
-    using Instruction = AddressMode::DirectPageIndexed<Operator::LD_<State::IndexRegister::Y>, State::IndexRegister::X>;
+    using Instruction = CPU::AddressMode::DirectPageIndexed<CPU::Operator::LD_<CPU::State::IndexRegister::Y>, CPU::State::IndexRegister::X>;
 
     // 2   5-x+w       dir,X     x.....x. . LDY $10,X
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "B4: LDY dp,X");
 
@@ -2759,12 +2761,12 @@ struct Opcode<State, 0xB4>
 // LDY addr,X
 // Absolute Indexed, X (3-Byte)
 template<>
-struct Opcode<State, 0xBC>
+struct Opcode<CPU::State, 0xBC>
 {
-    using Instruction = AddressMode::AbsoluteIndexed<Operator::LD_<State::IndexRegister::Y>, State::IndexRegister::X, true>;
+    using Instruction = CPU::AddressMode::AbsoluteIndexed<CPU::Operator::LD_<CPU::State::IndexRegister::Y>, CPU::State::IndexRegister::X, true>;
 
     // 3   6-2*x+x*p   abs,X     x.....x. . LDY $9876,X
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "BC: LDY addr,X");
 
@@ -2778,12 +2780,12 @@ struct Opcode<State, 0xBC>
 // LSR dp
 // Direct Page (2-Byte)
 template<>
-struct Opcode<State, 0x46>
+struct Opcode<CPU::State, 0x46>
 {
-    using Instruction = AddressMode::DirectPage<Operator::LSR>;
+    using Instruction = CPU::AddressMode::DirectPage<CPU::Operator::LSR>;
 
     // 2   7-2*m+w     dir       0.....m* . LSR $10
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "46: LSR dp");
 
@@ -2797,12 +2799,12 @@ struct Opcode<State, 0x46>
 // LSR A
 // Accumulator (1-Byte)
 template<>
-struct Opcode<State, 0x4A>
+struct Opcode<CPU::State, 0x4A>
 {
-    using Instruction = AddressMode::Accumulator<Operator::LSR>;
+    using Instruction = CPU::AddressMode::Accumulator<CPU::Operator::LSR>;
 
     // 1   2           acc       0.....m* . LSR
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "4A: LSR A");
 
@@ -2816,12 +2818,12 @@ struct Opcode<State, 0x4A>
 // LSR addr
 // Absolute (3-Byte)
 template<>
-struct Opcode<State, 0x4E>
+struct Opcode<CPU::State, 0x4E>
 {
-    using Instruction = AddressMode::Absolute<Operator::LSR>;
+    using Instruction = CPU::AddressMode::Absolute<CPU::Operator::LSR>;
 
     // 3   8-2*m       abs       0.....m* . LSR $9876
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "4E: LSR addr");
 
@@ -2835,12 +2837,12 @@ struct Opcode<State, 0x4E>
 // LSR dp,X
 // Direct Page Indexed, X (2-Byte)
 template<>
-struct Opcode<State, 0x56>
+struct Opcode<CPU::State, 0x56>
 {
-    using Instruction = AddressMode::DirectPageIndexed<Operator::LSR, State::IndexRegister::X>;
+    using Instruction = CPU::AddressMode::DirectPageIndexed<CPU::Operator::LSR, CPU::State::IndexRegister::X>;
 
     // 2   8-2*m+w     dir,X     0.....m* . LSR $10,X
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "56: LSR dp,X");
 
@@ -2855,12 +2857,12 @@ struct Opcode<State, 0x56>
 // LSR addr,X
 // Absolute Indexed, X (3-Byte)
 template<>
-struct Opcode<State, 0x5E>
+struct Opcode<CPU::State, 0x5E>
 {
-    using Instruction = AddressMode::AbsoluteIndexed<Operator::LSR, State::IndexRegister::X, false>;
+    using Instruction = CPU::AddressMode::AbsoluteIndexed<CPU::Operator::LSR, CPU::State::IndexRegister::X, false>;
 
     // 3   9-2*m       abs,X     0.....m* . LSR $9876,X
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "5E: LSR addr,X");
 
@@ -2874,12 +2876,12 @@ struct Opcode<State, 0x5E>
 // MVN srcbk,destbk
 // Block Move (3-Byte)
 template<>
-struct Opcode<State, 0x54>
+struct Opcode<CPU::State, 0x54>
 {
-    using Instruction = AddressMode::BlockMove<Operator::MVN>;
+    using Instruction = CPU::AddressMode::BlockMove<CPU::Operator::MVN>;
 
     // 3   7           src,dest  ........ . MVN #$12,#$34
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "54: MVN srcbk,destbk");
 
@@ -2893,12 +2895,12 @@ struct Opcode<State, 0x54>
 // MVP srcbk,destbk
 // Block Move (3-Byte)
 template<>
-struct Opcode<State, 0x44>
+struct Opcode<CPU::State, 0x44>
 {
-    using Instruction = AddressMode::BlockMove<Operator::MVP>;
+    using Instruction = CPU::AddressMode::BlockMove<CPU::Operator::MVP>;
 
     // 3   7           src,dest  ........ . MVP #$12,#$34
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "44: MVP srcbk,destbk");
 
@@ -2913,12 +2915,12 @@ struct Opcode<State, 0x44>
 // NOP
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0xEA>
+struct Opcode<CPU::State, 0xEA>
 {
-    using Instruction = AddressMode::Implied<Operator::NOP>;
+    using Instruction = CPU::AddressMode::Implied<CPU::Operator::NOP>;
 
     // 1   2           imp       ........ . NOP
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "EA: NOP");
 
@@ -2932,12 +2934,12 @@ struct Opcode<State, 0xEA>
 // ORA (dp,X)
 // Direct Page Indexed Indirect, X (2-Byte)
 template<>
-struct Opcode<State, 0x01>
+struct Opcode<CPU::State, 0x01>
 {
-    using Instruction = AddressMode::DirectPageIndexedIndirectX<Operator::ORA>;
+    using Instruction = CPU::AddressMode::DirectPageIndexedIndirectX<CPU::Operator::ORA>;
 
     // 2   7-m+w       (dir,X)   m.....m. . ORA ($10,X)
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "01: ORA (dp,X)");
 
@@ -2952,12 +2954,12 @@ struct Opcode<State, 0x01>
 // ORA sr,S
 // Stack Relative (2-Byte)
 template<>
-struct Opcode<State, 0x03>
+struct Opcode<CPU::State, 0x03>
 {
-    using Instruction = AddressMode::StackRelative<Operator::ORA>;
+    using Instruction = CPU::AddressMode::StackRelative<CPU::Operator::ORA>;
 
     // 2   5-m         stk,S     m.....m. . ORA $32,S
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "03: ORA sr,S");
 
@@ -2971,12 +2973,12 @@ struct Opcode<State, 0x03>
 // ORA dp
 // Direct Page (2-Byte)
 template<>
-struct Opcode<State, 0x05>
+struct Opcode<CPU::State, 0x05>
 {
-    using Instruction = AddressMode::DirectPage<Operator::ORA>;
+    using Instruction = CPU::AddressMode::DirectPage<CPU::Operator::ORA>;
 
     // 2   4-m+w       dir       m.....m. . ORA $10
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "05: ORA dp");
 
@@ -2990,12 +2992,12 @@ struct Opcode<State, 0x05>
 // ORA [dp]
 // Direct Page Indirect Long (2-Byte)
 template<>
-struct Opcode<State, 0x07>
+struct Opcode<CPU::State, 0x07>
 {
-    using Instruction = AddressMode::DirectPageIndirectLong<Operator::ORA>;
+    using Instruction = CPU::AddressMode::DirectPageIndirectLong<CPU::Operator::ORA>;
 
     // 2   7-m+w       [dir]     m.....m. . ORA [$10]
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "07: ORA [dp]");
 
@@ -3009,18 +3011,18 @@ struct Opcode<State, 0x07>
 // ORA #const
 // Immediate (2-Byte [17])
 template<>
-struct Opcode<State, 0x09>
+struct Opcode<CPU::State, 0x09>
 {
-    using Instruction = AddressMode::Immediate<Operator::ORA>;
-    using Instruction16Bit = AddressMode::Immediate16Bit<Operator::ORA>;
+    using Instruction = CPU::AddressMode::Immediate<CPU::Operator::ORA>;
+    using Instruction16Bit = CPU::AddressMode::Immediate16Bit<CPU::Operator::ORA>;
 
     // 3-m 3-m         imm       m.....m. . ORA #$54
     // ¤17: Add 1 byte if m=0 (16-bit memory/accumulator)
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "09: ORA #const");
 
-        if (state.is16Bit(State::Flag::m))
+        if (state.is16Bit(CPU::State::Flag::m))
         {
                 return 2 + Instruction16Bit::Type::applyOperand<Instruction16Bit>(state);
         }
@@ -3037,12 +3039,12 @@ struct Opcode<State, 0x09>
 // ORA addr
 // Absolute (3-Byte)
 template<>
-struct Opcode<State, 0x0D>
+struct Opcode<CPU::State, 0x0D>
 {
-    using Instruction = AddressMode::Absolute<Operator::ORA>;
+    using Instruction = CPU::AddressMode::Absolute<CPU::Operator::ORA>;
 
     // 3   5-m         abs       m.....m. . ORA $9876
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "0D: ORA addr");
 
@@ -3056,12 +3058,12 @@ struct Opcode<State, 0x0D>
 // ORA long
 // Absolute Long (4-Byte)
 template<>
-struct Opcode<State, 0x0F>
+struct Opcode<CPU::State, 0x0F>
 {
-    using Instruction = AddressMode::AbsoluteLong<Operator::ORA>;
+    using Instruction = CPU::AddressMode::AbsoluteLong<CPU::Operator::ORA>;
 
     // 4   6-m         long      m.....m. . ORA $FEDBCA
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "0F: ORA long");
 
@@ -3075,12 +3077,12 @@ struct Opcode<State, 0x0F>
 // ORA (dp),Y
 // Direct Page Indirect Indexed, Y (2-Byte)
 template<>
-struct Opcode<State, 0x11>
+struct Opcode<CPU::State, 0x11>
 {
-    using Instruction = AddressMode::DirectPageIndirectIndexedY<Operator::ORA>;
+    using Instruction = CPU::AddressMode::DirectPageIndirectIndexedY<CPU::Operator::ORA, true>;
 
     // 2   7-m+w-x+x*p (dir),Y   m.....m. . ORA ($10),Y
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "11: ORA (dp),Y");
 
@@ -3095,12 +3097,12 @@ struct Opcode<State, 0x11>
 // ORA (dp)
 // Direct Page Indirect (2-Byte)
 template<>
-struct Opcode<State, 0x12>
+struct Opcode<CPU::State, 0x12>
 {
-    using Instruction = AddressMode::DirectPageIndirect<Operator::ORA>;
+    using Instruction = CPU::AddressMode::DirectPageIndirect<CPU::Operator::ORA>;
 
     // 2   6-m+w       (dir)     m.....m. . ORA ($10)
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "12: ORA (dp)");
 
@@ -3115,12 +3117,12 @@ struct Opcode<State, 0x12>
 // ORA (sr,S),Y
 // Stack Relative Indirect Indexed, Y (2-Byte)
 template<>
-struct Opcode<State, 0x13>
+struct Opcode<CPU::State, 0x13>
 {
-    using Instruction = AddressMode::StackRelativeIndirectIndexedY<Operator::ORA>;
+    using Instruction = CPU::AddressMode::StackRelativeIndirectIndexedY<CPU::Operator::ORA>;
 
     // 2   8-m         (stk,S),Y m.....m. . ORA ($32,S),Y
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "13: ORA (sr,S),Y");
 
@@ -3135,12 +3137,12 @@ struct Opcode<State, 0x13>
 // ORA dp,X
 // Direct Page Indexed, X (2-Byte)
 template<>
-struct Opcode<State, 0x15>
+struct Opcode<CPU::State, 0x15>
 {
-    using Instruction = AddressMode::DirectPageIndexed<Operator::ORA, State::IndexRegister::X>;
+    using Instruction = CPU::AddressMode::DirectPageIndexed<CPU::Operator::ORA, CPU::State::IndexRegister::X>;
 
     // 2   5-m+w       dir,X     m.....m. . ORA $10,X
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "15: ORA dp,X");
 
@@ -3154,12 +3156,12 @@ struct Opcode<State, 0x15>
 // ORA [dp],Y
 // Direct Page Indirect Long Indexed, Y (2-Byte)
 template<>
-struct Opcode<State, 0x17>
+struct Opcode<CPU::State, 0x17>
 {
-    using Instruction = AddressMode::DirectPageIndirectLongIndexedY<Operator::ORA>;
+    using Instruction = CPU::AddressMode::DirectPageIndirectLongIndexedY<CPU::Operator::ORA>;
 
     // 2   7-m+w       [dir],Y   m.....m. . ORA [$10],Y
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "17: ORA [dp],Y");
 
@@ -3174,12 +3176,12 @@ struct Opcode<State, 0x17>
 // ORA addr,Y
 // Absolute Indexed, Y (3-Byte)
 template<>
-struct Opcode<State, 0x19>
+struct Opcode<CPU::State, 0x19>
 {
-    using Instruction = AddressMode::AbsoluteIndexed<Operator::ORA, State::IndexRegister::Y, true>;
+    using Instruction = CPU::AddressMode::AbsoluteIndexed<CPU::Operator::ORA, CPU::State::IndexRegister::Y, true>;
 
     // 3   6-m-x+x*p   abs,Y     m.....m. . ORA $9876,Y
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "19: ORA addr,Y");
 
@@ -3193,12 +3195,12 @@ struct Opcode<State, 0x19>
 // ORA addr,X
 // Absolute Indexed, X (3-Byte)
 template<>
-struct Opcode<State, 0x1D>
+struct Opcode<CPU::State, 0x1D>
 {
-    using Instruction = AddressMode::AbsoluteIndexed<Operator::ORA, State::IndexRegister::X, true>;
+    using Instruction = CPU::AddressMode::AbsoluteIndexed<CPU::Operator::ORA, CPU::State::IndexRegister::X, true>;
 
     // 3   6-m-x+x*p   abs,X     m.....m. . ORA $9876,X
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "1D: ORA addr,X");
 
@@ -3212,12 +3214,12 @@ struct Opcode<State, 0x1D>
 // ORA long,X
 // Absolute Long Indexed, X (4-Byte)
 template<>
-struct Opcode<State, 0x1F>
+struct Opcode<CPU::State, 0x1F>
 {
-    using Instruction = AddressMode::AbsoluteLongIndexedX<Operator::ORA>;
+    using Instruction = CPU::AddressMode::AbsoluteLongIndexedX<CPU::Operator::ORA>;
 
     // 4   6-m         long,X    m.....m. . ORA $FEDCBA,X
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "1F: ORA long,X");
 
@@ -3231,12 +3233,12 @@ struct Opcode<State, 0x1F>
 // PEA addr
 // Absolute (3-Byte)
 template<>
-struct Opcode<State, 0xF4>
+struct Opcode<CPU::State, 0xF4>
 {
-    using Instruction = AddressMode::Absolute_ControlFlow<Operator::PE_<'A'>>;
+    using Instruction = CPU::AddressMode::Absolute_ControlFlow<CPU::Operator::PE_<'A'>>;
 
     // 3   5           imm       ........ . PEA #$1234
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "F4: PEA addr");
 
@@ -3250,12 +3252,12 @@ struct Opcode<State, 0xF4>
 // PEI (dp)
 // Direct Page Indirect (2-Byte)
 template<>
-struct Opcode<State, 0xD4>
+struct Opcode<CPU::State, 0xD4>
 {
-    using Instruction = AddressMode::DirectPageIndirect_ControlFlow<Operator::PE_<'I'>>;
+    using Instruction = CPU::AddressMode::DirectPageIndirect_ControlFlow<CPU::Operator::PE_<'I'>>;
 
     // 2   6+w         dir       ........ . PEI $12
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "D4: PEI (dp)");
 
@@ -3269,12 +3271,12 @@ struct Opcode<State, 0xD4>
 // PER label
 // Program Counter Relative Long (3-Byte)
 template<>
-struct Opcode<State, 0x62>
+struct Opcode<CPU::State, 0x62>
 {
-    using Instruction = AddressMode::ProgramCounterRelativeLong<Operator::PER>;
+    using Instruction = CPU::AddressMode::ProgramCounterRelativeLong<CPU::Operator::PER>;
 
     // 3   6           imm       ........ . PER LABEL
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "62: PER label");
 
@@ -3288,12 +3290,12 @@ struct Opcode<State, 0x62>
 // PHA
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0x48>
+struct Opcode<CPU::State, 0x48>
 {
-    using Instruction = AddressMode::Implied<Operator::PHA>;
+    using Instruction = CPU::AddressMode::Implied<CPU::Operator::PHA>;
 
     // 1   4-m         imp       ........ . PHA
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "48: PHA");
 
@@ -3307,12 +3309,12 @@ struct Opcode<State, 0x48>
 // PHB
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0x8B>
+struct Opcode<CPU::State, 0x8B>
 {
-    using Instruction = AddressMode::Implied<Operator::PHB>;
+    using Instruction = CPU::AddressMode::Implied<CPU::Operator::PHB>;
 
     // 1   3           imp       ........ . PHB
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "8B: PHB");
 
@@ -3326,12 +3328,12 @@ struct Opcode<State, 0x8B>
 // PHD
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0x0B>
+struct Opcode<CPU::State, 0x0B>
 {
-    using Instruction = AddressMode::Implied<Operator::PHD>;
+    using Instruction = CPU::AddressMode::Implied<CPU::Operator::PHD>;
 
     // 1   4           imp       ........ . PHD
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "0B: PHD");
 
@@ -3345,12 +3347,12 @@ struct Opcode<State, 0x0B>
 // PHK
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0x4B>
+struct Opcode<CPU::State, 0x4B>
 {
-    using Instruction = AddressMode::Implied<Operator::PHK>;
+    using Instruction = CPU::AddressMode::Implied<CPU::Operator::PHK>;
 
     // 1   3           imp       ........ . PHK
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "4B: PHK");
 
@@ -3364,12 +3366,12 @@ struct Opcode<State, 0x4B>
 // PHP
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0x08>
+struct Opcode<CPU::State, 0x08>
 {
-    using Instruction = AddressMode::Implied<Operator::PHP>;
+    using Instruction = CPU::AddressMode::Implied<CPU::Operator::PHP>;
 
     // 1   3           imp       ........ . PHP
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "08: PHP");
 
@@ -3383,12 +3385,12 @@ struct Opcode<State, 0x08>
 // PHX
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0xDA>
+struct Opcode<CPU::State, 0xDA>
 {
-    using Instruction = AddressMode::Implied<Operator::PH_<State::IndexRegister::X>>;
+    using Instruction = CPU::AddressMode::Implied<CPU::Operator::PH_<CPU::State::IndexRegister::X>>;
 
     // 1   4-x         imp       ........ . PHX
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "DA: PHX");
 
@@ -3402,12 +3404,12 @@ struct Opcode<State, 0xDA>
 // PHY
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0x5A>
+struct Opcode<CPU::State, 0x5A>
 {
-    using Instruction = AddressMode::Implied<Operator::PH_<State::IndexRegister::Y>>;
+    using Instruction = CPU::AddressMode::Implied<CPU::Operator::PH_<CPU::State::IndexRegister::Y>>;
 
     // 1   4-x         imp       ........ . PHY
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "5A: PHY");
 
@@ -3421,12 +3423,12 @@ struct Opcode<State, 0x5A>
 // PLA
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0x68>
+struct Opcode<CPU::State, 0x68>
 {
-    using Instruction = AddressMode::Implied<Operator::PLA>;
+    using Instruction = CPU::AddressMode::Implied<CPU::Operator::PLA>;
 
     // 1   5-m         imp       m.....m. . PLA
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "68: PLA");
 
@@ -3440,12 +3442,12 @@ struct Opcode<State, 0x68>
 // PLB
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0xAB>
+struct Opcode<CPU::State, 0xAB>
 {
-    using Instruction = AddressMode::Implied<Operator::PLB>;
+    using Instruction = CPU::AddressMode::Implied<CPU::Operator::PLB>;
 
     // 1   4           imp       *.....*. . PLB
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "AB: PLB");
 
@@ -3459,12 +3461,12 @@ struct Opcode<State, 0xAB>
 // PLD
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0x2B>
+struct Opcode<CPU::State, 0x2B>
 {
-    using Instruction = AddressMode::Implied<Operator::PLD>;
+    using Instruction = CPU::AddressMode::Implied<CPU::Operator::PLD>;
 
     // 1   5           imp       *.....*. . PLD
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "2B: PLD");
 
@@ -3478,12 +3480,12 @@ struct Opcode<State, 0x2B>
 // PLP
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0x28>
+struct Opcode<CPU::State, 0x28>
 {
-    using Instruction = AddressMode::Implied<Operator::PLP>;
+    using Instruction = CPU::AddressMode::Implied<CPU::Operator::PLP>;
 
     // 1   4           imp       ******** . PLP
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "28: PLP");
 
@@ -3497,12 +3499,12 @@ struct Opcode<State, 0x28>
 // PLX
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0xFA>
+struct Opcode<CPU::State, 0xFA>
 {
-    using Instruction = AddressMode::Implied<Operator::PL_<State::IndexRegister::X>>;
+    using Instruction = CPU::AddressMode::Implied<CPU::Operator::PL_<CPU::State::IndexRegister::X>>;
 
     // 1   5-x         imp       x.....x. . PLX
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "FA: PLX");
 
@@ -3516,12 +3518,12 @@ struct Opcode<State, 0xFA>
 // PLY
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0x7A>
+struct Opcode<CPU::State, 0x7A>
 {
-    using Instruction = AddressMode::Implied<Operator::PL_<State::IndexRegister::Y>>;
+    using Instruction = CPU::AddressMode::Implied<CPU::Operator::PL_<CPU::State::IndexRegister::Y>>;
 
     // 1   5-x         imp       x.....x. . PLY
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "7A: PLY");
 
@@ -3535,12 +3537,12 @@ struct Opcode<State, 0x7A>
 // REP #const
 // Immediate (2-Byte)
 template<>
-struct Opcode<State, 0xC2>
+struct Opcode<CPU::State, 0xC2>
 {
-    using Instruction = AddressMode::Immediate<Operator::REP>;
+    using Instruction = CPU::AddressMode::Immediate<CPU::Operator::REP>;
 
     // 2   3           imm       ******** . REP #$12
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "C2: REP #const");
 
@@ -3554,12 +3556,12 @@ struct Opcode<State, 0xC2>
 // ROL dp
 // Direct Page (2-Byte)
 template<>
-struct Opcode<State, 0x26>
+struct Opcode<CPU::State, 0x26>
 {
-    using Instruction = AddressMode::DirectPage<Operator::ROL>;
+    using Instruction = CPU::AddressMode::DirectPage<CPU::Operator::ROL>;
 
     // 2   7-2*m+w     dir       m.....mm . ROL $10
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "26: ROL dp");
 
@@ -3573,12 +3575,12 @@ struct Opcode<State, 0x26>
 // ROL A
 // Accumulator (1-Byte)
 template<>
-struct Opcode<State, 0x2A>
+struct Opcode<CPU::State, 0x2A>
 {
-    using Instruction = AddressMode::Accumulator<Operator::ROL>;
+    using Instruction = CPU::AddressMode::Accumulator<CPU::Operator::ROL>;
 
     // 1   2           acc       m.....mm . ROL
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "2A: ROL A");
 
@@ -3592,12 +3594,12 @@ struct Opcode<State, 0x2A>
 // ROL addr
 // Absolute (3-Byte)
 template<>
-struct Opcode<State, 0x2E>
+struct Opcode<CPU::State, 0x2E>
 {
-    using Instruction = AddressMode::Absolute<Operator::ROL>;
+    using Instruction = CPU::AddressMode::Absolute<CPU::Operator::ROL>;
 
     // 3   8-2*m       abs       m.....mm . ROL $9876
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "2E: ROL addr");
 
@@ -3611,12 +3613,12 @@ struct Opcode<State, 0x2E>
 // ROL dp,X
 // Direct Page Indexed, X (2-Byte)
 template<>
-struct Opcode<State, 0x36>
+struct Opcode<CPU::State, 0x36>
 {
-    using Instruction = AddressMode::DirectPageIndexed<Operator::ROL, State::IndexRegister::X>;
+    using Instruction = CPU::AddressMode::DirectPageIndexed<CPU::Operator::ROL, CPU::State::IndexRegister::X>;
 
     // 2   8-2*m+w     dir,X     m.....mm . ROL $10,X
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "36: ROL dp,X");
 
@@ -3631,12 +3633,12 @@ struct Opcode<State, 0x36>
 // ROL addr,X
 // Absolute Indexed, X (3-Byte)
 template<>
-struct Opcode<State, 0x3E>
+struct Opcode<CPU::State, 0x3E>
 {
-    using Instruction = AddressMode::AbsoluteIndexed<Operator::ROL, State::IndexRegister::X, false>;
+    using Instruction = CPU::AddressMode::AbsoluteIndexed<CPU::Operator::ROL, CPU::State::IndexRegister::X, false>;
 
     // 3   9-2*m       abs,X     m.....mm . ROL $9876,X
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "3E: ROL addr,X");
 
@@ -3650,12 +3652,12 @@ struct Opcode<State, 0x3E>
 // ROR dp
 // Direct Page (2-Byte)
 template<>
-struct Opcode<State, 0x66>
+struct Opcode<CPU::State, 0x66>
 {
-    using Instruction = AddressMode::DirectPage<Operator::ROR>;
+    using Instruction = CPU::AddressMode::DirectPage<CPU::Operator::ROR>;
 
     // 2   7-2*m+w     dir       m.....m* . ROR $10
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "66: ROR dp");
 
@@ -3669,12 +3671,12 @@ struct Opcode<State, 0x66>
 // ROR A
 // Accumulator (1-Byte)
 template<>
-struct Opcode<State, 0x6A>
+struct Opcode<CPU::State, 0x6A>
 {
-    using Instruction = AddressMode::Accumulator<Operator::ROR>;
+    using Instruction = CPU::AddressMode::Accumulator<CPU::Operator::ROR>;
 
     // 1   2           acc       m.....m* . ROR
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "6A: ROR A");
 
@@ -3688,12 +3690,12 @@ struct Opcode<State, 0x6A>
 // ROR addr
 // Absolute (3-Byte)
 template<>
-struct Opcode<State, 0x6E>
+struct Opcode<CPU::State, 0x6E>
 {
-    using Instruction = AddressMode::Absolute<Operator::ROR>;
+    using Instruction = CPU::AddressMode::Absolute<CPU::Operator::ROR>;
 
     // 3   8-2*m       abs       m.....m* . ROR $9876
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "6E: ROR addr");
 
@@ -3707,12 +3709,12 @@ struct Opcode<State, 0x6E>
 // ROR dp,X
 // Direct Page Indexed, X (2-Byte)
 template<>
-struct Opcode<State, 0x76>
+struct Opcode<CPU::State, 0x76>
 {
-    using Instruction = AddressMode::DirectPageIndexed<Operator::ROR, State::IndexRegister::X>;
+    using Instruction = CPU::AddressMode::DirectPageIndexed<CPU::Operator::ROR, CPU::State::IndexRegister::X>;
 
     // 2   8-2*m+w     dir,X     m.....m* . ROR $10,X
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "76: ROR dp,X");
 
@@ -3726,12 +3728,12 @@ struct Opcode<State, 0x76>
 // ROR addr,X
 // Absolute Indexed, X (3-Byte)
 template<>
-struct Opcode<State, 0x7E>
+struct Opcode<CPU::State, 0x7E>
 {
-    using Instruction = AddressMode::AbsoluteIndexed<Operator::ROR, State::IndexRegister::X, false>;
+    using Instruction = CPU::AddressMode::AbsoluteIndexed<CPU::Operator::ROR, CPU::State::IndexRegister::X, false>;
 
     // 3   9-2*m       abs,X     m.....m* . ROR $9876,X
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "7E: ROR addr,X");
 
@@ -3745,12 +3747,12 @@ struct Opcode<State, 0x7E>
 // RTI
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0x40>
+struct Opcode<CPU::State, 0x40>
 {
-    using Instruction = AddressMode::Implied<Operator::RTI>;
+    using Instruction = CPU::AddressMode::Implied<CPU::Operator::RTI>;
 
     // 1   7-e         imp       ******** . RTI
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "40: RTI");
 
@@ -3764,12 +3766,12 @@ struct Opcode<State, 0x40>
 // RTL
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0x6B>
+struct Opcode<CPU::State, 0x6B>
 {
-    using Instruction = AddressMode::Implied<Operator::RTL>;
+    using Instruction = CPU::AddressMode::Implied<CPU::Operator::RTL>;
 
     // 1   6           imp       ........ . RTL
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "6B: RTL");
 
@@ -3783,12 +3785,12 @@ struct Opcode<State, 0x6B>
 // RTS
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0x60>
+struct Opcode<CPU::State, 0x60>
 {
-    using Instruction = AddressMode::Implied<Operator::RTS>;
+    using Instruction = CPU::AddressMode::Implied<CPU::Operator::RTS>;
 
     // 1   6           imp       ........ . RTS
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "60: RTS");
 
@@ -3802,12 +3804,12 @@ struct Opcode<State, 0x60>
 // SBC (dp,X)
 // Direct Page Indexed Indirect, X (2-Byte)
 template<>
-struct Opcode<State, 0xE1>
+struct Opcode<CPU::State, 0xE1>
 {
-    using Instruction = AddressMode::DirectPageIndexedIndirectX<Operator::SBC>;
+    using Instruction = CPU::AddressMode::DirectPageIndexedIndirectX<CPU::Operator::SBC>;
 
     // 2   7-m+w       (dir,X)   mm....mm . SBC ($10,X)
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "E1: SBC (dp,X)");
 
@@ -3822,12 +3824,12 @@ struct Opcode<State, 0xE1>
 // SBC sr,S
 // Stack Relative (2-Byte)
 template<>
-struct Opcode<State, 0xE3>
+struct Opcode<CPU::State, 0xE3>
 {
-    using Instruction = AddressMode::StackRelative<Operator::SBC>;
+    using Instruction = CPU::AddressMode::StackRelative<CPU::Operator::SBC>;
 
     // 2   5-m         stk,S     mm....mm . SBC $32,S
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "E3: SBC sr,S");
 
@@ -3841,12 +3843,12 @@ struct Opcode<State, 0xE3>
 // SBC dp
 // Direct Page (2-Byte)
 template<>
-struct Opcode<State, 0xE5>
+struct Opcode<CPU::State, 0xE5>
 {
-    using Instruction = AddressMode::DirectPage<Operator::SBC>;
+    using Instruction = CPU::AddressMode::DirectPage<CPU::Operator::SBC>;
 
     // 2   4-m+w       dir       mm....mm . SBC $10
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "E5: SBC dp");
 
@@ -3860,12 +3862,12 @@ struct Opcode<State, 0xE5>
 // SBC [dp]
 // Direct Page Indirect Long (2-Byte)
 template<>
-struct Opcode<State, 0xE7>
+struct Opcode<CPU::State, 0xE7>
 {
-    using Instruction = AddressMode::DirectPageIndirectLong<Operator::SBC>;
+    using Instruction = CPU::AddressMode::DirectPageIndirectLong<CPU::Operator::SBC>;
 
     // 2   7-m+w       [dir]     mm....mm . SBC [$10]
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "E7: SBC [dp]");
 
@@ -3880,18 +3882,18 @@ struct Opcode<State, 0xE7>
 // SBC #const
 // Immediate (2-Byte [17])
 template<>
-struct Opcode<State, 0xE9>
+struct Opcode<CPU::State, 0xE9>
 {
-    using Instruction = AddressMode::Immediate<Operator::SBC>;
-    using Instruction16Bit = AddressMode::Immediate16Bit<Operator::SBC>;
+    using Instruction = CPU::AddressMode::Immediate<CPU::Operator::SBC>;
+    using Instruction16Bit = CPU::AddressMode::Immediate16Bit<CPU::Operator::SBC>;
 
     // 3-m 3-m         imm       mm....mm . SBC #$54
     // ¤17: Add 1 byte if m=0 (16-bit memory/accumulator)
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "E9: SBC #const");
 
-        if (state.is16Bit(State::Flag::m))
+        if (state.is16Bit(CPU::State::Flag::m))
         {
                 return 2 + Instruction16Bit::Type::applyOperand<Instruction16Bit>(state);
         }
@@ -3908,12 +3910,12 @@ struct Opcode<State, 0xE9>
 // SBC addr
 // Absolute (3-Byte)
 template<>
-struct Opcode<State, 0xED>
+struct Opcode<CPU::State, 0xED>
 {
-    using Instruction = AddressMode::Absolute<Operator::SBC>;
+    using Instruction = CPU::AddressMode::Absolute<CPU::Operator::SBC>;
 
     // 3   5-m         abs       mm....mm . SBC $9876
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "ED: SBC addr");
 
@@ -3927,12 +3929,12 @@ struct Opcode<State, 0xED>
 // SBC long
 // Absolute Long (4-Byte)
 template<>
-struct Opcode<State, 0xEF>
+struct Opcode<CPU::State, 0xEF>
 {
-    using Instruction = AddressMode::AbsoluteLong<Operator::SBC>;
+    using Instruction = CPU::AddressMode::AbsoluteLong<CPU::Operator::SBC>;
 
     // 4   6-m         long      mm....mm . SBC $FEDBCA
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "EF: SBC long");
 
@@ -3946,12 +3948,12 @@ struct Opcode<State, 0xEF>
 // SBC (dp),Y
 // Direct Page Indirect Indexed, Y (2-Byte)
 template<>
-struct Opcode<State, 0xF1>
+struct Opcode<CPU::State, 0xF1>
 {
-    using Instruction = AddressMode::DirectPageIndirectIndexedY<Operator::SBC>;
+    using Instruction = CPU::AddressMode::DirectPageIndirectIndexedY<CPU::Operator::SBC, true>;
 
     // 2   7-m+w-x+x*p (dir),Y   mm....mm . SBC ($10),Y
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "F1: SBC (dp),Y");
 
@@ -3966,12 +3968,12 @@ struct Opcode<State, 0xF1>
 // SBC (dp)
 // Direct Page Indirect (2-Byte)
 template<>
-struct Opcode<State, 0xF2>
+struct Opcode<CPU::State, 0xF2>
 {
-    using Instruction = AddressMode::DirectPageIndirect<Operator::SBC>;
+    using Instruction = CPU::AddressMode::DirectPageIndirect<CPU::Operator::SBC>;
 
     // 2   6-m+w       (dir)     mm....mm . SBC ($10)
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "F2: SBC (dp)");
 
@@ -3986,12 +3988,12 @@ struct Opcode<State, 0xF2>
 // SBC (sr,S),Y
 // Stack Relative Indirect Indexed, Y (2-Byte)
 template<>
-struct Opcode<State, 0xF3>
+struct Opcode<CPU::State, 0xF3>
 {
-    using Instruction = AddressMode::StackRelativeIndirectIndexedY<Operator::SBC>;
+    using Instruction = CPU::AddressMode::StackRelativeIndirectIndexedY<CPU::Operator::SBC>;
 
     // 2   8-m         (stk,S),Y mm....mm . SBC ($32,S),Y
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "F3: SBC (sr,S),Y");
 
@@ -4006,12 +4008,12 @@ struct Opcode<State, 0xF3>
 // SBC dp,X
 // Direct Page Indexed, X (2-Byte)
 template<>
-struct Opcode<State, 0xF5>
+struct Opcode<CPU::State, 0xF5>
 {
-    using Instruction = AddressMode::DirectPageIndexed<Operator::SBC, State::IndexRegister::X>;
+    using Instruction = CPU::AddressMode::DirectPageIndexed<CPU::Operator::SBC, CPU::State::IndexRegister::X>;
 
     // 2   5-m+w       dir,X     mm....mm . SBC $10,X
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "F5: SBC dp,X");
 
@@ -4025,12 +4027,12 @@ struct Opcode<State, 0xF5>
 // SBC [dp],Y
 // Direct Page Indirect Long Indexed, Y (2-Byte)
 template<>
-struct Opcode<State, 0xF7>
+struct Opcode<CPU::State, 0xF7>
 {
-    using Instruction = AddressMode::DirectPageIndirectLongIndexedY<Operator::SBC>;
+    using Instruction = CPU::AddressMode::DirectPageIndirectLongIndexedY<CPU::Operator::SBC>;
 
     // 2   7-m+w       [dir],Y   mm....mm . SBC [$10],Y
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "F7: SBC [dp],Y");
 
@@ -4045,12 +4047,12 @@ struct Opcode<State, 0xF7>
 // SBC addr,Y
 // Absolute Indexed, Y (3-Byte)
 template<>
-struct Opcode<State, 0xF9>
+struct Opcode<CPU::State, 0xF9>
 {
-    using Instruction = AddressMode::AbsoluteIndexed<Operator::SBC, State::IndexRegister::Y, true>;
+    using Instruction = CPU::AddressMode::AbsoluteIndexed<CPU::Operator::SBC, CPU::State::IndexRegister::Y, true>;
 
     // 3   6-m-x+x*p   abs,Y     mm....mm . SBC $9876,Y
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "F9: SBC addr,Y");
 
@@ -4064,12 +4066,12 @@ struct Opcode<State, 0xF9>
 // SBC addr,X
 // Absolute Indexed, X (3-Byte)
 template<>
-struct Opcode<State, 0xFD>
+struct Opcode<CPU::State, 0xFD>
 {
-    using Instruction = AddressMode::AbsoluteIndexed<Operator::SBC, State::IndexRegister::X, true>;
+    using Instruction = CPU::AddressMode::AbsoluteIndexed<CPU::Operator::SBC, CPU::State::IndexRegister::X, true>;
 
     // 3   6-m-x+x*p   abs,X     mm....mm . SBC $9876,X
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "FD: SBC addr,X");
 
@@ -4083,12 +4085,12 @@ struct Opcode<State, 0xFD>
 // SBC long,X
 // Absolute Long Indexed, X (4-Byte)
 template<>
-struct Opcode<State, 0xFF>
+struct Opcode<CPU::State, 0xFF>
 {
-    using Instruction = AddressMode::AbsoluteLongIndexedX<Operator::SBC>;
+    using Instruction = CPU::AddressMode::AbsoluteLongIndexedX<CPU::Operator::SBC>;
 
     // 4   6-m         long,X    mm....mm . SBC $FEDCBA,X
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "FF: SBC long,X");
 
@@ -4102,12 +4104,12 @@ struct Opcode<State, 0xFF>
 // SEC
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0x38>
+struct Opcode<CPU::State, 0x38>
 {
-    using Instruction = AddressMode::Implied<Operator::SE_<State::Flag::c, true>>;
+    using Instruction = CPU::AddressMode::Implied<CPU::Operator::SE_<CPU::State::Flag::c, true>>;
 
     // 1   2           imp       .......1 . SEC
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "38: SEC");
 
@@ -4121,12 +4123,12 @@ struct Opcode<State, 0x38>
 // SED
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0xF8>
+struct Opcode<CPU::State, 0xF8>
 {
-    using Instruction = AddressMode::Implied<Operator::SE_<State::Flag::d, true>>;
+    using Instruction = CPU::AddressMode::Implied<CPU::Operator::SE_<CPU::State::Flag::d, true>>;
 
     // 1   2           imp       ....1... . SED
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "F8: SED");
 
@@ -4140,12 +4142,12 @@ struct Opcode<State, 0xF8>
 // SEI
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0x78>
+struct Opcode<CPU::State, 0x78>
 {
-    using Instruction = AddressMode::Implied<Operator::SE_<State::Flag::i, true>>;
+    using Instruction = CPU::AddressMode::Implied<CPU::Operator::SE_<CPU::State::Flag::i, true>>;
 
     // 1   2           imp       .....1.. . SEI
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "78: SEI");
 
@@ -4159,12 +4161,12 @@ struct Opcode<State, 0x78>
 // SEP #const
 // Immediate (2-Byte)
 template<>
-struct Opcode<State, 0xE2>
+struct Opcode<CPU::State, 0xE2>
 {
-    using Instruction = AddressMode::Immediate<Operator::SEP>;
+    using Instruction = CPU::AddressMode::Immediate<CPU::Operator::SEP>;
 
     // 2   3           imm       ******** . SEP #$12
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "E2: SEP #const");
 
@@ -4178,12 +4180,12 @@ struct Opcode<State, 0xE2>
 // STA (dp,X)
 // Direct Page Indexed Indirect, X (2-Byte)
 template<>
-struct Opcode<State, 0x81>
+struct Opcode<CPU::State, 0x81>
 {
-    using Instruction = AddressMode::DirectPageIndexedIndirectX<Operator::STA>;
+    using Instruction = CPU::AddressMode::DirectPageIndexedIndirectX<CPU::Operator::STA>;
 
     // 2   7-m+w       (dir,X)   ........ . STA ($10,X)
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "81: STA (dp,X)");
 
@@ -4198,12 +4200,12 @@ struct Opcode<State, 0x81>
 // STA sr,S
 // Stack Relative (2-Byte)
 template<>
-struct Opcode<State, 0x83>
+struct Opcode<CPU::State, 0x83>
 {
-    using Instruction = AddressMode::StackRelative<Operator::STA>;
+    using Instruction = CPU::AddressMode::StackRelative<CPU::Operator::STA>;
 
     // 2   5-m         stk,S     ........ . STA $32,S
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "83: STA sr,S");
 
@@ -4217,12 +4219,12 @@ struct Opcode<State, 0x83>
 // STA dp
 // Direct Page (2-Byte)
 template<>
-struct Opcode<State, 0x85>
+struct Opcode<CPU::State, 0x85>
 {
-    using Instruction = AddressMode::DirectPage<Operator::STA>;
+    using Instruction = CPU::AddressMode::DirectPage<CPU::Operator::STA>;
 
     // 2   4-m+w       dir       ........ . STA $10
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "85: STA dp");
 
@@ -4236,12 +4238,12 @@ struct Opcode<State, 0x85>
 // STA [dp]
 // Direct Page Indirect Long (2-Byte)
 template<>
-struct Opcode<State, 0x87>
+struct Opcode<CPU::State, 0x87>
 {
-    using Instruction = AddressMode::DirectPageIndirectLong<Operator::STA>;
+    using Instruction = CPU::AddressMode::DirectPageIndirectLong<CPU::Operator::STA>;
 
     // 2   7-m+w       [dir]     ........ . STA [$10]
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "87: STA [dp]");
 
@@ -4255,12 +4257,12 @@ struct Opcode<State, 0x87>
 // STA addr
 // Absolute (3-Byte)
 template<>
-struct Opcode<State, 0x8D>
+struct Opcode<CPU::State, 0x8D>
 {
-    using Instruction = AddressMode::Absolute<Operator::STA>;
+    using Instruction = CPU::AddressMode::Absolute<CPU::Operator::STA>;
 
     // 3   5-m         abs       ........ . STA $9876
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "8D: STA addr");
 
@@ -4274,12 +4276,12 @@ struct Opcode<State, 0x8D>
 // STA long
 // Absolute Long (4-Byte)
 template<>
-struct Opcode<State, 0x8F>
+struct Opcode<CPU::State, 0x8F>
 {
-    using Instruction = AddressMode::AbsoluteLong<Operator::STA>;
+    using Instruction = CPU::AddressMode::AbsoluteLong<CPU::Operator::STA>;
 
     // 4   6-m         long      ........ . STA $FEDBCA
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "8F: STA long");
 
@@ -4293,17 +4295,15 @@ struct Opcode<State, 0x8F>
 // STA (dp),Y
 // Direct Page Indirect Indexed, Y (2-Byte)
 template<>
-struct Opcode<State, 0x91>
+struct Opcode<CPU::State, 0x91>
 {
-    using Instruction = AddressMode::DirectPageIndirectIndexedY<Operator::STA>;
+    using Instruction = CPU::AddressMode::DirectPageIndirectIndexedY<CPU::Operator::STA, false>;
 
     // 2   7-m+w       (dir),Y   ........ . STA ($10),Y
-    // §20: TODO manually add exception for 3
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "91: STA (dp),Y");
 
-        throw NotYetImplementedException("TODO20");
         return 6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -4314,12 +4314,12 @@ struct Opcode<State, 0x91>
 // STA (dp)
 // Direct Page Indirect (2-Byte)
 template<>
-struct Opcode<State, 0x92>
+struct Opcode<CPU::State, 0x92>
 {
-    using Instruction = AddressMode::DirectPageIndirect<Operator::STA>;
+    using Instruction = CPU::AddressMode::DirectPageIndirect<CPU::Operator::STA>;
 
     // 2   6-m+w       (dir)     ........ . STA ($10)
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "92: STA (dp)");
 
@@ -4333,12 +4333,12 @@ struct Opcode<State, 0x92>
 // STA (sr,S),Y
 // Stack Relative Indirect Indexed, Y (2-Byte)
 template<>
-struct Opcode<State, 0x93>
+struct Opcode<CPU::State, 0x93>
 {
-    using Instruction = AddressMode::StackRelativeIndirectIndexedY<Operator::STA>;
+    using Instruction = CPU::AddressMode::StackRelativeIndirectIndexedY<CPU::Operator::STA>;
 
     // 2   8-m         (stk,S),Y ........ . STA ($32,S),Y
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "93: STA (sr,S),Y");
 
@@ -4353,12 +4353,12 @@ struct Opcode<State, 0x93>
 // STA dp,X
 // Direct Page Indexed, X (2-Byte)
 template<>
-struct Opcode<State, 0x95>
+struct Opcode<CPU::State, 0x95>
 {
-    using Instruction = AddressMode::DirectPageIndexed<Operator::STA, State::IndexRegister::X>;
+    using Instruction = CPU::AddressMode::DirectPageIndexed<CPU::Operator::STA, CPU::State::IndexRegister::X>;
 
     // 2   5-m+w       dir,X     ........ . STA $10,X
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "95: STA dp,X");
 
@@ -4372,12 +4372,12 @@ struct Opcode<State, 0x95>
 // STA [dp],Y
 // Direct Page Indirect Long Indexed, Y (2-Byte)
 template<>
-struct Opcode<State, 0x97>
+struct Opcode<CPU::State, 0x97>
 {
-    using Instruction = AddressMode::DirectPageIndirectLongIndexedY<Operator::STA>;
+    using Instruction = CPU::AddressMode::DirectPageIndirectLongIndexedY<CPU::Operator::STA>;
 
     // 2   7-m+w       [dir],Y   ........ . STA [$10],Y
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "97: STA [dp],Y");
 
@@ -4391,12 +4391,12 @@ struct Opcode<State, 0x97>
 // STA addr,Y
 // Absolute Indexed, Y (3-Byte)
 template<>
-struct Opcode<State, 0x99>
+struct Opcode<CPU::State, 0x99>
 {
-    using Instruction = AddressMode::AbsoluteIndexed<Operator::STA, State::IndexRegister::Y, false>;
+    using Instruction = CPU::AddressMode::AbsoluteIndexed<CPU::Operator::STA, CPU::State::IndexRegister::Y, false>;
 
     // 3   6-m         abs,Y     ........ . STA $9876,Y
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "99: STA addr,Y");
 
@@ -4410,12 +4410,12 @@ struct Opcode<State, 0x99>
 // STA addr,X
 // Absolute Indexed, X (3-Byte)
 template<>
-struct Opcode<State, 0x9D>
+struct Opcode<CPU::State, 0x9D>
 {
-    using Instruction = AddressMode::AbsoluteIndexed<Operator::STA, State::IndexRegister::X, false>;
+    using Instruction = CPU::AddressMode::AbsoluteIndexed<CPU::Operator::STA, CPU::State::IndexRegister::X, false>;
 
     // 3   6-m         abs,X     ........ . STA $9876,X
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "9D: STA addr,X");
 
@@ -4429,12 +4429,12 @@ struct Opcode<State, 0x9D>
 // STA long,X
 // Absolute Long Indexed, X (4-Byte)
 template<>
-struct Opcode<State, 0x9F>
+struct Opcode<CPU::State, 0x9F>
 {
-    using Instruction = AddressMode::AbsoluteLongIndexedX<Operator::STA>;
+    using Instruction = CPU::AddressMode::AbsoluteLongIndexedX<CPU::Operator::STA>;
 
     // 4   6-m         long,X    ........ . STA $FEDCBA,X
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "9F: STA long,X");
 
@@ -4448,12 +4448,12 @@ struct Opcode<State, 0x9F>
 // STP
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0xDB>
+struct Opcode<CPU::State, 0xDB>
 {
-    using Instruction = AddressMode::Implied<Operator::STP>;
+    using Instruction = CPU::AddressMode::Implied<CPU::Operator::STP>;
 
     // 1   3           imp       ........ . STP
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "DB: STP");
 
@@ -4468,12 +4468,12 @@ struct Opcode<State, 0xDB>
 // STX dp
 // Direct Page (2-Byte)
 template<>
-struct Opcode<State, 0x86>
+struct Opcode<CPU::State, 0x86>
 {
-    using Instruction = AddressMode::DirectPage<Operator::ST_<State::IndexRegister::X>>;
+    using Instruction = CPU::AddressMode::DirectPage<CPU::Operator::ST_<CPU::State::IndexRegister::X>>;
 
     // 2   4-x+w       dir       ........ . STX $10
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "86: STX dp");
 
@@ -4487,12 +4487,12 @@ struct Opcode<State, 0x86>
 // STX addr
 // Absolute (3-Byte)
 template<>
-struct Opcode<State, 0x8E>
+struct Opcode<CPU::State, 0x8E>
 {
-    using Instruction = AddressMode::Absolute<Operator::ST_<State::IndexRegister::X>>;
+    using Instruction = CPU::AddressMode::Absolute<CPU::Operator::ST_<CPU::State::IndexRegister::X>>;
 
     // 3   5-x         abs       ........ . STX $9876
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "8E: STX addr");
 
@@ -4506,12 +4506,12 @@ struct Opcode<State, 0x8E>
 // STX dp,Y
 // Direct Page Indexed, Y (2-Byte)
 template<>
-struct Opcode<State, 0x96>
+struct Opcode<CPU::State, 0x96>
 {
-    using Instruction = AddressMode::DirectPageIndexed<Operator::ST_<State::IndexRegister::X>, State::IndexRegister::Y>;
+    using Instruction = CPU::AddressMode::DirectPageIndexed<CPU::Operator::ST_<CPU::State::IndexRegister::X>, CPU::State::IndexRegister::Y>;
 
     // 2   5-x+w       dir,Y     ........ . STX $10,Y
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "96: STX dp,Y");
 
@@ -4526,12 +4526,12 @@ struct Opcode<State, 0x96>
 // STY dp
 // Direct Page (2-Byte)
 template<>
-struct Opcode<State, 0x84>
+struct Opcode<CPU::State, 0x84>
 {
-    using Instruction = AddressMode::DirectPage<Operator::ST_<State::IndexRegister::Y>>;
+    using Instruction = CPU::AddressMode::DirectPage<CPU::Operator::ST_<CPU::State::IndexRegister::Y>>;
 
     // 2   4-x+w       dir       ........ . STY $10
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "84: STY dp");
 
@@ -4545,12 +4545,12 @@ struct Opcode<State, 0x84>
 // STY addr
 // Absolute (3-Byte)
 template<>
-struct Opcode<State, 0x8C>
+struct Opcode<CPU::State, 0x8C>
 {
-    using Instruction = AddressMode::Absolute<Operator::ST_<State::IndexRegister::Y>>;
+    using Instruction = CPU::AddressMode::Absolute<CPU::Operator::ST_<CPU::State::IndexRegister::Y>>;
 
     // 3   5-x         abs       ........ . STY $9876
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "8C: STY addr");
 
@@ -4564,12 +4564,12 @@ struct Opcode<State, 0x8C>
 // STY dp,X
 // Direct Page Indexed, X (2-Byte)
 template<>
-struct Opcode<State, 0x94>
+struct Opcode<CPU::State, 0x94>
 {
-    using Instruction = AddressMode::DirectPageIndexed<Operator::ST_<State::IndexRegister::Y>, State::IndexRegister::X>;
+    using Instruction = CPU::AddressMode::DirectPageIndexed<CPU::Operator::ST_<CPU::State::IndexRegister::Y>, CPU::State::IndexRegister::X>;
 
     // 2   5-x+w       dir,X     ........ . STY $10,X
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "94: STY dp,X");
 
@@ -4583,12 +4583,12 @@ struct Opcode<State, 0x94>
 // STZ dp
 // Direct Page (2-Byte)
 template<>
-struct Opcode<State, 0x64>
+struct Opcode<CPU::State, 0x64>
 {
-    using Instruction = AddressMode::DirectPage<Operator::STZ>;
+    using Instruction = CPU::AddressMode::DirectPage<CPU::Operator::STZ>;
 
     // 2   4-m+w       dir       ........ . STZ $10
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "64: STZ dp");
 
@@ -4602,12 +4602,12 @@ struct Opcode<State, 0x64>
 // STZ dp,X
 // Direct Page Indexed, X (2-Byte)
 template<>
-struct Opcode<State, 0x74>
+struct Opcode<CPU::State, 0x74>
 {
-    using Instruction = AddressMode::DirectPageIndexed<Operator::STZ, State::IndexRegister::X>;
+    using Instruction = CPU::AddressMode::DirectPageIndexed<CPU::Operator::STZ, CPU::State::IndexRegister::X>;
 
     // 2   5-m+w       dir,X     ........ . STZ $10,X
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "74: STZ dp,X");
 
@@ -4621,12 +4621,12 @@ struct Opcode<State, 0x74>
 // STZ addr
 // Absolute (3-Byte)
 template<>
-struct Opcode<State, 0x9C>
+struct Opcode<CPU::State, 0x9C>
 {
-    using Instruction = AddressMode::Absolute<Operator::STZ>;
+    using Instruction = CPU::AddressMode::Absolute<CPU::Operator::STZ>;
 
     // 3   5-m         abs       ........ . STZ $9876
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "9C: STZ addr");
 
@@ -4640,12 +4640,12 @@ struct Opcode<State, 0x9C>
 // STZ addr,X
 // Absolute Indexed, X (3-Byte)
 template<>
-struct Opcode<State, 0x9E>
+struct Opcode<CPU::State, 0x9E>
 {
-    using Instruction = AddressMode::AbsoluteIndexed<Operator::STZ, State::IndexRegister::X, false>;
+    using Instruction = CPU::AddressMode::AbsoluteIndexed<CPU::Operator::STZ, CPU::State::IndexRegister::X, false>;
 
     // 3   6-m         abs,X     ........ . STZ $9876,X
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "9E: STZ addr,X");
 
@@ -4659,12 +4659,12 @@ struct Opcode<State, 0x9E>
 // TAX
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0xAA>
+struct Opcode<CPU::State, 0xAA>
 {
-    using Instruction = AddressMode::Implied<Operator::TA_<State::IndexRegister::X>>;
+    using Instruction = CPU::AddressMode::Implied<CPU::Operator::TA_<CPU::State::IndexRegister::X>>;
 
     // 1   2           imp       x.....x. . TAX
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "AA: TAX");
 
@@ -4678,12 +4678,12 @@ struct Opcode<State, 0xAA>
 // TAY
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0xA8>
+struct Opcode<CPU::State, 0xA8>
 {
-    using Instruction = AddressMode::Implied<Operator::TA_<State::IndexRegister::Y>>;
+    using Instruction = CPU::AddressMode::Implied<CPU::Operator::TA_<CPU::State::IndexRegister::Y>>;
 
     // 1   2           imp       x.....x. . TAY
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "A8: TAY");
 
@@ -4697,12 +4697,12 @@ struct Opcode<State, 0xA8>
 // TCD
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0x5B>
+struct Opcode<CPU::State, 0x5B>
 {
-    using Instruction = AddressMode::Implied<Operator::TCD>;
+    using Instruction = CPU::AddressMode::Implied<CPU::Operator::TCD>;
 
     // 1   2           imp       *.....*. . TCD
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "5B: TCD");
 
@@ -4716,12 +4716,12 @@ struct Opcode<State, 0x5B>
 // TCS
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0x1B>
+struct Opcode<CPU::State, 0x1B>
 {
-    using Instruction = AddressMode::Implied<Operator::TCS>;
+    using Instruction = CPU::AddressMode::Implied<CPU::Operator::TCS>;
 
     // 1   2           imp       ........ . TCS
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "1B: TCS");
 
@@ -4735,12 +4735,12 @@ struct Opcode<State, 0x1B>
 // TDC
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0x7B>
+struct Opcode<CPU::State, 0x7B>
 {
-    using Instruction = AddressMode::Implied<Operator::TDC>;
+    using Instruction = CPU::AddressMode::Implied<CPU::Operator::TDC>;
 
     // 1   2           imp       *.....*. . TDC
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "7B: TDC");
 
@@ -4754,12 +4754,12 @@ struct Opcode<State, 0x7B>
 // TRB dp
 // Direct Page (2-Byte)
 template<>
-struct Opcode<State, 0x14>
+struct Opcode<CPU::State, 0x14>
 {
-    using Instruction = AddressMode::DirectPage<Operator::TRB>;
+    using Instruction = CPU::AddressMode::DirectPage<CPU::Operator::TRB>;
 
     // 2   7-2*m+w     dir       ......m. . TRB $10
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "14: TRB dp");
 
@@ -4773,12 +4773,12 @@ struct Opcode<State, 0x14>
 // TRB addr
 // Absolute (3-Byte)
 template<>
-struct Opcode<State, 0x1C>
+struct Opcode<CPU::State, 0x1C>
 {
-    using Instruction = AddressMode::Absolute<Operator::TRB>;
+    using Instruction = CPU::AddressMode::Absolute<CPU::Operator::TRB>;
 
     // 3   8-2*m       abs       ......m. . TRB $9876
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "1C: TRB addr");
 
@@ -4792,12 +4792,12 @@ struct Opcode<State, 0x1C>
 // TSB dp
 // Direct Page (2-Byte)
 template<>
-struct Opcode<State, 0x04>
+struct Opcode<CPU::State, 0x04>
 {
-    using Instruction = AddressMode::DirectPage<Operator::TSB>;
+    using Instruction = CPU::AddressMode::DirectPage<CPU::Operator::TSB>;
 
     // 2   7-2*m+w     dir       ......m. . TSB $10
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "04: TSB dp");
 
@@ -4811,12 +4811,12 @@ struct Opcode<State, 0x04>
 // TSB addr
 // Absolute (3-Byte)
 template<>
-struct Opcode<State, 0x0C>
+struct Opcode<CPU::State, 0x0C>
 {
-    using Instruction = AddressMode::Absolute<Operator::TSB>;
+    using Instruction = CPU::AddressMode::Absolute<CPU::Operator::TSB>;
 
     // 3   8-2*m       abs       ......m. . TSB $9876
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "0C: TSB addr");
 
@@ -4830,12 +4830,12 @@ struct Opcode<State, 0x0C>
 // TSC
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0x3B>
+struct Opcode<CPU::State, 0x3B>
 {
-    using Instruction = AddressMode::Implied<Operator::TSC>;
+    using Instruction = CPU::AddressMode::Implied<CPU::Operator::TSC>;
 
     // 1   2           imp       *.....*. . TSC
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "3B: TSC");
 
@@ -4849,12 +4849,12 @@ struct Opcode<State, 0x3B>
 // TSX
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0xBA>
+struct Opcode<CPU::State, 0xBA>
 {
-    using Instruction = AddressMode::Implied<Operator::TSX>;
+    using Instruction = CPU::AddressMode::Implied<CPU::Operator::TSX>;
 
     // 1   2           imp       x.....x. . TSX
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "BA: TSX");
 
@@ -4869,12 +4869,12 @@ struct Opcode<State, 0xBA>
 // TXA
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0x8A>
+struct Opcode<CPU::State, 0x8A>
 {
-    using Instruction = AddressMode::Implied<Operator::T_A<State::IndexRegister::X>>;
+    using Instruction = CPU::AddressMode::Implied<CPU::Operator::T_A<CPU::State::IndexRegister::X>>;
 
     // 1   2           imp       m.....m. . TXA
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "8A: TXA");
 
@@ -4888,12 +4888,12 @@ struct Opcode<State, 0x8A>
 // TXS
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0x9A>
+struct Opcode<CPU::State, 0x9A>
 {
-    using Instruction = AddressMode::Implied<Operator::TXS>;
+    using Instruction = CPU::AddressMode::Implied<CPU::Operator::TXS>;
 
     // 1   2           imp       ........ . TXS
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "9A: TXS");
 
@@ -4907,12 +4907,12 @@ struct Opcode<State, 0x9A>
 // TXY
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0x9B>
+struct Opcode<CPU::State, 0x9B>
 {
-    using Instruction = AddressMode::Implied<Operator::T__<State::IndexRegister::X, State::IndexRegister::Y>>;
+    using Instruction = CPU::AddressMode::Implied<CPU::Operator::T__<CPU::State::IndexRegister::X, CPU::State::IndexRegister::Y>>;
 
     // 1   2           imp       x.....x. . TXY
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "9B: TXY");
 
@@ -4926,12 +4926,12 @@ struct Opcode<State, 0x9B>
 // TYA
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0x98>
+struct Opcode<CPU::State, 0x98>
 {
-    using Instruction = AddressMode::Implied<Operator::T_A<State::IndexRegister::Y>>;
+    using Instruction = CPU::AddressMode::Implied<CPU::Operator::T_A<CPU::State::IndexRegister::Y>>;
 
     // 1   2           imp       m.....m. . TYA
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "98: TYA");
 
@@ -4945,12 +4945,12 @@ struct Opcode<State, 0x98>
 // TYX
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0xBB>
+struct Opcode<CPU::State, 0xBB>
 {
-    using Instruction = AddressMode::Implied<Operator::T__<State::IndexRegister::Y, State::IndexRegister::X>>;
+    using Instruction = CPU::AddressMode::Implied<CPU::Operator::T__<CPU::State::IndexRegister::Y, CPU::State::IndexRegister::X>>;
 
     // 1   2           imp       x.....x. . TYX
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "BB: TYX");
 
@@ -4964,12 +4964,12 @@ struct Opcode<State, 0xBB>
 // WAI
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0xCB>
+struct Opcode<CPU::State, 0xCB>
 {
-    using Instruction = AddressMode::Implied<Operator::WAI>;
+    using Instruction = CPU::AddressMode::Implied<CPU::Operator::WAI>;
 
     // 1   3           imp       ........ . WAI
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "CB: WAI");
 
@@ -4984,12 +4984,12 @@ struct Opcode<State, 0xCB>
 // WDM #const
 // Immediate (2-Byte)
 template<>
-struct Opcode<State, 0x42>
+struct Opcode<CPU::State, 0x42>
 {
-    using Instruction = AddressMode::Immediate<Operator::WDM>;
+    using Instruction = CPU::AddressMode::Immediate<CPU::Operator::WDM>;
 
     // 2   2           imm       ........ . WDM
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "42: WDM #const");
 
@@ -5004,12 +5004,12 @@ struct Opcode<State, 0x42>
 // XBA
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0xEB>
+struct Opcode<CPU::State, 0xEB>
 {
-    using Instruction = AddressMode::Implied<Operator::XBA>;
+    using Instruction = CPU::AddressMode::Implied<CPU::Operator::XBA>;
 
     // 1   3           imp       *.....*. . XBA
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "EB: XBA");
 
@@ -5023,12 +5023,12 @@ struct Opcode<State, 0xEB>
 // XCE
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0xFB>
+struct Opcode<CPU::State, 0xFB>
 {
-    using Instruction = AddressMode::Implied<Operator::XCE>;
+    using Instruction = CPU::AddressMode::Implied<CPU::Operator::XCE>;
 
     // 1   2           imp       .......* * XCE
-    static int execute(State& state)
+    static int execute(CPU::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "FB: XCE");
 
@@ -5038,4 +5038,3 @@ struct Opcode<State, 0xFB>
     static std::string opcodeToString() { return "FB: XCE"; }
 };
 
-}

@@ -15,34 +15,34 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\src\include\Common\Exception.h">
+    <ClInclude Include="..\..\..\src\Common\Exception.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\include\Common\Instruction.h">
+    <ClInclude Include="..\..\..\src\Common\Instruction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\include\Common\Types.h">
+    <ClInclude Include="..\..\..\src\Common\Memory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\include\Common\Util.h">
+    <ClInclude Include="..\..\..\src\Common\MemoryLocation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\include\Common\System.h">
+    <ClInclude Include="..\..\..\src\Common\Output.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\include\Common\MemoryLocation.h">
+    <ClInclude Include="..\..\..\src\Common\Profiler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\include\Common\Memory.h">
+    <ClInclude Include="..\..\..\src\Common\RegisterManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\include\Common\RegisterManager.h">
+    <ClInclude Include="..\..\..\src\Common\System.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\include\Common\Output.h">
+    <ClInclude Include="..\..\..\src\Common\Types.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\include\Common\Profiler.h">
+    <ClInclude Include="..\..\..\src\Common\Util.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

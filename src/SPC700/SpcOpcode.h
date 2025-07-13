@@ -15,15 +15,17 @@ EXCEPTION(NotYetImplementedException, ::NotYetImplementedException)
 
 CREATE_PROFILER();
 
+}
+
 // ADC (X), (Y)
 // (X) = (X)+(Y)+C    	[NV..H.ZC]
 // Indirect Indirect (1-Byte)
 template<>
-struct Opcode<State, 0x99>
+struct Opcode<SPC::State, 0x99>
 {
-    using Instruction = AddressMode::IndirectIndirect<Operator::ADC>;
+    using Instruction = SPC::AddressMode::IndirectIndirect<SPC::Operator::ADC>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "99: ADC (X), (Y)");
 
@@ -38,11 +40,11 @@ struct Opcode<State, 0x99>
 // A = A+i+C    	[NV..H.ZC]
 // Register Immediate (2-Byte)
 template<>
-struct Opcode<State, 0x88>
+struct Opcode<SPC::State, 0x88>
 {
-    using Instruction = AddressMode::RegisterImmediate<Operator::ADC, State::Register::A>;
+    using Instruction = SPC::AddressMode::RegisterImmediate<SPC::Operator::ADC, SPC::State::Register::A>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "88: ADC A, #i");
 
@@ -56,11 +58,11 @@ struct Opcode<State, 0x88>
 // A = A+(X)+C    	[NV..H.ZC]
 // Register Register Indirect (1-Byte)
 template<>
-struct Opcode<State, 0x86>
+struct Opcode<SPC::State, 0x86>
 {
-    using Instruction = AddressMode::RegisterRegisterIndirect<Operator::ADC, State::Register::A, State::Register::X>;
+    using Instruction = SPC::AddressMode::RegisterRegisterIndirect<SPC::Operator::ADC, SPC::State::Register::A, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "86: ADC A, (X)");
 
@@ -75,11 +77,11 @@ struct Opcode<State, 0x86>
 // A = A+([d]+Y)+C    	[NV..H.ZC]
 // Register Direct Indirect Indexed (2-Byte)
 template<>
-struct Opcode<State, 0x97>
+struct Opcode<SPC::State, 0x97>
 {
-    using Instruction = AddressMode::RegisterDirectIndirectIndexed<Operator::ADC, State::Register::A, State::Register::Y>;
+    using Instruction = SPC::AddressMode::RegisterDirectIndirectIndexed<SPC::Operator::ADC, SPC::State::Register::A, SPC::State::Register::Y>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "97: ADC A, [d]+Y");
 
@@ -93,11 +95,11 @@ struct Opcode<State, 0x97>
 // A = A+([d+X])+C    	[NV..H.ZC]
 // Register Direct Indexed Indirect (2-Byte)
 template<>
-struct Opcode<State, 0x87>
+struct Opcode<SPC::State, 0x87>
 {
-    using Instruction = AddressMode::RegisterDirectIndexedIndirect<Operator::ADC, State::Register::A, State::Register::X>;
+    using Instruction = SPC::AddressMode::RegisterDirectIndexedIndirect<SPC::Operator::ADC, SPC::State::Register::A, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "87: ADC A, [d+X]");
 
@@ -112,11 +114,11 @@ struct Opcode<State, 0x87>
 // A = A+(d)+C    	[NV..H.ZC]
 // Register Direct (2-Byte)
 template<>
-struct Opcode<State, 0x84>
+struct Opcode<SPC::State, 0x84>
 {
-    using Instruction = AddressMode::RegisterDirect<Operator::ADC, State::Register::A>;
+    using Instruction = SPC::AddressMode::RegisterDirect<SPC::Operator::ADC, SPC::State::Register::A>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "84: ADC A, d");
 
@@ -130,11 +132,11 @@ struct Opcode<State, 0x84>
 // A = A+(d+X)+C    	[NV..H.ZC]
 // Register Direct Indexed (2-Byte)
 template<>
-struct Opcode<State, 0x94>
+struct Opcode<SPC::State, 0x94>
 {
-    using Instruction = AddressMode::RegisterDirectIndexed<Operator::ADC, State::Register::A, State::Register::X>;
+    using Instruction = SPC::AddressMode::RegisterDirectIndexed<SPC::Operator::ADC, SPC::State::Register::A, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "94: ADC A, d+X");
 
@@ -148,11 +150,11 @@ struct Opcode<State, 0x94>
 // A = A+(a)+C    	[NV..H.ZC]
 // Register Absolute (3-Byte)
 template<>
-struct Opcode<State, 0x85>
+struct Opcode<SPC::State, 0x85>
 {
-    using Instruction = AddressMode::RegisterAbsolute<Operator::ADC, State::Register::A>;
+    using Instruction = SPC::AddressMode::RegisterAbsolute<SPC::Operator::ADC, SPC::State::Register::A>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "85: ADC A, !a");
 
@@ -166,11 +168,11 @@ struct Opcode<State, 0x85>
 // A = A+(a+X)+C    	[NV..H.ZC]
 // Register Absolute Indexed (3-Byte)
 template<>
-struct Opcode<State, 0x95>
+struct Opcode<SPC::State, 0x95>
 {
-    using Instruction = AddressMode::RegisterAbsoluteIndexed<Operator::ADC, State::Register::A, State::Register::X>;
+    using Instruction = SPC::AddressMode::RegisterAbsoluteIndexed<SPC::Operator::ADC, SPC::State::Register::A, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "95: ADC A, !a+X");
 
@@ -184,11 +186,11 @@ struct Opcode<State, 0x95>
 // A = A+(a+Y)+C    	[NV..H.ZC]
 // Register Absolute Indexed (3-Byte)
 template<>
-struct Opcode<State, 0x96>
+struct Opcode<SPC::State, 0x96>
 {
-    using Instruction = AddressMode::RegisterAbsoluteIndexed<Operator::ADC, State::Register::A, State::Register::Y>;
+    using Instruction = SPC::AddressMode::RegisterAbsoluteIndexed<SPC::Operator::ADC, SPC::State::Register::A, SPC::State::Register::Y>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "96: ADC A, !a+Y");
 
@@ -202,11 +204,11 @@ struct Opcode<State, 0x96>
 // (dd) = (dd)+(d)+C    	[NV..H.ZC]
 // Direct Direct (3-Byte)
 template<>
-struct Opcode<State, 0x89>
+struct Opcode<SPC::State, 0x89>
 {
-    using Instruction = AddressMode::DirectDirect<Operator::ADC>;
+    using Instruction = SPC::AddressMode::DirectDirect<SPC::Operator::ADC>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "89: ADC dd, ds");
 
@@ -221,11 +223,11 @@ struct Opcode<State, 0x89>
 // (d) = (d)+i+C    	[NV..H.ZC]
 // Direct Immediate (3-Byte)
 template<>
-struct Opcode<State, 0x98>
+struct Opcode<SPC::State, 0x98>
 {
-    using Instruction = AddressMode::DirectImmediate<Operator::ADC>;
+    using Instruction = SPC::AddressMode::DirectImmediate<SPC::Operator::ADC>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "98: ADC d, #i");
 
@@ -239,11 +241,11 @@ struct Opcode<State, 0x98>
 // YA  = YA + (d), H on high byte    	[NV..H.ZC]
 // Y Accumulator Direct (2-Byte)
 template<>
-struct Opcode<State, 0x7A>
+struct Opcode<SPC::State, 0x7A>
 {
-    using Instruction = AddressMode::YAccumulatorDirect<Operator::ADDW>;
+    using Instruction = SPC::AddressMode::YAccumulatorDirect<SPC::Operator::ADDW>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "7A: ADDW YA, d");
 
@@ -257,11 +259,11 @@ struct Opcode<State, 0x7A>
 // (X) = (X) & (Y)    	[N.....Z.]
 // Indirect Indirect (1-Byte)
 template<>
-struct Opcode<State, 0x39>
+struct Opcode<SPC::State, 0x39>
 {
-    using Instruction = AddressMode::IndirectIndirect<Operator::AND>;
+    using Instruction = SPC::AddressMode::IndirectIndirect<SPC::Operator::AND>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "39: AND (X), (Y)");
 
@@ -276,11 +278,11 @@ struct Opcode<State, 0x39>
 // A = A & i    	[N.....Z.]
 // Register Immediate (2-Byte)
 template<>
-struct Opcode<State, 0x28>
+struct Opcode<SPC::State, 0x28>
 {
-    using Instruction = AddressMode::RegisterImmediate<Operator::AND, State::Register::A>;
+    using Instruction = SPC::AddressMode::RegisterImmediate<SPC::Operator::AND, SPC::State::Register::A>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "28: AND A, #i");
 
@@ -294,11 +296,11 @@ struct Opcode<State, 0x28>
 // A = A & (X)    	[N.....Z.]
 // Register Register Indirect (1-Byte)
 template<>
-struct Opcode<State, 0x26>
+struct Opcode<SPC::State, 0x26>
 {
-    using Instruction = AddressMode::RegisterRegisterIndirect<Operator::AND, State::Register::A, State::Register::X>;
+    using Instruction = SPC::AddressMode::RegisterRegisterIndirect<SPC::Operator::AND, SPC::State::Register::A, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "26: AND A, (X)");
 
@@ -312,11 +314,11 @@ struct Opcode<State, 0x26>
 // A = A & ([d]+Y)    	[N.....Z.]
 // Register Direct Indirect Indexed (2-Byte)
 template<>
-struct Opcode<State, 0x37>
+struct Opcode<SPC::State, 0x37>
 {
-    using Instruction = AddressMode::RegisterDirectIndirectIndexed<Operator::AND, State::Register::A, State::Register::Y>;
+    using Instruction = SPC::AddressMode::RegisterDirectIndirectIndexed<SPC::Operator::AND, SPC::State::Register::A, SPC::State::Register::Y>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "37: AND A, [d]+Y");
 
@@ -331,11 +333,11 @@ struct Opcode<State, 0x37>
 // A = A & ([d+X])    	[N.....Z.]
 // Register Direct Indexed Indirect (2-Byte)
 template<>
-struct Opcode<State, 0x27>
+struct Opcode<SPC::State, 0x27>
 {
-    using Instruction = AddressMode::RegisterDirectIndexedIndirect<Operator::AND, State::Register::A, State::Register::X>;
+    using Instruction = SPC::AddressMode::RegisterDirectIndexedIndirect<SPC::Operator::AND, SPC::State::Register::A, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "27: AND A, [d+X]");
 
@@ -350,11 +352,11 @@ struct Opcode<State, 0x27>
 // A = A & (d)    	[N.....Z.]
 // Register Direct (2-Byte)
 template<>
-struct Opcode<State, 0x24>
+struct Opcode<SPC::State, 0x24>
 {
-    using Instruction = AddressMode::RegisterDirect<Operator::AND, State::Register::A>;
+    using Instruction = SPC::AddressMode::RegisterDirect<SPC::Operator::AND, SPC::State::Register::A>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "24: AND A, d");
 
@@ -368,11 +370,11 @@ struct Opcode<State, 0x24>
 // A = A & (d+X)    	[N.....Z.]
 // Register Direct Indexed (2-Byte)
 template<>
-struct Opcode<State, 0x34>
+struct Opcode<SPC::State, 0x34>
 {
-    using Instruction = AddressMode::RegisterDirectIndexed<Operator::AND, State::Register::A, State::Register::X>;
+    using Instruction = SPC::AddressMode::RegisterDirectIndexed<SPC::Operator::AND, SPC::State::Register::A, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "34: AND A, d+X");
 
@@ -387,11 +389,11 @@ struct Opcode<State, 0x34>
 // A = A & (a)    	[N.....Z.]
 // Register Absolute (3-Byte)
 template<>
-struct Opcode<State, 0x25>
+struct Opcode<SPC::State, 0x25>
 {
-    using Instruction = AddressMode::RegisterAbsolute<Operator::AND, State::Register::A>;
+    using Instruction = SPC::AddressMode::RegisterAbsolute<SPC::Operator::AND, SPC::State::Register::A>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "25: AND A, !a");
 
@@ -405,11 +407,11 @@ struct Opcode<State, 0x25>
 // A = A & (a+X)    	[N.....Z.]
 // Register Absolute Indexed (3-Byte)
 template<>
-struct Opcode<State, 0x35>
+struct Opcode<SPC::State, 0x35>
 {
-    using Instruction = AddressMode::RegisterAbsoluteIndexed<Operator::AND, State::Register::A, State::Register::X>;
+    using Instruction = SPC::AddressMode::RegisterAbsoluteIndexed<SPC::Operator::AND, SPC::State::Register::A, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "35: AND A, !a+X");
 
@@ -424,11 +426,11 @@ struct Opcode<State, 0x35>
 // A = A & (a+Y)    	[N.....Z.]
 // Register Absolute Indexed (3-Byte)
 template<>
-struct Opcode<State, 0x36>
+struct Opcode<SPC::State, 0x36>
 {
-    using Instruction = AddressMode::RegisterAbsoluteIndexed<Operator::AND, State::Register::A, State::Register::Y>;
+    using Instruction = SPC::AddressMode::RegisterAbsoluteIndexed<SPC::Operator::AND, SPC::State::Register::A, SPC::State::Register::Y>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "36: AND A, !a+Y");
 
@@ -443,11 +445,11 @@ struct Opcode<State, 0x36>
 // (dd) = (dd) & (ds)    	[N.....Z.]
 // Direct Direct (3-Byte)
 template<>
-struct Opcode<State, 0x29>
+struct Opcode<SPC::State, 0x29>
 {
-    using Instruction = AddressMode::DirectDirect<Operator::AND>;
+    using Instruction = SPC::AddressMode::DirectDirect<SPC::Operator::AND>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "29: AND dd, ds");
 
@@ -461,11 +463,11 @@ struct Opcode<State, 0x29>
 // (d) = (d) & i    	[N.....Z.]
 // Direct Immediate (3-Byte)
 template<>
-struct Opcode<State, 0x38>
+struct Opcode<SPC::State, 0x38>
 {
-    using Instruction = AddressMode::DirectImmediate<Operator::AND>;
+    using Instruction = SPC::AddressMode::DirectImmediate<SPC::Operator::AND>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "38: AND d, #i");
 
@@ -480,11 +482,11 @@ struct Opcode<State, 0x38>
 // C = C & ~(m.b)    	[.......C]
 // Carry Negated Memory Bit (3-Byte)
 template<>
-struct Opcode<State, 0x6A>
+struct Opcode<SPC::State, 0x6A>
 {
-    using Instruction = AddressMode::CarryNegatedMemoryBit<Operator::AND1>;
+    using Instruction = SPC::AddressMode::CarryNegatedMemoryBit<SPC::Operator::AND1>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "6A: AND1 C, /m.b");
 
@@ -499,11 +501,11 @@ struct Opcode<State, 0x6A>
 // C = C & (m.b)    	[.......C]
 // Carry Memory Bit (3-Byte)
 template<>
-struct Opcode<State, 0x4A>
+struct Opcode<SPC::State, 0x4A>
 {
-    using Instruction = AddressMode::CarryMemoryBit<Operator::AND1>;
+    using Instruction = SPC::AddressMode::CarryMemoryBit<SPC::Operator::AND1>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "4A: AND1 C, m.b");
 
@@ -518,11 +520,11 @@ struct Opcode<State, 0x4A>
 // Left shift A: high->C, 0->low    	[N.....ZC]
 // Register (1-Byte)
 template<>
-struct Opcode<State, 0x1C>
+struct Opcode<SPC::State, 0x1C>
 {
-    using Instruction = AddressMode::Register<Operator::ASL, State::Register::A>;
+    using Instruction = SPC::AddressMode::Register<SPC::Operator::ASL, SPC::State::Register::A>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "1C: ASL A");
 
@@ -536,11 +538,11 @@ struct Opcode<State, 0x1C>
 // Left shift (d) as above    	[N.....ZC]
 // Direct (2-Byte)
 template<>
-struct Opcode<State, 0x0B>
+struct Opcode<SPC::State, 0x0B>
 {
-    using Instruction = AddressMode::Direct<Operator::ASL>;
+    using Instruction = SPC::AddressMode::Direct<SPC::Operator::ASL>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "0B: ASL d");
 
@@ -554,11 +556,11 @@ struct Opcode<State, 0x0B>
 // Left shift (d+X) as above    	[N.....ZC]
 // Direct Indexed (2-Byte)
 template<>
-struct Opcode<State, 0x1B>
+struct Opcode<SPC::State, 0x1B>
 {
-    using Instruction = AddressMode::DirectIndexed<Operator::ASL, State::Register::X>;
+    using Instruction = SPC::AddressMode::DirectIndexed<SPC::Operator::ASL, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "1B: ASL d+X");
 
@@ -573,11 +575,11 @@ struct Opcode<State, 0x1B>
 // Left shift (a) as above    	[N.....ZC]
 // Absolute (3-Byte)
 template<>
-struct Opcode<State, 0x0C>
+struct Opcode<SPC::State, 0x0C>
 {
-    using Instruction = AddressMode::Absolute<Operator::ASL>;
+    using Instruction = SPC::AddressMode::Absolute<SPC::Operator::ASL>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "0C: ASL !a");
 
@@ -591,11 +593,11 @@ struct Opcode<State, 0x0C>
 // PC+=r  if d.0 == 0    	[........]
 // Direct Program Counter Relative (3-Byte)
 template<>
-struct Opcode<State, 0x13>
+struct Opcode<SPC::State, 0x13>
 {
-    using Instruction = AddressMode::DirectProgramCounterRelative<Operator::BB_<0, false>>;
+    using Instruction = SPC::AddressMode::DirectProgramCounterRelative<SPC::Operator::BB_<0, false>>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "13: BBC d.0, r");
 
@@ -609,11 +611,11 @@ struct Opcode<State, 0x13>
 // PC+=r  if d.1 == 0    	[........]
 // Direct Program Counter Relative (3-Byte)
 template<>
-struct Opcode<State, 0x33>
+struct Opcode<SPC::State, 0x33>
 {
-    using Instruction = AddressMode::DirectProgramCounterRelative<Operator::BB_<1, false>>;
+    using Instruction = SPC::AddressMode::DirectProgramCounterRelative<SPC::Operator::BB_<1, false>>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "33: BBC d.1, r");
 
@@ -627,11 +629,11 @@ struct Opcode<State, 0x33>
 // PC+=r  if d.2 == 0    	[........]
 // Direct Program Counter Relative (3-Byte)
 template<>
-struct Opcode<State, 0x53>
+struct Opcode<SPC::State, 0x53>
 {
-    using Instruction = AddressMode::DirectProgramCounterRelative<Operator::BB_<2, false>>;
+    using Instruction = SPC::AddressMode::DirectProgramCounterRelative<SPC::Operator::BB_<2, false>>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "53: BBC d.2, r");
 
@@ -646,11 +648,11 @@ struct Opcode<State, 0x53>
 // PC+=r  if d.3 == 0    	[........]
 // Direct Program Counter Relative (3-Byte)
 template<>
-struct Opcode<State, 0x73>
+struct Opcode<SPC::State, 0x73>
 {
-    using Instruction = AddressMode::DirectProgramCounterRelative<Operator::BB_<3, false>>;
+    using Instruction = SPC::AddressMode::DirectProgramCounterRelative<SPC::Operator::BB_<3, false>>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "73: BBC d.3, r");
 
@@ -665,11 +667,11 @@ struct Opcode<State, 0x73>
 // PC+=r  if d.4 == 0    	[........]
 // Direct Program Counter Relative (3-Byte)
 template<>
-struct Opcode<State, 0x93>
+struct Opcode<SPC::State, 0x93>
 {
-    using Instruction = AddressMode::DirectProgramCounterRelative<Operator::BB_<4, false>>;
+    using Instruction = SPC::AddressMode::DirectProgramCounterRelative<SPC::Operator::BB_<4, false>>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "93: BBC d.4, r");
 
@@ -684,11 +686,11 @@ struct Opcode<State, 0x93>
 // PC+=r  if d.5 == 0    	[........]
 // Direct Program Counter Relative (3-Byte)
 template<>
-struct Opcode<State, 0xB3>
+struct Opcode<SPC::State, 0xB3>
 {
-    using Instruction = AddressMode::DirectProgramCounterRelative<Operator::BB_<5, false>>;
+    using Instruction = SPC::AddressMode::DirectProgramCounterRelative<SPC::Operator::BB_<5, false>>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "B3: BBC d.5, r");
 
@@ -702,11 +704,11 @@ struct Opcode<State, 0xB3>
 // PC+=r  if d.6 == 0    	[........]
 // Direct Program Counter Relative (3-Byte)
 template<>
-struct Opcode<State, 0xD3>
+struct Opcode<SPC::State, 0xD3>
 {
-    using Instruction = AddressMode::DirectProgramCounterRelative<Operator::BB_<6, false>>;
+    using Instruction = SPC::AddressMode::DirectProgramCounterRelative<SPC::Operator::BB_<6, false>>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "D3: BBC d.6, r");
 
@@ -721,11 +723,11 @@ struct Opcode<State, 0xD3>
 // PC+=r  if d.7 == 0    	[........]
 // Direct Program Counter Relative (3-Byte)
 template<>
-struct Opcode<State, 0xF3>
+struct Opcode<SPC::State, 0xF3>
 {
-    using Instruction = AddressMode::DirectProgramCounterRelative<Operator::BB_<7, false>>;
+    using Instruction = SPC::AddressMode::DirectProgramCounterRelative<SPC::Operator::BB_<7, false>>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "F3: BBC d.7, r");
 
@@ -739,11 +741,11 @@ struct Opcode<State, 0xF3>
 // PC+=r  if d.0 == 1    	[........]
 // Direct Program Counter Relative (3-Byte)
 template<>
-struct Opcode<State, 0x03>
+struct Opcode<SPC::State, 0x03>
 {
-    using Instruction = AddressMode::DirectProgramCounterRelative<Operator::BB_<0, true>>;
+    using Instruction = SPC::AddressMode::DirectProgramCounterRelative<SPC::Operator::BB_<0, true>>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "03: BBS d.0, r");
 
@@ -758,11 +760,11 @@ struct Opcode<State, 0x03>
 // PC+=r  if d.1 == 1    	[........]
 // Direct Program Counter Relative (3-Byte)
 template<>
-struct Opcode<State, 0x23>
+struct Opcode<SPC::State, 0x23>
 {
-    using Instruction = AddressMode::DirectProgramCounterRelative<Operator::BB_<1, true>>;
+    using Instruction = SPC::AddressMode::DirectProgramCounterRelative<SPC::Operator::BB_<1, true>>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "23: BBS d.1, r");
 
@@ -776,11 +778,11 @@ struct Opcode<State, 0x23>
 // PC+=r  if d.2 == 1    	[........]
 // Direct Program Counter Relative (3-Byte)
 template<>
-struct Opcode<State, 0x43>
+struct Opcode<SPC::State, 0x43>
 {
-    using Instruction = AddressMode::DirectProgramCounterRelative<Operator::BB_<2, true>>;
+    using Instruction = SPC::AddressMode::DirectProgramCounterRelative<SPC::Operator::BB_<2, true>>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "43: BBS d.2, r");
 
@@ -795,11 +797,11 @@ struct Opcode<State, 0x43>
 // PC+=r  if d.3 == 1    	[........]
 // Direct Program Counter Relative (3-Byte)
 template<>
-struct Opcode<State, 0x63>
+struct Opcode<SPC::State, 0x63>
 {
-    using Instruction = AddressMode::DirectProgramCounterRelative<Operator::BB_<3, true>>;
+    using Instruction = SPC::AddressMode::DirectProgramCounterRelative<SPC::Operator::BB_<3, true>>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "63: BBS d.3, r");
 
@@ -814,11 +816,11 @@ struct Opcode<State, 0x63>
 // PC+=r  if d.4 == 1    	[........]
 // Direct Program Counter Relative (3-Byte)
 template<>
-struct Opcode<State, 0x83>
+struct Opcode<SPC::State, 0x83>
 {
-    using Instruction = AddressMode::DirectProgramCounterRelative<Operator::BB_<4, true>>;
+    using Instruction = SPC::AddressMode::DirectProgramCounterRelative<SPC::Operator::BB_<4, true>>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "83: BBS d.4, r");
 
@@ -833,11 +835,11 @@ struct Opcode<State, 0x83>
 // PC+=r  if d.5 == 1    	[........]
 // Direct Program Counter Relative (3-Byte)
 template<>
-struct Opcode<State, 0xA3>
+struct Opcode<SPC::State, 0xA3>
 {
-    using Instruction = AddressMode::DirectProgramCounterRelative<Operator::BB_<5, true>>;
+    using Instruction = SPC::AddressMode::DirectProgramCounterRelative<SPC::Operator::BB_<5, true>>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "A3: BBS d.5, r");
 
@@ -851,11 +853,11 @@ struct Opcode<State, 0xA3>
 // PC+=r  if d.6 == 1    	[........]
 // Direct Program Counter Relative (3-Byte)
 template<>
-struct Opcode<State, 0xC3>
+struct Opcode<SPC::State, 0xC3>
 {
-    using Instruction = AddressMode::DirectProgramCounterRelative<Operator::BB_<6, true>>;
+    using Instruction = SPC::AddressMode::DirectProgramCounterRelative<SPC::Operator::BB_<6, true>>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "C3: BBS d.6, r");
 
@@ -869,11 +871,11 @@ struct Opcode<State, 0xC3>
 // PC+=r  if d.7 == 1    	[........]
 // Direct Program Counter Relative (3-Byte)
 template<>
-struct Opcode<State, 0xE3>
+struct Opcode<SPC::State, 0xE3>
 {
-    using Instruction = AddressMode::DirectProgramCounterRelative<Operator::BB_<7, true>>;
+    using Instruction = SPC::AddressMode::DirectProgramCounterRelative<SPC::Operator::BB_<7, true>>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "E3: BBS d.7, r");
 
@@ -887,11 +889,11 @@ struct Opcode<State, 0xE3>
 // PC+=r  if C == 0    	[........]
 // Program Counter Relative (2-Byte)
 template<>
-struct Opcode<State, 0x90>
+struct Opcode<SPC::State, 0x90>
 {
-    using Instruction = AddressMode::ProgramCounterRelative<Operator::B__<State::Flag::c, false>>;
+    using Instruction = SPC::AddressMode::ProgramCounterRelative<SPC::Operator::B__<SPC::State::Flag::c, false>>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "90: BCC r");
 
@@ -905,11 +907,11 @@ struct Opcode<State, 0x90>
 // PC+=r  if C == 1    	[........]
 // Program Counter Relative (2-Byte)
 template<>
-struct Opcode<State, 0xB0>
+struct Opcode<SPC::State, 0xB0>
 {
-    using Instruction = AddressMode::ProgramCounterRelative<Operator::B__<State::Flag::c, true>>;
+    using Instruction = SPC::AddressMode::ProgramCounterRelative<SPC::Operator::B__<SPC::State::Flag::c, true>>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "B0: BCS r");
 
@@ -923,11 +925,11 @@ struct Opcode<State, 0xB0>
 // PC+=r  if Z == 1    	[........]
 // Program Counter Relative (2-Byte)
 template<>
-struct Opcode<State, 0xF0>
+struct Opcode<SPC::State, 0xF0>
 {
-    using Instruction = AddressMode::ProgramCounterRelative<Operator::BEQ>;
+    using Instruction = SPC::AddressMode::ProgramCounterRelative<SPC::Operator::BEQ>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "F0: BEQ r");
 
@@ -941,11 +943,11 @@ struct Opcode<State, 0xF0>
 // PC+=r  if N == 1    	[........]
 // Program Counter Relative (2-Byte)
 template<>
-struct Opcode<State, 0x30>
+struct Opcode<SPC::State, 0x30>
 {
-    using Instruction = AddressMode::ProgramCounterRelative<Operator::BMI>;
+    using Instruction = SPC::AddressMode::ProgramCounterRelative<SPC::Operator::BMI>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "30: BMI r");
 
@@ -959,11 +961,11 @@ struct Opcode<State, 0x30>
 // PC+=r  if Z == 0    	[........]
 // Program Counter Relative (2-Byte)
 template<>
-struct Opcode<State, 0xD0>
+struct Opcode<SPC::State, 0xD0>
 {
-    using Instruction = AddressMode::ProgramCounterRelative<Operator::BNE>;
+    using Instruction = SPC::AddressMode::ProgramCounterRelative<SPC::Operator::BNE>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "D0: BNE r");
 
@@ -977,11 +979,11 @@ struct Opcode<State, 0xD0>
 // PC+=r  if N == 0    	[........]
 // Program Counter Relative (2-Byte)
 template<>
-struct Opcode<State, 0x10>
+struct Opcode<SPC::State, 0x10>
 {
-    using Instruction = AddressMode::ProgramCounterRelative<Operator::BPL>;
+    using Instruction = SPC::AddressMode::ProgramCounterRelative<SPC::Operator::BPL>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "10: BPL r");
 
@@ -995,11 +997,11 @@ struct Opcode<State, 0x10>
 // PC+=r  if V == 0    	[........]
 // Program Counter Relative (2-Byte)
 template<>
-struct Opcode<State, 0x50>
+struct Opcode<SPC::State, 0x50>
 {
-    using Instruction = AddressMode::ProgramCounterRelative<Operator::B__<State::Flag::v, false>>;
+    using Instruction = SPC::AddressMode::ProgramCounterRelative<SPC::Operator::B__<SPC::State::Flag::v, false>>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "50: BVC r");
 
@@ -1014,11 +1016,11 @@ struct Opcode<State, 0x50>
 // PC+=r  if V == 1    	[........]
 // Program Counter Relative (2-Byte)
 template<>
-struct Opcode<State, 0x70>
+struct Opcode<SPC::State, 0x70>
 {
-    using Instruction = AddressMode::ProgramCounterRelative<Operator::B__<State::Flag::v, true>>;
+    using Instruction = SPC::AddressMode::ProgramCounterRelative<SPC::Operator::B__<SPC::State::Flag::v, true>>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "70: BVS r");
 
@@ -1033,11 +1035,11 @@ struct Opcode<State, 0x70>
 // PC+=r    	[........]
 // Program Counter Relative (2-Byte)
 template<>
-struct Opcode<State, 0x2F>
+struct Opcode<SPC::State, 0x2F>
 {
-    using Instruction = AddressMode::ProgramCounterRelative<Operator::BRA>;
+    using Instruction = SPC::AddressMode::ProgramCounterRelative<SPC::Operator::BRA>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "2F: BRA r");
 
@@ -1051,11 +1053,11 @@ struct Opcode<State, 0x2F>
 // Push PC and Flags, PC = [$FFDE]    	[...1.0..]
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0x0F>
+struct Opcode<SPC::State, 0x0F>
 {
-    using Instruction = AddressMode::Implied<Operator::BRK>;
+    using Instruction = SPC::AddressMode::Implied<SPC::Operator::BRK>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "0F: BRK ");
 
@@ -1070,11 +1072,11 @@ struct Opcode<State, 0x0F>
 // (SP--)=PCh, (SP--)=PCl, PC=a    	[........]
 // Absolute (3-Byte)
 template<>
-struct Opcode<State, 0x3F>
+struct Opcode<SPC::State, 0x3F>
 {
-    using Instruction = AddressMode::Absolute_ControlFlow<Operator::CALL>;
+    using Instruction = SPC::AddressMode::Absolute_ControlFlow<SPC::Operator::CALL>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "3F: CALL !a");
 
@@ -1088,11 +1090,11 @@ struct Opcode<State, 0x3F>
 // CMP A, (d+X) then BNE    	[........]
 // Direct Indexed Program Counter Relative (3-Byte)
 template<>
-struct Opcode<State, 0xDE>
+struct Opcode<SPC::State, 0xDE>
 {
-    using Instruction = AddressMode::DirectIndexedProgramCounterRelative<Operator::CBNE, State::Register::X>;
+    using Instruction = SPC::AddressMode::DirectIndexedProgramCounterRelative<SPC::Operator::CBNE, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "DE: CBNE d+X, r");
 
@@ -1106,11 +1108,11 @@ struct Opcode<State, 0xDE>
 // CMP A, (d) then BNE    	[........]
 // Direct Program Counter Relative (3-Byte)
 template<>
-struct Opcode<State, 0x2E>
+struct Opcode<SPC::State, 0x2E>
 {
-    using Instruction = AddressMode::DirectProgramCounterRelative<Operator::CBNE>;
+    using Instruction = SPC::AddressMode::DirectProgramCounterRelative<SPC::Operator::CBNE>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "2E: CBNE d, r");
 
@@ -1124,11 +1126,11 @@ struct Opcode<State, 0x2E>
 // d.0 = 0    	[........]
 // Direct (2-Byte)
 template<>
-struct Opcode<State, 0x12>
+struct Opcode<SPC::State, 0x12>
 {
-    using Instruction = AddressMode::Direct<Operator::SET1<0, false>>;
+    using Instruction = SPC::AddressMode::Direct<SPC::Operator::SET1<0, false>>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "12: CLR1 d.0");
 
@@ -1142,11 +1144,11 @@ struct Opcode<State, 0x12>
 // d.1 = 0    	[........]
 // Direct (2-Byte)
 template<>
-struct Opcode<State, 0x32>
+struct Opcode<SPC::State, 0x32>
 {
-    using Instruction = AddressMode::Direct<Operator::SET1<1, false>>;
+    using Instruction = SPC::AddressMode::Direct<SPC::Operator::SET1<1, false>>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "32: CLR1 d.1");
 
@@ -1160,11 +1162,11 @@ struct Opcode<State, 0x32>
 // d.2 = 0    	[........]
 // Direct (2-Byte)
 template<>
-struct Opcode<State, 0x52>
+struct Opcode<SPC::State, 0x52>
 {
-    using Instruction = AddressMode::Direct<Operator::SET1<2, false>>;
+    using Instruction = SPC::AddressMode::Direct<SPC::Operator::SET1<2, false>>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "52: CLR1 d.2");
 
@@ -1179,11 +1181,11 @@ struct Opcode<State, 0x52>
 // d.3 = 0    	[........]
 // Direct (2-Byte)
 template<>
-struct Opcode<State, 0x72>
+struct Opcode<SPC::State, 0x72>
 {
-    using Instruction = AddressMode::Direct<Operator::SET1<3, false>>;
+    using Instruction = SPC::AddressMode::Direct<SPC::Operator::SET1<3, false>>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "72: CLR1 d.3");
 
@@ -1197,11 +1199,11 @@ struct Opcode<State, 0x72>
 // d.4 = 0    	[........]
 // Direct (2-Byte)
 template<>
-struct Opcode<State, 0x92>
+struct Opcode<SPC::State, 0x92>
 {
-    using Instruction = AddressMode::Direct<Operator::SET1<4, false>>;
+    using Instruction = SPC::AddressMode::Direct<SPC::Operator::SET1<4, false>>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "92: CLR1 d.4");
 
@@ -1215,11 +1217,11 @@ struct Opcode<State, 0x92>
 // d.5 = 0    	[........]
 // Direct (2-Byte)
 template<>
-struct Opcode<State, 0xB2>
+struct Opcode<SPC::State, 0xB2>
 {
-    using Instruction = AddressMode::Direct<Operator::SET1<5, false>>;
+    using Instruction = SPC::AddressMode::Direct<SPC::Operator::SET1<5, false>>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "B2: CLR1 d.5");
 
@@ -1233,11 +1235,11 @@ struct Opcode<State, 0xB2>
 // d.6 = 0    	[........]
 // Direct (2-Byte)
 template<>
-struct Opcode<State, 0xD2>
+struct Opcode<SPC::State, 0xD2>
 {
-    using Instruction = AddressMode::Direct<Operator::SET1<6, false>>;
+    using Instruction = SPC::AddressMode::Direct<SPC::Operator::SET1<6, false>>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "D2: CLR1 d.6");
 
@@ -1251,11 +1253,11 @@ struct Opcode<State, 0xD2>
 // d.7 = 0    	[........]
 // Direct (2-Byte)
 template<>
-struct Opcode<State, 0xF2>
+struct Opcode<SPC::State, 0xF2>
 {
-    using Instruction = AddressMode::Direct<Operator::SET1<7, false>>;
+    using Instruction = SPC::AddressMode::Direct<SPC::Operator::SET1<7, false>>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "F2: CLR1 d.7");
 
@@ -1269,11 +1271,11 @@ struct Opcode<State, 0xF2>
 // C = 0    	[.......0]
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0x60>
+struct Opcode<SPC::State, 0x60>
 {
-    using Instruction = AddressMode::Implied<Operator::SET<State::Flag::c, false>>;
+    using Instruction = SPC::AddressMode::Implied<SPC::Operator::SET<SPC::State::Flag::c, false>>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "60: CLRC ");
 
@@ -1287,11 +1289,11 @@ struct Opcode<State, 0x60>
 // P = 0    	[..0.....]
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0x20>
+struct Opcode<SPC::State, 0x20>
 {
-    using Instruction = AddressMode::Implied<Operator::SET<State::Flag::p, false>>;
+    using Instruction = SPC::AddressMode::Implied<SPC::Operator::SET<SPC::State::Flag::p, false>>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "20: CLRP ");
 
@@ -1305,11 +1307,11 @@ struct Opcode<State, 0x20>
 // V = 0, H = 0    	[.0..0...]
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0xE0>
+struct Opcode<SPC::State, 0xE0>
 {
-    using Instruction = AddressMode::Implied<Operator::SET<State::Flag::v, false>>;
+    using Instruction = SPC::AddressMode::Implied<SPC::Operator::SET<SPC::State::Flag::v, false>>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "E0: CLRV ");
 
@@ -1324,11 +1326,11 @@ struct Opcode<State, 0xE0>
 // (X) - (Y)    	[N.....ZC]
 // Indirect Indirect (1-Byte)
 template<>
-struct Opcode<State, 0x79>
+struct Opcode<SPC::State, 0x79>
 {
-    using Instruction = AddressMode::IndirectIndirect<Operator::CMP>;
+    using Instruction = SPC::AddressMode::IndirectIndirect<SPC::Operator::CMP>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "79: CMP (X), (Y)");
 
@@ -1343,11 +1345,11 @@ struct Opcode<State, 0x79>
 // A - i    	[N.....ZC]
 // Register Immediate (2-Byte)
 template<>
-struct Opcode<State, 0x68>
+struct Opcode<SPC::State, 0x68>
 {
-    using Instruction = AddressMode::RegisterImmediate<Operator::CMP, State::Register::A>;
+    using Instruction = SPC::AddressMode::RegisterImmediate<SPC::Operator::CMP, SPC::State::Register::A>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "68: CMP A, #i");
 
@@ -1361,11 +1363,11 @@ struct Opcode<State, 0x68>
 // A - (X)    	[N.....ZC]
 // Register Register Indirect (1-Byte)
 template<>
-struct Opcode<State, 0x66>
+struct Opcode<SPC::State, 0x66>
 {
-    using Instruction = AddressMode::RegisterRegisterIndirect<Operator::CMP, State::Register::A, State::Register::X>;
+    using Instruction = SPC::AddressMode::RegisterRegisterIndirect<SPC::Operator::CMP, SPC::State::Register::A, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "66: CMP A, (X)");
 
@@ -1380,11 +1382,11 @@ struct Opcode<State, 0x66>
 // A - ([d]+Y)    	[N.....ZC]
 // Register Direct Indirect Indexed (2-Byte)
 template<>
-struct Opcode<State, 0x77>
+struct Opcode<SPC::State, 0x77>
 {
-    using Instruction = AddressMode::RegisterDirectIndirectIndexed<Operator::CMP, State::Register::A, State::Register::Y>;
+    using Instruction = SPC::AddressMode::RegisterDirectIndirectIndexed<SPC::Operator::CMP, SPC::State::Register::A, SPC::State::Register::Y>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "77: CMP A, [d]+Y");
 
@@ -1399,11 +1401,11 @@ struct Opcode<State, 0x77>
 // A - ([d+X])    	[N.....ZC]
 // Register Direct Indexed Indirect (2-Byte)
 template<>
-struct Opcode<State, 0x67>
+struct Opcode<SPC::State, 0x67>
 {
-    using Instruction = AddressMode::RegisterDirectIndexedIndirect<Operator::CMP, State::Register::A, State::Register::X>;
+    using Instruction = SPC::AddressMode::RegisterDirectIndexedIndirect<SPC::Operator::CMP, SPC::State::Register::A, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "67: CMP A, [d+X]");
 
@@ -1418,11 +1420,11 @@ struct Opcode<State, 0x67>
 // A - (d)    	[N.....ZC]
 // Register Direct (2-Byte)
 template<>
-struct Opcode<State, 0x64>
+struct Opcode<SPC::State, 0x64>
 {
-    using Instruction = AddressMode::RegisterDirect<Operator::CMP, State::Register::A>;
+    using Instruction = SPC::AddressMode::RegisterDirect<SPC::Operator::CMP, SPC::State::Register::A>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "64: CMP A, d");
 
@@ -1436,11 +1438,11 @@ struct Opcode<State, 0x64>
 // A - (d+X)    	[N.....ZC]
 // Register Direct Indexed (2-Byte)
 template<>
-struct Opcode<State, 0x74>
+struct Opcode<SPC::State, 0x74>
 {
-    using Instruction = AddressMode::RegisterDirectIndexed<Operator::CMP, State::Register::A, State::Register::X>;
+    using Instruction = SPC::AddressMode::RegisterDirectIndexed<SPC::Operator::CMP, SPC::State::Register::A, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "74: CMP A, d+X");
 
@@ -1454,11 +1456,11 @@ struct Opcode<State, 0x74>
 // A - (a)    	[N.....ZC]
 // Register Absolute (3-Byte)
 template<>
-struct Opcode<State, 0x65>
+struct Opcode<SPC::State, 0x65>
 {
-    using Instruction = AddressMode::RegisterAbsolute<Operator::CMP, State::Register::A>;
+    using Instruction = SPC::AddressMode::RegisterAbsolute<SPC::Operator::CMP, SPC::State::Register::A>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "65: CMP A, !a");
 
@@ -1472,11 +1474,11 @@ struct Opcode<State, 0x65>
 // A - (a+X)    	[N.....ZC]
 // Register Absolute Indexed (3-Byte)
 template<>
-struct Opcode<State, 0x75>
+struct Opcode<SPC::State, 0x75>
 {
-    using Instruction = AddressMode::RegisterAbsoluteIndexed<Operator::CMP, State::Register::A, State::Register::X>;
+    using Instruction = SPC::AddressMode::RegisterAbsoluteIndexed<SPC::Operator::CMP, SPC::State::Register::A, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "75: CMP A, !a+X");
 
@@ -1490,11 +1492,11 @@ struct Opcode<State, 0x75>
 // A - (a+Y)    	[N.....ZC]
 // Register Absolute Indexed (3-Byte)
 template<>
-struct Opcode<State, 0x76>
+struct Opcode<SPC::State, 0x76>
 {
-    using Instruction = AddressMode::RegisterAbsoluteIndexed<Operator::CMP, State::Register::A, State::Register::Y>;
+    using Instruction = SPC::AddressMode::RegisterAbsoluteIndexed<SPC::Operator::CMP, SPC::State::Register::A, SPC::State::Register::Y>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "76: CMP A, !a+Y");
 
@@ -1509,11 +1511,11 @@ struct Opcode<State, 0x76>
 // X - i    	[N.....ZC]
 // Register Immediate (2-Byte)
 template<>
-struct Opcode<State, 0xC8>
+struct Opcode<SPC::State, 0xC8>
 {
-    using Instruction = AddressMode::RegisterImmediate<Operator::CMP, State::Register::X>;
+    using Instruction = SPC::AddressMode::RegisterImmediate<SPC::Operator::CMP, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "C8: CMP X, #i");
 
@@ -1527,11 +1529,11 @@ struct Opcode<State, 0xC8>
 // X - (d)    	[N.....ZC]
 // Register Direct (2-Byte)
 template<>
-struct Opcode<State, 0x3E>
+struct Opcode<SPC::State, 0x3E>
 {
-    using Instruction = AddressMode::RegisterDirect<Operator::CMP, State::Register::X>;
+    using Instruction = SPC::AddressMode::RegisterDirect<SPC::Operator::CMP, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "3E: CMP X, d");
 
@@ -1545,11 +1547,11 @@ struct Opcode<State, 0x3E>
 // X - (a)    	[N.....ZC]
 // Register Absolute (3-Byte)
 template<>
-struct Opcode<State, 0x1E>
+struct Opcode<SPC::State, 0x1E>
 {
-    using Instruction = AddressMode::RegisterAbsolute<Operator::CMP, State::Register::X>;
+    using Instruction = SPC::AddressMode::RegisterAbsolute<SPC::Operator::CMP, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "1E: CMP X, !a");
 
@@ -1564,11 +1566,11 @@ struct Opcode<State, 0x1E>
 // Y - i    	[N.....ZC]
 // Register Immediate (2-Byte)
 template<>
-struct Opcode<State, 0xAD>
+struct Opcode<SPC::State, 0xAD>
 {
-    using Instruction = AddressMode::RegisterImmediate<Operator::CMP, State::Register::Y>;
+    using Instruction = SPC::AddressMode::RegisterImmediate<SPC::Operator::CMP, SPC::State::Register::Y>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "AD: CMP Y, #i");
 
@@ -1582,11 +1584,11 @@ struct Opcode<State, 0xAD>
 // Y - (d)    	[N.....ZC]
 // Register Direct (2-Byte)
 template<>
-struct Opcode<State, 0x7E>
+struct Opcode<SPC::State, 0x7E>
 {
-    using Instruction = AddressMode::RegisterDirect<Operator::CMP, State::Register::Y>;
+    using Instruction = SPC::AddressMode::RegisterDirect<SPC::Operator::CMP, SPC::State::Register::Y>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "7E: CMP Y, d");
 
@@ -1600,11 +1602,11 @@ struct Opcode<State, 0x7E>
 // Y - (a)    	[N.....ZC]
 // Register Absolute (3-Byte)
 template<>
-struct Opcode<State, 0x5E>
+struct Opcode<SPC::State, 0x5E>
 {
-    using Instruction = AddressMode::RegisterAbsolute<Operator::CMP, State::Register::Y>;
+    using Instruction = SPC::AddressMode::RegisterAbsolute<SPC::Operator::CMP, SPC::State::Register::Y>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "5E: CMP Y, !a");
 
@@ -1618,11 +1620,11 @@ struct Opcode<State, 0x5E>
 // (dd) - (ds)    	[N.....ZC]
 // Direct Direct (3-Byte)
 template<>
-struct Opcode<State, 0x69>
+struct Opcode<SPC::State, 0x69>
 {
-    using Instruction = AddressMode::DirectDirect<Operator::CMP>;
+    using Instruction = SPC::AddressMode::DirectDirect<SPC::Operator::CMP>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "69: CMP dd, ds");
 
@@ -1636,11 +1638,11 @@ struct Opcode<State, 0x69>
 // (d) - i    	[N.....ZC]
 // Direct Immediate (3-Byte)
 template<>
-struct Opcode<State, 0x78>
+struct Opcode<SPC::State, 0x78>
 {
-    using Instruction = AddressMode::DirectImmediate<Operator::CMP>;
+    using Instruction = SPC::AddressMode::DirectImmediate<SPC::Operator::CMP>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "78: CMP d, #i");
 
@@ -1654,11 +1656,11 @@ struct Opcode<State, 0x78>
 // YA - (d)    	[N.....ZC]
 // Y Accumulator Direct (2-Byte)
 template<>
-struct Opcode<State, 0x5A>
+struct Opcode<SPC::State, 0x5A>
 {
-    using Instruction = AddressMode::YAccumulatorDirect<Operator::CMPW>;
+    using Instruction = SPC::AddressMode::YAccumulatorDirect<SPC::Operator::CMPW>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "5A: CMPW YA, d");
 
@@ -1672,11 +1674,11 @@ struct Opcode<State, 0x5A>
 // decimal adjust for addition    	[N.....ZC]
 // Register (1-Byte)
 template<>
-struct Opcode<State, 0xDF>
+struct Opcode<SPC::State, 0xDF>
 {
-    using Instruction = AddressMode::Register<Operator::DAA, State::Register::A>;
+    using Instruction = SPC::AddressMode::Register<SPC::Operator::DAA, SPC::State::Register::A>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "DF: DAA A");
 
@@ -1691,11 +1693,11 @@ struct Opcode<State, 0xDF>
 // decimal adjust for subtraction    	[N.....ZC]
 // Register (1-Byte)
 template<>
-struct Opcode<State, 0xBE>
+struct Opcode<SPC::State, 0xBE>
 {
-    using Instruction = AddressMode::Register<Operator::DAS, State::Register::A>;
+    using Instruction = SPC::AddressMode::Register<SPC::Operator::DAS, SPC::State::Register::A>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "BE: DAS A");
 
@@ -1710,11 +1712,11 @@ struct Opcode<State, 0xBE>
 // Y-- then JNZ    	[........]
 // Register Program Counter Relative (2-Byte)
 template<>
-struct Opcode<State, 0xFE>
+struct Opcode<SPC::State, 0xFE>
 {
-    using Instruction = AddressMode::RegisterProgramCounterRelative<Operator::DBNZ, State::Register::Y>;
+    using Instruction = SPC::AddressMode::RegisterProgramCounterRelative<SPC::Operator::DBNZ, SPC::State::Register::Y>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "FE: DBNZ Y, r");
 
@@ -1728,11 +1730,11 @@ struct Opcode<State, 0xFE>
 // (d)-- then JNZ    	[........]
 // Direct Program Counter Relative (3-Byte)
 template<>
-struct Opcode<State, 0x6E>
+struct Opcode<SPC::State, 0x6E>
 {
-    using Instruction = AddressMode::DirectProgramCounterRelative<Operator::DBNZ>;
+    using Instruction = SPC::AddressMode::DirectProgramCounterRelative<SPC::Operator::DBNZ>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "6E: DBNZ d, r");
 
@@ -1746,11 +1748,11 @@ struct Opcode<State, 0x6E>
 // A--    	[N.....Z.]
 // Register (1-Byte)
 template<>
-struct Opcode<State, 0x9C>
+struct Opcode<SPC::State, 0x9C>
 {
-    using Instruction = AddressMode::Register<Operator::DEC, State::Register::A>;
+    using Instruction = SPC::AddressMode::Register<SPC::Operator::DEC, SPC::State::Register::A>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "9C: DEC A");
 
@@ -1764,11 +1766,11 @@ struct Opcode<State, 0x9C>
 // X--    	[N.....Z.]
 // Register (1-Byte)
 template<>
-struct Opcode<State, 0x1D>
+struct Opcode<SPC::State, 0x1D>
 {
-    using Instruction = AddressMode::Register<Operator::DEC, State::Register::X>;
+    using Instruction = SPC::AddressMode::Register<SPC::Operator::DEC, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "1D: DEC X");
 
@@ -1782,11 +1784,11 @@ struct Opcode<State, 0x1D>
 // Y--    	[N.....Z.]
 // Register (1-Byte)
 template<>
-struct Opcode<State, 0xDC>
+struct Opcode<SPC::State, 0xDC>
 {
-    using Instruction = AddressMode::Register<Operator::DEC, State::Register::Y>;
+    using Instruction = SPC::AddressMode::Register<SPC::Operator::DEC, SPC::State::Register::Y>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "DC: DEC Y");
 
@@ -1800,11 +1802,11 @@ struct Opcode<State, 0xDC>
 // (d)--    	[N.....Z.]
 // Direct (2-Byte)
 template<>
-struct Opcode<State, 0x8B>
+struct Opcode<SPC::State, 0x8B>
 {
-    using Instruction = AddressMode::Direct<Operator::DEC>;
+    using Instruction = SPC::AddressMode::Direct<SPC::Operator::DEC>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "8B: DEC d");
 
@@ -1818,11 +1820,11 @@ struct Opcode<State, 0x8B>
 // (d+X)--    	[N.....Z.]
 // Direct Indexed (2-Byte)
 template<>
-struct Opcode<State, 0x9B>
+struct Opcode<SPC::State, 0x9B>
 {
-    using Instruction = AddressMode::DirectIndexed<Operator::DEC, State::Register::X>;
+    using Instruction = SPC::AddressMode::DirectIndexed<SPC::Operator::DEC, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "9B: DEC d+X");
 
@@ -1836,11 +1838,11 @@ struct Opcode<State, 0x9B>
 // (a)--    	[N.....Z.]
 // Absolute (3-Byte)
 template<>
-struct Opcode<State, 0x8C>
+struct Opcode<SPC::State, 0x8C>
 {
-    using Instruction = AddressMode::Absolute<Operator::DEC>;
+    using Instruction = SPC::AddressMode::Absolute<SPC::Operator::DEC>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "8C: DEC !a");
 
@@ -1854,11 +1856,11 @@ struct Opcode<State, 0x8C>
 // Word (d)--    	[N.....Z.]
 // Direct (2-Byte)
 template<>
-struct Opcode<State, 0x1A>
+struct Opcode<SPC::State, 0x1A>
 {
-    using Instruction = AddressMode::Direct<Operator::DECW>;
+    using Instruction = SPC::AddressMode::Direct<SPC::Operator::DECW>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "1A: DECW d");
 
@@ -1872,11 +1874,11 @@ struct Opcode<State, 0x1A>
 // I = 0    	[.....0..]
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0xC0>
+struct Opcode<SPC::State, 0xC0>
 {
-    using Instruction = AddressMode::Implied<Operator::DI>;
+    using Instruction = SPC::AddressMode::Implied<SPC::Operator::DI>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "C0: DI ");
 
@@ -1891,11 +1893,11 @@ struct Opcode<State, 0xC0>
 // A=YA/X, Y=mod(YA,X)    	[NV..H.Z.]
 // Y Accumulator Index (1-Byte)
 template<>
-struct Opcode<State, 0x9E>
+struct Opcode<SPC::State, 0x9E>
 {
-    using Instruction = AddressMode::YAccumulatorIndex<Operator::DIV, State::Register::X>;
+    using Instruction = SPC::AddressMode::YAccumulatorIndex<SPC::Operator::DIV, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "9E: DIV YA, X");
 
@@ -1909,11 +1911,11 @@ struct Opcode<State, 0x9E>
 // I = 1    	[.....1..]
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0xA0>
+struct Opcode<SPC::State, 0xA0>
 {
-    using Instruction = AddressMode::Implied<Operator::EI>;
+    using Instruction = SPC::AddressMode::Implied<SPC::Operator::EI>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "A0: EI ");
 
@@ -1928,11 +1930,11 @@ struct Opcode<State, 0xA0>
 // (X) = (X) EOR (Y)    	[N.....Z.]
 // Indirect Indirect (1-Byte)
 template<>
-struct Opcode<State, 0x59>
+struct Opcode<SPC::State, 0x59>
 {
-    using Instruction = AddressMode::IndirectIndirect<Operator::EOR>;
+    using Instruction = SPC::AddressMode::IndirectIndirect<SPC::Operator::EOR>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "59: EOR (X), (Y)");
 
@@ -1947,11 +1949,11 @@ struct Opcode<State, 0x59>
 // A = A EOR i    	[N.....Z.]
 // Register Immediate (2-Byte)
 template<>
-struct Opcode<State, 0x48>
+struct Opcode<SPC::State, 0x48>
 {
-    using Instruction = AddressMode::RegisterImmediate<Operator::EOR, State::Register::A>;
+    using Instruction = SPC::AddressMode::RegisterImmediate<SPC::Operator::EOR, SPC::State::Register::A>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "48: EOR A, #i");
 
@@ -1965,11 +1967,11 @@ struct Opcode<State, 0x48>
 // A = A EOR (X)    	[N.....Z.]
 // Register Register Indirect (1-Byte)
 template<>
-struct Opcode<State, 0x46>
+struct Opcode<SPC::State, 0x46>
 {
-    using Instruction = AddressMode::RegisterRegisterIndirect<Operator::EOR, State::Register::A, State::Register::X>;
+    using Instruction = SPC::AddressMode::RegisterRegisterIndirect<SPC::Operator::EOR, SPC::State::Register::A, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "46: EOR A, (X)");
 
@@ -1984,11 +1986,11 @@ struct Opcode<State, 0x46>
 // A = A EOR ([d]+Y)    	[N.....Z.]
 // Register Direct Indirect Indexed (2-Byte)
 template<>
-struct Opcode<State, 0x57>
+struct Opcode<SPC::State, 0x57>
 {
-    using Instruction = AddressMode::RegisterDirectIndirectIndexed<Operator::EOR, State::Register::A, State::Register::Y>;
+    using Instruction = SPC::AddressMode::RegisterDirectIndirectIndexed<SPC::Operator::EOR, SPC::State::Register::A, SPC::State::Register::Y>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "57: EOR A, [d]+Y");
 
@@ -2003,11 +2005,11 @@ struct Opcode<State, 0x57>
 // A = A EOR ([d+X])    	[N.....Z.]
 // Register Direct Indexed Indirect (2-Byte)
 template<>
-struct Opcode<State, 0x47>
+struct Opcode<SPC::State, 0x47>
 {
-    using Instruction = AddressMode::RegisterDirectIndexedIndirect<Operator::EOR, State::Register::A, State::Register::X>;
+    using Instruction = SPC::AddressMode::RegisterDirectIndexedIndirect<SPC::Operator::EOR, SPC::State::Register::A, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "47: EOR A, [d+X]");
 
@@ -2022,11 +2024,11 @@ struct Opcode<State, 0x47>
 // A = A EOR (d)    	[N.....Z.]
 // Register Direct (2-Byte)
 template<>
-struct Opcode<State, 0x44>
+struct Opcode<SPC::State, 0x44>
 {
-    using Instruction = AddressMode::RegisterDirect<Operator::EOR, State::Register::A>;
+    using Instruction = SPC::AddressMode::RegisterDirect<SPC::Operator::EOR, SPC::State::Register::A>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "44: EOR A, d");
 
@@ -2040,11 +2042,11 @@ struct Opcode<State, 0x44>
 // A = A EOR (d+X)    	[N.....Z.]
 // Register Direct Indexed (2-Byte)
 template<>
-struct Opcode<State, 0x54>
+struct Opcode<SPC::State, 0x54>
 {
-    using Instruction = AddressMode::RegisterDirectIndexed<Operator::EOR, State::Register::A, State::Register::X>;
+    using Instruction = SPC::AddressMode::RegisterDirectIndexed<SPC::Operator::EOR, SPC::State::Register::A, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "54: EOR A, d+X");
 
@@ -2058,11 +2060,11 @@ struct Opcode<State, 0x54>
 // A = A EOR (a)    	[N.....Z.]
 // Register Absolute (3-Byte)
 template<>
-struct Opcode<State, 0x45>
+struct Opcode<SPC::State, 0x45>
 {
-    using Instruction = AddressMode::RegisterAbsolute<Operator::EOR, State::Register::A>;
+    using Instruction = SPC::AddressMode::RegisterAbsolute<SPC::Operator::EOR, SPC::State::Register::A>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "45: EOR A, !a");
 
@@ -2077,11 +2079,11 @@ struct Opcode<State, 0x45>
 // A = A EOR (a+X)    	[N.....Z.]
 // Register Absolute Indexed (3-Byte)
 template<>
-struct Opcode<State, 0x55>
+struct Opcode<SPC::State, 0x55>
 {
-    using Instruction = AddressMode::RegisterAbsoluteIndexed<Operator::EOR, State::Register::A, State::Register::X>;
+    using Instruction = SPC::AddressMode::RegisterAbsoluteIndexed<SPC::Operator::EOR, SPC::State::Register::A, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "55: EOR A, !a+X");
 
@@ -2096,11 +2098,11 @@ struct Opcode<State, 0x55>
 // A = A EOR (a+Y)    	[N.....Z.]
 // Register Absolute Indexed (3-Byte)
 template<>
-struct Opcode<State, 0x56>
+struct Opcode<SPC::State, 0x56>
 {
-    using Instruction = AddressMode::RegisterAbsoluteIndexed<Operator::EOR, State::Register::A, State::Register::Y>;
+    using Instruction = SPC::AddressMode::RegisterAbsoluteIndexed<SPC::Operator::EOR, SPC::State::Register::A, SPC::State::Register::Y>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "56: EOR A, !a+Y");
 
@@ -2115,11 +2117,11 @@ struct Opcode<State, 0x56>
 // (dd) = (dd) EOR (ds)    	[N.....Z.]
 // Direct Direct (3-Byte)
 template<>
-struct Opcode<State, 0x49>
+struct Opcode<SPC::State, 0x49>
 {
-    using Instruction = AddressMode::DirectDirect<Operator::EOR>;
+    using Instruction = SPC::AddressMode::DirectDirect<SPC::Operator::EOR>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "49: EOR dd, ds");
 
@@ -2134,11 +2136,11 @@ struct Opcode<State, 0x49>
 // (d) = (d) EOR i    	[N.....Z.]
 // Direct Immediate (3-Byte)
 template<>
-struct Opcode<State, 0x58>
+struct Opcode<SPC::State, 0x58>
 {
-    using Instruction = AddressMode::DirectImmediate<Operator::EOR>;
+    using Instruction = SPC::AddressMode::DirectImmediate<SPC::Operator::EOR>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "58: EOR d, #i");
 
@@ -2152,11 +2154,11 @@ struct Opcode<State, 0x58>
 // C = C EOR (m.b)    	[.......C]
 // Carry Memory Bit (3-Byte)
 template<>
-struct Opcode<State, 0x8A>
+struct Opcode<SPC::State, 0x8A>
 {
-    using Instruction = AddressMode::CarryMemoryBit<Operator::EOR1>;
+    using Instruction = SPC::AddressMode::CarryMemoryBit<SPC::Operator::EOR1>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "8A: EOR1 C, m.b");
 
@@ -2171,11 +2173,11 @@ struct Opcode<State, 0x8A>
 // A++    	[N.....Z.]
 // Register (1-Byte)
 template<>
-struct Opcode<State, 0xBC>
+struct Opcode<SPC::State, 0xBC>
 {
-    using Instruction = AddressMode::Register<Operator::INC, State::Register::A>;
+    using Instruction = SPC::AddressMode::Register<SPC::Operator::INC, SPC::State::Register::A>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "BC: INC A");
 
@@ -2189,11 +2191,11 @@ struct Opcode<State, 0xBC>
 // X++    	[N.....Z.]
 // Register (1-Byte)
 template<>
-struct Opcode<State, 0x3D>
+struct Opcode<SPC::State, 0x3D>
 {
-    using Instruction = AddressMode::Register<Operator::INC, State::Register::X>;
+    using Instruction = SPC::AddressMode::Register<SPC::Operator::INC, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "3D: INC X");
 
@@ -2207,11 +2209,11 @@ struct Opcode<State, 0x3D>
 // Y++    	[N.....Z.]
 // Register (1-Byte)
 template<>
-struct Opcode<State, 0xFC>
+struct Opcode<SPC::State, 0xFC>
 {
-    using Instruction = AddressMode::Register<Operator::INC, State::Register::Y>;
+    using Instruction = SPC::AddressMode::Register<SPC::Operator::INC, SPC::State::Register::Y>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "FC: INC Y");
 
@@ -2225,11 +2227,11 @@ struct Opcode<State, 0xFC>
 // (d)++    	[N.....Z.]
 // Direct (2-Byte)
 template<>
-struct Opcode<State, 0xAB>
+struct Opcode<SPC::State, 0xAB>
 {
-    using Instruction = AddressMode::Direct<Operator::INC>;
+    using Instruction = SPC::AddressMode::Direct<SPC::Operator::INC>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "AB: INC d");
 
@@ -2243,11 +2245,11 @@ struct Opcode<State, 0xAB>
 // (d+X)++    	[N.....Z.]
 // Direct Indexed (2-Byte)
 template<>
-struct Opcode<State, 0xBB>
+struct Opcode<SPC::State, 0xBB>
 {
-    using Instruction = AddressMode::DirectIndexed<Operator::INC, State::Register::X>;
+    using Instruction = SPC::AddressMode::DirectIndexed<SPC::Operator::INC, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "BB: INC d+X");
 
@@ -2261,11 +2263,11 @@ struct Opcode<State, 0xBB>
 // (a)++    	[N.....Z.]
 // Absolute (3-Byte)
 template<>
-struct Opcode<State, 0xAC>
+struct Opcode<SPC::State, 0xAC>
 {
-    using Instruction = AddressMode::Absolute<Operator::INC>;
+    using Instruction = SPC::AddressMode::Absolute<SPC::Operator::INC>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "AC: INC !a");
 
@@ -2279,11 +2281,11 @@ struct Opcode<State, 0xAC>
 // Word (d)++    	[N.....Z.]
 // Direct (2-Byte)
 template<>
-struct Opcode<State, 0x3A>
+struct Opcode<SPC::State, 0x3A>
 {
-    using Instruction = AddressMode::Direct<Operator::INCW>;
+    using Instruction = SPC::AddressMode::Direct<SPC::Operator::INCW>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "3A: INCW d");
 
@@ -2297,11 +2299,11 @@ struct Opcode<State, 0x3A>
 // PC = [a+X]    	[........]
 // Absolute Indexed Indirect (3-Byte)
 template<>
-struct Opcode<State, 0x1F>
+struct Opcode<SPC::State, 0x1F>
 {
-    using Instruction = AddressMode::AbsoluteIndexedIndirect<Operator::JMP, State::Register::X>;
+    using Instruction = SPC::AddressMode::AbsoluteIndexedIndirect<SPC::Operator::JMP, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "1F: JMP [!a+X]");
 
@@ -2315,11 +2317,11 @@ struct Opcode<State, 0x1F>
 // PC = a    	[........]
 // Absolute (3-Byte)
 template<>
-struct Opcode<State, 0x5F>
+struct Opcode<SPC::State, 0x5F>
 {
-    using Instruction = AddressMode::Absolute_ControlFlow<Operator::JMP>;
+    using Instruction = SPC::AddressMode::Absolute_ControlFlow<SPC::Operator::JMP>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "5F: JMP !a");
 
@@ -2333,11 +2335,11 @@ struct Opcode<State, 0x5F>
 // Right shift A: 0->high, low->C    	[N.....ZC]
 // Register (1-Byte)
 template<>
-struct Opcode<State, 0x5C>
+struct Opcode<SPC::State, 0x5C>
 {
-    using Instruction = AddressMode::Register<Operator::LSR, State::Register::A>;
+    using Instruction = SPC::AddressMode::Register<SPC::Operator::LSR, SPC::State::Register::A>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "5C: LSR A");
 
@@ -2351,11 +2353,11 @@ struct Opcode<State, 0x5C>
 // Right shift (d) as above    	[N.....ZC]
 // Direct (2-Byte)
 template<>
-struct Opcode<State, 0x4B>
+struct Opcode<SPC::State, 0x4B>
 {
-    using Instruction = AddressMode::Direct<Operator::LSR>;
+    using Instruction = SPC::AddressMode::Direct<SPC::Operator::LSR>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "4B: LSR d");
 
@@ -2369,11 +2371,11 @@ struct Opcode<State, 0x4B>
 // Right shift (d+X) as above    	[N.....ZC]
 // Direct Indexed (2-Byte)
 template<>
-struct Opcode<State, 0x5B>
+struct Opcode<SPC::State, 0x5B>
 {
-    using Instruction = AddressMode::DirectIndexed<Operator::LSR, State::Register::X>;
+    using Instruction = SPC::AddressMode::DirectIndexed<SPC::Operator::LSR, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "5B: LSR d+X");
 
@@ -2388,11 +2390,11 @@ struct Opcode<State, 0x5B>
 // Right shift (a) as above    	[N.....ZC]
 // Absolute (3-Byte)
 template<>
-struct Opcode<State, 0x4C>
+struct Opcode<SPC::State, 0x4C>
 {
-    using Instruction = AddressMode::Absolute<Operator::LSR>;
+    using Instruction = SPC::AddressMode::Absolute<SPC::Operator::LSR>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "4C: LSR !a");
 
@@ -2406,11 +2408,11 @@ struct Opcode<State, 0x4C>
 // (X++) = A      (no read)    	[........]
 // Register Indirect Increment Register (1-Byte)
 template<>
-struct Opcode<State, 0xAF>
+struct Opcode<SPC::State, 0xAF>
 {
-    using Instruction = AddressMode::RegisterIndirectIncrementRegister<Operator::MOV, State::Register::X, State::Register::A>;
+    using Instruction = SPC::AddressMode::RegisterIndirectIncrementRegister<SPC::Operator::MOV, SPC::State::Register::X, SPC::State::Register::A>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "AF: MOV (X)+, A");
 
@@ -2424,11 +2426,11 @@ struct Opcode<State, 0xAF>
 // (X) = A        (read)    	[........]
 // Register Indirect Register (1-Byte)
 template<>
-struct Opcode<State, 0xC6>
+struct Opcode<SPC::State, 0xC6>
 {
-    using Instruction = AddressMode::RegisterIndirectRegister<Operator::MOV, State::Register::X, State::Register::A>;
+    using Instruction = SPC::AddressMode::RegisterIndirectRegister<SPC::Operator::MOV, SPC::State::Register::X, SPC::State::Register::A>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "C6: MOV (X), A");
 
@@ -2442,11 +2444,11 @@ struct Opcode<State, 0xC6>
 // ([d]+Y) = A    (read)    	[........]
 // Direct Indirect Indexed Register (2-Byte)
 template<>
-struct Opcode<State, 0xD7>
+struct Opcode<SPC::State, 0xD7>
 {
-    using Instruction = AddressMode::DirectIndirectIndexedRegister<Operator::MOV, State::Register::Y, State::Register::A>;
+    using Instruction = SPC::AddressMode::DirectIndirectIndexedRegister<SPC::Operator::MOV, SPC::State::Register::Y, SPC::State::Register::A>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "D7: MOV [d]+Y, A");
 
@@ -2460,11 +2462,11 @@ struct Opcode<State, 0xD7>
 // ([d+X]) = A    (read)    	[........]
 // Direct Indexed Indirect Register (2-Byte)
 template<>
-struct Opcode<State, 0xC7>
+struct Opcode<SPC::State, 0xC7>
 {
-    using Instruction = AddressMode::DirectIndexedIndirectRegister<Operator::MOV, State::Register::X, State::Register::A>;
+    using Instruction = SPC::AddressMode::DirectIndexedIndirectRegister<SPC::Operator::MOV, SPC::State::Register::X, SPC::State::Register::A>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "C7: MOV [d+X], A");
 
@@ -2478,11 +2480,11 @@ struct Opcode<State, 0xC7>
 // A = i    	[N.....Z.]
 // Register Immediate (2-Byte)
 template<>
-struct Opcode<State, 0xE8>
+struct Opcode<SPC::State, 0xE8>
 {
-    using Instruction = AddressMode::RegisterImmediate<Operator::MOV_SignedResult, State::Register::A>;
+    using Instruction = SPC::AddressMode::RegisterImmediate<SPC::Operator::MOV_SignedResult, SPC::State::Register::A>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "E8: MOV A, #i");
 
@@ -2496,11 +2498,11 @@ struct Opcode<State, 0xE8>
 // A = (X)    	[N.....Z.]
 // Register Register Indirect (1-Byte)
 template<>
-struct Opcode<State, 0xE6>
+struct Opcode<SPC::State, 0xE6>
 {
-    using Instruction = AddressMode::RegisterRegisterIndirect<Operator::MOV_SignedResult, State::Register::A, State::Register::X>;
+    using Instruction = SPC::AddressMode::RegisterRegisterIndirect<SPC::Operator::MOV_SignedResult, SPC::State::Register::A, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "E6: MOV A, (X)");
 
@@ -2514,11 +2516,11 @@ struct Opcode<State, 0xE6>
 // A = (X++)    	[N.....Z.]
 // Register Register Indirect Increment (1-Byte)
 template<>
-struct Opcode<State, 0xBF>
+struct Opcode<SPC::State, 0xBF>
 {
-    using Instruction = AddressMode::RegisterRegisterIndirectIncrement<Operator::MOV_SignedResult, State::Register::A, State::Register::X>;
+    using Instruction = SPC::AddressMode::RegisterRegisterIndirectIncrement<SPC::Operator::MOV_SignedResult, SPC::State::Register::A, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "BF: MOV A, (X)+");
 
@@ -2533,11 +2535,11 @@ struct Opcode<State, 0xBF>
 // A = ([d]+Y)    	[N.....Z.]
 // Register Direct Indirect Indexed (2-Byte)
 template<>
-struct Opcode<State, 0xF7>
+struct Opcode<SPC::State, 0xF7>
 {
-    using Instruction = AddressMode::RegisterDirectIndirectIndexed<Operator::MOV_SignedResult, State::Register::A, State::Register::Y>;
+    using Instruction = SPC::AddressMode::RegisterDirectIndirectIndexed<SPC::Operator::MOV_SignedResult, SPC::State::Register::A, SPC::State::Register::Y>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "F7: MOV A, [d]+Y");
 
@@ -2551,11 +2553,11 @@ struct Opcode<State, 0xF7>
 // A = ([d+X])    	[N.....Z.]
 // Register Direct Indexed Indirect (2-Byte)
 template<>
-struct Opcode<State, 0xE7>
+struct Opcode<SPC::State, 0xE7>
 {
-    using Instruction = AddressMode::RegisterDirectIndexedIndirect<Operator::MOV_SignedResult, State::Register::A, State::Register::X>;
+    using Instruction = SPC::AddressMode::RegisterDirectIndexedIndirect<SPC::Operator::MOV_SignedResult, SPC::State::Register::A, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "E7: MOV A, [d+X]");
 
@@ -2569,11 +2571,11 @@ struct Opcode<State, 0xE7>
 // A = X    	[N.....Z.]
 // Register Register (1-Byte)
 template<>
-struct Opcode<State, 0x7D>
+struct Opcode<SPC::State, 0x7D>
 {
-    using Instruction = AddressMode::RegisterRegister<Operator::MOV_SignedResult, State::Register::A, State::Register::X>;
+    using Instruction = SPC::AddressMode::RegisterRegister<SPC::Operator::MOV_SignedResult, SPC::State::Register::A, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "7D: MOV A, X");
 
@@ -2587,11 +2589,11 @@ struct Opcode<State, 0x7D>
 // A = Y    	[N.....Z.]
 // Register Register (1-Byte)
 template<>
-struct Opcode<State, 0xDD>
+struct Opcode<SPC::State, 0xDD>
 {
-    using Instruction = AddressMode::RegisterRegister<Operator::MOV_SignedResult, State::Register::A, State::Register::Y>;
+    using Instruction = SPC::AddressMode::RegisterRegister<SPC::Operator::MOV_SignedResult, SPC::State::Register::A, SPC::State::Register::Y>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "DD: MOV A, Y");
 
@@ -2605,11 +2607,11 @@ struct Opcode<State, 0xDD>
 // A = (d)    	[N.....Z.]
 // Register Direct (2-Byte)
 template<>
-struct Opcode<State, 0xE4>
+struct Opcode<SPC::State, 0xE4>
 {
-    using Instruction = AddressMode::RegisterDirect<Operator::MOV_SignedResult, State::Register::A>;
+    using Instruction = SPC::AddressMode::RegisterDirect<SPC::Operator::MOV_SignedResult, SPC::State::Register::A>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "E4: MOV A, d");
 
@@ -2623,11 +2625,11 @@ struct Opcode<State, 0xE4>
 // A = (d+X)    	[N.....Z.]
 // Register Direct Indexed (2-Byte)
 template<>
-struct Opcode<State, 0xF4>
+struct Opcode<SPC::State, 0xF4>
 {
-    using Instruction = AddressMode::RegisterDirectIndexed<Operator::MOV_SignedResult, State::Register::A, State::Register::X>;
+    using Instruction = SPC::AddressMode::RegisterDirectIndexed<SPC::Operator::MOV_SignedResult, SPC::State::Register::A, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "F4: MOV A, d+X");
 
@@ -2641,11 +2643,11 @@ struct Opcode<State, 0xF4>
 // A = (a)    	[N.....Z.]
 // Register Absolute (3-Byte)
 template<>
-struct Opcode<State, 0xE5>
+struct Opcode<SPC::State, 0xE5>
 {
-    using Instruction = AddressMode::RegisterAbsolute<Operator::MOV_SignedResult, State::Register::A>;
+    using Instruction = SPC::AddressMode::RegisterAbsolute<SPC::Operator::MOV_SignedResult, SPC::State::Register::A>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "E5: MOV A, !a");
 
@@ -2659,11 +2661,11 @@ struct Opcode<State, 0xE5>
 // A = (a+X)    	[N.....Z.]
 // Register Absolute Indexed (3-Byte)
 template<>
-struct Opcode<State, 0xF5>
+struct Opcode<SPC::State, 0xF5>
 {
-    using Instruction = AddressMode::RegisterAbsoluteIndexed<Operator::MOV_SignedResult, State::Register::A, State::Register::X>;
+    using Instruction = SPC::AddressMode::RegisterAbsoluteIndexed<SPC::Operator::MOV_SignedResult, SPC::State::Register::A, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "F5: MOV A, !a+X");
 
@@ -2677,11 +2679,11 @@ struct Opcode<State, 0xF5>
 // A = (a+Y)    	[N.....Z.]
 // Register Absolute Indexed (3-Byte)
 template<>
-struct Opcode<State, 0xF6>
+struct Opcode<SPC::State, 0xF6>
 {
-    using Instruction = AddressMode::RegisterAbsoluteIndexed<Operator::MOV_SignedResult, State::Register::A, State::Register::Y>;
+    using Instruction = SPC::AddressMode::RegisterAbsoluteIndexed<SPC::Operator::MOV_SignedResult, SPC::State::Register::A, SPC::State::Register::Y>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "F6: MOV A, !a+Y");
 
@@ -2695,11 +2697,11 @@ struct Opcode<State, 0xF6>
 // SP = X    	[........]
 // Register Register (1-Byte)
 template<>
-struct Opcode<State, 0xBD>
+struct Opcode<SPC::State, 0xBD>
 {
-    using Instruction = AddressMode::RegisterRegister<Operator::MOV, State::Register::SP, State::Register::X>;
+    using Instruction = SPC::AddressMode::RegisterRegister<SPC::Operator::MOV, SPC::State::Register::SP, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "BD: MOV SP, X");
 
@@ -2713,11 +2715,11 @@ struct Opcode<State, 0xBD>
 // X = i    	[N.....Z.]
 // Register Immediate (2-Byte)
 template<>
-struct Opcode<State, 0xCD>
+struct Opcode<SPC::State, 0xCD>
 {
-    using Instruction = AddressMode::RegisterImmediate<Operator::MOV_SignedResult, State::Register::X>;
+    using Instruction = SPC::AddressMode::RegisterImmediate<SPC::Operator::MOV_SignedResult, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "CD: MOV X, #i");
 
@@ -2731,11 +2733,11 @@ struct Opcode<State, 0xCD>
 // X = A    	[N.....Z.]
 // Register Register (1-Byte)
 template<>
-struct Opcode<State, 0x5D>
+struct Opcode<SPC::State, 0x5D>
 {
-    using Instruction = AddressMode::RegisterRegister<Operator::MOV_SignedResult, State::Register::X, State::Register::A>;
+    using Instruction = SPC::AddressMode::RegisterRegister<SPC::Operator::MOV_SignedResult, SPC::State::Register::X, SPC::State::Register::A>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "5D: MOV X, A");
 
@@ -2749,11 +2751,11 @@ struct Opcode<State, 0x5D>
 // X = SP    	[N.....Z.]
 // Register Register (1-Byte)
 template<>
-struct Opcode<State, 0x9D>
+struct Opcode<SPC::State, 0x9D>
 {
-    using Instruction = AddressMode::RegisterRegister<Operator::MOV_SignedResult, State::Register::X, State::Register::SP>;
+    using Instruction = SPC::AddressMode::RegisterRegister<SPC::Operator::MOV_SignedResult, SPC::State::Register::X, SPC::State::Register::SP>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "9D: MOV X, SP");
 
@@ -2768,11 +2770,11 @@ struct Opcode<State, 0x9D>
 // X = (d)    	[N.....Z.]
 // Register Direct (2-Byte)
 template<>
-struct Opcode<State, 0xF8>
+struct Opcode<SPC::State, 0xF8>
 {
-    using Instruction = AddressMode::RegisterDirect<Operator::MOV_SignedResult, State::Register::X>;
+    using Instruction = SPC::AddressMode::RegisterDirect<SPC::Operator::MOV_SignedResult, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "F8: MOV X, d");
 
@@ -2786,11 +2788,11 @@ struct Opcode<State, 0xF8>
 // X = (d+Y)    	[N.....Z.]
 // Register Direct Indexed (2-Byte)
 template<>
-struct Opcode<State, 0xF9>
+struct Opcode<SPC::State, 0xF9>
 {
-    using Instruction = AddressMode::RegisterDirectIndexed<Operator::MOV_SignedResult, State::Register::X, State::Register::Y>;
+    using Instruction = SPC::AddressMode::RegisterDirectIndexed<SPC::Operator::MOV_SignedResult, SPC::State::Register::X, SPC::State::Register::Y>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "F9: MOV X, d+Y");
 
@@ -2805,11 +2807,11 @@ struct Opcode<State, 0xF9>
 // X = (a)    	[N.....Z.]
 // Register Absolute (3-Byte)
 template<>
-struct Opcode<State, 0xE9>
+struct Opcode<SPC::State, 0xE9>
 {
-    using Instruction = AddressMode::RegisterAbsolute<Operator::MOV_SignedResult, State::Register::X>;
+    using Instruction = SPC::AddressMode::RegisterAbsolute<SPC::Operator::MOV_SignedResult, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "E9: MOV X, !a");
 
@@ -2823,11 +2825,11 @@ struct Opcode<State, 0xE9>
 // Y = i    	[N.....Z.]
 // Register Immediate (2-Byte)
 template<>
-struct Opcode<State, 0x8D>
+struct Opcode<SPC::State, 0x8D>
 {
-    using Instruction = AddressMode::RegisterImmediate<Operator::MOV_SignedResult, State::Register::Y>;
+    using Instruction = SPC::AddressMode::RegisterImmediate<SPC::Operator::MOV_SignedResult, SPC::State::Register::Y>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "8D: MOV Y, #i");
 
@@ -2841,11 +2843,11 @@ struct Opcode<State, 0x8D>
 // Y = A    	[N.....Z.]
 // Register Register (1-Byte)
 template<>
-struct Opcode<State, 0xFD>
+struct Opcode<SPC::State, 0xFD>
 {
-    using Instruction = AddressMode::RegisterRegister<Operator::MOV_SignedResult, State::Register::Y, State::Register::A>;
+    using Instruction = SPC::AddressMode::RegisterRegister<SPC::Operator::MOV_SignedResult, SPC::State::Register::Y, SPC::State::Register::A>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "FD: MOV Y, A");
 
@@ -2859,11 +2861,11 @@ struct Opcode<State, 0xFD>
 // Y = (d)    	[N.....Z.]
 // Register Direct (2-Byte)
 template<>
-struct Opcode<State, 0xEB>
+struct Opcode<SPC::State, 0xEB>
 {
-    using Instruction = AddressMode::RegisterDirect<Operator::MOV_SignedResult, State::Register::Y>;
+    using Instruction = SPC::AddressMode::RegisterDirect<SPC::Operator::MOV_SignedResult, SPC::State::Register::Y>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "EB: MOV Y, d");
 
@@ -2877,11 +2879,11 @@ struct Opcode<State, 0xEB>
 // Y = (d+X)    	[N.....Z.]
 // Register Direct Indexed (2-Byte)
 template<>
-struct Opcode<State, 0xFB>
+struct Opcode<SPC::State, 0xFB>
 {
-    using Instruction = AddressMode::RegisterDirectIndexed<Operator::MOV_SignedResult, State::Register::Y, State::Register::X>;
+    using Instruction = SPC::AddressMode::RegisterDirectIndexed<SPC::Operator::MOV_SignedResult, SPC::State::Register::Y, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "FB: MOV Y, d+X");
 
@@ -2895,11 +2897,11 @@ struct Opcode<State, 0xFB>
 // Y = (a)    	[N.....Z.]
 // Register Absolute (3-Byte)
 template<>
-struct Opcode<State, 0xEC>
+struct Opcode<SPC::State, 0xEC>
 {
-    using Instruction = AddressMode::RegisterAbsolute<Operator::MOV_SignedResult, State::Register::Y>;
+    using Instruction = SPC::AddressMode::RegisterAbsolute<SPC::Operator::MOV_SignedResult, SPC::State::Register::Y>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "EC: MOV Y, !a");
 
@@ -2913,11 +2915,11 @@ struct Opcode<State, 0xEC>
 // (dd) = (ds)    (no read)    	[........]
 // Direct Direct (3-Byte)
 template<>
-struct Opcode<State, 0xFA>
+struct Opcode<SPC::State, 0xFA>
 {
-    using Instruction = AddressMode::DirectDirect<Operator::MOV>;
+    using Instruction = SPC::AddressMode::DirectDirect<SPC::Operator::MOV>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "FA: MOV dd, ds");
 
@@ -2931,11 +2933,11 @@ struct Opcode<State, 0xFA>
 // (d+X) = A      (read)    	[........]
 // Direct Indexed Register (2-Byte)
 template<>
-struct Opcode<State, 0xD4>
+struct Opcode<SPC::State, 0xD4>
 {
-    using Instruction = AddressMode::DirectIndexedRegister<Operator::MOV, State::Register::X, State::Register::A>;
+    using Instruction = SPC::AddressMode::DirectIndexedRegister<SPC::Operator::MOV, SPC::State::Register::X, SPC::State::Register::A>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "D4: MOV d+X, A");
 
@@ -2949,11 +2951,11 @@ struct Opcode<State, 0xD4>
 // (d+X) = Y      (read)    	[........]
 // Direct Indexed Register (2-Byte)
 template<>
-struct Opcode<State, 0xDB>
+struct Opcode<SPC::State, 0xDB>
 {
-    using Instruction = AddressMode::DirectIndexedRegister<Operator::MOV, State::Register::X, State::Register::Y>;
+    using Instruction = SPC::AddressMode::DirectIndexedRegister<SPC::Operator::MOV, SPC::State::Register::X, SPC::State::Register::Y>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "DB: MOV d+X, Y");
 
@@ -2967,11 +2969,11 @@ struct Opcode<State, 0xDB>
 // (d+Y) = X      (read)    	[........]
 // Direct Indexed Register (2-Byte)
 template<>
-struct Opcode<State, 0xD9>
+struct Opcode<SPC::State, 0xD9>
 {
-    using Instruction = AddressMode::DirectIndexedRegister<Operator::MOV, State::Register::Y, State::Register::X>;
+    using Instruction = SPC::AddressMode::DirectIndexedRegister<SPC::Operator::MOV, SPC::State::Register::Y, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "D9: MOV d+Y, X");
 
@@ -2986,11 +2988,11 @@ struct Opcode<State, 0xD9>
 // (d) = i        (read)    	[........]
 // Direct Immediate (3-Byte)
 template<>
-struct Opcode<State, 0x8F>
+struct Opcode<SPC::State, 0x8F>
 {
-    using Instruction = AddressMode::DirectImmediate<Operator::MOV>;
+    using Instruction = SPC::AddressMode::DirectImmediate<SPC::Operator::MOV>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "8F: MOV d, #i");
 
@@ -3004,11 +3006,11 @@ struct Opcode<State, 0x8F>
 // (d) = A        (read)    	[........]
 // Direct Register (2-Byte)
 template<>
-struct Opcode<State, 0xC4>
+struct Opcode<SPC::State, 0xC4>
 {
-    using Instruction = AddressMode::DirectRegister<Operator::MOV, State::Register::A>;
+    using Instruction = SPC::AddressMode::DirectRegister<SPC::Operator::MOV, SPC::State::Register::A>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "C4: MOV d, A");
 
@@ -3022,11 +3024,11 @@ struct Opcode<State, 0xC4>
 // (d) = X        (read)    	[........]
 // Direct Register (2-Byte)
 template<>
-struct Opcode<State, 0xD8>
+struct Opcode<SPC::State, 0xD8>
 {
-    using Instruction = AddressMode::DirectRegister<Operator::MOV, State::Register::X>;
+    using Instruction = SPC::AddressMode::DirectRegister<SPC::Operator::MOV, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "D8: MOV d, X");
 
@@ -3040,11 +3042,11 @@ struct Opcode<State, 0xD8>
 // (d) = Y        (read)    	[........]
 // Direct Register (2-Byte)
 template<>
-struct Opcode<State, 0xCB>
+struct Opcode<SPC::State, 0xCB>
 {
-    using Instruction = AddressMode::DirectRegister<Operator::MOV, State::Register::Y>;
+    using Instruction = SPC::AddressMode::DirectRegister<SPC::Operator::MOV, SPC::State::Register::Y>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "CB: MOV d, Y");
 
@@ -3058,11 +3060,11 @@ struct Opcode<State, 0xCB>
 // (a+X) = A      (read)    	[........]
 // Absolute Indexed Register (3-Byte)
 template<>
-struct Opcode<State, 0xD5>
+struct Opcode<SPC::State, 0xD5>
 {
-    using Instruction = AddressMode::AbsoluteIndexedRegister<Operator::MOV, State::Register::X, State::Register::A>;
+    using Instruction = SPC::AddressMode::AbsoluteIndexedRegister<SPC::Operator::MOV, SPC::State::Register::X, SPC::State::Register::A>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "D5: MOV !a+X, A");
 
@@ -3076,11 +3078,11 @@ struct Opcode<State, 0xD5>
 // (a+Y) = A      (read)    	[........]
 // Absolute Indexed Register (3-Byte)
 template<>
-struct Opcode<State, 0xD6>
+struct Opcode<SPC::State, 0xD6>
 {
-    using Instruction = AddressMode::AbsoluteIndexedRegister<Operator::MOV, State::Register::Y, State::Register::A>;
+    using Instruction = SPC::AddressMode::AbsoluteIndexedRegister<SPC::Operator::MOV, SPC::State::Register::Y, SPC::State::Register::A>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "D6: MOV !a+Y, A");
 
@@ -3094,11 +3096,11 @@ struct Opcode<State, 0xD6>
 // (a) = A        (read)    	[........]
 // Absolute Register (3-Byte)
 template<>
-struct Opcode<State, 0xC5>
+struct Opcode<SPC::State, 0xC5>
 {
-    using Instruction = AddressMode::AbsoluteRegister<Operator::MOV, State::Register::A>;
+    using Instruction = SPC::AddressMode::AbsoluteRegister<SPC::Operator::MOV, SPC::State::Register::A>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "C5: MOV !a, A");
 
@@ -3112,11 +3114,11 @@ struct Opcode<State, 0xC5>
 // (a) = X        (read)    	[........]
 // Absolute Register (3-Byte)
 template<>
-struct Opcode<State, 0xC9>
+struct Opcode<SPC::State, 0xC9>
 {
-    using Instruction = AddressMode::AbsoluteRegister<Operator::MOV, State::Register::X>;
+    using Instruction = SPC::AddressMode::AbsoluteRegister<SPC::Operator::MOV, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "C9: MOV !a, X");
 
@@ -3130,11 +3132,11 @@ struct Opcode<State, 0xC9>
 // (a) = Y        (read)    	[........]
 // Absolute Register (3-Byte)
 template<>
-struct Opcode<State, 0xCC>
+struct Opcode<SPC::State, 0xCC>
 {
-    using Instruction = AddressMode::AbsoluteRegister<Operator::MOV, State::Register::Y>;
+    using Instruction = SPC::AddressMode::AbsoluteRegister<SPC::Operator::MOV, SPC::State::Register::Y>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "CC: MOV !a, Y");
 
@@ -3148,11 +3150,11 @@ struct Opcode<State, 0xCC>
 // C = (m.b)    	[.......C]
 // Carry Memory Bit (3-Byte)
 template<>
-struct Opcode<State, 0xAA>
+struct Opcode<SPC::State, 0xAA>
 {
-    using Instruction = AddressMode::CarryMemoryBit<Operator::MOV1>;
+    using Instruction = SPC::AddressMode::CarryMemoryBit<SPC::Operator::MOV1>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "AA: MOV1 C, m.b");
 
@@ -3167,11 +3169,11 @@ struct Opcode<State, 0xAA>
 // (m.b) = C    	[........]
 // Memory Bit Carry (3-Byte)
 template<>
-struct Opcode<State, 0xCA>
+struct Opcode<SPC::State, 0xCA>
 {
-    using Instruction = AddressMode::MemoryBitCarry<Operator::MOV1>;
+    using Instruction = SPC::AddressMode::MemoryBitCarry<SPC::Operator::MOV1>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "CA: MOV1 m.b, C");
 
@@ -3186,11 +3188,11 @@ struct Opcode<State, 0xCA>
 // YA = word (d)    	[N.....Z.]
 // Y Accumulator Direct (2-Byte)
 template<>
-struct Opcode<State, 0xBA>
+struct Opcode<SPC::State, 0xBA>
 {
-    using Instruction = AddressMode::YAccumulatorDirect<Operator::MOVW_SignedResult>;
+    using Instruction = SPC::AddressMode::YAccumulatorDirect<SPC::Operator::MOVW_SignedResult>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "BA: MOVW YA, d");
 
@@ -3204,11 +3206,11 @@ struct Opcode<State, 0xBA>
 // word (d) = YA  (read low only)    	[........]
 // Direct Y Accumulator (2-Byte)
 template<>
-struct Opcode<State, 0xDA>
+struct Opcode<SPC::State, 0xDA>
 {
-    using Instruction = AddressMode::DirectYAccumulator<Operator::MOVW>;
+    using Instruction = SPC::AddressMode::DirectYAccumulator<SPC::Operator::MOVW>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "DA: MOVW d, YA");
 
@@ -3222,11 +3224,11 @@ struct Opcode<State, 0xDA>
 // YA = Y * A, NZ on Y only    	[N.....Z.]
 // Y Accumulator (1-Byte)
 template<>
-struct Opcode<State, 0xCF>
+struct Opcode<SPC::State, 0xCF>
 {
-    using Instruction = AddressMode::YAccumulator<Operator::MUL>;
+    using Instruction = SPC::AddressMode::YAccumulator<SPC::Operator::MUL>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "CF: MUL YA");
 
@@ -3240,11 +3242,11 @@ struct Opcode<State, 0xCF>
 // do nothing    	[........]
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0x00>
+struct Opcode<SPC::State, 0x00>
 {
-    using Instruction = AddressMode::Implied<Operator::NOP>;
+    using Instruction = SPC::AddressMode::Implied<SPC::Operator::NOP>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "00: NOP ");
 
@@ -3258,11 +3260,11 @@ struct Opcode<State, 0x00>
 // m.b = ~m.b    	[........]
 // Memory Bit (3-Byte)
 template<>
-struct Opcode<State, 0xEA>
+struct Opcode<SPC::State, 0xEA>
 {
-    using Instruction = AddressMode::MemoryBit<Operator::NOT1>;
+    using Instruction = SPC::AddressMode::MemoryBit<SPC::Operator::NOT1>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "EA: NOT1 m.b");
 
@@ -3277,11 +3279,11 @@ struct Opcode<State, 0xEA>
 // C = !C    	[.......C]
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0xED>
+struct Opcode<SPC::State, 0xED>
 {
-    using Instruction = AddressMode::Implied<Operator::NOTC>;
+    using Instruction = SPC::AddressMode::Implied<SPC::Operator::NOTC>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "ED: NOTC ");
 
@@ -3295,11 +3297,11 @@ struct Opcode<State, 0xED>
 // (X) = (X) | (Y)    	[N.....Z.]
 // Indirect Indirect (1-Byte)
 template<>
-struct Opcode<State, 0x19>
+struct Opcode<SPC::State, 0x19>
 {
-    using Instruction = AddressMode::IndirectIndirect<Operator::OR>;
+    using Instruction = SPC::AddressMode::IndirectIndirect<SPC::Operator::OR>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "19: OR (X), (Y)");
 
@@ -3314,11 +3316,11 @@ struct Opcode<State, 0x19>
 // A = A | i    	[N.....Z.]
 // Register Immediate (2-Byte)
 template<>
-struct Opcode<State, 0x08>
+struct Opcode<SPC::State, 0x08>
 {
-    using Instruction = AddressMode::RegisterImmediate<Operator::OR, State::Register::A>;
+    using Instruction = SPC::AddressMode::RegisterImmediate<SPC::Operator::OR, SPC::State::Register::A>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "08: OR A, #i");
 
@@ -3332,11 +3334,11 @@ struct Opcode<State, 0x08>
 // A = A | (X)    	[N.....Z.]
 // Register Register Indirect (1-Byte)
 template<>
-struct Opcode<State, 0x06>
+struct Opcode<SPC::State, 0x06>
 {
-    using Instruction = AddressMode::RegisterRegisterIndirect<Operator::OR, State::Register::A, State::Register::X>;
+    using Instruction = SPC::AddressMode::RegisterRegisterIndirect<SPC::Operator::OR, SPC::State::Register::A, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "06: OR A, (X)");
 
@@ -3351,11 +3353,11 @@ struct Opcode<State, 0x06>
 // A = A | ([d]+Y)    	[N.....Z.]
 // Register Direct Indirect Indexed (2-Byte)
 template<>
-struct Opcode<State, 0x17>
+struct Opcode<SPC::State, 0x17>
 {
-    using Instruction = AddressMode::RegisterDirectIndirectIndexed<Operator::OR, State::Register::A, State::Register::Y>;
+    using Instruction = SPC::AddressMode::RegisterDirectIndirectIndexed<SPC::Operator::OR, SPC::State::Register::A, SPC::State::Register::Y>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "17: OR A, [d]+Y");
 
@@ -3370,11 +3372,11 @@ struct Opcode<State, 0x17>
 // A = A | ([d+X])    	[N.....Z.]
 // Register Direct Indexed Indirect (2-Byte)
 template<>
-struct Opcode<State, 0x07>
+struct Opcode<SPC::State, 0x07>
 {
-    using Instruction = AddressMode::RegisterDirectIndexedIndirect<Operator::OR, State::Register::A, State::Register::X>;
+    using Instruction = SPC::AddressMode::RegisterDirectIndexedIndirect<SPC::Operator::OR, SPC::State::Register::A, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "07: OR A, [d+X]");
 
@@ -3389,11 +3391,11 @@ struct Opcode<State, 0x07>
 // A = A | (d)    	[N.....Z.]
 // Register Direct (2-Byte)
 template<>
-struct Opcode<State, 0x04>
+struct Opcode<SPC::State, 0x04>
 {
-    using Instruction = AddressMode::RegisterDirect<Operator::OR, State::Register::A>;
+    using Instruction = SPC::AddressMode::RegisterDirect<SPC::Operator::OR, SPC::State::Register::A>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "04: OR A, d");
 
@@ -3407,11 +3409,11 @@ struct Opcode<State, 0x04>
 // A = A | (d+X)    	[N.....Z.]
 // Register Direct Indexed (2-Byte)
 template<>
-struct Opcode<State, 0x14>
+struct Opcode<SPC::State, 0x14>
 {
-    using Instruction = AddressMode::RegisterDirectIndexed<Operator::OR, State::Register::A, State::Register::X>;
+    using Instruction = SPC::AddressMode::RegisterDirectIndexed<SPC::Operator::OR, SPC::State::Register::A, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "14: OR A, d+X");
 
@@ -3425,11 +3427,11 @@ struct Opcode<State, 0x14>
 // A = A | (a)    	[N.....Z.]
 // Register Absolute (3-Byte)
 template<>
-struct Opcode<State, 0x05>
+struct Opcode<SPC::State, 0x05>
 {
-    using Instruction = AddressMode::RegisterAbsolute<Operator::OR, State::Register::A>;
+    using Instruction = SPC::AddressMode::RegisterAbsolute<SPC::Operator::OR, SPC::State::Register::A>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "05: OR A, !a");
 
@@ -3443,11 +3445,11 @@ struct Opcode<State, 0x05>
 // A = A | (a+X)    	[N.....Z.]
 // Register Absolute Indexed (3-Byte)
 template<>
-struct Opcode<State, 0x15>
+struct Opcode<SPC::State, 0x15>
 {
-    using Instruction = AddressMode::RegisterAbsoluteIndexed<Operator::OR, State::Register::A, State::Register::X>;
+    using Instruction = SPC::AddressMode::RegisterAbsoluteIndexed<SPC::Operator::OR, SPC::State::Register::A, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "15: OR A, !a+X");
 
@@ -3461,11 +3463,11 @@ struct Opcode<State, 0x15>
 // A = A | (a+Y)    	[N.....Z.]
 // Register Absolute Indexed (3-Byte)
 template<>
-struct Opcode<State, 0x16>
+struct Opcode<SPC::State, 0x16>
 {
-    using Instruction = AddressMode::RegisterAbsoluteIndexed<Operator::OR, State::Register::A, State::Register::Y>;
+    using Instruction = SPC::AddressMode::RegisterAbsoluteIndexed<SPC::Operator::OR, SPC::State::Register::A, SPC::State::Register::Y>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "16: OR A, !a+Y");
 
@@ -3480,11 +3482,11 @@ struct Opcode<State, 0x16>
 // (dd) = (dd) | (ds)    	[N.....Z.]
 // Direct Direct (3-Byte)
 template<>
-struct Opcode<State, 0x09>
+struct Opcode<SPC::State, 0x09>
 {
-    using Instruction = AddressMode::DirectDirect<Operator::OR>;
+    using Instruction = SPC::AddressMode::DirectDirect<SPC::Operator::OR>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "09: OR dd, ds");
 
@@ -3498,11 +3500,11 @@ struct Opcode<State, 0x09>
 // (d) = (d) | i    	[N.....Z.]
 // Direct Immediate (3-Byte)
 template<>
-struct Opcode<State, 0x18>
+struct Opcode<SPC::State, 0x18>
 {
-    using Instruction = AddressMode::DirectImmediate<Operator::OR>;
+    using Instruction = SPC::AddressMode::DirectImmediate<SPC::Operator::OR>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "18: OR d, #i");
 
@@ -3517,11 +3519,11 @@ struct Opcode<State, 0x18>
 // C = C | ~(m.b)    	[.......C]
 // Carry Negated Memory Bit (3-Byte)
 template<>
-struct Opcode<State, 0x2A>
+struct Opcode<SPC::State, 0x2A>
 {
-    using Instruction = AddressMode::CarryNegatedMemoryBit<Operator::OR1>;
+    using Instruction = SPC::AddressMode::CarryNegatedMemoryBit<SPC::Operator::OR1>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "2A: OR1 C, /m.b");
 
@@ -3536,11 +3538,11 @@ struct Opcode<State, 0x2A>
 // C = C | (m.b)    	[.......C]
 // Carry Memory Bit (3-Byte)
 template<>
-struct Opcode<State, 0x0A>
+struct Opcode<SPC::State, 0x0A>
 {
-    using Instruction = AddressMode::CarryMemoryBit<Operator::OR1>;
+    using Instruction = SPC::AddressMode::CarryMemoryBit<SPC::Operator::OR1>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "0A: OR1 C, m.b");
 
@@ -3555,11 +3557,11 @@ struct Opcode<State, 0x0A>
 // CALL $FF00+u    	[........]
 // U Page (2-Byte)
 template<>
-struct Opcode<State, 0x4F>
+struct Opcode<SPC::State, 0x4F>
 {
-    using Instruction = AddressMode::UPage<Operator::PCALL>;
+    using Instruction = SPC::AddressMode::UPage<SPC::Operator::PCALL>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "4F: PCALL u");
 
@@ -3574,11 +3576,11 @@ struct Opcode<State, 0x4F>
 // A = (++SP)    	[........]
 // Register (1-Byte)
 template<>
-struct Opcode<State, 0xAE>
+struct Opcode<SPC::State, 0xAE>
 {
-    using Instruction = AddressMode::Register<Operator::POP, State::Register::A>;
+    using Instruction = SPC::AddressMode::Register<SPC::Operator::POP, SPC::State::Register::A>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "AE: POP A");
 
@@ -3592,11 +3594,11 @@ struct Opcode<State, 0xAE>
 // Flags = (++SP)    	[NVPBHIZC]
 // Register (1-Byte)
 template<>
-struct Opcode<State, 0x8E>
+struct Opcode<SPC::State, 0x8E>
 {
-    using Instruction = AddressMode::Register<Operator::POP, State::Register::PSW>;
+    using Instruction = SPC::AddressMode::Register<SPC::Operator::POP, SPC::State::Register::PSW>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "8E: POP PSW");
 
@@ -3610,11 +3612,11 @@ struct Opcode<State, 0x8E>
 // X = (++SP)    	[........]
 // Register (1-Byte)
 template<>
-struct Opcode<State, 0xCE>
+struct Opcode<SPC::State, 0xCE>
 {
-    using Instruction = AddressMode::Register<Operator::POP, State::Register::X>;
+    using Instruction = SPC::AddressMode::Register<SPC::Operator::POP, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "CE: POP X");
 
@@ -3628,11 +3630,11 @@ struct Opcode<State, 0xCE>
 // Y = (++SP)    	[........]
 // Register (1-Byte)
 template<>
-struct Opcode<State, 0xEE>
+struct Opcode<SPC::State, 0xEE>
 {
-    using Instruction = AddressMode::Register<Operator::POP, State::Register::Y>;
+    using Instruction = SPC::AddressMode::Register<SPC::Operator::POP, SPC::State::Register::Y>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "EE: POP Y");
 
@@ -3646,11 +3648,11 @@ struct Opcode<State, 0xEE>
 // (SP--) = A    	[........]
 // Register (1-Byte)
 template<>
-struct Opcode<State, 0x2D>
+struct Opcode<SPC::State, 0x2D>
 {
-    using Instruction = AddressMode::Register<Operator::PUSH, State::Register::A>;
+    using Instruction = SPC::AddressMode::Register<SPC::Operator::PUSH, SPC::State::Register::A>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "2D: PUSH A");
 
@@ -3664,11 +3666,11 @@ struct Opcode<State, 0x2D>
 // (SP--) = Flags    	[........]
 // Register (1-Byte)
 template<>
-struct Opcode<State, 0x0D>
+struct Opcode<SPC::State, 0x0D>
 {
-    using Instruction = AddressMode::Register<Operator::PUSH, State::Register::PSW>;
+    using Instruction = SPC::AddressMode::Register<SPC::Operator::PUSH, SPC::State::Register::PSW>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "0D: PUSH PSW");
 
@@ -3682,11 +3684,11 @@ struct Opcode<State, 0x0D>
 // (SP--) = X    	[........]
 // Register (1-Byte)
 template<>
-struct Opcode<State, 0x4D>
+struct Opcode<SPC::State, 0x4D>
 {
-    using Instruction = AddressMode::Register<Operator::PUSH, State::Register::X>;
+    using Instruction = SPC::AddressMode::Register<SPC::Operator::PUSH, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "4D: PUSH X");
 
@@ -3700,11 +3702,11 @@ struct Opcode<State, 0x4D>
 // (SP--) = Y    	[........]
 // Register (1-Byte)
 template<>
-struct Opcode<State, 0x6D>
+struct Opcode<SPC::State, 0x6D>
 {
-    using Instruction = AddressMode::Register<Operator::PUSH, State::Register::Y>;
+    using Instruction = SPC::AddressMode::Register<SPC::Operator::PUSH, SPC::State::Register::Y>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "6D: PUSH Y");
 
@@ -3718,11 +3720,11 @@ struct Opcode<State, 0x6D>
 // Pop PC    	[........]
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0x6F>
+struct Opcode<SPC::State, 0x6F>
 {
-    using Instruction = AddressMode::Implied<Operator::RET>;
+    using Instruction = SPC::AddressMode::Implied<SPC::Operator::RET>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "6F: RET ");
 
@@ -3736,11 +3738,11 @@ struct Opcode<State, 0x6F>
 // Pop Flags, PC    	[NVPBHIZC]
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0x7F>
+struct Opcode<SPC::State, 0x7F>
 {
-    using Instruction = AddressMode::Implied<Operator::RET1>;
+    using Instruction = SPC::AddressMode::Implied<SPC::Operator::RET1>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "7F: RET1 ");
 
@@ -3755,11 +3757,11 @@ struct Opcode<State, 0x7F>
 // Left shift A: low=C, C=high    	[N.....ZC]
 // Register (1-Byte)
 template<>
-struct Opcode<State, 0x3C>
+struct Opcode<SPC::State, 0x3C>
 {
-    using Instruction = AddressMode::Register<Operator::ROL, State::Register::A>;
+    using Instruction = SPC::AddressMode::Register<SPC::Operator::ROL, SPC::State::Register::A>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "3C: ROL A");
 
@@ -3774,11 +3776,11 @@ struct Opcode<State, 0x3C>
 // Left shift (d) as above    	[N.....ZC]
 // Direct (2-Byte)
 template<>
-struct Opcode<State, 0x2B>
+struct Opcode<SPC::State, 0x2B>
 {
-    using Instruction = AddressMode::Direct<Operator::ROL>;
+    using Instruction = SPC::AddressMode::Direct<SPC::Operator::ROL>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "2B: ROL d");
 
@@ -3792,11 +3794,11 @@ struct Opcode<State, 0x2B>
 // Left shift (d+X) as above    	[N.....ZC]
 // Direct Indexed (2-Byte)
 template<>
-struct Opcode<State, 0x3B>
+struct Opcode<SPC::State, 0x3B>
 {
-    using Instruction = AddressMode::DirectIndexed<Operator::ROL, State::Register::X>;
+    using Instruction = SPC::AddressMode::DirectIndexed<SPC::Operator::ROL, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "3B: ROL d+X");
 
@@ -3811,11 +3813,11 @@ struct Opcode<State, 0x3B>
 // Left shift (a) as above    	[N.....ZC]
 // Absolute (3-Byte)
 template<>
-struct Opcode<State, 0x2C>
+struct Opcode<SPC::State, 0x2C>
 {
-    using Instruction = AddressMode::Absolute<Operator::ROL>;
+    using Instruction = SPC::AddressMode::Absolute<SPC::Operator::ROL>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "2C: ROL !a");
 
@@ -3830,11 +3832,11 @@ struct Opcode<State, 0x2C>
 // Right shift A: high=C, C=low    	[N.....ZC]
 // Register (1-Byte)
 template<>
-struct Opcode<State, 0x7C>
+struct Opcode<SPC::State, 0x7C>
 {
-    using Instruction = AddressMode::Register<Operator::ROR, State::Register::A>;
+    using Instruction = SPC::AddressMode::Register<SPC::Operator::ROR, SPC::State::Register::A>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "7C: ROR A");
 
@@ -3848,11 +3850,11 @@ struct Opcode<State, 0x7C>
 // Right shift (d) as above    	[N.....ZC]
 // Direct (2-Byte)
 template<>
-struct Opcode<State, 0x6B>
+struct Opcode<SPC::State, 0x6B>
 {
-    using Instruction = AddressMode::Direct<Operator::ROR>;
+    using Instruction = SPC::AddressMode::Direct<SPC::Operator::ROR>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "6B: ROR d");
 
@@ -3866,11 +3868,11 @@ struct Opcode<State, 0x6B>
 // Right shift (d+X) as above    	[N.....ZC]
 // Direct Indexed (2-Byte)
 template<>
-struct Opcode<State, 0x7B>
+struct Opcode<SPC::State, 0x7B>
 {
-    using Instruction = AddressMode::DirectIndexed<Operator::ROR, State::Register::X>;
+    using Instruction = SPC::AddressMode::DirectIndexed<SPC::Operator::ROR, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "7B: ROR d+X");
 
@@ -3885,11 +3887,11 @@ struct Opcode<State, 0x7B>
 // Right shift (a) as above    	[N.....ZC]
 // Absolute (3-Byte)
 template<>
-struct Opcode<State, 0x6C>
+struct Opcode<SPC::State, 0x6C>
 {
-    using Instruction = AddressMode::Absolute<Operator::ROR>;
+    using Instruction = SPC::AddressMode::Absolute<SPC::Operator::ROR>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "6C: ROR !a");
 
@@ -3904,11 +3906,11 @@ struct Opcode<State, 0x6C>
 // (X) = (X)-(Y)-!C    	[NV..H.ZC]
 // Indirect Indirect (1-Byte)
 template<>
-struct Opcode<State, 0xB9>
+struct Opcode<SPC::State, 0xB9>
 {
-    using Instruction = AddressMode::IndirectIndirect<Operator::SBC>;
+    using Instruction = SPC::AddressMode::IndirectIndirect<SPC::Operator::SBC>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "B9: SBC (X), (Y)");
 
@@ -3923,11 +3925,11 @@ struct Opcode<State, 0xB9>
 // A = A-i-!C    	[NV..H.ZC]
 // Register Immediate (2-Byte)
 template<>
-struct Opcode<State, 0xA8>
+struct Opcode<SPC::State, 0xA8>
 {
-    using Instruction = AddressMode::RegisterImmediate<Operator::SBC, State::Register::A>;
+    using Instruction = SPC::AddressMode::RegisterImmediate<SPC::Operator::SBC, SPC::State::Register::A>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "A8: SBC A, #i");
 
@@ -3941,11 +3943,11 @@ struct Opcode<State, 0xA8>
 // A = A-(X)-!C    	[NV..H.ZC]
 // Register Register Indirect (1-Byte)
 template<>
-struct Opcode<State, 0xA6>
+struct Opcode<SPC::State, 0xA6>
 {
-    using Instruction = AddressMode::RegisterRegisterIndirect<Operator::SBC, State::Register::A, State::Register::X>;
+    using Instruction = SPC::AddressMode::RegisterRegisterIndirect<SPC::Operator::SBC, SPC::State::Register::A, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "A6: SBC A, (X)");
 
@@ -3960,11 +3962,11 @@ struct Opcode<State, 0xA6>
 // A = A-([d]+Y)-!C    	[NV..H.ZC]
 // Register Direct Indirect Indexed (2-Byte)
 template<>
-struct Opcode<State, 0xB7>
+struct Opcode<SPC::State, 0xB7>
 {
-    using Instruction = AddressMode::RegisterDirectIndirectIndexed<Operator::SBC, State::Register::A, State::Register::Y>;
+    using Instruction = SPC::AddressMode::RegisterDirectIndirectIndexed<SPC::Operator::SBC, SPC::State::Register::A, SPC::State::Register::Y>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "B7: SBC A, [d]+Y");
 
@@ -3979,11 +3981,11 @@ struct Opcode<State, 0xB7>
 // A = A-([d+X])-!C    	[NV..H.ZC]
 // Register Direct Indexed Indirect (2-Byte)
 template<>
-struct Opcode<State, 0xA7>
+struct Opcode<SPC::State, 0xA7>
 {
-    using Instruction = AddressMode::RegisterDirectIndexedIndirect<Operator::SBC, State::Register::A, State::Register::X>;
+    using Instruction = SPC::AddressMode::RegisterDirectIndexedIndirect<SPC::Operator::SBC, SPC::State::Register::A, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "A7: SBC A, [d+X]");
 
@@ -3998,11 +4000,11 @@ struct Opcode<State, 0xA7>
 // A = A-(d)-!C    	[NV..H.ZC]
 // Register Direct (2-Byte)
 template<>
-struct Opcode<State, 0xA4>
+struct Opcode<SPC::State, 0xA4>
 {
-    using Instruction = AddressMode::RegisterDirect<Operator::SBC, State::Register::A>;
+    using Instruction = SPC::AddressMode::RegisterDirect<SPC::Operator::SBC, SPC::State::Register::A>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "A4: SBC A, d");
 
@@ -4016,11 +4018,11 @@ struct Opcode<State, 0xA4>
 // A = A-(d+X)-!C    	[NV..H.ZC]
 // Register Direct Indexed (2-Byte)
 template<>
-struct Opcode<State, 0xB4>
+struct Opcode<SPC::State, 0xB4>
 {
-    using Instruction = AddressMode::RegisterDirectIndexed<Operator::SBC, State::Register::A, State::Register::X>;
+    using Instruction = SPC::AddressMode::RegisterDirectIndexed<SPC::Operator::SBC, SPC::State::Register::A, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "B4: SBC A, d+X");
 
@@ -4035,11 +4037,11 @@ struct Opcode<State, 0xB4>
 // A = A-(a)-!C    	[NV..H.ZC]
 // Register Absolute (3-Byte)
 template<>
-struct Opcode<State, 0xA5>
+struct Opcode<SPC::State, 0xA5>
 {
-    using Instruction = AddressMode::RegisterAbsolute<Operator::SBC, State::Register::A>;
+    using Instruction = SPC::AddressMode::RegisterAbsolute<SPC::Operator::SBC, SPC::State::Register::A>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "A5: SBC A, !a");
 
@@ -4053,11 +4055,11 @@ struct Opcode<State, 0xA5>
 // A = A-(a+X)-!C    	[NV..H.ZC]
 // Register Absolute Indexed (3-Byte)
 template<>
-struct Opcode<State, 0xB5>
+struct Opcode<SPC::State, 0xB5>
 {
-    using Instruction = AddressMode::RegisterAbsoluteIndexed<Operator::SBC, State::Register::A, State::Register::X>;
+    using Instruction = SPC::AddressMode::RegisterAbsoluteIndexed<SPC::Operator::SBC, SPC::State::Register::A, SPC::State::Register::X>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "B5: SBC A, !a+X");
 
@@ -4071,11 +4073,11 @@ struct Opcode<State, 0xB5>
 // A = A-(a+Y)-!C    	[NV..H.ZC]
 // Register Absolute Indexed (3-Byte)
 template<>
-struct Opcode<State, 0xB6>
+struct Opcode<SPC::State, 0xB6>
 {
-    using Instruction = AddressMode::RegisterAbsoluteIndexed<Operator::SBC, State::Register::A, State::Register::Y>;
+    using Instruction = SPC::AddressMode::RegisterAbsoluteIndexed<SPC::Operator::SBC, SPC::State::Register::A, SPC::State::Register::Y>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "B6: SBC A, !a+Y");
 
@@ -4089,11 +4091,11 @@ struct Opcode<State, 0xB6>
 // (dd) = (dd)-(ds)-!C    	[NV..H.ZC]
 // Direct Direct (3-Byte)
 template<>
-struct Opcode<State, 0xA9>
+struct Opcode<SPC::State, 0xA9>
 {
-    using Instruction = AddressMode::DirectDirect<Operator::SBC>;
+    using Instruction = SPC::AddressMode::DirectDirect<SPC::Operator::SBC>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "A9: SBC dd, ds");
 
@@ -4108,11 +4110,11 @@ struct Opcode<State, 0xA9>
 // (d) = (d)-i-!C    	[NV..H.ZC]
 // Direct Immediate (3-Byte)
 template<>
-struct Opcode<State, 0xB8>
+struct Opcode<SPC::State, 0xB8>
 {
-    using Instruction = AddressMode::DirectImmediate<Operator::SBC>;
+    using Instruction = SPC::AddressMode::DirectImmediate<SPC::Operator::SBC>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "B8: SBC d, #i");
 
@@ -4127,11 +4129,11 @@ struct Opcode<State, 0xB8>
 // d.0 = 1    	[........]
 // Direct (2-Byte)
 template<>
-struct Opcode<State, 0x02>
+struct Opcode<SPC::State, 0x02>
 {
-    using Instruction = AddressMode::Direct<Operator::SET1<0, true>>;
+    using Instruction = SPC::AddressMode::Direct<SPC::Operator::SET1<0, true>>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "02: SET1 d.0");
 
@@ -4146,11 +4148,11 @@ struct Opcode<State, 0x02>
 // d.1 = 1    	[........]
 // Direct (2-Byte)
 template<>
-struct Opcode<State, 0x22>
+struct Opcode<SPC::State, 0x22>
 {
-    using Instruction = AddressMode::Direct<Operator::SET1<1, true>>;
+    using Instruction = SPC::AddressMode::Direct<SPC::Operator::SET1<1, true>>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "22: SET1 d.1");
 
@@ -4164,11 +4166,11 @@ struct Opcode<State, 0x22>
 // d.2 = 1    	[........]
 // Direct (2-Byte)
 template<>
-struct Opcode<State, 0x42>
+struct Opcode<SPC::State, 0x42>
 {
-    using Instruction = AddressMode::Direct<Operator::SET1<2, true>>;
+    using Instruction = SPC::AddressMode::Direct<SPC::Operator::SET1<2, true>>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "42: SET1 d.2");
 
@@ -4183,11 +4185,11 @@ struct Opcode<State, 0x42>
 // d.3 = 1    	[........]
 // Direct (2-Byte)
 template<>
-struct Opcode<State, 0x62>
+struct Opcode<SPC::State, 0x62>
 {
-    using Instruction = AddressMode::Direct<Operator::SET1<3, true>>;
+    using Instruction = SPC::AddressMode::Direct<SPC::Operator::SET1<3, true>>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "62: SET1 d.3");
 
@@ -4201,11 +4203,11 @@ struct Opcode<State, 0x62>
 // d.4 = 1    	[........]
 // Direct (2-Byte)
 template<>
-struct Opcode<State, 0x82>
+struct Opcode<SPC::State, 0x82>
 {
-    using Instruction = AddressMode::Direct<Operator::SET1<4, true>>;
+    using Instruction = SPC::AddressMode::Direct<SPC::Operator::SET1<4, true>>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "82: SET1 d.4");
 
@@ -4219,11 +4221,11 @@ struct Opcode<State, 0x82>
 // d.5 = 1    	[........]
 // Direct (2-Byte)
 template<>
-struct Opcode<State, 0xA2>
+struct Opcode<SPC::State, 0xA2>
 {
-    using Instruction = AddressMode::Direct<Operator::SET1<5, true>>;
+    using Instruction = SPC::AddressMode::Direct<SPC::Operator::SET1<5, true>>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "A2: SET1 d.5");
 
@@ -4237,11 +4239,11 @@ struct Opcode<State, 0xA2>
 // d.6 = 1    	[........]
 // Direct (2-Byte)
 template<>
-struct Opcode<State, 0xC2>
+struct Opcode<SPC::State, 0xC2>
 {
-    using Instruction = AddressMode::Direct<Operator::SET1<6, true>>;
+    using Instruction = SPC::AddressMode::Direct<SPC::Operator::SET1<6, true>>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "C2: SET1 d.6");
 
@@ -4255,11 +4257,11 @@ struct Opcode<State, 0xC2>
 // d.7 = 1    	[........]
 // Direct (2-Byte)
 template<>
-struct Opcode<State, 0xE2>
+struct Opcode<SPC::State, 0xE2>
 {
-    using Instruction = AddressMode::Direct<Operator::SET1<7, true>>;
+    using Instruction = SPC::AddressMode::Direct<SPC::Operator::SET1<7, true>>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "E2: SET1 d.7");
 
@@ -4273,11 +4275,11 @@ struct Opcode<State, 0xE2>
 // C = 1    	[.......1]
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0x80>
+struct Opcode<SPC::State, 0x80>
 {
-    using Instruction = AddressMode::Implied<Operator::SET<State::Flag::c, true>>;
+    using Instruction = SPC::AddressMode::Implied<SPC::Operator::SET<SPC::State::Flag::c, true>>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "80: SETC ");
 
@@ -4291,11 +4293,11 @@ struct Opcode<State, 0x80>
 // P = 1    	[..1.....]
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0x40>
+struct Opcode<SPC::State, 0x40>
 {
-    using Instruction = AddressMode::Implied<Operator::SET<State::Flag::p, true>>;
+    using Instruction = SPC::AddressMode::Implied<SPC::Operator::SET<SPC::State::Flag::p, true>>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "40: SETP ");
 
@@ -4309,11 +4311,11 @@ struct Opcode<State, 0x40>
 // Halts the processor    	[........]
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0xEF>
+struct Opcode<SPC::State, 0xEF>
 {
-    using Instruction = AddressMode::Implied<Operator::SLEEP>;
+    using Instruction = SPC::AddressMode::Implied<SPC::Operator::SLEEP>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "EF: SLEEP ");
 
@@ -4328,11 +4330,11 @@ struct Opcode<State, 0xEF>
 // Halts the processor    	[........]
 // Implied (1-Byte)
 template<>
-struct Opcode<State, 0xFF>
+struct Opcode<SPC::State, 0xFF>
 {
-    using Instruction = AddressMode::Implied<Operator::STOP>;
+    using Instruction = SPC::AddressMode::Implied<SPC::Operator::STOP>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "FF: STOP ");
 
@@ -4347,11 +4349,11 @@ struct Opcode<State, 0xFF>
 // YA  = YA - (d), H on high byte    	[NV..H.ZC]
 // Y Accumulator Direct (2-Byte)
 template<>
-struct Opcode<State, 0x9A>
+struct Opcode<SPC::State, 0x9A>
 {
-    using Instruction = AddressMode::YAccumulatorDirect<Operator::SUBW>;
+    using Instruction = SPC::AddressMode::YAccumulatorDirect<SPC::Operator::SUBW>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "9A: SUBW YA, d");
 
@@ -4365,11 +4367,11 @@ struct Opcode<State, 0x9A>
 // CALL [$FFDE]    	[........]
 // Table (1-Byte)
 template<>
-struct Opcode<State, 0x01>
+struct Opcode<SPC::State, 0x01>
 {
-    using Instruction = AddressMode::Table<Operator::TCALL, 0>;
+    using Instruction = SPC::AddressMode::Table<SPC::Operator::TCALL, 0>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "01: TCALL 0");
 
@@ -4384,11 +4386,11 @@ struct Opcode<State, 0x01>
 // CALL [$FFDC]    	[........]
 // Table (1-Byte)
 template<>
-struct Opcode<State, 0x11>
+struct Opcode<SPC::State, 0x11>
 {
-    using Instruction = AddressMode::Table<Operator::TCALL, 1>;
+    using Instruction = SPC::AddressMode::Table<SPC::Operator::TCALL, 1>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "11: TCALL 1");
 
@@ -4403,11 +4405,11 @@ struct Opcode<State, 0x11>
 // CALL [$FFDA]    	[........]
 // Table (1-Byte)
 template<>
-struct Opcode<State, 0x21>
+struct Opcode<SPC::State, 0x21>
 {
-    using Instruction = AddressMode::Table<Operator::TCALL, 2>;
+    using Instruction = SPC::AddressMode::Table<SPC::Operator::TCALL, 2>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "21: TCALL 2");
 
@@ -4422,11 +4424,11 @@ struct Opcode<State, 0x21>
 // CALL [$FFD8]    	[........]
 // Table (1-Byte)
 template<>
-struct Opcode<State, 0x31>
+struct Opcode<SPC::State, 0x31>
 {
-    using Instruction = AddressMode::Table<Operator::TCALL, 3>;
+    using Instruction = SPC::AddressMode::Table<SPC::Operator::TCALL, 3>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "31: TCALL 3");
 
@@ -4441,11 +4443,11 @@ struct Opcode<State, 0x31>
 // CALL [$FFD6]    	[........]
 // Table (1-Byte)
 template<>
-struct Opcode<State, 0x41>
+struct Opcode<SPC::State, 0x41>
 {
-    using Instruction = AddressMode::Table<Operator::TCALL, 4>;
+    using Instruction = SPC::AddressMode::Table<SPC::Operator::TCALL, 4>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "41: TCALL 4");
 
@@ -4460,11 +4462,11 @@ struct Opcode<State, 0x41>
 // CALL [$FFD4]    	[........]
 // Table (1-Byte)
 template<>
-struct Opcode<State, 0x51>
+struct Opcode<SPC::State, 0x51>
 {
-    using Instruction = AddressMode::Table<Operator::TCALL, 5>;
+    using Instruction = SPC::AddressMode::Table<SPC::Operator::TCALL, 5>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "51: TCALL 5");
 
@@ -4479,11 +4481,11 @@ struct Opcode<State, 0x51>
 // CALL [$FFD2]    	[........]
 // Table (1-Byte)
 template<>
-struct Opcode<State, 0x61>
+struct Opcode<SPC::State, 0x61>
 {
-    using Instruction = AddressMode::Table<Operator::TCALL, 6>;
+    using Instruction = SPC::AddressMode::Table<SPC::Operator::TCALL, 6>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "61: TCALL 6");
 
@@ -4498,11 +4500,11 @@ struct Opcode<State, 0x61>
 // CALL [$FFD0]    	[........]
 // Table (1-Byte)
 template<>
-struct Opcode<State, 0x71>
+struct Opcode<SPC::State, 0x71>
 {
-    using Instruction = AddressMode::Table<Operator::TCALL, 7>;
+    using Instruction = SPC::AddressMode::Table<SPC::Operator::TCALL, 7>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "71: TCALL 7");
 
@@ -4517,11 +4519,11 @@ struct Opcode<State, 0x71>
 // CALL [$FFCE]    	[........]
 // Table (1-Byte)
 template<>
-struct Opcode<State, 0x81>
+struct Opcode<SPC::State, 0x81>
 {
-    using Instruction = AddressMode::Table<Operator::TCALL, 8>;
+    using Instruction = SPC::AddressMode::Table<SPC::Operator::TCALL, 8>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "81: TCALL 8");
 
@@ -4536,11 +4538,11 @@ struct Opcode<State, 0x81>
 // CALL [$FFCC]    	[........]
 // Table (1-Byte)
 template<>
-struct Opcode<State, 0x91>
+struct Opcode<SPC::State, 0x91>
 {
-    using Instruction = AddressMode::Table<Operator::TCALL, 9>;
+    using Instruction = SPC::AddressMode::Table<SPC::Operator::TCALL, 9>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "91: TCALL 9");
 
@@ -4555,11 +4557,11 @@ struct Opcode<State, 0x91>
 // CALL [$FFCA]    	[........]
 // Table (1-Byte)
 template<>
-struct Opcode<State, 0xA1>
+struct Opcode<SPC::State, 0xA1>
 {
-    using Instruction = AddressMode::Table<Operator::TCALL, 10>;
+    using Instruction = SPC::AddressMode::Table<SPC::Operator::TCALL, 10>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "A1: TCALL 10");
 
@@ -4574,11 +4576,11 @@ struct Opcode<State, 0xA1>
 // CALL [$FFC8]    	[........]
 // Table (1-Byte)
 template<>
-struct Opcode<State, 0xB1>
+struct Opcode<SPC::State, 0xB1>
 {
-    using Instruction = AddressMode::Table<Operator::TCALL, 11>;
+    using Instruction = SPC::AddressMode::Table<SPC::Operator::TCALL, 11>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "B1: TCALL 11");
 
@@ -4593,11 +4595,11 @@ struct Opcode<State, 0xB1>
 // CALL [$FFC6]    	[........]
 // Table (1-Byte)
 template<>
-struct Opcode<State, 0xC1>
+struct Opcode<SPC::State, 0xC1>
 {
-    using Instruction = AddressMode::Table<Operator::TCALL, 12>;
+    using Instruction = SPC::AddressMode::Table<SPC::Operator::TCALL, 12>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "C1: TCALL 12");
 
@@ -4612,11 +4614,11 @@ struct Opcode<State, 0xC1>
 // CALL [$FFC4]    	[........]
 // Table (1-Byte)
 template<>
-struct Opcode<State, 0xD1>
+struct Opcode<SPC::State, 0xD1>
 {
-    using Instruction = AddressMode::Table<Operator::TCALL, 13>;
+    using Instruction = SPC::AddressMode::Table<SPC::Operator::TCALL, 13>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "D1: TCALL 13");
 
@@ -4631,11 +4633,11 @@ struct Opcode<State, 0xD1>
 // CALL [$FFC2]    	[........]
 // Table (1-Byte)
 template<>
-struct Opcode<State, 0xE1>
+struct Opcode<SPC::State, 0xE1>
 {
-    using Instruction = AddressMode::Table<Operator::TCALL, 14>;
+    using Instruction = SPC::AddressMode::Table<SPC::Operator::TCALL, 14>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "E1: TCALL 14");
 
@@ -4650,11 +4652,11 @@ struct Opcode<State, 0xE1>
 // CALL [$FFC0]    	[........]
 // Table (1-Byte)
 template<>
-struct Opcode<State, 0xF1>
+struct Opcode<SPC::State, 0xF1>
 {
-    using Instruction = AddressMode::Table<Operator::TCALL, 15>;
+    using Instruction = SPC::AddressMode::Table<SPC::Operator::TCALL, 15>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "F1: TCALL 15");
 
@@ -4669,11 +4671,11 @@ struct Opcode<State, 0xF1>
 // (a) = (a)&~A, ZN as for A-(a)    	[N.....Z.]
 // Absolute (3-Byte)
 template<>
-struct Opcode<State, 0x4E>
+struct Opcode<SPC::State, 0x4E>
 {
-    using Instruction = AddressMode::Absolute<Operator::TCLR1>;
+    using Instruction = SPC::AddressMode::Absolute<SPC::Operator::TCLR1>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "4E: TCLR1 !a");
 
@@ -4687,11 +4689,11 @@ struct Opcode<State, 0x4E>
 // (a) = (a)|A, ZN as for A-(a)    	[N.....Z.]
 // Absolute (3-Byte)
 template<>
-struct Opcode<State, 0x0E>
+struct Opcode<SPC::State, 0x0E>
 {
-    using Instruction = AddressMode::Absolute<Operator::TSET1>;
+    using Instruction = SPC::AddressMode::Absolute<SPC::Operator::TSET1>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "0E: TSET1 !a");
 
@@ -4705,11 +4707,11 @@ struct Opcode<State, 0x0E>
 // A = (A>>4) | (A<<4)    	[N.....Z.]
 // Register (1-Byte)
 template<>
-struct Opcode<State, 0x9F>
+struct Opcode<SPC::State, 0x9F>
 {
-    using Instruction = AddressMode::Register<Operator::XCN, State::Register::A>;
+    using Instruction = SPC::AddressMode::Register<SPC::Operator::XCN, SPC::State::Register::A>;
 
-    static int execute(State& state)
+    static int execute(SPC::State& state)
     {
         PROFILE_IF(PROFILE_OPCODES, "9F: XCN A");
 
@@ -4719,4 +4721,3 @@ struct Opcode<State, 0x9F>
     static std::string opcodeToString() { return "9F: XCN A"; }
 };
 
-}

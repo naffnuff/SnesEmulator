@@ -202,7 +202,7 @@ void generateOpcode(std::ostream& output, Instruction& instruction, const Opcode
     bool extraCycles = false;
 
     std::string addressModeClass = instruction.addressModeClass;
-    if (instruction.extraCycleForPageBoundary && addressModeClass == "AbsoluteIndexed")
+    if (instruction.extraCycleForPageBoundary && (addressModeClass == "AbsoluteIndexed" || addressModeClass == "DirectPageIndirectIndexedY"))
     {
         const bool hasRemark = instruction.cyclesRemarks.find(20) != instruction.cyclesRemarks.end();
         if (hasRemark)
@@ -235,11 +235,11 @@ void generateOpcode(std::ostream& output, Instruction& instruction, const Opcode
     }
     else if (operatorName == "TXA" || operatorName == "TYA")
     {
-        operatorName = std::string("T_A<State::IndexRegister::") + operatorName[1] + ">";
+        operatorName = std::string("T_A<CPU::State::IndexRegister::") + operatorName[1] + ">";
     }
     else if (operatorName == "TXY" || operatorName == "TYX")
     {
-        operatorName = std::string("T__<State::IndexRegister::") + operatorName[1] + ", State::IndexRegister::" + operatorName[2] + ">";
+        operatorName = std::string("T__<CPU::State::IndexRegister::") + operatorName[1] + ", CPU::State::IndexRegister::" + operatorName[2] + ">";
     }
     else
     {
@@ -249,7 +249,7 @@ void generateOpcode(std::ostream& output, Instruction& instruction, const Opcode
         if (prefix == "CL" || prefix == "SE" && suffix != 'P')
         {
             const bool isSet = prefix == "SE";
-            operatorName = std::string("SE_<State::Flag::") + char(std::tolower(suffix)) + ", " + (isSet ? "true" : "false") + ">";
+            operatorName = std::string("SE_<CPU::State::Flag::") + char(std::tolower(suffix)) + ", " + (isSet ? "true" : "false") + ">";
         }
         else if (prefix == "PE" && (suffix == 'A' || suffix == 'I'))
         {
@@ -258,29 +258,29 @@ void generateOpcode(std::ostream& output, Instruction& instruction, const Opcode
         }
         else if ((prefix == "CP" || prefix == "DE" || prefix == "IN" || prefix == "LD" || prefix == "PH" || prefix == "PL" || prefix == "ST" || prefix == "TA") && (suffix == 'X' || suffix == 'Y'))
         {
-            operatorName = prefix + "_<State::IndexRegister::" + operatorName[2] + ">";
+            operatorName = prefix + "_<CPU::State::IndexRegister::" + operatorName[2] + ">";
         }
     }
 
     output << "template<>" << std::endl;
-    output << "struct Opcode<State, 0x" << instruction.code << ">" << std::endl;
+    output << "struct Opcode<CPU::State, 0x" << instruction.code << ">" << std::endl;
     output << "{" << std::endl;
-    output << "    using Instruction = AddressMode::" << addressModeClass << "<Operator::" << operatorName;
+    output << "    using Instruction = CPU::AddressMode::" << addressModeClass << "<CPU::Operator::" << operatorName;
     if (!instruction.addressModeClassArg.empty())
     {
-        output << ", " << instruction.addressModeClassArg;
+        output << ", CPU::" << instruction.addressModeClassArg;
     }
-    if (addressModeClass == "AbsoluteIndexed")
+    if (addressModeClass == "AbsoluteIndexed" || addressModeClass == "DirectPageIndirectIndexedY")
     {
         output << ", " << (extraCycles ? "true" : "false");
     }
     output << ">;" << std::endl;
     if (!flag16Bit.empty())
     {
-        output << "    using Instruction16Bit = AddressMode::" << addressModeClass << "16Bit<Operator::" << operatorName;
+        output << "    using Instruction16Bit = CPU::AddressMode::" << addressModeClass << "16Bit<CPU::Operator::" << operatorName;
         if (!instruction.addressModeClassArg.empty())
         {
-            output << ", " << instruction.addressModeClassArg;
+            output << ", CPU::" << instruction.addressModeClassArg;
         }
         output << ">;" << std::endl;
     }
@@ -299,7 +299,7 @@ void generateOpcode(std::ostream& output, Instruction& instruction, const Opcode
             output << "    // " << getRemark(remark) << std::endl;
         }
     }
-    output << "    static int execute(State& state)" << std::endl
+    output << "    static int execute(CPU::State& state)" << std::endl
         << "    {" << std::endl
         << "        PROFILE_IF(PROFILE_OPCODES, \"" << instruction.code << ": " << instruction.name << "\");" << std::endl
         << std::endl;
@@ -310,7 +310,7 @@ void generateOpcode(std::ostream& output, Instruction& instruction, const Opcode
     std::string indentation = "";
     if (!flag16Bit.empty())
     {
-        output << "        if (state.is16Bit(State::Flag::" + flag16Bit + "))" << std::endl;
+        output << "        if (state.is16Bit(CPU::State::Flag::" + flag16Bit + "))" << std::endl;
         output << "        {" << std::endl;
         indentation = "        ";
         if (hasCycleModification(instruction.cyclesRemarks))
@@ -402,6 +402,8 @@ void generateOpcodes(std::vector<Instruction>& instructions)
         << "EXCEPTION(NotYetImplementedException, ::NotYetImplementedException)" << std::endl
         << std::endl
         << "CREATE_PROFILER();" << std::endl
+        << std::endl
+        << "}" << std::endl
         << std::endl;
 
     for (Instruction& instruction : instructions)
@@ -413,8 +415,6 @@ void generateOpcodes(std::vector<Instruction>& instructions)
         }
         generateOpcode(output, instruction, opcodeMap[instruction.code], flag);
     }
-
-    output << "}" << std::endl;
 }
 
 void generateOpcodeMap(const std::vector<Instruction>& instructions)
@@ -455,7 +455,7 @@ void generateAddressMode(std::ofstream& output, const std::string& name, const A
     {
         output << ", State::IndexRegister Register";
     }
-    if (name == "AbsoluteIndexed")
+    if (name == "AbsoluteIndexed" || name == "DirectPageIndirectIndexedY")
     {
         output << ", bool ExtraCycles";
     }
@@ -469,12 +469,9 @@ void generateAddressMode(std::ofstream& output, const std::string& name, const A
 
     output << "    using Type = Instruction" << actualSize << "Byte;" << std::endl << std::endl;
 
-    if (name != "AbsoluteIndexed")
+    for (int cycleRemark : args.cycleRemarks)
     {
-        for (int cycleRemark : args.cycleRemarks)
-        {
-            output << "    // " << getRemark(cycleRemark) << std::endl;
-        }
+        output << "    // " << getRemark(cycleRemark) << std::endl;
     }
 
     output << "    static int invokeOperator(State& state";
@@ -503,23 +500,6 @@ void generateAddressMode(std::ofstream& output, const std::string& name, const A
         }
     }
     output << "    }" << std::endl;
-
-    if (name == "AbsoluteIndexed")
-    {
-        output << std::endl
-            << "    // §3: Add 1 cycle if adding index crosses a page boundary" << std::endl
-            << "    static int getExtraCycles(Long staticAddress, Long indexedAddress)" << std::endl
-            << "    {" << std::endl
-            << "        int cycles = 0;" << std::endl
-            << "        Word addressPage(staticAddress >> 8);" << std::endl
-            << "        Word indexedAddressPage(indexedAddress >> 8);" << std::endl
-            << "        if (addressPage != indexedAddressPage)" << std::endl
-            << "        {" << std::endl
-            << "            cycles += 1;" << std::endl
-            << "        }" << std::endl
-            << "        return cycles;" << std::endl
-            << "    }" << std::endl;
-    }
 
     output << std::endl
         << "    static std::string toString(const State& state)" << std::endl
