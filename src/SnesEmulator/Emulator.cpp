@@ -80,7 +80,7 @@ void Emulator::initialize()
         {
             if (rom.saveRamSize > 0)
             {
-                std::ifstream file(rom.gameTitle + ".save");
+                std::ifstream file(System::getRomLibraryPath() / (rom.gameTitle + ".save"));
                 file >> std::hex;
                 Long saveRamAddress = 0x700000;
                 for (Long address = saveRamAddress; address < 0x7e0000; ++address, ++saveRamAddress)

@@ -44,7 +44,7 @@ private:
                     saveRamModified = false;
                 }
                 if (save) {
-                    std::ofstream file(rom.gameTitle + ".save");
+                    std::ofstream file(System::getRomLibraryPath() / (rom.gameTitle + ".save"));
                     for (int address = 0; address < rom.saveRamSize; ++address) {
                         file << saveRam[address] << ' ';
                     }

@@ -280,4 +280,6 @@ __pycache__/
 build/vscode/WDC65816.lib
 *.bin
 
-vcpkg_installed/
+/vcpkg_installed/
+
+/build/vs2017/enc_temp_folder/
