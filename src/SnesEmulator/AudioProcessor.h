@@ -513,6 +513,8 @@ private:
     std::vector<float> leftOutputBuffer;
     std::vector<float> rightOutputBuffer;
 
+    std::mutex outputBufferMutex;
+
     size_t maxOutputLag = 0;
 
     size_t leftOutputCount = 0;

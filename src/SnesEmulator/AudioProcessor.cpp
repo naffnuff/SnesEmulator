@@ -205,6 +205,8 @@ void Processor::outputNextSample(float& leftChannel, float& rightChannel)
 
         while (outputLag * 2 > outputBufferSize)
         {
+            std::lock_guard outputBufferLock(outputBufferMutex);
+
             outputBufferSize <<= 1;
             leftOutputBuffer.resize(outputBufferSize);
             rightOutputBuffer.resize(outputBufferSize);
@@ -1117,10 +1119,14 @@ void Processor::onSampleCycle<26>()
     // TODO
 
     //  3. Output the left sample to the DAC.
-    //const float leftOutput = applyMainVolume(leftSampleSum, mainVolumeLeft);
-    //const size_t outputIndex = leftOutputCount & (outputBufferSize - 1);
-    //leftOutputBuffer[outputIndex] = leftOutput;
-    ++leftOutputCount;
+    const float leftOutput = applyMainVolume(leftSampleSum, mainVolumeLeft);
+    {
+        std::lock_guard outputBufferLock(outputBufferMutex);
+
+        const size_t outputIndex = leftOutputCount & (outputBufferSize - 1);
+        leftOutputBuffer[outputIndex] = leftOutput;
+        ++leftOutputCount;
+    }
 
     //  4. Load and apply EFB.
     // TODO
@@ -1139,10 +1145,14 @@ void Processor::onSampleCycle<27>()
     // TODO
 
     //  3. Output the right sample to the DAC.
-    //const float rightOutput = applyMainVolume(rightSampleSum, mainVolumeRight);
-    //const size_t outputIndex = rightOutputCount & (outputBufferSize - 1);
-    //rightOutputBuffer[outputIndex] = rightOutput;
-    ++rightOutputCount;
+    const float rightOutput = applyMainVolume(rightSampleSum, mainVolumeRight);
+    {
+        std::lock_guard outputBufferLock(outputBufferMutex);
+
+        const size_t outputIndex = rightOutputCount & (outputBufferSize - 1);
+        rightOutputBuffer[outputIndex] = rightOutput;
+        ++rightOutputCount;
+    }
 
     //  4. Load PMON
     setVoiceBits<&Processor::Voice::pitchModulation>(registers[size_t(Register::PMON)]);
