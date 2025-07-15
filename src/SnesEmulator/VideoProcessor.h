@@ -657,9 +657,9 @@ public:
             c.blue = c.blue >> 1;
         }
         Byte maxColor = 0x1f;
-        c.red = std::min(c.red, maxColor);
-        c.green = std::min(c.green, maxColor);
-        c.blue = std::min(c.blue, maxColor);
+        c.red = min(c.red, maxColor);
+        c.green = min(c.green, maxColor);
+        c.blue = min(c.blue, maxColor);
         return c;
     }
 

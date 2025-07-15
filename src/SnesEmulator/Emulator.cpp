@@ -396,8 +396,8 @@ void Emulator::run()
                         static int printOuts = 0;
                         if (currentTime - previousTime >= std::chrono::seconds(1))
                         {
-                            minFrameCount = std::min(minFrameCount, frameCount);
-                            maxFrameCount = std::max(maxFrameCount, frameCount);
+                            minFrameCount = min(minFrameCount, frameCount);
+                            maxFrameCount = max(maxFrameCount, frameCount);
 
                             output.debug("FPS: ", frameCount);
 

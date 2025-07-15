@@ -133,7 +133,7 @@ public:
         }
 
 #ifdef _WIN32
-        void setOutputColor(Output&, Color color, bool bright)
+        void setOutputColor(Lock&, const Output&, Color color, bool bright)
         {
             int effectiveColor = int(color);
             if (bright) {
