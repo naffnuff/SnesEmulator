@@ -4,37 +4,25 @@
         {
             "name": "release",
             "displayName": "Release preset",
-            "description": "Ninja with Clang-CL compiler - Release build",
+            "description": "Ninja - Release build",
             "generator": "Ninja",
             "binaryDir": "${sourceDir}/out/build/${presetName}",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
-                "CMAKE_C_COMPILER": "clang-cl",
-                "CMAKE_CXX_COMPILER": "clang-cl",
                 "CMAKE_TOOLCHAIN_FILE": "../vcpkg/scripts/buildsystems/vcpkg.cmake",
                 "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
-            },
-            "environment": {
-                "CC": "clang-cl",
-                "CXX": "clang-cl"
             }
         },
         {
             "name": "debug",
             "displayName": "Debug preset",
-            "description": "Ninja with Clang-CL compiler - Debug build",
+            "description": "Ninja - Debug build",
             "generator": "Ninja",
             "binaryDir": "${sourceDir}/out/build/${presetName}",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_C_COMPILER": "clang-cl",
-                "CMAKE_CXX_COMPILER": "clang-cl",
                 "CMAKE_TOOLCHAIN_FILE": "../vcpkg/scripts/buildsystems/vcpkg.cmake",
                 "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
-            },
-            "environment": {
-                "CC": "clang-cl",
-                "CXX": "clang-cl"
             }
         }
     ]

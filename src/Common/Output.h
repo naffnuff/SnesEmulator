@@ -77,6 +77,8 @@ public:
     };
 #endif
 
+    class Lock;
+
     class System
     {
     public:
@@ -131,7 +133,7 @@ public:
         }
 
 #ifdef _WIN32
-        void setOutputColor(Color color, bool bright)
+        void setOutputColor(Output&, Color color, bool bright)
         {
             int effectiveColor = int(color);
             if (bright) {
@@ -140,13 +142,13 @@ public:
             SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), WORD(effectiveColor));
         }
 #else
-        void setOutputColor(Color color, bool bright)
+        void setOutputColor(Lock& lock, const Output& output, Color color, bool bright)
         {
-            output << "\33[" << color;
+            output.print(lock, "\33[", (int)color);
             if (bright) {
-                output << ";" << 1;
+                output.print(lock, ";", 1);
             }
-            output << "m";
+            output.print(lock, "m");
         }
 #endif
 
@@ -201,15 +203,17 @@ public:
     class ColorScope
     {
     public:
-        ColorScope(Lock& lock, Color color, bool bright)
+        ColorScope(Lock& lock, const Output& output, Color color, bool bright)
             : system(lock.system)
+            , lock(lock)
+            , output(output)
         {
-            system.setOutputColor(color, bright);
+            system.setOutputColor(lock, output, color, bright);
         }
 
         ~ColorScope()
         {
-            system.setOutputColor(Color::Default, false);
+            system.setOutputColor(lock, output, Color::Default, false);
         }
 
         ColorScope() = delete;
@@ -219,6 +223,8 @@ public:
 
     private:
         System& system;
+        Lock& lock;
+        const Output& output;
     };
 
     Output(System& system, const std::string& name)
@@ -270,7 +276,7 @@ public:
     {
         if (logLevel > Log::Level::None) {
             Lock lock(system);
-            ColorScope colorScope(lock, color, bright);
+            ColorScope colorScope(lock, *this, color, bright);
             printLine(lock, std::forward<Ts>(values)...);
         }
     }

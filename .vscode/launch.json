@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Release",
+            "name": "Release (Windows)",
             "type": "cppvsdbg",
             "request": "launch",
             "program": "${workspaceFolder}/out/build/release/SnesEmulator.exe",
@@ -14,7 +14,7 @@
             "preLaunchTask": "CMake Build Release"
         },
         {
-            "name": "Debug",
+            "name": "Debug (Windows)",
             "type": "cppvsdbg",
             "request": "launch",
             "program": "${workspaceFolder}/out/build/debug/SnesEmulator.exe",
@@ -24,6 +24,46 @@
             "environment": [],
             "console": "integratedTerminal",
             "preLaunchTask": "CMake Build Debug"
+        },
+        {
+            "name": "Release (Linux)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/out/build/release/SnesEmulator",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/out/build/release",
+            "environment": [],
+            "externalConsole": false,
+            "preLaunchTask": "CMake Build Release",
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Debug (Linux)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/out/build/debug/SnesEmulator",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/out/build/debug",
+            "environment": [],
+            "externalConsole": false,
+            "preLaunchTask": "CMake Build Debug",
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
         }
     ]
 }

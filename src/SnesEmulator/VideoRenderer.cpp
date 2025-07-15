@@ -71,10 +71,12 @@ void getConsoleWindowPosition(int& left, int& top, int& right, int& bottom)
     }
 }
 #else
-void getConsoleWindowPosition(int& x, int& y)
+void getConsoleWindowPosition(int& x, int& y, int& right, int& bottom)
 {
     x = 0;
     y = 0;
+    right = 0;
+    bottom = 0;
 }
 #endif
 
@@ -295,8 +297,8 @@ void Renderer::update()
                 static const float thresholdSquared = .25f * .25f;
                 if (axisX * axisX + axisY * axisY > thresholdSquared)
                 {
-                    float angle = std::atan2f(axisY, axisX);
-                    static const float pi8 = std::atanf(1.f) / 2.f;
+                    float angle = atan2f(axisY, axisX);
+                    static const float pi8 = atanf(1.f) / 2.f;
 
                     if (angle > pi8 * 5 || angle < -pi8 * 5)
                     {

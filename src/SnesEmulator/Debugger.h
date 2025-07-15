@@ -214,7 +214,7 @@ public:
                 int applicationCountIndex = int(breakpointString.find('#'));
                 int argumentValueIndex = int(breakpointString.find(':'));
                 Breakpoint<State> breakpoint;
-                int index = min(applicationCountIndex, argumentValueIndex) - 1;
+                int index = std::min(applicationCountIndex, argumentValueIndex) - 1;
                 breakpoint.address = typename State::AddressType(std::stoi(breakpointString.substr(1, index), 0, 16));
                 if (applicationCountIndex >= 0)
                 {
@@ -275,7 +275,7 @@ public:
                         state.setProgramAddress(context.getLastKnownAddress());
                         output.print(lock, " while executing ");
                         {
-                            Output::ColorScope colorScope(lock, context.stepMode ? context.debugColor : Output::Color::Red, true);
+                            Output::ColorScope colorScope(lock, output, context.stepMode ? context.debugColor : Output::Color::Red, true);
                             output.print(lock, context.nextInstruction->toString(state));
                         }
                         output.printLine(lock, " @", context.getLastKnownAddress());
@@ -513,7 +513,7 @@ public:
     void printRegisters(const State& state, Context<State>& context)
     {
         Output::Lock lock(output);
-        Output::ColorScope colorScope(lock, context.debugColor, true);
+        Output::ColorScope colorScope(lock, output, context.debugColor, true);
         state.printRegisters(output, lock);
         output.printLine(lock);
     }
@@ -522,7 +522,7 @@ public:
     void printState(State& state, Context<State>& context)
     {
         Output::Lock lock(output);
-        Output::ColorScope colorScope(lock, paused ? context.debugColor : Output::Color::Red, true);
+        Output::ColorScope colorScope(lock, output, paused ? context.debugColor : Output::Color::Red, true);
         state.printRegisters(output, lock);
         output.printLine(lock);
         output.printLine(lock, context.nextInstruction->opcodeToString());
@@ -638,7 +638,7 @@ public:
                     ConstMemoryAccess access(audioProcessor.dspMemory, dspAddress);
                     OutputColorVisitor colorVisitor;
                     access.accept(colorVisitor);
-                    Output::ColorScope outputColor(lock, colorVisitor.color, false);
+                    Output::ColorScope outputColor(lock, output, colorVisitor.color, false);
                     output.print(lock, access, ' ');
                     ++dspAddress;
                 }
@@ -674,7 +674,7 @@ public:
                     Output::Color color = Output::Color::Default;
                     bool bright = false;
                     setColor(cpuState, cpuContext, cpuAddress, access, color, bright);
-                    Output::ColorScope outputColor(lock, color, bright);
+                    Output::ColorScope outputColor(lock, output, color, bright);
                     output.print(lock, access, ' ');
                     ++cpuAddress;
                 }
@@ -694,7 +694,7 @@ public:
                     Output::Color color;
                     bool bright = false;
                     setColor(spcState, spcContext, spcAddress, access, color, bright);
-                    Output::ColorScope outputColor(lock, color, bright);
+                    Output::ColorScope outputColor(lock, output, color, bright);
                     if (spcAddress >= 0xffc0 && audioRegisters.bootRomDataEnabled)
                     {
                         output.print(lock, audioRegisters.bootRomData[spcAddress - 0xffc0], ' ');

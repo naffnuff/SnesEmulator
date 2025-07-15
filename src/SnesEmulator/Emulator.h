@@ -2,6 +2,7 @@
 
 #include <ctime>
 #include <set>
+#include <condition_variable>
 
 #include "Common/Instruction.h"
 #include "Common/System.h"
