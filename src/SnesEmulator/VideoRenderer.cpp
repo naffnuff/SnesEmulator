@@ -275,47 +275,53 @@ void Renderer::update()
     {
         if (glfwJoystickIsGamepad(joystick))
         {
-            GLFWgamepadstate state;
-            if (glfwGetGamepadState(joystick, &state))
+            if (const char* name = glfwGetJoystickName(joystick))
             {
-                buttonStart |= state.buttons[GLFW_GAMEPAD_BUTTON_START] == GLFW_PRESS;
-                buttonSelect |= state.buttons[GLFW_GAMEPAD_BUTTON_BACK] == GLFW_PRESS;
-                buttonA |= state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_PRESS;
-                buttonB |= state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_PRESS;
-                buttonX |= state.buttons[GLFW_GAMEPAD_BUTTON_Y] == GLFW_PRESS;
-                buttonY |= state.buttons[GLFW_GAMEPAD_BUTTON_X] == GLFW_PRESS;
-                buttonL |= state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_PRESS;
-                buttonR |= state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER] == GLFW_PRESS;
-                buttonUp |= state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_UP] == GLFW_PRESS;
-                buttonDown |= state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_DOWN] == GLFW_PRESS;
-                buttonLeft |= state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_LEFT] == GLFW_PRESS;
-                buttonRight |= state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_RIGHT] == GLFW_PRESS;
-
-                float axisX = state.axes[GLFW_GAMEPAD_AXIS_LEFT_X];
-                float axisY = state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
-
-                static const float thresholdSquared = .25f * .25f;
-                if (axisX * axisX + axisY * axisY > thresholdSquared)
+                if (name[0] == 'X') // To filter out non-Xbox controllers
                 {
-                    float angle = atan2f(axisY, axisX);
-                    static const float pi8 = atanf(1.f) / 2.f;
+                    GLFWgamepadstate state;
+                    if (glfwGetGamepadState(joystick, &state))
+                    {
+                        buttonStart |= state.buttons[GLFW_GAMEPAD_BUTTON_START] == GLFW_PRESS;
+                        buttonSelect |= state.buttons[GLFW_GAMEPAD_BUTTON_BACK] == GLFW_PRESS;
+                        buttonA |= state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_PRESS;
+                        buttonB |= state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_PRESS;
+                        buttonX |= state.buttons[GLFW_GAMEPAD_BUTTON_Y] == GLFW_PRESS;
+                        buttonY |= state.buttons[GLFW_GAMEPAD_BUTTON_X] == GLFW_PRESS;
+                        buttonL |= state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_PRESS;
+                        buttonR |= state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER] == GLFW_PRESS;
+                        buttonUp |= state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_UP] == GLFW_PRESS;
+                        buttonDown |= state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_DOWN] == GLFW_PRESS;
+                        buttonLeft |= state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_LEFT] == GLFW_PRESS;
+                        buttonRight |= state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_RIGHT] == GLFW_PRESS;
 
-                    if (angle > pi8 * 5 || angle < -pi8 * 5)
-                    {
-                        buttonLeft = true;
-                    }
-                    else if (angle > -pi8 * 3 && angle < pi8 * 3)
-                    {
-                        buttonRight = true;
-                    }
+                        float axisX = state.axes[GLFW_GAMEPAD_AXIS_LEFT_X];
+                        float axisY = state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
 
-                    if (angle > -pi8 * 7 && angle < -pi8)
-                    {
-                        buttonUp = true;
-                    }
-                    else if (angle > pi8 && angle < pi8 * 7)
-                    {
-                        buttonDown = true;
+                        static const float thresholdSquared = .25f * .25f;
+                        if (axisX * axisX + axisY * axisY > thresholdSquared)
+                        {
+                            float angle = atan2f(axisY, axisX);
+                            static const float pi8 = atanf(1.f) / 2.f;
+
+                            if (angle > pi8 * 5 || angle < -pi8 * 5)
+                            {
+                                buttonLeft = true;
+                            }
+                            else if (angle > -pi8 * 3 && angle < pi8 * 3)
+                            {
+                                buttonRight = true;
+                            }
+
+                            if (angle > -pi8 * 7 && angle < -pi8)
+                            {
+                                buttonUp = true;
+                            }
+                            else if (angle > pi8 && angle < pi8 * 7)
+                            {
+                                buttonDown = true;
+                            }
+                        }
                     }
                 }
             }
