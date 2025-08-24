@@ -42,7 +42,7 @@ public:
                 }
                 else
                 {
-                    //throw NotYetImplementedException("Register ", address, ": ", info);
+                    throw NotYetImplementedException("Register ", address, ": ", info);
                 }
             };
         if (openBus)
@@ -94,7 +94,7 @@ public:
                 }
                 else
                 {
-                    //throw NotYetImplementedException("Register ", address, ": ", info);
+                    throw NotYetImplementedException("Register ", address, ": ", info);
                 }
 
                 if (debug && value)
