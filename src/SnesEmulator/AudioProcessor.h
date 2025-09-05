@@ -35,12 +35,12 @@ private:
     class FrequencyCounter
     {
     private:
-        static constexpr int frequencyTableSize = 32;
-        using FrequencyTable = std::array<int, frequencyTableSize>;
+        static constexpr int tableSize = 32;
+        using Table = std::array<uint16_t, tableSize>;
 
-        static constexpr FrequencyTable getFrequencyTable()
+        static constexpr Table frequencyTable = []()
         {
-            FrequencyTable table = { 0 };
+            Table table = { 0 };
             size_t index = table.size();
             table[--index] = 1;
             table[--index] = 2;
@@ -52,14 +52,31 @@ private:
             }
             table[0] = 0;
             return table;
-        }
+        }();
+
+        static constexpr Table offsetTable = []()
+        {
+            Table table = { 0 };
+            for (int i = 0; i < table.size(); ++i)
+            {
+                if (i > 2 && i < 30 && i % 3 == 0)
+                {
+                    table[i] = 536;
+                }
+                else if ((i - 2) % 3 == 0)
+                {
+                    table[i] = 1040;
+                }
+            }
+            return table;
+        }();
 
     public:
-        FrequencyCounter()
+        /*FrequencyCounter()
         {
-            /*std::cout << "Frequencies:" << std::endl;
+            std::cout << "Frequencies:" << std::endl;
             int i = 0;
-            for (int entry : getTable())
+            for (int entry : getFrequencyTable())
             {
                 std::cout << entry << "\t";
 
@@ -68,44 +85,41 @@ private:
                     std::cout << std::endl;
                 }
             }
-            std::cout << "***" << std::endl;*/
-        }
-
-        void changeFrequency(int index)
-        {
-            if (index < 0 || index >= frequencyTableSize)
+            std::cout << "***" << std::endl;
+            std::cout << "Offsets:" << std::endl;
+            i = 0;
+            for (int entry : getOffsetTable())
             {
-                throw RuntimeError("FrequencyCounter::changeFrequency: Frequency index is out-of-bounds");
+                std::cout << entry << "\t";
+
+                if (++i % 3 == 0)
+                {
+                    std::cout << std::endl;
+                }
             }
+            std::cout << "***" << std::endl;
+            std::cin.get();
+            exit(1);
+        }*/
+
+        constexpr void changeFrequency(int index)
+        {
             frequency = frequencyTable[index];
-            counter = 0;
+            offset = offsetTable[index];
         }
 
-        bool tick()
+        constexpr bool tick()
         {
-            if (frequency == 0)
+            if (frequency == 0) // infinity entry
             {
                 return false;
             }
-            if (counter >= frequency)
-            {
-                throw RuntimeError("FrequencyCounter::tick: Counter is beyond frequency: counter: ", counter, ", frequency: ", frequency);
-            }
-            if (++counter == frequency)
-            {
-                counter = 0;
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return (--counter + offset) % frequency == 0;
         }
 	private:
-		static FrequencyTable frequencyTable;
-
-        int frequency = 0;
-        int counter = 0;
+        uint16_t frequency;
+        uint16_t offset;
+        uint16_t counter = 0x77ff;
     };
 
 public:
@@ -246,13 +260,13 @@ public:
             }
         }
 
-        void calculateNextSample();
+        //void calculateNextSample();
         int16_t applyVolume(int8_t volume);
         void setADSRStage(ADSRStage nextStage);
         void calculateEnvelope();
         void readSampleAddress(bool loopAddress);
         void decodeSampleSource();
-        void decodeNextBlock();
+        //void decodeNextBlock();
 
         void doStep3a();
         void doStep3b();
