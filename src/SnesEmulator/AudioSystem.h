@@ -25,6 +25,7 @@ public:
         , context("spc.txt", Output::Color::Magenta, debugger)
         , elapsedTime(0)
         , nextSpc(0)
+        , state(output)
     {
     }
 

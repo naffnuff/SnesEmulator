@@ -138,7 +138,9 @@ public:
 
     //static const size_t spcRegisterCount = 4;
 
-    State()
+    State(Output& output)
+        : output(output, "cpu")
+        , memory(output)
     {
 #ifdef DEBUGMEMORY
         for (int address = 0; address < memory.size(); ++address) {
@@ -176,7 +178,7 @@ public:
         return memory.size();
     }
 
-    void printRegisters(Output& output, Output::Lock& lock) const
+    void printRegisters(Output& debugOutput, Output::Lock& lock) const
     {
         std::string flagsString;
         if (emulationMode) {
@@ -193,7 +195,7 @@ public:
 
         std::bitset<8> flagSet(flags);
 
-        return output.print(lock,
+        return debugOutput.print(lock,
             "PB=", programBank,
             ", PC=", programCounter,
             ", A=", getAccumulatorC(),
@@ -671,6 +673,9 @@ public:
 
         forceRegisters();
     }
+
+public:
+    Output output;
 
 private:
     Byte dataBank = 0;

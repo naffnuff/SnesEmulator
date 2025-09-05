@@ -1,9 +1,11 @@
 audio info
+cpu info
 debugger info
 default info
 dma info
 emulator debug
 hdma info
 main info
+memory info
 rom info
 video info

@@ -66,7 +66,7 @@ public:
     Emulator(Output& output, const Rom& rom)
         : output(output, "emulator")
         , rom(rom)
-        , cpuState()
+        , cpuState(output)
         , cpuInstructionDecoder()
         , videoRegisters(output, cpuState, rom.gameTitle)
         , videoProcessor(videoRegisters.processor)

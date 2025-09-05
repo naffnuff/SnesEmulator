@@ -83,7 +83,7 @@ Processor::Processor(Output& output, Memory<Word>& spcMemory)
     : RegisterManager(output, "audio", dspMemory)
     , output(output, "audio")
     , spcMemory(spcMemory)
-    , dspMemory(0x80)
+    , dspMemory(0x80, output)
 {
     timers[2].highPrecision = true;
 

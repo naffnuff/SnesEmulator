@@ -8,6 +8,8 @@
 #include "Exception.h"
 #include "Types.h"
 
+#define DEBUG_MEMORY false
+
 class LocationVisitor
 {
 public:
@@ -499,14 +501,15 @@ public:
         Full = AddressType::bitMask
     };
 
-    Memory()
-        : Memory(AddressType::spaceSize)
+    Memory(Output& output)
+        : Memory(AddressType::spaceSize, output)
     {
     }
 
-    Memory(uint32_t size)
+    Memory(uint32_t size, Output& output)
         : memory(size)
         , memorySize(size)
+        , output(output, "memory")
     {
     }
 
@@ -741,23 +744,27 @@ private:
     {
         std::ostringstream ss;
         ss << " @" << address;
-        throw AccessException(e.what() + ss.str());
+        std::string message = e.what() + ss.str();
+#if DEBUG_MEMORY
+        throw AccessException(message);
+#else
+        output.error(message);
+#endif
     }
-    
+
 public:
     Byte bus;
 
 private:
     std::vector<std::shared_ptr<Location>> memory;
     const uint32_t memorySize;
+    Output output;
 };
 
 template<typename Memory>
 class MemoryAccess : public LocationAccess
 {
 public:
-    //typedef typename Memory::AddressType AddressType;
-    //typedef typename Memory::WrappingMask WrappingMask;
     using AddressType = typename Memory::AddressType;
     using WrappingMask = typename Memory::WrappingMask;
 

@@ -114,8 +114,9 @@ public:
         //Register registerIndex;
     };
 
-    State()
+    State(Output& output)
         : programCounter(0xffc0)
+        , memory(output)
     {
         for (Word address = 0; address < 0xf0; ++address) {
             memory.createLocation<ReadWriteMemory>(address, Byte(0x55));
@@ -141,7 +142,7 @@ public:
         return memory.size();
     }
 
-    void printRegisters(Output& output, Output::Lock& lock) const
+    void printRegisters(Output& debugOutput, Output::Lock& lock) const
     {
         std::string flagsString = "nvpbhizc";
 
@@ -153,7 +154,7 @@ public:
 
         std::bitset<8> flagSet(readRegister<Register::PSW>());
 
-        output.print(lock,
+        debugOutput.print(lock,
             "PC=", programCounter,
             ", A=", readRegister<Register::A>(),
             ", X=", readRegister<Register::X>(),

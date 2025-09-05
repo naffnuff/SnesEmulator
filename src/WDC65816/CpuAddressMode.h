@@ -518,7 +518,7 @@ struct Immediate
     {
         PROFILE_IF(PROFILE_ADDRESS_MODES, "Immediate");
 
-        Memory<Byte> memory(1);
+        Memory<Byte> memory(1, state.output);
         memory.createLocation<ReadOnlyMemory>(0, lowByte);
         MemoryAccess<Memory<Byte>> access(memory, 0);
         return Operator::invoke(state, access);
@@ -541,7 +541,7 @@ struct Immediate16Bit
     {
         PROFILE_IF(PROFILE_ADDRESS_MODES, "Immediate16Bit");
 
-        Memory<Byte> memory(2);
+        Memory<Byte> memory(2, state.output);
         memory.createLocation<ReadOnlyMemory>(0, lowByte);
         memory.createLocation<ReadOnlyMemory>(1, highByte);
         MemoryAccess access(memory, 0);
