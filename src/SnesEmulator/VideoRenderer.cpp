@@ -30,14 +30,16 @@ GLFWmonitor* getMonitorForPoint(int x, int y)
     int monitorCount;
     GLFWmonitor** monitors = glfwGetMonitors(&monitorCount);
     GLFWmonitor* result = nullptr;
-    for (int i = 0; i < monitorCount; ++i) {
+    for (int i = 0; i < monitorCount; ++i)
+    {
         GLFWmonitor* monitor = monitors[i];
         int monitorX, monitorY;
         glfwGetMonitorPos(monitor, &monitorX, &monitorY);
         const GLFWvidmode* mode = glfwGetVideoMode(monitor);
         int relativeX = x - monitorX;
         int relativeY = y - monitorY;
-        if (relativeX >= 0 && relativeX < mode->width && relativeY >= 0 && relativeY < mode->height) {
+        if (relativeX >= 0 && relativeX < mode->width && relativeY >= 0 && relativeY < mode->height)
+        {
             result = monitor;
         }
     }
@@ -56,7 +58,8 @@ void getWindowPosition(GLFWwindow* window, int& x, int& y)
 #ifdef _WIN32
 void getConsoleWindowPosition(int& left, int& top, int& right, int& bottom)
 {
-    if (HWND window = GetConsoleWindow()) {
+    if (HWND window = GetConsoleWindow())
+    {
         RECT rect;
         GetWindowRect(window, &rect);
         left = rect.left;
@@ -64,7 +67,8 @@ void getConsoleWindowPosition(int& left, int& top, int& right, int& bottom)
         right = rect.right;
         bottom = rect.bottom;
     }
-    else {
+    else
+    {
         left = 0;
         top = 0;
         right = 0;
@@ -76,8 +80,8 @@ void getConsoleWindowPosition(int& x, int& y, int& right, int& bottom)
 {
     x = 0;
     y = 0;
-    right = 0;
-    bottom = 0;
+    right = 100;
+    bottom = 100;
 }
 #endif
 
@@ -278,7 +282,8 @@ void Renderer::update()
         {
             if (const char* name = glfwGetJoystickName(joystick))
             {
-                if (name[0] == 'X') // To filter out non-Xbox controllers
+                //std::cout << name << std::endl;
+                //if (name[0] == 'X') // To filter out non-Xbox controllers
                 {
                     GLFWgamepadstate state;
                     if (glfwGetGamepadState(joystick, &state))

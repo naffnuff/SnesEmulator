@@ -41,7 +41,8 @@ public:
     Byte read(Byte& bus)
     {
         const Byte value = readImpl(bus);
-        if (breakpoint) {
+        if (breakpoint)
+        {
             breakpoint(Operation::Read, value, 0);
         }
         return value;
@@ -57,7 +58,8 @@ public:
     void write(Byte value)
     {
         writeImpl(value);
-        if (breakpoint) {
+        if (breakpoint)
+        {
             breakpoint(Operation::Write, value, 0);
         }
     }
@@ -79,7 +81,8 @@ public:
 
     void applyBreakpoint() const
     {
-        if (breakpoint) {
+        if (breakpoint)
+        {
             breakpoint(Operation::Apply, 0, applicationCount + 1);
         }
     }
@@ -221,9 +224,12 @@ private:
     Byte readImpl(Byte& bus) override
     {
         Byte value;
-        if (onRead == nullptr) {
+        if (onRead == nullptr)
+        {
             value = Register::readImpl(bus);
-        } else {
+        }
+        else
+        {
             onRead(value);
         }
         lastValue = value;
@@ -233,7 +239,8 @@ private:
 
     void writeImpl(Byte) override
     {
-        if (throwOnWrite) {
+        if (throwOnWrite)
+        {
             throwAccessException(__FUNCTION__, "writing not allowed");
         }
     }
@@ -265,9 +272,12 @@ public:
 private:
     void writeImpl(Byte value) override
     {
-        if (onWrite == nullptr) {
+        if (onWrite == nullptr)
+        {
             Register::writeImpl(value);
-        } else {
+        }
+        else
+        {
             onWrite(lastValue, value);
         }
         lastValue = value;
@@ -327,9 +337,12 @@ private:
     Byte readImpl(Byte& bus) override
     {
         Byte value;
-        if (onRead == nullptr) {
+        if (onRead == nullptr)
+        {
             value = Register::readImpl(bus);
-        } else {
+        }
+        else
+        {
             value = 0xfa;
             onRead(value);
         }
@@ -339,9 +352,12 @@ private:
 
     void writeImpl(Byte value) override
     {
-        if (onWrite == nullptr) {
+        if (onWrite == nullptr)
+        {
             Register::writeImpl(value);
-        } else {
+        }
+        else
+        {
             onWrite(lastValue, value);
             lastValue = value;
         }
@@ -377,9 +393,12 @@ private:
     Byte readImpl(Byte& bus) override
     {
         Byte value;
-        if (bootRomDataEnabled) {
+        if (bootRomDataEnabled)
+        {
             value = bootRomValue;
-        } else {
+        }
+        else
+        {
             value = ramValue;
         }
         bus = value;
@@ -393,9 +412,12 @@ private:
 
     Byte inspect() const override
     {
-        if (bootRomDataEnabled) {
+        if (bootRomDataEnabled)
+        {
             return bootRomValue;
-        } else {
+        }
+        else
+        {
             return ramValue;
         }
     }
@@ -407,9 +429,12 @@ private:
 
     void print(std::ostream& out) const override
     {
-        if (bootRomDataEnabled) {
+        if (bootRomDataEnabled)
+        {
             out << bootRomValue;
-        } else {
+        }
+        else
+        {
             out << ramValue;
         }
     }
@@ -503,15 +528,18 @@ public:
     void createMirror(AddressType mirror, AddressType origin)
     {
         checkIsInitialized(mirror, false, __FUNCTION__);
-        if (std::shared_ptr<Location> location = memory[origin]) {
+        if (std::shared_ptr<Location> location = memory[origin])
+        {
             memory[mirror] = location;
         }
     }
 
     void finalize()
     {
-        for (std::shared_ptr<Location>& location : memory) {
-            if (location.get() == nullptr) {
+        for (std::shared_ptr<Location>& location : memory)
+        {
+            if (location.get() == nullptr)
+            {
                 location = std::make_shared<InvalidLocation>();
             }
         }
@@ -521,9 +549,12 @@ public:
     {
         Byte result;
         checkIsInitialized(address, true, __FUNCTION__);
-        try {
+        try
+        {
             result = memory[address]->read(bus);
-        } catch (const AccessException& e) {
+        }
+        catch (const AccessException& e)
+        {
             handleAccessException(e, address);
         }
         return result;
@@ -562,10 +593,12 @@ public:
     void writeByte(Byte value, AddressType address)
     {
         checkIsInitialized(address, true, __FUNCTION__);
-        try {
+        try
+        {
             return memory[address]->write(value);
         }
-        catch (const AccessException& e) {
+        catch (const AccessException& e)
+        {
             handleAccessException(e, address);
         }
     }
@@ -587,9 +620,12 @@ public:
     {
         Byte result;
         checkIsInitialized(address, true, __FUNCTION__);
-        try {
+        try
+        {
             result = memory[address]->apply(bus);
-        } catch (const AccessException& e) {
+        }
+        catch (const AccessException& e)
+        {
             handleAccessException(e, address);
         }
         return result;
@@ -598,9 +634,12 @@ public:
     void reset(AddressType address)
     {
         checkIsInitialized(address, true, __FUNCTION__);
-        try {
+        try
+        {
             return memory[address]->reset();
-        } catch (const AccessException& e) {
+        }
+        catch (const AccessException& e)
+        {
             handleAccessException(e, address);
         }
     }
@@ -627,9 +666,12 @@ public:
     {
         Byte result;
         checkIsInitialized(address, true, __FUNCTION__);
-        try {
+        try
+        {
             result = memory[address]->inspect();
-        } catch (const AccessException& e) {
+        }
+        catch (const AccessException& e)
+        {
             handleAccessException(e, address);
         }
         return result;
@@ -661,7 +703,8 @@ private:
 
     void checkBounds(AddressType address, const char* operation) const
     {
-        if (address >= memorySize) {
+        if (address >= memorySize)
+        {
             std::ostringstream ss;
             ss << operation << ": ";
             ss << address << " is out of bounds, memory size is " << memorySize;
@@ -671,19 +714,23 @@ private:
 
     void checkIsInitialized(AddressType address, bool shouldBeInitialized, const char* operation) const
     {
-        if (shouldBeInitialized) {
+        if (shouldBeInitialized)
+        {
             return;
         }
         checkBounds(address, operation);
         bool isInitialized = memory[address].get() != nullptr;
-        if (isInitialized != shouldBeInitialized) {
+        if (isInitialized != shouldBeInitialized)
+        {
             std::ostringstream ss;
             ss << operation << ": ";
             ss << "memory @" << address << " ";
-            if (isInitialized) {
+            if (isInitialized)
+            {
                 ss << "is aready initialized";
             }
-            else {
+            else
+            {
                 ss << "is not initialized";
             }
             throw AccessException(ss.str());
