@@ -214,7 +214,7 @@ public:
                 int applicationCountIndex = int(breakpointString.find('#'));
                 int argumentValueIndex = int(breakpointString.find(':'));
                 Breakpoint<State> breakpoint;
-                int index = min(applicationCountIndex, argumentValueIndex) - 1;
+                int index = std::min(applicationCountIndex, argumentValueIndex) - 1;
                 breakpoint.address = typename State::AddressType(std::stoi(breakpointString.substr(1, index), 0, 16));
                 if (applicationCountIndex >= 0)
                 {

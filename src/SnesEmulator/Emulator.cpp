@@ -284,7 +284,7 @@ void Emulator::run()
             {
                 audioSystem.pauseRequested = false;
                 debugger.pause(audioSystem.context);
-                //nextSpc = max(std::chrono::duration_cast<CycleCount>(audioSystem.nextSpc), masterCycle);
+                //nextSpc = std::max(std::chrono::duration_cast<CycleCount>(audioSystem.nextSpc), masterCycle);
                 nextSpc = masterCycle;
             }
 
@@ -396,8 +396,8 @@ void Emulator::run()
                         static int printOuts = 0;
                         if (currentTime - previousTime >= std::chrono::seconds(1))
                         {
-                            minFrameCount = min(minFrameCount, frameCount);
-                            maxFrameCount = max(maxFrameCount, frameCount);
+                            minFrameCount = std::min(minFrameCount, frameCount);
+                            maxFrameCount = std::max(maxFrameCount, frameCount);
 
                             output.debug("FPS: ", frameCount);
 
