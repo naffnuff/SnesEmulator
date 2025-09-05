@@ -32,29 +32,24 @@ public:
 
     typedef std::function<void(Operation operation, Byte value, uint64_t applicationCount)> BreakpointCallback;
 
-    Location() = delete;
-
-    Location(Byte& defaultBus)
-        : defaultBus(defaultBus)
-    {
-    }
+    Location() = default;
 
     Location(const Location&) = delete;
     Location& operator=(const Location&) = delete;
 
 public:
-    Byte read()
+    Byte read(Byte& bus)
     {
-        const Byte value = readImpl(defaultBus);
+        const Byte value = readImpl(bus);
         if (breakpoint) {
             breakpoint(Operation::Read, value, 0);
         }
         return value;
     }
 
-    Byte apply()
+    Byte apply(Byte& bus)
     {
-        const Byte value = readImpl(defaultBus);
+        const Byte value = readImpl(bus);
         ++applicationCount;
         return value;
     }
@@ -123,19 +118,12 @@ protected:
     }
 
 private:
-    Byte& defaultBus;
     uint64_t applicationCount = 0;
     BreakpointCallback breakpoint;
 };
 
 class InvalidLocation : public Location
 {
-public:
-    InvalidLocation(Byte& defaultBus)
-        : Location(defaultBus)
-    {
-    }
-
 private:
     void accept(LocationVisitor& visitor) const override
     {
@@ -153,9 +141,8 @@ private:
 class MemoryLocation : public Location
 {
 public:
-    MemoryLocation(Byte& defaultBus, Byte value)
-        : Location(defaultBus)
-        , value(value)
+    MemoryLocation(Byte value)
+        : value(value)
     {
     }
 
@@ -183,8 +170,8 @@ protected:
 class ReadOnlyMemory : public MemoryLocation
 {
 public:
-    ReadOnlyMemory(Byte& bus, const Byte& value)
-        : MemoryLocation(bus, value)
+    ReadOnlyMemory(const Byte& value)
+        : MemoryLocation(value)
     {
     }
 
@@ -198,8 +185,8 @@ private:
 class ReadWriteMemory : public MemoryLocation
 {
 public:
-    ReadWriteMemory(Byte& bus, Byte value)
-        : MemoryLocation(bus, value)
+    ReadWriteMemory(Byte value)
+        : MemoryLocation(value)
     {
     }
 
@@ -219,19 +206,13 @@ private:
 
 class Register : public Location
 {
-protected:
-    Register(Byte& defaultBus)
-        : Location(defaultBus)
-    {
-    }
 };
 
 class ReadRegister : public Register
 {
 public:
-    ReadRegister(Byte& bus, std::function<void(Byte&)> onRead, bool throwOnWrite)
-        : Register(bus)
-        , onRead(onRead)
+    ReadRegister(std::function<void(Byte&)> onRead, bool throwOnWrite)
+        : onRead(onRead)
         , throwOnWrite(throwOnWrite)
     {
     }
@@ -276,9 +257,8 @@ private:
 class WriteRegister : public Register
 {
 public:
-    WriteRegister(Byte& bus, std::function<void(Byte, Byte)> onWrite)
-        : Register(bus)
-        , onWrite(onWrite)
+    WriteRegister(std::function<void(Byte, Byte)> onWrite)
+        : onWrite(onWrite)
     {
     }
 
@@ -336,9 +316,8 @@ private:
 class ReadWriteRegister : public Register
 {
 public:
-    ReadWriteRegister(Byte& bus, std::function<void(Byte&)> onRead, std::function<void(Byte, Byte)> onWrite, Byte lastValue = Byte())
-        : Register(bus)
-        , onRead(onRead)
+    ReadWriteRegister(std::function<void(Byte&)> onRead, std::function<void(Byte, Byte)> onWrite, Byte lastValue = Byte())
+        : onRead(onRead)
         , onWrite(onWrite)
         , lastValue(lastValue)
     {
@@ -387,9 +366,8 @@ private:
 class BootRomLocation : public Location
 {
 public:
-    BootRomLocation(Byte& defaultBus, Byte ramValue, Byte bootRomValue, bool& bootRomDataEnabled)
-        : Location(defaultBus)
-        , ramValue(ramValue)
+    BootRomLocation(Byte ramValue, Byte bootRomValue, bool& bootRomDataEnabled)
+        : ramValue(ramValue)
         , bootRomValue(bootRomValue)
         , bootRomDataEnabled(bootRomDataEnabled)
     {
@@ -519,7 +497,7 @@ public:
     void createLocation(AddressType address, Args&&... args)
     {
         checkIsInitialized(address, false, __FUNCTION__);
-        memory[address] = std::make_shared<LocationType>(bus, std::forward<Args>(args)...);
+        memory[address] = std::make_shared<LocationType>(std::forward<Args>(args)...);
     }
 
     void createMirror(AddressType mirror, AddressType origin)
@@ -534,7 +512,7 @@ public:
     {
         for (std::shared_ptr<Location>& location : memory) {
             if (location.get() == nullptr) {
-                location = std::make_shared<InvalidLocation>(bus);
+                location = std::make_shared<InvalidLocation>();
             }
         }
     }
@@ -544,7 +522,7 @@ public:
         Byte result;
         checkIsInitialized(address, true, __FUNCTION__);
         try {
-            result = memory[address]->read();
+            result = memory[address]->read(bus);
         } catch (const AccessException& e) {
             handleAccessException(e, address);
         }
@@ -605,12 +583,12 @@ public:
         writeByte(value.getHighByte(), highAddress);
     }
 
-    Byte applyByte(AddressType address) const
+    Byte applyByte(AddressType address)
     {
         Byte result;
         checkIsInitialized(address, true, __FUNCTION__);
         try {
-            result = memory[address]->apply();
+            result = memory[address]->apply(bus);
         } catch (const AccessException& e) {
             handleAccessException(e, address);
         }
