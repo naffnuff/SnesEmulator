@@ -70,6 +70,9 @@
     <ClInclude Include="..\..\..\src\SnesEmulator\AudioTest.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\SnesEmulator\Shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\SnesEmulator\Emulator.cpp">

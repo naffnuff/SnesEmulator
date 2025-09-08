@@ -28,18 +28,24 @@ public:
 
         void operator()()
         {
-            //return;
-            video.renderer.title = gameTitle;
-            video.renderer.initialize(fullscreen, aspectRatioCorrection);
-            while (run && video.renderer.isRunning())
+            try
             {
-                if (video.renderer.toggleFullscreenRequested)
+                video.renderer.title = gameTitle;
+                video.renderer.initialize(fullscreen);
+                while (run && video.renderer.isRunning())
                 {
-                    video.renderer.toggleFullscreenRequested = false;
-                    fullscreen = !fullscreen;
-                    video.renderer.setWindowProperties(fullscreen, aspectRatioCorrection);
+                    if (video.renderer.toggleFullscreenRequested)
+                    {
+                        video.renderer.toggleFullscreenRequested = false;
+                        fullscreen = !fullscreen;
+                        video.renderer.setWindowProperties(fullscreen);
+                    }
+                    video.renderer.update();
                 }
-                video.renderer.update();
+            }
+            catch (const std::exception& e)
+            {
+                video.output.error("Renderer failure:\n", e.what());
             }
             video.renderer.terminate();
         }
@@ -48,7 +54,6 @@ public:
         bool run = true;
         std::string gameTitle;
         bool fullscreen = false;
-        bool aspectRatioCorrection = true;
     };
 
     Processor(Output& output, const std::string& gameTitle)

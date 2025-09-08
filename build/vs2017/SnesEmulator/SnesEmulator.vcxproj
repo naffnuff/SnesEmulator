@@ -193,6 +193,7 @@
     <ClInclude Include="..\..\..\src\SnesEmulator\Emulator.h" />
     <ClInclude Include="..\..\..\src\SnesEmulator\HdmaInstruction.h" />
     <ClInclude Include="..\..\..\src\SnesEmulator\Rom.h" />
+    <ClInclude Include="..\..\..\src\SnesEmulator\Shader.h" />
     <ClInclude Include="..\..\..\src\SnesEmulator\VideoData.h" />
     <ClInclude Include="..\..\..\src\SnesEmulator\VideoDebugger.h" />
     <ClInclude Include="..\..\..\src\SnesEmulator\VideoProcessor.h" />

@@ -8,6 +8,7 @@
 
 #include "Common/Output.h"
 
+struct GLFWmonitor;
 struct GLFWwindow;
 struct GLFWvidmode;
 
@@ -18,47 +19,60 @@ class Renderer
 public:
     typedef uint16_t Pixel;
 
-    Renderer(int windowXPosition, int windowYPosition, int width, int height, float scale, bool syncUpdate, Output& output)
-        : output(output, "video")
-        , windowXPosition(windowXPosition)
-        , windowYPosition(windowYPosition)
-        , width(width)
-        , height(height)
-        , scale(scale)
-        , syncUpdate(syncUpdate)
-        , pixelBuffer(size_t(height) * size_t(width))
-        , title("SNES Emulator")
-    {
-    }
+    Renderer(int windowXPosition, int windowYPosition, int width, int height, float scale, bool syncUpdate, Output& output);
 
     Renderer(const Renderer&) = delete;
     Renderer& operator=(const Renderer&) = delete;
 
     ~Renderer();
 
-    void initialize(bool fullscreen = false, bool aspectCorrection = false);
-    void terminate();
-    float getAspectCorrectionFactor(bool aspectCorrection) const;
-    void calculateScale(const GLFWvidmode* mode, bool aspectCorrection);
-    void setWindowProperties(bool fullscreen, bool aspectCorrection);
-    void update();
-    bool isRunning() const;
     double getTime() const;
-    void setScanline(int lineIndex, const std::vector<Pixel>& pixels);
-    void setPixel(int row, int column, Pixel pixel);
-    void setGrayscalePixel(int row, int column, uint8_t white);
-    void setGrayscaleTile(int startRow, int startColumn, const std::array<std::array<uint8_t, 8>, 8> & tile, int bitsPerPixel);
-    void clearDisplay(uint16_t clearColor);
-    void clearScanline(int vCounter, uint16_t clearColor);
-    bool isPressed(int key) const;
     void focusWindow(bool value);
 
+private:
+    // setup
+    void initialize(bool fullscreen = false);
+
+    // GLFW setup
+    void setupGlfw(bool fullscreen);
+    GLFWmonitor* getMonitorForPoint(int x, int y);
+    void getConsoleWindowPosition(int& left, int& top, int& right, int& bottom);
+    void calculateScale(const GLFWvidmode* mode);
+    float getAspectCorrectionFactor() const;
+    void setWindowProperties(bool fullscreen);
+    void getWindowPosition(GLFWwindow* window, int& x, int& y);
+
+    // OpenGL setup
+    void setupOpenGL();
+    void setViewportSize();
+    void createShaders();
+    unsigned int createShaderProgram(const char* vertexSource, const char* fragmentSource);
+    unsigned int compileShader(const char* source, unsigned int type);
+    void createBuffers();
+    void createTextures();
+
+    // interface
+    void setPixel(int row, int column, Pixel pixel);
+    void setGrayscalePixel(int row, int column, uint8_t white);
+    void clearDisplay(uint16_t clearColor);
+    void clearScanline(int vCounter, uint16_t clearColor);
+    bool isRunning() const;
+    bool isPressed(int key) const;
+
+    // update
+    void update();
+    void handleInput();
+    void uploadTexture();
+
+    // teardown
+    void terminate();
 
 
 public:
-    bool pauseRequested = false;
     bool toggleFullscreenRequested = false;
+    bool pauseRequested = false;
 
+private:
     bool buttonStart = false;
     bool buttonSelect = false;
     bool buttonA = false;
@@ -94,9 +108,24 @@ public:
     float yScreenCoverage = 0.0f;
     const bool syncUpdate;
 
-    int pressKeyTimeout = 0;
+    unsigned int shaderProgram = 0;
+    unsigned int screenQuadVertexArray = 0;
+    unsigned int screenQuadVertexBuffer = 0;
+    unsigned int screenQuadIndexBuffer = 0;
+    unsigned int texture = 0;
 
+    int timeUniform = -1;
+    int resolutionUniform = -1;
+    int aspectRatioUniform = -1;
+    int gameTextureUniform = -1;
+
+    int pressKeyTimeout = 0;
     bool focusWindowRequested = false;
+    bool textureNeedsUpdate = false;
+
+    friend class Processor;
+    friend class Registers;
+    friend void framebufferSizeCallback(GLFWwindow*, int width, int height);
 };
 
 }
