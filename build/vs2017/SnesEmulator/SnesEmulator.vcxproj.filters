@@ -90,5 +90,8 @@
     <ClCompile Include="..\..\..\src\SnesEmulator\AudioProcessor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\SnesEmulator\Shader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

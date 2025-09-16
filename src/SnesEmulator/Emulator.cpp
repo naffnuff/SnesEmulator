@@ -364,6 +364,8 @@ void Emulator::run()
                 nextAudioTick += CycleCount(21);
             }
 
+            //increment = true;
+
             if (increment)
             {
                 masterCycle = nextMasterCycle;
@@ -428,7 +430,7 @@ void Emulator::run()
                         spriteLayer4Viewer.update();
                         mode7Viewer.update();
 
-                        videoProcessor.unlockRenderer();
+                        videoProcessor.renderer.swapPixelBuffers();
 
                         std::this_thread::yield();
                     }
@@ -460,8 +462,6 @@ void Emulator::run()
                     }
                     else if (videoRegisters.vCounter == 262)
                     {
-                        videoProcessor.lockRenderer();
-
                         if (videoProcessor.renderer.pauseRequested)
                         {
                             videoProcessor.renderer.pauseRequested = false;

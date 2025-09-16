@@ -741,10 +741,6 @@ public:
             return;
         }
         paused = true;
-        if (videoProcessor.tryUnlockRenderer())
-        {
-            rendererUnlocked = true;
-        }
         if (videoProcessor.rendererRunner.fullscreen)
         {
             videoProcessor.renderer.toggleFullscreenRequested = true;
@@ -763,11 +759,6 @@ public:
         paused = false;
         context.stepMode = false;
         otherContext.stepMode = false;
-        if (rendererUnlocked)
-        {
-            videoProcessor.lockRenderer();
-            rendererUnlocked = false;
-        }
         videoProcessor.renderer.focusWindow(true);
     }
 
@@ -790,5 +781,4 @@ private:
     bool& running;
     Word inspectedVideoMemory = 0x0;
     bool paused = false;
-    bool rendererUnlocked = false;
 };

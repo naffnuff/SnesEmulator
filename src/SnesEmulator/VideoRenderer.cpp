@@ -18,8 +18,6 @@
 
 #include "Common/System.h"
 
-#include "Shader.h"
-
 namespace Video
 {
 
@@ -33,9 +31,12 @@ Renderer::Renderer(int windowXPosition, int windowYPosition, int width, int heig
     , height(height)
     , scale(scale)
     , syncUpdate(syncUpdate)
-    , pixelBuffer(size_t(height)* size_t(width))
     , title("SNES Emulator")
 {
+    for (std::vector<Pixel>& pixelBuffer : pixelBuffers)
+    {
+        pixelBuffer.resize(pixelBufferSize);
+    }
 }
 
 Renderer::~Renderer()
@@ -54,15 +55,22 @@ void Renderer::focusWindow(bool value)
     focusWindowRequested = value;
 }
 
+void Renderer::swapPixelBuffers()
+{
+    drawBufferIndex = writeBufferIndex;
+    writeBufferIndex = (writeBufferIndex + 1) % pixelBuffers.size();
+    textureNeedsUpdate = true;
+}
+
 // private
 
 // callbacks
 
-void framebufferSizeCallback(GLFWwindow*, int width, int height)
+void framebufferSizeCallback(GLFWwindow*, int , int )
 {
     //Renderer* renderer = static_cast<Renderer*>(glfwGetWindowUserPointer(window));
 
-    std::cout << "yo " << width << ":" << height << std::endl;
+    //std::cout << "yo " << width << ":" << height << std::endl;
 
     //renderer->setWindowProperties(false);
 }
@@ -267,61 +275,13 @@ void Renderer::setViewportSize()
     glfwGetFramebufferSize(window, &windowWidth, &windowHeight);
     glViewport(0, 0, windowWidth, windowHeight);
 
-    std::cout << "windowed " << windowWidth << ":" << windowHeight << std::endl;
+    //std::cout << "windowed " << windowWidth << ":" << windowHeight << std::endl;
 }
 
 void Renderer::createShaders()
 {
-    shaderProgram = createShaderProgram(vertexShaderSource, scanlineFragmentShaderSource);
-
-    timeUniform = glGetUniformLocation(shaderProgram, "time");
-    resolutionUniform = glGetUniformLocation(shaderProgram, "resolution");
-    aspectRatioUniform = glGetUniformLocation(shaderProgram, "aspectRatio");
-    gameTextureUniform = glGetUniformLocation(shaderProgram, "gameTexture");
-}
-
-unsigned int Renderer::createShaderProgram(const char* vertexSource, const char* fragmentSource)
-{
-    unsigned int vertexShader = compileShader(vertexSource, GL_VERTEX_SHADER);
-    unsigned int fragmentShader = compileShader(fragmentSource, GL_FRAGMENT_SHADER);
-
-    unsigned int program = glCreateProgram();
-    glAttachShader(program, vertexShader);
-    glAttachShader(program, fragmentShader);
-
-    glLinkProgram(program);
-
-    int success;
-    glGetProgramiv(program, GL_LINK_STATUS, &success);
-    if (!success)
-    {
-        char infoLog[512];
-        glGetProgramInfoLog(program, 512, nullptr, infoLog);
-        throw std::runtime_error("Shader linking failed: " + std::string(infoLog));
-    }
-
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
-
-    return program;
-}
-
-unsigned int Renderer::compileShader(const char* source, unsigned int type)
-{
-    unsigned int shader = glCreateShader(type);
-    glShaderSource(shader, 1, &source, nullptr);
-    glCompileShader(shader);
-
-    int success;
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        char infoLog[512];
-        glGetShaderInfoLog(shader, 512, nullptr, infoLog);
-        throw std::runtime_error("Shader compilation failed: " + std::string(infoLog));
-    }
-
-    return shader;
+    simpleShader.initialize();
+    scanlineShader.initialize();
 }
 
 void Renderer::createBuffers()
@@ -386,13 +346,11 @@ void Renderer::setPixel(int row, int column, Pixel pixel)
 {
     row = height - 1 - row;
     int index = row * width + column;
-    if (index < 0 || index >= pixelBuffer.size())
+    if (index < 0 || index >= pixelBufferSize)
     {
         throw std::logic_error("Renderer: Index out of bounds in pixel buffer");
     }
-    pixelBuffer[index] = pixel;
-
-    textureNeedsUpdate = true;
+    pixelBuffers[writeBufferIndex][index] = pixel;
 }
 
 void Renderer::setGrayscalePixel(int row, int column, uint8_t white)
@@ -433,42 +391,36 @@ bool Renderer::isPressed(int key) const
 
 // update
 
+void Renderer::uploadTexture()
+{
+    if (textureNeedsUpdate)
+    {
+        glBindTexture(GL_TEXTURE_2D, texture);
+        {
+            glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, pixelBuffers[drawBufferIndex].data());
+        }
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        textureNeedsUpdate = false;
+    }
+}
+
 void Renderer::update()
 {
-    handleInput();
-
     uploadTexture();
+
+    handleInput();
 
     glClearColor(0.f, 0.f, 0.f, 1.f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glUseProgram(shaderProgram);
-
-    if (timeUniform >= 0)
-    {
-        glUniform1f(timeUniform, (float)getTime());
-    }
-    if (resolutionUniform >= 0)
-    {
-        glUniform2f(resolutionUniform, (float)width, (float)height);
-    }
-    if (aspectRatioUniform >= 0)
-    {
-        glUniform1f(aspectRatioUniform, (float)width / (float)height);
-    }
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    if (gameTextureUniform >= 0)
-    {
-        glUniform1i(gameTextureUniform, 0);
-    }
+    shaders[currentShaderIndex]->apply(*this);
 
     glBindVertexArray(screenQuadVertexArray);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 
-    if (!syncUpdate)
+    //if (!syncUpdate)
     {
         static double previousTime = glfwGetTime();
         static int frameCount = 0;
@@ -496,24 +448,71 @@ void Renderer::handleInput()
         focusWindowRequested = false;
     }
 
-    bool spacePressed = isPressed(GLFW_KEY_SPACE);
-    bool escapePressed = isPressed(GLFW_KEY_ESCAPE);
-    if (pressKeyTimeout == 0)
+    double currentTime = getTime();
+    if (currentTime > pressKeyTimeout)
     {
-        if (escapePressed)
+        if (isPressed(GLFW_KEY_ESCAPE))
         {
             pauseRequested = true;
-            pressKeyTimeout = 30;
+            pressKeyTimeout = currentTime + 1.0;
         }
-        if (spacePressed)
+        bool screenSettingsChanged = false;
+        if (isPressed(GLFW_KEY_SPACE))
         {
             toggleFullscreenRequested = true;
-            pressKeyTimeout = 30;
+            pressKeyTimeout = currentTime + 1.0;
+            screenSettingsChanged = true;
         }
-    }
-    else
-    {
-        --pressKeyTimeout;
+        if (isPressed(GLFW_KEY_5))
+        {
+            currentShaderIndex = (currentShaderIndex + 1) % shaders.size();
+            pressKeyTimeout = currentTime + 1.0;
+            screenSettingsChanged = true;
+        }
+        if (isPressed(GLFW_KEY_1))
+        {
+            scanlineShader.scanlineIntensity = std::max(scanlineShader.scanlineIntensity - 0.1f, 0.f);
+            pressKeyTimeout = currentTime + 0.1;
+            screenSettingsChanged = true;
+        }
+        if (isPressed(GLFW_KEY_3))
+        {
+            scanlineShader.scanlineIntensity += 0.1f;
+            pressKeyTimeout = currentTime + 0.1;
+            screenSettingsChanged = true;
+        }
+        if (isPressed(GLFW_KEY_4))
+        {
+            scanlineShader.brightness -= 0.1f;
+            pressKeyTimeout = currentTime + 0.1;
+            screenSettingsChanged = true;
+        }
+        if (isPressed(GLFW_KEY_6))
+        {
+            scanlineShader.brightness += 0.1f;
+            pressKeyTimeout = currentTime + 0.1;
+            screenSettingsChanged = true;
+        }
+        if (isPressed(GLFW_KEY_7))
+        {
+            scanlineShader.contrast -= 0.1f;
+            pressKeyTimeout = currentTime + 0.1;
+            screenSettingsChanged = true;
+        }
+        if (isPressed(GLFW_KEY_9))
+        {
+            scanlineShader.contrast += 0.1f;
+            pressKeyTimeout = currentTime + 0.1;
+            screenSettingsChanged = true;
+        }
+        if (screenSettingsChanged)
+        {
+            std::cout << "***" << std::endl;
+            std::cout << "currentShaderIndex = " << currentShaderIndex << std::endl;
+            std::cout << "scanlineIntensity = " << scanlineShader.scanlineIntensity << std::endl;
+            std::cout << "brightness = " << scanlineShader.brightness << std::endl;
+            std::cout << "contrast = " << scanlineShader.contrast << std::endl;
+        }
     }
 
     buttonStart = isPressed(GLFW_KEY_COMMA);
@@ -588,21 +587,6 @@ void Renderer::handleInput()
     }
 }
 
-void Renderer::uploadTexture()
-{
-    if (textureNeedsUpdate)
-    {
-        glBindTexture(GL_TEXTURE_2D, texture);
-        {
-            std::scoped_lock lock(pixelBufferMutex);
-            glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, pixelBuffer.data());
-        }
-        glBindTexture(GL_TEXTURE_2D, 0);
-
-        textureNeedsUpdate = false;
-    }
-}
-
 // teardown
 
 void Renderer::terminate()
@@ -623,10 +607,9 @@ void Renderer::terminate()
     {
         glDeleteTextures(1, &texture);
     }
-    if (shaderProgram)
-    {
-        glDeleteProgram(shaderProgram);
-    }
+
+    simpleShader.destroy();
+    scanlineShader.destroy();
 
     if (window)
     {

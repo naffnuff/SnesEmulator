@@ -3,7 +3,7 @@ cpu info
 debugger info
 default info
 dma info
-emulator info
+emulator debug
 hdma info
 main info
 memory info

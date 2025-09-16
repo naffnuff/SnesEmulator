@@ -64,7 +64,6 @@ public:
         , renderer(1000, 40, rendererWidth, rendererHeight, 3.f, true, output)
         , rendererRunner(*this, output, gameTitle)
         , backgrounds(4)
-        , rendererLock(renderer.pixelBufferMutex)
         , rendererThread(std::ref(rendererRunner))
     {
     }
@@ -72,35 +71,11 @@ public:
     ~Processor()
     {
         rendererRunner.run = false;
-        tryUnlockRenderer();
         rendererThread.join();
     }
 
     Processor(const Processor&) = delete;
     Processor& operator=(const Processor&) = delete;
-
-    void lockRenderer()
-    {
-        rendererLock.lock();
-    }
-
-    void unlockRenderer()
-    {
-        rendererLock.unlock();
-    }
-
-    bool tryUnlockRenderer()
-    {
-        if (rendererLock.owns_lock())
-        {
-            rendererLock.unlock();
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
 
     void initialize(const std::string& gameTitle)
     {
@@ -130,43 +105,57 @@ public:
 
     void drawScanline(int vCounter)
     {
-        if (screenDisplay.getBit(7))
+        try
         {
-            renderer.clearScanline(vCounter - 1, 0);
-            return;
-        }
-        if (characterSize.getBits(4, 4) != 0)
-        {
-            throw NotYetImplementedException("16x16 backgrounds");
-        }
+            if (screenDisplay.getBit(7))
+            {
+                renderer.clearScanline(vCounter - 1, 0);
+                return;
+            }
+            if (characterSize.getBits(4, 4) != 0)
+            {
+                throw NotYetImplementedException("16x16 backgrounds");
+            }
 
-        if (backgroundMode == 1)
-        {
-            drawMode(mode1Extension ? mode1e : mode1, vCounter);
+            if (backgroundMode == 1)
+            {
+                drawMode(mode1Extension ? mode1e : mode1, vCounter);
+            }
+            else if (backgroundMode == 7)
+            {
+                try
+                {
+                    if (mode7HorizontalMirroring)
+                    {
+                        throw NotYetImplementedException("Register 211a: Horizontal mirroring");
+                    }
+                    if (mode7VerticalMirroring)
+                    {
+                        throw NotYetImplementedException("Register 211a: Vertical mirroring");
+                    }
+                    if (mode7EmptySpaceFill)
+                    {
+                        throw NotYetImplementedException("Register 211a: Empty space fill");
+                    }
+                    if (directColorMode)
+                    {
+                        throw NotYetImplementedException("Direct color mode for 256-color BGs");
+                    }
+                }
+                catch (std::exception& e)
+                {
+                    output.error(e.what());
+                }
+                drawMode(mode7, vCounter, true);
+            }
+            else if (backgroundMode != 0)
+            {
+                throw NotYetImplementedException("BG mode: ", backgroundMode, ", e: ", mode1Extension);
+            }
         }
-        else if (backgroundMode == 7)
+        catch (std::exception& e)
         {
-            if (mode7HorizontalMirroring)
-            {
-                throw NotYetImplementedException("Register 211a: Horizontal mirroring");
-            }
-            if (mode7VerticalMirroring)
-            {
-                throw NotYetImplementedException("Register 211a: Vertical mirroring");
-            }
-            if (mode7EmptySpaceFill)
-            {
-                throw NotYetImplementedException("Register 211a: Empty space fill");
-            }
-            if (directColorMode)
-            {
-                throw NotYetImplementedException("Direct color mode for 256-color BGs");
-            }
-            drawMode(mode7, vCounter, true);
-        }
-        else if (backgroundMode != 0)
-        {
-            throw NotYetImplementedException("BG mode: ", backgroundMode, ", e: ", mode1Extension);
+            output.error(e.what());
         }
     }
 

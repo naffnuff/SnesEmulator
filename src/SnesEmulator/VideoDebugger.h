@@ -33,32 +33,36 @@ public:
     {
         renderer.title = "OAM viewer";
         renderer.initialize();
-        while (running && renderer.isRunning()) {
+        while (running && renderer.isRunning())
+        {
             renderer.update();
         }
     }
 
     void update()
     {
-        std::scoped_lock lock(renderer.pixelBufferMutex);
-
         renderer.clearDisplay(0x7c1f);
 
         int rowOffset = 0;
         int columnOffset = 0;
-        for (int i = firstObjectIndex; i < 128 && rowOffset < renderer.height && columnOffset < renderer.width; ++i) {
+        for (int i = firstObjectIndex; i < 128 && rowOffset < renderer.height && columnOffset < renderer.width; ++i)
+        {
             Video::Object object = video.readObject(i);
 
             int objectSize = video.getObjectSize(object.sizeSelect);
             int objectTileSize = objectSize / 8;
-            for (int tileRow = 0; tileRow < objectTileSize; ++tileRow) {
-                for (int tileColumn = 0; tileColumn < objectTileSize; ++tileColumn) {
+            for (int tileRow = 0; tileRow < objectTileSize; ++tileRow)
+            {
+                for (int tileColumn = 0; tileColumn < objectTileSize; ++tileColumn)
+                {
                     int tileIndex = object.tileIndex + tileRow * 0x10 + tileColumn;
                     Word tileAddress = video.nameBaseSelect + uint16_t(tileIndex << 4);
-                    if (object.nameTable) {
+                    if (object.nameTable)
+                    {
                         tileAddress += video.nameSelect;
                     }
-                    for (int row = 0; row < 8; ++row, ++tileAddress) {
+                    for (int row = 0; row < 8; ++row, ++tileAddress)
+                    {
                         int bpp = 4;
                         const int displayRow = rowOffset + tileRow * 8 + row;
                         const int displayColumnOffset = tileColumn * 8;
@@ -66,20 +70,26 @@ public:
                         Byte firstHighByte(video.vram.highTable[tileAddress]);
                         Byte secondLowByte(video.vram.lowTable[tileAddress + 8]);
                         Byte secondHighByte(video.vram.highTable[tileAddress + 8]);
-                        for (int column = 0; column < 8; ++column) {
+                        for (int column = 0; column < 8; ++column)
+                        {
                             Byte paletteIndex;
                             paletteIndex.setBit(0, firstLowByte.getBit(7 - column));
                             paletteIndex.setBit(1, firstHighByte.getBit(7 - column));
-                            if (bpp >= 4) {
+                            if (bpp >= 4)
+                            {
                                 paletteIndex.setBit(2, secondLowByte.getBit(7 - column));
                                 paletteIndex.setBit(3, secondHighByte.getBit(7 - column));
                             }
-                            if (paletteIndex > 0) {
+                            if (paletteIndex > 0)
+                            {
                                 Word colorAddress = uint16_t(0x80 + (1 << bpp) * object.palette + paletteIndex);
                                 Word color = video.cgram.getWord(colorAddress);
-                                if (object.horizontalFlip) {
+                                if (object.horizontalFlip)
+                                {
                                     renderer.setPixel(displayRow, columnOffset + objectSize - 1 - displayColumnOffset - column, color);
-                                } else {
+                                }
+                                else
+                                {
                                     renderer.setPixel(displayRow, columnOffset + displayColumnOffset + column, color);
                                 }
                             }
@@ -88,11 +98,13 @@ public:
                 }
             }
             columnOffset += spriteSize;
-            if (columnOffset >= renderer.width) {
+            if (columnOffset >= renderer.width)
+            {
                 columnOffset = 0;
                 rowOffset += spriteSize;
             }
         }
+        renderer.swapPixelBuffers();
     }
 
     std::thread thread;
@@ -131,38 +143,49 @@ public:
     {
         renderer.title = std::string("Background ") + char('1' + int(backgroundLayer)) + " viewer";
         renderer.initialize();
-        while (running && renderer.isRunning()) {
+        while (running && renderer.isRunning())
+        {
             renderer.update();
         }
     }
 
     void update()
     {
-        std::scoped_lock lock(renderer.pixelBufferMutex);
-
-        if (backgroundLayer == Layer::Background1 && video.backgroundMode == 7) {
+        if (backgroundLayer == Layer::Background1 && video.backgroundMode == 7)
+        {
             renderer.clearDisplay(0x3ff);
             return;
-        } else {
+        }
+        else
+        {
             renderer.clearDisplay(0);
         }
 
         Video::Background& background = video.backgrounds[size_t(backgroundLayer)];
 
         const int tileSize = 8;
-        for (int screenRow = 0; screenRow < background.verticalMirroring + 1; ++screenRow) {
-            for (int screenColumn = 0; screenColumn < background.horizontalMirroring + 1; ++screenColumn) {
-                for (int tileRow = 0; tileRow < 32; ++tileRow) {
-                    for (int tileColumn = 0; tileColumn < 32; ++tileColumn) {
+        for (int screenRow = 0; screenRow < background.verticalMirroring + 1; ++screenRow)
+        {
+            for (int screenColumn = 0; screenColumn < background.horizontalMirroring + 1; ++screenColumn)
+            {
+                for (int tileRow = 0; tileRow < 32; ++tileRow)
+                {
+                    for (int tileColumn = 0; tileColumn < 32; ++tileColumn)
+                    {
                         Word tileDataAddress = uint16_t(background.tilemapAddress + (tileRow << 5) + tileColumn);
-                        if (screenRow) {
-                            if (background.horizontalMirroring) {
+                        if (screenRow)
+                        {
+                            if (background.horizontalMirroring)
+                            {
                                 tileDataAddress += 0x800;
-                            } else {
+                            }
+                            else
+                            {
                                 tileDataAddress += 0x400;
                             }
                         }
-                        if (screenColumn) {
+                        if (screenColumn)
+                        {
                             tileDataAddress += 0x400;
                         }
                         Word tileData = video.vram.getWord(tileDataAddress);
@@ -173,27 +196,32 @@ public:
                         bool verticalFlip = tileData.getBit(15);
                         Word tileAddress = background.characterAddress + uint16_t(tileNumber * tileSize * background.bitsPerPixel / 2);
                         int paletteAddress = (1 << background.bitsPerPixel) * palette;
-                        for (int row = 0; row < 8; ++row) {
+                        for (int row = 0; row < 8; ++row)
+                        {
                             Byte firstLowByte(video.vram.lowTable[tileAddress + row]);
                             Byte firstHighByte(video.vram.highTable[tileAddress + row]);
                             Byte secondLowByte(video.vram.lowTable[tileAddress + row + 8]);
                             Byte secondHighByte(video.vram.highTable[tileAddress + row + 8]);
                             int displayRow = tileRow * tileSize + screenRow * Video::rendererWidth + (verticalFlip ? tileSize - 1 - row : row);
-                            for (int column = 0; column < 8; ++column) {
+                            for (int column = 0; column < 8; ++column)
+                            {
                                 Byte paletteIndex;
                                 paletteIndex.setBit(0, firstLowByte.getBit(7 - column));
                                 paletteIndex.setBit(1, firstHighByte.getBit(7 - column));
-                                if (background.bitsPerPixel >= 4) {
+                                if (background.bitsPerPixel >= 4)
+                                {
                                     paletteIndex.setBit(2, secondLowByte.getBit(7 - column));
                                     paletteIndex.setBit(3, secondHighByte.getBit(7 - column));
                                 }
                                 Word color = 0x5555;
                                 int displayColumn = tileColumn * tileSize + screenColumn * Video::rendererWidth + (horizontalFlip ? tileSize - 1 - column : column);
-                                if (paletteIndex > 0) {
+                                if (paletteIndex > 0)
+                                {
                                     Word colorAddress = uint16_t(paletteAddress + paletteIndex);
                                     color = video.cgram.getWord(colorAddress);
                                 }
-                                if (tilePriority) {
+                                if (tilePriority)
+                                {
                                     color = Processor::addColors(color, Word(0x1084), false);//0x2108));
                                 }
                                 renderer.setPixel(displayRow, displayColumn, color);
@@ -203,6 +231,7 @@ public:
                 }
             }
         }
+        renderer.swapPixelBuffers();
     }
 
     std::thread thread;
@@ -242,14 +271,14 @@ public:
     {
         renderer.title = std::string("Sprites prio ") + char('1' + priority) + " viewer";
         renderer.initialize();
-        while (running && renderer.isRunning()) {
+        while (running && renderer.isRunning())
+        {
             renderer.update();
         }
     }
 
     void update()
     {
-        std::scoped_lock lock(renderer.pixelBufferMutex);
         renderer.clearDisplay(0x7c1f);
         int firstObjectIndex = 0;
         if (video.objectPriority) {
@@ -319,6 +348,7 @@ public:
                 }
             }
         }
+        renderer.swapPixelBuffers();
     }
 
     std::thread thread;
@@ -357,22 +387,26 @@ public:
     {
         renderer.title = "Mode 7 viewer";
         renderer.initialize();
-        while (running && renderer.isRunning()) {
+        while (running && renderer.isRunning())
+        {
             renderer.update();
         }
     }
 
     void update()
     {
-        std::scoped_lock lock(renderer.pixelBufferMutex);
         renderer.clearDisplay(0);
         int tileDataAddress = 0;
         //int i = 0;
-        for (int tileRow = 0; tileRow < 128; ++tileRow) {
-            for (int tileColumn = 0; tileColumn < 128; ++tileColumn) {
+        for (int tileRow = 0; tileRow < 128; ++tileRow)
+        {
+            for (int tileColumn = 0; tileColumn < 128; ++tileColumn)
+            {
                 Byte tileData = video.vram.lowTable[tileDataAddress];
-                for (int row = 0; row < 8; ++row) {
-                    for (int column = 0; column < 8; ++column) {
+                for (int row = 0; row < 8; ++row)
+                {
+                    for (int column = 0; column < 8; ++column)
+                    {
                         int pixelDataAddress = tileData * 8 * 8 + row * 8 + column;
                         Byte pixelData = video.vram.highTable[pixelDataAddress];
                         Word pixel = video.cgram.getWord(Word(pixelData));
@@ -382,6 +416,7 @@ public:
                 ++tileDataAddress;
             }
         }
+        renderer.swapPixelBuffers();
     }
 
     std::thread thread;

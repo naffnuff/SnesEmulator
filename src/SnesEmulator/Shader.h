@@ -2,74 +2,56 @@
 
 namespace Video {
 
-const char* vertexShaderSource = R"(
-#version 330 core
-layout (location = 0) in vec3 aPos;
-layout (location = 1) in vec2 aTexCoord;
+class Renderer;
 
-out vec2 TexCoord;
-
-void main()
+class Shader
 {
-	gl_Position = vec4(aPos, 1.0);
-	TexCoord = aTexCoord;
-}
-)";
+public:
+	virtual ~Shader() {}
 
-const char* simpleFragmentShaderSource = R"(
-#version 330 core
-out vec4 FragColor;
+	virtual void apply(const Renderer& renderer);
 
-in vec2 TexCoord;
-uniform sampler2D gameTexture;
+	void destroy();
 
-void main()
+protected:
+	void createProgram(const char* vertexSource, const char* fragmentSource);
+
+private:
+	unsigned int compileShader(const char* source, unsigned int type);
+
+protected:
+	unsigned int program = 0;
+
+private:
+	int gameTextureUniform = -1;
+};
+
+class SimpleShader : public Shader
 {
-	FragColor = texture(gameTexture, TexCoord);
-}
-)";
+public:
+	void initialize();
+};
 
-const char* scanlineFragmentShaderSource = R"(
-#version 330 core
-out vec4 FragColor;
-
-in vec2 TexCoord;
-
-uniform sampler2D gameTexture;
-uniform float time;
-uniform vec2 resolution;
-uniform float aspectRatio;
-
-// CRT effect parameters
-const float scanlineIntensity = 0.3;
-const float brightness = 1.1;
-const float contrast = 1.2;
-
-void main()
+class ScanlineShader : public Shader
 {
-	vec2 coord = TexCoord;
+public:
+	void initialize();
 
-	// Sample the game texture
-	vec4 color = texture(gameTexture, coord);
+private:
+	void apply(const Renderer& renderer) override;
 
-	// Apply scanlines
-	float scanline = sin(coord.y * resolution.y * 3.14159);
-	scanline = 1.0 - scanlineIntensity + scanlineIntensity * scanline * scanline;
-	
-	// Apply brightness and contrast
-	color.rgb *= brightness;
-	color.rgb = (color.rgb - 0.5) * contrast + 0.5;
+public:
+	float scanlineIntensity = 0.2f;
+	float brightness = 1.1f;
+	float contrast = 1.f;
 
-	// Apply scanline effect
-	color.rgb *= scanline;
-
-	// Slight vignette effect
-	vec2 center = coord - 0.5;
-	float vignette = 1.0 - length(center) * 0.3;
-	color.rgb *= vignette;
-
-	FragColor = color;
-}
-)";
+private:
+	int timeUniform = -1;
+	int resolutionUniform = -1;
+	int aspectRatioUniform = -1;
+	int scanlineIntensityUniform = -1;
+	int brightnessUniform = -1;
+	int contrastUniform = -1;
+};
 
 }

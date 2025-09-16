@@ -8,6 +8,8 @@
 
 #include "Common/Output.h"
 
+#include "Shader.h"
+
 struct GLFWmonitor;
 struct GLFWwindow;
 struct GLFWvidmode;
@@ -28,6 +30,8 @@ public:
 
     double getTime() const;
     void focusWindow(bool value);
+    void swapPixelBuffers();
+    unsigned int getTexture() const { return texture; }
 
 private:
     // setup
@@ -46,8 +50,6 @@ private:
     void setupOpenGL();
     void setViewportSize();
     void createShaders();
-    unsigned int createShaderProgram(const char* vertexSource, const char* fragmentSource);
-    unsigned int compileShader(const char* source, unsigned int type);
     void createBuffers();
     void createTextures();
 
@@ -60,6 +62,7 @@ private:
     bool isPressed(int key) const;
 
     // update
+public:
     void update();
     void handleInput();
     void uploadTexture();
@@ -71,6 +74,9 @@ private:
 public:
     bool toggleFullscreenRequested = false;
     bool pauseRequested = false;
+
+    const int width;
+    const int height;
 
 private:
     bool buttonStart = false;
@@ -89,10 +95,12 @@ private:
     int windowXPosition;
     int windowYPosition;
 
-    const int width;
-    const int height;
+    const size_t pixelBufferSize = size_t(height) * size_t(width);
+    std::array<std::vector<Pixel>, 3> pixelBuffers;
 
-    std::vector<Pixel> pixelBuffer;
+    int drawBufferIndex = 0;
+    int writeBufferIndex = 1;
+
     std::mutex pixelBufferMutex;
 
     Output output;
@@ -108,23 +116,27 @@ private:
     float yScreenCoverage = 0.0f;
     const bool syncUpdate;
 
-    unsigned int shaderProgram = 0;
     unsigned int screenQuadVertexArray = 0;
     unsigned int screenQuadVertexBuffer = 0;
     unsigned int screenQuadIndexBuffer = 0;
     unsigned int texture = 0;
 
-    int timeUniform = -1;
-    int resolutionUniform = -1;
-    int aspectRatioUniform = -1;
-    int gameTextureUniform = -1;
+    SimpleShader simpleShader;
+    ScanlineShader scanlineShader;
+    std::array<Shader*, 2> shaders = { &simpleShader, &scanlineShader };
+    int currentShaderIndex = 0;
 
-    int pressKeyTimeout = 0;
+    double pressKeyTimeout = 0.f;
     bool focusWindowRequested = false;
     bool textureNeedsUpdate = false;
 
     friend class Processor;
     friend class Registers;
+    friend class OamViewer;
+    friend class BackgroundViewer;
+    friend class SpriteLayerViewer;
+    friend class Mode7Viewer;
+
     friend void framebufferSizeCallback(GLFWwindow*, int width, int height);
 };
 
