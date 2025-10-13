@@ -21,7 +21,7 @@ public:
     Registers(Output& output, SPC::State& state)
         : RegisterManager(output, "audio", state.getMemory())
         , output(output, "audio")
-        , spcMemory(state.getMemory())
+        , memory(state.getMemory())
         , processor(output, state.getMemory())
     {
     }
@@ -94,159 +94,11 @@ public:
                 });
         }
 
-        for (int i = 0; i < bootRomData.size(); ++i)
+        /*for (int i = 0; i < bootRomData.size(); ++i)
         {
             Word address(0xffc0 + i);
-            spcMemory.createLocation<BootRomLocation>(address, Byte(0xff), bootRomData[i], std::ref(bootRomDataEnabled));
-        }
-
-        //// DSP Registers
-        //for (int i = 0; i < processor.voices.size(); ++i)
-        //{
-        //    Byte voiceAddressStart(i << 4);
-        //    std::string voiceName("Voice ");
-        //    voiceName += char('0' + i);
-        //    voiceName += " ";
-        //    processor.makeWriteRegister(voiceAddressStart, voiceName + "Left Volume", false, processor.voices[i].leftVolume);
-        //    processor.makeWriteRegister(voiceAddressStart + 1, voiceName + "Right Volume", false, processor.voices[i].rightVolume);
-        //    processor.makeWriteRegister(voiceAddressStart + 2, voiceName + "Pitch low byte", false,
-        //        /*[this, i](Byte& value) {
-        //            value = processor.voices[i].pitch.getLowByte();
-        //        },*/
-        //        [this, i](Byte value)
-        //        {
-        //            processor.voices[i].pitch.setLowByte(value);
-        //        }
-        //    );
-        //    processor.makeWriteRegister(voiceAddressStart + 3, voiceName + "Pitch high byte", false,
-        //        /*[this, i](Byte& value) {
-        //            value = processor.voices[i].pitch.getHighByte();
-        //        },*/
-        //        [this, i](Byte value)
-        //        {
-        //            processor.voices[i].pitch.setHighByte(value.getBits(0, 6));
-        //        }
-        //    );
-        //    processor.makeWriteRegister(voiceAddressStart + 4, voiceName + "Source Number", false, processor.voices[i].sourceNumber);
-        //    processor.makeWriteRegister(voiceAddressStart + 5, voiceName + "ADSR low byte", false,
-        //        /*[this, i](Byte& value) {
-        //            value = processor.voices[i].attackRate | processor.voices[i].decayRate << 4 | processor.voices[i].envelopeType << 7;
-        //        },*/
-        //        [this, i](Byte value)
-        //        {
-        //            processor.voices[i].attackRate = value.getBits(0, 4);
-        //            processor.voices[i].decayRate = value.getBits(4, 3);
-        //            if (value.getBit(7))
-        //            {
-        //                processor.voices[i].envelopeType = Processor::Voice::EnvelopeType::ADSR;
-        //            }
-        //            else
-        //            {
-        //                processor.voices[i].envelopeType = Processor::Voice::EnvelopeType::Gain;
-        //                //throw NotYetImplementedException("Gain mode not supported");
-        //            }
-        //        }
-        //    );
-        //    processor.makeWriteRegister(voiceAddressStart + 6, voiceName + "ADSR high byte", false,
-        //        /*[this, i](Byte& value) {
-        //            value = processor.voices[i].sustainRate | processor.voices[i].sustainLevel << 5;
-        //        },*/
-        //        [this, i](Byte value)
-        //        {
-        //            processor.voices[i].sustainRate = value.getBits(0, 5);
-        //            processor.voices[i].sustainLevel = value.getBits(5, 3);
-        //        }
-        //    );
-        //    processor.makeWriteRegister(voiceAddressStart + 7, voiceName + "Gain", false,
-        //        /*[this, i](Byte& value) {
-        //            if (processor.voices[i].gainMode == Processor::Direct) {
-        //                value = processor.voices[i].gainLevel;
-        //            } else {
-        //                value = Byte(processor.voices[i].gainLevel | processor.voices[i].gainMode << 5 | 1 << 7);
-        //            }
-        //        },*/
-        //        [this, i](Byte value)
-        //        {
-        //            if (value.getBit(7))
-        //            {
-        //                processor.voices[i].gainMode = Processor::Voice::GainMode(uint8_t(value.getBits(5, 2)));
-        //                processor.voices[i].gainLevel = value.getBits(0, 5);
-        //            }
-        //            else
-        //            {
-        //                processor.voices[i].gainMode = Processor::Voice::GainMode::Direct;
-        //                processor.voices[i].gainLevel = value.getBits(0, 7);
-        //            }
-        //        }
-        //    );
-        //    //processor.makeReadRegister(voiceAddressStart + 8, voiceName + "Envelope", false, processor.renderer.data[i].envelope);
-        //    //processor.makeReadRegister(voiceAddressStart + 9, voiceName + "Output", false, processor.renderer.data[i].output);
-        //}
-        //processor.makeWriteRegister(0x0c, "Main Volume Left", false, processor.mainVolumeLeft);
-        //processor.makeWriteRegister(0x1c, "Main Volume Right", false, processor.mainVolumeRight);
-        //processor.makeWriteRegister(0x2c, "Echo Volume Left", false, processor.echoVolumeLeft);
-        //processor.makeWriteRegister(0x3c, "Echo Volume Right", false, processor.echoVolumeRight);
-        //processor.makeWriteRegister(0x4c, "Key On", false,
-        //    [this](Byte value)
-        //    {
-        //        std::bitset<8> bitSet(value);
-        //        for (int i = 0; i < 8; ++i)
-        //        {
-        //            bool oldKeyOn = processor.voices[i].keyOn;
-        //            processor.voices[i].keyOn = bitSet[i];
-        //            if (bitSet[i] && !oldKeyOn)
-        //            {
-        //                processor.voices[i].keyOnInternal = true;
-        //            }
-        //        }
-        //    }
-        //);
-        //processor.makeVoiceBitWriteRegister<&Processor::Voice::keyOff>(0x5c, "Key Off", false);
-        //processor.makeWriteRegister(0x6c, "Flags", false,
-        //    /*[this](Byte& value) {
-        //        value = processor.reset << 7 | processor.mute << 6 | processor.echoOff << 5 | processor.noiseGeneratorClock;
-        //    },*/
-        //    [this](Byte value)
-        //    {
-        //        processor.reset = value.getBit(7);
-        //        processor.mute = value.getBit(6);
-        //        processor.echoOff = value.getBit(5);
-        //        processor.noiseGeneratorClock = value.getBits(0, 5);
-        //    }
-        //);
-        //processor.makeWriteRegister(0x7c, "Source End Block", true,
-        //    /*[this](Byte& value) {
-        //    },*/
-        //    [this](Byte value)
-        //    {
-        //        for (Processor::Voice& voice : processor.voices)
-        //        {
-        //            voice.sourceEndBlock = false;
-        //        }
-        //    }
-        //);
-        //processor.makeWriteRegister(0x0d, "Echo Feedback", false, processor.echoFeedback);
-        //processor.makeVoiceBitWriteRegister<&Processor::Voice::pitchModulation>(0x2d, "Pitch Modulation", false);
-        //processor.makeVoiceBitWriteRegister<&Processor::Voice::noiseOn>(0x3d, "Noise On", false);
-        //processor.makeVoiceBitWriteRegister<&Processor::Voice::echoOn>(0x4d, "Echo On", false);
-        //processor.makeWriteRegister(0x5d, "Source Directory Offset", true, processor.sourceDirectory);
-        //processor.makeWriteRegister(0x6d, "Echo Region Offset", false, processor.echoRegionOffset);
-        //processor.makeReadWriteRegister(0x7d, "Echo Delay", false,
-        //    [this](Byte& value)
-        //    {
-        //        value = processor.echoDelay;
-        //    },
-        //    [this](Byte value)
-        //    {
-        //        processor.echoDelay = value.getBits(0, 4);
-        //    }
-        //);
-        //for (int i = 0; i < processor.voiceCount; ++i)
-        //{
-        //    std::string coefficientName("Coefficient ");
-        //    coefficientName += char('0' + i);
-        //    processor.makeWriteRegister(Byte(i << 4 | 0x0f), coefficientName, false, processor.voices[i].coefficient);
-        //}
+            memory.createLocation<BootRomLocation>(address, Byte(0xff), bootRomData[i], std::ref(bootRomDataEnabled));
+        }*/
 
         // DSP Registers
         for (int i = 0; i < processor.voices.size(); ++i)
@@ -311,7 +163,7 @@ public:
 
     Output output;
 
-    SPC::State::MemoryType& spcMemory;
+    SPC::State::MemoryType& memory;
 
     Processor processor;
 
@@ -322,10 +174,200 @@ public:
     bool bootRomDataEnabled = true;
 
     std::array<Byte, 64> bootRomData = {
-       0xcd, 0xef, 0xbd, 0xe8, 0x00, 0xc6, 0x1d, 0xd0, 0xfc, 0x8f, 0xaa, 0xf4, 0x8f, 0xbb, 0xf5, 0x78,
-       0xcc, 0xf4, 0xd0, 0xfb, 0x2f, 0x19, 0xeb, 0xf4, 0xd0, 0xfc, 0x7e, 0xf4, 0xd0, 0x0b, 0xe4, 0xf5,
-       0xcb, 0xf4, 0xd7, 0x00, 0xfc, 0xd0, 0xf3, 0xab, 0x01, 0x10, 0xef, 0x7e, 0xf4, 0x10, 0xeb, 0xba,
-       0xf6, 0xda, 0x00, 0xba, 0xf4, 0xc4, 0xf4, 0xdd, 0x5d, 0xd0, 0xdb, 0x1f, 0x00, 0x00, 0xc0, 0xff,
+// cd: MOV X, #$ef
+// MOV X, #i
+// X = i    	[N.....Z.]
+// Register Immediate (2-Byte)
+        0xcd, 0xef,
+
+// bd: MOV SP, X
+// MOV SP, X
+// SP = X    	[........]
+// Register Register (1-Byte)
+        0xbd,
+
+// e8: MOV A, #$00
+// MOV A, #i
+// A = i    	[N.....Z.]
+// Register Immediate (2-Byte)
+        0xe8, 0x00,
+
+// c6: MOV(X), A
+// MOV (X), A
+// (X) = A        (read)    	[........]
+// Register Indirect Register (1-Byte)
+        0xc6,
+
+// 1d: DEC X
+// DEC X
+// X--    	[N.....Z.]
+// Register (1-Byte)
+        0x1d,
+
+// d0: BNE $ffc5
+// BNE r
+// PC+=r  if Z == 0    	[........]
+// Program Counter Relative (2-Byte)
+        0xd0, 0xfc,
+
+// 8f: MOV $f4, #$aa
+// MOV d, #i
+// (d) = i        (read)    	[........]
+// Direct Immediate (3-Byte)
+        0x8f, 0xaa, 0xf4,
+
+// 8f: MOV $f5, #$bb
+// MOV d, #i
+// (d) = i        (read)    	[........]
+// Direct Immediate (3-Byte)
+        0x8f, 0xbb, 0xf5,
+
+// 78: CMP $f4, #$cc
+// CMP d, #i
+// (d) - i    	[N.....ZC]
+// Direct Immediate (3-Byte)
+        0x78, 0xcc, 0xf4,
+
+// d0: BNE $ffcf
+// BNE r
+// PC+=r  if Z == 0    	[........]
+// Program Counter Relative (2-Byte)
+        0xd0, 0xfb,
+
+// 2f: BRA $ffef
+// BRA r
+// PC+=r    	[........]
+// Program Counter Relative (2-Byte)
+        0x2f, 0x19,
+
+// eb: MOV Y, $f4
+// MOV Y, d
+// Y = (d)    	[N.....Z.]
+// Register Direct (2-Byte)
+        0xeb, 0xf4,
+
+// d0: BNE $ffd6
+// BNE r
+// PC+=r  if Z == 0    	[........]
+// Program Counter Relative (2-Byte)
+        0xd0, 0xfc,
+
+// 7e: CMP Y, $f4
+// CMP Y, d
+// Y - (d)    	[N.....ZC]
+// Register Direct (2-Byte)
+        0x7e, 0xf4,
+
+// d0: BNE $ffe9
+// BNE r
+// PC+=r  if Z == 0    	[........]
+// Program Counter Relative (2-Byte)
+        0xd0, 0x0b,
+
+// e4: MOV A, $f5
+// MOV A, d
+// A = (d)    	[N.....Z.]
+// Register Direct (2-Byte)
+        0xe4, 0xf5,
+
+// cb: MOV $f4, Y
+// MOV d, Y
+// (d) = Y        (read)    	[........]
+// Direct Register (2-Byte)
+        0xcb, 0xf4,
+
+// d7: MOV [$00]+Y, A
+// MOV [d]+Y, A
+// ([d]+Y) = A    (read)    	[........]
+// Direct Indirect Indexed Register (2-Byte)
+        0xd7, 0x00,
+
+// fc: INC Y
+// INC Y
+// Y++    	[N.....Z.]
+// Register (1-Byte)
+        0xfc,
+
+// d0: BNE $ffda
+// BNE r
+// PC+=r  if Z == 0    	[........]
+// Program Counter Relative (2-Byte)
+        0xd0, 0xf3,
+
+// ab: INC $01
+// INC d
+// (d)++    	[N.....Z.]
+// Direct (2-Byte)
+        0xab, 0x01,
+
+// 10: BPL $ffda
+// BPL r
+// PC+=r  if N == 0    	[........]
+// Program Counter Relative (2-Byte)
+        0x10, 0xef,
+
+// 7e: CMP Y, $f4
+// CMP Y, d
+// Y - (d)    	[N.....ZC]
+// Register Direct (2-Byte)
+        0x7e, 0xf4,
+
+// 10: BPL $ffda
+// BPL r
+// PC+=r  if N == 0    	[........]
+// Program Counter Relative (2-Byte)
+        0x10, 0xeb,
+
+// ba: MOVW YA, $f6
+// MOVW YA, d
+// YA = word (d)    	[N.....Z.]
+// Y Accumulator Direct (2-Byte)
+        0xba, 0xf6,
+
+// da: MOVW $00, YA
+// MOVW d, YA
+// word (d) = YA  (read low only)    	[........]
+// Direct Y Accumulator (2-Byte)
+        0xda, 0x00,
+
+// ba: MOVW YA, $f4
+// MOVW YA, d
+// YA = word (d)    	[N.....Z.]
+// Y Accumulator Direct (2-Byte)
+        0xba, 0xf4,
+
+// c4: MOV $f4, A
+// MOV d, A
+// (d) = A        (read)    	[........]
+// Direct Register (2-Byte)
+        0xc4, 0xf4,
+
+// dd: MOV A, Y
+// MOV A, Y
+// A = Y    	[N.....Z.]
+// Register Register (1-Byte)
+        0xdd,
+
+// 5d: MOV X, A
+// MOV X, A
+// X = A    	[N.....Z.]
+// Register Register (1-Byte)
+        0x5d,
+
+// d0: BNE $ffd6
+// BNE r
+// PC+=r  if Z == 0    	[........]
+// Program Counter Relative (2-Byte)
+        0xd0, 0xdb,
+
+// 1f: JMP [$0000+X]
+// JMP [!a+X]
+// PC = [a+X]    	[........]
+// Absolute Indexed Indirect (3-Byte)
+        0x1f, 0x00, 0x00,
+
+// unreachable gibberish
+        0xc0, 0xff
     };
 
     int libraryByteCount = 0;

@@ -3,10 +3,10 @@ cpu info
 debugger info
 default info
 dma info
-emulator debug
+emulator info
 hdma info
 main info
 memory info
-renderer debug
+renderer info
 rom info
 video info

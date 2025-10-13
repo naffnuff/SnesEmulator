@@ -251,6 +251,17 @@ public:
         return memory.readWord<Wrapping>(address);
     }
 
+    void writeMemoryByte(Byte value, Word address)
+    {
+        memory.writeByte(value, address);
+    }
+
+    template<MemoryType::WrappingMask Wrapping = MemoryType::WrappingMask::Full>
+    void writeMemoryWord(Word value, Word address)
+    {
+        memory.writeWord<Wrapping>(value, address);
+    }
+
     template<MemoryType::WrappingMask Wrapping = MemoryType::WrappingMask::Full>
     ConstMemoryAccessType getConstMemoryAccess(Word address) const
     {
@@ -266,7 +277,7 @@ public:
     template<MemoryType::WrappingMask Wrapping = MemoryType::WrappingMask::Full>
     MemoryAccessType getMemoryAccess(Byte lowByte, Byte highByte)
     {
-        return getMemoryAccess(Word(lowByte, highByte));
+        return getMemoryAccess<Wrapping>(Word(lowByte, highByte));
     }
 
     Word getDirectAddress(Byte lowByte) const
@@ -284,9 +295,21 @@ public:
         return readMemoryByte(getDirectAddress(address));
     }
 
+    template<MemoryType::WrappingMask Wrapping = MemoryType::WrappingMask::Full>
     Word readDirectMemoryWord(Byte address)
     {
-        return readMemoryWord(getDirectAddress(address));
+        return readMemoryWord<Wrapping>(getDirectAddress(address));
+    }
+
+    void writeDirectMemoryByte(Byte value, Byte address)
+    {
+        writeMemoryByte(value, getDirectAddress(address));
+    }
+
+    template<MemoryType::WrappingMask Wrapping = MemoryType::WrappingMask::Full>
+    void writeDirectMemoryWord(Word value, Byte address)
+    {
+        writeMemoryWord<Wrapping>(value, getDirectAddress(address));
     }
 
     MemoryAccessType getDirectMemoryAccess(Byte address)
