@@ -94,11 +94,11 @@ public:
                 });
         }
 
-        /*for (int i = 0; i < bootRomData.size(); ++i)
+        for (int i = 0; i < bootRomData.size(); ++i)
         {
             Word address(0xffc0 + i);
             memory.createLocation<BootRomLocation>(address, Byte(0xff), bootRomData[i], std::ref(bootRomDataEnabled));
-        }*/
+        }
 
         // DSP Registers
         for (int i = 0; i < processor.voices.size(); ++i)
@@ -173,201 +173,45 @@ public:
 
     bool bootRomDataEnabled = true;
 
+    // SPC700 IPL ROM (64 bytes at 0xffc0 - 0xffff)
+    // Documented here for emulation accuracy and educational purposes
     std::array<Byte, 64> bootRomData = {
-// cd: MOV X, #$ef
-// MOV X, #i
-// X = i    	[N.....Z.]
-// Register Immediate (2-Byte)
-        0xcd, 0xef,
-
-// bd: MOV SP, X
-// MOV SP, X
-// SP = X    	[........]
-// Register Register (1-Byte)
-        0xbd,
-
-// e8: MOV A, #$00
-// MOV A, #i
-// A = i    	[N.....Z.]
-// Register Immediate (2-Byte)
-        0xe8, 0x00,
-
-// c6: MOV(X), A
-// MOV (X), A
-// (X) = A        (read)    	[........]
-// Register Indirect Register (1-Byte)
-        0xc6,
-
-// 1d: DEC X
-// DEC X
-// X--    	[N.....Z.]
-// Register (1-Byte)
-        0x1d,
-
-// d0: BNE $ffc5
-// BNE r
-// PC+=r  if Z == 0    	[........]
-// Program Counter Relative (2-Byte)
-        0xd0, 0xfc,
-
-// 8f: MOV $f4, #$aa
-// MOV d, #i
-// (d) = i        (read)    	[........]
-// Direct Immediate (3-Byte)
-        0x8f, 0xaa, 0xf4,
-
-// 8f: MOV $f5, #$bb
-// MOV d, #i
-// (d) = i        (read)    	[........]
-// Direct Immediate (3-Byte)
-        0x8f, 0xbb, 0xf5,
-
-// 78: CMP $f4, #$cc
-// CMP d, #i
-// (d) - i    	[N.....ZC]
-// Direct Immediate (3-Byte)
-        0x78, 0xcc, 0xf4,
-
-// d0: BNE $ffcf
-// BNE r
-// PC+=r  if Z == 0    	[........]
-// Program Counter Relative (2-Byte)
-        0xd0, 0xfb,
-
-// 2f: BRA $ffef
-// BRA r
-// PC+=r    	[........]
-// Program Counter Relative (2-Byte)
-        0x2f, 0x19,
-
-// eb: MOV Y, $f4
-// MOV Y, d
-// Y = (d)    	[N.....Z.]
-// Register Direct (2-Byte)
-        0xeb, 0xf4,
-
-// d0: BNE $ffd6
-// BNE r
-// PC+=r  if Z == 0    	[........]
-// Program Counter Relative (2-Byte)
-        0xd0, 0xfc,
-
-// 7e: CMP Y, $f4
-// CMP Y, d
-// Y - (d)    	[N.....ZC]
-// Register Direct (2-Byte)
-        0x7e, 0xf4,
-
-// d0: BNE $ffe9
-// BNE r
-// PC+=r  if Z == 0    	[........]
-// Program Counter Relative (2-Byte)
-        0xd0, 0x0b,
-
-// e4: MOV A, $f5
-// MOV A, d
-// A = (d)    	[N.....Z.]
-// Register Direct (2-Byte)
-        0xe4, 0xf5,
-
-// cb: MOV $f4, Y
-// MOV d, Y
-// (d) = Y        (read)    	[........]
-// Direct Register (2-Byte)
-        0xcb, 0xf4,
-
-// d7: MOV [$00]+Y, A
-// MOV [d]+Y, A
-// ([d]+Y) = A    (read)    	[........]
-// Direct Indirect Indexed Register (2-Byte)
-        0xd7, 0x00,
-
-// fc: INC Y
-// INC Y
-// Y++    	[N.....Z.]
-// Register (1-Byte)
-        0xfc,
-
-// d0: BNE $ffda
-// BNE r
-// PC+=r  if Z == 0    	[........]
-// Program Counter Relative (2-Byte)
-        0xd0, 0xf3,
-
-// ab: INC $01
-// INC d
-// (d)++    	[N.....Z.]
-// Direct (2-Byte)
-        0xab, 0x01,
-
-// 10: BPL $ffda
-// BPL r
-// PC+=r  if N == 0    	[........]
-// Program Counter Relative (2-Byte)
-        0x10, 0xef,
-
-// 7e: CMP Y, $f4
-// CMP Y, d
-// Y - (d)    	[N.....ZC]
-// Register Direct (2-Byte)
-        0x7e, 0xf4,
-
-// 10: BPL $ffda
-// BPL r
-// PC+=r  if N == 0    	[........]
-// Program Counter Relative (2-Byte)
-        0x10, 0xeb,
-
-// ba: MOVW YA, $f6
-// MOVW YA, d
-// YA = word (d)    	[N.....Z.]
-// Y Accumulator Direct (2-Byte)
-        0xba, 0xf6,
-
-// da: MOVW $00, YA
-// MOVW d, YA
-// word (d) = YA  (read low only)    	[........]
-// Direct Y Accumulator (2-Byte)
-        0xda, 0x00,
-
-// ba: MOVW YA, $f4
-// MOVW YA, d
-// YA = word (d)    	[N.....Z.]
-// Y Accumulator Direct (2-Byte)
-        0xba, 0xf4,
-
-// c4: MOV $f4, A
-// MOV d, A
-// (d) = A        (read)    	[........]
-// Direct Register (2-Byte)
-        0xc4, 0xf4,
-
-// dd: MOV A, Y
-// MOV A, Y
-// A = Y    	[N.....Z.]
-// Register Register (1-Byte)
-        0xdd,
-
-// 5d: MOV X, A
-// MOV X, A
-// X = A    	[N.....Z.]
-// Register Register (1-Byte)
-        0x5d,
-
-// d0: BNE $ffd6
-// BNE r
-// PC+=r  if Z == 0    	[........]
-// Program Counter Relative (2-Byte)
-        0xd0, 0xdb,
-
-// 1f: JMP [$0000+X]
-// JMP [!a+X]
-// PC = [a+X]    	[........]
-// Absolute Indexed Indirect (3-Byte)
-        0x1f, 0x00, 0x00,
-
-// unreachable gibberish
-        0xc0, 0xff
+        // Init
+        0xcd, 0xef,         // ffc0: MOV X, #$ef
+        0xbd,               // ffc2: MOV SP, X
+        0xe8, 0x00,         // ffc3: MOV A, #$00
+        0xc6,               // ffc5: MOV(X), A
+        0x1d,               // ffc6: DEC X
+        0xd0, 0xfc,         // ffc7: BNE $ffc5
+        0x8f, 0xaa, 0xf4,   // ffc9: MOV $f4, #$aa
+        0x8f, 0xbb, 0xf5,   // ffcc: MOV $f5, #$bb
+        0x78, 0xcc, 0xf4,   // ffcf: CMP $f4, #$cc
+        0xd0, 0xfb,         // ffd2: BNE $ffcf
+        0x2f, 0x19,         // ffd4: BRA $ffef
+        // Transfer routine
+        0xeb, 0xf4,         // ffd6: MOV Y, $f4
+        0xd0, 0xfc,         // ffd8: BNE $ffd6
+        0x7e, 0xf4,         // ffda: CMP Y, $f4
+        0xd0, 0x0b,         // ffdc: BNE $ffe9
+        0xe4, 0xf5,         // ffde: MOV A, $f5
+        0xcb, 0xf4,         // ffe0: MOV $f4, Y
+        0xd7, 0x00,         // ffe2: MOV [$00]+Y, A
+        0xfc,               // ffe4: INC Y
+        0xd0, 0xf3,         // ffe5: BNE $ffda
+        0xab, 0x01,         // ffe7: INC $01
+        0x10, 0xef,         // ffe9: BPL $ffda
+        0x7e, 0xf4,         // ffeb: CMP Y, $f4
+        0x10, 0xeb,         // ffed: BPL $ffda
+        // Main loop
+        0xba, 0xf6,         // ffef: MOVW YA, $f6
+        0xda, 0x00,         // fff1: MOVW $00, YA
+        0xba, 0xf4,         // fff3: MOVW YA, $f4
+        0xc4, 0xf4,         // fff5: MOV $f4, A
+        0xdd,               // fff7: MOV A, Y
+        0x5d,               // fff8: MOV X, A
+        0xd0, 0xdb,         // fff9: BNE $ffd6
+        0x1f, 0x00, 0x00,   // fffb: JMP [$0000+X]
+        0xc0, 0xff          // fffe: reset vector
     };
 
     int libraryByteCount = 0;

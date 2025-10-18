@@ -697,8 +697,7 @@ public:
                     Output::ColorScope outputColor(lock, output, color, bright);
                     if (spcAddress >= 0xffc0 && audioRegisters.bootRomDataEnabled)
                     {
-                        //output.print(lock, audioRegisters.bootRomData[spcAddress - 0xffc0], ' ');
-                        output.print(lock, "--", ' ');
+                        output.print(lock, audioRegisters.bootRomData[spcAddress - 0xffc0], ' ');
                     }
                     else
                     {

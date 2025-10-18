@@ -1,7 +1,0 @@
-{
-    "files.associations": {
-        "mutex": "cpp",
-        "condition_variable": "cpp",
-        "functional": "cpp"
-    }
-}

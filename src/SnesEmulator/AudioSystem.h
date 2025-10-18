@@ -32,9 +32,7 @@ public:
     ~AudioSystem()
     {
         run = false;
-        bootLoaderThread.join();
-        if (systemThreadStarted)
-        {
+        if (systemThreadStarted) {
             systemThread.join();
         }
     }
@@ -110,13 +108,10 @@ private:
 
 public:
     std::thread systemThread;
-    std::thread bootLoaderThread;
 
     Debugger::Context<SPC::State> context;
 
     bool threaded = true;
-
-    bool booted = false;
 
     bool pauseRequested = false;
 
@@ -128,5 +123,4 @@ public:
     CycleCount nextSpc;
 
     friend class AudioSystemRunner;
-    friend class BootLoaderRunner;
 };

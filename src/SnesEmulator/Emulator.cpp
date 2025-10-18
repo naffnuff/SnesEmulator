@@ -171,12 +171,11 @@ void Emulator::run()
     DmaInstruction dmaInstruction(output, cpuState, videoRegisters);
     HdmaInstruction hdmaInstruction(output, cpuState, videoRegisters);
 
-    masterCycle = CycleCount(0);
-    CycleCount nextCpu(0);
-    CycleCount nextSpc(0);
-    CycleCount nextAudioTick(0);
+    CycleCount nextCpu = masterCycle;
+    CycleCount nextSpc = masterCycle;
+    CycleCount nextAudioTick = masterCycle;
     CycleCount lostCycles(0);
-    const CycleCount oneCycle(1);
+    CycleCount oneCycle(1);
 
     //uint64_t audioCycle = 0;
 
@@ -289,12 +288,8 @@ void Emulator::run()
                 nextSpc = masterCycle;
             }
 
-            if (!audioSystem.threaded && audioSystem.booted)
+            if (!audioSystem.threaded)
             {
-                if (nextSpc == CycleCount(0))
-                {
-                    nextSpc = masterCycle;
-                }
                 if (masterCycle == nextSpc)
                 {
                     Instruction<SPC::State>* instruction = audioSystem.instructionDecoder.getNextInstruction(audioSystem.state);
@@ -363,17 +358,10 @@ void Emulator::run()
                     //++cycleCountDelta;
                 }
             }
-            if (!audioSystem.threaded && audioSystem.booted)
+            if (!audioSystem.threaded && masterCycle == nextAudioTick)
             {
-                if (nextAudioTick == CycleCount(0))
-                {
-                    nextAudioTick = masterCycle;
-                }
-                if (masterCycle == nextAudioTick)
-                {
-                    audioSystem.tick();
-                    nextAudioTick += CycleCount(21);
-                }
+                audioSystem.tick();
+                nextAudioTick += CycleCount(21);
             }
 
             //increment = true;
