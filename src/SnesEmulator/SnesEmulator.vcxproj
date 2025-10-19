@@ -85,7 +85,7 @@
       <ConformanceMode>true</ConformanceMode>
       <TreatWarningAsError>true</TreatWarningAsError>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>..\..\..\src\;..\..\..\src\Common\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\;..\Common\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -104,7 +104,7 @@
       <ConformanceMode>true</ConformanceMode>
       <TreatWarningAsError>true</TreatWarningAsError>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>..\..\..\src\;..\..\..\src\Common\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\;..\Common\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -126,7 +126,7 @@
       <ConformanceMode>true</ConformanceMode>
       <TreatWarningAsError>true</TreatWarningAsError>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>..\..\..\src\;..\..\..\src\Common\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\;..\Common\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -149,7 +149,7 @@
       <ConformanceMode>true</ConformanceMode>
       <TreatWarningAsError>true</TreatWarningAsError>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>..\..\..\src\;..\..\..\src\Common\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\;..\Common\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <AdditionalOptions>/we4033 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -166,10 +166,6 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Text Include="cpu.txt" />
-    <Text Include="spc.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Common\Common.vcxproj">
       <Project>{0390f7ba-7ea0-409f-ad82-2de104b2fce6}</Project>
     </ProjectReference>
@@ -181,32 +177,35 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\README.md" />
+    <ClInclude Include="AudioProcessor.h" />
+    <ClInclude Include="AudioRegisters.h" />
+    <ClInclude Include="AudioSystem.h" />
+    <ClInclude Include="AudioTest.h" />
+    <ClInclude Include="Debugger.h" />
+    <ClInclude Include="DmaInstruction.h" />
+    <ClInclude Include="Emulator.h" />
+    <ClInclude Include="HdmaInstruction.h" />
+    <ClInclude Include="Rom.h" />
+    <ClInclude Include="Shader.h" />
+    <ClInclude Include="VideoData.h" />
+    <ClInclude Include="VideoDebugger.h" />
+    <ClInclude Include="VideoProcessor.h" />
+    <ClInclude Include="VideoRegisters.h" />
+    <ClInclude Include="VideoRenderer.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\src\SnesEmulator\AudioProcessor.h" />
-    <ClInclude Include="..\..\..\src\SnesEmulator\AudioRegisters.h" />
-    <ClInclude Include="..\..\..\src\SnesEmulator\AudioSystem.h" />
-    <ClInclude Include="..\..\..\src\SnesEmulator\AudioTest.h" />
-    <ClInclude Include="..\..\..\src\SnesEmulator\Debugger.h" />
-    <ClInclude Include="..\..\..\src\SnesEmulator\DmaInstruction.h" />
-    <ClInclude Include="..\..\..\src\SnesEmulator\Emulator.h" />
-    <ClInclude Include="..\..\..\src\SnesEmulator\HdmaInstruction.h" />
-    <ClInclude Include="..\..\..\src\SnesEmulator\Rom.h" />
-    <ClInclude Include="..\..\..\src\SnesEmulator\Shader.h" />
-    <ClInclude Include="..\..\..\src\SnesEmulator\VideoData.h" />
-    <ClInclude Include="..\..\..\src\SnesEmulator\VideoDebugger.h" />
-    <ClInclude Include="..\..\..\src\SnesEmulator\VideoProcessor.h" />
-    <ClInclude Include="..\..\..\src\SnesEmulator\VideoRegisters.h" />
-    <ClInclude Include="..\..\..\src\SnesEmulator\VideoRenderer.h" />
+    <ClCompile Include="AudioProcessor.cpp" />
+    <ClCompile Include="AudioSystem.cpp" />
+    <ClCompile Include="Emulator.cpp" />
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="VideoRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\src\SnesEmulator\AudioProcessor.cpp" />
-    <ClCompile Include="..\..\..\src\SnesEmulator\AudioSystem.cpp" />
-    <ClCompile Include="..\..\..\src\SnesEmulator\Emulator.cpp" />
-    <ClCompile Include="..\..\..\src\SnesEmulator\Main.cpp" />
-    <ClCompile Include="..\..\..\src\SnesEmulator\Shader.cpp" />
-    <ClCompile Include="..\..\..\src\SnesEmulator\VideoRenderer.cpp" />
+    <Text Include="logconfig.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\README.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

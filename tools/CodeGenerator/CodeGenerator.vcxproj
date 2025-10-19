@@ -18,6 +18,20 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CpuAddressModeImplementations.h" />
+    <ClInclude Include="SpcAddressModeImplementations.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="CpuGeneration.cpp" />
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="SpcGeneration.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="cpuInstructions.txt" />
+    <Text Include="cpuOpcodeTable.txt" />
+    <Text Include="spcInstructions.txt" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{463F940B-4D76-4A0E-AE28-9DD589478FA4}</ProjectGuid>
@@ -115,20 +129,6 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\..\tools\CodeGenerator\CpuGeneration.cpp" />
-    <ClCompile Include="..\..\..\tools\CodeGenerator\Main.cpp" />
-    <ClCompile Include="..\..\..\tools\CodeGenerator\SpcGeneration.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="..\..\..\tools\CodeGenerator\cpuInstructions.txt" />
-    <Text Include="..\..\..\tools\CodeGenerator\cpuOpcodeTable.txt" />
-    <Text Include="..\..\..\tools\CodeGenerator\spcInstructions.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\..\tools\CodeGenerator\CpuAddressModeImplementations.h" />
-    <ClInclude Include="..\..\..\tools\CodeGenerator\SpcAddressModeImplementations.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
