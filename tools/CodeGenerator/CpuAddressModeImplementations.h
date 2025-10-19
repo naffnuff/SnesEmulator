@@ -36,7 +36,7 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
                 "Long indexedAddress = staticAddress + state.getIndexRegister<Register>();",
                 "MemoryAccess access = state.getMemoryAccess(indexedAddress);",
                 "int cycles = 0;",
-                "if (ExtraCycles)",
+                "if constexpr (ExtraCycles)",
                 "{",
                 "    Word addressPage(staticAddress >> 8);",
                 "    Word indexedAddressPage(indexedAddress >> 8);",
@@ -255,9 +255,12 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
                 "}",
                 "Long address(state.getDirectMemoryAccess(lowByte).readWord(), state.getDataBank());",
                 "Long indexedAddress = address + state.getIndexRegister<State::IndexRegister::Y>();",
-                "if (address >> 8 != indexedAddress >> 8)",
+                "if constexpr (ExtraCycles)",
                 "{",
-                "    cycles += 1;",
+                "    if (address >> 8 != indexedAddress >> 8)",
+                "    {",
+                "        cycles += 1;",
+                "    }",
                 "}",
                 "MemoryAccess access = state.getMemoryAccess(indexedAddress);",
                 "return cycles + Operator::invoke(state, access);"
@@ -307,7 +310,7 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
         "Immediate",
         {
             {
-                "Memory<Byte> memory(1);",
+                "Memory<Byte> memory(1, state.output);",
                 "memory.createLocation<ReadOnlyMemory>(0, lowByte);",
                 "MemoryAccess<Memory<Byte>> access(memory, 0);",
                 "return Operator::invoke(state, access);"
@@ -321,7 +324,7 @@ static const std::unordered_map<std::string, std::tuple<std::vector<std::string>
         "Immediate16Bit",
         {
             {
-                "Memory<Byte> memory(2);",
+                "Memory<Byte> memory(2, state.output);",
                 "memory.createLocation<ReadOnlyMemory>(0, lowByte);",
                 "memory.createLocation<ReadOnlyMemory>(1, highByte);",
                 "MemoryAccess access(memory, 0);",

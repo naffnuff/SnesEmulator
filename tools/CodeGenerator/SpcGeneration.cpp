@@ -747,7 +747,7 @@ void generateOperators(const OperatorMap& operatorMap)
 
 void generateSpc()
 {
-    std::ifstream instructionsFile("../../../src/CodeGenerator/spcInstructions.txt");
+    std::ifstream instructionsFile("../../../tools/CodeGenerator/spcInstructions.txt");
 
     if (!instructionsFile) {
         throw std::runtime_error("Cannot find instruction definitions");
