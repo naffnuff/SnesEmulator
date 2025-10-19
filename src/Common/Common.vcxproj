@@ -19,20 +19,20 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\src\Common\Exception.h" />
-    <ClInclude Include="..\..\..\src\Common\Instruction.h" />
-    <ClInclude Include="..\..\..\src\Common\Memory.h" />
-    <ClInclude Include="..\..\..\src\Common\MemoryLocation.h" />
-    <ClInclude Include="..\..\..\src\Common\Output.h" />
-    <ClInclude Include="..\..\..\src\Common\Profiler.h" />
-    <ClInclude Include="..\..\..\src\Common\RegisterManager.h" />
-    <ClInclude Include="..\..\..\src\Common\System.h" />
-    <ClInclude Include="..\..\..\src\Common\Types.h" />
-    <ClInclude Include="..\..\..\src\Common\Util.h" />
+    <ClInclude Include="Exception.h" />
+    <ClInclude Include="Instruction.h" />
+    <ClInclude Include="Memory.h" />
+    <ClInclude Include="MemoryLocation.h" />
+    <ClInclude Include="Output.h" />
+    <ClInclude Include="Profiler.h" />
+    <ClInclude Include="RegisterManager.h" />
+    <ClInclude Include="System.h" />
+    <ClInclude Include="Types.h" />
+    <ClInclude Include="Util.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\src\Common\Profiler.cpp" />
-    <ClCompile Include="..\..\..\src\Common\System.cpp" />
+    <ClCompile Include="Profiler.cpp" />
+    <ClCompile Include="System.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

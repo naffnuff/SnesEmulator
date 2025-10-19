@@ -19,14 +19,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\src\SPC700\SpcInstructionDecoder.cpp" />
+    <ClInclude Include="SpcAddressMode.h" />
+    <ClInclude Include="SpcInstructionDecoder.h" />
+    <ClInclude Include="SpcOpcode.h" />
+    <ClInclude Include="SpcOperator.h" />
+    <ClInclude Include="SpcState.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\src\SPC700\SpcAddressMode.h" />
-    <ClInclude Include="..\..\..\src\SPC700\SpcInstructionDecoder.h" />
-    <ClInclude Include="..\..\..\src\SPC700\SpcOpcode.h" />
-    <ClInclude Include="..\..\..\src\SPC700\SpcOperator.h" />
-    <ClInclude Include="..\..\..\src\SPC700\SpcState.h" />
+    <ClCompile Include="SpcInstructionDecoder.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -95,7 +95,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\..\src\Common\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Common\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -109,7 +109,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\..\src\Common\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Common\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
@@ -119,7 +119,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\..\src\Common\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Common\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
@@ -131,7 +131,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\..\src\Common\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Common\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
