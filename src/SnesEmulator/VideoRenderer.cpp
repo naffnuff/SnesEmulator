@@ -463,6 +463,16 @@ void Renderer::handleInput()
             pressKeyTimeout = currentTime + 1.0;
             screenSettingsChanged = true;
         }
+        if (isPressed(GLFW_KEY_F5))
+        {
+            saveStateRequested = true;
+            pressKeyTimeout = currentTime + 1.0;
+        }
+        if (isPressed(GLFW_KEY_F7))
+        {
+            loadStateRequested = true;
+            pressKeyTimeout = currentTime + 1.0;
+        }
         if (isPressed(GLFW_KEY_5))
         {
             currentShaderIndex = (currentShaderIndex + 1) % shaders.size();

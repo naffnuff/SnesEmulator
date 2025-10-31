@@ -74,6 +74,8 @@ public:
 public:
     bool toggleFullscreenRequested = false;
     bool pauseRequested = false;
+    bool saveStateRequested = false;
+    bool loadStateRequested = false;
 
     const int width;
     const int height;

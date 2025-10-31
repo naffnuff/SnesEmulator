@@ -6,6 +6,8 @@
 
 #include "Exception.h"
 
+#include "Serialization.h"
+
 #pragma warning( disable : 4702 ) // unreachable code
 #pragma warning( disable : 4100 ) // unreferenced formal parameter
 
@@ -270,6 +272,8 @@ public:
 
 private:
     uint8_t value;
+
+    SAVE(value);
 
     friend std::ostream& operator<<(std::ostream&, Byte);
 };

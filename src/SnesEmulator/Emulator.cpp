@@ -432,6 +432,19 @@ void Emulator::run()
 
                         videoProcessor.renderer.swapPixelBuffers();
 
+                        if (videoProcessor.renderer.saveStateRequested)
+                        {
+                            std::ofstream file(System::getRomLibraryPath() / (rom.gameTitle + "_cpu.bin"));
+                            save(file);
+                            videoProcessor.renderer.saveStateRequested = false;
+                        }
+                        if (videoProcessor.renderer.loadStateRequested)
+                        {
+                            std::ifstream file(System::getRomLibraryPath() / (rom.gameTitle + "_cpu.bin"));
+                            load(file);
+                            videoProcessor.renderer.loadStateRequested = false;
+                        }
+
                         std::this_thread::yield();
                     }
                     videoRegisters.hBlank = true;

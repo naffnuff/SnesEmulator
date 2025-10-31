@@ -6,6 +6,7 @@
 
 #include "Common/Instruction.h"
 #include "Common/System.h"
+#include "Common/Serialization.h"
 
 #include "WDC65816/CpuState.h"
 
@@ -128,5 +129,7 @@ private:
 
     std::array<Byte, 4> cpuToSpcBuffers;
     std::array<Byte, 4> spcToCpuBuffers;
+
+    SAVE();
 };
 

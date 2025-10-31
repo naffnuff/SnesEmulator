@@ -11,6 +11,7 @@
 #include "Types.h"
 #include "Memory.h"
 #include "Util.h"
+#include "Serialization.h"
 
 namespace CPU {
 
