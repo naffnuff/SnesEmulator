@@ -17,7 +17,7 @@ class AudioSystem
 {
 public:
     AudioSystem(Output& output, Debugger& debugger)
-        : output(output, "audio")
+        : output(output, "audio_sys")
         , instructionDecoder()
         , registers(output, state)
         , processor(registers.processor)

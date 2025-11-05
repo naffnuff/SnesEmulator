@@ -739,9 +739,6 @@ public:
     bool mode7HorizontalMirroring = false;
     bool mode7VerticalMirroring = false;
     bool mode7EmptySpaceFill = false;
-
-private:
-    std::unique_lock<std::mutex> rendererLock;
 };
 
 }

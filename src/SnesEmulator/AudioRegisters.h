@@ -19,8 +19,8 @@ class Registers : public RegisterManager<SPC::State::MemoryType, Output::Color::
 {
 public:
     Registers(Output& output, SPC::State& state)
-        : RegisterManager(output, "audio", state.getMemory())
-        , output(output, "audio")
+        : RegisterManager(output, "audio_reg", state.getMemory())
+        , output(output, "audio_reg")
         , memory(state.getMemory())
         , processor(output, state.getMemory())
     {

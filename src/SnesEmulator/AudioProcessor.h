@@ -6,7 +6,6 @@
 #include <vector>
 #include <map>
 #include <bitset>
-#include <mutex>
 
 #include "Exception.h"
 #include "Types.h"
@@ -522,18 +521,125 @@ private:
 
     bool dspOutputStarted = false;
 
-    size_t outputBufferSize = 1;
+    struct OutputBuffer
+    {
+        struct Node
+        {
+            float data = 0.f;
+            Node* next = nullptr;
+        };
 
-    std::vector<float> leftOutputBuffer;
-    std::vector<float> rightOutputBuffer;
+        OutputBuffer()
+        {
+            first = new Node();
+            last = first;
+            currentRead = first;
+            currentWrite = first;
+            first->next = first;
+        }
 
-    std::mutex outputBufferMutex;
+        ~OutputBuffer()
+        {
+            last->next = nullptr;
+            Node* node = first;
+            while (node)
+            {
+                Node* nextNode = node->next;
+                delete node;
+                node = nextNode;
+            }
+        }
+
+        void ensureSize()
+        {
+            const size_t lag = getLag();
+            while (size < lag)
+            {
+                Node* firstNew = new Node();
+                Node* newNode = firstNew;
+                Node* oldNode = first;
+
+                firstNew->data = first->data;
+                if (currentWrite == first)
+                {
+                    currentWrite = firstNew;
+                }
+
+                for (int i = 1; i < size; ++i)
+                {
+                    newNode->next = new Node();
+                    newNode = newNode->next;
+                    oldNode = oldNode->next;
+                    newNode->data = oldNode->data;
+                    if (currentWrite == oldNode)
+                    {
+                        currentWrite = newNode;
+                    }
+                }
+
+                last->next = firstNew;
+                last = newNode;
+                last->next = first;
+
+                size <<= 1;
+            }
+        }
+
+        bool read(float& value)
+        {
+            if (readCount < writeCount)
+            {
+                value = currentRead->data;
+                currentRead = currentRead->next;
+                ++readCount;
+                return true;
+            }
+            else
+            {
+                started = true;
+                return false;
+            }
+        }
+
+        void write(float value)
+        {
+            if (started)
+            {
+                ++writeCount;
+                ensureSize();
+                currentWrite->data = value;
+                currentWrite = currentWrite->next;
+            }
+        }
+
+        size_t getLag() const
+        {
+            if (readCount < writeCount)
+            {
+                return writeCount - readCount;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
+        Node* first = nullptr;
+        Node* last = nullptr;
+        Node* currentRead = nullptr;
+        Node* currentWrite = nullptr;
+
+        size_t readCount = 0;
+        size_t writeCount = 0;
+        size_t size = 1;
+
+        bool started = false;
+    };
+
+    OutputBuffer leftOutputBuffer;
+    OutputBuffer rightOutputBuffer;
 
     size_t maxOutputLag = 0;
-
-    size_t leftOutputCount = 0;
-    size_t rightOutputCount = 0;
-    size_t dspOutputCount = 0;
 
     void* stream;
 

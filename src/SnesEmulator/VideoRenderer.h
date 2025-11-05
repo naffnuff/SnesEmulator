@@ -4,7 +4,6 @@
 #include <vector>
 #include <array>
 #include <string>
-#include <mutex>
 
 #include "Common/Output.h"
 
@@ -100,8 +99,6 @@ private:
 
     int drawBufferIndex = 0;
     int writeBufferIndex = 1;
-
-    std::mutex pixelBufferMutex;
 
     Output output;
 

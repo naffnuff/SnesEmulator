@@ -1,4 +1,6 @@
-audio info
+audio_dsp info
+audio_reg info
+audio_sys info
 cpu info
 debugger info
 default info

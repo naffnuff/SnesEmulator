@@ -80,8 +80,8 @@ void check(PaError error)
 static constexpr Processor::SampleCycleTable createSampleCycleTable();
 
 Processor::Processor(Output& output, Memory<Word>& spcMemory)
-    : RegisterManager(output, "audio", dspMemory)
-    , output(output, "audio")
+    : RegisterManager(output, "audio_reg", dspMemory)
+    , output(output, "audio_dsp")
     , spcMemory(spcMemory)
     , dspMemory(0x80, output)
 {
@@ -93,9 +93,6 @@ Processor::Processor(Output& output, Memory<Word>& spcMemory)
         voice.previousVoice = previousVoice;
         previousVoice = &voice;
     }
-
-    leftOutputBuffer.resize(outputBufferSize, 0);
-    rightOutputBuffer.resize(outputBufferSize, 0);
 
     sampleCycleTable = createSampleCycleTable();
 }
@@ -190,53 +187,25 @@ void Processor::outputNextSample(float& leftChannel, float& rightChannel)
     {
         dspOutputStarted = true;
 
-        dspOutputCount = rightOutputCount;
+        output.info("Starting dsp output at writeCount ", rightOutputBuffer.writeCount);
 
-        output.debug("Starting dsp output cycle ", rightOutputCount);
+        
     }
 
-    if (dspOutputCount <= rightOutputCount)
+    bool success = leftOutputBuffer.read(leftChannel);
+    success = rightOutputBuffer.read(rightChannel) && success;
+
+    if (success)
     {
-        const size_t outputLag = leftOutputCount - dspOutputCount;
-
-        const size_t oldOutputBufferSize = outputBufferSize;
-
-        while (outputLag * 2 > outputBufferSize)
-        {
-            std::lock_guard outputBufferLock(outputBufferMutex);
-
-            outputBufferSize <<= 1;
-            leftOutputBuffer.resize(outputBufferSize);
-            rightOutputBuffer.resize(outputBufferSize);
-
-            for (int i = 0; i < oldOutputBufferSize; ++i)
-            {
-                leftOutputBuffer[i + oldOutputBufferSize] = leftOutputBuffer[i];
-                rightOutputBuffer[i + oldOutputBufferSize] = rightOutputBuffer[i];
-            }
-        }
-
-        if (oldOutputBufferSize != outputBufferSize)
-        {
-            output.debug("Iteration ", dspOutputCount, " New buffer size ", outputBufferSize);
-        }
-
+        const size_t outputLag = rightOutputBuffer.getLag();
         maxOutputLag = std::max<size_t>(maxOutputLag, outputLag);
-
-        const size_t outputIndex = dspOutputCount & (outputBufferSize - 1);
-
-        leftChannel = leftOutputBuffer[outputIndex];
-        rightChannel = rightOutputBuffer[outputIndex];
-
-        ++dspOutputCount;
 
         if (lastDebugOutputCounter++ == 100000)
         {
-            output.debug("Output count ", dspOutputCount);
-            output.debug("Output index ", outputIndex);
-            output.debug("Current ouput lag ", outputLag);
-            output.debug("Max output lag ", maxOutputLag);
-            output.debug("Buffer underrun counter ", outputBufferUnderrunCounter);
+            output.info("Output count ", rightOutputBuffer.readCount);
+            output.info("Current ouput lag ", outputLag);
+            output.info("Max output lag ", maxOutputLag);
+            output.info("Buffer underrun counter ", outputBufferUnderrunCounter);
             lastDebugOutputCounter = 0;
         }
     }
@@ -1188,13 +1157,7 @@ void Processor::onSampleCycle<26>()
 
     //  3. Output the left sample to the DAC.
     const float leftOutput = applyMainVolume(leftSampleSum, mainVolumeLeft);
-    {
-        std::lock_guard outputBufferLock(outputBufferMutex);
-
-        const size_t outputIndex = leftOutputCount & (outputBufferSize - 1);
-        leftOutputBuffer[outputIndex] = leftOutput;
-        ++leftOutputCount;
-    }
+    leftOutputBuffer.write(leftOutput);
 
     //  4. Load and apply EFB.
     // TODO
@@ -1214,13 +1177,7 @@ void Processor::onSampleCycle<27>()
 
     //  3. Output the right sample to the DAC.
     const float rightOutput = applyMainVolume(rightSampleSum, mainVolumeRight);
-    {
-        std::lock_guard outputBufferLock(outputBufferMutex);
-
-        const size_t outputIndex = rightOutputCount & (outputBufferSize - 1);
-        rightOutputBuffer[outputIndex] = rightOutput;
-        ++rightOutputCount;
-    }
+    rightOutputBuffer.write(rightOutput);
 
     //  4. Load PMON
     setVoiceBits<&Processor::Voice::pitchModulation>(registers[size_t(Register::PMON)]);
