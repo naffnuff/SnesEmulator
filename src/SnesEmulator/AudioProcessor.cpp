@@ -32,18 +32,6 @@ struct StreamHandler
         {
             float* out = (float*)output;
 
-            /*
-            for (int i = 0; i < 0x8; ++i) {
-                //testAttack(processor, i);
-                //testDecay(processor, i);
-            }
-            for (int i = 1; i < 0x20; ++i) {
-                //testAttack(processor, i);
-                //testSustain(processor, i);
-            }
-            //return paAbort;
-            */
-
             if (processor.checkStreamStatus(statusFlags))
             {
                 processor.outputNextSample(out[0], out[1]);
@@ -84,6 +72,8 @@ Processor::Processor(Output& output, Memory<Word>& spcMemory)
     , output(output, "audio_dsp")
     , spcMemory(spcMemory)
     , dspMemory(0x80, output)
+    , leftOutputBuffer(output, "audio_left")
+    , rightOutputBuffer(output, "audio_right")
 {
     timers[2].highPrecision = true;
 
@@ -108,18 +98,8 @@ Processor::~Processor()
 
 void Processor::initialize()
 {
-    //output.debug("Initializing PortAudio version ", Pa_GetVersionInfo()->versionText);
     check(Pa_Initialize());
     initialized = true;
-
-    //for (int i = 0; i < tableSize; i++)
-    {
-        //sine[i] = sin(((double)i / (double)tableSize) * M_PI * 2.0);
-        //double time = (double)i / (double)tableSize;
-        //sine[i] = sampleSineWave(time, 0.01, 0.0) + sampleSquareWave(time, 1.0, 0.0) + sampleSawtoothWave(time, 0.5);
-        //sine[i] = sampleSineWave(time, 0.01, 0.0) + sampleSineWave(time, 0.1, 0.0) + sampleSineWave(time, 0.5, 0.0);
-        //sine[i] = sampleSquareWave(time, 0.01, 0.0) + sampleSineWave(time, 1.0, 0.0) + sampleSquareWave(time, 0.5, 0.0);
-    }
 }
 
 void Processor::startStream()
@@ -182,125 +162,14 @@ bool Processor::checkStreamStatus(unsigned long statusFlags)
 
 void Processor::outputNextSample(float& leftChannel, float& rightChannel)
 {
-
     if (!dspOutputStarted)
     {
-        dspOutputStarted = true;
-
-        output.info("Starting dsp output at writeCount ", rightOutputBuffer.writeCount);
-
-        
+        dspOutputStarted = true;        
     }
 
-    bool success = leftOutputBuffer.read(leftChannel);
-    success = rightOutputBuffer.read(rightChannel) && success;
-
-    if (success)
-    {
-        const size_t outputLag = rightOutputBuffer.getLag();
-        maxOutputLag = std::max<size_t>(maxOutputLag, outputLag);
-
-        if (lastDebugOutputCounter++ == 100000)
-        {
-            output.info("Output count ", rightOutputBuffer.readCount);
-            output.info("Current ouput lag ", outputLag);
-            output.info("Max output lag ", maxOutputLag);
-            output.info("Buffer underrun counter ", outputBufferUnderrunCounter);
-            lastDebugOutputCounter = 0;
-        }
-    }
-    else
-    {
-        leftChannel = 0.0f;
-        rightChannel = 0.0f;
-
-        ++outputBufferUnderrunCounter;
-
-    }
-
-    /*leftSampleSum = 0;
-    rightSampleSum = 0;
-    int i = 0;
-    for (Audio::Processor::Voice& voice : voices)
-	{
-        try
-        {
-            //Audio::Processor::Voice& voice = voices[0];
-
-            voice.calculateNextSample();
-            int16_t leftSample = voice.applyVolume(voice.leftVolume);
-            int16_t rightSample = voice.applyVolume(voice.rightVolume);
-            leftSampleSum = Types::signedClamp<16, int32_t>(leftSampleSum + leftSample);
-            rightSampleSum = Types::signedClamp<16, int32_t>(rightSampleSum + rightSample);
-        }
-        catch (const std::runtime_error& e)
-        {
-            output.error("Exception in voice ", i);
-            output.error(e.what());
-        }
-
-        ++i;
-    }
-
-    leftSampleSum = Types::signedClamp<16, int32_t>(leftSampleSum * mainVolumeLeft >> 7);
-    rightSampleSum = Types::signedClamp<16, int32_t>(rightSampleSum * mainVolumeRight >> 7);
-    leftChannel = float(leftSampleSum) / float(leftSampleSum < 0 ? 0x8000 : 0x7fff);
-    rightChannel = float(rightSampleSum) / float(rightSampleSum < 0 ? 0x8000 : 0x7fff);*/
+    leftChannel = leftOutputBuffer.read();
+    rightChannel = rightOutputBuffer.read();
 }
-
-/*void Processor::Voice::calculateNextSample()
-{
-    if (keyOnInternal)
-    {
-        setupPhase = 5;
-        keyOnInternal = false;
-    }
-    if (keyOff)
-    {
-        setupPhase = 0;
-        setADSRStage(ADSRStage::Release);
-    }
-    if (setupPhase > 0)
-    {
-        if (setupPhase == 5)
-        {
-            envelope = 0;
-            adsrStage = ADSRStage::Inactive;
-            readSampleAddress(false);
-        }
-        else if (setupPhase == 1)
-        {
-            setADSRStage(ADSRStage::Attack);
-        }
-        else // 4, 3, 2
-        {
-            decodeNextBlock();
-        }
-        //calculateEnvelope();
-        --setupPhase;
-        nextSample = 0;
-    }
-    else
-    {
-        interpolationIndex += pitch;
-        if (interpolationIndex > 0x7fff)
-        {
-            interpolationIndex = 0x7fff;
-        }
-        if (interpolationIndex >= 0x4000)
-        {
-            decodeNextBlock();
-            interpolationIndex -= 0x4000;
-        }
-        nextSample = sampleBuffer[interpolationIndex >> 12];
-        calculateEnvelope();
-        if (envelope == 0)
-        {
-            nextSample = 0;
-        }
-        nextSample = Types::signedClamp<16, int16_t>(int(nextSample) * int(envelope) >> 11);
-    }
-}*/
 
 int16_t Processor::Voice::applyVolume(int8_t volume)
 {
@@ -380,34 +249,6 @@ void Processor::Voice::decodeSampleSource()
 
     nextSampleAddress += 2;
 }
-
-/*void Processor::Voice::decodeNextBlock()
-{
-    if (nextSampleAddress - headerAddress > 8)
-    {
-        if (header.getBit(0))
-        { // end bit set
-            if (!header.getBit(1))
-            { // loop bit not set
-                envelope = 0;
-                adsrStage = ADSRStage::Inactive;
-            }
-            readSampleAddress(true);
-        }
-        else
-        {
-            headerAddress = nextSampleAddress;
-            ++nextSampleAddress;
-        }
-    }
-
-    header = processor.spcMemory.readByte(headerAddress);
-
-    sampleSource[0] = processor.spcMemory.readByte(nextSampleAddress);
-    sampleSource[1] = processor.spcMemory.readByte(nextSampleAddress + 1);
-
-    decodeSampleSource();
-}*/
 
 void Processor::Voice::setADSRStage(ADSRStage nextStage)
 {
@@ -1294,29 +1135,11 @@ void Processor::tick()
         throw RuntimeError();
     }
 
-
     if (++sampleCycle == 32)
     {
         sampleCycle = 0;
         ++sampleCount;
     }
-
-    /*if ((spcCycle & 15) == 0)
-    {
-        for (int i = 0; i < 3; ++i)
-        {
-            if (timers[i].enabled && (timers[i].highPrecision || (spcCycle & 127) == 0))
-            {
-                ++timers[i].tick;
-                if (timers[i].tick == timers[i].target)
-                {
-                    timers[i].tick = 0;
-                    timers[i].counter = (timers[i].counter + 1) & 0xf;
-                }
-            }
-        }
-    }
-	++spcCycle;*/
 }
 
 void Processor::printTimeInfo(double currentTime)

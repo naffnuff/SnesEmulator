@@ -60,6 +60,9 @@
     <ClInclude Include="VideoRenderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="AudioOutputBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AudioProcessor.cpp">

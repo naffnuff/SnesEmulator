@@ -68,11 +68,7 @@ void Renderer::swapPixelBuffers()
 
 void framebufferSizeCallback(GLFWwindow*, int , int )
 {
-    //Renderer* renderer = static_cast<Renderer*>(glfwGetWindowUserPointer(window));
-
-    //std::cout << "yo " << width << ":" << height << std::endl;
-
-    //renderer->setWindowProperties(false);
+    // TODO
 }
 
 // setup

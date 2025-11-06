@@ -177,6 +177,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AudioOutputBuffer.h" />
     <ClInclude Include="AudioProcessor.h" />
     <ClInclude Include="AudioRegisters.h" />
     <ClInclude Include="AudioSystem.h" />

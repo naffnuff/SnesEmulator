@@ -1,5 +1,7 @@
 audio_dsp info
+audio_left info
 audio_reg info
+audio_right info
 audio_sys info
 cpu info
 debugger info

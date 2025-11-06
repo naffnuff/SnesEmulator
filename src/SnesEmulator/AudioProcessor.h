@@ -12,6 +12,7 @@
 #include "Output.h"
 #include "Memory.h"
 #include "RegisterManager.h"
+#include "AudioOutputBuffer.h"
 
 namespace Audio {
 
@@ -116,8 +117,8 @@ private:
             return (--counter + offset) % frequency == 0;
         }
 	private:
-        uint16_t frequency;
-        uint16_t offset;
+        uint16_t frequency = 0;
+        uint16_t offset = 0;
         uint16_t counter = 0x77ff;
     };
 
@@ -495,8 +496,6 @@ private:
 
     friend struct StreamHandler;
 
-    //uint64_t spcCycle = 0;
-
     uint64_t dspCycle = 0;
 
     Memory<Word>& spcMemory;
@@ -520,121 +519,6 @@ private:
 	int outputBufferUnderrunCounter = 0;
 
     bool dspOutputStarted = false;
-
-    struct OutputBuffer
-    {
-        struct Node
-        {
-            float data = 0.f;
-            Node* next = nullptr;
-        };
-
-        OutputBuffer()
-        {
-            first = new Node();
-            last = first;
-            currentRead = first;
-            currentWrite = first;
-            first->next = first;
-        }
-
-        ~OutputBuffer()
-        {
-            last->next = nullptr;
-            Node* node = first;
-            while (node)
-            {
-                Node* nextNode = node->next;
-                delete node;
-                node = nextNode;
-            }
-        }
-
-        void ensureSize()
-        {
-            const size_t lag = getLag();
-            while (size < lag)
-            {
-                Node* firstNew = new Node();
-                Node* newNode = firstNew;
-                Node* oldNode = first;
-
-                firstNew->data = first->data;
-                if (currentWrite == first)
-                {
-                    currentWrite = firstNew;
-                }
-
-                for (int i = 1; i < size; ++i)
-                {
-                    newNode->next = new Node();
-                    newNode = newNode->next;
-                    oldNode = oldNode->next;
-                    newNode->data = oldNode->data;
-                    if (currentWrite == oldNode)
-                    {
-                        currentWrite = newNode;
-                    }
-                }
-
-                last->next = firstNew;
-                last = newNode;
-                last->next = first;
-
-                size <<= 1;
-            }
-        }
-
-        bool read(float& value)
-        {
-            if (readCount < writeCount)
-            {
-                value = currentRead->data;
-                currentRead = currentRead->next;
-                ++readCount;
-                return true;
-            }
-            else
-            {
-                started = true;
-                return false;
-            }
-        }
-
-        void write(float value)
-        {
-            if (started)
-            {
-                ++writeCount;
-                ensureSize();
-                currentWrite->data = value;
-                currentWrite = currentWrite->next;
-            }
-        }
-
-        size_t getLag() const
-        {
-            if (readCount < writeCount)
-            {
-                return writeCount - readCount;
-            }
-            else
-            {
-                return 0;
-            }
-        }
-
-        Node* first = nullptr;
-        Node* last = nullptr;
-        Node* currentRead = nullptr;
-        Node* currentWrite = nullptr;
-
-        size_t readCount = 0;
-        size_t writeCount = 0;
-        size_t size = 1;
-
-        bool started = false;
-    };
 
     OutputBuffer leftOutputBuffer;
     OutputBuffer rightOutputBuffer;

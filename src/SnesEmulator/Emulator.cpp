@@ -177,17 +177,14 @@ void Emulator::run()
     CycleCount lostCycles(0);
     CycleCount oneCycle(1);
 
-    //uint64_t audioCycle = 0;
-
     videoRegisters.hCounter = int(masterCycle.count());
 
     bool nmiRequested = false;
     bool irqRequested = false;
 
-    //cpuContext.setPaused(true);
+    //audioSystem.pauseRequested = true;
 
     double runStartTime = 0.0;
-    //uint64_t cycleCountDelta = 0;
     bool stepMode = debugger.isPaused();
     if (!stepMode)
     {
@@ -198,14 +195,12 @@ void Emulator::run()
 
     audioSystem.start();
 
-    //try {
     uint64_t iteration = 0;
-    //bool dmaActive = false;
     while (running)
     {
         try
         {
-            if (masterCycle == nextCpu)
+            if (masterCycle == nextCpu) // CPU context execution
             {
                 if (nmiRequested)
                 {
@@ -225,15 +220,9 @@ void Emulator::run()
                 bool dmaPicked = false;
                 if (dmaInstruction.enabled())
                 {
-                    //cpuContext.setPaused(true);
                     dmaInstruction.blockedInstruction = instruction;
                     instruction = static_cast<Instruction<CPU::State>*>(&dmaInstruction);
                     dmaPicked = true;
-                    if (!videoRegisters.vBlank)
-                    {
-                        //output << "DMA not during V blank" << std::endl;
-                        //cpuContext.stepMode = true;
-                    }
                 }
 
                 if (hdmaInstruction.isActive())
@@ -284,13 +273,12 @@ void Emulator::run()
             {
                 audioSystem.pauseRequested = false;
                 debugger.pause(audioSystem.context);
-                //nextSpc = std::max(std::chrono::duration_cast<CycleCount>(audioSystem.nextSpc), masterCycle);
                 nextSpc = masterCycle;
             }
 
             if (!audioSystem.threaded)
             {
-                if (masterCycle == nextSpc)
+                if (masterCycle == nextSpc) // SPC context execution
                 {
                     Instruction<SPC::State>* instruction = audioSystem.instructionDecoder.getNextInstruction(audioSystem.state);
                     audioSystem.context.nextInstruction = instruction;
@@ -306,7 +294,7 @@ void Emulator::run()
 
                     int cycles = 0;
                     {
-                        //PROFILE_SCOPE("Execute SPC Instruction");
+                        PROFILE_IF(false, "Execute SPC Instruction");
                         cycles = executeNext(instruction, audioSystem.state, debugger, audioSystem.context, cpuState, cpuContext, output);
                     }
                     if (cycles)
@@ -323,26 +311,17 @@ void Emulator::run()
 
             CycleCount nextMasterCycle = masterCycle + oneCycle;
             bool increment = false;
-            if (debugger.isPaused())
-            { // step mode
+            if (debugger.isPaused()) // step mode
+            {
                 increment = true;
                 stepMode = true;
             }
-            else if (stepMode)
-            { // run mode initiated
+            else if (stepMode) // run mode initiated
+            {
                 stepMode = false;
-                //runStartTime = videoProcessor.renderer.getTime();
-                //cycleCountDelta = 0;
             }
-            else
-            { // run mode continued
-                         /*if (iteration % 100 == 0)
-                         {
-                             double elapsedTime = videoProcessor.renderer.getTime() - runStartTime;
-                             constexpr double clockSpeedTarget = 1.89e9 / 88.0;
-                             cycleCountTarget = uint64_t(elapsedTime * clockSpeedTarget);
-                         }*/
-
+            else // run mode continued
+            {
                 if (nextMasterCycle <= audioSystem.elapsedTime - lostCycles)
                 {
                     increment = true;
@@ -351,11 +330,6 @@ void Emulator::run()
                 if (!audioSystem.threaded)
                 {
                     increment = true;
-                }
-
-                if (increment)
-                {
-                    //++cycleCountDelta;
                 }
             }
             if (!audioSystem.threaded && masterCycle == nextAudioTick)
@@ -366,17 +340,17 @@ void Emulator::run()
 
             //increment = true;
 
-            if (increment)
+            if (increment) // next master cycle
             {
                 masterCycle = nextMasterCycle;
                 ++videoRegisters.hCounter;
-                if (videoRegisters.hCounter == 274)
+                if (videoRegisters.hCounter == 274) // start of H-blank
                 {
-                    if (videoRegisters.vCounter <= 224)
+                    if (videoRegisters.vCounter <= 224) // draw next scanline
                     {
                         if (videoRegisters.vCounter > 0)
                         {
-                            //PROFILE_SCOPE("draw scanline");
+                            PROFILE_IF(false, "draw scanline");
                             videoProcessor.drawScanline(videoRegisters.vCounter);
                         }
                         if (hdmaInstruction.enabled() && !hdmaInstruction.isActive())
@@ -384,7 +358,7 @@ void Emulator::run()
                             hdmaInstruction.setActive(true);
                         }
                     }
-                    if (videoRegisters.vCounter == 224)
+                    if (videoRegisters.vCounter == 224) // all scanlines drawn
                     {
                         static std::chrono::steady_clock::time_point previousTime = std::chrono::steady_clock::now();
                         static uint32_t frameCount = 0;
@@ -436,7 +410,7 @@ void Emulator::run()
                     }
                     videoRegisters.hBlank = true;
                 }
-                else if (videoRegisters.hCounter == 1374)
+                else if (videoRegisters.hCounter == 1374) // end of H-blank
                 {
                     videoRegisters.hCounter = 0;
                     videoRegisters.hBlank = false;
@@ -445,12 +419,11 @@ void Emulator::run()
                     {
                         irqRequested = true;
                     }
-                    if (videoRegisters.vCounter == 225)
+                    if (videoRegisters.vCounter == 225) // start of V-blank
                     {
                         hdmaInstruction.setActive(false);
                         videoRegisters.vBlank = true;
                         videoProcessor.oam.currentAddress = videoRegisters.oamStartAddress;
-                        //videoRegisters.videoProcessor.vram.address = videoRegisters.vramStartAddress;
                         if (videoRegisters.nmiEnabled)
                         {
                             nmiRequested = true;
@@ -460,7 +433,7 @@ void Emulator::run()
                     {
                         videoRegisters.readControllers();
                     }
-                    else if (videoRegisters.vCounter == 262)
+                    else if (videoRegisters.vCounter == 262) // end of V-blank
                     {
                         if (videoProcessor.renderer.pauseRequested)
                         {
@@ -495,7 +468,6 @@ void Emulator::run()
             std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
             if (currentTime - lastTime > std::chrono::seconds(10))
             {
-                //lostCycles = std::chrono::duration_cast<CycleCount>(audioSystem.elapsedTime) - masterCycle;
                 output.debug("Video cycles: ", masterCycle.count(), " / ", iteration, " (", (100.0 * masterCycle.count() / iteration), "%)");
                 output.debug("Lost cycles: ", lostCycles.count());
                 lastTime = currentTime;
@@ -504,16 +476,10 @@ void Emulator::run()
         }
         catch (const Video::AccessException& e)
         {
-            //cpuState.setProgramAddress(cpuState.getLastKnownAddress());
             debugger.pause(cpuContext);
             output.error(e.what());
         }
     }
-    /*}
-    catch (const std::exception& e) {
-        running = false;
-        throw e;
-    }*/
 }
 
 template<typename State, typename OtherState>
