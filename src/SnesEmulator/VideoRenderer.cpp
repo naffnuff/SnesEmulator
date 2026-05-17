@@ -3,8 +3,6 @@
 #include <cmath>
 
 #include <iostream>
-#include <fstream>
-#include <sstream>
 #include <array>
 #include <vector>
 
@@ -15,8 +13,6 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
-#include "Common/System.h"
 
 namespace Video
 {
@@ -42,7 +38,7 @@ Renderer::Renderer(int windowXPosition, int windowYPosition, int width, int heig
 Renderer::~Renderer()
 {
     output.debug("Renderer ", title, " destructor");
-    terminate();
+    //terminate();
 }
 
 double Renderer::getTime() const

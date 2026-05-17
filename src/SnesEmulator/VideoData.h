@@ -1,6 +1,10 @@
 #pragma once
 
+#include <array>
 #include <vector>
+
+#include "Exception.h"
+#include "Types.h"
 
 namespace Video {
 

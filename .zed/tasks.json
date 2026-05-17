@@ -1,0 +1,50 @@
+[
+  {
+    "label": "Clean",
+    "command": "rm -rf ./out/",
+  },
+  {
+    "label": "Config: Linux Clang Release",
+    "command": "cmake --preset linux-clang-release",
+  },
+  {
+    "label": "Build: Linux Clang Release",
+    "command": "cmake --build --preset linux-clang-release",
+  },
+  {
+    "label": "Config: Linux Clang Debug",
+    "command": "cmake --preset linux-clang-debug",
+  },
+  {
+    "label": "Build: Linux Clang Debug",
+    "command": "cmake --build --preset linux-clang-debug",
+  },
+  {
+    "label": "Config: Linux Gcc Release",
+    "command": "cmake --preset linux-gcc-release",
+  },
+  {
+    "label": "Build: Linux Gcc Release",
+    "command": "cmake --build --preset linux-gcc-release",
+  },
+  {
+    "label": "Config: Linux Gcc Debug",
+    "command": "cmake --preset linux-gcc-debug",
+  },
+  {
+    "label": "Build: Linux Gcc Debug",
+    "command": "cmake --build --preset linux-gcc-debug",
+  },
+  {
+    "label": "Run: SnesEmulator Clang Release",
+    "command": "./out/build/clang-release/SnesEmulator",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+  },
+  {
+    "label": "Run: SnesEmulator Gcc Release",
+    "command": "./out/build/gcc-release/SnesEmulator",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+  },
+]
