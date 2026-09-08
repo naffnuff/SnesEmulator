@@ -512,7 +512,7 @@ void generateOpcode(std::ostream& output, const Instruction& instruction)
 
 void generateOpcodes(const std::vector<Instruction>& instructions)
 {
-    std::ofstream output("../../../src/SPC700/SpcOpcode.h");
+    std::ofstream output("../../src/SPC700/SpcOpcode.h");
 
     output << "#pragma once" << std::endl
         << std::endl
@@ -542,7 +542,7 @@ void generateOpcodes(const std::vector<Instruction>& instructions)
 
 void generateOpcodeMap(const std::vector<Instruction>& instructions)
 {
-    std::ofstream output("../../../src/SPC700/SpcInstructionDecoder.cpp");
+    std::ofstream output("../../src/SPC700/SpcInstructionDecoder.cpp");
 
     output << "#include \"SpcInstructionDecoder.h\"" << std::endl
         << std::endl
@@ -642,7 +642,7 @@ void generateAddressMode(std::ofstream& output, std::string name, bool controlFl
 typedef std::map<std::pair<std::string, bool>, AddressModeClassArgs> AddressModeClassMap;
 void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
 {
-    std::ofstream output("../../../src/SPC700/SpcAddressMode.h");
+    std::ofstream output("../../src/SPC700/SpcAddressMode.h");
 
     output << "#pragma once" << std::endl
         << std::endl
@@ -686,7 +686,7 @@ void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
 typedef std::map<std::string, OperatorArgs> OperatorMap;
 void generateOperators(const OperatorMap& operatorMap)
 {
-    std::ofstream output("../../../src/SPC700/SpcOperator.h");
+    std::ofstream output("../../src/SPC700/SpcOperator.h");
 
     output << "#pragma once" << std::endl
         << std::endl
@@ -747,10 +747,10 @@ void generateOperators(const OperatorMap& operatorMap)
 
 void generateSpc()
 {
-    std::ifstream instructionsFile("../../../src/CodeGenerator/spcInstructions.txt");
+    std::ifstream instructionsFile("../../tools/CodeGenerator/spcInstructions.txt");
 
     if (!instructionsFile) {
-        throw std::runtime_error("Cannot find instruction definitions");
+        throw std::runtime_error("SPC: Cannot find instruction definitions");
     }
 
     std::vector<std::vector<std::string>> lines;
