@@ -309,7 +309,7 @@ void generateOpcode(std::ostream& output, Instruction& instruction, const Opcode
     }
 
     int executionCycles = std::stoi(instruction.cycles) - std::stoi(instruction.size);
-    std::string execturionCyclesString = executionCycles > 0 ? " + " + std::to_string(executionCycles) : "";
+    std::string exectutionCyclesString = executionCycles > 0 ? " + " + std::to_string(executionCycles) : "";
 
     std::string indentation = "";
     if (!flag16Bit.empty())
@@ -319,14 +319,14 @@ void generateOpcode(std::ostream& output, Instruction& instruction, const Opcode
         indentation = "        ";
         if (hasCycleModification(instruction.cyclesRemarks))
         {
-            output << indentation << "        int cycles = Instruction::Type::size()" << execturionCyclesString << ";" << std::endl;
+            output << indentation << "        int cycles = Instruction::Type::size()" << exectutionCyclesString << ";" << std::endl;
             addCycleModifications(output, instruction.cyclesRemarks, indentation);
             output << indentation << "        return Banana";
         }
         else
         {
             addCycleModifications(output, instruction.cyclesRemarks, indentation);
-            output << indentation << "        return Instruction::Type::size()" << execturionCyclesString;
+            output << indentation << "        return Instruction::Type::size()" << exectutionCyclesString;
         }
         output << " + Instruction16Bit::Type::applyOperand<Instruction16Bit>(state);" << std::endl;
         output << "        }" << std::endl;
@@ -335,14 +335,14 @@ void generateOpcode(std::ostream& output, Instruction& instruction, const Opcode
     }
     if (hasCycleModification(instruction.cyclesRemarks))
     {
-        output << indentation << "        int cycles = Instruction::Type::size()" << execturionCyclesString << ";" << std::endl;
+        output << indentation << "        int cycles = Instruction::Type::size()" << exectutionCyclesString << ";" << std::endl;
         addCycleModifications(output, instruction.cyclesRemarks, indentation);
         output << indentation << "        return Banana";
     }
     else
     {
         addCycleModifications(output, instruction.cyclesRemarks, indentation);
-        output << indentation << "        return Instruction::Type::size()" << execturionCyclesString;
+        output << indentation << "        return Instruction::Type::size()" << exectutionCyclesString;
     }
     output << " + Instruction::Type::applyOperand<Instruction>(state);" << std::endl;
     if (!flag16Bit.empty())
