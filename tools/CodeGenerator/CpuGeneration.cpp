@@ -359,7 +359,7 @@ void generateOpcode(std::ostream& output, Instruction& instruction, const Opcode
 
 void generateOpcodes(std::vector<Instruction>& instructions)
 {
-    std::ifstream opcodeTableFile("../../../tools/CodeGenerator/cpuOpcodeTable.txt");
+    std::ifstream opcodeTableFile("../../tools/CodeGenerator/cpuOpcodeTable.txt");
     if (!opcodeTableFile)
     {
         throw std::runtime_error("Cannot find opcode table file");
@@ -388,7 +388,7 @@ void generateOpcodes(std::vector<Instruction>& instructions)
     }
     std::cout << std::endl;
 
-    std::ofstream output("../../../src/WDC65816/CpuOpcode.h");
+    std::ofstream output("../../src/WDC65816/CpuOpcode.h");
 
     output << "#pragma once" << std::endl
         << std::endl
@@ -423,7 +423,7 @@ void generateOpcodes(std::vector<Instruction>& instructions)
 
 void generateOpcodeMap(const std::vector<Instruction>& instructions)
 {
-    std::ofstream output("../../../src/WDC65816/CpuInstructionDecoder.cpp");
+    std::ofstream output("../../src/WDC65816/CpuInstructionDecoder.cpp");
 
     //std::ostream& output = std::cout;
 
@@ -530,7 +530,7 @@ void generateAddressMode(std::ofstream& output, const std::string& name, const A
 typedef std::map<std::string, AddressModeClassArgs> AddressModeClassMap;
 void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
 {
-    std::ofstream output("../../../src/WDC65816/CpuAddressMode.h");
+    std::ofstream output("../../src/WDC65816/CpuAddressMode.h");
 
     output << "#pragma once" << std::endl
         << std::endl
@@ -574,7 +574,7 @@ void generateAddressModes(const AddressModeClassMap& addressModeClassMap)
 typedef std::map<std::string, OperatorArgs> OperatorMap;
 void generateOperators(const OperatorMap& operatorMap)
 {
-    std::ofstream output("../../../src/WDC65816/CpuOperator.h");
+    std::ofstream output("../../src/WDC65816/CpuOperator.h");
 
     output << "#pragma once" << std::endl
         << std::endl
@@ -648,11 +648,11 @@ void generateOperators(const OperatorMap& operatorMap)
 
 void generateCpu()
 {
-    std::ifstream instructionsFile("../../../tools/CodeGenerator/cpuInstructions.txt");
+    std::ifstream instructionsFile("../../tools/CodeGenerator/cpuInstructions.txt");
 
     if (!instructionsFile)
     {
-        throw std::runtime_error("Cannot find instruction definitions");
+        throw std::runtime_error("CPU: Cannot find instruction definitions");
     }
 
     std::vector<std::vector<std::string>> lines;
