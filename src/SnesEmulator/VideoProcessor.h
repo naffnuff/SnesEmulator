@@ -2,9 +2,9 @@
 
 #include <vector>
 #include <thread>
+#include <bitset>
 
 #include "Common/Types.h"
-#include "Common/Util.h"
 
 #include "VideoData.h"
 #include "VideoRenderer.h"

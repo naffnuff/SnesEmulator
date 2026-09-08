@@ -1,10 +1,5 @@
 {
   "name": "snes-emulator",
   "version": "1.0.0",
-  "dependencies": [
-    "opengl",
-    "glad",
-    "glfw3",
-    "portaudio"
-  ]
+  "dependencies": ["opengl", "glad", "glfw3", "portaudio"]
 }
