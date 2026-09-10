@@ -44,6 +44,8 @@ https://github.com/naffnuff/SnesEmulator/blob/master/doc/Anomie's%20Register%20D
 http://simsnex.tripod.com/SNESMem.txt
 #### timing
 https://github.com/naffnuff/SnesEmulator/blob/master/doc/Anomie's%20SNES%20Timing%20Doc
+#### DMA
+https://wiki.superfamicom.org/grog's-guide-to-dma-and-hdma-on-the-snes
 #### transparency
 http://folk.uio.no/sigurdkn/snes/transparency.txt
 
