@@ -41,7 +41,7 @@ https://wiki.superfamicom.org/bit-rate-reduction-(brr)
 #### registers
 https://github.com/naffnuff/SnesEmulator/blob/master/doc/Anomie's%20Register%20Doc
 #### memory map
-http://simsnex.tripod.com/SNESMem.txt
+https://snes.nesdev.org/wiki/Memory_map
 #### timing
 https://github.com/naffnuff/SnesEmulator/blob/master/doc/Anomie's%20SNES%20Timing%20Doc
 #### DMA
