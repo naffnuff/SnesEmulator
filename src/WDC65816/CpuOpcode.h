@@ -31,7 +31,7 @@ struct Opcode<CPU::State, 0x61>
         PROFILE_IF(PROFILE_OPCODES, "61: ADC (dp,X)");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x61>");
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "61: ADC (dp,X)"; }
@@ -50,7 +50,7 @@ struct Opcode<CPU::State, 0x63>
     {
         PROFILE_IF(PROFILE_OPCODES, "63: ADC sr,S");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "63: ADC sr,S"; }
@@ -69,7 +69,7 @@ struct Opcode<CPU::State, 0x65>
     {
         PROFILE_IF(PROFILE_OPCODES, "65: ADC dp");
 
-        return 3 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "65: ADC dp"; }
@@ -88,7 +88,7 @@ struct Opcode<CPU::State, 0x67>
     {
         PROFILE_IF(PROFILE_OPCODES, "67: ADC [dp]");
 
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "67: ADC [dp]"; }
@@ -111,11 +111,11 @@ struct Opcode<CPU::State, 0x69>
 
         if (state.is16Bit(CPU::State::Flag::m))
         {
-                return 2 + Instruction16Bit::Type::applyOperand<Instruction16Bit>(state);
+                return Instruction::Type::size() + Instruction16Bit::Type::applyOperand<Instruction16Bit>(state);
         }
         else
         {
-                return 2 + Instruction::Type::applyOperand<Instruction>(state);
+                return Instruction::Type::size() + Instruction::Type::applyOperand<Instruction>(state);
         }
     }
 
@@ -135,7 +135,7 @@ struct Opcode<CPU::State, 0x6D>
     {
         PROFILE_IF(PROFILE_OPCODES, "6D: ADC addr");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "6D: ADC addr"; }
@@ -154,7 +154,7 @@ struct Opcode<CPU::State, 0x6F>
     {
         PROFILE_IF(PROFILE_OPCODES, "6F: ADC long");
 
-        return 5 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "6F: ADC long"; }
@@ -173,7 +173,7 @@ struct Opcode<CPU::State, 0x71>
     {
         PROFILE_IF(PROFILE_OPCODES, "71: ADC (dp),Y");
 
-        return 5 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "71: ADC (dp),Y"; }
@@ -192,7 +192,7 @@ struct Opcode<CPU::State, 0x72>
     {
         PROFILE_IF(PROFILE_OPCODES, "72: ADC (dp)");
 
-        return 5 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "72: ADC (dp)"; }
@@ -212,7 +212,7 @@ struct Opcode<CPU::State, 0x73>
         PROFILE_IF(PROFILE_OPCODES, "73: ADC (sr,S),Y");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x73>");
-        return 7 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "73: ADC (sr,S),Y"; }
@@ -231,7 +231,7 @@ struct Opcode<CPU::State, 0x75>
     {
         PROFILE_IF(PROFILE_OPCODES, "75: ADC dp,X");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "75: ADC dp,X"; }
@@ -250,7 +250,7 @@ struct Opcode<CPU::State, 0x77>
     {
         PROFILE_IF(PROFILE_OPCODES, "77: ADC [dp],Y");
 
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "77: ADC [dp],Y"; }
@@ -269,7 +269,7 @@ struct Opcode<CPU::State, 0x79>
     {
         PROFILE_IF(PROFILE_OPCODES, "79: ADC addr,Y");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "79: ADC addr,Y"; }
@@ -288,7 +288,7 @@ struct Opcode<CPU::State, 0x7D>
     {
         PROFILE_IF(PROFILE_OPCODES, "7D: ADC addr,X");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "7D: ADC addr,X"; }
@@ -307,7 +307,7 @@ struct Opcode<CPU::State, 0x7F>
     {
         PROFILE_IF(PROFILE_OPCODES, "7F: ADC long,X");
 
-        return 5 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "7F: ADC long,X"; }
@@ -327,7 +327,7 @@ struct Opcode<CPU::State, 0x21>
         PROFILE_IF(PROFILE_OPCODES, "21: AND (dp,X)");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x21>");
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "21: AND (dp,X)"; }
@@ -347,7 +347,7 @@ struct Opcode<CPU::State, 0x23>
         PROFILE_IF(PROFILE_OPCODES, "23: AND sr,S");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x23>");
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "23: AND sr,S"; }
@@ -366,7 +366,7 @@ struct Opcode<CPU::State, 0x25>
     {
         PROFILE_IF(PROFILE_OPCODES, "25: AND dp");
 
-        return 3 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "25: AND dp"; }
@@ -386,7 +386,7 @@ struct Opcode<CPU::State, 0x27>
         PROFILE_IF(PROFILE_OPCODES, "27: AND [dp]");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x27>");
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "27: AND [dp]"; }
@@ -409,11 +409,11 @@ struct Opcode<CPU::State, 0x29>
 
         if (state.is16Bit(CPU::State::Flag::m))
         {
-                return 2 + Instruction16Bit::Type::applyOperand<Instruction16Bit>(state);
+                return Instruction::Type::size() + Instruction16Bit::Type::applyOperand<Instruction16Bit>(state);
         }
         else
         {
-                return 2 + Instruction::Type::applyOperand<Instruction>(state);
+                return Instruction::Type::size() + Instruction::Type::applyOperand<Instruction>(state);
         }
     }
 
@@ -433,7 +433,7 @@ struct Opcode<CPU::State, 0x2D>
     {
         PROFILE_IF(PROFILE_OPCODES, "2D: AND addr");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "2D: AND addr"; }
@@ -452,7 +452,7 @@ struct Opcode<CPU::State, 0x2F>
     {
         PROFILE_IF(PROFILE_OPCODES, "2F: AND long");
 
-        return 5 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "2F: AND long"; }
@@ -472,7 +472,7 @@ struct Opcode<CPU::State, 0x31>
         PROFILE_IF(PROFILE_OPCODES, "31: AND (dp),Y");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x31>");
-        return 5 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "31: AND (dp),Y"; }
@@ -492,7 +492,7 @@ struct Opcode<CPU::State, 0x32>
         PROFILE_IF(PROFILE_OPCODES, "32: AND (dp)");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x32>");
-        return 5 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "32: AND (dp)"; }
@@ -512,7 +512,7 @@ struct Opcode<CPU::State, 0x33>
         PROFILE_IF(PROFILE_OPCODES, "33: AND (sr,S),Y");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x33>");
-        return 7 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "33: AND (sr,S),Y"; }
@@ -532,7 +532,7 @@ struct Opcode<CPU::State, 0x35>
         PROFILE_IF(PROFILE_OPCODES, "35: AND dp,X");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x35>");
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "35: AND dp,X"; }
@@ -552,7 +552,7 @@ struct Opcode<CPU::State, 0x37>
         PROFILE_IF(PROFILE_OPCODES, "37: AND [dp],Y");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x37>");
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "37: AND [dp],Y"; }
@@ -571,7 +571,7 @@ struct Opcode<CPU::State, 0x39>
     {
         PROFILE_IF(PROFILE_OPCODES, "39: AND addr,Y");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "39: AND addr,Y"; }
@@ -590,7 +590,7 @@ struct Opcode<CPU::State, 0x3D>
     {
         PROFILE_IF(PROFILE_OPCODES, "3D: AND addr,X");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "3D: AND addr,X"; }
@@ -609,7 +609,7 @@ struct Opcode<CPU::State, 0x3F>
     {
         PROFILE_IF(PROFILE_OPCODES, "3F: AND long,X");
 
-        return 5 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "3F: AND long,X"; }
@@ -628,7 +628,7 @@ struct Opcode<CPU::State, 0x06>
     {
         PROFILE_IF(PROFILE_OPCODES, "06: ASL dp");
 
-        return 5 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "06: ASL dp"; }
@@ -647,7 +647,7 @@ struct Opcode<CPU::State, 0x0A>
     {
         PROFILE_IF(PROFILE_OPCODES, "0A: ASL A");
 
-        return 2 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "0A: ASL A"; }
@@ -666,7 +666,7 @@ struct Opcode<CPU::State, 0x0E>
     {
         PROFILE_IF(PROFILE_OPCODES, "0E: ASL addr");
 
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "0E: ASL addr"; }
@@ -685,7 +685,7 @@ struct Opcode<CPU::State, 0x16>
     {
         PROFILE_IF(PROFILE_OPCODES, "16: ASL dp,X");
 
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "16: ASL dp,X"; }
@@ -704,7 +704,7 @@ struct Opcode<CPU::State, 0x1E>
     {
         PROFILE_IF(PROFILE_OPCODES, "1E: ASL addr,X");
 
-        return 7 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "1E: ASL addr,X"; }
@@ -723,7 +723,7 @@ struct Opcode<CPU::State, 0x90>
     {
         PROFILE_IF(PROFILE_OPCODES, "90: BCC nearlabel");
 
-        return 2 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "90: BCC nearlabel"; }
@@ -742,7 +742,7 @@ struct Opcode<CPU::State, 0xB0>
     {
         PROFILE_IF(PROFILE_OPCODES, "B0: BCS nearlabel");
 
-        return 2 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "B0: BCS nearlabel"; }
@@ -761,7 +761,7 @@ struct Opcode<CPU::State, 0xF0>
     {
         PROFILE_IF(PROFILE_OPCODES, "F0: BEQ nearlabel");
 
-        return 2 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "F0: BEQ nearlabel"; }
@@ -780,7 +780,7 @@ struct Opcode<CPU::State, 0x24>
     {
         PROFILE_IF(PROFILE_OPCODES, "24: BIT dp");
 
-        return 3 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "24: BIT dp"; }
@@ -799,7 +799,7 @@ struct Opcode<CPU::State, 0x2C>
     {
         PROFILE_IF(PROFILE_OPCODES, "2C: BIT addr");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "2C: BIT addr"; }
@@ -818,7 +818,7 @@ struct Opcode<CPU::State, 0x34>
     {
         PROFILE_IF(PROFILE_OPCODES, "34: BIT dp,X");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "34: BIT dp,X"; }
@@ -837,7 +837,7 @@ struct Opcode<CPU::State, 0x3C>
     {
         PROFILE_IF(PROFILE_OPCODES, "3C: BIT addr,X");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "3C: BIT addr,X"; }
@@ -860,11 +860,11 @@ struct Opcode<CPU::State, 0x89>
 
         if (state.is16Bit(CPU::State::Flag::m))
         {
-                return 2 + Instruction16Bit::Type::applyOperand<Instruction16Bit>(state);
+                return Instruction::Type::size() + Instruction16Bit::Type::applyOperand<Instruction16Bit>(state);
         }
         else
         {
-                return 2 + Instruction::Type::applyOperand<Instruction>(state);
+                return Instruction::Type::size() + Instruction::Type::applyOperand<Instruction>(state);
         }
     }
 
@@ -884,7 +884,7 @@ struct Opcode<CPU::State, 0x30>
     {
         PROFILE_IF(PROFILE_OPCODES, "30: BMI nearlabel");
 
-        return 2 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "30: BMI nearlabel"; }
@@ -903,7 +903,7 @@ struct Opcode<CPU::State, 0xD0>
     {
         PROFILE_IF(PROFILE_OPCODES, "D0: BNE nearlabel");
 
-        return 2 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "D0: BNE nearlabel"; }
@@ -922,7 +922,7 @@ struct Opcode<CPU::State, 0x10>
     {
         PROFILE_IF(PROFILE_OPCODES, "10: BPL nearlabel");
 
-        return 2 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "10: BPL nearlabel"; }
@@ -941,7 +941,7 @@ struct Opcode<CPU::State, 0x80>
     {
         PROFILE_IF(PROFILE_OPCODES, "80: BRA nearlabel");
 
-        return 3 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "80: BRA nearlabel"; }
@@ -962,7 +962,7 @@ struct Opcode<CPU::State, 0x00>
         PROFILE_IF(PROFILE_OPCODES, "00: BRK");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x00>");
-        return 7 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "00: BRK"; }
@@ -981,7 +981,7 @@ struct Opcode<CPU::State, 0x82>
     {
         PROFILE_IF(PROFILE_OPCODES, "82: BRL label");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "82: BRL label"; }
@@ -1000,7 +1000,7 @@ struct Opcode<CPU::State, 0x50>
     {
         PROFILE_IF(PROFILE_OPCODES, "50: BVC nearlabel");
 
-        return 2 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "50: BVC nearlabel"; }
@@ -1019,7 +1019,7 @@ struct Opcode<CPU::State, 0x70>
     {
         PROFILE_IF(PROFILE_OPCODES, "70: BVS nearlabel");
 
-        return 2 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "70: BVS nearlabel"; }
@@ -1038,7 +1038,7 @@ struct Opcode<CPU::State, 0x18>
     {
         PROFILE_IF(PROFILE_OPCODES, "18: CLC");
 
-        return 2 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "18: CLC"; }
@@ -1057,7 +1057,7 @@ struct Opcode<CPU::State, 0xD8>
     {
         PROFILE_IF(PROFILE_OPCODES, "D8: CLD");
 
-        return 2 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "D8: CLD"; }
@@ -1076,7 +1076,7 @@ struct Opcode<CPU::State, 0x58>
     {
         PROFILE_IF(PROFILE_OPCODES, "58: CLI");
 
-        return 2 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "58: CLI"; }
@@ -1096,7 +1096,7 @@ struct Opcode<CPU::State, 0xB8>
         PROFILE_IF(PROFILE_OPCODES, "B8: CLV");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0xB8>");
-        return 2 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "B8: CLV"; }
@@ -1116,7 +1116,7 @@ struct Opcode<CPU::State, 0xC1>
         PROFILE_IF(PROFILE_OPCODES, "C1: CMP (dp,X)");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0xC1>");
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "C1: CMP (dp,X)"; }
@@ -1135,7 +1135,7 @@ struct Opcode<CPU::State, 0xC3>
     {
         PROFILE_IF(PROFILE_OPCODES, "C3: CMP sr,S");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "C3: CMP sr,S"; }
@@ -1154,7 +1154,7 @@ struct Opcode<CPU::State, 0xC5>
     {
         PROFILE_IF(PROFILE_OPCODES, "C5: CMP dp");
 
-        return 3 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "C5: CMP dp"; }
@@ -1173,7 +1173,7 @@ struct Opcode<CPU::State, 0xC7>
     {
         PROFILE_IF(PROFILE_OPCODES, "C7: CMP [dp]");
 
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "C7: CMP [dp]"; }
@@ -1196,11 +1196,11 @@ struct Opcode<CPU::State, 0xC9>
 
         if (state.is16Bit(CPU::State::Flag::m))
         {
-                return 2 + Instruction16Bit::Type::applyOperand<Instruction16Bit>(state);
+                return Instruction::Type::size() + Instruction16Bit::Type::applyOperand<Instruction16Bit>(state);
         }
         else
         {
-                return 2 + Instruction::Type::applyOperand<Instruction>(state);
+                return Instruction::Type::size() + Instruction::Type::applyOperand<Instruction>(state);
         }
     }
 
@@ -1220,7 +1220,7 @@ struct Opcode<CPU::State, 0xCD>
     {
         PROFILE_IF(PROFILE_OPCODES, "CD: CMP addr");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "CD: CMP addr"; }
@@ -1239,7 +1239,7 @@ struct Opcode<CPU::State, 0xCF>
     {
         PROFILE_IF(PROFILE_OPCODES, "CF: CMP long");
 
-        return 5 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "CF: CMP long"; }
@@ -1259,7 +1259,7 @@ struct Opcode<CPU::State, 0xD1>
         PROFILE_IF(PROFILE_OPCODES, "D1: CMP (dp),Y");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0xD1>");
-        return 5 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "D1: CMP (dp),Y"; }
@@ -1279,7 +1279,7 @@ struct Opcode<CPU::State, 0xD2>
         PROFILE_IF(PROFILE_OPCODES, "D2: CMP (dp)");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0xD2>");
-        return 5 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "D2: CMP (dp)"; }
@@ -1299,7 +1299,7 @@ struct Opcode<CPU::State, 0xD3>
         PROFILE_IF(PROFILE_OPCODES, "D3: CMP (sr,S),Y");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0xD3>");
-        return 7 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "D3: CMP (sr,S),Y"; }
@@ -1318,7 +1318,7 @@ struct Opcode<CPU::State, 0xD5>
     {
         PROFILE_IF(PROFILE_OPCODES, "D5: CMP dp,X");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "D5: CMP dp,X"; }
@@ -1337,7 +1337,7 @@ struct Opcode<CPU::State, 0xD7>
     {
         PROFILE_IF(PROFILE_OPCODES, "D7: CMP [dp],Y");
 
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "D7: CMP [dp],Y"; }
@@ -1356,7 +1356,7 @@ struct Opcode<CPU::State, 0xD9>
     {
         PROFILE_IF(PROFILE_OPCODES, "D9: CMP addr,Y");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "D9: CMP addr,Y"; }
@@ -1375,7 +1375,7 @@ struct Opcode<CPU::State, 0xDD>
     {
         PROFILE_IF(PROFILE_OPCODES, "DD: CMP addr,X");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "DD: CMP addr,X"; }
@@ -1394,7 +1394,7 @@ struct Opcode<CPU::State, 0xDF>
     {
         PROFILE_IF(PROFILE_OPCODES, "DF: CMP long,X");
 
-        return 5 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "DF: CMP long,X"; }
@@ -1415,7 +1415,7 @@ struct Opcode<CPU::State, 0x02>
         PROFILE_IF(PROFILE_OPCODES, "02: COP const");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x02>");
-        return 7 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "02: COP const"; }
@@ -1438,11 +1438,11 @@ struct Opcode<CPU::State, 0xE0>
 
         if (state.is16Bit(CPU::State::Flag::x))
         {
-                return 2 + Instruction16Bit::Type::applyOperand<Instruction16Bit>(state);
+                return Instruction::Type::size() + Instruction16Bit::Type::applyOperand<Instruction16Bit>(state);
         }
         else
         {
-                return 2 + Instruction::Type::applyOperand<Instruction>(state);
+                return Instruction::Type::size() + Instruction::Type::applyOperand<Instruction>(state);
         }
     }
 
@@ -1462,7 +1462,7 @@ struct Opcode<CPU::State, 0xE4>
     {
         PROFILE_IF(PROFILE_OPCODES, "E4: CPX dp");
 
-        return 3 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "E4: CPX dp"; }
@@ -1481,7 +1481,7 @@ struct Opcode<CPU::State, 0xEC>
     {
         PROFILE_IF(PROFILE_OPCODES, "EC: CPX addr");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "EC: CPX addr"; }
@@ -1504,11 +1504,11 @@ struct Opcode<CPU::State, 0xC0>
 
         if (state.is16Bit(CPU::State::Flag::x))
         {
-                return 2 + Instruction16Bit::Type::applyOperand<Instruction16Bit>(state);
+                return Instruction::Type::size() + Instruction16Bit::Type::applyOperand<Instruction16Bit>(state);
         }
         else
         {
-                return 2 + Instruction::Type::applyOperand<Instruction>(state);
+                return Instruction::Type::size() + Instruction::Type::applyOperand<Instruction>(state);
         }
     }
 
@@ -1528,7 +1528,7 @@ struct Opcode<CPU::State, 0xC4>
     {
         PROFILE_IF(PROFILE_OPCODES, "C4: CPY dp");
 
-        return 3 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "C4: CPY dp"; }
@@ -1547,7 +1547,7 @@ struct Opcode<CPU::State, 0xCC>
     {
         PROFILE_IF(PROFILE_OPCODES, "CC: CPY addr");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "CC: CPY addr"; }
@@ -1566,7 +1566,7 @@ struct Opcode<CPU::State, 0x3A>
     {
         PROFILE_IF(PROFILE_OPCODES, "3A: DEC A");
 
-        return 2 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "3A: DEC A"; }
@@ -1585,7 +1585,7 @@ struct Opcode<CPU::State, 0xC6>
     {
         PROFILE_IF(PROFILE_OPCODES, "C6: DEC dp");
 
-        return 5 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "C6: DEC dp"; }
@@ -1604,7 +1604,7 @@ struct Opcode<CPU::State, 0xCE>
     {
         PROFILE_IF(PROFILE_OPCODES, "CE: DEC addr");
 
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "CE: DEC addr"; }
@@ -1623,7 +1623,7 @@ struct Opcode<CPU::State, 0xD6>
     {
         PROFILE_IF(PROFILE_OPCODES, "D6: DEC dp,X");
 
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "D6: DEC dp,X"; }
@@ -1642,7 +1642,7 @@ struct Opcode<CPU::State, 0xDE>
     {
         PROFILE_IF(PROFILE_OPCODES, "DE: DEC addr,X");
 
-        return 7 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "DE: DEC addr,X"; }
@@ -1661,7 +1661,7 @@ struct Opcode<CPU::State, 0xCA>
     {
         PROFILE_IF(PROFILE_OPCODES, "CA: DEX");
 
-        return 2 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "CA: DEX"; }
@@ -1680,7 +1680,7 @@ struct Opcode<CPU::State, 0x88>
     {
         PROFILE_IF(PROFILE_OPCODES, "88: DEY");
 
-        return 2 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "88: DEY"; }
@@ -1700,7 +1700,7 @@ struct Opcode<CPU::State, 0x41>
         PROFILE_IF(PROFILE_OPCODES, "41: EOR (dp,X)");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x41>");
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "41: EOR (dp,X)"; }
@@ -1719,7 +1719,7 @@ struct Opcode<CPU::State, 0x43>
     {
         PROFILE_IF(PROFILE_OPCODES, "43: EOR sr,S");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "43: EOR sr,S"; }
@@ -1738,7 +1738,7 @@ struct Opcode<CPU::State, 0x45>
     {
         PROFILE_IF(PROFILE_OPCODES, "45: EOR dp");
 
-        return 3 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "45: EOR dp"; }
@@ -1758,7 +1758,7 @@ struct Opcode<CPU::State, 0x47>
         PROFILE_IF(PROFILE_OPCODES, "47: EOR [dp]");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x47>");
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "47: EOR [dp]"; }
@@ -1781,11 +1781,11 @@ struct Opcode<CPU::State, 0x49>
 
         if (state.is16Bit(CPU::State::Flag::m))
         {
-                return 2 + Instruction16Bit::Type::applyOperand<Instruction16Bit>(state);
+                return Instruction::Type::size() + Instruction16Bit::Type::applyOperand<Instruction16Bit>(state);
         }
         else
         {
-                return 2 + Instruction::Type::applyOperand<Instruction>(state);
+                return Instruction::Type::size() + Instruction::Type::applyOperand<Instruction>(state);
         }
     }
 
@@ -1805,7 +1805,7 @@ struct Opcode<CPU::State, 0x4D>
     {
         PROFILE_IF(PROFILE_OPCODES, "4D: EOR addr");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "4D: EOR addr"; }
@@ -1825,7 +1825,7 @@ struct Opcode<CPU::State, 0x4F>
         PROFILE_IF(PROFILE_OPCODES, "4F: EOR long");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x4F>");
-        return 5 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "4F: EOR long"; }
@@ -1845,7 +1845,7 @@ struct Opcode<CPU::State, 0x51>
         PROFILE_IF(PROFILE_OPCODES, "51: EOR (dp),Y");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x51>");
-        return 5 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "51: EOR (dp),Y"; }
@@ -1865,7 +1865,7 @@ struct Opcode<CPU::State, 0x52>
         PROFILE_IF(PROFILE_OPCODES, "52: EOR (dp)");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x52>");
-        return 5 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "52: EOR (dp)"; }
@@ -1885,7 +1885,7 @@ struct Opcode<CPU::State, 0x53>
         PROFILE_IF(PROFILE_OPCODES, "53: EOR (sr,S),Y");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x53>");
-        return 7 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "53: EOR (sr,S),Y"; }
@@ -1904,7 +1904,7 @@ struct Opcode<CPU::State, 0x55>
     {
         PROFILE_IF(PROFILE_OPCODES, "55: EOR dp,X");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "55: EOR dp,X"; }
@@ -1924,7 +1924,7 @@ struct Opcode<CPU::State, 0x57>
         PROFILE_IF(PROFILE_OPCODES, "57: EOR [dp],Y");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x57>");
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "57: EOR [dp],Y"; }
@@ -1943,7 +1943,7 @@ struct Opcode<CPU::State, 0x59>
     {
         PROFILE_IF(PROFILE_OPCODES, "59: EOR addr,Y");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "59: EOR addr,Y"; }
@@ -1962,7 +1962,7 @@ struct Opcode<CPU::State, 0x5D>
     {
         PROFILE_IF(PROFILE_OPCODES, "5D: EOR addr,X");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "5D: EOR addr,X"; }
@@ -1982,7 +1982,7 @@ struct Opcode<CPU::State, 0x5F>
         PROFILE_IF(PROFILE_OPCODES, "5F: EOR long,X");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x5F>");
-        return 5 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "5F: EOR long,X"; }
@@ -2001,7 +2001,7 @@ struct Opcode<CPU::State, 0x1A>
     {
         PROFILE_IF(PROFILE_OPCODES, "1A: INC A");
 
-        return 2 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "1A: INC A"; }
@@ -2020,7 +2020,7 @@ struct Opcode<CPU::State, 0xE6>
     {
         PROFILE_IF(PROFILE_OPCODES, "E6: INC dp");
 
-        return 5 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "E6: INC dp"; }
@@ -2039,7 +2039,7 @@ struct Opcode<CPU::State, 0xEE>
     {
         PROFILE_IF(PROFILE_OPCODES, "EE: INC addr");
 
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "EE: INC addr"; }
@@ -2058,7 +2058,7 @@ struct Opcode<CPU::State, 0xF6>
     {
         PROFILE_IF(PROFILE_OPCODES, "F6: INC dp,X");
 
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "F6: INC dp,X"; }
@@ -2077,7 +2077,7 @@ struct Opcode<CPU::State, 0xFE>
     {
         PROFILE_IF(PROFILE_OPCODES, "FE: INC addr,X");
 
-        return 7 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "FE: INC addr,X"; }
@@ -2096,7 +2096,7 @@ struct Opcode<CPU::State, 0xE8>
     {
         PROFILE_IF(PROFILE_OPCODES, "E8: INX");
 
-        return 2 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "E8: INX"; }
@@ -2115,7 +2115,7 @@ struct Opcode<CPU::State, 0xC8>
     {
         PROFILE_IF(PROFILE_OPCODES, "C8: INY");
 
-        return 2 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "C8: INY"; }
@@ -2134,7 +2134,7 @@ struct Opcode<CPU::State, 0x4C>
     {
         PROFILE_IF(PROFILE_OPCODES, "4C: JMP addr");
 
-        return 3 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "4C: JMP addr"; }
@@ -2153,7 +2153,7 @@ struct Opcode<CPU::State, 0x5C>
     {
         PROFILE_IF(PROFILE_OPCODES, "5C: JMP long");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "5C: JMP long"; }
@@ -2172,7 +2172,7 @@ struct Opcode<CPU::State, 0x6C>
     {
         PROFILE_IF(PROFILE_OPCODES, "6C: JMP (addr)");
 
-        return 5 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "6C: JMP (addr)"; }
@@ -2191,7 +2191,7 @@ struct Opcode<CPU::State, 0x7C>
     {
         PROFILE_IF(PROFILE_OPCODES, "7C: JMP (addr,X)");
 
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "7C: JMP (addr,X)"; }
@@ -2210,7 +2210,7 @@ struct Opcode<CPU::State, 0xDC>
     {
         PROFILE_IF(PROFILE_OPCODES, "DC: JMP [addr]");
 
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "DC: JMP [addr]"; }
@@ -2229,7 +2229,7 @@ struct Opcode<CPU::State, 0x20>
     {
         PROFILE_IF(PROFILE_OPCODES, "20: JSR addr");
 
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "20: JSR addr"; }
@@ -2248,7 +2248,7 @@ struct Opcode<CPU::State, 0x22>
     {
         PROFILE_IF(PROFILE_OPCODES, "22: JSR long");
 
-        return 8 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "22: JSR long"; }
@@ -2267,7 +2267,7 @@ struct Opcode<CPU::State, 0xFC>
     {
         PROFILE_IF(PROFILE_OPCODES, "FC: JSR (addr,X)");
 
-        return 8 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "FC: JSR (addr,X)"; }
@@ -2287,7 +2287,7 @@ struct Opcode<CPU::State, 0xA1>
         PROFILE_IF(PROFILE_OPCODES, "A1: LDA (dp,X)");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0xA1>");
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "A1: LDA (dp,X)"; }
@@ -2306,7 +2306,7 @@ struct Opcode<CPU::State, 0xA3>
     {
         PROFILE_IF(PROFILE_OPCODES, "A3: LDA sr,S");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "A3: LDA sr,S"; }
@@ -2325,7 +2325,7 @@ struct Opcode<CPU::State, 0xA5>
     {
         PROFILE_IF(PROFILE_OPCODES, "A5: LDA dp");
 
-        return 3 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "A5: LDA dp"; }
@@ -2344,7 +2344,7 @@ struct Opcode<CPU::State, 0xA7>
     {
         PROFILE_IF(PROFILE_OPCODES, "A7: LDA [dp]");
 
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "A7: LDA [dp]"; }
@@ -2367,11 +2367,11 @@ struct Opcode<CPU::State, 0xA9>
 
         if (state.is16Bit(CPU::State::Flag::m))
         {
-                return 2 + Instruction16Bit::Type::applyOperand<Instruction16Bit>(state);
+                return Instruction::Type::size() + Instruction16Bit::Type::applyOperand<Instruction16Bit>(state);
         }
         else
         {
-                return 2 + Instruction::Type::applyOperand<Instruction>(state);
+                return Instruction::Type::size() + Instruction::Type::applyOperand<Instruction>(state);
         }
     }
 
@@ -2391,7 +2391,7 @@ struct Opcode<CPU::State, 0xAD>
     {
         PROFILE_IF(PROFILE_OPCODES, "AD: LDA addr");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "AD: LDA addr"; }
@@ -2410,7 +2410,7 @@ struct Opcode<CPU::State, 0xAF>
     {
         PROFILE_IF(PROFILE_OPCODES, "AF: LDA long");
 
-        return 5 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "AF: LDA long"; }
@@ -2429,7 +2429,7 @@ struct Opcode<CPU::State, 0xB1>
     {
         PROFILE_IF(PROFILE_OPCODES, "B1: LDA (dp),Y");
 
-        return 5 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "B1: LDA (dp),Y"; }
@@ -2448,7 +2448,7 @@ struct Opcode<CPU::State, 0xB2>
     {
         PROFILE_IF(PROFILE_OPCODES, "B2: LDA (dp)");
 
-        return 5 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "B2: LDA (dp)"; }
@@ -2467,7 +2467,7 @@ struct Opcode<CPU::State, 0xB3>
     {
         PROFILE_IF(PROFILE_OPCODES, "B3: LDA (sr,S),Y");
 
-        return 7 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "B3: LDA (sr,S),Y"; }
@@ -2486,7 +2486,7 @@ struct Opcode<CPU::State, 0xB5>
     {
         PROFILE_IF(PROFILE_OPCODES, "B5: LDA dp,X");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "B5: LDA dp,X"; }
@@ -2505,7 +2505,7 @@ struct Opcode<CPU::State, 0xB7>
     {
         PROFILE_IF(PROFILE_OPCODES, "B7: LDA [dp],Y");
 
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "B7: LDA [dp],Y"; }
@@ -2524,7 +2524,7 @@ struct Opcode<CPU::State, 0xB9>
     {
         PROFILE_IF(PROFILE_OPCODES, "B9: LDA addr,Y");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "B9: LDA addr,Y"; }
@@ -2543,7 +2543,7 @@ struct Opcode<CPU::State, 0xBD>
     {
         PROFILE_IF(PROFILE_OPCODES, "BD: LDA addr,X");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "BD: LDA addr,X"; }
@@ -2562,7 +2562,7 @@ struct Opcode<CPU::State, 0xBF>
     {
         PROFILE_IF(PROFILE_OPCODES, "BF: LDA long,X");
 
-        return 5 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "BF: LDA long,X"; }
@@ -2585,11 +2585,11 @@ struct Opcode<CPU::State, 0xA2>
 
         if (state.is16Bit(CPU::State::Flag::x))
         {
-                return 2 + Instruction16Bit::Type::applyOperand<Instruction16Bit>(state);
+                return Instruction::Type::size() + Instruction16Bit::Type::applyOperand<Instruction16Bit>(state);
         }
         else
         {
-                return 2 + Instruction::Type::applyOperand<Instruction>(state);
+                return Instruction::Type::size() + Instruction::Type::applyOperand<Instruction>(state);
         }
     }
 
@@ -2609,7 +2609,7 @@ struct Opcode<CPU::State, 0xA6>
     {
         PROFILE_IF(PROFILE_OPCODES, "A6: LDX dp");
 
-        return 3 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "A6: LDX dp"; }
@@ -2628,7 +2628,7 @@ struct Opcode<CPU::State, 0xAE>
     {
         PROFILE_IF(PROFILE_OPCODES, "AE: LDX addr");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "AE: LDX addr"; }
@@ -2647,7 +2647,7 @@ struct Opcode<CPU::State, 0xB6>
     {
         PROFILE_IF(PROFILE_OPCODES, "B6: LDX dp,Y");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "B6: LDX dp,Y"; }
@@ -2666,7 +2666,7 @@ struct Opcode<CPU::State, 0xBE>
     {
         PROFILE_IF(PROFILE_OPCODES, "BE: LDX addr,Y");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "BE: LDX addr,Y"; }
@@ -2689,11 +2689,11 @@ struct Opcode<CPU::State, 0xA0>
 
         if (state.is16Bit(CPU::State::Flag::x))
         {
-                return 2 + Instruction16Bit::Type::applyOperand<Instruction16Bit>(state);
+                return Instruction::Type::size() + Instruction16Bit::Type::applyOperand<Instruction16Bit>(state);
         }
         else
         {
-                return 2 + Instruction::Type::applyOperand<Instruction>(state);
+                return Instruction::Type::size() + Instruction::Type::applyOperand<Instruction>(state);
         }
     }
 
@@ -2713,7 +2713,7 @@ struct Opcode<CPU::State, 0xA4>
     {
         PROFILE_IF(PROFILE_OPCODES, "A4: LDY dp");
 
-        return 3 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "A4: LDY dp"; }
@@ -2732,7 +2732,7 @@ struct Opcode<CPU::State, 0xAC>
     {
         PROFILE_IF(PROFILE_OPCODES, "AC: LDY addr");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "AC: LDY addr"; }
@@ -2751,7 +2751,7 @@ struct Opcode<CPU::State, 0xB4>
     {
         PROFILE_IF(PROFILE_OPCODES, "B4: LDY dp,X");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "B4: LDY dp,X"; }
@@ -2770,7 +2770,7 @@ struct Opcode<CPU::State, 0xBC>
     {
         PROFILE_IF(PROFILE_OPCODES, "BC: LDY addr,X");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "BC: LDY addr,X"; }
@@ -2789,7 +2789,7 @@ struct Opcode<CPU::State, 0x46>
     {
         PROFILE_IF(PROFILE_OPCODES, "46: LSR dp");
 
-        return 5 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "46: LSR dp"; }
@@ -2808,7 +2808,7 @@ struct Opcode<CPU::State, 0x4A>
     {
         PROFILE_IF(PROFILE_OPCODES, "4A: LSR A");
 
-        return 2 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "4A: LSR A"; }
@@ -2827,7 +2827,7 @@ struct Opcode<CPU::State, 0x4E>
     {
         PROFILE_IF(PROFILE_OPCODES, "4E: LSR addr");
 
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "4E: LSR addr"; }
@@ -2847,7 +2847,7 @@ struct Opcode<CPU::State, 0x56>
         PROFILE_IF(PROFILE_OPCODES, "56: LSR dp,X");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x56>");
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "56: LSR dp,X"; }
@@ -2866,7 +2866,7 @@ struct Opcode<CPU::State, 0x5E>
     {
         PROFILE_IF(PROFILE_OPCODES, "5E: LSR addr,X");
 
-        return 7 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "5E: LSR addr,X"; }
@@ -2885,7 +2885,7 @@ struct Opcode<CPU::State, 0x54>
     {
         PROFILE_IF(PROFILE_OPCODES, "54: MVN srcbk,destbk");
 
-        return 7 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "54: MVN srcbk,destbk"; }
@@ -2905,7 +2905,7 @@ struct Opcode<CPU::State, 0x44>
         PROFILE_IF(PROFILE_OPCODES, "44: MVP srcbk,destbk");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x44>");
-        return 7 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "44: MVP srcbk,destbk"; }
@@ -2924,7 +2924,7 @@ struct Opcode<CPU::State, 0xEA>
     {
         PROFILE_IF(PROFILE_OPCODES, "EA: NOP");
 
-        return 2 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "EA: NOP"; }
@@ -2944,7 +2944,7 @@ struct Opcode<CPU::State, 0x01>
         PROFILE_IF(PROFILE_OPCODES, "01: ORA (dp,X)");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x01>");
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "01: ORA (dp,X)"; }
@@ -2963,7 +2963,7 @@ struct Opcode<CPU::State, 0x03>
     {
         PROFILE_IF(PROFILE_OPCODES, "03: ORA sr,S");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "03: ORA sr,S"; }
@@ -2982,7 +2982,7 @@ struct Opcode<CPU::State, 0x05>
     {
         PROFILE_IF(PROFILE_OPCODES, "05: ORA dp");
 
-        return 3 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "05: ORA dp"; }
@@ -3001,7 +3001,7 @@ struct Opcode<CPU::State, 0x07>
     {
         PROFILE_IF(PROFILE_OPCODES, "07: ORA [dp]");
 
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "07: ORA [dp]"; }
@@ -3024,11 +3024,11 @@ struct Opcode<CPU::State, 0x09>
 
         if (state.is16Bit(CPU::State::Flag::m))
         {
-                return 2 + Instruction16Bit::Type::applyOperand<Instruction16Bit>(state);
+                return Instruction::Type::size() + Instruction16Bit::Type::applyOperand<Instruction16Bit>(state);
         }
         else
         {
-                return 2 + Instruction::Type::applyOperand<Instruction>(state);
+                return Instruction::Type::size() + Instruction::Type::applyOperand<Instruction>(state);
         }
     }
 
@@ -3048,7 +3048,7 @@ struct Opcode<CPU::State, 0x0D>
     {
         PROFILE_IF(PROFILE_OPCODES, "0D: ORA addr");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "0D: ORA addr"; }
@@ -3067,7 +3067,7 @@ struct Opcode<CPU::State, 0x0F>
     {
         PROFILE_IF(PROFILE_OPCODES, "0F: ORA long");
 
-        return 5 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "0F: ORA long"; }
@@ -3087,7 +3087,7 @@ struct Opcode<CPU::State, 0x11>
         PROFILE_IF(PROFILE_OPCODES, "11: ORA (dp),Y");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x11>");
-        return 5 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "11: ORA (dp),Y"; }
@@ -3107,7 +3107,7 @@ struct Opcode<CPU::State, 0x12>
         PROFILE_IF(PROFILE_OPCODES, "12: ORA (dp)");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x12>");
-        return 5 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "12: ORA (dp)"; }
@@ -3127,7 +3127,7 @@ struct Opcode<CPU::State, 0x13>
         PROFILE_IF(PROFILE_OPCODES, "13: ORA (sr,S),Y");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x13>");
-        return 7 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "13: ORA (sr,S),Y"; }
@@ -3146,7 +3146,7 @@ struct Opcode<CPU::State, 0x15>
     {
         PROFILE_IF(PROFILE_OPCODES, "15: ORA dp,X");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "15: ORA dp,X"; }
@@ -3166,7 +3166,7 @@ struct Opcode<CPU::State, 0x17>
         PROFILE_IF(PROFILE_OPCODES, "17: ORA [dp],Y");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x17>");
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "17: ORA [dp],Y"; }
@@ -3185,7 +3185,7 @@ struct Opcode<CPU::State, 0x19>
     {
         PROFILE_IF(PROFILE_OPCODES, "19: ORA addr,Y");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "19: ORA addr,Y"; }
@@ -3204,7 +3204,7 @@ struct Opcode<CPU::State, 0x1D>
     {
         PROFILE_IF(PROFILE_OPCODES, "1D: ORA addr,X");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "1D: ORA addr,X"; }
@@ -3223,7 +3223,7 @@ struct Opcode<CPU::State, 0x1F>
     {
         PROFILE_IF(PROFILE_OPCODES, "1F: ORA long,X");
 
-        return 5 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "1F: ORA long,X"; }
@@ -3242,7 +3242,7 @@ struct Opcode<CPU::State, 0xF4>
     {
         PROFILE_IF(PROFILE_OPCODES, "F4: PEA addr");
 
-        return 5 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "F4: PEA addr"; }
@@ -3261,7 +3261,7 @@ struct Opcode<CPU::State, 0xD4>
     {
         PROFILE_IF(PROFILE_OPCODES, "D4: PEI (dp)");
 
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "D4: PEI (dp)"; }
@@ -3280,7 +3280,7 @@ struct Opcode<CPU::State, 0x62>
     {
         PROFILE_IF(PROFILE_OPCODES, "62: PER label");
 
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "62: PER label"; }
@@ -3299,7 +3299,7 @@ struct Opcode<CPU::State, 0x48>
     {
         PROFILE_IF(PROFILE_OPCODES, "48: PHA");
 
-        return 3 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "48: PHA"; }
@@ -3318,7 +3318,7 @@ struct Opcode<CPU::State, 0x8B>
     {
         PROFILE_IF(PROFILE_OPCODES, "8B: PHB");
 
-        return 3 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "8B: PHB"; }
@@ -3337,7 +3337,7 @@ struct Opcode<CPU::State, 0x0B>
     {
         PROFILE_IF(PROFILE_OPCODES, "0B: PHD");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "0B: PHD"; }
@@ -3356,7 +3356,7 @@ struct Opcode<CPU::State, 0x4B>
     {
         PROFILE_IF(PROFILE_OPCODES, "4B: PHK");
 
-        return 3 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "4B: PHK"; }
@@ -3375,7 +3375,7 @@ struct Opcode<CPU::State, 0x08>
     {
         PROFILE_IF(PROFILE_OPCODES, "08: PHP");
 
-        return 3 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "08: PHP"; }
@@ -3394,7 +3394,7 @@ struct Opcode<CPU::State, 0xDA>
     {
         PROFILE_IF(PROFILE_OPCODES, "DA: PHX");
 
-        return 3 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "DA: PHX"; }
@@ -3413,7 +3413,7 @@ struct Opcode<CPU::State, 0x5A>
     {
         PROFILE_IF(PROFILE_OPCODES, "5A: PHY");
 
-        return 3 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "5A: PHY"; }
@@ -3432,7 +3432,7 @@ struct Opcode<CPU::State, 0x68>
     {
         PROFILE_IF(PROFILE_OPCODES, "68: PLA");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "68: PLA"; }
@@ -3451,7 +3451,7 @@ struct Opcode<CPU::State, 0xAB>
     {
         PROFILE_IF(PROFILE_OPCODES, "AB: PLB");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "AB: PLB"; }
@@ -3470,7 +3470,7 @@ struct Opcode<CPU::State, 0x2B>
     {
         PROFILE_IF(PROFILE_OPCODES, "2B: PLD");
 
-        return 5 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "2B: PLD"; }
@@ -3489,7 +3489,7 @@ struct Opcode<CPU::State, 0x28>
     {
         PROFILE_IF(PROFILE_OPCODES, "28: PLP");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "28: PLP"; }
@@ -3508,7 +3508,7 @@ struct Opcode<CPU::State, 0xFA>
     {
         PROFILE_IF(PROFILE_OPCODES, "FA: PLX");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "FA: PLX"; }
@@ -3527,7 +3527,7 @@ struct Opcode<CPU::State, 0x7A>
     {
         PROFILE_IF(PROFILE_OPCODES, "7A: PLY");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "7A: PLY"; }
@@ -3546,7 +3546,7 @@ struct Opcode<CPU::State, 0xC2>
     {
         PROFILE_IF(PROFILE_OPCODES, "C2: REP #const");
 
-        return 3 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "C2: REP #const"; }
@@ -3565,7 +3565,7 @@ struct Opcode<CPU::State, 0x26>
     {
         PROFILE_IF(PROFILE_OPCODES, "26: ROL dp");
 
-        return 5 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "26: ROL dp"; }
@@ -3584,7 +3584,7 @@ struct Opcode<CPU::State, 0x2A>
     {
         PROFILE_IF(PROFILE_OPCODES, "2A: ROL A");
 
-        return 2 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "2A: ROL A"; }
@@ -3603,7 +3603,7 @@ struct Opcode<CPU::State, 0x2E>
     {
         PROFILE_IF(PROFILE_OPCODES, "2E: ROL addr");
 
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "2E: ROL addr"; }
@@ -3623,7 +3623,7 @@ struct Opcode<CPU::State, 0x36>
         PROFILE_IF(PROFILE_OPCODES, "36: ROL dp,X");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x36>");
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "36: ROL dp,X"; }
@@ -3642,7 +3642,7 @@ struct Opcode<CPU::State, 0x3E>
     {
         PROFILE_IF(PROFILE_OPCODES, "3E: ROL addr,X");
 
-        return 7 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "3E: ROL addr,X"; }
@@ -3661,7 +3661,7 @@ struct Opcode<CPU::State, 0x66>
     {
         PROFILE_IF(PROFILE_OPCODES, "66: ROR dp");
 
-        return 5 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "66: ROR dp"; }
@@ -3680,7 +3680,7 @@ struct Opcode<CPU::State, 0x6A>
     {
         PROFILE_IF(PROFILE_OPCODES, "6A: ROR A");
 
-        return 2 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "6A: ROR A"; }
@@ -3699,7 +3699,7 @@ struct Opcode<CPU::State, 0x6E>
     {
         PROFILE_IF(PROFILE_OPCODES, "6E: ROR addr");
 
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "6E: ROR addr"; }
@@ -3718,7 +3718,7 @@ struct Opcode<CPU::State, 0x76>
     {
         PROFILE_IF(PROFILE_OPCODES, "76: ROR dp,X");
 
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "76: ROR dp,X"; }
@@ -3737,7 +3737,7 @@ struct Opcode<CPU::State, 0x7E>
     {
         PROFILE_IF(PROFILE_OPCODES, "7E: ROR addr,X");
 
-        return 7 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "7E: ROR addr,X"; }
@@ -3756,7 +3756,7 @@ struct Opcode<CPU::State, 0x40>
     {
         PROFILE_IF(PROFILE_OPCODES, "40: RTI");
 
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "40: RTI"; }
@@ -3775,7 +3775,7 @@ struct Opcode<CPU::State, 0x6B>
     {
         PROFILE_IF(PROFILE_OPCODES, "6B: RTL");
 
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "6B: RTL"; }
@@ -3794,7 +3794,7 @@ struct Opcode<CPU::State, 0x60>
     {
         PROFILE_IF(PROFILE_OPCODES, "60: RTS");
 
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "60: RTS"; }
@@ -3814,7 +3814,7 @@ struct Opcode<CPU::State, 0xE1>
         PROFILE_IF(PROFILE_OPCODES, "E1: SBC (dp,X)");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0xE1>");
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "E1: SBC (dp,X)"; }
@@ -3833,7 +3833,7 @@ struct Opcode<CPU::State, 0xE3>
     {
         PROFILE_IF(PROFILE_OPCODES, "E3: SBC sr,S");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "E3: SBC sr,S"; }
@@ -3852,7 +3852,7 @@ struct Opcode<CPU::State, 0xE5>
     {
         PROFILE_IF(PROFILE_OPCODES, "E5: SBC dp");
 
-        return 3 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "E5: SBC dp"; }
@@ -3872,7 +3872,7 @@ struct Opcode<CPU::State, 0xE7>
         PROFILE_IF(PROFILE_OPCODES, "E7: SBC [dp]");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0xE7>");
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "E7: SBC [dp]"; }
@@ -3895,11 +3895,11 @@ struct Opcode<CPU::State, 0xE9>
 
         if (state.is16Bit(CPU::State::Flag::m))
         {
-                return 2 + Instruction16Bit::Type::applyOperand<Instruction16Bit>(state);
+                return Instruction::Type::size() + Instruction16Bit::Type::applyOperand<Instruction16Bit>(state);
         }
         else
         {
-                return 2 + Instruction::Type::applyOperand<Instruction>(state);
+                return Instruction::Type::size() + Instruction::Type::applyOperand<Instruction>(state);
         }
     }
 
@@ -3919,7 +3919,7 @@ struct Opcode<CPU::State, 0xED>
     {
         PROFILE_IF(PROFILE_OPCODES, "ED: SBC addr");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "ED: SBC addr"; }
@@ -3938,7 +3938,7 @@ struct Opcode<CPU::State, 0xEF>
     {
         PROFILE_IF(PROFILE_OPCODES, "EF: SBC long");
 
-        return 5 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "EF: SBC long"; }
@@ -3958,7 +3958,7 @@ struct Opcode<CPU::State, 0xF1>
         PROFILE_IF(PROFILE_OPCODES, "F1: SBC (dp),Y");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0xF1>");
-        return 5 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "F1: SBC (dp),Y"; }
@@ -3978,7 +3978,7 @@ struct Opcode<CPU::State, 0xF2>
         PROFILE_IF(PROFILE_OPCODES, "F2: SBC (dp)");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0xF2>");
-        return 5 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "F2: SBC (dp)"; }
@@ -3998,7 +3998,7 @@ struct Opcode<CPU::State, 0xF3>
         PROFILE_IF(PROFILE_OPCODES, "F3: SBC (sr,S),Y");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0xF3>");
-        return 7 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "F3: SBC (sr,S),Y"; }
@@ -4017,7 +4017,7 @@ struct Opcode<CPU::State, 0xF5>
     {
         PROFILE_IF(PROFILE_OPCODES, "F5: SBC dp,X");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "F5: SBC dp,X"; }
@@ -4037,7 +4037,7 @@ struct Opcode<CPU::State, 0xF7>
         PROFILE_IF(PROFILE_OPCODES, "F7: SBC [dp],Y");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0xF7>");
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "F7: SBC [dp],Y"; }
@@ -4056,7 +4056,7 @@ struct Opcode<CPU::State, 0xF9>
     {
         PROFILE_IF(PROFILE_OPCODES, "F9: SBC addr,Y");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "F9: SBC addr,Y"; }
@@ -4075,7 +4075,7 @@ struct Opcode<CPU::State, 0xFD>
     {
         PROFILE_IF(PROFILE_OPCODES, "FD: SBC addr,X");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "FD: SBC addr,X"; }
@@ -4094,7 +4094,7 @@ struct Opcode<CPU::State, 0xFF>
     {
         PROFILE_IF(PROFILE_OPCODES, "FF: SBC long,X");
 
-        return 5 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "FF: SBC long,X"; }
@@ -4113,7 +4113,7 @@ struct Opcode<CPU::State, 0x38>
     {
         PROFILE_IF(PROFILE_OPCODES, "38: SEC");
 
-        return 2 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "38: SEC"; }
@@ -4132,7 +4132,7 @@ struct Opcode<CPU::State, 0xF8>
     {
         PROFILE_IF(PROFILE_OPCODES, "F8: SED");
 
-        return 2 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "F8: SED"; }
@@ -4151,7 +4151,7 @@ struct Opcode<CPU::State, 0x78>
     {
         PROFILE_IF(PROFILE_OPCODES, "78: SEI");
 
-        return 2 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "78: SEI"; }
@@ -4170,7 +4170,7 @@ struct Opcode<CPU::State, 0xE2>
     {
         PROFILE_IF(PROFILE_OPCODES, "E2: SEP #const");
 
-        return 3 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "E2: SEP #const"; }
@@ -4190,7 +4190,7 @@ struct Opcode<CPU::State, 0x81>
         PROFILE_IF(PROFILE_OPCODES, "81: STA (dp,X)");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x81>");
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "81: STA (dp,X)"; }
@@ -4209,7 +4209,7 @@ struct Opcode<CPU::State, 0x83>
     {
         PROFILE_IF(PROFILE_OPCODES, "83: STA sr,S");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "83: STA sr,S"; }
@@ -4228,7 +4228,7 @@ struct Opcode<CPU::State, 0x85>
     {
         PROFILE_IF(PROFILE_OPCODES, "85: STA dp");
 
-        return 3 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "85: STA dp"; }
@@ -4247,7 +4247,7 @@ struct Opcode<CPU::State, 0x87>
     {
         PROFILE_IF(PROFILE_OPCODES, "87: STA [dp]");
 
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "87: STA [dp]"; }
@@ -4266,7 +4266,7 @@ struct Opcode<CPU::State, 0x8D>
     {
         PROFILE_IF(PROFILE_OPCODES, "8D: STA addr");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "8D: STA addr"; }
@@ -4285,7 +4285,7 @@ struct Opcode<CPU::State, 0x8F>
     {
         PROFILE_IF(PROFILE_OPCODES, "8F: STA long");
 
-        return 5 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "8F: STA long"; }
@@ -4304,7 +4304,7 @@ struct Opcode<CPU::State, 0x91>
     {
         PROFILE_IF(PROFILE_OPCODES, "91: STA (dp),Y");
 
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "91: STA (dp),Y"; }
@@ -4323,7 +4323,7 @@ struct Opcode<CPU::State, 0x92>
     {
         PROFILE_IF(PROFILE_OPCODES, "92: STA (dp)");
 
-        return 5 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "92: STA (dp)"; }
@@ -4343,7 +4343,7 @@ struct Opcode<CPU::State, 0x93>
         PROFILE_IF(PROFILE_OPCODES, "93: STA (sr,S),Y");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x93>");
-        return 7 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "93: STA (sr,S),Y"; }
@@ -4362,7 +4362,7 @@ struct Opcode<CPU::State, 0x95>
     {
         PROFILE_IF(PROFILE_OPCODES, "95: STA dp,X");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "95: STA dp,X"; }
@@ -4381,7 +4381,7 @@ struct Opcode<CPU::State, 0x97>
     {
         PROFILE_IF(PROFILE_OPCODES, "97: STA [dp],Y");
 
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "97: STA [dp],Y"; }
@@ -4400,7 +4400,7 @@ struct Opcode<CPU::State, 0x99>
     {
         PROFILE_IF(PROFILE_OPCODES, "99: STA addr,Y");
 
-        return 5 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "99: STA addr,Y"; }
@@ -4419,7 +4419,7 @@ struct Opcode<CPU::State, 0x9D>
     {
         PROFILE_IF(PROFILE_OPCODES, "9D: STA addr,X");
 
-        return 5 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "9D: STA addr,X"; }
@@ -4438,7 +4438,7 @@ struct Opcode<CPU::State, 0x9F>
     {
         PROFILE_IF(PROFILE_OPCODES, "9F: STA long,X");
 
-        return 5 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "9F: STA long,X"; }
@@ -4458,7 +4458,7 @@ struct Opcode<CPU::State, 0xDB>
         PROFILE_IF(PROFILE_OPCODES, "DB: STP");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0xDB>");
-        return 3 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "DB: STP"; }
@@ -4477,7 +4477,7 @@ struct Opcode<CPU::State, 0x86>
     {
         PROFILE_IF(PROFILE_OPCODES, "86: STX dp");
 
-        return 3 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "86: STX dp"; }
@@ -4496,7 +4496,7 @@ struct Opcode<CPU::State, 0x8E>
     {
         PROFILE_IF(PROFILE_OPCODES, "8E: STX addr");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "8E: STX addr"; }
@@ -4516,7 +4516,7 @@ struct Opcode<CPU::State, 0x96>
         PROFILE_IF(PROFILE_OPCODES, "96: STX dp,Y");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x96>");
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "96: STX dp,Y"; }
@@ -4535,7 +4535,7 @@ struct Opcode<CPU::State, 0x84>
     {
         PROFILE_IF(PROFILE_OPCODES, "84: STY dp");
 
-        return 3 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "84: STY dp"; }
@@ -4554,7 +4554,7 @@ struct Opcode<CPU::State, 0x8C>
     {
         PROFILE_IF(PROFILE_OPCODES, "8C: STY addr");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "8C: STY addr"; }
@@ -4573,7 +4573,7 @@ struct Opcode<CPU::State, 0x94>
     {
         PROFILE_IF(PROFILE_OPCODES, "94: STY dp,X");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "94: STY dp,X"; }
@@ -4592,7 +4592,7 @@ struct Opcode<CPU::State, 0x64>
     {
         PROFILE_IF(PROFILE_OPCODES, "64: STZ dp");
 
-        return 3 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "64: STZ dp"; }
@@ -4611,7 +4611,7 @@ struct Opcode<CPU::State, 0x74>
     {
         PROFILE_IF(PROFILE_OPCODES, "74: STZ dp,X");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "74: STZ dp,X"; }
@@ -4630,7 +4630,7 @@ struct Opcode<CPU::State, 0x9C>
     {
         PROFILE_IF(PROFILE_OPCODES, "9C: STZ addr");
 
-        return 4 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "9C: STZ addr"; }
@@ -4649,7 +4649,7 @@ struct Opcode<CPU::State, 0x9E>
     {
         PROFILE_IF(PROFILE_OPCODES, "9E: STZ addr,X");
 
-        return 5 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "9E: STZ addr,X"; }
@@ -4668,7 +4668,7 @@ struct Opcode<CPU::State, 0xAA>
     {
         PROFILE_IF(PROFILE_OPCODES, "AA: TAX");
 
-        return 2 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "AA: TAX"; }
@@ -4687,7 +4687,7 @@ struct Opcode<CPU::State, 0xA8>
     {
         PROFILE_IF(PROFILE_OPCODES, "A8: TAY");
 
-        return 2 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "A8: TAY"; }
@@ -4706,7 +4706,7 @@ struct Opcode<CPU::State, 0x5B>
     {
         PROFILE_IF(PROFILE_OPCODES, "5B: TCD");
 
-        return 2 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "5B: TCD"; }
@@ -4725,7 +4725,7 @@ struct Opcode<CPU::State, 0x1B>
     {
         PROFILE_IF(PROFILE_OPCODES, "1B: TCS");
 
-        return 2 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "1B: TCS"; }
@@ -4744,7 +4744,7 @@ struct Opcode<CPU::State, 0x7B>
     {
         PROFILE_IF(PROFILE_OPCODES, "7B: TDC");
 
-        return 2 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "7B: TDC"; }
@@ -4763,7 +4763,7 @@ struct Opcode<CPU::State, 0x14>
     {
         PROFILE_IF(PROFILE_OPCODES, "14: TRB dp");
 
-        return 5 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "14: TRB dp"; }
@@ -4782,7 +4782,7 @@ struct Opcode<CPU::State, 0x1C>
     {
         PROFILE_IF(PROFILE_OPCODES, "1C: TRB addr");
 
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "1C: TRB addr"; }
@@ -4801,7 +4801,7 @@ struct Opcode<CPU::State, 0x04>
     {
         PROFILE_IF(PROFILE_OPCODES, "04: TSB dp");
 
-        return 5 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "04: TSB dp"; }
@@ -4820,7 +4820,7 @@ struct Opcode<CPU::State, 0x0C>
     {
         PROFILE_IF(PROFILE_OPCODES, "0C: TSB addr");
 
-        return 6 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "0C: TSB addr"; }
@@ -4839,7 +4839,7 @@ struct Opcode<CPU::State, 0x3B>
     {
         PROFILE_IF(PROFILE_OPCODES, "3B: TSC");
 
-        return 2 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "3B: TSC"; }
@@ -4859,7 +4859,7 @@ struct Opcode<CPU::State, 0xBA>
         PROFILE_IF(PROFILE_OPCODES, "BA: TSX");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0xBA>");
-        return 2 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "BA: TSX"; }
@@ -4878,7 +4878,7 @@ struct Opcode<CPU::State, 0x8A>
     {
         PROFILE_IF(PROFILE_OPCODES, "8A: TXA");
 
-        return 2 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "8A: TXA"; }
@@ -4897,7 +4897,7 @@ struct Opcode<CPU::State, 0x9A>
     {
         PROFILE_IF(PROFILE_OPCODES, "9A: TXS");
 
-        return 2 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "9A: TXS"; }
@@ -4916,7 +4916,7 @@ struct Opcode<CPU::State, 0x9B>
     {
         PROFILE_IF(PROFILE_OPCODES, "9B: TXY");
 
-        return 2 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "9B: TXY"; }
@@ -4935,7 +4935,7 @@ struct Opcode<CPU::State, 0x98>
     {
         PROFILE_IF(PROFILE_OPCODES, "98: TYA");
 
-        return 2 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "98: TYA"; }
@@ -4954,7 +4954,7 @@ struct Opcode<CPU::State, 0xBB>
     {
         PROFILE_IF(PROFILE_OPCODES, "BB: TYX");
 
-        return 2 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "BB: TYX"; }
@@ -4974,7 +4974,7 @@ struct Opcode<CPU::State, 0xCB>
         PROFILE_IF(PROFILE_OPCODES, "CB: WAI");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0xCB>");
-        return 3 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "CB: WAI"; }
@@ -4994,7 +4994,7 @@ struct Opcode<CPU::State, 0x42>
         PROFILE_IF(PROFILE_OPCODES, "42: WDM #const");
 
         throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x42>");
-        return 2 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "42: WDM #const"; }
@@ -5013,7 +5013,7 @@ struct Opcode<CPU::State, 0xEB>
     {
         PROFILE_IF(PROFILE_OPCODES, "EB: XBA");
 
-        return 3 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "EB: XBA"; }
@@ -5032,7 +5032,7 @@ struct Opcode<CPU::State, 0xFB>
     {
         PROFILE_IF(PROFILE_OPCODES, "FB: XCE");
 
-        return 2 + Instruction::Type::applyOperand<Instruction>(state);
+        return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
     static std::string opcodeToString() { return "FB: XCE"; }
