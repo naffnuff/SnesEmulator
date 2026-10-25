@@ -441,11 +441,12 @@ private:
         }
     }
 
+private:
+    Byte ramValue;
+    Byte bootRomValue;
+
 public:
     bool& bootRomDataEnabled;
-private:
-    Byte bootRomValue;
-    Byte ramValue;
 };
 
 class Access

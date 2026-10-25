@@ -69,9 +69,9 @@ static constexpr Processor::SampleCycleTable createSampleCycleTable();
 
 Processor::Processor(Output& output, Memory<Word>& spcMemory)
     : RegisterManager(output, "audio_reg", dspMemory)
+    , dspMemory(0x80, output)
     , output(output, "audio_dsp")
     , spcMemory(spcMemory)
-    , dspMemory(0x80, output)
     , leftOutputBuffer(output, "audio_left")
     , rightOutputBuffer(output, "audio_right")
 {
@@ -1071,7 +1071,7 @@ void Processor::onSampleCycle<30>()
         //  5. ** Load KOFF and internal KON.
         // Note: this presumably has to be done before voice step 3c, despite anomie's ordering
         Byte externalKeyOn = registers[size_t(Register::KON)];
-        for (int i = 0; i < voices.size(); ++i)
+        for (int i = 0; i < (int)voices.size(); ++i)
         {
             bool oldKeyOn = voices[i].keyOn;
             voices[i].keyOn = externalKeyOn.getBit(i);
@@ -1217,7 +1217,7 @@ void Processor::printDebuggerInfo(Output& out, Output::Lock& lock) const
     out.printLine(lock);
 
     out.printLine(lock, "   Vol L       Vol R       Pitch       Src  Type AR DR SR SL     Gain Mode               Lvl Envelope    Output");
-    for (int i = 0; i < voices.size(); ++i)
+    for (int i = 0; i < (int)voices.size(); ++i)
     {
         const Voice& voice = voices[i];
         out.printLine(lock, i, ": ",

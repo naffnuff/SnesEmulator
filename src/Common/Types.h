@@ -426,7 +426,7 @@ public:
 
     void setLowByte(Byte lowByte)
     {
-        value = lowByte | value & 0xff00;
+        value = lowByte | (value & 0xff00);
     }
 
     Byte getHighByte() const
@@ -549,7 +549,7 @@ public:
 
     void setLowByte(Byte lowByte)
     {
-        value = lowByte | value & 0xffff00;
+        value = lowByte | (value & 0xffff00);
     }
 
     Byte getHighByte() const

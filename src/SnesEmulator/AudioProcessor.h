@@ -57,7 +57,7 @@ private:
         static constexpr Table offsetTable = []()
         {
             Table table = { 0 };
-            for (int i = 0; i < table.size(); ++i)
+            for (int i = 0; i < (int)table.size(); ++i)
             {
                 if (i > 2 && i < 30 && i % 3 == 0)
                 {

@@ -61,7 +61,7 @@ private:
                 currentWrite = extendedFirst;
             }
 
-            for (int i = 1; i < size; ++i)
+            for (int i = 1; i < (int)size; ++i)
             {
                 Node* nextNode = new Node{ oldNode->data
 #if AUDIO_BUFFER_DIAGNOSTICS
