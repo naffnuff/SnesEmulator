@@ -507,43 +507,56 @@ void Renderer::handleInput()
         }
     }
 
-    buttonStart = isPressed(GLFW_KEY_COMMA);
-    buttonSelect = isPressed(GLFW_KEY_PERIOD);
-    buttonA = isPressed(GLFW_KEY_L);
-    buttonB = isPressed(GLFW_KEY_K);
-    buttonX = isPressed(GLFW_KEY_I);
-    buttonY = isPressed(GLFW_KEY_J);
-    buttonL = isPressed(GLFW_KEY_U);
-    buttonR = isPressed(GLFW_KEY_O);
-    buttonUp = isPressed(GLFW_KEY_W);
-    buttonDown = isPressed(GLFW_KEY_S);
-    buttonLeft = isPressed(GLFW_KEY_A);
-    buttonRight = isPressed(GLFW_KEY_D);
+    joysticks[0].buttonStart = isPressed(GLFW_KEY_COMMA);
+    joysticks[0].buttonSelect = isPressed(GLFW_KEY_PERIOD);
+    joysticks[0].buttonA = isPressed(GLFW_KEY_L);
+    joysticks[0].buttonB = isPressed(GLFW_KEY_K);
+    joysticks[0].buttonX = isPressed(GLFW_KEY_I);
+    joysticks[0].buttonY = isPressed(GLFW_KEY_J);
+    joysticks[0].buttonL = isPressed(GLFW_KEY_U);
+    joysticks[0].buttonR = isPressed(GLFW_KEY_O);
+    joysticks[0].buttonUp = isPressed(GLFW_KEY_W);
+    joysticks[0].buttonDown = isPressed(GLFW_KEY_S);
+    joysticks[0].buttonLeft = isPressed(GLFW_KEY_A);
+    joysticks[0].buttonRight = isPressed(GLFW_KEY_D);
 
-    for (int joystick = GLFW_JOYSTICK_1; joystick <= GLFW_JOYSTICK_LAST; ++joystick)
+    joysticks[1].buttonStart = isPressed(GLFW_KEY_KP_1);
+    joysticks[1].buttonSelect = isPressed(GLFW_KEY_KP_2);
+    joysticks[1].buttonA = isPressed(GLFW_KEY_KP_6);
+    joysticks[1].buttonB = isPressed(GLFW_KEY_KP_5);
+    joysticks[1].buttonX = isPressed(GLFW_KEY_KP_8);
+    joysticks[1].buttonY = isPressed(GLFW_KEY_KP_4);
+    joysticks[1].buttonL = isPressed(GLFW_KEY_KP_7);
+    joysticks[1].buttonR = isPressed(GLFW_KEY_KP_9);
+    joysticks[1].buttonUp = isPressed(GLFW_KEY_UP);
+    joysticks[1].buttonDown = isPressed(GLFW_KEY_DOWN);
+    joysticks[1].buttonLeft = isPressed(GLFW_KEY_LEFT);
+    joysticks[1].buttonRight = isPressed(GLFW_KEY_RIGHT);
+
+    for (int i = GLFW_JOYSTICK_1; i <= GLFW_JOYSTICK_LAST && i < GLFW_JOYSTICK_1 + joysticks.size(); ++i)
     {
-        if (glfwJoystickIsGamepad(joystick))
+        if (glfwJoystickIsGamepad(i))
         {
-            if (const char* name = glfwGetJoystickName(joystick))
+            if (const char* name = glfwGetJoystickName(i))
             {
-                //std::cout << name << std::endl;
+                //std::cout << "Joystick " << i << ": " << name << std::endl;
                 //if (name[0] == 'X') // To filter out non-Xbox controllers
                 {
                     GLFWgamepadstate state;
-                    if (glfwGetGamepadState(joystick, &state))
+                    if (glfwGetGamepadState(i, &state))
                     {
-                        buttonStart |= state.buttons[GLFW_GAMEPAD_BUTTON_START] == GLFW_PRESS;
-                        buttonSelect |= state.buttons[GLFW_GAMEPAD_BUTTON_BACK] == GLFW_PRESS;
-                        buttonA |= state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_PRESS;
-                        buttonB |= state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_PRESS;
-                        buttonX |= state.buttons[GLFW_GAMEPAD_BUTTON_Y] == GLFW_PRESS;
-                        buttonY |= state.buttons[GLFW_GAMEPAD_BUTTON_X] == GLFW_PRESS;
-                        buttonL |= state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_PRESS;
-                        buttonR |= state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER] == GLFW_PRESS;
-                        buttonUp |= state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_UP] == GLFW_PRESS;
-                        buttonDown |= state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_DOWN] == GLFW_PRESS;
-                        buttonLeft |= state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_LEFT] == GLFW_PRESS;
-                        buttonRight |= state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_RIGHT] == GLFW_PRESS;
+                        joysticks[i].buttonStart |= state.buttons[GLFW_GAMEPAD_BUTTON_START] == GLFW_PRESS;
+                        joysticks[i].buttonSelect |= state.buttons[GLFW_GAMEPAD_BUTTON_BACK] == GLFW_PRESS;
+                        joysticks[i].buttonA |= state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_PRESS;
+                        joysticks[i].buttonB |= state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_PRESS;
+                        joysticks[i].buttonX |= state.buttons[GLFW_GAMEPAD_BUTTON_Y] == GLFW_PRESS;
+                        joysticks[i].buttonY |= state.buttons[GLFW_GAMEPAD_BUTTON_X] == GLFW_PRESS;
+                        joysticks[i].buttonL |= state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_PRESS;
+                        joysticks[i].buttonR |= state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER] == GLFW_PRESS;
+                        joysticks[i].buttonUp |= state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_UP] == GLFW_PRESS;
+                        joysticks[i].buttonDown |= state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_DOWN] == GLFW_PRESS;
+                        joysticks[i].buttonLeft |= state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_LEFT] == GLFW_PRESS;
+                        joysticks[i].buttonRight |= state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_RIGHT] == GLFW_PRESS;
 
                         float axisX = state.axes[GLFW_GAMEPAD_AXIS_LEFT_X];
                         float axisY = state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
@@ -556,20 +569,20 @@ void Renderer::handleInput()
 
                             if (angle > pi8 * 5 || angle < -pi8 * 5)
                             {
-                                buttonLeft = true;
+                                joysticks[i].buttonLeft = true;
                             }
                             else if (angle > -pi8 * 3 && angle < pi8 * 3)
                             {
-                                buttonRight = true;
+                                joysticks[i].buttonRight = true;
                             }
 
                             if (angle > -pi8 * 7 && angle < -pi8)
                             {
-                                buttonUp = true;
+                                joysticks[i].buttonUp = true;
                             }
                             else if (angle > pi8 && angle < pi8 * 7)
                             {
-                                buttonDown = true;
+                                joysticks[i].buttonDown = true;
                             }
                         }
                     }

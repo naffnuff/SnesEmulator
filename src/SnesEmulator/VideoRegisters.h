@@ -1228,8 +1228,9 @@ public:
         makeReadRegister(0x4216, "Multiplication Product or Divide Remainder", false, product, false);
 
         makeReadRegister(0x4218, "Controller Port 1 Data1 Register", false, controllerPort1Data1);
-        makeReadRegister(0x421a, "Controller Port 2 Data1 Register low byte", false);
-        makeReadRegister(0x421b, "Controller Port 2 Data1 Register high byte", false);
+        makeReadRegister(0x421a, "Controller Port 2 Data1 Register", false, controllerPort2Data1);
+        makeReadRegister(0x421c, "Controller Port 1 Data2 Register", false, controllerPort1Data2);
+        makeReadRegister(0x421e, "Controller Port 2 Data2 Register", false, controllerPort2Data2);
 
         for (int i = 0; i < dmaChannels.size(); ++i)
         {
@@ -1325,18 +1326,23 @@ public:
     {
         if (autoJoypadReadEnabled)
         {
-            controllerPort1Data1.setBit(4, processor.renderer.buttonR);
-            controllerPort1Data1.setBit(5, processor.renderer.buttonL);
-            controllerPort1Data1.setBit(6, processor.renderer.buttonX);
-            controllerPort1Data1.setBit(7, processor.renderer.buttonA);
-            controllerPort1Data1.setBit(8, processor.renderer.buttonRight);
-            controllerPort1Data1.setBit(9, processor.renderer.buttonLeft);
-            controllerPort1Data1.setBit(10, processor.renderer.buttonDown);
-            controllerPort1Data1.setBit(11, processor.renderer.buttonUp);
-            controllerPort1Data1.setBit(12, processor.renderer.buttonStart);
-            controllerPort1Data1.setBit(13, processor.renderer.buttonSelect);
-            controllerPort1Data1.setBit(14, processor.renderer.buttonY);
-            controllerPort1Data1.setBit(15, processor.renderer.buttonB);
+            int i = 0;
+            for (Word* controllerData : { &controllerPort1Data1, &controllerPort2Data1 })
+            {
+                controllerData->setBit(4, processor.renderer.joysticks[i].buttonR);
+                controllerData->setBit(5, processor.renderer.joysticks[i].buttonL);
+                controllerData->setBit(6, processor.renderer.joysticks[i].buttonX);
+                controllerData->setBit(7, processor.renderer.joysticks[i].buttonA);
+                controllerData->setBit(8, processor.renderer.joysticks[i].buttonRight);
+                controllerData->setBit(9, processor.renderer.joysticks[i].buttonLeft);
+                controllerData->setBit(10, processor.renderer.joysticks[i].buttonDown);
+                controllerData->setBit(11, processor.renderer.joysticks[i].buttonUp);
+                controllerData->setBit(12, processor.renderer.joysticks[i].buttonStart);
+                controllerData->setBit(13, processor.renderer.joysticks[i].buttonSelect);
+                controllerData->setBit(14, processor.renderer.joysticks[i].buttonY);
+                controllerData->setBit(15, processor.renderer.joysticks[i].buttonB);
+                ++i;
+            }
         }
     }
 
@@ -1431,6 +1437,9 @@ public:
     Long wramAddress;
 
     Word controllerPort1Data1;
+    Word controllerPort1Data2;
+    Word controllerPort2Data1;
+    Word controllerPort2Data2;
 
     Byte videoPortControl;
     bool incrementVramOnHighByte = false;

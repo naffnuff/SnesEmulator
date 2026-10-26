@@ -78,18 +78,23 @@ public:
     const int height;
 
 private:
-    bool buttonStart = false;
-    bool buttonSelect = false;
-    bool buttonA = false;
-    bool buttonB = false;
-    bool buttonX = false;
-    bool buttonY = false;
-    bool buttonL = false;
-    bool buttonR = false;
-    bool buttonUp = false;
-    bool buttonDown = false;
-    bool buttonLeft = false;
-    bool buttonRight = false;
+    struct Joystick
+    {
+        bool buttonStart = false;
+        bool buttonSelect = false;
+        bool buttonA = false;
+        bool buttonB = false;
+        bool buttonX = false;
+        bool buttonY = false;
+        bool buttonL = false;
+        bool buttonR = false;
+        bool buttonUp = false;
+        bool buttonDown = false;
+        bool buttonLeft = false;
+        bool buttonRight = false;
+    };
+
+    std::array<Joystick, 2> joysticks;
 
     int windowXPosition;
     int windowYPosition;
