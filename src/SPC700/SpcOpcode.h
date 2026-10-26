@@ -637,7 +637,6 @@ struct Opcode<SPC::State, 0x53>
     {
         PROFILE_IF(PROFILE_OPCODES, "53: BBC d.2, r");
 
-        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x53>");
         return 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -656,7 +655,6 @@ struct Opcode<SPC::State, 0x73>
     {
         PROFILE_IF(PROFILE_OPCODES, "73: BBC d.3, r");
 
-        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x73>");
         return 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -675,7 +673,6 @@ struct Opcode<SPC::State, 0x93>
     {
         PROFILE_IF(PROFILE_OPCODES, "93: BBC d.4, r");
 
-        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x93>");
         return 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -712,7 +709,6 @@ struct Opcode<SPC::State, 0xD3>
     {
         PROFILE_IF(PROFILE_OPCODES, "D3: BBC d.6, r");
 
-        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0xD3>");
         return 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -749,7 +745,6 @@ struct Opcode<SPC::State, 0x03>
     {
         PROFILE_IF(PROFILE_OPCODES, "03: BBS d.0, r");
 
-        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x03>");
         return 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -786,7 +781,6 @@ struct Opcode<SPC::State, 0x43>
     {
         PROFILE_IF(PROFILE_OPCODES, "43: BBS d.2, r");
 
-        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x43>");
         return 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -805,7 +799,6 @@ struct Opcode<SPC::State, 0x63>
     {
         PROFILE_IF(PROFILE_OPCODES, "63: BBS d.3, r");
 
-        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x63>");
         return 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -1170,7 +1163,6 @@ struct Opcode<SPC::State, 0x52>
     {
         PROFILE_IF(PROFILE_OPCODES, "52: CLR1 d.2");
 
-        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x52>");
         return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -4137,7 +4129,6 @@ struct Opcode<SPC::State, 0x02>
     {
         PROFILE_IF(PROFILE_OPCODES, "02: SET1 d.0");
 
-        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x02>");
         return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -4174,7 +4165,6 @@ struct Opcode<SPC::State, 0x42>
     {
         PROFILE_IF(PROFILE_OPCODES, "42: SET1 d.2");
 
-        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x42>");
         return  4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 

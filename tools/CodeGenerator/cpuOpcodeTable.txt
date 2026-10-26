@@ -73,7 +73,7 @@ C8:1   2           imp       x.....x. . INY:
 31:2   7-m+w-x+x*p (dir),Y   m.....m. . AND ($10),Y:*
 32:2   6-m+w       (dir)     m.....m. . AND ($10):*
 33:2   8-m         (stk,S),Y m.....m. . AND ($32,S),Y:*
-35:2   5-m+w       dir,X     m.....m. . AND $10,X:*
+35:2   5-m+w       dir,X     m.....m. . AND $10,X:
 37:2   7-m+w       [dir],Y   m.....m. . AND [$10],Y:*
 39:3   6-m-x+x*p   abs,Y     m.....m. . AND $9876,Y:
 3D:3   6-m-x+x*p   abs,X     m.....m. . AND $9876,X:
@@ -210,7 +210,7 @@ BC:3   6-2*x+x*p   abs,X     x.....x. . LDY $9876,X:
 9F:4   6-m         long,X    ........ . STA $FEDCBA,X:
 86:2   4-x+w       dir       ........ . STX $10:
 8E:3   5-x         abs       ........ . STX $9876:
-96:2   5-x+w       dir,Y     ........ . STX $10,Y:*
+96:2   5-x+w       dir,Y     ........ . STX $10,Y:
 84:2   4-x+w       dir       ........ . STY $10:
 8C:3   5-x         abs       ........ . STY $9876:
 94:2   5-x+w       dir,X     ........ . STY $10,X:

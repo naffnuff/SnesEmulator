@@ -531,7 +531,6 @@ struct Opcode<CPU::State, 0x35>
     {
         PROFILE_IF(PROFILE_OPCODES, "35: AND dp,X");
 
-        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x35>");
         return Instruction::Type::size() + 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -4515,7 +4514,6 @@ struct Opcode<CPU::State, 0x96>
     {
         PROFILE_IF(PROFILE_OPCODES, "96: STX dp,Y");
 
-        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x96>");
         return Instruction::Type::size() + 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
