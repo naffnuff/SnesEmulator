@@ -13,6 +13,17 @@
 class Rom
 {
 public:
+    enum class RomType
+    {
+        Uninitialized,
+        LoRom,
+        HiRom,
+        Sa1Rom,
+        Sdd1Rom,
+        ExHiRom
+    };
+
+public:
     Rom(Output& output)
         : output(output, "rom")
     {
@@ -54,26 +65,48 @@ public:
     {
         bool romLoaded = false;
 
+        int startBank = 0;
+        int startAddress = 0;
+
+        if (romType == RomType::LoRom)
+        {
+            startBank = 0x80;
+            startAddress = 0x8000;
+        }
+        else if (romType == RomType::HiRom)
+        {
+            startBank = 0xC0;
+            startAddress = 0x0;
+        }
+
         int romIndex = 0;
-        for (int bank = 0; bank < Byte::spaceSize; ++bank) {
-            for (int address = 0x8000; address < Word::spaceSize; ++address) {
+        for (int bank = startBank; bank < Byte::spaceSize; ++bank)
+        {
+            for (int address = startAddress; address < Word::spaceSize; ++address)
+            {
                 Long longAddress = Long(Word(address), Byte(bank));
                 state.createMemoryLocation<ReadOnlyMemory>(longAddress, data[romIndex++]);
-                if (romIndex >= (int)data.size()) {
+                if (romIndex >= (int)data.size())
+                {
                     output.debug("ROM ends at ", longAddress);
                     romLoaded = true;
                     break;
                 }
             }
-            if (romLoaded) {
+            if (romLoaded)
+            {
                 break;
             }
         }
 
-        if (!romLoaded) {
+        if (!romLoaded)
+        {
             throw std::runtime_error("ROM not fully loaded");
         }
+    }
 
+    void loadInterruptVectors(CPU::State& state) const
+    {
         state.loadInterruptVectors();
 
         CPU::State::InterruptVectors& nativeVectors = state.getInterruptVectors(true);
@@ -99,11 +132,6 @@ public:
         output.debug();
     }
 
-    bool isLowRom() const
-    {
-        return mapMode == 0x20 || mapMode == 0x30;
-    }
-
 private:
     bool tryReadHeader(Word offset)
     {
@@ -117,7 +145,13 @@ private:
         output.debug("Maker code: ", data[0xFFD6 - offset]);
 
         for (int i = 0; i < 21; ++i) {
-            gameTitle.push_back(data[0xFFC0 + size_t(i) - size_t(offset)]);
+            const char c = data[0xFFC0 + size_t(i) - size_t(offset)];
+            if (!isGameTitleCharacterValid(c))
+            {
+                gameTitle.clear();
+                return false;
+            }
+            gameTitle.push_back(c);
         }
 
         mapMode = data[0xFFD5 - offset];
@@ -128,13 +162,40 @@ private:
 
         saveRamSize = 0x400 << data[0xFFD8 - offset];
 
-        output.debug("Game Title=", gameTitle);
+        output.info(gameTitle);
         output.debug("Map Mode=", mapMode);
         output.debug("Cartridge Type=", cartridgeType);
         output.debug("ROM Size=", romSize);
         output.debug("SaveRAM Size=", saveRamSize);
         output.debug();
 
+        if (mapMode == 0x20 || mapMode == 0x30)
+        {
+            romType = RomType::LoRom;
+            if (offset != 0x8000)
+            {
+                throw std::runtime_error("LoROM header location mismatch");
+            }
+        }
+        else if (mapMode == 0x21 || mapMode == 0x31)
+        {
+            romType = RomType::HiRom;
+            if (offset != 0x0)
+            {
+                throw std::runtime_error("LoROM header location mismatch");
+            }
+        }
+
+        return true;
+    }
+
+    bool isGameTitleCharacterValid(char c) const
+    {
+        if (c != ' ' && (c < 'A' || c > 'Z') && (c < 'a' || c > 'z'))
+        {
+            output.debug("Invalid game-title character: ", c);
+            return false;
+        }
         return true;
     }
 
@@ -148,4 +209,5 @@ public:
     Byte cartridgeType;
     int romSize = 0;
     int saveRamSize = 0;
+    RomType romType = RomType::Uninitialized;
 };
