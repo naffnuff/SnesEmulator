@@ -58,6 +58,12 @@ void Renderer::swapPixelBuffers()
     textureNeedsUpdate = true;
 }
 
+void Renderer::setEmulationRate(uint32_t rate)
+{
+    emulationRate = rate;
+    updateWindowTitle();
+}
+
 // private
 
 // callbacks
@@ -397,6 +403,13 @@ void Renderer::uploadTexture()
     }
 }
 
+void Renderer::updateWindowTitle()
+{
+    std::stringstream ss;
+    ss << title << " | Screen: " << refreshRate << " Hz | Emulation: " << emulationRate << " Hz";
+    glfwSetWindowTitle(window, ss.str().c_str());
+}
+
 void Renderer::update()
 {
     uploadTexture();
@@ -421,9 +434,8 @@ void Renderer::update()
         frameCount++;
         if (currentTime - previousTime >= 1.0)
         {
-            std::stringstream ss;
-            ss << title << " " << frameCount << " fps";
-            glfwSetWindowTitle(window, ss.str().c_str());
+            refreshRate = frameCount;
+            updateWindowTitle();
 
             output.debug(frameCount);
 

@@ -128,5 +128,7 @@ private:
 
     std::array<Byte, 4> cpuToSpcBuffers;
     std::array<Byte, 4> spcToCpuBuffers;
+
+    friend class Rom;
 };
 

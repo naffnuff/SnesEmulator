@@ -31,6 +31,7 @@ public:
     void focusWindow(bool value);
     void swapPixelBuffers();
     unsigned int getTexture() const { return texture; }
+    void setEmulationRate(uint32_t rate);
 
 private:
     // setup
@@ -61,6 +62,9 @@ private:
     bool isPressed(int key) const;
 
     // update
+    void updateWindowTitle();
+
+    // update
 public:
     void update();
     void handleInput();
@@ -68,7 +72,6 @@ public:
 
     // teardown
     void terminate();
-
 
 public:
     bool toggleFullscreenRequested = false;
@@ -117,6 +120,9 @@ private:
     float xScreenCoverage = 0.0f;
     float yScreenCoverage = 0.0f;
     const bool syncUpdate;
+
+    int refreshRate = 0;
+    uint32_t emulationRate = 0;
 
     unsigned int screenQuadVertexArray = 0;
     unsigned int screenQuadVertexBuffer = 0;
