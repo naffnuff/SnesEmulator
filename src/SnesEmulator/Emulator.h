@@ -25,7 +25,7 @@ class Emulator
 private:
     struct SaveRamSaver {
         SaveRamSaver(Emulator& emulator)
-            : saveRam(emulator.rom.romSize)
+            : saveRam(emulator.rom.saveRamSize)
             , rom(emulator.rom)
         {
         }

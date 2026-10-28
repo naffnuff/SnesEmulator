@@ -30,7 +30,6 @@ struct Opcode<CPU::State, 0x61>
     {
         PROFILE_IF(PROFILE_OPCODES, "61: ADC (dp,X)");
 
-        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x61>");
         return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -346,7 +345,6 @@ struct Opcode<CPU::State, 0x23>
     {
         PROFILE_IF(PROFILE_OPCODES, "23: AND sr,S");
 
-        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x23>");
         return Instruction::Type::size() + 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -960,7 +958,6 @@ struct Opcode<CPU::State, 0x00>
     {
         PROFILE_IF(PROFILE_OPCODES, "00: BRK");
 
-        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x00>");
         return Instruction::Type::size() + 5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -1823,7 +1820,6 @@ struct Opcode<CPU::State, 0x4F>
     {
         PROFILE_IF(PROFILE_OPCODES, "4F: EOR long");
 
-        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x4F>");
         return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -1980,7 +1976,6 @@ struct Opcode<CPU::State, 0x5F>
     {
         PROFILE_IF(PROFILE_OPCODES, "5F: EOR long,X");
 
-        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x5F>");
         return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -2285,7 +2280,6 @@ struct Opcode<CPU::State, 0xA1>
     {
         PROFILE_IF(PROFILE_OPCODES, "A1: LDA (dp,X)");
 
-        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0xA1>");
         return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -2845,7 +2839,6 @@ struct Opcode<CPU::State, 0x56>
     {
         PROFILE_IF(PROFILE_OPCODES, "56: LSR dp,X");
 
-        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x56>");
         return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -3164,7 +3157,6 @@ struct Opcode<CPU::State, 0x17>
     {
         PROFILE_IF(PROFILE_OPCODES, "17: ORA [dp],Y");
 
-        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x17>");
         return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -4856,7 +4848,6 @@ struct Opcode<CPU::State, 0xBA>
     {
         PROFILE_IF(PROFILE_OPCODES, "BA: TSX");
 
-        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0xBA>");
         return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -4971,7 +4962,6 @@ struct Opcode<CPU::State, 0xCB>
     {
         PROFILE_IF(PROFILE_OPCODES, "CB: WAI");
 
-        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0xCB>");
         return Instruction::Type::size() + 2 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -4991,7 +4981,6 @@ struct Opcode<CPU::State, 0x42>
     {
         PROFILE_IF(PROFILE_OPCODES, "42: WDM #const");
 
-        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x42>");
         return Instruction::Type::size() + Instruction::Type::applyOperand<Instruction>(state);
     }
 

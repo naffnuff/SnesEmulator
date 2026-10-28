@@ -1681,7 +1681,6 @@ public:
     {
         PROFILE_IF(PROFILE_OPERATORS, "WDM");
 
-        throw NotYetImplementedException("CPU::Operator::WDM");
         return 0;
     }
 

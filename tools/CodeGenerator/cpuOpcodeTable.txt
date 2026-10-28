@@ -1,4 +1,4 @@
-61:2   7-m+w       (dir,X)   mm....mm . ADC ($10,X):*
+61:2   7-m+w       (dir,X)   mm....mm . ADC ($10,X):
 63:2   5-m         stk,S     mm....mm . ADC $32,S:
 65:2   4-m+w       dir       mm....mm . ADC $10:
 67:2   7-m+w       [dir]     mm....mm . ADC [$10]:
@@ -64,7 +64,7 @@ FE:3   9-2*m       abs,X     m.....m. . INC $9876,X:
 E8:1   2           imp       x.....x. . INX:
 C8:1   2           imp       x.....x. . INY:
 21:2   7-m+w       (dir,X)   m.....m. . AND ($10,X):*
-23:2   5-m         stk,S     m.....m. . AND $32,S:*
+23:2   5-m         stk,S     m.....m. . AND $32,S:
 25:2   4-m+w       dir       m.....m. . AND $10:
 27:2   7-m+w       [dir]     m.....m. . AND [$10]:*
 29:3-m 3-m         imm       m.....m. . AND #$54:
@@ -84,7 +84,7 @@ C8:1   2           imp       x.....x. . INY:
 47:2   7-m+w       [dir]     m.....m. . EOR [$10]:*
 49:3-m 3-m         imm       m.....m. . EOR #$54:
 4D:3   5-m         abs       m.....m. . EOR $9876:
-4F:4   6-m         long      m.....m. . EOR $FEDBCA:*
+4F:4   6-m         long      m.....m. . EOR $FEDBCA:
 51:2   7-m+w-x+x*p (dir),Y   m.....m. . EOR ($10),Y:*
 52:2   6-m+w       (dir)     m.....m. . EOR ($10):*
 53:2   8-m         (stk,S),Y m.....m. . EOR ($32,S),Y:*
@@ -92,7 +92,7 @@ C8:1   2           imp       x.....x. . INY:
 57:2   7-m+w       [dir],Y   m.....m. . EOR [$10],Y:*
 59:3   6-m-x+x*p   abs,Y     m.....m. . EOR $9876,Y:
 5D:3   6-m-x+x*p   abs,X     m.....m. . EOR $9876,X:
-5F:4   6-m         long,X    m.....m. . EOR $FEDCBA,X:*
+5F:4   6-m         long,X    m.....m. . EOR $FEDCBA,X:
 01:2   7-m+w       (dir,X)   m.....m. . ORA ($10,X):*
 03:2   5-m         stk,S     m.....m. . ORA $32,S:
 05:2   4-m+w       dir       m.....m. . ORA $10:
@@ -104,7 +104,7 @@ C8:1   2           imp       x.....x. . INY:
 12:2   6-m+w       (dir)     m.....m. . ORA ($10):*
 13:2   8-m         (stk,S),Y m.....m. . ORA ($32,S),Y:*
 15:2   5-m+w       dir,X     m.....m. . ORA $10,X:
-17:2   7-m+w       [dir],Y   m.....m. . ORA [$10],Y:*
+17:2   7-m+w       [dir],Y   m.....m. . ORA [$10],Y:
 19:3   6-m-x+x*p   abs,Y     m.....m. . ORA $9876,Y:
 1D:3   6-m-x+x*p   abs,X     m.....m. . ORA $9876,X:
 1F:4   6-m         long,X    m.....m. . ORA $FEDCBA,X:
@@ -125,7 +125,7 @@ C8:1   2           imp       x.....x. . INY:
 46:2   7-2*m+w     dir       0.....m* . LSR $10:
 4A:1   2           acc       0.....m* . LSR:
 4E:3   8-2*m       abs       0.....m* . LSR $9876:
-56:2   8-2*m+w     dir,X     0.....m* . LSR $10,X:*
+56:2   8-2*m+w     dir,X     0.....m* . LSR $10,X:
 5E:3   9-2*m       abs,X     0.....m* . LSR $9876,X:
 26:2   7-2*m+w     dir       m.....mm . ROL $10:
 2A:1   2           acc       m.....mm . ROL:
@@ -157,7 +157,7 @@ DC:3   6           [abs]     ........ . JMP [$1234]:
 FC:3   8           (abs,X)   ........ . JSR ($1234,X):
 6B:1   6           imp       ........ . RTL:
 60:1   6           imp       ........ . RTS:
-00:1   8-e         imp       ....01.. . BRK:*
+00:1   8-e         imp       ....01.. . BRK:
 02:2   8-e         imm       ....01.. . COP #$12:*
 40:1   7-e         imp       ******** . RTI:
 18:1   2           imp       .......0 . CLC:
@@ -169,7 +169,7 @@ F8:1   2           imp       ....1... . SED:
 78:1   2           imp       .....1.. . SEI:
 C2:2   3           imm       ******** . REP #$12:
 E2:2   3           imm       ******** . SEP #$12:
-A1:2   7-m+w       (dir,X)   m.....m. . LDA ($10,X):*
+A1:2   7-m+w       (dir,X)   m.....m. . LDA ($10,X):
 A3:2   5-m         stk,S     m.....m. . LDA $32,S:
 A5:2   4-m+w       dir       m.....m. . LDA $10:
 A7:2   7-m+w       [dir]     m.....m. . LDA [$10]:
@@ -221,7 +221,7 @@ BC:3   6-2*x+x*p   abs,X     x.....x. . LDY $9876,X:
 54:3   7           src,dest  ........ . MVN #$12,#$34:
 44:3   7           src,dest  ........ . MVP #$12,#$34:*
 EA:1   2           imp       ........ . NOP:
-42:2   2           imm       ........ . WDM:*
+42:2   2           imm       ........ . WDM:
 F4:3   5           imm       ........ . PEA #$1234:
 D4:2   6+w         dir       ........ . PEI $12:
 62:3   6           imm       ........ . PER LABEL:
@@ -239,10 +239,10 @@ AB:1   4           imp       *.....*. . PLB:
 2B:1   5           imp       *.....*. . PLD:
 28:1   4           imp       ******** . PLP:
 DB:1   3           imp       ........ . STP:*
-CB:1   3           imp       ........ . WAI:*
+CB:1   3           imp       ........ . WAI:
 AA:1   2           imp       x.....x. . TAX:
 A8:1   2           imp       x.....x. . TAY:
-BA:1   2           imp       x.....x. . TSX:*
+BA:1   2           imp       x.....x. . TSX:
 8A:1   2           imp       m.....m. . TXA:
 9A:1   2           imp       ........ . TXS:
 9B:1   2           imp       x.....x. . TXY:

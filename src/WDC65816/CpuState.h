@@ -625,7 +625,8 @@ public:
             irqActive = false;
         }
         else {
-            throw std::logic_error("End interrupt with neither nmi not irq ongoing");
+            //throw std::logic_error("End interrupt with neither nmi not irq ongoing");
+            output.error("End interrupt with neither nmi nor irq ongoing");
         }
     }
 

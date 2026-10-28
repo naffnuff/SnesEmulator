@@ -723,7 +723,8 @@ private:
             return;
         }
         checkBounds(address, operation);
-        bool isInitialized = memory[address].get() != nullptr;
+        const Location* location = memory[address].get();
+        const bool isInitialized = location != nullptr;
         if (isInitialized != shouldBeInitialized)
         {
             std::ostringstream ss;
@@ -731,7 +732,7 @@ private:
             ss << "memory @" << address << " ";
             if (isInitialized)
             {
-                ss << "is aready initialized";
+                ss << "is already initialized";
             }
             else
             {

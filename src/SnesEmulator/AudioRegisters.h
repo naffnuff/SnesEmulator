@@ -56,12 +56,16 @@ public:
                 }
                 bootRomDataEnabled = byte.getBit(7);
             });
-        makeWriteRegister(0xf2, "DSP Communication Address", false,
+        makeReadWriteRegister(0xf2, "DSP Communication Address", false,
+            [this](Byte& value)
+            {
+                value = dspAddress;
+            },
             [this](Byte value)
             {
                 dspAddress = value;
             });
-        makeReadWriteRegister(0xf3, "DSP Communication Data", false,
+        makeReadWriteRegister(0xf3, "DSP Communication Data", true,
             [this](Byte& value)
             {
                 value = processor.dspMemory.readByte(dspAddress & 0x7f);
@@ -124,7 +128,7 @@ public:
         processor.makeAudioWriteRegister<Processor::Register::EVOLR>(0x3c, "Echo Volume Right", false);
         processor.makeAudioWriteRegister<Processor::Register::KON>(0x4c, "Key On", true);
         processor.makeAudioWriteRegister<Processor::Register::KOFF>(0x5c, "Key Off", false);
-        processor.makeAudioWriteRegister<Processor::Register::FLG>(0x6c, "Flags", false);
+        processor.makeAudioReadWriteRegister<Processor::Register::FLG>(0x6c, "Flags", false);
         processor.makeAudioWriteRegister<Processor::Register::ENDX>(0x7c, "Source End Block", true);
         processor.makeAudioWriteRegister<Processor::Register::EFB>(0x0d, "Echo Feedback", false);
         processor.makeAudioWriteRegister<Processor::Register::PMON>(0x2d, "Pitch Modulation", false);

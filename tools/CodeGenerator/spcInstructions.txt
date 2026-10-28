@@ -8,7 +8,7 @@ ADC	A, d+X	94	2	 4	A = A+(d+X)+C	NV..H.ZC
 ADC	A, !a	85	3	 4	A = A+(a)+C	NV..H.ZC	
 ADC	A, !a+X	95	3	 5	A = A+(a+X)+C	NV..H.ZC	
 ADC	A, !a+Y	96	3	 5	A = A+(a+Y)+C	NV..H.ZC	
-ADC	dd, ds	89	3	 6	(dd) = (dd)+(d)+C	NV..H.ZC	*
+ADC	dd, ds	89	3	 6	(dd) = (dd)+(d)+C	NV..H.ZC	
 ADC	d, #i	98	3	 5	(d) = (d)+i+C	NV..H.ZC	
 ADDW	YA, d	7A	2	 5	YA  = YA + (d), H on high byte	NV..H.ZC	
 AND	(X), (Y)	39	1	 5	(X) = (X) & (Y)	N.....Z.	*
@@ -19,10 +19,10 @@ AND	A, [d+X]	27	2	 6	A = A & ([d+X])	N.....Z.	*
 AND	A, d	24	2	 3	A = A & (d)	N.....Z.	
 AND	A, d+X	34	2	 4	A = A & (d+X)	N.....Z.	*
 AND	A, !a	25	3	 4	A = A & (a)	N.....Z.	
-AND	A, !a+X	35	3	 5	A = A & (a+X)	N.....Z.	*
+AND	A, !a+X	35	3	 5	A = A & (a+X)	N.....Z.	
 AND	A, !a+Y	36	3	 5	A = A & (a+Y)	N.....Z.	*
 AND	dd, ds	29	3	 6	(dd) = (dd) & (ds)	N.....Z.	
-AND	d, #i	38	3	 5	(d) = (d) & i	N.....Z.	*
+AND	d, #i	38	3	 5	(d) = (d) & i	N.....Z.	
 AND1	C, /m.b	6A	3	 4	C = C & ~(m.b)	.......C	*
 AND1	C, m.b	4A	3	 4	C = C & (m.b)	.......C	*
 ASL	A	1C	1	 2	Left shift A: high->C, 0->low	N.....ZC	
@@ -41,7 +41,7 @@ BBS	d.0, r	03	3	5/7	PC+=r  if d.0 == 1	........
 BBS	d.1, r	23	3	5/7	PC+=r  if d.1 == 1	........	
 BBS	d.2, r	43	3	5/7	PC+=r  if d.2 == 1	........	
 BBS	d.3, r	63	3	5/7	PC+=r  if d.3 == 1	........	
-BBS	d.4, r	83	3	5/7	PC+=r  if d.4 == 1	........	*
+BBS	d.4, r	83	3	5/7	PC+=r  if d.4 == 1	........	
 BBS	d.5, r	A3	3	5/7	PC+=r  if d.5 == 1	........	
 BBS	d.6, r	C3	3	5/7	PC+=r  if d.6 == 1	........	
 BBS	d.7, r	E3	3	5/7	PC+=r  if d.7 == 1	........	
@@ -71,17 +71,17 @@ CLRP		20	1	 2	P = 0	..0.....
 CLRV		E0	1	 2	V = 0, H = 0	.0..0...	*
 CMP	(X), (Y)	79	1	 5	(X) - (Y)	N.....ZC	*
 CMP	A, #i	68	2	 2	A - i	N.....ZC	
-CMP	A, (X)	66	1	 3	A - (X)	N.....ZC	*
+CMP	A, (X)	66	1	 3	A - (X)	N.....ZC	
 CMP	A, [d]+Y	77	2	 6	A - ([d]+Y)	N.....ZC	*
 CMP	A, [d+X]	67	2	 6	A - ([d+X])	N.....ZC	*
 CMP	A, d	64	2	 3	A - (d)	N.....ZC	
 CMP	A, d+X	74	2	 4	A - (d+X)	N.....ZC	
 CMP	A, !a	65	3	 4	A - (a)	N.....ZC	
 CMP	A, !a+X	75	3	 5	A - (a+X)	N.....ZC	
-CMP	A, !a+Y	76	3	 5	A - (a+Y)	N.....ZC	*
+CMP	A, !a+Y	76	3	 5	A - (a+Y)	N.....ZC	
 CMP	X, #i	C8	2	 2	X - i	N.....ZC	
 CMP	X, d	3E	2	 3	X - (d)	N.....ZC	
-CMP	X, !a	1E	3	 4	X - (a)	N.....ZC	*
+CMP	X, !a	1E	3	 4	X - (a)	N.....ZC	
 CMP	Y, #i	AD	2	 2	Y - i	N.....ZC	
 CMP	Y, d	7E	2	 3	Y - (d)	N.....ZC	
 CMP	Y, !a	5E	3	 4	Y - (a)	N.....ZC	
@@ -99,7 +99,7 @@ DEC	d	8B	2	 4	(d)--	N.....Z.
 DEC	d+X	9B	2	 5	(d+X)--	N.....Z.	
 DEC	!a	8C	3	 5	(a)--	N.....Z.	
 DECW	d	1A	2	 6	Word (d)--	N.....Z.	
-DI		C0	1	 3	I = 0	.....0..	*
+DI		C0	1	 3	I = 0	.....0..	
 DIV	YA, X	9E	1	12	A=YA/X, Y=mod(YA,X)	NV..H.Z.	
 EI		A0	1	 3	I = 1	.....1..	*
 EOR	(X), (Y)	59	1	 5	(X) = (X) EOR (Y)	N.....Z.	*
@@ -109,9 +109,9 @@ EOR	A, [d]+Y	57	2	 6	A = A EOR ([d]+Y)	N.....Z.	*
 EOR	A, [d+X]	47	2	 6	A = A EOR ([d+X])	N.....Z.	*
 EOR	A, d	44	2	 3	A = A EOR (d)	N.....Z.	
 EOR	A, d+X	54	2	 4	A = A EOR (d+X)	N.....Z.	
-EOR	A, !a	45	3	 4	A = A EOR (a)	N.....Z.	*
-EOR	A, !a+X	55	3	 5	A = A EOR (a+X)	N.....Z.	*
-EOR	A, !a+Y	56	3	 5	A = A EOR (a+Y)	N.....Z.	*
+EOR	A, !a	45	3	 4	A = A EOR (a)	N.....Z.	
+EOR	A, !a+X	55	3	 5	A = A EOR (a+X)	N.....Z.	
+EOR	A, !a+Y	56	3	 5	A = A EOR (a+Y)	N.....Z.	
 EOR	dd, ds	49	3	 6	(dd) = (dd) EOR (ds)	N.....Z.	*
 EOR	d, #i	58	3	 5	(d) = (d) EOR i	N.....Z.	
 EOR1	C, m.b	8A	3	 5	C = C EOR (m.b)	.......C	*
@@ -159,7 +159,7 @@ MOV	Y, !a	EC	3	 4	Y = (a)	N.....Z.
 MOV	dd, ds	FA	3	 5	(dd) = (ds)    (no read)	........	
 MOV	d+X, A	D4	2	 5	(d+X) = A      (read)	........	
 MOV	d+X, Y	DB	2	 5	(d+X) = Y      (read)	........	
-MOV	d+Y, X	D9	2	 5	(d+Y) = X      (read)	........	*
+MOV	d+Y, X	D9	2	 5	(d+Y) = X      (read)	........	
 MOV	d, #i	8F	3	 5	(d) = i        (read)	........	
 MOV	d, A	C4	2	 4	(d) = A        (read)	........	
 MOV	d, X	D8	2	 4	(d) = X        (read)	........	
@@ -169,7 +169,7 @@ MOV	!a+Y, A	D6	3	 6	(a+Y) = A      (read)	........
 MOV	!a, A	C5	3	 5	(a) = A        (read)	........	
 MOV	!a, X	C9	3	 5	(a) = X        (read)	........	
 MOV	!a, Y	CC	3	 5	(a) = Y        (read)	........	
-MOV1	C, m.b	AA	3	 4	C = (m.b)	.......C	*
+MOV1	C, m.b	AA	3	 4	C = (m.b)	.......C	
 MOV1	m.b, C	CA	3	 6	(m.b) = C	........	*
 MOVW	YA, d	BA	2	 5	YA = word (d)	N.....Z.	
 MOVW	d, YA	DA	2	 5	word (d) = YA  (read low only)	........	
@@ -180,7 +180,7 @@ NOTC		ED	1	 3	C = !C	.......C
 OR	(X), (Y)	19	1	 5	(X) = (X) | (Y)	N.....Z.	*
 OR	A, #i	08	2	 2	A = A | i	N.....Z.	
 OR	A, (X)	06	1	 3	A = A | (X)	N.....Z.	*
-OR	A, [d]+Y	17	2	 6	A = A | ([d]+Y)	N.....Z.	*
+OR	A, [d]+Y	17	2	 6	A = A | ([d]+Y)	N.....Z.	
 OR	A, [d+X]	07	2	 6	A = A | ([d+X])	N.....Z.	*
 OR	A, d	04	2	 3	A = A | (d)	N.....Z.	
 OR	A, d+X	14	2	 4	A = A | (d+X)	N.....Z.	
@@ -188,10 +188,10 @@ OR	A, !a	05	3	 4	A = A | (a)	N.....Z.
 OR	A, !a+X	15	3	 5	A = A | (a+X)	N.....Z.	
 OR	A, !a+Y	16	3	 5	A = A | (a+Y)	N.....Z.	*
 OR	dd, ds	09	3	 6	(dd) = (dd) | (ds)	N.....Z.	
-OR	d, #i	18	3	 5	(d) = (d) | i	N.....Z.	*
+OR	d, #i	18	3	 5	(d) = (d) | i	N.....Z.	
 OR1	C, /m.b	2A	3	 5	C = C | ~(m.b)	.......C	*
 OR1	C, m.b	0A	3	 5	C = C | (m.b)	.......C	*
-PCALL	u	4F	2	 6	CALL $FF00+u	........	*
+PCALL	u	4F	2	 6	CALL $FF00+u	........	
 POP	A	AE	1	 4	A = (++SP)	........	
 POP	PSW	8E	1	 4	Flags = (++SP)	NVPBHIZC	
 POP	X	CE	1	 4	X = (++SP)	........	
@@ -202,7 +202,7 @@ PUSH	X	4D	1	 4	(SP--) = X	........
 PUSH	Y	6D	1	 4	(SP--) = Y	........	
 RET		6F	1	 5	Pop PC	........	
 RET1		7F	1	 6	Pop Flags, PC	NVPBHIZC	*
-ROL	A	3C	1	 2	Left shift A: low=C, C=high	N.....ZC	*
+ROL	A	3C	1	 2	Left shift A: low=C, C=high	N.....ZC	
 ROL	d	2B	2	 4	Left shift (d) as above	N.....ZC	
 ROL	d+X	3B	2	 5	Left shift (d+X) as above	N.....ZC	*
 ROL	!a	2C	3	 5	Left shift (a) as above	N.....ZC	*
@@ -216,7 +216,7 @@ SBC	A, (X)	A6	1	 3	A = A-(X)-!C	NV..H.ZC	*
 SBC	A, [d]+Y	B7	2	 6	A = A-([d]+Y)-!C	NV..H.ZC	*
 SBC	A, [d+X]	A7	2	 6	A = A-([d+X])-!C	NV..H.ZC	*
 SBC	A, d	A4	2	 3	A = A-(d)-!C	NV..H.ZC	
-SBC	A, d+X	B4	2	 4	A = A-(d+X)-!C	NV..H.ZC	*
+SBC	A, d+X	B4	2	 4	A = A-(d+X)-!C	NV..H.ZC	
 SBC	A, !a	A5	3	 4	A = A-(a)-!C	NV..H.ZC	
 SBC	A, !a+X	B5	3	 5	A = A-(a+X)-!C	NV..H.ZC	
 SBC	A, !a+Y	B6	3	 5	A = A-(a+Y)-!C	NV..H.ZC	
@@ -232,8 +232,8 @@ SET1	d.6	C2	2	 4	d.6 = 1	........
 SET1	d.7	E2	2	 4	d.7 = 1	........	
 SETC		80	1	 2	C = 1	.......1	
 SETP		40	1	 2	P = 1	..1.....	
-SLEEP		EF	1	 3	Halts the processor	........	*
-STOP		FF	1	 3	Halts the processor	........	*
+SLEEP		EF	1	 3	Halts the processor	........	
+STOP		FF	1	 3	Halts the processor	........	
 SUBW	YA, d	9A	2	 5	YA  = YA - (d), H on high byte	NV..H.ZC	
 TCALL	0	01	1	 8	CALL [$FFDE]	........	*
 TCALL	1	11	1	 8	CALL [$FFDC]	........	*

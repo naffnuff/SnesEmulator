@@ -421,6 +421,10 @@ void Renderer::update()
         frameCount++;
         if (currentTime - previousTime >= 1.0)
         {
+            std::stringstream ss;
+            ss << title << " " << frameCount << " fps";
+            glfwSetWindowTitle(window, ss.str().c_str());
+
             output.debug(frameCount);
 
             frameCount = 0;

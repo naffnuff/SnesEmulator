@@ -78,6 +78,10 @@ public:
             startBank = 0xC0;
             startAddress = 0x0;
         }
+        else
+        {
+            throw std::runtime_error("Only the LoROM and HiROM memory maps are supported for now");
+        }
 
         int romIndex = 0;
         for (int bank = startBank; bank < Byte::spaceSize; ++bank)
@@ -191,9 +195,9 @@ private:
 
     bool isGameTitleCharacterValid(char c) const
     {
-        if (c != ' ' && (c < 'A' || c > 'Z') && (c < 'a' || c > 'z'))
+        if (c != ' ' && c != '\'' && c != '-' && c != '_' && c != '(' && c != ')' && c != '%' && c != '+' && c != '.' && c != '!' && (c < 'A' || c > 'Z') && (c < 'a' || c > 'z') && (c < '0' || c > '9'))
         {
-            output.debug("Invalid game-title character: ", c);
+            output.debug("Invalid game-title character: ", c, " (", int(c), ")");
             return false;
         }
         return true;

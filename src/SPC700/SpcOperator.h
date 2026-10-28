@@ -431,7 +431,7 @@ class DI
 public:
     static int invoke(State& state)
     {
-        throw NotYetImplementedException("SPC::Operator::DI");
+        state.setFlag(State::Flag::i, false);
         return 0;
     }
 
@@ -1024,6 +1024,7 @@ public:
     static int invoke(State& state)
     {
         throw NotYetImplementedException("SPC::Operator::SLEEP");
+        return 0;
     }
 
     static std::string toString() { return "SLEEP"; }
@@ -1037,6 +1038,7 @@ public:
     static int invoke(State& state)
     {
         throw NotYetImplementedException("SPC::Operator::STOP");
+        return 0;
     }
 
     static std::string toString() { return "STOP"; }

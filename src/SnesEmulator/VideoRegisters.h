@@ -1118,12 +1118,29 @@ public:
                 verticalScanlineLocation.highByteSelect = false;
             });
 
-        makeWriteRegister(0x2180, "WRAM Data read/write", false,
+        makeReadWriteRegister(0x2180, "WRAM Data read/write", false,
+            [this](Byte& value)
+            {
+                Long wramAddress(wramAddressLowByte, wramAddressMiddleByte, wramAddressHighBit | 0x7E);
+                value = memory.readByte(wramAddress++);
+                wramAddressLowByte = wramAddress.getLowByte();
+                wramAddressMiddleByte = wramAddress.getHighByte();
+                wramAddressHighBit = wramAddress.getBankByte() & 0x1;
+            },
             [this](Byte value)
             {
+                Long wramAddress(wramAddressLowByte, wramAddressMiddleByte, wramAddressHighBit | 0x7E);
                 memory.writeByte(value, wramAddress++);
+                wramAddressLowByte = wramAddress.getLowByte();
+                wramAddressMiddleByte = wramAddress.getHighByte();
+                wramAddressHighBit = wramAddress.getBankByte() & 0x1;
             });
-        makeWriteRegister(0x2181, "WRAM Address", false, wramAddress);
+        makeWriteRegister(0x2181, "WRAM Address low byte", false, wramAddressLowByte);
+        makeWriteRegister(0x2182, "WRAM Address middle byte", false, wramAddressMiddleByte);
+        makeWriteRegister(0x2183, "WRAM Address high bit", true, [this](Byte value)
+            {
+                wramAddressHighBit = value & 0x1;
+            });
 
         makeReadWriteRegister(0x4016, "NES-style Joypad Access Port 1", false,
             [this](Byte& value)
@@ -1152,7 +1169,7 @@ public:
                 }
             });
 
-        makeWriteRegister(0x4200, "Interrupt Enable Flags", false,
+        makeWriteRegister(0x4200, "Interrupt Enable Flags", true,
             [this](Byte value)
             {
                 autoJoypadReadEnabled = value.getBit(0);
@@ -1223,6 +1240,7 @@ public:
                 value.setBit(6, hBlank);
                 value.setBit(0, autoJoypadReadEnabled && vCounter >= 225 && vCounter < 228);
             });
+        makeReadRegister(0x4213, "PPU Status extra byte", false);
 
         makeReadRegister(0x4214, "Quotient of Divide Result", false, quotient);
         makeReadRegister(0x4216, "Multiplication Product or Divide Remainder", false, product, false);
@@ -1257,11 +1275,15 @@ public:
         {
             for (Long address = range.first; address < range.second; ++address)
             {
-                makeReadRegister(address, "Invalid register", true,
+                makeReadWriteRegister(address, "Invalid register", true,
                     [this](Byte& value)
                     {
                         //pauseRequested = true;
                         value = memory.bus;
+                    },
+                    [this](Byte value)
+                    {
+                        //pauseRequested = true;
                     });
             }
         }
@@ -1434,7 +1456,9 @@ public:
 
     Word vramBuffer;
 
-    Long wramAddress;
+    Byte wramAddressLowByte;
+    Byte wramAddressMiddleByte;
+    Byte wramAddressHighBit;
 
     Word controllerPort1Data1;
     Word controllerPort1Data2;
