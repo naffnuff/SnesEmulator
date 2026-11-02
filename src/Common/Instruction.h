@@ -1,11 +1,11 @@
 #pragma once
+
+#include "Types.h"
  
 #include <sstream>
 #include <iomanip>
 #include <tuple>
 #include <utility>
-
-#include "Types.h"
 
 template<typename State>
 class Instruction

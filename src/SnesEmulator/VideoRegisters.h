@@ -11,15 +11,17 @@ All documentation in the comments of this file is from:
 
 #pragma once
 
-#include <vector>
+#include "VideoProcessor.h"
+#include "VideoRenderer.h"
+
+#include "WDC65816/CpuState.h"
 
 #include "Common/System.h"
 #include "Common/Output.h"
 #include "Common/Memory.h"
 #include "Common/RegisterManager.h"
 
-#include "VideoProcessor.h"
-#include "VideoRenderer.h"
+#include <vector>
 
 namespace Video
 {
@@ -1276,13 +1278,15 @@ public:
             for (Long address = range.first; address < range.second; ++address)
             {
                 makeReadWriteRegister(address, "Invalid register", true,
-                    [this](Byte& value)
+                    [this, address](Byte& value)
                     {
+                        output.error("Invalid register ", address, ", value ", value);
                         //pauseRequested = true;
                         value = memory.bus;
                     },
-                    [this](Byte value)
+                    [this, address](Byte value)
                     {
+                        output.error("Invalid register ", address, ", value ", value);
                         //pauseRequested = true;
                     });
             }

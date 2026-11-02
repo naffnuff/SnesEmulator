@@ -87,12 +87,14 @@ void Rom::createMemoryMap(CPU::State::MemoryType& cpuMemory, Emulator& emulator)
         cpuMemory.createLocation<ReadWriteMemory>(address, Byte(0x55));
     }
 
+    using Range = std::pair<int, int>;
+
     // RAM mirrors
     {
-        std::vector<std::pair<Byte, Byte>> mirrorBankRanges = { { 0x00, 0x40 }, { 0x80, 0xC0 } };
-        for (std::pair<Byte, Byte> mirrorBankRange : mirrorBankRanges)
+        std::vector<Range> mirrorBankRanges = { { 0x00, 0x40 }, { 0x80, 0xC0 } };
+        for (const Range& mirrorBankRange : mirrorBankRanges)
         {
-            for (Byte mirrorBank = mirrorBankRange.first; mirrorBank < mirrorBankRange.second; ++mirrorBank)
+            for (Byte mirrorBank = Byte(mirrorBankRange.first); mirrorBank < mirrorBankRange.second; ++mirrorBank)
             {
                 for (Word address = 0; address < 0x2000; ++address)
                 {
@@ -119,10 +121,10 @@ void Rom::createMemoryMap(CPU::State::MemoryType& cpuMemory, Emulator& emulator)
 
     // Register mirrors
     {
-        std::vector<std::pair<Byte, Byte>> mirrorBankRanges = { { 0x01, 0x40 }, { 0x80, 0xC0 } };
-        for (std::pair<Byte, Byte> mirrorBankRange : mirrorBankRanges)
+        std::vector<Range> mirrorBankRanges = { { 0x01, 0x40 }, { 0x80, 0xC0 } };
+        for (const Range& mirrorBankRange : mirrorBankRanges)
         {
-            for (Byte mirrorBank = mirrorBankRange.first; mirrorBank < mirrorBankRange.second; ++mirrorBank)
+            for (Byte mirrorBank = Byte(mirrorBankRange.first); mirrorBank < mirrorBankRange.second; ++mirrorBank)
             {
                 for (Word address = 0x2000; address < 0x6000; ++address)
                 {
@@ -155,10 +157,10 @@ void Rom::createMemoryMap(CPU::State::MemoryType& cpuMemory, Emulator& emulator)
     else if (romType == Rom::RomType::HiRom)
     {
         // ROM mirrors
-        std::vector<std::pair<Byte, Byte>> mirrorBankRanges = { { 0x00, 0x40 }, { 0x40, 0x7E }, { 0x80, 0xC0 } };
-        for (std::pair<Byte, Byte> mirrorBankRange : mirrorBankRanges)
+        std::vector<Range> mirrorBankRanges = { { 0x00, 0x40 }, { 0x40, 0x7E }, { 0x80, 0xC0 } };
+        for (const Range& mirrorBankRange : mirrorBankRanges)
         {
-            for (Byte mirrorBank = mirrorBankRange.first, romBank = 0xC0; mirrorBank < mirrorBankRange.second; ++mirrorBank, ++romBank)
+            for (Byte mirrorBank = Byte(mirrorBankRange.first), romBank = 0xC0; mirrorBank < mirrorBankRange.second; ++mirrorBank, ++romBank)
             {
                 for (int localAddress = 0x8000; localAddress < Word::spaceSize; ++localAddress)
                 {
@@ -175,78 +177,85 @@ void Rom::createMemoryMap(CPU::State::MemoryType& cpuMemory, Emulator& emulator)
             std::ifstream file(System::getRomLibraryPath() / (gameTitle + ".save"));
             file >> std::hex;
 
-            int saveRamStartAddress = 0;
-            int saveRamEndAddress = 0;
-
-            int mirrorStartAddress = 0;
+            std::vector<Range> bankRanges;
+            Range addressRange;
 
             if (romType == Rom::RomType::LoRom)
             {
-                saveRamStartAddress = 0x700000;
-                saveRamEndAddress = 0x708000;
-                mirrorStartAddress = saveRamStartAddress + saveRamSize;
+                bankRanges = { { 0x70, 0x7E } };
+                addressRange = { 0x0, 0x8000 };
             }
             else if (romType == Rom::RomType::HiRom)
             {
-                saveRamStartAddress = 0x306000;
-                saveRamEndAddress = 0x308000;
-                mirrorStartAddress = 0xB06000;
+                bankRanges = { { 0x30, 0x40 }, { 0xB0, 0xC0 } };
+                addressRange = { 0x6000, 0x8000 };
             }
 
-            if (saveRamSize != emulator.saveRamSaver.saveRam.size())
+            Emulator::SaveRamSaver& saver = emulator.saveRamSaver;
+
+            if (saveRamSize != saver.saveRam.size())
             {
                 throw std::runtime_error("Save RAM mismatch");
             }
 
-            for (int address = saveRamStartAddress, localAddress = 0; localAddress < saveRamSize; ++address, ++localAddress)
+            const Long saveRamStartAddress(Word(addressRange.first), Byte(bankRanges.front().first));
+            int localAddress = 0;
+            bool createMirrors = false;
+
+            for (const Range& bankRange : bankRanges)
             {
-                if (address == saveRamEndAddress)
+                for (Byte bank = Byte(bankRange.first); bank < bankRange.second; ++bank)
                 {
-                    throw std::runtime_error("Save RAM stepping into ROM space");
-                }
-                if (localAddress == saveRamSize)
-                {
-                    throw std::runtime_error("Save RAM overflow");
-                }
-                Byte byte;
-                int inputValue;
-                if (file >> inputValue)
-                {
-                    byte = Byte(inputValue);
-                }
-                emulator.saveRamSaver.saveRam[localAddress] = byte;
-                cpuMemory.createLocation<ReadWriteRegister>(address,
-                    [&emulator, localAddress](Byte& value)
+                    for (Word address = Word(addressRange.first); address < addressRange.second; ++address, ++localAddress)
                     {
-                        value = emulator.saveRamSaver.saveRam[localAddress];
-                    },
-                    [&emulator, localAddress](Byte oldValue, Byte newValue)
-                    {
-                        if (oldValue != emulator.saveRamSaver.saveRam[localAddress])
+                        if (localAddress == saveRamSize)
                         {
-                            std::stringstream ss;
-                            ss << __FUNCTION__ << ": ";
-                            ss << "oldValue=" << oldValue << " != saveRamSaver.saveRam[address]=" << emulator.saveRamSaver.saveRam[localAddress];
-                            ss << " @" << localAddress << std::endl;
-                            throw std::logic_error(ss.str());
+                            localAddress = 0;
+                            createMirrors = true;
                         }
-                        if (newValue != emulator.saveRamSaver.saveRam[localAddress])
+
+                        Long longAddress(address, bank);
+                        if (createMirrors)
                         {
-                            emulator.saveRamSaver.saveRam[localAddress] = newValue;
-                            std::scoped_lock<std::mutex> lock(emulator.saveRamSaver.mutex);
-                            emulator.saveRamSaver.saveRamModified = true;
+                            Long saveRamAddress = saveRamStartAddress + localAddress;
+                            cpuMemory.createMirror(longAddress, saveRamAddress);
                         }
-                        emulator.saveRamSaver.condition.notify_one();
-                    },
-                    byte);
-            }
-            for (int mirrorAddress = mirrorStartAddress, address = saveRamStartAddress; address < saveRamStartAddress + saveRamSize; ++mirrorAddress, ++address)
-            {
-                if (mirrorAddress == saveRamEndAddress)
-                {
-                    //break;
+                        else
+                        {
+                            Byte byte;
+                            int inputValue;
+                            if (file >> inputValue)
+                            {
+                                byte = Byte(inputValue);
+                            }
+                            saver.saveRam[localAddress] = byte;
+                            cpuMemory.createLocation<ReadWriteRegister>(longAddress,
+                                [&saver, localAddress](Byte& value)
+                                {
+                                    value = saver.saveRam[localAddress];
+                                },
+                                [&saver, localAddress](Byte oldValue, Byte newValue)
+                                {
+                                    if (oldValue != saver.saveRam[localAddress])
+                                    {
+                                        std::stringstream ss;
+                                        ss << __FUNCTION__ << ": ";
+                                        ss << "oldValue=" << oldValue << " != saveRamSaver.saveRam[address]=" << saver.saveRam[localAddress];
+                                        ss << " @" << localAddress << std::endl;
+                                        throw std::logic_error(ss.str());
+                                    }
+                                    if (newValue != saver.saveRam[localAddress])
+                                    {
+                                        saver.saveRam[localAddress] = newValue;
+                                        std::scoped_lock<std::mutex> lock(saver.mutex);
+                                        saver.saveRamModified = true;
+                                    }
+                                    saver.condition.notify_one();
+                                },
+                                byte);
+                        }
+                    }
                 }
-                cpuMemory.createMirror(mirrorAddress, address);
             }
         }
     } // Save RAM

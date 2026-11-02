@@ -1,9 +1,10 @@
 #pragma once
 
-#include "Exception.h"
 #include "CpuState.h"
 #include "CpuAddressMode.h"
 #include "CpuOperator.h"
+
+#include "Exception.h"
 
 #include "Profiler.h"
 
@@ -489,7 +490,6 @@ struct Opcode<CPU::State, 0x32>
     {
         PROFILE_IF(PROFILE_OPCODES, "32: AND (dp)");
 
-        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x32>");
         return Instruction::Type::size() + 3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -1091,7 +1091,6 @@ struct Opcode<CPU::State, 0xB8>
     {
         PROFILE_IF(PROFILE_OPCODES, "B8: CLV");
 
-        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0xB8>");
         return Instruction::Type::size() + 1 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -1254,7 +1253,6 @@ struct Opcode<CPU::State, 0xD1>
     {
         PROFILE_IF(PROFILE_OPCODES, "D1: CMP (dp),Y");
 
-        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0xD1>");
         return Instruction::Type::size() + 3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -3078,7 +3076,6 @@ struct Opcode<CPU::State, 0x11>
     {
         PROFILE_IF(PROFILE_OPCODES, "11: ORA (dp),Y");
 
-        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x11>");
         return Instruction::Type::size() + 3 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -3613,7 +3610,6 @@ struct Opcode<CPU::State, 0x36>
     {
         PROFILE_IF(PROFILE_OPCODES, "36: ROL dp,X");
 
-        throw NotYetImplementedException("CPU::Opcode<CPU::State, 0x36>");
         return Instruction::Type::size() + 4 + Instruction::Type::applyOperand<Instruction>(state);
     }
 

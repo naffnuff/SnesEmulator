@@ -35,7 +35,7 @@ C7:2   7-m+w       [dir]     m.....mm . CMP [$10]:
 C9:3-m 3-m         imm       m.....mm . CMP #$54:
 CD:3   5-m         abs       m.....mm . CMP $9876:
 CF:4   6-m         long      m.....mm . CMP $FEDBCA:
-D1:2   7-m+w-x+x*p (dir),Y   m.....mm . CMP ($10),Y:*
+D1:2   7-m+w-x+x*p (dir),Y   m.....mm . CMP ($10),Y:
 D2:2   6-m+w       (dir)     m.....mm . CMP ($10):*
 D3:2   8-m         (stk,S),Y m.....mm . CMP ($32,S),Y:*
 D5:2   5-m+w       dir,X     m.....mm . CMP $10,X:
@@ -71,7 +71,7 @@ C8:1   2           imp       x.....x. . INY:
 2D:3   5-m         abs       m.....m. . AND $9876:
 2F:4   6-m         long      m.....m. . AND $FEDBCA:
 31:2   7-m+w-x+x*p (dir),Y   m.....m. . AND ($10),Y:*
-32:2   6-m+w       (dir)     m.....m. . AND ($10):*
+32:2   6-m+w       (dir)     m.....m. . AND ($10):
 33:2   8-m         (stk,S),Y m.....m. . AND ($32,S),Y:*
 35:2   5-m+w       dir,X     m.....m. . AND $10,X:
 37:2   7-m+w       [dir],Y   m.....m. . AND [$10],Y:*
@@ -100,7 +100,7 @@ C8:1   2           imp       x.....x. . INY:
 09:3-m 3-m         imm       m.....m. . ORA #$54:
 0D:3   5-m         abs       m.....m. . ORA $9876:
 0F:4   6-m         long      m.....m. . ORA $FEDBCA:
-11:2   7-m+w-x+x*p (dir),Y   m.....m. . ORA ($10),Y:*
+11:2   7-m+w-x+x*p (dir),Y   m.....m. . ORA ($10),Y:
 12:2   6-m+w       (dir)     m.....m. . ORA ($10):*
 13:2   8-m         (stk,S),Y m.....m. . ORA ($32,S),Y:*
 15:2   5-m+w       dir,X     m.....m. . ORA $10,X:
@@ -130,7 +130,7 @@ C8:1   2           imp       x.....x. . INY:
 26:2   7-2*m+w     dir       m.....mm . ROL $10:
 2A:1   2           acc       m.....mm . ROL:
 2E:3   8-2*m       abs       m.....mm . ROL $9876:
-36:2   8-2*m+w     dir,X     m.....mm . ROL $10,X:*
+36:2   8-2*m+w     dir,X     m.....mm . ROL $10,X:
 3E:3   9-2*m       abs,X     m.....mm . ROL $9876,X:
 66:2   7-2*m+w     dir       m.....m* . ROR $10:
 6A:1   2           acc       m.....m* . ROR:
@@ -163,7 +163,7 @@ FC:3   8           (abs,X)   ........ . JSR ($1234,X):
 18:1   2           imp       .......0 . CLC:
 D8:1   2           imp       ....0... . CLD:
 58:1   2           imp       .....0.. . CLI:
-B8:1   2           imp       .0...... . CLV:*
+B8:1   2           imp       .0...... . CLV:
 38:1   2           imp       .......1 . SEC:
 F8:1   2           imp       ....1... . SED:
 78:1   2           imp       .....1.. . SEI:

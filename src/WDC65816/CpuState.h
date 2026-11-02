@@ -1,16 +1,16 @@
 #pragma once
 
+#include "Output.h"
+#include "Types.h"
+#include "Memory.h"
+#include "Util.h"
+
 #include <iostream>
 #include <vector>
 #include <array>
 #include <map>
 #include <bitset>
 #include <iomanip>
-
-#include "Output.h"
-#include "Types.h"
-#include "Memory.h"
-#include "Util.h"
 
 namespace CPU {
 

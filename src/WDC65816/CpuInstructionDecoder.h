@@ -1,11 +1,12 @@
 #pragma once
 
+#include "CpuState.h"
+
+#include "Instruction.h"
+#include "System.h"
+
 #include <array>
 #include <memory>
-
-#include "System.h"
-#include "Instruction.h"
-#include "CpuState.h"
 
 namespace CPU {
 

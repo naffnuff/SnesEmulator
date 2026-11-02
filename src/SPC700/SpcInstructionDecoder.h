@@ -1,11 +1,11 @@
 #pragma once
 
-#include <array>
-#include <memory>
-
 #include "System.h"
 #include "Instruction.h"
 #include "SpcState.h"
+
+#include <array>
+#include <memory>
 
 namespace SPC {
 

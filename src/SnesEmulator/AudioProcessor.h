@@ -1,18 +1,19 @@
 #pragma once
 
+#include "Common/Exception.h"
+#include "Common/Types.h"
+#include "Common/Output.h"
+#include "Common/Memory.h"
+#include "Common/RegisterManager.h"
+
+#include "AudioOutputBuffer.h"
+
 #include <stdexcept>
 #include <iostream>
 #include <array>
 #include <vector>
 #include <map>
 #include <bitset>
-
-#include "Exception.h"
-#include "Types.h"
-#include "Output.h"
-#include "Memory.h"
-#include "RegisterManager.h"
-#include "AudioOutputBuffer.h"
 
 namespace Audio {
 

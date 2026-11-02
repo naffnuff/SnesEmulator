@@ -1,3 +1,5 @@
+#include "SpcAddressModeImplementations.h"
+
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -6,8 +8,6 @@
 #include <set>
 #include <string>
 #include <algorithm>
-
-#include "SpcAddressModeImplementations.h"
 
 namespace {
 

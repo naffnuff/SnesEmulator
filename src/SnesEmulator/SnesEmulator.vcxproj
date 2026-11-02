@@ -188,6 +188,7 @@
     <ClInclude Include="HdmaInstruction.h" />
     <ClInclude Include="Rom.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="Test.h" />
     <ClInclude Include="VideoData.h" />
     <ClInclude Include="VideoDebugger.h" />
     <ClInclude Include="VideoProcessor.h" />
@@ -201,6 +202,7 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Rom.cpp" />
     <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="Test.cpp" />
     <ClCompile Include="VideoRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>

@@ -1,12 +1,12 @@
 #pragma once
 
+#include "Exception.h"
+#include "Types.h"
+
 #include <memory>
 #include <functional>
 #include <vector>
 #include <sstream>
-
-#include "Exception.h"
-#include "Types.h"
 
 #define DEBUG_MEMORY false
 

@@ -1,13 +1,13 @@
 #pragma once
 
+#include "Shader.h"
+
+#include "Common/Output.h"
+
 #include <iostream>
 #include <vector>
 #include <array>
 #include <string>
-
-#include "Common/Output.h"
-
-#include "Shader.h"
 
 struct GLFWmonitor;
 struct GLFWwindow;

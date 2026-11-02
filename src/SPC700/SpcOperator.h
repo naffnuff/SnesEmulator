@@ -1,7 +1,8 @@
 #pragma once
 
-#include "Exception.h"
 #include "SpcState.h"
+
+#include "Exception.h"
 
 namespace SPC {
 
@@ -445,13 +446,16 @@ class DIV
 public:
     static int invoke(State& state, Access& access, Byte divisor)
     {
-        Word dividend = access.readWord();
-        Byte quotient = uint8_t(dividend / divisor);
-        Byte remainder = dividend % divisor;
-        state.setFlag(State::Flag::v, divisor <= dividend.getHighByte());
-        state.setFlag(State::Flag::h, (divisor & 0xf) <= (dividend.getHighByte() & 0xf));
-        access.writeWord(Word(quotient, remainder));
-        state.updateSignFlags(quotient);
+        if (divisor != 0)
+        {
+            Word dividend = access.readWord();
+            Byte quotient = uint8_t(dividend / divisor);
+            Byte remainder = dividend % divisor;
+            state.setFlag(State::Flag::v, divisor <= dividend.getHighByte());
+            state.setFlag(State::Flag::h, (divisor & 0xf) <= (dividend.getHighByte() & 0xf));
+            access.writeWord(Word(quotient, remainder));
+            state.updateSignFlags(quotient);
+        }
         return 0;
     }
 

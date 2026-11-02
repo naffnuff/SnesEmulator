@@ -1,5 +1,10 @@
 #pragma once
 
+#include "Output.h"
+#include "Types.h"
+#include "Memory.h"
+#include "Util.h"
+
 #include <sstream>
 #include <iostream>
 #include <vector>
@@ -7,11 +12,6 @@
 #include <map>
 #include <bitset>
 #include <iomanip>
-
-#include "Output.h"
-#include "Types.h"
-#include "Memory.h"
-#include "Util.h"
 
 namespace SPC {
 

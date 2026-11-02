@@ -1,16 +1,16 @@
 #pragma once
 
+#ifdef _WIN32
+#define NOMINMAX
+#include <windows.h>
+#endif
+
 #include <map>
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <mutex>
-
-#ifdef _WIN32
-#define NOMINMAX
-#include <windows.h>
-#endif
 
 #define LOG_NAME(NAME) static constexpr const char* NAME = #NAME
 

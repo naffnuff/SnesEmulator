@@ -1,13 +1,13 @@
 ﻿#pragma once
 
-#include <vector>
-#include <thread>
-#include <bitset>
+#include "VideoData.h"
+#include "VideoRenderer.h"
 
 #include "Common/Types.h"
 
-#include "VideoData.h"
-#include "VideoRenderer.h"
+#include <vector>
+#include <thread>
+#include <bitset>
 
 #pragma warning( disable : 26110 ) // Caller failing to hold lock <lock> before calling function <func>
 

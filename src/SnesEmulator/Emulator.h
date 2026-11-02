@@ -1,24 +1,23 @@
 #pragma once
 
-#include <ctime>
-#include <set>
-#include <condition_variable>
-
-#include "Common/Instruction.h"
-#include "Common/System.h"
-
-#include "WDC65816/CpuState.h"
-
-#include "WDC65816/CpuInstructionDecoder.h"
-
-#include "Rom.h"
-#include "Debugger.h"
-
 #include "VideoRenderer.h"
 #include "VideoProcessor.h"
 #include "VideoRegisters.h"
 
 #include "AudioSystem.h"
+
+#include "Rom.h"
+#include "Debugger.h"
+
+#include "Common/Instruction.h"
+#include "Common/System.h"
+
+#include "WDC65816/CpuState.h"
+#include "WDC65816/CpuInstructionDecoder.h"
+
+#include <ctime>
+#include <set>
+#include <condition_variable>
 
 class Emulator
 {

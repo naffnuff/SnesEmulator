@@ -1,16 +1,35 @@
+#include "Output.h"
+#include "Emulator.h"
+#include "VideoRenderer.h"
+#include "Test.h"
+
 #include <iostream>
 #include <bitset>
 #include <thread>
 #include <filesystem>
 
-#include "Output.h"
-#include "Emulator.h"
-#include "VideoRenderer.h"
+#define RUN_TESTS false
 
 int main(int, char**)
 {
     Output::System outputSystem("logconfig.txt");
     Output output(outputSystem, "main");
+
+#if RUN_TESTS
+    try
+    {
+        runTests();
+    }
+    catch (const std::exception& e)
+    {
+        output.error("Test failure: ", e.what());
+        std::getchar();
+        exit(0);
+    }
+
+    std::getchar();
+    exit(0);
+#endif
 
     while (true)
     {
@@ -33,7 +52,7 @@ int main(int, char**)
                             {
                                 std::string filename = entry.path().filename().string();
                                 titles.push_back(filename);
-                                output.printLine(lock, titles.size(), ". ", filename);
+                                output.printLine(lock, titles.size(), ".\t", filename);
                             }
                         }
                         if (titles.empty())
@@ -48,8 +67,7 @@ int main(int, char**)
                     while (pickedTitle.empty())
                     {
                         output.printLine(lock, "Enter command or game index (h for help): ");
-                        std::string command = "43";
-                        //command = "18";
+                        std::string command = "8";
                         std::getline(std::cin, command);
                         try
                         {

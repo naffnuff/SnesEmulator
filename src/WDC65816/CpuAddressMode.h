@@ -1,9 +1,10 @@
 #pragma once
 
+#include "CpuState.h"
+
 #include "Exception.h"
 #include "Instruction.h"
 #include "Memory.h"
-#include "CpuState.h"
 
 #include "Profiler.h"
 

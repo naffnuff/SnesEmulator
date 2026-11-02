@@ -1,9 +1,10 @@
 #pragma once
 
-#include "Exception.h"
 #include "SpcState.h"
 #include "SpcAddressMode.h"
 #include "SpcOperator.h"
+
+#include "Exception.h"
 
 #include "Profiler.h"
 
@@ -561,7 +562,6 @@ struct Opcode<SPC::State, 0x1B>
     {
         PROFILE_IF(PROFILE_OPCODES, "1B: ASL d+X");
 
-        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x1B>");
         return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -1377,7 +1377,6 @@ struct Opcode<SPC::State, 0x77>
     {
         PROFILE_IF(PROFILE_OPCODES, "77: CMP A, [d]+Y");
 
-        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x77>");
         return  6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -3449,7 +3448,6 @@ struct Opcode<SPC::State, 0x16>
     {
         PROFILE_IF(PROFILE_OPCODES, "16: OR A, !a+Y");
 
-        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0x16>");
         return  5 + Instruction::Type::applyOperand<Instruction>(state);
     }
 
@@ -4073,7 +4071,6 @@ struct Opcode<SPC::State, 0xA9>
     {
         PROFILE_IF(PROFILE_OPCODES, "A9: SBC dd, ds");
 
-        throw NotYetImplementedException("SPC::Opcode<SPC::State, 0xA9>");
         return  6 + Instruction::Type::applyOperand<Instruction>(state);
     }
 

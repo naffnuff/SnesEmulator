@@ -1,13 +1,13 @@
 #pragma once
 
-#include <vector>
+#include "VideoRegisters.h"
+
+#include "WDC65816/CpuState.h"
 
 #include "Common/Instruction.h"
 #include "Common/Memory.h"
 
-#include "WDC65816/CpuState.h"
-
-#include "VideoRegisters.h"
+#include <vector>
 
 class DmaInstruction : public Instruction<CPU::State>
 {

@@ -4,6 +4,8 @@
 #include "System.h"
 #include "Output.h"
 
+#include <bitset>
+
 template<typename Memory, Output::Color DebugColor>
 class RegisterManager
 {

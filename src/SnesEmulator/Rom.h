@@ -1,14 +1,15 @@
 #pragma once
 
+#include "WDC65816/CpuState.h"
+
+#include "Common/Types.h"
+
 #include <cmath>
 #include <fstream>
 #include <string>
 #include <vector>
 #include <bitset>
 #include <algorithm>
-
-#include "Common/Types.h"
-#include "WDC65816/CpuState.h"
 
 class Emulator;
 

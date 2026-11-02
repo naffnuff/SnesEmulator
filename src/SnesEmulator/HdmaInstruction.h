@@ -1,11 +1,11 @@
 #pragma once
 
-#include <vector>
+#include "WDC65816/CpuState.h"
 
 #include "Common/Instruction.h"
 #include "Common/Memory.h"
 
-#include "WDC65816/CpuState.h"
+#include <vector>
 
 class HdmaInstruction : public Instruction<CPU::State>
 {

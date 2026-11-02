@@ -1,17 +1,17 @@
 #pragma once
 
-#include <iostream>
-#include <array>
-
-#include "Common/System.h"
+#include "AudioRegisters.h"
+#include "AudioProcessor.h"
 
 #include "SPC700/SpcState.h"
 #include "SPC700/SpcInstructionDecoder.h"
 
 #include "Debugger.h"
 
-#include "AudioRegisters.h"
-#include "AudioProcessor.h"
+#include "Common/System.h"
+
+#include <iostream>
+#include <array>
 
 class AudioSystem
 {

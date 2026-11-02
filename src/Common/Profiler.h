@@ -1,9 +1,9 @@
 #pragma once
 
+#include "Output.h"
+
 #include <chrono>
 #include <unordered_map>
-
-#include "Output.h"
 
 struct CompilationUnitProfilerCount
 {

@@ -1,7 +1,8 @@
 #pragma once
 
-#include "Exception.h"
 #include "CpuState.h"
+
+#include "Exception.h"
 
 #include "Profiler.h"
 

@@ -1,22 +1,21 @@
 #pragma once
 
-#include <iostream>
-#include <fstream>
-#include <algorithm>
-#include <set>
-
-#include "Common/System.h"
-
-#include "WDC65816/CpuState.h"
-#include "SPC700/SpcState.h"
-
-#include "Instruction.h"
-
 #include "VideoProcessor.h"
 #include "VideoRegisters.h"
 #include "VideoDebugger.h"
 
 #include "AudioRegisters.h"
+
+#include "WDC65816/CpuState.h"
+#include "SPC700/SpcState.h"
+
+#include "Common/System.h"
+#include "Common/Instruction.h"
+
+#include <iostream>
+#include <fstream>
+#include <algorithm>
+#include <set>
 
 template<typename State>
 struct Breakpoint

@@ -1,16 +1,16 @@
 #include "Emulator.h"
 
-#include <fstream>
-#include <iostream>
-#include <string>
-
-#include "Common/Exception.h"
-#include "Common/Memory.h"
-
 #include "VideoDebugger.h"
 
 #include "DmaInstruction.h"
 #include "HdmaInstruction.h"
+
+#include "Common/Exception.h"
+#include "Common/Memory.h"
+
+#include <fstream>
+#include <iostream>
+#include <string>
 
 #define PROFILING_ENABLED false
 

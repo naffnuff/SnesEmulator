@@ -1,11 +1,11 @@
 #include "AudioProcessor.h"
 
-#include <iostream>
+#include "Common/System.h"
+#include "Common/Util.h"
 
 #include <portaudio.h>
 
-#include "System.h"
-#include "Util.h"
+#include <iostream>
 
 #define PROFILING_ENABLED false
 
@@ -329,7 +329,7 @@ void Processor::Voice::calculateEnvelope()
 // Gaussian table by libopenspc
 // Take note of the 'int32' datatype. These 11-bit hex values are all
 // positive and must be treated as signed.
-static const int32_t gauss_coeffs[512] = {
+/*static const int32_t gauss_coeffs[512] = {
 0x000, 0x000, 0x000, 0x000, 0x000, 0x000, 0x000, 0x000,
 0x000, 0x000, 0x000, 0x000, 0x000, 0x000, 0x000, 0x000,
 0x001, 0x001, 0x001, 0x001, 0x001, 0x001, 0x001, 0x001,
@@ -394,7 +394,7 @@ static const int32_t gauss_coeffs[512] = {
 0x50C, 0x50D, 0x50E, 0x50F, 0x510, 0x511, 0x511, 0x512,
 0x513, 0x514, 0x514, 0x515, 0x516, 0x516, 0x517, 0x517,
 0x517, 0x518, 0x518, 0x518, 0x518, 0x518, 0x519, 0x519
-};
+};*/
 
 //  S1.
 template<>

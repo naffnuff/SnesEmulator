@@ -1,9 +1,10 @@
 #pragma once
 
+#include "SpcState.h"
+
 #include "Exception.h"
 #include "Instruction.h"
 #include "Memory.h"
-#include "SpcState.h"
 
 #include "Profiler.h"
 

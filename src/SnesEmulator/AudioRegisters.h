@@ -1,16 +1,16 @@
 #pragma once
 
-#include <vector>
-#include <functional>
+#include "AudioProcessor.h"
 
 #include "SPC700/SpcState.h"
 
-#include "Util.h"
-#include "RegisterManager.h"
-#include "System.h"
-#include "Memory.h"
+#include "Common/Util.h"
+#include "Common/RegisterManager.h"
+#include "Common/System.h"
+#include "Common/Memory.h"
 
-#include "AudioProcessor.h"
+#include <vector>
+#include <functional>
 
 namespace Audio
 {

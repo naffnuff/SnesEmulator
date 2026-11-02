@@ -1,10 +1,10 @@
 #pragma once
 
+#include "Exception.h"
+
 #include <stdint.h>
 #include <iostream>
 #include <iomanip>
-
-#include "Exception.h"
 
 #pragma warning( disable : 4702 ) // unreachable code
 #pragma warning( disable : 4100 ) // unreferenced formal parameter
@@ -55,11 +55,17 @@ struct BitMask
 };
 
 template<typename T>
+bool isOverflow(T augend, T addend, T sum)
+{
+    return augend.isNegative() == addend.isNegative() && addend.isNegative() != sum.isNegative();
+}
+
+template<typename T>
 T binaryAdd(T augend, T addend, bool& unsignedCarry, bool& signedOverflow, bool& halfCarry)
 {
     uint32_t sum = uint32_t(augend) + uint32_t(addend) + unsignedCarry;
     T result(sum);
-    T halfCarryHighBitMask = 1 << (T::bitCount - 4);
+    T halfCarryHighBitMask = T(1) << (T::bitCount - 4);
     T halfCarryLowBitsMask = halfCarryHighBitMask - 1;
     halfCarry = ((augend & halfCarryLowBitsMask) + (addend & halfCarryLowBitsMask) + unsignedCarry) & halfCarryHighBitMask;
     bool halfCarryAlt = (augend ^ addend ^ result) & halfCarryHighBitMask;
@@ -67,7 +73,7 @@ T binaryAdd(T augend, T addend, bool& unsignedCarry, bool& signedOverflow, bool&
         throw std::logic_error(__FUNCTION__ + std::string(" bad half-carry calculation"));
     }
     unsignedCarry = sum & 1 << T::bitCount;
-    signedOverflow = augend.isNegative() == addend.isNegative() && addend.isNegative() != result.isNegative();
+    signedOverflow = isOverflow(augend, addend, result);
     return result;
 }
 
@@ -78,9 +84,24 @@ T binarySubtract(T minuhend, T subtrahend, bool& invertedUnsignedBorrow, bool& s
 }
 
 template<typename T>
-T decimalAdd(T augend, T addend, bool& unsignedCarry, bool& signedOverflow)
+T decimalAdd(T augend, T addend, bool& carry, bool& overflow)
 {
-    return T::decimalAdd(augend, addend, unsignedCarry, signedOverflow);
+    T sum = carry ? T(1) : T(0);
+    for (int offset = 0; offset < T::bitCount; offset += 4)
+    {
+        T nibbleMask = T(0xf) << offset;
+        sum = sum + T(augend & nibbleMask) + T(addend & nibbleMask);
+        carry = sum >= (T(0x0a) << offset);
+        if (carry)
+        {
+            T fullBitmask = (T(0x10) << offset) - T(1);
+            sum = ((sum + (T(0x06) << offset)) & fullBitmask) + (T(0x10) << offset);
+        }
+    }
+
+    overflow = isOverflow(augend, addend, sum);
+
+    return sum;
 }
 
 template<typename T>
@@ -237,22 +258,31 @@ public:
         return getBit(7);
     }
 
-    static Byte decimalAdd(Byte augend, Byte addend, bool& unsignedCarry, bool& signedOverflow)
-    {
-        int sumLow = (augend & 0x0f) + (addend & 0x0f) + unsignedCarry;
-        if (sumLow >= 0x0a) {
-            sumLow = ((sumLow + 0x06) & 0x0f) + 0x10;
-        }
-        int sum = (augend & 0xf0) + (addend & 0xf0) + sumLow;
-        if (sum >= 0xa0) {
-            sum += 0x60;
-        }
-        unsignedCarry = sum >= 0x100;
-        int signedSum = int8_t(augend & 0xf0) + int8_t(addend & 0xf0) + int8_t(sumLow);
-        signedOverflow = signedSum < -128 || signedSum > 127;
-        return Byte(sum);
-    }
+    /*
+        SBC B: A = A-B+C-1
 
+ 	    6502	65C02	65816
+        A	Seq. 3	Seq. 4	Seq. 3
+        C	bin	bin	bin
+        N	bin	dec	dec
+        V	bin	bin	bin
+        Z	bin	dec	dec
+        Seq. 3:
+
+        3a. AL = (A & $0F) - (B & $0F) + C-1
+        3b. If AL < 0, then AL = ((AL - $06) & $0F) - $10
+        3c. A = (A & $F0) - (B & $F0) + AL
+        3d. If A < 0, then A = A - $60
+        3e. The accumulator result is the lower 8 bits of A
+
+        Seq. 4:
+
+        4a. AL = (A & $0F) - (B & $0F) + C-1
+        4b. A = A - B + C-1
+        4c. If A < 0, then A = A - $60
+        4d. If AL < 0, then A = A - $06
+        4e. The accumulator result is the lower 8 bits of A
+    */
     static Byte decimalSubtract(Byte minuhend, Byte subtrahend, bool& invertedUnsignedBorrow, bool& signedOverflow)
     {
         int differenceLow = (minuhend & 0x0f) - (subtrahend & 0x0f) + invertedUnsignedBorrow - 1;
@@ -439,16 +469,31 @@ public:
         value = Word(Byte(value), highByte);
     }
 
-    static Word decimalAdd(Word augend, Word addend, bool& unsignedCarry, bool& signedOverflow)
-    {
-        throw NotYetImplementedException("Decimal addition for Word");
-        return 0;
-    }
-
     static Word decimalSubtract(Word minuhend, Word subtrahend, bool& invertedUnsignedBorrow, bool& signedOverflow)
     {
-        throw NotYetImplementedException("Decimal subtraction for Word");
-        return 0;
+        int differenceLow = (minuhend & 0x000f) - (subtrahend & 0x000f) + invertedUnsignedBorrow - 1;
+        if (differenceLow < 0)
+        {
+            differenceLow = ((differenceLow - 0x0006) & 0x000f) - 0x0010;
+        }
+        int difference1 = (minuhend & 0x00f0) - (subtrahend & 0x00f0) + differenceLow;
+        if (difference1 < 0)
+        {
+            difference1 -= 0x0060;
+        }
+        int difference2 = (minuhend & 0x0f00) - (subtrahend & 0x0f00) + difference1;
+        if (difference2 < 0)
+        {
+            difference2 -= 0x0600;
+        }
+        int difference3 = (minuhend & 0xf000) - (subtrahend & 0xf000) + difference2;
+        if (difference3 < 0)
+        {
+            difference3 -= 0x6000;
+        }
+        bool dummy = false;
+        Types::binarySubtract(minuhend, subtrahend, invertedUnsignedBorrow, signedOverflow, dummy);
+        return Word(difference3);
     }
 
 private:

@@ -1,18 +1,18 @@
 #include "VideoRenderer.h"
 
-#include <cmath>
-
-#include <iostream>
-#include <array>
-#include <vector>
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
 #ifdef _WIN32
 #define NOMINMAX
 #include <windows.h>
 #endif
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include <cmath>
+
+#include <iostream>
+#include <array>
+#include <vector>
 
 namespace Video
 {
