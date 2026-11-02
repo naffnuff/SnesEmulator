@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<!-- saved from url=(0054)https://wiki.superfamicom.org/bit-rate-reduction-(brr) -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="theme-color" content="#222222">
+<meta name="format-detection" content="telephone=no">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bit Rate Reduction (BRR) | Super Famicom Development Wiki</title>
+<link rel="stylesheet" href="./Bit Rate Reduction (BRR) _ Super Famicom Development Wiki_files/style.css" media="all">
+<link rel="apple-touch-icon" href="https://wiki.superfamicom.org/apple-touch-icon.png">
+<link rel="preconnect" href="https://snes.in/" crossorigin="">
+<link rel="dns-prefetch" href="https://snes.in/">
+<meta property="og:type" content="article">
+<meta name="twitter:card" content="summary">
+<meta name="description" content="BRR, or Bit Rate Reduction, is the sound encoding scheme used by the SPC700, the sound chip in the SNES.">
+<meta property="og:description" content="BRR, or Bit Rate Reduction, is the sound encoding scheme used by the SPC700, the sound chip in the SNES.">
+<meta property="twitter:description" content="BRR, or Bit Rate Reduction, is the sound encoding scheme used by the SPC700, the sound chip in the SNES.">
+<meta property="og:title" content="Bit Rate Reduction (BRR)">
+<meta property="twitter:title" content="Bit Rate Reduction (BRR)">
+<meta property="og:site_name" content="Super Famicom Development Wiki">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:site" content="@superfamicom">
+<meta name="twitter:creator" content="@superfamicom">
+<meta property="article:publisher" content="https://wiki.superfamicom.org">
+<meta property="og:url" content="https://wiki.superfamicom.org/bit-rate-reduction-(brr)">
+<link rel="canonical" href="https://wiki.superfamicom.org/bit-rate-reduction-(brr)">
+<meta property="article:modified_time" content="2023-06-13T02:26:25.146Z">
+<meta property="og:updated_time" content="2023-06-13T02:26:25.146Z">
+<script>window.basePath = '';</script>
+</head>
+<body class="dark-theme">
+<header class="navbar" role="banner">
+  <div class="background">
+    <div class="container">
+      <div class="navbar-header">
+        <h2 class="navbar-brand">
+          <a href="https://wiki.superfamicom.org/" title="Super Famicom Development Wiki">SFC Development Wiki</a>
+        </h2>
+        <form role="search" method="get" name="search" class="navbar-form" action="https://wiki.superfamicom.org/search">
+          <input type="text" aria-label="Search" value="" name="s" class="form-control search-query" placeholder="🔍 Search Super Famicom Development Wiki" required="">
+        </form>
+        <div class="navbar-buttons">
+          <div class="navbar-button">
+            <button class="theme-toggle" type="button" title="Toggle Light Mode &amp; Dark Mode">🌚</button>
+          </div>
+          <div class="navbar-button">
+            <a href="https://wiki.superfamicom.org/tags" class="button tags" title="Browse Document Tags">Browse Tags</a>
+          </div>
+          <div class="navbar-button">
+            <a href="https://wiki.superfamicom.org/new" class="button new-document" title="Create New Document">New Document</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+<div class="flash-messages container">
+</div>
+<div class="before-main-wrapper">
+  <div class="header-wrapper">
+    <div class="container">
+      <div class="header-titles">
+        <h1>Bit Rate Reduction (BRR)</h1>
+        <a class="button" href="https://wiki.superfamicom.org/bit-rate-reduction-(brr)/edit" title="Edit">✏️ Edit</a>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="container main-section detail">
+  <div class="content">
+    <div class="row">
+      <main class="col-sm-12" role="main">
+                <article><h3 id="introduction-0">Introduction</h3>
+<p>Due to the requests of several people, the lack of documentation in this area, and a hope to spring the SNES emulation "scene" forward, I am going to try to describe the BRR encoding scheme in this doc. Everything here, I either read in publicly available documentation, or discovered myself through trial and error. I cannot guarantee the accuracy of this doc, and I will not be responsible for errors, either typographical or otherwise. However, if you are satisfied with the output of SNESSOR, the SNES SOund Ripper, then this doc should work for you.</p>
+<h3 id="brr-3">BRR</h3>
+<p><strong>BRR</strong>, or <strong>Bit Rate Reduction</strong>, is the sound encoding scheme used by the <strong>SPC700</strong>, the sound chip in the SNES.  It has a compression ratio of 32:9, meaning that for every 32 bytes of 16-bit PCM there are 9 bytes of BRR.  These 9 bytes consist of 1 header byte, and 16 nibble of data, as follows:</p>
+<pre><code> _______
+|       | byte
+|Header |  1
+|       |
+|-------|
+|data 1 | byte
+| - - - |  2
+|data 2 |
+|-------|
+|data 3 | byte 
+| - - - |  3
+|data 4 |
+|-------|
+/       /
+/       /
+|-------|
+|data 15| byte
+| - - - |  9
+|data 16|
+|_______|
+</code></pre>
+<p>The header byte is decoded as follows:</p>
+<pre><code>xxxxxxxx
+||||||||____END  bit - determines the end of a sample
+|||||||_____LOOP bit - determines whether a sample will loop
+||||||______
+|||||_______&gt;FILTER bits - determines which filter to apply (described later)
+||||________
+|||_________\
+||__________ &gt;RANGE bits - see below
+|___________/
+</code></pre>
+<p>The END bit is clear for every 9-byte block until the last block of a sample. When you encounter this bit, you should finish reading the following 8 bytes, then stop.</p>
+<p>The LOOP bit is only effective in the last header block of a sample, the one where you set the END bit. Setting it causes the DSP to continue playing from a specified loop address. See <a href="http://problemkaputt.de/fullsnes.htm#snesapudspbrrsamples" rel="external nofollow noopener noreferrer" target="_blank">FullSNES</a> for super awesome information. If you're trying to create music on SPC700, read on: The "loop address" is specified by you as part of the Sample's "Source" Entry. Here is a quick primer:</p>
+<p>In the SPC RAM, a "Source Directory" location is specified by writing to the "DIR" DSP register. Be sure to learn how to write to the SPC's DSP registers, it's an indirect kind of operation. Hint: 0xf2,0xf3. Anyways, the "Source Directory" location describes each Sample's start-address and loop address. The Directory must be built by you. It is a simple table composed of 4-byte entries. The first word is the Sample-Start Address, and the 2nd word is the Sample Loop-Address. Point them to BRR-header blocks. The loop-point address is typically a sub-address of your sample, and I personally recommend you set it to a valid BRR sample location, even if unused. Try creating a dummy sample block of silence. I recommend this because FullSNES states that even non-looped samples jump to the loop address after initiating release envelope, and that makes me wonder if that is audible.. I will investigate into this personally and update this wiki. You might be able to be creative and use other sample addresses for the loop-point address.</p>
+<p>If you are designing a looped sample, take care to ensure the looped section starts and ends on a multiple of 16 samples. This is because the smallest unit of BRR is 16 samples. Non-aligned loops will always carry more information than they should - that could wind up being extra silence or sound.</p>
+<p>The FILTER bits are described below.</p>
+<p>The RANGE bits tell how to read each nibble of data. Basically, you take the nibble, and you shift it left RANGE times. The nibble is signed, and this must be taken into account. Note that a RANGE greater than 12 would shift the nibble past a 16-bit value, so RANGE values from 12 to 15 are invalid, and it is on this that the SNESSOR sample search is based, among other things.</p>
+<p>If that wasn't especially clear, I'm sorry.  Let's try some example code to help:</p>
+<pre><code>int range, end=0, loop, filter, counter, temp; // Size of these doesn't matter
+short input, output[MAXSAMPLEN];               // These must be 16-bit
+int now = 0;                                   // Pointer to where we are in output[];
+
+while(end == 0){
+    range = GetNextByte();     // Let's just put the header here for now
+    end = range&amp;1;         // END bit is bit 0
+    loop = range&amp;2;        // LOOP bit is bit 1
+    filter = (range &gt;&gt; 2) &amp; 3; // FILTER is bits 2 and 3
+    range &gt;&gt;= 4;               // RANGE is the upper 4 bits
+
+    for(counter = 0; counter &lt; 8; counter++){ // Get the next 8 bytes
+        temp = GetNextByte();                 // Wherever you want to get this from
+        input = temp&gt;&gt;4;                      // Get the first nibble of the byte
+        input &amp;= 0xF;
+        if(input &gt;= 8){                        // The nibble is negative, so make the 
+            input |= 0xFFF0;                  // 16-bit value negative
+        }
+        output[now] = input &lt;&lt; range;         // Apply the RANGE value
+
+        // Filter processing goes here (explained later)
+
+        now++;                                // Advance our output pointer
+
+        // Now do the same thing for the other nibble
+
+        input = temp &amp; 0xF;                   // Get the second nibble of the byte
+        if(input &gt;= 8){                        // The nibble is negative, so make the 
+            input |= 0xFFF0;                  // 16-bit value negative
+        }
+        output[now] = input &lt;&lt; range;         // Apply the RANGE value
+
+        // Filter processing goes here (explained later)
+
+        now++;                                // Advance our output pointer
+    }
+    // We're done with all 8 bytes, and if the END bit was present, we're done with the whole sample.
+}
+</code></pre>
+<p>Note that this does NOT deal with the filter bits, so lets discuss that now:</p>
+<h3 id="filters-94">Filters</h3>
+<p>There are 3 BRR filters. A filter value of zero means apply no filter.</p>
+<ol>
+<li><strong>Filter 1</strong>: This filter is relatively simple.  All you have to do, is take the 16-bit sample that was last output, multiply it by the fraction 15/16, and add the value you got by decoding the nibble as usual. In all 3 filters, this decoded value will serve as an "error" between the calculated value and the actual one.</li>
+<li><strong>Filter 2</strong>: This filter and the next are a little more complicated. To calculate the value, multiply the last sample output by the fraction 61/32. Then, subtract from it the value when the sample before that is multiplied by the fraction 15/16.  Then, add the value decoded from the nibble as always.</li>
+<li><strong>Filter 3</strong>: This filter is identical to the last one, except the fractions are different.  The fraction for the previous sample is 115/64, and for the sample before that, 13/16.</li>
+</ol>
+<p>Now, I KNOW that explanation is going to need some example code.  Assuming that output[now] already contains the value decoded by shifting the nibble by the range(see example code above), processing the filters is as follows:</p>
+<pre><code>if(filter==1){
+    output[now] += (short)((double)output[now-1] * 15/16);
+}
+else if(filter==2){
+    output[now]+=(short)(((double)output[now-1] * 61/32) - ((double)output[now-2] * 15/16));
+}
+else if(filter==3){
+    output[now]+=(short)(((double)output[now-1] * 115/64) - ((double)output[now-2] * 13/16));
+}
+</code></pre>
+<h3 id="closing-113">Closing</h3>
+<p>I think that should about do it...  If you didn't catch all that, I'm sorry, this is my first doc.  If someone thinks they can describe it better, please do.</p>
+<h3 id="thanks-116">Thanks</h3>
+<ul>
+<li>Everyone that ever wrote an SPC doc, especially:</li>
+<li>Gau of the Veldt for his SPC doc,</li>
+<li>Ledi for his APU manual (TODO.TXT),</li>
+<li>Uxorious, who didn't write a doc that I know of, but did write the Cool 95 plugin that can read BRR, from which I learned how to do the filters, and who I still wonder how he learned them,</li>
+<li><em>Demo</em> of ZSNES for helping to make a great emulator, and for his support.</li>
+</ul>
+<p>And anyone else that feels they should be thanked!</p>
+<p><em>The Bit Rate Reduction sound encoding scheme, as interpreted by Butcha</em></p>
+<p>Notes by Bazz on the loop stuff.</p></article>
+      </main>
+    </div>
+    <div class="row actions">
+      <main class="col-sm-12">
+        <a class="button" href="https://wiki.superfamicom.org/bit-rate-reduction-(brr)/edit" title="Edit">✏️ Edit</a>
+        <a class="button" href="https://wiki.superfamicom.org/bit-rate-reduction-(brr)/history" title="View Document Edit History">📕 View History</a>
+      </main>
+    </div>
+    <div class="row bottom">
+      <main class="col-sm-12">
+        <div class="row content-sections">
+          <div class="col-sm-4">
+            <div class="section">
+              <h2>Related Documents</h2>
+              <ul class="related-documents">
+                <li><a href="https://wiki.superfamicom.org/65816-reference" title="65816 Reference">65816 Reference</a></li>
+                <li><a href="https://wiki.superfamicom.org/agenda-music-format" title="Agenda Music Format">Agenda Music Format</a></li>
+                <li><a href="https://wiki.superfamicom.org/bs-x-bios-functions" title="BS-X BIOS Functions">BS-X BIOS Functions</a></li>
+                <li><a href="https://wiki.superfamicom.org/background-mode-capability-table" title="Background Mode Capability Table">Background Mode Capability Table</a></li>
+                <li><a href="https://wiki.superfamicom.org/background-priority-chart" title="Background Priority Chart">Background Priority Chart</a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="section">
+              <h2>Recent Documents</h2>
+              <ul class="recent-documents">
+                <li><a href="https://wiki.superfamicom.org/backgrounds" title="Backgrounds">Backgrounds</a></li>
+                <li><a href="https://wiki.superfamicom.org/gd-leen" title="GD Leen">GD Leen</a></li>
+                <li><a href="https://wiki.superfamicom.org/daikaijuu-monogatari-2" title="Daikaijuu Monogatari 2">Daikaijuu Monogatari 2</a></li>
+                <li><a href="https://wiki.superfamicom.org/bubsy-in-claws-encounters-of-the-furred-kind" title="Bubsy in Claws Encounters of the Furred Kind">Bubsy in Claws Encounters of the Furred Kind</a></li>
+                <li><a href="https://wiki.superfamicom.org/breath-of-fire-2" title="Breath of Fire 2">Breath of Fire 2</a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="section">
+              <h2>Popular Documents</h2>
+              <ul class="popular-documents">
+                <li><a href="https://wiki.superfamicom.org/spc700-reference" title="SPC700 Reference">SPC700 Reference</a></li>
+                <li><a href="https://wiki.superfamicom.org/registers" title="Registers">Registers</a></li>
+                <li><a href="https://wiki.superfamicom.org/memory-mapping" title="Memory Mapping">Memory Mapping</a></li>
+                <li><a href="https://wiki.superfamicom.org/65816-reference" title="65816 Reference">65816 Reference</a></li>
+                <li><a href="https://wiki.superfamicom.org/schematics-ports-and-pinouts" title="Schematics, Ports, and Pinouts">Schematics, Ports, and Pinouts</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+</div>
+
+<footer class="footer" role="contentinfo">
+  <div class="container">
+    <div class="row">
+      ©2025 Super Famicom Development Wiki | 🐌 | 🌺 | <a href="https://github.com/uttori/uttori-wiki" rel="external" title="Powered by Uttori Wiki">🔌 by Uttori Wiki</a> | <a href="https://twitter.com/superfamicom" rel="external" title="Help &amp; Support">Help &amp; Support</a>
+    </div>
+  </div>
+</footer>
+<script type="module" src="./Bit Rate Reduction (BRR) _ Super Famicom Development Wiki_files/page.js.download"></script><script async="" src="./Bit Rate Reduction (BRR) _ Super Famicom Development Wiki_files/js"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-RC5NJVRC8F');
+</script>
+
+
+</body></html>
