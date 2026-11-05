@@ -2,12 +2,93 @@
 
 #include "VideoProcessor.h"
 
+//#define DEBUGCG
 //#define DEBUGOAM
 //#define DEBUGBG
 //#define DEBUGSPRITES
 //#define DEBUGMODE7
 
 namespace Video {
+
+class CgViewer
+{
+public:
+
+#ifdef DEBUGCG
+    CgViewer(Processor& video, int windowXPosition, int windowYPosition)
+        : video(video)
+        , renderer(windowXPosition, windowYPosition, 0x10, 0x10, 64.f, true, video.output)
+    {
+        thread = std::thread(std::ref(*this));
+    }
+
+    ~CgViewer()
+    {
+        running = false;
+        thread.join();
+    }
+
+    void operator()()
+    {
+        renderer.title = "CG viewer";
+        renderer.initialize();
+        while (running && renderer.isRunning())
+        {
+            renderer.update();
+        }
+    }
+
+    void update()
+    {
+        renderer.clearDisplay(0x7c1f);
+
+        static std::chrono::steady_clock::time_point previousTime = std::chrono::steady_clock::now();
+
+        std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
+        const bool print = currentTime - previousTime >= std::chrono::seconds(5);
+        if (print)
+        {
+            previousTime = currentTime;
+        }
+
+        for (int row = 0; row < 0x10; ++row)
+        {
+            for (int col = 0; col < 0x10; ++col)
+            {
+                Word color = video.cgram.getWord(Word((row << 4) | col));
+                renderer.setPixel(row, col, color);
+
+                if (print)
+                {
+                    Long unpacked(uint8_t((color & 0x7C00) >> 10), uint8_t((color & 0x3E0) >> 5), uint8_t(color & 0x1f));
+                    std::cout << color << " (" << unpacked << ")\t";
+                }
+            }
+            if (print)
+            {
+                std::cout << std::endl;
+            }
+        }
+        if (print)
+        {
+            std::cout << std::endl;
+        }
+        renderer.swapPixelBuffers();
+    }
+
+    std::thread thread;
+    Renderer renderer;
+    Processor& video;
+    bool running = true;
+#else
+    CgViewer(Processor&, int, int)
+    {
+    }
+    void update()
+    {
+    }
+#endif
+};
 
 class OamViewer
 {
@@ -96,12 +177,6 @@ public:
                         }
                     }
                 }
-            }
-            columnOffset += spriteSize;
-            if (columnOffset >= renderer.width)
-            {
-                columnOffset = 0;
-                rowOffset += spriteSize;
             }
         }
         renderer.swapPixelBuffers();

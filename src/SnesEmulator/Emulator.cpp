@@ -49,6 +49,7 @@ void Emulator::initialize()
 
 void Emulator::run()
 {
+    Video::CgViewer cgViewer(videoProcessor, 1080, 760);
     Video::OamViewer oamViewer(videoProcessor, 1080, 760);
     Video::BackgroundViewer background1Viewer(videoProcessor, Video::Layer::Background1, 0, 10);
     Video::BackgroundViewer background2Viewer(videoProcessor, Video::Layer::Background2, Video::rendererWidth * 2 + 20, 10);
@@ -287,6 +288,7 @@ void Emulator::run()
 
                         //videoProcessor.renderer.update();
 
+                        cgViewer.update();
                         oamViewer.update();
                         background1Viewer.update();
                         background2Viewer.update();

@@ -140,6 +140,7 @@ private:
 
     friend class Processor;
     friend class Registers;
+    friend class CgViewer;
     friend class OamViewer;
     friend class BackgroundViewer;
     friend class SpriteLayerViewer;

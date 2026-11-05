@@ -566,7 +566,6 @@ public:
                 writeToVram(value, false, !incrementVramOnHighByte);
             }
         );
-
         makeWriteRegister(0x2119, "VRAM Data Write high byte", false,
             [this](Byte value)
             {
@@ -736,15 +735,17 @@ public:
         makeWriteRegister(0x2122, "CGRAM Data Write", false,
             [this](Byte value)
             {
-                Word cgramAddress = processor.cgram.currentAddress;
+                if (processor.cgram.currentHighTableSelect)
+                {
+                    value = value & 0x7f;
+                }
 
                 processor.cgram.writeByte(value);
 
-                /*if (cgramHighTable) {
-                    int row = cgramAddress / 0x10;
-                    int column = cgramAddress & 0xf;
-                    processor.cgramRenderer.setPixel(row, column, processor.cgram.readWord(cgramAddress));
-                }*/
+                if (value != 0)
+                {
+                    //pauseRequested = true;
+                }
             }
         );
 
@@ -1092,6 +1093,27 @@ public:
             }*/
         );
 
+        /*
+            2139 r l++?- VMDATALREAD* - VRAM Data Read low byte
+            213a r h++?- VMDATAHREAD* - VRAM Data Read high byte
+                    xxxxxxxx xxxxxxxx
+
+                    Simply, this reads data from VRAM. The address is incremented when
+                    either $2139 or $213a is read, depending on the setting of bit 7 of
+                    $2115.
+
+                    Actually, the reading is more complex. When either of these registers
+                    is read, the appropriate byte from a word-sized buffer is returned. A
+                    word from VRAM is loaded into this buffer just *before* the VRAM
+                    address is incremented. The actual data read and the amount of the
+                    increment depend on the low 4 bits of $2115. The effect of this is
+                    that a 'dummy read' is required after setting $2116-7 before you start
+                    getting the actual data.
+
+                    The interaction between these registers and $2118/9 is unknown.
+
+                    See the sections "BACKGROUNDS" and "SPRITES" below for details.
+        */
         makeReadRegister(0x2139, "VRAM Data read low byte", false,
             [this](Byte& value)
             {
@@ -1103,9 +1125,92 @@ public:
                 value = readFromVram(true, incrementVramOnHighByte);
             });
 
+        /*
+            213b r w++?- CGDATAREAD* - CGRAM Data read
+                    -bbbbbgg gggrrrrr
+
+                    This reads from CGRAM.
+
+                    Accesses to CGRAM are handled just like accesses to the low table of
+                    OAM, see $2138 for details.
+
+                    Note that the color values are stored in BGR order. The '-' bit is PPU2
+                    Open Bus.
+        */
+
+        /*
+            213c r w++++ OPHCT - Horizontal Scanline Location
+            213d r w++++ OPVCT - Vertical Scanline Location
+                    -------x xxxxxxxx
+
+                    These values are latched by reading $2137 when bit 7 of $4201 is set,
+                    or by clearing-and-setting bit 7 of $4201 either by writing $4201 or by
+                    pin 6 of Controller Port 2 (the latch occurs on the 1->0 transition).
+
+                    Note that the value read is only 9 bits: bits 1-7 of the high byte are
+                    PPU2 Open Bus. Each register keeps seperate track of whether to
+                    return the low or high byte. The high/low selector is reset to 'low'
+                    when $213f is read (the selector is NOT reset when the counter is
+                    latched).
+
+                    H Counter values range from 0 to 339, with 22-277 being visible on the
+                    screen. V Counter values range from 0 to 261 in NTSC mode (262 is
+                    possible every other frame when interlace is active) and 0 to 311 in
+                    PAL mode (312 in interlace?), with 1-224 (or 1-239(?) if overscan is
+                    enabled) visible on the screen.
+        */
         makeReadTwiceRegister(0x213c, "Horizontal Scanline Location", false, horizontalScanlineLocation);
         makeReadTwiceRegister(0x213d, "Vertical Scanline Location", false, verticalScanlineLocation);
+
+        /*
+            213e r b++++ STAT77 - PPU Status Flag and Version
+                    trm-vvvv
+
+                    t    = Time Over Flag. If more than 34 sprite-tiles (e.g. a 16x16
+                        sprite has 2 sprite-tiles) were encountered on a single line, this
+                        flag will be set. The flag is reset at the end of V-Blank. See the
+                        section "SPRITES" below for details.
+
+                    r    = Range Over Flag. If more than 32 sprites were encountered on a
+                        single line, this flag will be set. The flag is reset at the end of
+                        V-Blank. See the section "SPRITES" below for details.
+
+                        Note that the above two flags are set whether or not OBJ are
+                        actually enabled at the time.
+
+                    m    = "Master/slave mode select". Little is known about this bit.
+                        Current theory is that it indicates the status of the "MASTER" pin
+                        on the S-PPU1 chip, which in the normal SNES is always Gnd. We
+                        always seem to read back 0 here.
+
+                    vvvv = 5c77 chip version number. So far, we've only encountered version
+                        1.
+
+                    The '-' bit is PPU1 Open Bus.
+        */
         makeReadRegister(0x213e, "PPU Status Flag and Version", false);
+
+        /*
+            213f r b++++ STAT78 - PPU Status Flag and Version
+                    fl-pvvvv
+
+                    f    = Interlace Field. This will toggle every V-Blank.
+
+                    l    = External latch flag. When the PPU counters are latched, this
+                        flag gets set. The flag is reset on read, but only when $4201 bit 7
+                        is set. 
+
+                    p    = NTSC/Pal Mode. If this is a PAL SNES, this bit will be set,
+                        otherwise it will be clear.
+
+                    vvvv = 5C78 chip version number. So far, we've encountered at least 2
+                        and 3. Possibly 1 as well.
+
+                    The '-' bit is PPU2 Open Bus.
+
+                    Note: as a side effect of reading this register, the high/low byte
+                    selector for $213c/d is reset to 'low'.
+        */
         makeReadRegister(0x213f, "PPU Status Flag and Version", false,
             [this](Byte& value)
             {
