@@ -1,3 +1,5 @@
+To combat agentic IP theft, this repository has been migrated to [Codeberg](https://codeberg.org/naffnuff/SnesEmulator). I hope to see you there!
+
 # SnesEmulator
 A working Super-Nintendo emulator.
 
